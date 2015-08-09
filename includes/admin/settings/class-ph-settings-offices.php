@@ -77,7 +77,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             array(
                 'title' => __( 'Address Line 1', 'propertyhive' ),
-                'id'        => 'office_address_1',
+                'id'        => '_office_address_1',
                 //'css'       => 'width:50px;',
                 'default'   => get_post_meta($current_id, '_office_address_1', TRUE),
                 'type'      => 'text',
@@ -86,7 +86,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             array(
                 'title' => __( 'Address Line 2', 'propertyhive' ),
-                'id'        => 'office_address_2',
+                'id'        => '_office_address_2',
                 //'css'       => 'width:50px;',
                 'default'   => get_post_meta($current_id, '_office_address_2', TRUE),
                 'type'      => 'text',
@@ -95,7 +95,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             array(
                 'title' => __( 'Address Line 3', 'propertyhive' ),
-                'id'        => 'office_address_3',
+                'id'        => '_office_address_3',
                 //'css'       => 'width:50px;',
                 'default'   => get_post_meta($current_id, '_office_address_3', TRUE),
                 'type'      => 'text',
@@ -104,7 +104,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             array(
                 'title' => __( 'Address Line 4', 'propertyhive' ),
-                'id'        => 'office_address_4',
+                'id'        => '_office_address_4',
                 //'css'       => 'width:50px;',
                 'default'   => get_post_meta($current_id, '_office_address_4', TRUE),
                 'type'      => 'text',
@@ -113,7 +113,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             array(
                 'title' => __( 'Postcode', 'propertyhive' ),
-                'id'        => 'office_address_postcode',
+                'id'        => '_office_address_postcode',
                 'css'       => 'width:85px;',
                 'default'   => get_post_meta($current_id, '_office_address_postcode', TRUE),
                 'type'      => 'text',
@@ -130,7 +130,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
         {
             $args[] = array(
                 'title' => __( 'Telephone Number (Residential Sales)', 'propertyhive' ),
-                'id'        => 'office_telephone_number_sales',
+                'id'        => '_office_telephone_number_sales',
                 //'css'       => 'width:50px;',
                 'default'   => get_post_meta($current_id, '_office_telephone_number_sales', TRUE),
                 'type'      => 'text',
@@ -139,7 +139,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             $args[] = array(
                 'title' => __( 'Email Address (Residential Sales)', 'propertyhive' ),
-                'id'        => 'office_email_address_sales',
+                'id'        => '_office_email_address_sales',
                 //'css'       => 'width:50px;',
                 'default'   => get_post_meta($current_id, '_office_email_address_sales', TRUE),
                 'type'      => 'text',
@@ -151,7 +151,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
         {
             $args[] = array(
                 'title' => __( 'Telephone Number (Residential Lettings)', 'propertyhive' ),
-                'id'        => 'office_telephone_number_lettings',
+                'id'        => '_office_telephone_number_lettings',
                 //'css'       => 'width:50px;',
                 'default'   => get_post_meta($current_id, '_office_telephone_number_lettings', TRUE),
                 'type'      => 'text',
@@ -160,7 +160,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             $args[] = array(
                 'title' => __( 'Email Address (Residential Lettings)', 'propertyhive' ),
-                'id'        => 'office_email_address_lettings',
+                'id'        => '_office_email_address_lettings',
                 //'css'       => 'width:50px;',
                 'default'   => get_post_meta($current_id, '_office_email_address_lettings', TRUE),
                 'type'      => 'text',
