@@ -4,7 +4,7 @@
  *
  * Override this template by copying it to yourtheme/propertyhive/search/no-properties-found.php
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @package 	PropertyHive/Templates
  * @version     1.0.0
  */

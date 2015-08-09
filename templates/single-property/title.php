@@ -2,7 +2,7 @@
 /**
  * Single Property title
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @package 	PropertyHive/Templates
  * @version     1.0.0
  */

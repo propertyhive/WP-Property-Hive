@@ -4,7 +4,7 @@
  *
  * Sharing plugins can hook into here or you can add your own code directly.
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @package 	PropertyHive/Templates
  * @version     1.0.0
  */

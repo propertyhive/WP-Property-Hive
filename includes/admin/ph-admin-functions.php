@@ -2,7 +2,7 @@
 /**
  * PropertyHive Admin Functions
  *
- * @author      BIOSTALL
+ * @author      PropertyHive
  * @category    Core
  * @package     PropertyHive/Admin/Functions
  * @version     1.0.0

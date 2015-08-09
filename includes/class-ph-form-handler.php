@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @version		1.0.0
  * @package		PropertyHive/Classes/
  * @category	Class
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  */
 class PH_Form_Handler {
 

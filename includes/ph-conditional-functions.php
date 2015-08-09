@@ -4,7 +4,7 @@
  *
  * Functions for determining the current query/page.
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @category 	Core
  * @package 	PropertyHive/Functions
  * @version     1.0.0

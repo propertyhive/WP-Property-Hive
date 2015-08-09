@@ -2,7 +2,7 @@
 /**
  * PropertyHive Add-Ons
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @category 	Admin
  * @package 	PropertyHive/Admin
  * @version     1.0.0

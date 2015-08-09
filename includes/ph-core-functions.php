@@ -4,7 +4,7 @@
  *
  * General core functions available on both the front-end and admin.
  *
- * @author      BIOSTALL
+ * @author      PropertyHive
  * @category    Core
  * @package     PropertyHive/Functions
  * @version     1.0.0

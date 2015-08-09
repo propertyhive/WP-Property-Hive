@@ -4,7 +4,7 @@
  *
  * Functions for the templating system.
  *
- * @author      BIOSTALL
+ * @author      PropertyHive
  * @category    Core
  * @package     PropertyHive/Functions
  * @version     1.0.0

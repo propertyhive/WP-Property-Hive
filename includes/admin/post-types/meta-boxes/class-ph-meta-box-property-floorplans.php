@@ -2,7 +2,7 @@
 /**
  * Property Floorplans
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @category 	Admin
  * @package 	PropertyHive/Admin/Meta Boxes
  * @version     1.0.0

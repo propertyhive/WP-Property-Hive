@@ -4,7 +4,7 @@
  *
  * Override this template by copying it to yourtheme/propertyhive/single-property.php
  *
- * @author      BIOSTALL
+ * @author      PropertyHive
  * @package     PropertyHive/Templates
  * @version     1.0.0
  */

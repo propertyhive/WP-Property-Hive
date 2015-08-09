@@ -2,7 +2,7 @@
 /**
  * Installation related functions and actions.
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @category 	Admin
  * @package 	PropertyHive/Classes
  * @version     1.0.0

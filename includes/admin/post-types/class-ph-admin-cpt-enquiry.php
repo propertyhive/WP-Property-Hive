@@ -2,7 +2,7 @@
 /**
  * Admin functions for the enquiry post type
  *
- * @author      BIOSTALL
+ * @author      PropertyHive
  * @category    Admin
  * @package     PropertyHive/Admin/Post Types
  * @version     1.0.0

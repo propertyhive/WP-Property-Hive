@@ -4,7 +4,7 @@
  *
  * Action/filter hooks used for PropertyHive functions/templates
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @category 	Core
  * @package 	PropertyHive/Templates
  * @version     1.0.0

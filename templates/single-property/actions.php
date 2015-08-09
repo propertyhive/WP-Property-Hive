@@ -3,7 +3,7 @@
  * Single Property Actions (Make Enquiry etc)
  * Editable through use of the filter propertyhive_single_property_actions
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @package 	PropertyHive/Templates
  * @version     1.0.0
  */

@@ -4,7 +4,7 @@
  *
  * Functions for handling terms/term meta.
  *
- * @author      BIOSTALL
+ * @author      PropertyHive
  * @category    Core
  * @package     PropertyHive/Functions
  * @version     1.0.0

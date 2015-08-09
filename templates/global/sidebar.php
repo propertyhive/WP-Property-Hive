@@ -2,7 +2,7 @@
 /**
  * Sidebar
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @package 	PropertyHive/Templates
  * @version     1.0.0
  */

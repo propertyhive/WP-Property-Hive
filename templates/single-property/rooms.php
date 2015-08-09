@@ -2,7 +2,7 @@
 /**
  * Single Property Rooms, also known as the full description
  *
- * @author      BIOSTALL
+ * @author      PropertyHive
  * @package     PropertyHive/Templates
  * @version     1.0.0
  */

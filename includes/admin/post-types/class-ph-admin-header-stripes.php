@@ -4,7 +4,7 @@
  *
  * 
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @category 	Admin
  * @package 	PropertyHive/Admin/Header Stripes
  * @version     1.0.0

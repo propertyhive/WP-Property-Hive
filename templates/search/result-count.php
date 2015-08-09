@@ -4,7 +4,7 @@
  *
  * Shows text: Showing x - x of x results
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @package 	PropertyHive/Templates
  * @version     1.0.0
  */

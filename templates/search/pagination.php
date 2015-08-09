@@ -2,7 +2,7 @@
 /**
  * Pagination - Show numbered pagination for search results pages.
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @package 	PropertyHive/Templates
  * @version     1.0.0
  */

@@ -4,8 +4,8 @@
  * Plugin URI: http://wordpress.org/extend/plugins/property-hive/
  * Description: Estate Agency Property Software Plugin for WordPress
  * Version: 1.0.0
- * Author: BIOSTALL
- * Author URI: http://biostall.com
+ * Author: PropertyHive
+ * Author URI: http://wp-property-hive.com
  * Requires at least: 3.8
  * Tested up to: 3.9.2
  * 
@@ -14,7 +14,7 @@
  *
  * @package PropertyHive
  * @category Core
- * @author BIOSTALL
+ * @author PropertyHive
  */
   
 if ( ! defined( 'ABSPATH' ) ) {

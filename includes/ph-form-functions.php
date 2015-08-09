@@ -4,7 +4,7 @@
  *
  * Functions related to drawing forms on the frontend.
  *
- * @author      BIOSTALL
+ * @author      PropertyHive
  * @category    Core
  * @package     PropertyHive/Functions
  * @version     1.0.0

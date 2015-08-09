@@ -2,7 +2,7 @@
 /**
  * Admin functions for post types
  *
- * @author 		BIOSTALL
+ * @author 		PropertyHive
  * @category 	Admin
  * @package 	PropertyHive/Admin/Post Types
  * @version     1.0.0
