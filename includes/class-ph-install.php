@@ -213,6 +213,29 @@ class PH_Install {
 	private function create_terms() {
 
 		$taxonomies = array(
+			'availability' => array(
+				array(
+				    'name' => 'For Sale'
+				),
+				array(
+				    'name' => 'Under Offer'
+				),
+				array(
+				    'name' => 'Sold STC'
+				),
+				array(
+				    'name' => 'Sold'
+				),
+				array(
+				    'name' => 'To Let'
+				),
+				array(
+				    'name' => 'Let Agreed'
+				),
+				array(
+				    'name' => 'Let'
+				),
+			),
 			'property_type' => array(
 			    // HOUSE
 				array(
