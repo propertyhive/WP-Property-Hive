@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-PropertyHive is estate agency software for WordPress. Use it to simply market you properties on the website, or expand the features through additional add-ons
+PropertyHive is estate agency software for WP. Use it to market your properties on the website, or expand the features through additional add-ons
 
 == Description ==
 
