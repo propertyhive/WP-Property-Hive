@@ -74,7 +74,7 @@ class PH_Settings_Add_Ons extends PH_Settings_Page {
     public function addons_setting() {
         global $post;
         
-        $add_ons = @file_get_contents('http://wp-property-hive.com/add-ons.json');
+        $add_ons = @file_get_contents('http://wp-property-hive.com/add-ons-json.php');
 ?>
 <tr>
     <td class="add-ons">
