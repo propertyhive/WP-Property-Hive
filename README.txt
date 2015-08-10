@@ -35,6 +35,8 @@ Our add-ons are priced individually from just £150 meaning you only pay for wha
 
 You can [view all of our add-ons](http://wp-property-hive.com/add-ons/ "PropertyHive Add-Ons") on our website.
 
+**Note: PropertyHive is currently in BETA. If you use PropertyHive for your next website, let us know how you get on or if you come across problems and we'll work with you to resolve them as soon as possible.**
+
 == Installation ==
 
 = Minimum Requirements =
