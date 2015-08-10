@@ -61,6 +61,19 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 == Screenshots ==
 
+1. Once activated, all your property related information is maintained within it's own section
+2. Manage your properties just like you would normal posts and pages
+3. Editing a property record - the 'Summary' tab contains address and owner/landlord information
+4. Editing a property record - the 'Details' tab contains details about the property (bedrooms, price etc)
+5. Editing a property record - The 'Marketing' tab allows you to specify whether the property is on the market, and it's availability
+6. Editing a property record - The 'Descriptions' tab allows you to add features and property descriptions.
+7. Editing a property record - The 'Media' tab is where photos, floorplans, brochures and EPC's are uploaded.
+8. Manage your owners and landlords from the 'Contacts' page.
+9. Editing a contact record - The 'Contact Details' tab is where you store contact information for the contact
+10. Editing a contact record - The 'Realtionships' tab contains all of the relationships that you have with this contact (i.e. in the event they're a landlord of two properties)
+11. Enquiries made on the site are available from within WordPress. Assign them to a negotiator and mark them as 'Closed' once complete.
+12. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
+
 == Changelog ==
 
 = 1.0.0 =
