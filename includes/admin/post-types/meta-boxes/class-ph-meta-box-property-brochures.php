@@ -63,7 +63,7 @@ class PH_Meta_Box_Property_Brochures {
                             }
                         }
                         
-                        echo '<li id="brochures_' . $brochures_attachment_id . '">';
+                        echo '<li id="brochure_' . $brochures_attachment_id . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
                             echo '<a href="' . wp_get_attachment_url( $brochures_attachment_id ) . '" target="_blank"><img src="' . PH()->plugin_url() . '/assets/images/filetypes/' . $icon . '" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></a>';
                         echo '</li>';
