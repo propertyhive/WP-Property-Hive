@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 global $propertyhive, $wp_query;
 
-if ( 1 == $wp_query->found_posts )
+if ( $wp_query->found_posts < 2 )
 	return;
 ?>
 <form class="propertyhive-ordering" method="get">
