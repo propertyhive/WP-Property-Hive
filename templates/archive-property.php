@@ -74,13 +74,4 @@ get_header(); global $wpdb; ?>
         do_action( 'propertyhive_after_main_content' );
     ?>
 
-    <?php
-        /**
-         * propertyhive_sidebar hook
-         *
-         * @hooked propertyhive_get_sidebar - 10
-         */
-        do_action( 'propertyhive_sidebar' );
-    ?>
-
 <?php get_footer(); ?>

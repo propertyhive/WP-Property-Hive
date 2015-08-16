@@ -141,19 +141,6 @@ if ( ! function_exists( 'propertyhive_output_content_wrapper_end' ) ) {
     }
 }
 
-if ( ! function_exists( 'propertyhive_get_sidebar' ) ) {
-
-    /**
-     * Get the shop sidebar template.
-     *
-     * @access public
-     * @return void
-     */
-    function propertyhive_get_sidebar() {
-        ph_get_template( 'global/sidebar.php' );
-    }
-}
-
 /** Loop ******************************************************************/
 
 if ( ! function_exists( 'propertyhive_page_title' ) ) {

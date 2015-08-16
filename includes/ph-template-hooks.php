@@ -35,13 +35,6 @@ add_action( 'propertyhive_before_main_content', 'propertyhive_output_content_wra
 add_action( 'propertyhive_after_main_content', 'propertyhive_output_content_wrapper_end', 10 );
 
 /**
- * Sidebar
- *
- * @see propertyhive_get_sidebar()
- */
-add_action( 'propertyhive_sidebar', 'propertyhive_get_sidebar', 10 );
-
-/**
  * Properties Loop
  *
  * @see propertyhive_result_count()
