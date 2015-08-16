@@ -190,7 +190,7 @@ class PH_Post_types {
 					//'rewrite' 				=> $product_permalink ? array( 'slug' => untrailingslashit( $product_permalink ), 'with_front' => false, 'feeds' => true ) : false,
 					'query_var' 			=> true,
 					'supports' 				=> array( 'title', 'excerpt' ),
-					'has_archive' 			=> ( $search_results_page_id = ph_get_page_id( 'search_results' ) ) && get_page( $search_results_page_id ) ? get_page_uri( $search_results_page_id ) : 'search_results',
+					'has_archive' 			=> ( $search_results_page_id == ph_get_page_id( 'search_results' ) ) && get_page( $search_results_page_id ) ? get_page_uri( $search_results_page_id ) : 'search_results',
 					'show_in_nav_menus' 	=> false,
 					'show_in_menu'          => false
 				)
