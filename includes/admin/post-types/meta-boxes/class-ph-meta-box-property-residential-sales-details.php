@@ -208,10 +208,6 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
                 // Setting to blank
                 wp_delete_object_term_relationships( $post_id, 'tenure' );
             }
-            
-            //update_post_meta( $post_id, 'price_qualifier_id', $_POST['price_qualifier_id'] );
-            //update_post_meta( $post_id, 'sale_by_id', $_POST['sale_by_id'] );
-            //update_post_meta( $post_id, 'tenure_id', $_POST['tenure_id'] );
         }
     }
 
