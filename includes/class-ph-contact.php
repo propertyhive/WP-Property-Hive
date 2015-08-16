@@ -70,7 +70,10 @@ class PH_Contact {
     public function __get( $key ) {
         // Get values or default if not set
         $value = get_post_meta( $this->id, $key, true );
-
+        if ($value == '')
+        {
+            $value = get_post_meta( $this->id, '_' . $key, true );
+        }
         return $value;
     }
     
