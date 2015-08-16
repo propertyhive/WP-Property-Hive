@@ -555,7 +555,7 @@ class PH_Query {
         if ( !is_admin() )
         {
     		$meta_query = array(
-    		    'key'     => 'on_market',
+    		    'key'     => '_on_market',
     		    'value'   => 'yes',
     		    'compare' => '='
     		);
@@ -577,7 +577,7 @@ class PH_Query {
         if ( isset( $_REQUEST['department'] ) && $_REQUEST['department'] != '' )
         {
             $meta_query = array(
-                'key'     => 'department',
+                'key'     => '_department',
                 'value'   => $_REQUEST['department'],
                 'compare' => '='
             );
@@ -598,7 +598,7 @@ class PH_Query {
                 }
                 
                 $meta_query = array(
-                    'key'     => 'department',
+                    'key'     => '_department',
                     'value'   => $departments[0],
                     'compare' => '='
                 );
@@ -624,7 +624,7 @@ class PH_Query {
         )
         {
             $meta_query = array(
-                'key'     => 'price_actual',
+                'key'     => '_price_actual',
                 'value'   => $_REQUEST['minimum_price'],
                 'compare' => '>='
             );
@@ -649,7 +649,7 @@ class PH_Query {
         )
         {
             $meta_query = array(
-                'key'     => 'price_actual',
+                'key'     => '_price_actual',
                 'value'   => $_REQUEST['maximum_price'],
                 'compare' => '<='
             );
@@ -674,7 +674,7 @@ class PH_Query {
         )
         {
             $meta_query = array(
-                'key'     => 'price_actual',
+                'key'     => '_price_actual',
                 'value'   => $_REQUEST['minimum_rent'],
                 'compare' => '>='
             );
@@ -699,7 +699,7 @@ class PH_Query {
         )
         {
             $meta_query = array(
-                'key'     => 'price_actual',
+                'key'     => '_price_actual',
                 'value'   => $_REQUEST['maximum_rent'],
                 'compare' => '<='
             );
@@ -721,7 +721,7 @@ class PH_Query {
         if ( isset( $_REQUEST['minimum_bedrooms'] ) && $_REQUEST['minimum_bedrooms'] != '' )
         {
             $meta_query = array(
-                'key'     => 'bedrooms',
+                'key'     => '_bedrooms',
                 'value'   => $_REQUEST['minimum_bedrooms'],
                 'compare' => '>='
             );
@@ -758,7 +758,7 @@ class PH_Query {
         if ( isset( $_REQUEST['property_type'] ) && $_REQUEST['property_type'] != '' )
         {
             $tax_query = array(
-                'taxonomy'  => 'property_type',
+                'taxonomy'  => '_property_type',
                 'terms' => array( $_REQUEST['property_type'] )
             );
         }
