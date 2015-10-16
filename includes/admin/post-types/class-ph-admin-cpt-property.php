@@ -71,7 +71,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		// Uploads
 		add_filter( 'upload_dir', array( $this, 'upload_dir' ) );
 		add_action( 'media_upload_downloadable_product', array( $this, 'media_upload_downloadable_product' ) );
-		add_filter( 'mod_rewrite_rules', array( $this, 'ms_protect_download_rewite_rules' ) );
+		//add_filter( 'mod_rewrite_rules', array( $this, 'ms_protect_download_rewite_rules' ) );
 
 		// Download permissions
 		//add_action( 'propertyhive_process_product_file_download_paths', array( $this, 'process_product_file_download_paths' ), 10, 3 );*/
