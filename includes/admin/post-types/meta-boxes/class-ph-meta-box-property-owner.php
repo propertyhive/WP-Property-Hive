@@ -318,28 +318,41 @@ class PH_Meta_Box_Property_Owner {
         
         if ($contact_post_id == '')
         {
-            // If a new owner has been added
-            
-            // Insert contact
-            $owner_post = array(
-              'post_title'    => $_POST['_owner_name'],
-              'post_content'  => '',
-              'post_status'   => 'publish',
-              'post_type'  => 'contact',
-            );
-            
-            // Insert the post into the database
-            $contact_post_id = wp_insert_post( $owner_post );
-            
-            update_post_meta( $contact_post_id, '_address_name_number', $_POST['_owner_address_name_number'] );
-            update_post_meta( $contact_post_id, '_address_street', $_POST['_owner_address_street'] );
-            update_post_meta( $contact_post_id, '_address_two', $_POST['_owner_address_two'] );
-            update_post_meta( $contact_post_id, '_address_three', $_POST['_owner_address_three'] );
-            update_post_meta( $contact_post_id, '_address_four', $_POST['_owner_address_four'] );
-            update_post_meta( $contact_post_id, '_address_postcode', $_POST['_owner_address_postcode'] );
-            
-            update_post_meta( $contact_post_id, '_telephone_number', $_POST['_owner_telephone_number'] );
-            update_post_meta( $contact_post_id, '_email_address', $_POST['_owner_email_address'] );
+            // If no owner passed in, only add if new fields have been filled in
+            if (
+                $_POST['_owner_name'] != '' ||
+                $_POST['_owner_address_name_number'] != '' ||
+                $_POST['_owner_address_street'] != '' ||
+                $_POST['_owner_address_two'] != '' ||
+                $_POST['_owner_address_three'] != '' ||
+                $_POST['_owner_address_four'] != '' ||
+                $_POST['_owner_address_postcode'] != '' ||
+                $_POST['_owner_telephone_number'] != '' ||
+                $_POST['_owner_email_address'] != ''
+
+            )
+            {
+				// Insert contact
+				$owner_post = array(
+				  'post_title'    => $_POST['_owner_name'],
+				  'post_content'  => '',
+				  'post_status'   => 'publish',
+				  'post_type'  => 'contact',
+				);
+				
+				// Insert the post into the database
+				$contact_post_id = wp_insert_post( $owner_post );
+				
+				update_post_meta( $contact_post_id, '_address_name_number', $_POST['_owner_address_name_number'] );
+				update_post_meta( $contact_post_id, '_address_street', $_POST['_owner_address_street'] );
+				update_post_meta( $contact_post_id, '_address_two', $_POST['_owner_address_two'] );
+				update_post_meta( $contact_post_id, '_address_three', $_POST['_owner_address_three'] );
+				update_post_meta( $contact_post_id, '_address_four', $_POST['_owner_address_four'] );
+				update_post_meta( $contact_post_id, '_address_postcode', $_POST['_owner_address_postcode'] );
+				
+				update_post_meta( $contact_post_id, '_telephone_number', $_POST['_owner_telephone_number'] );
+				update_post_meta( $contact_post_id, '_email_address', $_POST['_owner_email_address'] );
+			}
         }
         
         update_post_meta( $post_id, '_owner_contact_id', $contact_post_id );
