@@ -64,7 +64,7 @@ class PH_Admin {
         
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
         {
-            wp_deregister_script('postbox');
+            //wp_deregister_script('postbox');
         }
     }
     
