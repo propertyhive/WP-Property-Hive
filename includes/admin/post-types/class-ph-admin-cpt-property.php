@@ -267,12 +267,14 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 
 				break;
 			case 'status' :
-			    
-			    $availability = get_term($the_property->_availability, 'availability');
-			    if (!is_wp_error($availability) && !is_null($availability))
-			    {
-                	echo $availability->name . '<br>';
-            	}
+
+            	$term_list = wp_get_post_terms($post->ID, 'availability', array("fields" => "names"));
+            
+	            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+	            {
+	               echo $term_list[0]. '<br>';
+	            }
+
             	if (isset($the_property->_on_market) && $the_property->_on_market == 'yes')
             	{
             		echo 'On The Market';
@@ -281,6 +283,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
             	{
             		echo 'Not On The Market';
             	}
+            	
             	if (isset($the_property->_featured) && $the_property->_featured == 'yes')
             	{
             		echo '<br>Featured';
