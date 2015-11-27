@@ -17,14 +17,14 @@ if ( $wp_query->found_posts < 2 )
 <form class="propertyhive-ordering" method="get">
 	<select name="orderby" class="orderby">
 		<?php
-			$catalog_orderby = apply_filters( 'propertyhive_catalog_orderby', array(
+			$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
 				'price-desc' => __( 'Default sorting', 'propertyhive' ),
 				'date'       => __( 'Sort by date added', 'propertyhive' ),
-				'price'      => __( 'Sort by price: low to high', 'propertyhive' ),
+				'price-asc'      => __( 'Sort by price: low to high', 'propertyhive' ),
 				'price-desc' => __( 'Sort by price: high to low', 'propertyhive' )
 			) );
             
-			foreach ( $catalog_orderby as $id => $name )
+			foreach ( $results_orderby as $id => $name )
 				echo '<option value="' . esc_attr( $id ) . '" ' . selected( $orderby, $id, false ) . '>' . esc_attr( $name ) . '</option>';
 		?>
 	</select>
