@@ -91,6 +91,13 @@ class PH_Settings_General extends PH_Settings_Page {
                 'css'       => 'min-width:300px;',
                 'desc_tip'  => __( 'This sets the page of your property search results', 'propertyhive' ),
             ),
+
+            array(
+                'title'   => __( 'Lettings Fees', 'propertyhive' ),
+                'id'      => 'propertyhive_lettings_fees',
+                'type'    => 'textarea',
+                'css'	  => 'height:150px; width:100%; max-width:400px'
+            ),
             
 			array( 'type' => 'sectionend', 'id' => 'general_options'),
 
