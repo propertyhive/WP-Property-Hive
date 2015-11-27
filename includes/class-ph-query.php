@@ -662,8 +662,9 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_price_actual',
-                'value'   => $_REQUEST['minimum_price'],
-                'compare' => '>='
+                'value'   => sanitize_text_field( $_REQUEST['minimum_price'] ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
             );
         }
         
@@ -687,8 +688,9 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_price_actual',
-                'value'   => $_REQUEST['maximum_price'],
-                'compare' => '<='
+                'value'   => sanitize_text_field( $_REQUEST['maximum_price'] ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
             );
         }
         
@@ -712,8 +714,9 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_price_actual',
-                'value'   => $_REQUEST['minimum_rent'],
-                'compare' => '>='
+                'value'   => sanitize_text_field( $_REQUEST['minimum_rent'] ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
             );
         }
         
@@ -737,8 +740,9 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_price_actual',
-                'value'   => $_REQUEST['maximum_rent'],
-                'compare' => '<='
+                'value'   => sanitize_text_field( $_REQUEST['maximum_rent'] ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
             );
         }
         
@@ -759,8 +763,9 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
-                'value'   => $_REQUEST['minimum_bedrooms'],
-                'compare' => '>='
+                'value'   => sanitize_text_field( $_REQUEST['minimum_bedrooms'] ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
             );
         }
         
