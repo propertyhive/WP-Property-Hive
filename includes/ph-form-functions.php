@@ -247,6 +247,7 @@ function ph_form_field( $key, $field )
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
             $field['required'] = isset( $field['required'] ) ? $field['label'] : false;
             
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
@@ -272,6 +273,7 @@ function ph_form_field( $key, $field )
                     name="' . esc_attr( $key ) . '" 
                     id="' . esc_attr( $key ) . '" 
                     value="' . esc_attr(  $field['value'] ) . '"
+                    placeholder="' . esc_attr(  $field['placeholder'] ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
                     ' . ( ($field['required']) ? 'required' : '' ) . '
             >';
@@ -287,6 +289,7 @@ function ph_form_field( $key, $field )
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
             $field['required'] = isset( $field['required'] ) ? $field['label'] : false;
             
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
@@ -310,6 +313,7 @@ function ph_form_field( $key, $field )
             $output .= '<textarea 
                     name="' . esc_attr( $key ) . '" 
                     id="' . esc_attr( $key ) . '" 
+                    placeholder="' . esc_attr(  $field['placeholder'] ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
                     ' . ( ($field['required']) ? 'required' : '' ) . '
             >' . esc_attr(  $field['value'] ) . '</textarea>';
