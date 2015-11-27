@@ -123,7 +123,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         {
             $rent = preg_replace("/[^0-9.]/", '', $_POST['_rent']);
             update_post_meta( $post_id, '_rent', $rent );
-            update_post_meta( $post_id, '_rent_frequency', $_POST['rent_frequency'] );
+            update_post_meta( $post_id, '_rent_frequency', $_POST['_rent_frequency'] );
             
             $price_actual = $rent; // Used for ordering properties. Stored in pcm
             switch ($_POST['_rent_frequency'])
