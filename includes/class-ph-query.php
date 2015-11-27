@@ -487,9 +487,9 @@ class PH_Query {
 		$args = array();
 
 		// default - menu_order
-		$args['orderby']  = 'menu_order title';
-		$args['order']    = $order == 'DESC' ? 'DESC' : 'ASC';
-		$args['meta_key'] = '';
+		$args['orderby']  = 'meta_value_num';
+		$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+		$args['meta_key'] = '_price_actual';
 
 		switch ( $orderby ) {
 			case 'rand' :
@@ -501,12 +501,8 @@ class PH_Query {
 			break;
 			case 'price' :
 				$args['orderby']  = 'meta_value_num';
-				$args['order']    = $order == 'DESC' ? 'DESC' : 'ASC';
-				$args['meta_key'] = 'price_actual';
-			break;
-			case 'title' :
-				$args['orderby']  = 'title';
-				$args['order']    = $order == 'DESC' ? 'DESC' : 'ASC';
+				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+				$args['meta_key'] = '_price_actual';
 			break;
 		}
 
