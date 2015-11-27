@@ -528,6 +528,7 @@ class PH_Query {
 
 		$meta_query[] = $this->on_market_meta_query();
         $meta_query[] = $this->department_meta_query($q);
+        $meta_query[] = $this->address_keyword_meta_query();
         $meta_query[] = $this->minimum_price_meta_query();
         $meta_query[] = $this->maximum_price_meta_query();
         $meta_query[] = $this->minimum_rent_meta_query();
@@ -535,7 +536,7 @@ class PH_Query {
         $meta_query[] = $this->minimum_bedrooms_meta_query();
         
         $meta_query = array_filter($meta_query); // Get rid of empty array elements
-        
+
 		return array_filter( $meta_query );
 	}
 
@@ -603,6 +604,46 @@ class PH_Query {
         
         return $meta_query;
     }
+
+    /**
+	 * Returns a meta query to handle searching for a keyword in the address
+	 *
+	 * @access public
+	 * @param string $compare (default: 'IN')
+	 * @return array
+	 */
+	public function address_keyword_meta_query( ) {
+      	
+      	if ( isset( $_REQUEST['address_keyword'] ) && $_REQUEST['address_keyword'] != '' )
+        {
+	      	$meta_query = array(
+	      		'relation' => 'OR',
+      			array(
+				    'key'     => '_address_two',
+				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
+				    'compare' => 'LIKE'
+				),
+				array(
+				    'key'     => '_address_three',
+				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
+				    'compare' => 'LIKE'
+				),
+				array(
+				    'key'     => '_address_four',
+				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
+				    'compare' => 'LIKE'
+				),
+				array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
+				    'compare' => 'LIKE'
+				),
+	      	);
+      	}
+
+		return $meta_query;
+	}
+
     
     /**
      * Returns a meta query to handle minimum price
