@@ -359,7 +359,7 @@ class PH_Property {
         return $return;
     }
 
-/**
+    /**
      * Get the summary formatted address
      *
      * @access public
@@ -407,6 +407,23 @@ class PH_Property {
         }
         
         return $return;
+    }
+
+    /**
+     * Returns boolean whether the property is featured or not
+     *
+     * @access public
+     * @return string
+     */
+    public function is_featured() {
+
+        if (isset($the_property->_featured) && $the_property->_featured == 'yes')
+        {
+            return true;
+        }
+
+        return false;
+
     }
     
     /**
