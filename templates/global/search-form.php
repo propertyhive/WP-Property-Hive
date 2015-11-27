@@ -18,6 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php endforeach; ?>
 
-    <input type="submit" value="<?php _e( 'Submit', 'propertyhive' ); ?>">
+    <input type="submit" value="<?php _e( 'Search', 'propertyhive' ); ?>">
 
 </form>
