@@ -38,7 +38,7 @@ class PH_Meta_Box_Property_Department {
         $args = array( 
             'id' => '_department',
             'label' => 'Department',
-            //'value' => 'residential-sales',
+            'value' => get_option( 'propertyhive_primary_department' ),
             'options' => $departments
         );
         if (count($departments) == 1)
