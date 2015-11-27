@@ -41,7 +41,7 @@ function ph_get_search_form_fields()
     if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
     {
         $departments['residential-sales'] = __( 'Sales', 'propertyhive' );
-        if ($value == '')
+        if ($value == '' && (get_option( 'propertyhive_primary_department' ) == 'residential-sales' || get_option( 'propertyhive_primary_department' ) === FALSE) )
         {
             $value = 'residential-sales';
         }
@@ -49,7 +49,7 @@ function ph_get_search_form_fields()
     if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
     {
         $departments['residential-lettings'] = __( 'Lettings', 'propertyhive' );
-        if ($value == '')
+        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'residential-lettings')
         {
             $value = 'residential-lettings';
         }
