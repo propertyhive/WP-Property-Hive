@@ -137,11 +137,11 @@ class PH_Shortcodes {
 			'order' 				=> $order,
 			'meta_query'			=> array(
 				array(
-					'key' 		=> 'on_market',
+					'key' 		=> '_on_market',
 					'value' 	=> 'yes',
 				),
 				array(
-					'key' 		=> 'featured',
+					'key' 		=> '_featured',
 					'value' 	=> 'yes'
 				)
 			)
