@@ -138,3 +138,33 @@ function ph_setcookie( $name, $value, $expire = 0, $secure = false ) {
         trigger_error( "Cookie cannot be set - headers already sent", E_USER_NOTICE );
     }
 }
+
+/**
+ * Get an image size.
+ *
+ * @param mixed $image_size
+ * @return array
+ */
+function ph_get_image_size( $image_size ) {
+    if ( is_array( $image_size ) ) {
+        $width  = isset( $image_size[0] ) ? $image_size[0] : '300';
+        $height = isset( $image_size[1] ) ? $image_size[1] : '300';
+        $crop   = isset( $image_size[2] ) ? $image_size[2] : 1;
+
+        $size = array(
+            'width'  => $width,
+            'height' => $height,
+            'crop'   => $crop
+        );
+
+        $image_size = $width . '_' . $height;
+    } else {
+        $size = array(
+            'width'  => '300',
+            'height' => '300',
+            'crop'   => 1
+        );
+    }
+
+    return $size;
+}
