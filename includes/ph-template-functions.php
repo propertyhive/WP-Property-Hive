@@ -309,7 +309,7 @@ if ( ! function_exists( 'propertyhive_search_form' ) ) {
      * @return void
      */
     function propertyhive_search_form($id = 'default') {
-        ph_get_search_form( $id );
+        ph_get_search_form( ( $id != '' ) ? $id : 'default' );
     }
 }
 
