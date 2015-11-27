@@ -98,7 +98,7 @@ function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
     if ( ! $post_id || get_post_type( $post_id ) !== 'property' )
         return $classes;
 
-    /*$property = get_property( $post_id );
+    $property = get_property( $post_id );
 
     if ( $property ) {
         if ( $property->is_featured() ) {
@@ -108,7 +108,7 @@ function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
 
     if ( ( $key = array_search( 'hentry', $classes ) ) !== false ) {
         unset( $classes[ $key ] );
-    }*/
+    }
 
     return $classes;
 }
