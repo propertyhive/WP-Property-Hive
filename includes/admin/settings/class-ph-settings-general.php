@@ -69,6 +69,17 @@ class PH_Settings_General extends PH_Settings_Page {
                 'default' => 'yes',
                 'checkboxgroup' => 'end'
             ),
+
+            array(
+                'title'   => __( 'Primary Department', 'propertyhive' ),
+                'id'      => 'propertyhive_primary_department',
+                'type'    => 'radio',
+                'default' => 'residential-sales',
+                'options' => array(
+                	'residential-sales' => 'Residential Sales',
+                	'residential-lettings' => 'Residential Lettings'
+                )
+            ),
             
             array(
                 'title' => __( 'Property Search Results Page', 'propertyhive' ),
