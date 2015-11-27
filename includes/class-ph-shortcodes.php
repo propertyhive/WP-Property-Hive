@@ -124,7 +124,7 @@ class PH_Shortcodes {
 		extract( shortcode_atts( array(
 			'per_page' 	=> '12',
 			'columns' 	=> '4',
-			'orderby' 	=> 'date',
+			'orderby' 	=> 'rand',
 			'order' 	=> 'desc'
 		), $atts ) );
 
