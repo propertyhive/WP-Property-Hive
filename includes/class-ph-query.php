@@ -575,7 +575,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_department',
-                'value'   => $_REQUEST['department'],
+                'value'   => sanitize_text_field( $_REQUEST['department'] ),
                 'compare' => '='
             );
         }
@@ -584,19 +584,27 @@ class PH_Query {
             // Need a department set if on search results page
             if (!empty($q) && $q->is_post_type_archive( 'property' ))
             {
-                $departments = array();
-                if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
-                {
-                    $departments[] = 'residential-sales';
-                }
-                if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-                {
-                    $departments[] = 'residential-lettings';
-                }
-                
+            	if (get_option( 'propertyhive_primary_department' ) != '')
+            	{
+            		$department = get_option( 'propertyhive_primary_department' );
+            	}
+            	else
+            	{
+	                $departments = array();
+	                if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+	                {
+	                    $departments[] = 'residential-sales';
+	                }
+	                if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
+	                {
+	                    $departments[] = 'residential-lettings';
+	                }
+	                
+	                $department = $departments[0];
+            	}
                 $meta_query = array(
                     'key'     => '_department',
-                    'value'   => $departments[0],
+                    'value'   => $department,
                     'compare' => '='
                 );
             }
