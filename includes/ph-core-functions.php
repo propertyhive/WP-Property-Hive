@@ -13,6 +13,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 // Include core functions
+include( 'ph-formatting-functions.php' );
 include( 'ph-conditional-functions.php' );
 include( 'ph-term-functions.php' );
 include( 'ph-page-functions.php' );
