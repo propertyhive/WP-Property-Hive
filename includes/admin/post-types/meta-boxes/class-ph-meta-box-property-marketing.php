@@ -56,12 +56,17 @@ class PH_Meta_Box_Property_Marketing {
                     }
                 }
 
-                propertyhive_wp_select( array( 
+                $args = array( 
                     'id' => '_availability', 
                     'label' => __( 'Availability', 'propertyhive' ), 
                     'options' => $options,
                     'desc_tip' => false,
-                ) );
+                );
+                if ($selected_value != '')
+                {
+                    $args['value'] = $selected_value;
+                }
+                propertyhive_wp_select( $args );
                 
                 // Featured
                 propertyhive_wp_checkbox( array( 
@@ -92,8 +97,17 @@ class PH_Meta_Box_Property_Marketing {
         global $wpdb;
         
         update_post_meta($post_id, '_on_market', ( isset($_POST['_on_market']) ? $_POST['_on_market'] : '' ) );
-        update_post_meta($post_id, '_availability', ( isset($_POST['_availability']) ? $_POST['_availability'] : '' ) );
         update_post_meta($post_id, '_featured', ( isset($_POST['_featured']) ? $_POST['_featured'] : '' ) );
+
+        if ( !empty($_POST['_availability']) )
+        {
+            wp_set_post_terms( $post_id, $_POST['_availability'], 'availability' );
+        }
+        else
+        {
+            // Setting to blank
+            wp_delete_object_term_relationships( $post_id, 'availability' );
+        }
 
         do_action( 'propertyhive_save_property_marketing', $post_id );
     }
