@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name: Property Hive
- * Plugin URI: http://wordpress.org/extend/plugins/property-hive/
+ * Plugin URI: https://wordpress.org/plugins/propertyhive/
  * Description: Estate Agency Property Software Plugin for WordPress
  * Version: 1.0.0
  * Author: PropertyHive
  * Author URI: http://wp-property-hive.com
  * Requires at least: 3.8
- * Tested up to: 3.9.2
+ * Tested up to: 4.3.1
  * 
  * Text Domain: propertyhive
  * Domain Path: /i18n/languages/
