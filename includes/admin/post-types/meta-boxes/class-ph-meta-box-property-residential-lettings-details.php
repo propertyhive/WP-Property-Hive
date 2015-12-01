@@ -135,7 +135,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
             }
             update_post_meta( $post_id, '_price_actual', $price_actual );
             
-            update_post_meta( $post_id, '_deposit', $_POST['_deposit'] );
+            update_post_meta( $post_id, '_deposit', preg_replace("/[^0-9.]/", '', $_POST['_deposit']) );
             update_post_meta( $post_id, '_available_date', $_POST['_available_date'] );
             
             if ( !empty($_POST['furnished_id']) )
