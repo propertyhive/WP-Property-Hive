@@ -48,6 +48,7 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Floorplans::save', 55, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Brochures::save', 65, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Epcs::save', 70, 2 );
+        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Virtual_Tours::save', 75, 2 );
         
         // Save Contact Meta Boxes
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Correspondence_Address::save', 10, 2 );
@@ -150,10 +151,11 @@ class PH_Admin_Meta_Boxes {
         add_meta_box( 'propertyhive-property-floorplans', __( 'Property Floorplans', 'propertyhive' ), 'PH_Meta_Box_Property_Floorplans::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-brochures', __( 'Property Brochures', 'propertyhive' ), 'PH_Meta_Box_Property_Brochures::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-epcs', __( 'Property EPCs', 'propertyhive' ), 'PH_Meta_Box_Property_Epcs::output', 'property', 'normal', 'high' );
+        add_meta_box( 'propertyhive-property-virtual-tours', __( 'Property Virtual Tours', 'propertyhive' ), 'PH_Meta_Box_Property_Virtual_Tours::output', 'property', 'normal', 'high' );
         $tabs[] = array(
             'name' => __( 'Media', 'propertyhive' ),
             'id' => 'tab_media', 
-            'metabox_ids' => array('propertyhive-property-photos', 'propertyhive-property-floorplans', 'propertyhive-property-brochures', 'propertyhive-property-epcs'),
+            'metabox_ids' => array('propertyhive-property-photos', 'propertyhive-property-floorplans', 'propertyhive-property-brochures', 'propertyhive-property-epcs', 'propertyhive-property-virtual-tours'),
             'post_type' => 'property'
         );
         

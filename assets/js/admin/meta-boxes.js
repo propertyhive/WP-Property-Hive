@@ -11,6 +11,12 @@ jQuery( function($){
          revert: true,
          handle: 'label'
      });
+
+     $('.propertyhive_meta_box #property_virtual_tours').sortable({
+         opacity: 0.8,
+         revert: true,
+         handle: 'label'
+     });
      
     // DATE PICKER FIELDS
     $( ".date-picker" ).datepicker({

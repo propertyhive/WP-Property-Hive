@@ -170,6 +170,26 @@ class PH_Property {
     {
         return apply_filters( 'propertyhive_property_epc_attachment_ids', array_filter( $this->_epcs ), $this );
     }
+
+    /**
+     * get_virtual_tour_urls function.
+     *
+     * @access public
+     * @return array
+     */
+    public function get_virtual_tour_urls() 
+    {
+        $num_property_virtual_tours = get_post_meta($this->id, '_virtual_tours', TRUE);
+        if ($num_property_virtual_tours == '') { $num_property_virtual_tours = 0; }
+
+        $virtual_tour_urls = array();
+        for ($i = 0; $i < $num_property_virtual_tours; ++$i)
+        {
+            $virtual_tour_urls[] = get_post_meta($this->id, '_virtual_tour_' . $i, TRUE);
+        }
+
+        return apply_filters( 'propertyhive_property_vitual_tour_urls', array_filter( $virtual_tour_urls ), $this );
+    }
     
     /**
      * Get the formatted price based on department. Show POA if on frontend and 'POA' ticked
