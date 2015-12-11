@@ -26,6 +26,7 @@ class PH_AJAX {
 			'delete_note'   => false,
 			'search_contacts'   => false,
 			'load_existing_owner_contact'   => false,
+            'load_applicant_matching_properties'   => false,
 			'make_property_enquiry'   => true
 		);
 
@@ -44,6 +45,217 @@ class PH_AJAX {
 	private function json_headers() {
 		header( 'Content-Type: application/json; charset=utf-8' );
 	}
+
+    /**
+     * Load matching applicant properties
+     */
+    public function load_applicant_matching_properties() {
+
+        global $post;
+
+        check_ajax_referer( 'load-applicant-matching-properties', 'security' );
+        
+        $contact_id = $_POST['contact_id'];
+        $applicant_profile = $_POST['applicant_profile'];
+
+        $contact = get_post($contact_id);
+
+        if ( !is_null( $contact ) )
+        {
+            $applicant_profile = get_post_meta( $contact_id, '_applicant_profile_' . $applicant_profile, TRUE );
+
+            $args = array(
+                'post_type' => 'property',
+                'nopaging' => true,
+            );
+
+            // Meta query
+            $meta_query = array('relation' => 'AND');
+            $meta_query[] = array(
+                'key' => '_on_market',
+                'value' => 'yes'
+            );
+            if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
+            {
+                $meta_query[] = array(
+                    'key' => '_department',
+                    'value' => $applicant_profile['department']
+                );
+                if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0 )
+                {
+                    $meta_query[] = array(
+                        'key' => '_price_actual',
+                        'value' => $applicant_profile['max_price_actual'],
+                        'compare' => '<=',
+                        'type' => 'NUMERIC'
+                    );
+                }
+            }
+            elseif ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-lettings' )
+            {
+                $meta_query[] = array(
+                    'key' => '_department',
+                    'value' => $applicant_profile['department']
+                );
+                if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0 )
+                {
+                    $meta_query[] = array(
+                        'key' => '_price_actual',
+                        'value' => $applicant_profile['max_price_actual'],
+                        'compare' => '<=',
+                        'type' => 'NUMERIC'
+                    );
+                }
+            }
+            if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
+            {
+                $meta_query[] = array(
+                    'key' => '_bedrooms',
+                    'value' => $applicant_profile['min_beds'],
+                    'compare' => '>=',
+                    'type' => 'NUMERIC'
+                );
+            }
+            $args['meta_query'] = $meta_query;
+
+            // Term query
+            $tax_query = array('relation' => 'AND');
+            if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+            {
+                $tax_query[] = array(
+                    'taxonomy' => 'property_type',
+                    'field'    => 'term_id',
+                    'terms'    => $applicant_profile['property_types'],
+                    'operator' => 'IN',
+                );
+            }
+            if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+            {
+                $tax_query[] = array(
+                    'taxonomy' => 'location',
+                    'field'    => 'term_id',
+                    'terms'    => $applicant_profile['locations'],
+                    'operator' => 'IN',
+                );
+            }
+            $args['tax_query'] = $tax_query;
+
+            $properties_query = new WP_Query( $args );
+
+            if ( $properties_query->have_posts() )
+            {
+                echo '<h2>' . $properties_query->found_posts . ' matching propert' . ( ( $properties_query->found_posts != 1 ) ? 'ies' : 'y') . ' found</h2>';
+
+                echo '<div style="background:#F3F3F3; border:1px solid #DDD; padding:20px;">
+                    
+                    <h3 style="padding-top:0; margin-top:0;">Applicant Requirements</h3>';
+                if ( 
+                    isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' &&
+                    isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0
+                )
+                {
+                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                        <strong>Maximum Price:</strong><br>
+                        &pound;' . number_format($applicant_profile['max_price']) . '
+                    </div>';
+                }
+                if ( 
+                    isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-lettings' &&
+                    isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0
+                )
+                {
+                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                        <strong>Maximum Rent:</strong><br>
+                        &pound;' . number_format($applicant_profile['max_rent']) . ' ' . $applicant_profile['rent_frequency'] . '
+                    </div>';
+                }
+                if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
+                {
+                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                        <strong>Minimum Beds:</strong><br>
+                        ' . $applicant_profile['min_beds'] . '
+                    </div>';
+                }
+                if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+                {
+                    $terms = get_terms('property_type', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['property_types']));
+                    if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
+                    {
+                        $sliced_terms = array_slice( $terms, 0, 2 );
+                        echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                            <strong>Property Types:</strong><br>
+                            ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ) . '
+                        </div>';
+                    }
+                }
+                if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+                {
+                    $terms = get_terms('location', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['locations']));
+                    if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
+                    {
+                        $sliced_terms = array_slice( $terms, 0, 2 );
+                        echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                            <strong>Locations:</strong><br>
+                            ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? ' <span title="' . addslashes( implode(", ", $terms) ) .'">+ ' . (count($terms) - 2) . ' more</span>' : '' ) . '
+                        </div>';
+                    }
+                }
+
+                if ( isset($applicant_profile['notes']) && $applicant_profile['notes'] != '' )
+                {
+                    echo '<div style="display:inline-block; width:100%; vertical-align:top; margin-top:15px;">
+                            <strong>Additional Requirement Notes:</strong><br>
+                            ' . strip_tags( $applicant_profile['notes'] ) . '
+                        </div>';
+                }
+
+                echo '</div>';
+
+                while ( $properties_query->have_posts() )
+                {
+                    $properties_query->the_post();
+
+                    $property = new PH_Property($post->ID);
+
+                    echo '<div style="padding:20px 0; border-bottom:1px solid #CCC;">';
+                    
+                        echo '<div style="float:left; width:18%;"><a href="' . get_edit_post_link( $post->ID ) . '" target="_blank"><img src="' . $property->get_main_photo_src() . '" style="max-width:100%; margin:0 auto; display:block;" alt="' . addslashes($property->get_formatted_summary_address()) . '"></a></div>';
+                        
+                        echo '<div style="float:right; width:79%;">';
+                            
+                            echo '<h3 style="margin:0; padding:0; margin-bottom:9px;"><a href="' . get_edit_post_link( $post->ID ) . '" target="_blank">' . $property->get_formatted_summary_address() . '</a></h3>';
+
+                            echo '<div style="margin-bottom:7px;">
+                                <strong>' . ( ($property->_department == 'residential-lettings') ? __('Rent', 'propertyhive') : __('Price', 'propertyhive') ) . ': ' . $property->get_formatted_price() . '</strong>
+                                |
+                                ' . $property->bedrooms . ' bed ' . $property->get_property_type() . '
+                                |
+                                ' . $property->get_availability() . '
+                            </div>';
+
+                            echo '<div style="">' . strip_tags(get_the_excerpt()) . '</div>';
+
+                        echo '</div>';
+
+                        echo '<div style="clear:both"></div>';
+
+                    echo '</div>';
+                }
+            }
+            else
+            {
+                echo '<div style="text-align:center"><br><br>' . __( 'No matching properties found', 'propertyhive' ) . '</div>';
+            }
+            wp_reset_postdata();
+        }
+        else
+        {
+            echo __( 'Invalid contact record', 'propertyhive' );
+        }
+        
+        // Quit out
+        die();
+    }
     
     /**
      * Load existing owner on property record
@@ -55,8 +267,6 @@ class PH_AJAX {
         $contact_id = $_POST['contact_id'];
         
         $contact = get_post($contact_id);
-        
-        $output = '';
         
         if ( !is_null( $contact ) )
         {
@@ -94,8 +304,6 @@ class PH_AJAX {
             echo '<label></label>';
             echo '<a href="" class="button" id="remove-owner-contact">Remove Owner</a>';
         echo '</p>';
-        
-        echo $output;
         
         // Quit out
         die();
