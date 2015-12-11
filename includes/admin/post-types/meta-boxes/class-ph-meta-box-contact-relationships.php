@@ -143,8 +143,6 @@ class PH_Meta_Box_Contact_Relationships {
                 
                 echo '<div class="clear"></div>
             
-            </div>
-            
         </div>';
         
         echo '</div>';
