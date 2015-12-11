@@ -262,6 +262,12 @@ class PH_Admin_Meta_Boxes {
                             
                             return false;
                         });
+
+                        // Set default tab if hash set
+                        if (window.location.hash != \'\')
+                        {
+                            jQuery("#propertyhive_metabox_tabs a[href=\'" + window.location.hash + "\']").trigger(\'click\');
+                        }
                     });
                     
                     function hide_meta_box_tabs()
