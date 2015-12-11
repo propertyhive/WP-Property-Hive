@@ -35,10 +35,15 @@ class PH_Meta_Box_Property_Department {
         {
             $departments['residential-lettings'] = __( 'Residential Lettings', 'propertyhive' );
         }
+        $value = get_post_meta( $post->ID, '_department', TRUE );
+        if ($value == '')
+        {
+            $value = get_option( 'propertyhive_primary_department' );
+        }
         $args = array( 
             'id' => '_department',
             'label' => 'Department',
-            'value' => get_option( 'propertyhive_primary_department' ),
+            'value' => $value,
             'options' => $departments
         );
         if (count($departments) == 1)
