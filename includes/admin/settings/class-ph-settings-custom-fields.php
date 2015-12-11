@@ -1324,10 +1324,68 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     $property_query = new WP_Query( $query_args );
                     
                     $num_properties = $property_query->found_posts;
+
+                    wp_reset_postdata();
                     
-                    // Get number of applicants assigned to this term (future)
-                    
-                    if ($num_properties > 0)
+                    // Get number of applicants assigned to this term
+                    $num_applicants = 0;
+                    if ( $taxonomy == 'property_type' || $taxonomy == 'location' )
+                    {
+                        $query_args = array(
+                            'post_type' => 'contact',
+                            'nopaging' => true,
+                            'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                            'meta_query' => array(
+                                array(
+                                    'key' => '_contact_types',
+                                    'value' => 'applicant',
+                                    'compare' => 'LIKE'
+                                ),
+                            ),
+                        );
+                        $applicant_query = new WP_Query( $query_args );
+
+                        if ( $applicant_query->have_posts() )
+                        {
+                            while ( $applicant_query->have_posts() )
+                            {
+                                $applicant_query->the_post();
+
+                                $applicant_has_taxonomy = false;
+
+                                $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
+                                if ( $num_applicant_profiles == '' )
+                                {
+                                    $num_applicant_profiles = 0;
+                                }
+
+                                if ( $num_applicant_profiles > 0 )
+                                {
+                                    for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+                                    {
+                                        $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
+
+                                        if ( isset($applicant_profile[$taxonomy.'s']) && is_array($applicant_profile[$taxonomy.'s']) && !empty($applicant_profile[$taxonomy.'s']) )
+                                        {
+                                            if (in_array($current_id, $applicant_profile[$taxonomy.'s']))
+                                            {
+                                                $applicant_has_taxonomy = true;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if ( $applicant_has_taxonomy )
+                                {
+                                    ++$num_applicants;
+                                }
+                            }
+                        }
+
+                        wp_reset_postdata();
+                    }
+
+                    if ($num_properties > 0 || $num_applicants > 0)
                     {
                         $alternative_terms = array();
                         
@@ -1345,6 +1403,36 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             foreach ($terms as $term)
                             {
                                 $alternative_terms[$term->term_id] = $term->name;
+
+                                $term_args = array(
+                                    'hide_empty' => false,
+                                    'exclude' => array($current_id),
+                                    'parent' => $term->term_id
+                                );
+                                $subterms = get_terms( $taxonomy, $term_args );
+                                
+                                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                                {
+                                    foreach ($subterms as $term)
+                                    {
+                                        $alternative_terms[$term->term_id] = '- ' . $term->name;
+
+                                        $term_args = array(
+                                            'hide_empty' => false,
+                                            'exclude' => array($current_id),
+                                            'parent' => $term->term_id
+                                        );
+                                        $subsubterms = get_terms( $taxonomy, $term_args );
+                                        
+                                        if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                                        {
+                                            foreach ($subsubterms as $term)
+                                            {
+                                                $alternative_terms[$term->term_id] = '- - ' . $term->name;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         } 
                         
@@ -1356,7 +1444,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'options'   => $alternative_terms,
                             'type'      => 'select',
                             'desc_tip'  =>  false,
-                            'desc'      => __( 'There are properties that have this term assigned to them. Which, if any, term should they be reassigned to?' , 'propertyhive' )
+                            'desc'      => __( 'There are properties or applicants that have this term assigned to them. Which, if any, term should they be reassigned to?' , 'propertyhive' )
                         );
                     }
                     
@@ -1647,7 +1735,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     {
                         if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == '1' )
                         {
-                            // Get number of properties assigned to this term
+                            // Update properties that have this taxonomy term set
                             $query_args = array(
                                 'post_type' => 'property',
                                 'nopaging' => true,
@@ -1683,7 +1771,67 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             }
                             
                             wp_reset_postdata();
-                            
+
+                            if ( $_POST['taxonomy'] == 'property_type' || $_POST['taxonomy'] == 'location' )
+                            {
+                                $query_args = array(
+                                    'post_type' => 'contact',
+                                    'nopaging' => true,
+                                    'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                                    'meta_query' => array(
+                                        array(
+                                            'key' => '_contact_types',
+                                            'value' => 'applicant',
+                                            'compare' => 'LIKE'
+                                        ),
+                                    ),
+                                );
+                                $applicant_query = new WP_Query( $query_args );
+
+                                if ( $applicant_query->have_posts() )
+                                {
+                                    while ( $applicant_query->have_posts() )
+                                    {
+                                        $applicant_query->the_post();
+                                    
+                                        $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
+                                        if ( $num_applicant_profiles == '' )
+                                        {
+                                            $num_applicant_profiles = 0;
+                                        }
+
+                                        if ( $num_applicant_profiles > 0 )
+                                        {
+                                            for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+                                            {
+                                                $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
+
+                                                if ( isset($applicant_profile[$_POST['taxonomy'].'s']) && is_array($applicant_profile[$_POST['taxonomy'].'s']) && !empty($applicant_profile[$_POST['taxonomy'].'s']) )
+                                                {
+                                                    if (in_array($current_id, $applicant_profile[$_POST['taxonomy'].'s']))
+                                                    {
+                                                        // This profile has this term set
+                                                        unset($applicant_profile[$_POST['taxonomy'].'s'][$current_id]);
+
+                                                        if ( isset($_POST['reassign_to']) && ! empty( $_POST['reassign_to'] ) && $_POST['reassign_to'] != 'none' )
+                                                        {
+                                                            $applicant_profile[$_POST['taxonomy'].'s'][] = $_POST['reassign_to'];
+                                                            $applicant_profile[$_POST['taxonomy'].'s'] = array_unique($applicant_profile[$_POST['taxonomy'].'s']);
+                                                        }
+
+                                                        $applicant_profile[$_POST['taxonomy'].'s'] = array_values($applicant_profile[$_POST['taxonomy'].'s']);
+
+                                                        update_post_meta( get_the_ID(), '_applicant_profile_' . $i, $applicant_profile );
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            wp_reset_postdata();
+
                             wp_delete_term( $current_id, $_POST['taxonomy'] );
                         }
 
