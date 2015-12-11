@@ -97,4 +97,6 @@ jQuery( function($){
     // Multiselect
     $("#propertyhive-property-residential-details select.multiselect").chosen();
 
+    $("#propertyhive-contact-relationships select.multiselect").chosen();
+
 });

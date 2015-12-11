@@ -49,7 +49,7 @@ class PH_Admin_Assets {
             //wp_enqueue_style( 'wp-color-picker' );
         }
         
-        if ( in_array( $screen->id, array( 'property' ) ) )
+        if ( in_array( $screen->id, array( 'property', 'contact' ) ) )
         {
             wp_enqueue_style( 'chosen', PH()->plugin_url() . '/assets/css/chosen.css', array(), PH_VERSION );
         }
@@ -130,6 +130,8 @@ class PH_Admin_Assets {
             wp_enqueue_script( 'propertyhive_admin_meta_boxes' );
             wp_enqueue_script( 'jquery-ui-datepicker' );
             wp_enqueue_script( 'jquery-ui-autocomplete' );
+            wp_enqueue_script( 'ajax-chosen' );
+            wp_enqueue_script( 'chosen' );
             
             $params = array(
                 'plugin_url'                    => PH()->plugin_url(),
@@ -139,15 +141,7 @@ class PH_Admin_Assets {
                 'delete_note_nonce'             => wp_create_nonce("delete-note"),
             );
             wp_localize_script( 'propertyhive_admin_meta_boxes', 'propertyhive_admin_meta_boxes', $params );
-        }
-        
-        if ( in_array( $screen->id, array( 'property' ) ) )
-        {
-            wp_enqueue_script( 'ajax-chosen' );
-            wp_enqueue_script( 'chosen' );
-            
-            
-            
+
             if ( is_rtl() ) 
             {
                 wp_enqueue_script( 'chosen-rtl', PH()->plugin_url() . '/assets/js/chosen/chosen-rtl' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
@@ -157,6 +151,8 @@ class PH_Admin_Assets {
         if ( in_array( $screen->id, array( 'contact' ) ) )
         {
             wp_enqueue_script( 'jquery-ui-dialog' );
+
+            add_thickbox();
         }
         
         if ( in_array( $screen->id, array( 'property-hive_page_ph-settings' ) ) )

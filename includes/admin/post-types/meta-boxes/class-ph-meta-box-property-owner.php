@@ -354,6 +354,17 @@ class PH_Meta_Box_Property_Owner {
                 update_post_meta( $contact_post_id, '_email_address', $_POST['_owner_email_address'] );
             }
         }
+
+        $existing_contact_types = get_post_meta( $contact_post_id, '_contact_types', TRUE );
+        if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
+        {
+            $existing_contact_types = array();
+        }
+        if ( !in_array( 'owner', $existing_contact_types ) )
+        {
+            $existing_contact_types[] = 'owner';
+            update_post_meta( $contact_post_id, '_contact_types', $existing_contact_types );
+        }
         
         update_post_meta( $post_id, '_owner_contact_id', $contact_post_id );
     }

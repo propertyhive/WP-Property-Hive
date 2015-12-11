@@ -12,6 +12,9 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+if ( ! class_exists( 'PH_Admin_Meta_Boxes' ) )
+{
+
 /**
  * PH_Admin_Meta_Boxes
  */
@@ -23,6 +26,7 @@ class PH_Admin_Meta_Boxes {
 	 * Constructor
 	 */
 	public function __construct() {
+
 		add_action( 'add_meta_boxes', array( $this, 'remove_meta_boxes' ), 10 );
 		add_action( 'add_meta_boxes', array( $this, 'rename_meta_boxes' ), 20 );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 30 );
@@ -53,6 +57,7 @@ class PH_Admin_Meta_Boxes {
         // Save Contact Meta Boxes
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Correspondence_Address::save', 10, 2 );
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Contact_Details::save', 15, 2 );
+        add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Relationships::save', 20, 2 );
         
         // Save Enquiry Meta Boxes
         add_action( 'propertyhive_process_enquiry_meta', 'PH_Meta_Box_Enquiry_Record_Details::save', 10, 2 );
@@ -61,7 +66,108 @@ class PH_Admin_Meta_Boxes {
 		// Error handling (for showing errors from meta boxes on next page load)
 		add_action( 'admin_notices', array( $this, 'output_errors' ) );
 		add_action( 'shutdown', array( $this, 'save_errors' ) );
+
+        $this->check_contact_create_relationship();
+        $this->check_contact_delete_relationship();
 	}
+
+    public function check_contact_create_relationship()
+    {
+        if ( isset($_GET['add_applicant_relationship']) && wp_verify_nonce($_GET['add_applicant_relationship'], '1') && isset($_GET['post']) ) 
+        {
+            // Need to add blank applicant
+            if ( get_post_type($_GET['post']) != 'contact' )
+                return;
+
+            $num_applicant_profiles = get_post_meta( $_GET['post'], '_applicant_profiles', TRUE );
+            if ( $num_applicant_profiles == '' )
+            {
+                $num_applicant_profiles = 0;
+            }
+
+            update_post_meta( $_GET['post'], '_applicant_profile_' . $num_applicant_profiles, '' );
+            update_post_meta( $_GET['post'], '_applicant_profiles', $num_applicant_profiles + 1 );
+
+            $existing_contact_types = get_post_meta( $_GET['post'], '_contact_types', TRUE );
+            if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
+            {
+                $existing_contact_types = array();
+            }
+            if ( !in_array( 'applicant', $existing_contact_types ) )
+            {
+                $existing_contact_types[] = 'applicant';
+                update_post_meta( $_GET['post'], '_contact_types', $existing_contact_types );
+            }
+
+            // Do redirect
+            wp_redirect( admin_url( 'post.php?post=' . $_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
+            exit();
+        }
+    }
+
+    public function check_contact_delete_relationship()
+    {
+        if ( isset($_GET['delete_applicant_relationship']) && isset($_GET['post']) )
+        {
+            // Need to add blank applicant
+            if ( get_post_type($_GET['post']) != 'contact' )
+                return;
+
+            $num_applicant_profiles = get_post_meta( $_GET['post'], '_applicant_profiles', TRUE );
+            if ( $num_applicant_profiles == '' )
+            {
+                $num_applicant_profiles = 0;
+            }
+
+            for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+            {
+                if ( wp_verify_nonce($_GET['delete_applicant_relationship'], $i) ) 
+                {
+                    $deleting_applicant_profile = $i;
+
+                    // We're deleting this one
+                    delete_post_meta( $_GET['post'], '_applicant_profile_' . $i );
+
+                    // Now need to rename any that are higher than $deleting_applicant_profile
+                    for ( $j = 0; $j < $num_applicant_profiles; ++$j )
+                    {
+                        if ( $j > $deleting_applicant_profile )
+                        {
+                            $this_applicant_profile = get_post_meta( $_GET['post'], '_applicant_profile_' . $j );
+                            update_post_meta( $_GET['post'], '_applicant_profile_' . ($j - 1), $this_applicant_profile );
+                            delete_post_meta( $_GET['post'], '_applicant_profile_' . $j );
+                        }
+                    }
+
+                    // remove from _contact_types if no more profiles left
+                    if ( $num_applicant_profiles == 1 )
+                    {
+                        $existing_contact_types = get_post_meta( $_GET['post'], '_contact_types', TRUE );
+                        if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
+                        {
+                            $existing_contact_types = array();
+                        }
+                        if( ( $key = array_search('applicant', $existing_contact_types) ) !== false )
+                        {
+                            unset($existing_contact_types[$key]);
+                        }
+                        update_post_meta( $_GET['post'], '_contact_types', $existing_contact_types );
+                    }
+
+                    update_post_meta( $_GET['post'], '_applicant_profiles', $num_applicant_profiles - 1 );
+
+                    // Do redirect
+                    wp_redirect( admin_url( 'post.php?post=' . $_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
+                    exit();
+                }
+            }
+        }
+
+
+
+
+        
+    }
 
 	/**
 	 * Add an error message
@@ -82,6 +188,7 @@ class PH_Admin_Meta_Boxes {
 	 * Show any stored error messages.
 	 */
 	public function output_errors() {
+        
 		$errors = maybe_unserialize( get_option( 'propertyhive_meta_box_errors' ) );
 
 		if ( ! empty( $errors ) ) {
@@ -208,7 +315,7 @@ class PH_Admin_Meta_Boxes {
             $meta_boxes_under_tabs = array();
             
             $i = 0;
-            echo '<div id="propertyhive_metabox_tabs">';
+            echo '<div id="propertyhive_metabox_tabs" style="margin-top:15px">';
             foreach ($tabs as $tab)
             {
                 if (isset($tab['post_type']) && $post->post_type == $tab['post_type'])
@@ -262,6 +369,12 @@ class PH_Admin_Meta_Boxes {
                             
                             return false;
                         });
+
+                        // Set default tab if hash set
+                        if (window.location.hash != \'\')
+                        {
+                            jQuery("#propertyhive_metabox_tabs a[href=\'" + window.location.hash + "\']").trigger(\'click\');
+                        }
                     });
                     
                     function hide_meta_box_tabs()
@@ -352,3 +465,5 @@ class PH_Admin_Meta_Boxes {
 }
 
 new PH_Admin_Meta_Boxes();
+
+}

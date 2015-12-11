@@ -309,6 +309,24 @@ class PH_Property {
     }
 
     /**
+     * Get the availability taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_availability()
+    {
+        $term_list = wp_get_post_terms($this->id, 'availability', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
      * Get an array of property features
      *
      * @access public
