@@ -161,7 +161,7 @@ class PH_Admin_Post_Types {
                 $this->property_filters();
                 break;
             case 'contact' :
-                //$this->contact_filters();
+                $this->contact_filters();
                 break;
             case 'enquiry' :
                 $this->enquiry_filters();
@@ -292,35 +292,33 @@ class PH_Admin_Post_Types {
     public function contact_filters() {
         global $wp_query;
         
-        // Type filtering
-        $output  = '<select name="_contact_type" id="dropdown_contact_type">';
-            
-            $output .= '<option value="">' . __( 'Show all contact types', 'propertyhive' ) . '</option>';
-            
-            $output .= '<option value="owner"';
-            if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
-            {
-                $output .= selected( 'owner', $_GET['_contact_type'], false );
-            }
-            $output .= '>' . __( 'Owners and Landlords', 'propertyhive' ) . '</option>';
-            
-            $output .= '<option value="applicant"';
-            if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
-            {
-                $output .= selected( 'applicant', $_GET['contact_type'], false );
-            }
-            $output .= '>' . __( 'Applicants', 'propertyhive' ) . '</option>';
-            
-            $output .= '<option value="thirdparty"';
-            if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
-            {
-                $output .= selected( 'thirdparty', $_GET['contact_type'], false );
-            }
-            $output .= '>' . __( 'Third Party Contacts', 'propertyhive' ) . '</option>';
-        
-        $output .= '</select>';
+        // Type filtering        
+        $options = array();
 
-        echo apply_filters( 'propertyhive_contact_filters', $output );
+        $option = '<option value="owner"';
+        if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
+        {
+            $option .= selected( 'owner', $_GET['_contact_type'], false );
+        }
+        $option .= '>' . __( 'Owners and Landlords', 'propertyhive' ) . '</option>';
+
+        $options[] = $option;
+
+        $options = apply_filters( 'propertyhive_contact_filter_options', $options );
+
+        $output = '';
+        if (count($options) > 1)
+        {
+            $output  = '<select name="_contact_type" id="dropdown_contact_type">';
+            
+                $output .= '<option value="">' . __( 'Show all contact types', 'propertyhive' ) . '</option>';
+
+                $output .= implode("", $options);
+            
+            $output .= '</select>';
+        }
+
+        echo $output;
     }
     
     /**
@@ -412,10 +410,18 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'contact' === $typenow ) 
         {
-            /*if ( ! empty( $_GET['_contact_type'] ) ) {
-                $vars['meta_key'] = '_contact_type';
-                $vars['meta_value'] = sanitize_text_field( $_GET['contact_type'] );
-            }*/
+            if ( ! empty( $_GET['_contact_type'] ) ) {
+                //$vars['meta_key '] = '_contact_types';
+                //$vars['meta_value'] = sanitize_text_field( $_GET['_contact_type'] );
+                //$vars['meta_compare '] = 'LIKE';
+                $vars['meta_query'] = array(
+                    array(
+                        'key' => '_contact_types',
+                        'value' => sanitize_text_field( $_GET['_contact_type'] ),
+                        'compare' => 'LIKE'
+                    )
+                );
+            }
         }
         elseif ( 'enquiry' === $typenow ) 
         {
