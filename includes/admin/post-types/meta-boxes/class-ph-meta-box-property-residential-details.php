@@ -181,9 +181,14 @@ class PH_Meta_Box_Property_Residential_Details {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        update_post_meta( $post_id, '_bedrooms', $_POST['_bedrooms'] );
-        update_post_meta( $post_id, '_bathrooms', $_POST['_bathrooms'] );
-        update_post_meta( $post_id, '_reception_rooms', $_POST['_reception_rooms'] );
+        $rooms = preg_replace("/[^0-9]/", '', $_POST['_bedrooms']);
+        update_post_meta( $post_id, '_bedrooms', $rooms );
+
+        $rooms = preg_replace("/[^0-9]/", '', $_POST['_bathrooms']);
+        update_post_meta( $post_id, '_bathrooms', $rooms );
+
+        $rooms = preg_replace("/[^0-9]/", '', $_POST['_reception_rooms']);
+        update_post_meta( $post_id, '_reception_rooms', $rooms );
         
         if ( !empty($_POST['property_type_id']) )
         {
