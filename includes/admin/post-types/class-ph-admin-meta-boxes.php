@@ -208,7 +208,7 @@ class PH_Admin_Meta_Boxes {
             $meta_boxes_under_tabs = array();
             
             $i = 0;
-            echo '<div id="propertyhive_metabox_tabs">';
+            echo '<div id="propertyhive_metabox_tabs" style="margin-top:15px">';
             foreach ($tabs as $tab)
             {
                 if (isset($tab['post_type']) && $post->post_type == $tab['post_type'])
