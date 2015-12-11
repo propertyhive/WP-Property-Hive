@@ -1248,7 +1248,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     }
 
     /**
-     * Show outside space delete options
+     * Show custom field delete options
      *
      * @access public
      * @return string

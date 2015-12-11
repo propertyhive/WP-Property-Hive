@@ -11,7 +11,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * PH_Meta_Box_Contact_Contact_Details
+ * PH_Meta_Box_Contact_Relationships
  */
 class PH_Meta_Box_Contact_Relationships {
 
