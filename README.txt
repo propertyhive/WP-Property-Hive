@@ -26,9 +26,8 @@ PropertyHive isn't developed by one person, or a small team. It's built by the w
 Want to build a new feature? Maybe fix a bug you've found? As long as you have an understanding of PHP and WordPress, or know someone that does, you can make the changes yourself. What's more, your hard work will be received gratefully by everyone else that uses the plugin.
 
 **Only use the features your business needs**
-By default PropertyHive is a marketing tool, allowing you to manage your property stock and list properties on your website. Through use of premium add-ons however, you can choose which features you want to bolt on. The add-ons fit seamlessly into the existing plugin, and with each other.
-
-Want to record applicants and their requirements? There's an add-on for that. 
+By default PropertyHive is a property and contact management tool, allowing you to manage your property stock, list properties on your website, record owners details, and store applicants requirements. Through use of premium add-ons however, you can choose which features you want to bolt on. The add-ons fit seamlessly into the existing plugin, and with each other.
+ 
 Want to send your properties to property portals? There's an add-on for that.
 
 Our add-ons are priced individually from just £150 meaning you only pay for what you use.
@@ -70,11 +69,16 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 7. Editing a property record - The 'Media' tab is where photos, floorplans, brochures and EPC's are uploaded.
 8. Manage your owners and landlords from the 'Contacts' page.
 9. Editing a contact record - The 'Contact Details' tab is where you store contact information for the contact
-10. Editing a contact record - The 'Realtionships' tab contains all of the relationships that you have with this contact (i.e. in the event they're a landlord of two properties)
-11. Enquiries made on the site are available from within WordPress. Assign them to a negotiator and mark them as 'Closed' once complete.
-12. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
+10. Editing a contact record - The 'Relationships' tab contains all of the relationships that you have with this contact (i.e. in the event they're a landlord of two properties)
+11. Record an applicants' requirements. Allows for one or more set of requirements in the case where someone is looking to buy and rent.
+12. View a list of properties that match the applicant's requirements.
+13. Enquiries made on the site are available from within WordPress. Assign them to a negotiator and mark them as 'Closed' once complete.
+14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.0.2 =
+* New applicant management feature
 
 = 1.0.1 =
 * Added support for virtual tours
