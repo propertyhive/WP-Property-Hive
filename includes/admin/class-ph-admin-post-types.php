@@ -295,12 +295,23 @@ class PH_Admin_Post_Types {
         // Type filtering        
         $options = array();
 
+        // Owners
         $option = '<option value="owner"';
         if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
         {
             $option .= selected( 'owner', $_GET['_contact_type'], false );
         }
         $option .= '>' . __( 'Owners and Landlords', 'propertyhive' ) . '</option>';
+
+        $options[] = $option;
+
+        // Applicants
+        $option = '<option value="applicant"';
+        if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
+        {
+            $option .= selected( 'applicant', $_GET['_contact_type'], false );
+        }
+        $option .= '>' . __( 'Applicants', 'propertyhive' ) . '</option>';
 
         $options[] = $option;
 
