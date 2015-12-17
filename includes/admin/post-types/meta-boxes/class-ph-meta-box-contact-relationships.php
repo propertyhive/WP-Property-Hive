@@ -24,7 +24,6 @@ class PH_Meta_Box_Contact_Relationships {
         $total_profiles = 0;
         
         $owner_profiles = array();
-        
         // get properties where this is the owner
         $args = array(
             'post_type' => 'property',
@@ -53,7 +52,7 @@ class PH_Meta_Box_Contact_Relationships {
         wp_reset_postdata();
 
         $applicant_profiles = array();
-        $num_applicant_profiles = get_post_meta( $post->ID, '_applicant_profiles', TRUE );
+        $num_applicant_profiles = get_post_meta( $thepostid, '_applicant_profiles', TRUE );
         if ( $num_applicant_profiles == '' )
         {
             $num_applicant_profiles = 0;
@@ -64,7 +63,7 @@ class PH_Meta_Box_Contact_Relationships {
             $total_profiles += $num_applicant_profiles;
             for ( $i = 0; $i < $num_applicant_profiles; ++$i )
             {
-                $applicant_profiles[] = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
+                $applicant_profiles[] = get_post_meta( $thepostid, '_applicant_profile_' . $i, TRUE );
             }
         }
 
@@ -493,7 +492,7 @@ class PH_Meta_Box_Contact_Relationships {
                 
                     echo '<p class="form-field">';
                         echo '<label>' . __('New Relationship Type', 'propertyhive') . '</label>';
-                        echo '<a href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit#propertyhive-contact-relationships' ), '1', 'add_applicant_relationship' ) . '" class="button">' . __( 'New Applicant Profile', 'propertyhive' ) . '</a><br><br>';
+                        echo '<a href="' . wp_nonce_url( admin_url( 'post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships' ), '1', 'add_applicant_relationship' ) . '" class="button">' . __( 'New Applicant Profile', 'propertyhive' ) . '</a><br><br>';
                         echo '<a href="' . admin_url( 'post-new.php?post_type=property&owner_contact_id=' . $thepostid ) . '" class="button">' . __( 'New Property Owner / Landlord', 'propertyhive' ) . '</a><br><br>';
                         //echo '<a href="#" class="button">' . __( 'New Third Party', 'propertyhive' ) . '</a>';
                     echo '</p>';
