@@ -39,9 +39,10 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         
         // POA
         propertyhive_wp_checkbox( array( 
-            'id' => '_poa', 
+            'id' => '_sale_poa', 
             'label' => __( 'Price On Application', 'propertyhive' ), 
             'desc_tip' => false,
+            'value' => get_post_meta( $post->ID, '_poa', true )
         ) );
         
         // Price Qualifier
@@ -177,7 +178,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             // Store price used for ordering. Not used yet but could be if introducing currencies in the future.
             update_post_meta( $post_id, '_price_actual', $price );
             
-            update_post_meta( $post_id, '_poa', ( isset($_POST['_poa']) ? $_POST['_poa'] : '' ) );
+            update_post_meta( $post_id, '_poa', ( isset($_POST['_sale_poa']) ? $_POST['_sale_poa'] : '' ) );
             
             if ( !empty($_POST['price_qualifier_id']) )
             {
