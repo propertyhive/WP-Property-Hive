@@ -29,7 +29,7 @@ class PH_Meta_Box_Property_Marketing {
                     'id' => '_on_market', 
                     'label' => __( 'On Market', 'propertyhive' ), 
                     'desc_tip' => true,
-                    'description' => __( 'Setting the property to be on the market means the property will be displayed on the website, and portals too if a <a href="#">portal add-on</a> is present.', 'propertyhive' ), 
+                    'description' => __( 'Setting the property to be on the market means the property will be displayed on the website, and portals too if a <a href="http://wp-property-hive.com/add-ons/" target="_blank">portal add-on</a> is present.', 'propertyhive' ), 
                 ) );
 
                 // Availability
