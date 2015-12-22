@@ -209,12 +209,12 @@ class PH_Property {
             {
                 case "residential-sales":
                 {
-                    return '&pound;' . number_format($this->_price, 0);
+                    return ( ( $this->_price != '' ) ? '&pound;' . number_format($this->_price, 0) : '-' );
                     break;
                 }
                 case "residential-lettings":
                 {
-                    return '&pound;' . number_format($this->_rent, 0) . ' ' . __( $this->_rent_frequency, 'propertyhive' );
+                    return ( ( $this->_rent != '' ) ? '&pound;' . number_format($this->_rent, 0) . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                     break;
                 }
             }
