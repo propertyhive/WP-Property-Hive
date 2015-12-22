@@ -18,8 +18,21 @@ class PH_Meta_Box_Property_Residential_Details {
 	/**
 	 * Output the metabox
 	 */
-	public static function output( $post ) {
+	public static function output( $post, $args = array() ) {
         
+        global $wpdb, $thepostid;
+
+        $original_post = $post;
+        $original_thepostid = $thepostid;
+
+        // Used in the scenario where this meta box isn't used on the property edit page
+        if ( isset( $args['args']['property_post'] ) )
+        {
+            $post = $args['args']['property_post'];
+            $thepostid = $post->ID;
+            setup_postdata($post);
+        }
+
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
@@ -172,7 +185,10 @@ class PH_Meta_Box_Property_Residential_Details {
         echo '</div>';
         
         echo '</div>';
-           
+        
+        $post = $original_post;
+        $thepostid = $original_thepostid;
+        setup_postdata($post);
     }
 
     /**

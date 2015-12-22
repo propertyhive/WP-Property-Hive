@@ -18,9 +18,20 @@ class PH_Meta_Box_Property_Owner {
 	/**
 	 * Output the metabox
 	 */
-	public static function output( $post ) {
+	public static function output( $post, $args = array() ) {
 	    
-        global $post, $wpdb, $thepostid;
+        global $wpdb, $thepostid;
+
+        $original_post = $post;
+        $original_thepostid = $thepostid;
+
+        // Used in the scenario where this meta box isn't used on the property edit page
+        if ( isset( $args['args']['property_post'] ) )
+        {
+            $post = $args['args']['property_post'];
+            $thepostid = $post->ID;
+            setup_postdata($post);
+        }
         
         if ( isset($_GET['owner_contact_id']) && ! empty( $_GET['owner_contact_id'] ) )
         {
@@ -306,6 +317,9 @@ class PH_Meta_Box_Property_Owner {
 
         </script>';
         
+        $post = $original_post;
+        $thepostid = $original_thepostid;
+        setup_postdata($post);
     }
 
     /**
