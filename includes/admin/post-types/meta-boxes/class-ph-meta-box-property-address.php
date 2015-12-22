@@ -308,6 +308,13 @@ class PH_Meta_Box_Property_Address {
             // Setting to blank
             wp_delete_object_term_relationships( $post_id, 'location' );
         }
+
+        // default status to 'instructed' if not set already
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        if ( $status == '' )
+        {
+            update_post_meta( $post_id, '_status', 'instructed' );
+        }
     }
 
 }
