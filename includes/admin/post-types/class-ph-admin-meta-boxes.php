@@ -290,7 +290,9 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => array('propertyhive-enquiry-record-details', 'propertyhive-enquiry-details'),
             'post_type' => 'enquiry'
         );
-        
+
+        $tabs = apply_filters( 'propertyhive_tabs', $tabs );
+
         // TO DO: move this so it works when in one column
         add_action( 'edit_form_after_title', array( $this, 'draw_meta_box_tabs' ), 31, 1);
     }
