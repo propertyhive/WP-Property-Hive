@@ -188,7 +188,7 @@ class PH_Property {
             $virtual_tour_urls[] = get_post_meta($this->id, '_virtual_tour_' . $i, TRUE);
         }
 
-        return apply_filters( 'propertyhive_property_vitual_tour_urls', array_filter( $virtual_tour_urls ), $this );
+        return apply_filters( 'propertyhive_property_virtual_tour_urls', array_filter( $virtual_tour_urls ), $this );
     }
     
     /**
