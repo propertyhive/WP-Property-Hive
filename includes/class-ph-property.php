@@ -188,7 +188,7 @@ class PH_Property {
             $virtual_tour_urls[] = get_post_meta($this->id, '_virtual_tour_' . $i, TRUE);
         }
 
-        return apply_filters( 'propertyhive_property_vitual_tour_urls', array_filter( $virtual_tour_urls ), $this );
+        return apply_filters( 'propertyhive_property_virtual_tour_urls', array_filter( $virtual_tour_urls ), $this );
     }
     
     /**
@@ -209,12 +209,12 @@ class PH_Property {
             {
                 case "residential-sales":
                 {
-                    return '&pound;' . number_format($this->_price, 0);
+                    return ( ( $this->_price != '' ) ? '&pound;' . number_format($this->_price, 0) : '-' );
                     break;
                 }
                 case "residential-lettings":
                 {
-                    return '&pound;' . number_format($this->_rent, 0) . ' ' . __( $this->_rent_frequency, 'propertyhive' );
+                    return ( ( $this->_rent != '' ) ? '&pound;' . number_format($this->_rent, 0) . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                     break;
                 }
             }

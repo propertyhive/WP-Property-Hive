@@ -18,8 +18,19 @@ class PH_Meta_Box_Property_Address {
 	/**
 	 * Output the metabox
 	 */
-	public static function output( $post ) {
-        global $post, $wpdb, $thepostid;
+	public static function output( $post, $args = array() ) {
+        global $wpdb, $thepostid;
+
+        $original_post = $post;
+        $original_thepostid = $thepostid;
+
+        // Used in the scenario where this meta box isn't used on the property edit page
+        if ( isset( $args['args']['property_post'] ) )
+        {
+            $post = $args['args']['property_post'];
+            $thepostid = $post->ID;
+            setup_postdata($post);
+        }
         
         wp_nonce_field( 'propertyhive_save_data', 'propertyhive_meta_nonce' );
         
@@ -282,7 +293,10 @@ class PH_Meta_Box_Property_Address {
         
         </script>
         ';
-        
+
+        $post = $original_post;
+        $thepostid = $original_thepostid;
+        setup_postdata($post);
     }
 
     /**
@@ -307,6 +321,13 @@ class PH_Meta_Box_Property_Address {
         {
             // Setting to blank
             wp_delete_object_term_relationships( $post_id, 'location' );
+        }
+
+        // default status to 'instructed' if not set already
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        if ( $status == '' )
+        {
+            update_post_meta( $post_id, '_status', 'instructed' );
         }
     }
 

@@ -212,15 +212,14 @@ class PH_Admin_Meta_Boxes {
         global $tabs, $post;
         
 		// PROPERTY
-		$tabs = array();
+		if (!isset($tabs)) $tabs = array();
         
         add_meta_box( 'propertyhive-property-address', __( 'Property Address', 'propertyhive' ), 'PH_Meta_Box_Property_Address::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-owner', __( 'Property Owner / Landlord', 'propertyhive' ), 'PH_Meta_Box_Property_Owner::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-record-details', __( 'Record Details', 'propertyhive' ), 'PH_Meta_Box_Property_Record_Details::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-coordinates', __( 'Property Location', 'propertyhive' ), 'PH_Meta_Box_Property_Coordinates::output', 'property', 'normal', 'high' );
-        $tabs[] = array(
+        $tabs['tab_address'] = array(
             'name' => __( 'Summary', 'propertyhive' ),
-            'id' => 'tab_address', 
             'metabox_ids' => array('propertyhive-property-address', 'propertyhive-property-owner', 'propertyhive-property-record-details', 'propertyhive-property-coordinates'),
             'post_type' => 'property'
         );
@@ -229,17 +228,15 @@ class PH_Admin_Meta_Boxes {
         add_meta_box( 'propertyhive-property-residential-sales-details', __( 'Residential Sales Details', 'propertyhive' ), 'PH_Meta_Box_Property_Residential_Sales_Details::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-residential-lettings-details', __( 'Residential Lettings Details', 'propertyhive' ), 'PH_Meta_Box_Property_Residential_Lettings_Details::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-residential-details', __( 'Residential Details', 'propertyhive' ), 'PH_Meta_Box_Property_Residential_Details::output', 'property', 'normal', 'high' );
-        $tabs[] = array(
+        $tabs['tab_details'] = array(
             'name' => __( 'Details', 'propertyhive' ),
-            'id' => 'tab_details', 
             'metabox_ids' => array('propertyhive-property-department', 'propertyhive-property-residential-sales-details', 'propertyhive-property-residential-lettings-details', 'propertyhive-property-residential-details'),
             'post_type' => 'property'
         );
         
         add_meta_box( 'propertyhive-property-marketing', __( 'Property Marketing', 'propertyhive' ), 'PH_Meta_Box_Property_Marketing::output', 'property', 'normal', 'high' );
-        $tabs[] = array(
+        $tabs['tab_marketing'] = array(
             'name' => __( 'Marketing', 'propertyhive' ),
-            'id' => 'tab_marketing', 
             'metabox_ids' => array('propertyhive-property-marketing'),
             'post_type' => 'property'
         );
@@ -247,9 +244,8 @@ class PH_Admin_Meta_Boxes {
         add_meta_box( 'propertyhive-property-features', __( 'Property Features', 'propertyhive' ), 'PH_Meta_Box_Property_Features::output', 'property', 'normal' );
         add_meta_box( 'postexcerpt', __( 'Property Summary Description', 'propertyhive' ), 'PH_Meta_Box_Property_Summary_Description::output', 'property', 'normal' );
 		add_meta_box( 'propertyhive-property-rooms', __( 'Property Rooms', 'propertyhive' ), 'PH_Meta_Box_Property_Rooms::output', 'property', 'normal' );
-        $tabs[] = array(
+        $tabs['tab_descriptions'] = array(
             'name' => __( 'Descriptions', 'propertyhive' ),
-            'id' => 'tab_descriptions', 
             'metabox_ids' => array('propertyhive-property-features', 'postexcerpt', 'propertyhive-property-rooms'),
             'post_type' => 'property'
         );
@@ -259,9 +255,8 @@ class PH_Admin_Meta_Boxes {
         add_meta_box( 'propertyhive-property-brochures', __( 'Property Brochures', 'propertyhive' ), 'PH_Meta_Box_Property_Brochures::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-epcs', __( 'Property EPCs', 'propertyhive' ), 'PH_Meta_Box_Property_Epcs::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-virtual-tours', __( 'Property Virtual Tours', 'propertyhive' ), 'PH_Meta_Box_Property_Virtual_Tours::output', 'property', 'normal', 'high' );
-        $tabs[] = array(
+        $tabs['tab_media'] = array(
             'name' => __( 'Media', 'propertyhive' ),
-            'id' => 'tab_media', 
             'metabox_ids' => array('propertyhive-property-photos', 'propertyhive-property-floorplans', 'propertyhive-property-brochures', 'propertyhive-property-epcs', 'propertyhive-property-virtual-tours'),
             'post_type' => 'property'
         );
@@ -271,9 +266,8 @@ class PH_Admin_Meta_Boxes {
         // CONTACT
         add_meta_box( 'propertyhive-contact-correspondence-address', __( 'Correspondence Address', 'propertyhive' ), 'PH_Meta_Box_Contact_Correspondence_Address::output', 'contact', 'normal', 'high' );
         add_meta_box( 'propertyhive-contact-contact-details', __( 'Contact Details', 'propertyhive' ), 'PH_Meta_Box_Contact_Contact_Details::output', 'contact', 'normal', 'high' );
-        $tabs[] = array(
+        $tabs['tab_contact_details'] = array(
             'name' => __( 'Contact Details', 'propertyhive' ),
-            'id' => 'tab_contact_details', 
             'metabox_ids' => array('propertyhive-contact-correspondence-address', 'propertyhive-contact-contact-details'),
             'post_type' => 'contact'
         );
@@ -281,9 +275,8 @@ class PH_Admin_Meta_Boxes {
         if (!is_null($post) && get_post_status($post->ID) != 'auto-draft')
         {
             add_meta_box( 'propertyhive-contact-relationships', __( 'Relationships', 'propertyhive' ), 'PH_Meta_Box_Contact_Relationships::output', 'contact', 'normal', 'high' );
-            $tabs[] = array(
+            $tabs['tab_contact_relationships'] = array(
                 'name' => __( 'Relationships', 'propertyhive' ),
-                'id' => 'tab_contact_relationships', 
                 'metabox_ids' => array('propertyhive-contact-relationships'),
                 'post_type' => 'contact'
             );
@@ -292,13 +285,14 @@ class PH_Admin_Meta_Boxes {
         // ENQUIRY
         add_meta_box( 'propertyhive-enquiry-record-details', __( 'Record Details', 'propertyhive' ), 'PH_Meta_Box_Enquiry_Record_details::output', 'enquiry', 'normal', 'high' );
         add_meta_box( 'propertyhive-enquiry-details', __( 'Enquiry Details', 'propertyhive' ), 'PH_Meta_Box_Enquiry_details::output', 'enquiry', 'normal', 'high' );
-        $tabs[] = array(
+        $tabs['tab_enquiry_details'] = array(
             'name' => __( 'Details', 'propertyhive' ),
-            'id' => 'tab_enquiry_details', 
             'metabox_ids' => array('propertyhive-enquiry-record-details', 'propertyhive-enquiry-details'),
             'post_type' => 'enquiry'
         );
-        
+
+        $tabs = apply_filters( 'propertyhive_tabs', $tabs );
+
         // TO DO: move this so it works when in one column
         add_action( 'edit_form_after_title', array( $this, 'draw_meta_box_tabs' ), 31, 1);
     }
@@ -316,11 +310,11 @@ class PH_Admin_Meta_Boxes {
             
             $i = 0;
             echo '<div id="propertyhive_metabox_tabs" style="margin-top:15px">';
-            foreach ($tabs as $tab)
+            foreach ($tabs as $tab_id => $tab)
             {
                 if (isset($tab['post_type']) && $post->post_type == $tab['post_type'])
                 {
-                    echo '<a href="#' . implode("|#", $tab['metabox_ids']) . '" id="' . $tab['id'] . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '">' . $tab['name'] . '</a> ';
+                    echo '<a href="#' . implode("|#", $tab['metabox_ids']) . '" id="' . $tab_id . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '">' . $tab['name'] . '</a> ';
                     
                     $meta_boxes_under_tabs[] = $tab['metabox_ids'];
                     

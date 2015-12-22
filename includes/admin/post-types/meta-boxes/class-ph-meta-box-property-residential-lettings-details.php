@@ -41,6 +41,14 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
             </select>
             
         </p>';
+
+        // POA
+        propertyhive_wp_checkbox( array( 
+            'id' => '_rent_poa', 
+            'label' => __( 'Rent On Application', 'propertyhive' ), 
+            'desc_tip' => false,
+            'value' => get_post_meta( $post->ID, '_poa', true )
+        ) );
         
         // Deposit
         propertyhive_wp_text_input( array( 
@@ -134,6 +142,8 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
                 case "pa": { $price_actual = ($rent / 52); break; }
             }
             update_post_meta( $post_id, '_price_actual', $price_actual );
+
+            update_post_meta( $post_id, '_poa', ( isset($_POST['_rent_poa']) ? $_POST['_rent_poa'] : '' ) );
             
             update_post_meta( $post_id, '_deposit', preg_replace("/[^0-9.]/", '', $_POST['_deposit']) );
             update_post_meta( $post_id, '_available_date', $_POST['_available_date'] );
