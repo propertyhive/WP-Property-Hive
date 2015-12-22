@@ -212,7 +212,7 @@ class PH_Admin_Meta_Boxes {
         global $tabs, $post;
         
 		// PROPERTY
-		$tabs = array();
+		if (!isset($tabs)) $tabs = array();
         
         add_meta_box( 'propertyhive-property-address', __( 'Property Address', 'propertyhive' ), 'PH_Meta_Box_Property_Address::output', 'property', 'normal', 'high' );
         add_meta_box( 'propertyhive-property-owner', __( 'Property Owner / Landlord', 'propertyhive' ), 'PH_Meta_Box_Property_Owner::output', 'property', 'normal', 'high' );
