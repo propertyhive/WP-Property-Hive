@@ -308,11 +308,11 @@ class PH_Admin_Meta_Boxes {
             
             $i = 0;
             echo '<div id="propertyhive_metabox_tabs" style="margin-top:15px">';
-            foreach ($tabs as $tab)
+            foreach ($tabs as $tab_id => $tab)
             {
                 if (isset($tab['post_type']) && $post->post_type == $tab['post_type'])
                 {
-                    echo '<a href="#' . implode("|#", $tab['metabox_ids']) . '" id="' . $tab['id'] . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '">' . $tab['name'] . '</a> ';
+                    echo '<a href="#' . implode("|#", $tab['metabox_ids']) . '" id="' . $tab_id . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '">' . $tab['name'] . '</a> ';
                     
                     $meta_boxes_under_tabs[] = $tab['metabox_ids'];
                     
