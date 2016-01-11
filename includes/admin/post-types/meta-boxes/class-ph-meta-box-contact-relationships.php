@@ -211,7 +211,7 @@ class PH_Meta_Box_Contact_Relationships {
                         $rent_frequency = ( ( isset($applicant_profile['rent_frequency']) ) ? $applicant_profile['rent_frequency'] : '' );
                         echo '<p class="form-field rent_field ">
                         
-                            <label for="rent">' . __('Maximum Rent', 'propertyhive') . ' (&pound;)</label>
+                            <label for="_applicant_maximum_rent_' . $key . '">' . __('Maximum Rent', 'propertyhive') . ' (&pound;)</label>
                             
                             <input type="text" class="" name="_applicant_maximum_rent_' . $key . '" id="_applicant_maximum_rent_' . $key . '" value="' . ( ( isset($applicant_profile['max_rent']) ) ? $applicant_profile['max_rent'] : '' ) . '" placeholder="" style="width:20%; max-width:150px;">
                             
@@ -299,7 +299,7 @@ class PH_Meta_Box_Contact_Relationships {
                         // Locations
                     ?>
                         <p class="form-field"><label for="_applicant_locations_<?php echo $key; ?>"><?php _e( 'Locations', 'propertyhive' ); ?></label>
-                        <select id="_applicant_location_<?php echo $key; ?>" name="_applicant_locations_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add location..." class="multiselect attribute_values">
+                        <select id="_applicant_locations_<?php echo $key; ?>" name="_applicant_locations_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add location..." class="multiselect attribute_values">
                             <?php
                                 $options = array( '' => '' );
                                 $args = array(
