@@ -21,6 +21,8 @@ class PH_Meta_Box_Property_Address {
 	public static function output( $post, $args = array() ) {
         global $wpdb, $thepostid;
 
+        $thepostid = $post->ID;
+
         $original_post = $post;
         $original_thepostid = $thepostid;
 

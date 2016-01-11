@@ -123,7 +123,7 @@ class PH_Meta_Box_Contact_Relationships {
                     $the_property = new PH_Property( $property_post->ID );
                     
                     echo '<div id="tab_property_data_' . $property_post->ID . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
-                        <div class="options_group">';
+                        <div class="options_group" style="float:left; width:100%;">';
                         
                         echo '<p class="form-field">';
                             echo '<label>' . __('Address', 'propertyhive') . '</label>';
@@ -160,7 +160,7 @@ class PH_Meta_Box_Contact_Relationships {
                 {
                     echo '<div id="tab_applicant_data_' . $key . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                         
-                        <div class="options_group applicant-fields-' . $key . '">';
+                        <div class="options_group applicant-fields-' . $key . '" style="float:left; width:100%;">';
                         
                         $departments = array();
                         if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
@@ -181,9 +181,9 @@ class PH_Meta_Box_Contact_Relationships {
                         );
                         if (count($departments) == 1)
                         {
-                            foreach ($departments as $key => $value)
+                            foreach ($departments as $department_key => $value)
                             {
-                                $args['value'] = $key;
+                                $args['value'] = $department_key;
                             }
                         }
                         propertyhive_wp_radio( $args );
@@ -211,7 +211,7 @@ class PH_Meta_Box_Contact_Relationships {
                         $rent_frequency = ( ( isset($applicant_profile['rent_frequency']) ) ? $applicant_profile['rent_frequency'] : '' );
                         echo '<p class="form-field rent_field ">
                         
-                            <label for="rent">' . __('Maximum Rent', 'propertyhive') . ' (&pound;)</label>
+                            <label for="_applicant_maximum_rent_' . $key . '">' . __('Maximum Rent', 'propertyhive') . ' (&pound;)</label>
                             
                             <input type="text" class="" name="_applicant_maximum_rent_' . $key . '" id="_applicant_maximum_rent_' . $key . '" value="' . ( ( isset($applicant_profile['max_rent']) ) ? $applicant_profile['max_rent'] : '' ) . '" placeholder="" style="width:20%; max-width:150px;">
                             
@@ -299,7 +299,7 @@ class PH_Meta_Box_Contact_Relationships {
                         // Locations
                     ?>
                         <p class="form-field"><label for="_applicant_locations_<?php echo $key; ?>"><?php _e( 'Locations', 'propertyhive' ); ?></label>
-                        <select id="_applicant_location_<?php echo $key; ?>" name="_applicant_locations_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add location..." class="multiselect attribute_values">
+                        <select id="_applicant_locations_<?php echo $key; ?>" name="_applicant_locations_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add location..." class="multiselect attribute_values">
                             <?php
                                 $options = array( '' => '' );
                                 $args = array(
