@@ -123,7 +123,7 @@ class PH_Meta_Box_Contact_Relationships {
                     $the_property = new PH_Property( $property_post->ID );
                     
                     echo '<div id="tab_property_data_' . $property_post->ID . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
-                        <div class="options_group">';
+                        <div class="options_group" style="float:left; width:100%;">';
                         
                         echo '<p class="form-field">';
                             echo '<label>' . __('Address', 'propertyhive') . '</label>';
@@ -160,7 +160,7 @@ class PH_Meta_Box_Contact_Relationships {
                 {
                     echo '<div id="tab_applicant_data_' . $key . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                         
-                        <div class="options_group applicant-fields-' . $key . '">';
+                        <div class="options_group applicant-fields-' . $key . '" style="float:left; width:100%;">';
                         
                         $departments = array();
                         if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
