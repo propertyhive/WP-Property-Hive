@@ -293,12 +293,14 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
             case 'owner' :
                 
                 $owner_contact_id = $the_property->_owner_contact_id;
-                
-                echo get_the_title($owner_contact_id) . '<br>';
-                echo '<div class="row-actions">';
-                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
-                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
-                echo '</div>';
+                if ($owner_contact_id !='' && $owner_contact_id != 0)
+                {
+	                echo get_the_title($owner_contact_id) . '<br>';
+	                echo '<div class="row-actions">';
+	                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
+	                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+	                echo '</div>';
+	            }
                 break;
             case 'negotiator_office' :
                 
