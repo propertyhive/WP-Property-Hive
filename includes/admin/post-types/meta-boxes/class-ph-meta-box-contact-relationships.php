@@ -181,9 +181,9 @@ class PH_Meta_Box_Contact_Relationships {
                         );
                         if (count($departments) == 1)
                         {
-                            foreach ($departments as $key => $value)
+                            foreach ($departments as $department_key => $value)
                             {
-                                $args['value'] = $key;
+                                $args['value'] = $department_key;
                             }
                         }
                         propertyhive_wp_radio( $args );
