@@ -29,7 +29,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         // Rent / Rent Frequency
         echo '<p class="form-field rent_field ">
         
-            <label for="rent">' . __('Rent', 'propertyhive') . ' (&pound;)</label>
+            <label for="rent">' . __('Rent', 'propertyhive') . ' (<span class="currency-symbol">&pound;</span>)</label>
             
             <input type="text" class="" name="_rent" id="_rent" value="' . get_post_meta( $post->ID, '_rent', true ) . '" placeholder="" style="width:20%;">
             
@@ -53,7 +53,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         // Deposit
         propertyhive_wp_text_input( array( 
             'id' => '_deposit', 
-            'label' => __( 'Deposit', 'propertyhive' ) . ' (&pound;)', 
+            'label' => __( 'Deposit', 'propertyhive' ) . ' (<span class="currency-symbol">&pound;</span>)', 
             'desc_tip' => false,
             'class' => '',
             'custom_attributes' => array(

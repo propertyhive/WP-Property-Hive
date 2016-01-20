@@ -27,7 +27,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         // Price
         propertyhive_wp_text_input( array( 
             'id' => '_price', 
-            'label' => __( 'Price', 'propertyhive' ) . ' (&pound;)', 
+            'label' => __( 'Price', 'propertyhive' ) . ' (<span class="currency-symbol">&pound;</span>)', 
             'desc_tip' => false, 
             //'description' => __( 'Stock quantity. If this is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.', 'propertyhive' ), 
             'type' => 'text',
