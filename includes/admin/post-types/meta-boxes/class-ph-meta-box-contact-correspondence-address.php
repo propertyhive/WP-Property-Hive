@@ -72,7 +72,41 @@ class PH_Meta_Box_Contact_Correspondence_Address {
             'type' => 'text'
         ) );
 
-        // Country dropdown?
+        // Country dropdown
+        $countries = get_option( 'propertyhive_countries', array( 'GB' ) );
+        $contact_country = get_post_meta( $thepostid, '_address_country', TRUE );
+        if ( $contact_country == '' )
+        {
+            $contact_country = get_option( 'propertyhive_default_country', 'GB' );
+        }
+        if ( empty($countries) || count($countries) < 2 )
+        {
+            propertyhive_wp_hidden_input( array( 
+                'id' => '_address_country',
+                'value' => $contact_country,
+            ) );
+        }
+        else
+        {
+            $ph_countries = new PH_Countries();
+
+            $country_options = array();
+            foreach ( $countries as $country_code )
+            {
+                $country = $ph_countries->get_country( $country_code );
+                if ( $country !== false )
+                {
+                    $country_options[$country_code] = $country['name'];
+                }
+            }
+            propertyhive_wp_select( array( 
+                'id' => '_address_country', 
+                'label' => __( 'Country', 'propertyhive' ), 
+                'desc_tip' => false,
+                'options' => $country_options,
+                'value' => $contact_country,
+            ) );
+        }
 
         do_action('propertyhive_contact_correspondence_address_fields');
 	    
@@ -94,6 +128,7 @@ class PH_Meta_Box_Contact_Correspondence_Address {
         update_post_meta( $post_id, '_address_three', $_POST['_address_three'] );
         update_post_meta( $post_id, '_address_four', $_POST['_address_four'] );
         update_post_meta( $post_id, '_address_postcode', $_POST['_address_postcode'] );
+        update_post_meta( $post_id, '_address_country', $_POST['_address_country'] );
     }
 
 }
