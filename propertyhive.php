@@ -181,10 +181,6 @@ if ( ! class_exists( 'PropertyHive' ) )
         private function includes() {
             include_once( 'includes/ph-core-functions.php' );
             include_once( 'includes/class-ph-install.php' );
-            //include_once( 'includes/class-ph-comments.php' );
-            //include_once( 'includes/class-ph-post-data.php' );
-            //include_once( 'includes/abstracts/abstract-ph-session.php' );
-            //include_once( 'includes/class-ph-session-handler.php' );
     
             if ( is_admin() ) {
                 include_once( 'includes/admin/class-ph-admin.php' );
@@ -198,23 +194,10 @@ if ( ! class_exists( 'PropertyHive' ) )
                 $this->frontend_includes();
             }
     
-            // Query class
             $this->query = include( 'includes/class-ph-query.php' );                // The main query class
     
-            // Post types
             include_once( 'includes/class-ph-post-types.php' );                     // Registers post types
-    
-            // API Class
-            /*include_once( 'includes/class-ph-api.php' );
-    
-            // Include abstract classes
-            include_once( 'includes/abstracts/abstract-ph-product.php' );           // Products
-    
-            // Classes (used on all pages)
-            include_once( 'includes/class-ph-property-factory.php' );                // Property factory
-            */
-            // Include template hooks in time for themes to remove/modify them
-            include_once( 'includes/ph-template-hooks.php' );
+            include_once( 'includes/class-ph-countries.php' );                     // Manages interaction with countries and currency
         }
     
         /**
@@ -228,6 +211,7 @@ if ( ! class_exists( 'PropertyHive' ) )
          * Include required frontend files.
          */
         public function frontend_includes() {
+            include_once( 'includes/ph-template-hooks.php' );
             include_once( 'includes/class-ph-template-loader.php' );        // Template Loader
             include_once( 'includes/class-ph-frontend-scripts.php' );       // Frontend Scripts
             include_once( 'includes/ph-form-functions.php' );               // Form Renderers
@@ -265,16 +249,9 @@ if ( ! class_exists( 'PropertyHive' ) )
     
             // Load class instances
             //$this->product_factory = new PH_Product_Factory();     // Product Factory to create new product instances
-            //$this->countries       = new PH_Countries();            // Countries class
+            $this->countries       = new PH_Countries();            // Countries class
             //$this->integrations    = new PH_Integrations();     // Integrations class
            // $this->session         = new $session_class();
-    
-            // Classes/actions loaded for the frontend and for ajax requests
-            if ( ! is_admin() || defined( 'DOING_AJAX' ) ) {
-                // Class instances
-                //$this->cart     = new PH_Cart();                // Cart class, stores the cart contents
-                //$this->customer = new PH_Customer();            // Customer class, handles data such as customer location
-            }
     
             // Email Actions
             /*$email_actions = array(
