@@ -87,7 +87,6 @@ class PH_Settings_General extends PH_Settings_Page {
                 'id'        => 'propertyhive_search_results_page_id',
                 'type'      => 'single_select_page',
                 'default'   => '',
-                'class'     => 'chosen_select_nostd',
                 'css'       => 'min-width:300px;',
                 'desc_tip'  => __( 'This sets the page of your property search results', 'propertyhive' ),
             ),
@@ -100,6 +99,24 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
             
 			array( 'type' => 'sectionend', 'id' => 'general_options'),
+
+			array( 'title' => __( 'International Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'international_options' ),
+
+			array(
+                'title'   => __( 'Default Country', 'propertyhive' ),
+                'id'      => 'propertyhive_default_country',
+                'type'    => 'single_select_country',
+                'css'       => 'min-width:300px;',
+            ),
+
+            array(
+                'title'   => __( 'Countries That You Operate', 'propertyhive' ),
+                'id'      => 'propertyhive_countries',
+                'type'    => 'multi_select_countries',
+                'css'       => 'min-width:300px;',
+            ),
+
+			array( 'type' => 'sectionend', 'id' => 'international_options'),
 
 		) ); // End general settings
 	}
