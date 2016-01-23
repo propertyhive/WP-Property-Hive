@@ -104,8 +104,9 @@ class PH_Meta_Box_Property_Address {
         {
             if ( count($countries) == 1 )
             {
+                $ph_countries = new PH_Countries();
                 $country = $ph_countries->get_country( $countries[0] );
-                $country_js[$country_code] = $country;
+                $country_js[$countries[0]] = $country;
             }
             propertyhive_wp_hidden_input( array( 
                 'id' => '_address_country',
