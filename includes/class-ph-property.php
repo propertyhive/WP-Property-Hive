@@ -206,8 +206,14 @@ class PH_Property {
         else
         {
             $ph_countries = new PH_Countries();
-
-            $currency = $ph_countries->get_currency( $this->_currency );
+            if ($this->_currency != '')
+            {
+                $currency = $ph_countries->get_currency( $this->_currency );
+            }
+            else
+            {
+                $currency = $ph_countries->get_currency( 'GBP' );
+            }
             $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
             $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
             switch ($this->_department)
