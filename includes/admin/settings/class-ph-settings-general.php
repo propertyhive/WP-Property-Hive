@@ -198,6 +198,7 @@ class PH_Settings_General extends PH_Settings_Page {
 
 		PH_Admin_Settings::save_fields( $settings );
 
+		do_action( 'propertyhive_update_currency_exchange_rates' );
 	}
 
 }

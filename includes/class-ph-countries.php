@@ -17,6 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PH_Countries {
 
+	public function __construct() {
+
+		add_action( 'propertyhive_update_currency_exchange_rates', array( $this, 'ph_update_currency_exchange_rates' ) );
+
+	}
+
 	/**
 	 * Auto-load in-accessible properties on demand.
 	 * @param  mixed $key
@@ -38,6 +44,22 @@ class PH_Countries {
 		}
 		
 		return false;
+	}
+
+	public function get_currency( $currency_code ) {
+
+		$countries = $this->get_countries();
+
+		foreach ( $countries as $country )
+		{
+			if ( $country['currency_code'] == $currency_code )
+			{
+				return array(
+					'currency_symbol' => $country['currency_symbol'],
+					'currency_prefix' => $country['currency_prefix']
+				);
+			}
+		}
 	}
 
 	/**
@@ -124,6 +146,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => true
 			),
+			'AE' => array(
+				'name' => 'United Arab Emirates',
+				'currency_code' => 'AED',
+				'currency_symbol' => '‎د.إ',
+				'currency_prefix' => false
+			),
 			'GB' => array(
 				'name' => 'United Kingdom',
 				'currency_code' => 'GBP',
@@ -155,6 +183,138 @@ class PH_Countries {
 				}
 				echo ' value="' . esc_attr( $key ) . '">' . ( $escape ? esc_js( $value['name'] ) : $value['name'] ) . '</option>';
 			}
+		}
+	}
+
+	public function convert_price_to_gbp( $price, $currency_code )
+	{
+		$exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
+
+		if ( isset($exchange_rates[$currency_code]) )
+		{
+			$price = $price / $exchange_rates[$currency_code];
+		}
+
+		return $price;
+	}
+
+	public function update_property_price_actual( $postID )
+	{
+		$countries = $this->countries;
+
+		$department = get_post_meta( $postID, '_department', true );
+		$country = get_post_meta( $postID, '_address_country', true );
+		$currency = get_post_meta( $postID, '_currency', true );
+		if ( $country == '' )
+		{
+			$country = get_option( 'propertyhive_default_country', 'GB' );
+		}
+		if ( $currency == '' )
+		{
+			$currency = $this->get_country($country);
+			$currency = $currency['currency_code'];
+		}
+
+		if (isset($countries[$country]))
+		{
+			if ( $department == 'residential-sales' )
+			{
+				$price = get_post_meta( $postID, '_price', true );
+				
+				$converted_price = $this->convert_price_to_gbp( $price, $currency );
+
+				update_post_meta( $postID, '_price_actual', $converted_price );
+			}
+			elseif ( $department == 'residential-lettings' )
+			{
+				$rent = get_post_meta( $postID, '_rent', true );
+				$rent_frequency = get_post_meta( $postID, '_rent_frequency', true );
+
+				$price = $rent; // Stored in pcm
+	            switch ($rent_frequency)
+	            {
+	                case "pw": { $price = ($rent * 52) / 12; break; }
+	                case "pcm": { $price = $rent; break; }
+	                case "pq": { $price = ($rent * 4) / 52; break; }
+	                case "pa": { $price = ($rent / 52); break; }
+	            }
+
+	            $converted_price = $this->convert_price_to_gbp( $price, $currency );
+
+	            update_post_meta( $postID, '_price_actual', $converted_price );
+			}
+		}
+	}
+
+	public function ph_update_currency_exchange_rates()
+	{
+		global $wpdb;
+
+		if ( $this->countries ) 
+		{
+			$countries = $this->countries;
+
+			$exchange_rates = array();
+			$previous_exchange_rates = get_option( 'propertyhive_currency_exchange_rates' );
+
+			$default_country = get_option( 'propertyhive_default_country', 'GB' );
+			$selected_countries = get_option( 'propertyhive_countries', array( $default_country ) );
+
+			foreach ( $countries as $key => $value )
+			{	
+				if (!isset($exchange_rates[$value['currency_code']]) && in_array($key, $selected_countries))
+				{
+					// we haven't got this exchange rate
+					$from   = 'GBP'; 
+					$to     = $value['currency_code'];
+					$url = 'http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s='. $from . $to .'=X';
+
+					$filehandler = @fopen( $url, 'r' );
+
+					$exchangeRate = '';
+
+					if ( $filehandler ) 
+					{
+						$data = fgets($filehandler, 4096);
+					    fclose($filehandler);
+
+					    $InfoData = explode(',',$data); 
+
+						if ( isset($InfoData[1]) )
+						{
+							$exchangeRate = $InfoData[1];
+							$exchange_rates[$to] = $exchangeRate;
+						}
+					}
+
+					if ( $exchangeRate == '' && isset($previous_exchange_rates[$to]) )
+					{
+						// if for some reason we get here and don't have an exchange rate
+						$exchange_rates[$to] = $previous_exchange_rates[$to];
+					}
+				}
+			}
+			update_option( 'propertyhive_currency_exchange_rates', $exchange_rates );
+
+			// Loop through all properties and update _actual_price meta value to be price in GBP
+			$args = array(
+				'post_type' => 'property',
+				'nopaging' => true
+			);
+			$property_query =  new WP_Query($args);
+
+			if ($property_query->have_posts())
+			{
+				while ($property_query->have_posts())
+				{
+					$property_query->the_post();
+
+					$this->update_property_price_actual( get_the_ID() );
+				}
+			}
+
+			wp_reset_postdata();
+
 		}
 	}
 
