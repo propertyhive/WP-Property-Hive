@@ -24,16 +24,52 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         
         echo '<div class="options_group">';
         
+        // Currency / Rent / Rent Frequency
+        $ph_countries = new PH_Countries();
+
+        $default_country = get_option( 'propertyhive_default_country', 'GB' );
+        $countries = get_option( 'propertyhive_countries', array( $default_country ) );
+        $currencies = array();
+        foreach ( $countries as $country )
+        {
+            $country = $ph_countries->get_country( $country );
+
+            if ( !isset($currencies[$country['currency_code']]) )
+            {
+                $currencies[$country['currency_code']] = $country['currency_symbol'];
+            }
+        }
+
+        $selected_currency = get_post_meta( $post->ID, '_currency', true );
+        if ( $selected_currency == '' )
+        {
+            $country = $ph_countries->get_country( $default_country );
+            $selected_currency = $country['currency_code'];
+        }
+
         $rent_frequency = get_post_meta( $post->ID, '_rent_frequency', true );
-        
-        // Rent / Rent Frequency
+
         echo '<p class="form-field rent_field ">
         
-            <label for="rent">' . __('Rent', 'propertyhive') . ' (&pound;)</label>
+            <label for="_rent">' . __('Rent', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
+        
+        if ( count($currencies) > 1 )
+        {
+            echo '<select id="_rent_currency" name="_rent_currency" class="select" style="width:auto; float:left;">';
+            foreach ($currencies as $currency_code => $currency_sybmol)
+            {
+                echo '<option value="' . $currency_code . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+            }
+            echo '</select>';
+        }
+        else
+        {
+            echo '<input type="hidden" name="_rent_currency" value="' . $selected_currency . '">';
+        }
+
+        echo '<input type="text" class="" name="_rent" id="_rent" value="' . get_post_meta( $post->ID, '_rent', true ) . '" placeholder="" style="width:20%;">
             
-            <input type="text" class="" name="_rent" id="_rent" value="' . get_post_meta( $post->ID, '_rent', true ) . '" placeholder="" style="width:20%;">
-            
-            <select id="_rent_frequency" name="_rent_frequency" class="select short">
+            <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:auto">
                 <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
                 <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
                 <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
@@ -53,7 +89,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         // Deposit
         propertyhive_wp_text_input( array( 
             'id' => '_deposit', 
-            'label' => __( 'Deposit', 'propertyhive' ) . ' (&pound;)', 
+            'label' => __( 'Deposit', 'propertyhive' ), 
             'desc_tip' => false,
             'class' => '',
             'custom_attributes' => array(
@@ -129,19 +165,15 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         
         if ($department == 'residential-lettings')
         {
+            update_post_meta( $post_id, '_currency', $_POST['_rent_currency'] );
+
             $rent = preg_replace("/[^0-9.]/", '', $_POST['_rent']);
             update_post_meta( $post_id, '_rent', $rent );
             update_post_meta( $post_id, '_rent_frequency', $_POST['_rent_frequency'] );
             
-            $price_actual = $rent; // Used for ordering properties. Stored in pcm
-            switch ($_POST['_rent_frequency'])
-            {
-                case "pw": { $price_actual = ($rent * 52) / 12; break; }
-                case "pcm": { $price_actual = $rent; break; }
-                case "pq": { $price_actual = ($rent * 4) / 52; break; }
-                case "pa": { $price_actual = ($rent / 52); break; }
-            }
-            update_post_meta( $post_id, '_price_actual', $price_actual );
+            // Store price in common currency (GBP) and frequency (PCM) used for ordering
+            $ph_countries = new PH_Countries();
+            $ph_countries->update_property_price_actual( $post_id );
 
             update_post_meta( $post_id, '_poa', ( isset($_POST['_rent_poa']) ? $_POST['_rent_poa'] : '' ) );
             

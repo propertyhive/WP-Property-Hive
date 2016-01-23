@@ -267,7 +267,36 @@ class PH_Meta_Box_Property_Owner {
                 'type' => 'text'
             ) );
             
-            // Country dropdown?
+            $countries = get_option( 'propertyhive_countries', array( 'GB' ) ); // Get all countries
+            $owner_country = get_option( 'propertyhive_default_country', 'GB' ); // get default
+            if ( empty($countries) || count($countries) < 2 )
+            {
+                propertyhive_wp_hidden_input( array( 
+                    'id' => '_owner_address_country',
+                    'value' => $owner_country,
+                ) );
+            }
+            else
+            {
+                $ph_countries = new PH_Countries(); // Can't use $this->countries because we're inside a static method
+
+                $country_options = array();
+                foreach ( $countries as $country_code )
+                {
+                    $country = $ph_countries->get_country( $country_code );
+                    if ( $country !== false )
+                    {
+                        $country_options[$country_code] = $country['name'];
+                    }
+                }
+                propertyhive_wp_select( array( 
+                    'id' => '_owner_address_country', 
+                    'label' => __( 'Country', 'propertyhive' ), 
+                    'desc_tip' => false,
+                    'options' => $country_options,
+                    'value' => $owner_country,
+                ) );
+            }
             
             echo '<h4>' . __('Contact Details', 'propertyhive') . '</h4>';
             
@@ -310,6 +339,7 @@ class PH_Meta_Box_Property_Owner {
                   jQuery(\'#_owner_address_three\').val( jQuery(\'#_address_three\').val() );
                   jQuery(\'#_owner_address_four\').val( jQuery(\'#_address_four\').val() );
                   jQuery(\'#_owner_address_postcode\').val( jQuery(\'#_address_postcode\').val() );
+                  jQuery(\'#_owner_address_country\').val( jQuery(\'#_address_country\').val() );
 
                   return false;
               });
@@ -363,6 +393,7 @@ class PH_Meta_Box_Property_Owner {
                 update_post_meta( $contact_post_id, '_address_three', $_POST['_owner_address_three'] );
                 update_post_meta( $contact_post_id, '_address_four', $_POST['_owner_address_four'] );
                 update_post_meta( $contact_post_id, '_address_postcode', $_POST['_owner_address_postcode'] );
+                update_post_meta( $contact_post_id, '_address_country', $_POST['_owner_address_country'] );
               
                 update_post_meta( $contact_post_id, '_telephone_number', $_POST['_owner_telephone_number'] );
                 update_post_meta( $contact_post_id, '_email_address', $_POST['_owner_email_address'] );

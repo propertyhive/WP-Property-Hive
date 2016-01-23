@@ -24,18 +24,65 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         
         echo '<div class="options_group">';
         
+        // Currency / Price
+        $ph_countries = new PH_Countries();
+
+        $default_country = get_option( 'propertyhive_default_country', 'GB' );
+        $countries = get_option( 'propertyhive_countries', array( $default_country ) );
+        $currencies = array();
+        foreach ( $countries as $country )
+        {
+            $country = $ph_countries->get_country( $country );
+
+            if ( !isset($currencies[$country['currency_code']]) )
+            {
+                $currencies[$country['currency_code']] = $country['currency_symbol'];
+            }
+        }
+
+        $selected_currency = get_post_meta( $post->ID, '_currency', true );
+        if ( $selected_currency == '' )
+        {
+            $country = $ph_countries->get_country( $default_country );
+            $selected_currency = $country['currency_code'];
+        }
+
+        echo '<p class="form-field price_field ">
+        
+            <label for="_price">' . __('Price', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
+         
+        if ( count($currencies) > 1 )
+        {
+            echo '<select id="_price_currency" name="_price_currency" class="select" style="width:auto; float:left;">';
+            foreach ($currencies as $currency_code => $currency_sybmol)
+            {
+                echo '<option value="' . $currency_code . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+            }
+            echo '</select>';
+        }
+        else
+        {
+            echo '<input type="hidden" name="_price_currency" value="' . $selected_currency . '">';
+        }
+
+        echo '<input type="text" class="" name="_price" id="_price" value="' . get_post_meta( $post->ID, '_price', true ) . '" placeholder="" style="width:15%;">
+            
+        </p>';
+
+
+
         // Price
-        propertyhive_wp_text_input( array( 
+        /*propertyhive_wp_text_input( array( 
             'id' => '_price', 
-            'label' => __( 'Price', 'propertyhive' ) . ' (&pound;)', 
+            'label' => __( 'Price', 'propertyhive' ) . ' (<span class="currency-symbol">&pound;</span>)', 
             'desc_tip' => false, 
             //'description' => __( 'Stock quantity. If this is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.', 'propertyhive' ), 
             'type' => 'text',
             'class' => '',
             'custom_attributes' => array(
-                'style' => 'width:10%'
+                'style' => 'width:14%'
             )
-        ) );
+        ) );*/
         
         // POA
         propertyhive_wp_checkbox( array( 
@@ -172,12 +219,15 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         
         if ($department == 'residential-sales')
         {
+            update_post_meta( $post_id, '_currency', $_POST['_price_currency'] );
+
             $price = preg_replace("/[^0-9]/", '', $_POST['_price']);
             update_post_meta( $post_id, '_price', $price );
             
-            // Store price used for ordering. Not used yet but could be if introducing currencies in the future.
-            update_post_meta( $post_id, '_price_actual', $price );
-            
+            // Store price in common currency (GBP) used for ordering
+            $ph_countries = new PH_Countries();
+            $ph_countries->update_property_price_actual( $post_id );
+
             update_post_meta( $post_id, '_poa', ( isset($_POST['_sale_poa']) ? $_POST['_sale_poa'] : '' ) );
             
             if ( !empty($_POST['price_qualifier_id']) )

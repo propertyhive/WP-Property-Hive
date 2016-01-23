@@ -87,9 +87,8 @@ class PH_Settings_General extends PH_Settings_Page {
                 'id'        => 'propertyhive_search_results_page_id',
                 'type'      => 'single_select_page',
                 'default'   => '',
-                'class'     => 'chosen_select_nostd',
                 'css'       => 'min-width:300px;',
-                'desc_tip'  => __( 'This sets the page of your property search results', 'propertyhive' ),
+                'desc'  => __( 'This sets the page of your property search results', 'propertyhive' ),
             ),
 
             array(
@@ -100,6 +99,25 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
             
 			array( 'type' => 'sectionend', 'id' => 'general_options'),
+
+			array( 'title' => __( 'International Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'international_options' ),
+
+			array(
+                'title'   => __( 'Default Country', 'propertyhive' ),
+                'id'      => 'propertyhive_default_country',
+                'type'    => 'single_select_country',
+                'css'       => 'min-width:300px;',
+            ),
+
+            array(
+                'title'   => __( 'Countries Where You Operate', 'propertyhive' ),
+                'id'      => 'propertyhive_countries',
+                'type'    => 'multi_select_countries',
+                'css'       => 'min-width:300px;',
+                'desc'	=> __( 'Hold ctrl/cmd whilst clicking to select multiple', 'propertyhive' )
+            ),
+
+			array( 'type' => 'sectionend', 'id' => 'international_options'),
 
 		) ); // End general settings
 	}
@@ -181,6 +199,22 @@ class PH_Settings_General extends PH_Settings_Page {
 
 		PH_Admin_Settings::save_fields( $settings );
 
+		if (!isset($_POST['propertyhive_countries']) || (isset($_POST['propertyhive_countries']) && empty($_POST['propertyhive_countries'])))
+		{
+			// If we haven't selected which countries we operate in
+			update_option( 'propertyhive_countries', array( $_POST['propertyhive_default_country'] ) );
+		}
+		else
+		{
+			// We have default country and countries set
+			// Make sure default country is in list of countries selected
+			if ( !in_array($_POST['propertyhive_default_country'], $_POST['propertyhive_countries']) ) {
+				$_POST['propertyhive_default_country'] = $_POST['propertyhive_countries'][0];
+				update_option( 'propertyhive_default_country', $_POST['propertyhive_default_country'] );
+			}
+		}
+
+		do_action( 'propertyhive_update_currency_exchange_rates' );
 	}
 
 }

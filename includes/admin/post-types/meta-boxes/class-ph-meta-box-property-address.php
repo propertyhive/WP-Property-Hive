@@ -92,7 +92,49 @@ class PH_Meta_Box_Property_Address {
             'type' => 'text'
         ) );
 
-        // Country dropdown?
+        // Country dropdown
+        $countries = get_option( 'propertyhive_countries', array( 'GB' ) );
+        $property_country = get_post_meta( $thepostid, '_address_country', TRUE );
+        $country_js = array();
+        if ( $property_country == '' )
+        {
+            $property_country = get_option( 'propertyhive_default_country', 'GB' );
+        }
+        if ( empty($countries) || count($countries) < 2 )
+        {
+            if ( count($countries) == 1 )
+            {
+                $ph_countries = new PH_Countries();
+                $country = $ph_countries->get_country( $countries[0] );
+                $country_js[$countries[0]] = $country;
+            }
+            propertyhive_wp_hidden_input( array( 
+                'id' => '_address_country',
+                'value' => $property_country,
+            ) );
+        }
+        else
+        {
+            $ph_countries = new PH_Countries(); // Can't use $this->countries because we're inside a static method
+
+            $country_options = array();
+            foreach ( $countries as $country_code )
+            {
+                $country = $ph_countries->get_country( $country_code );
+                if ( $country !== false )
+                {
+                    $country_options[$country_code] = $country['name'];
+                    $country_js[$country_code] = $country;
+                }
+            }
+            propertyhive_wp_select( array( 
+                'id' => '_address_country', 
+                'label' => __( 'Country', 'propertyhive' ), 
+                'desc_tip' => false,
+                'options' => $country_options,
+                'value' => $property_country,
+            ) );
+        }
         
         // Location
         $options = array( '' => '' );
@@ -167,9 +209,24 @@ class PH_Meta_Box_Property_Address {
         
         echo '
         <script>
-        
+            
+            var countries = ' . json_encode($country_js). ';
+
+            // Change currency symbol shown on sales and lettings details meta boxes
+            function countryChange(country_code)
+            {
+                jQuery(\'.currency-symbol\').html(countries[country_code].currency_symbol);
+            }
+
             jQuery(document).ready(function()
             {
+                countryChange(\'' . $property_country . '\');
+
+                jQuery(\'select[id=\\\'_address_country\\\']\').change(function()
+                {
+                    countryChange(jQuery(this).val());
+                });
+
                 if (jQuery(\'#title\').length > 0)
                 {
                     jQuery(\'#title\').change(function()
@@ -314,6 +371,7 @@ class PH_Meta_Box_Property_Address {
         update_post_meta( $post_id, '_address_three', $_POST['_address_three'] );
         update_post_meta( $post_id, '_address_four', $_POST['_address_four'] );
         update_post_meta( $post_id, '_address_postcode', $_POST['_address_postcode'] );
+        update_post_meta( $post_id, '_address_country', $_POST['_address_country'] );
 
         if ( !empty($_POST['location_id']) )
         {

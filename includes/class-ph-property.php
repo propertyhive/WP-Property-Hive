@@ -205,16 +205,27 @@ class PH_Property {
         }
         else
         {
+            $ph_countries = new PH_Countries();
+            if ($this->_currency != '')
+            {
+                $currency = $ph_countries->get_currency( $this->_currency );
+            }
+            else
+            {
+                $currency = $ph_countries->get_currency( 'GBP' );
+            }
+            $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+            $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
             switch ($this->_department)
             {
                 case "residential-sales":
                 {
-                    return ( ( $this->_price != '' ) ? '&pound;' . number_format($this->_price, 0) : '-' );
+                    return ( ( $this->_price != '' ) ? $prefix . number_format($this->_price, 0) . $suffix : '-' );
                     break;
                 }
                 case "residential-lettings":
                 {
-                    return ( ( $this->_rent != '' ) ? '&pound;' . number_format($this->_rent, 0) . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                    return ( ( $this->_rent != '' ) ? $prefix . number_format($this->_rent, 0) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                     break;
                 }
             }
@@ -231,7 +242,13 @@ class PH_Property {
      */
     public function get_formatted_deposit( ) 
     {
-        return '&pound;' . number_format($this->_deposit, 0);
+        $ph_countries = new PH_Countries();
+
+        $currency = $ph_countries->get_currency( $this->_currency );
+        $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+        $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+
+        return $prefix . number_format($this->_deposit, 0) . $suffix;
     }
     
     /**
@@ -340,8 +357,11 @@ class PH_Property {
         if ($num_property_features == '') { $num_property_features = 0; }
         
         for ($i = 0; $i < $num_property_features; ++$i)
-        {
-            $features[] = $this->{'_feature_' . $i};
+        {   
+            if ( $this->{'_feature_' . $i} != '' )
+            {
+                $features[] = $this->{'_feature_' . $i};
+            }
         }
         
         return $features;

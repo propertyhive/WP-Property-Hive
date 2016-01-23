@@ -540,32 +540,32 @@ class PH_Admin_Settings {
 	            break;
 
 	            // Single country selects
-	            /*case 'single_select_country' :
+	            case 'single_select_country' :
 					$country_setting = (string) self::get_option( $value['id'] );
 					$countries       = PH()->countries->countries;
 
 	            	if ( strstr( $country_setting, ':' ) ) {
 						$country_setting = explode( ':', $country_setting );
 						$country         = current( $country_setting );
-						$state           = end( $country_setting );
 	            	} else {
 						$country = $country_setting;
-						$state   = '*';
 	            	}
 	            	?><tr valign="top">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
 							<?php echo $tip; ?>
 						</th>
-	                    <td class="forminp"><select name="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>" data-placeholder="<?php _e( 'Choose a country&hellip;', 'propertyhive' ); ?>" title="Country" class="chosen_select">
-				        	<?php PH()->countries->country_dropdown_options( $country, $state ); ?>
-				        </select> <?php echo $description; ?>
+	                    <td class="forminp">
+		                    <select name="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>">
+					        	<?php PH()->countries->country_dropdown_options( $country ); ?>
+					        </select>
+					        <?php echo $description; ?>
 	               		</td>
 	               	</tr><?php
-	            break;*/
+	            break;
 
 	            // Country multiselects
-	            /*case 'multi_select_countries' :
+	            case 'multi_select_countries' :
 
 	            	$selections = (array) self::get_option( $value['id'] );
 
@@ -581,16 +581,16 @@ class PH_Admin_Settings {
 							<?php echo $tip; ?>
 						</th>
 	                    <td class="forminp">
-		                    <select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px" data-placeholder="<?php _e( 'Choose countries&hellip;', 'propertyhive' ); ?>" title="Country" class="chosen_select">
+		                    <select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="<?php echo esc_attr( $value['css'] ); ?>">
 					        	<?php
 					        		if ( $countries )
 					        			foreach ( $countries as $key => $val )
-		                    				echo '<option value="' . esc_attr( $key ) . '" ' . selected( in_array( $key, $selections ), true, false ).'>' . $val . '</option>';
+		                    				echo '<option value="' . esc_attr( $key ) . '" ' . selected( in_array( $key, $selections ), true, false ).'>' . $val['name'] . '</option>';
 		                    	?>
-					        </select> <?php if ( $description ) echo $description; ?> </br><a class="select_all button" href="#"><?php _e( 'Select all', 'propertyhive' ); ?></a> <a class="select_none button" href="#"><?php _e( 'Select none', 'propertyhive' ); ?></a>
+					        </select> <?php if ( $description ) echo $description; ?>
 	               		</td>
 	               	</tr><?php
-	            break;*/
+	            break;
 
 	            // Default: run an action
 	            default:
