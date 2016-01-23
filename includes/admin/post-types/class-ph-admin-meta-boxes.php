@@ -103,6 +103,32 @@ class PH_Admin_Meta_Boxes {
             wp_redirect( admin_url( 'post.php?post=' . $_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
             exit();
         }
+
+        if ( isset($_GET['add_third_party_relationship']) && wp_verify_nonce($_GET['add_third_party_relationship'], '1') && isset($_GET['post']) ) 
+        {
+            // Need to add blank applicant
+            if ( get_post_type($_GET['post']) != 'contact' )
+                return;
+
+            $existing_third_party_categories = get_post_meta( $_GET['post'], '_third_party_categories', TRUE );
+            if ($existing_third_party_categories)
+            {
+                $existing_third_party_categories = array();
+            }
+            $existing_third_party_categories[] = 0;
+            update_post_meta( $_GET['post'], '_third_party_categories', $existing_third_party_categories );
+
+            $existing_contact_types = get_post_meta( $_GET['post'], '_contact_types', TRUE );
+            if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
+            {
+                $existing_contact_types = array();
+            }
+            if ( !in_array( 'thirdparty', $existing_contact_types ) )
+            {
+                $existing_contact_types[] = 'thirdparty';
+                update_post_meta( $_GET['post'], '_contact_types', $existing_contact_types );
+            }
+        }
     }
 
     public function check_contact_delete_relationship()
