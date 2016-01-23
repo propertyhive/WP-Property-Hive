@@ -622,6 +622,8 @@ class PH_Query {
 	 */
 	public function address_keyword_meta_query( ) {
       	
+      	$meta_query = array();
+      	
       	if ( isset( $_REQUEST['address_keyword'] ) && $_REQUEST['address_keyword'] != '' )
         {
 	      	$meta_query = array(
