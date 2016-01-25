@@ -46,6 +46,7 @@ class PH_Admin_Menus {
 	    add_submenu_page( 'propertyhive', __( 'Properties', 'propertyhive' ), __( 'Properties', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=property'/*, array( $this, 'attributes_page' )*/ );
 	    add_submenu_page( 'propertyhive', __( 'Property Owners and Landlords', 'propertyhive' ), __( 'Owners &amp; Landlords', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=owner'/*, array( $this, 'attributes_page' )*/ );
         add_submenu_page( 'propertyhive', __( 'Applicants', 'propertyhive' ), __( 'Applicants', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=applicant'/*, array( $this, 'attributes_page' )*/ );
+        add_submenu_page( 'propertyhive', __( 'Third Party Contacts', 'propertyhive' ), __( 'Third Party Contacts', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=thirdparty'/*, array( $this, 'attributes_page' )*/ );
         add_submenu_page( 'propertyhive', __( 'Enquiries', 'propertyhive' ), __( 'Enquiries', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=enquiry'/*, array( $this, 'attributes_page' )*/ );
         //add_submenu_page( 'propertyhive', __( 'Reports', 'propertyhive' ), __( 'Reports', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=reports'/*, array( $this, 'attributes_page' )*/ );
     }

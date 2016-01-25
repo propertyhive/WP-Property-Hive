@@ -317,6 +317,18 @@ class PH_Admin_Post_Types {
 
         $options = apply_filters( 'propertyhive_contact_filter_options', $options );
 
+        // Third Parties
+        $option = '<option value="thirdparty"';
+        if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
+        {
+            $option .= selected( 'thirdparty', $_GET['_contact_type'], false );
+        }
+        $option .= '>' . __( 'Third Party Contacts', 'propertyhive' ) . '</option>';
+
+        $options[] = $option;
+
+        $options = apply_filters( 'propertyhive_contact_filter_options', $options );
+
         $output = '';
         if (count($options) > 1)
         {

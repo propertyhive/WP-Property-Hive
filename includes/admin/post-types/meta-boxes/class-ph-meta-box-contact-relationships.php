@@ -67,6 +67,20 @@ class PH_Meta_Box_Contact_Relationships {
             }
         }
 
+        $third_party_profiles = array();
+        $third_party_categories = get_post_meta( $thepostid, '_third_party_categories', TRUE );
+        if ( is_array($third_party_categories) && !empty($third_party_categories) )
+        {
+            $ph_third_party_contacts = new PH_Third_Party_Contacts();
+
+            foreach ( $third_party_categories as $third_party_category )
+            {
+                $third_party_profiles[] = $third_party_category;
+
+                ++$total_profiles;
+            }
+        }
+
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="panel-wrap">
@@ -104,6 +118,24 @@ class PH_Meta_Box_Contact_Relationships {
                     }
                     echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
                         <a href="#tab_applicant_data_' . $key . '">' . $label . '</a>
+                    </li>';
+                    
+                    ++$tab;
+                }
+
+                foreach ($third_party_profiles as $key => $third_party_profile)
+                {
+                    $label = __( 'New Third Party', 'propertyhive' );
+                    if ( $third_party_profile != '' && $third_party_profile != 0 )
+                    {
+                        $category_name = $ph_third_party_contacts->get_category( $third_party_profile );
+                        if ( $category_name !== false )
+                        {
+                            $label = $category_name;
+                        }
+                    }
+                    echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
+                        <a href="#tab_third_party_data_' . $key . '">' . $label . '</a>
                     </li>';
                     
                     ++$tab;
@@ -487,6 +519,43 @@ class PH_Meta_Box_Contact_Relationships {
                     ++$tab;
                 }
 
+                foreach ($third_party_profiles as $key => $category)
+                {
+                    echo '<div id="tab_third_party_data_' . $key . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
+                        <div class="options_group" style="float:left; width:100%;">';
+                        
+                        echo '<p class="form-field rent_field ">
+                        
+                            <label for="_third_party_category_' . $key . '">' . __('Contact Category', 'propertyhive') . '</label>
+                            
+                            <select id="_third_party_category_' . $key . '" name="_third_party_category[]" class="select short">';
+
+                        if ( $category == '' || $category == 0 )
+                        {
+                            echo '<option value="0"></option>';
+                        }
+
+                        $categories = $ph_third_party_contacts->get_categories();
+                        foreach ( $categories as $id => $category_name )
+                        {
+                            echo '<option value="' . $id . '"';
+                            if ( $id == $category )
+                            {
+                                echo ' selected';
+                            }
+                            echo '>' . $category_name . '</option>';
+                        }
+
+                        echo '</select>
+                            
+                        </p>';
+
+                        echo '
+                        </div>
+                    </div>';
+                    ++$tab;
+                }
+
                 echo '<div id="tab_add_relationship" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                     <div class="options_group">';
                 
@@ -494,7 +563,7 @@ class PH_Meta_Box_Contact_Relationships {
                         echo '<label>' . __('New Relationship Type', 'propertyhive') . '</label>';
                         echo '<a href="' . wp_nonce_url( admin_url( 'post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships' ), '1', 'add_applicant_relationship' ) . '" class="button">' . __( 'New Applicant Profile', 'propertyhive' ) . '</a><br><br>';
                         echo '<a href="' . admin_url( 'post-new.php?post_type=property&owner_contact_id=' . $thepostid ) . '" class="button">' . __( 'New Property Owner / Landlord', 'propertyhive' ) . '</a><br><br>';
-                        //echo '<a href="#" class="button">' . __( 'New Third Party', 'propertyhive' ) . '</a>';
+                        echo '<a href="' . wp_nonce_url( admin_url( 'post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships' ), '1', 'add_third_party_relationship' ) . '" class="button">' . __( 'New Third Party Contact', 'propertyhive' ) . '</a>';
                     echo '</p>';
                 
                 echo '
@@ -574,6 +643,16 @@ class PH_Meta_Box_Contact_Relationships {
                 update_post_meta( $post_id, '_applicant_profile_' . $i, $applicant_profile );
             }
         }
+
+        $third_party_categories = array();
+        if ( isset($_POST['_third_party_category']) && is_array($_POST['_third_party_category']) && !empty($_POST['_third_party_category']) )
+        {
+            foreach ( $_POST['_third_party_category'] as $category )
+            {
+                $third_party_categories[]  = $category;
+            }
+        }
+        update_post_meta( $post_id, '_third_party_categories', $third_party_categories );
     }
 
 }
