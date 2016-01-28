@@ -67,7 +67,7 @@ class PH_Countries {
 	 * @return array
 	 */
 	private function get_countries() {
-		return array(
+		$countries = array(
 			'AU' => array(
 				'name' => 'Australia',
 				'currency_code' => 'AUD',
@@ -165,6 +165,8 @@ class PH_Countries {
 				'currency_prefix' => true
 			),
 		);
+		
+		return apply_filters( 'propertyhive_countries', $countries );
 	}
 
 	/**
