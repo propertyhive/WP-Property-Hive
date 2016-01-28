@@ -222,7 +222,7 @@ class PH_Post_types {
                     'capability_type'       => 'post',
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => true,
-                    'exclude_from_search'   => false,
+                    'exclude_from_search'   => true,
                     'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
                     'query_var'             => true,
                     'supports'              => array( 'title' ),
@@ -240,7 +240,7 @@ class PH_Post_types {
                     'capability_type'       => 'post',
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => true,
-                    'exclude_from_search'   => false,
+                    'exclude_from_search'   => true,
                     'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
                     'query_var'             => true,
                     'supports'              => array( 'title' ),
@@ -274,7 +274,7 @@ class PH_Post_types {
                     'capability_type'       => 'post',
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
-                    'exclude_from_search'   => false,
+                    'exclude_from_search'   => true,
                     'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
                     'query_var'             => true,
                     'supports'              => array( 'title' ),
