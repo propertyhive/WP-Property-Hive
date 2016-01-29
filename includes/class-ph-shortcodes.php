@@ -17,8 +17,8 @@ class PH_Shortcodes {
 		// Define shortcodes
 		$shortcodes = array(
 			/*'property'                    => __CLASS__ . '::property',
-			'property_page'               => __CLASS__ . '::property_page',
-			'properties'                   => __CLASS__ . '::properties',*/
+			'property_page'               => __CLASS__ . '::property_page',*/
+			'properties'                   => __CLASS__ . '::properties',
 			'recent_properties'            => __CLASS__ . '::recent_properties',
 			'featured_properties'          => __CLASS__ . '::featured_properties',
 			'related_properties'           => __CLASS__ . '::related_properties',
@@ -58,6 +58,77 @@ class PH_Shortcodes {
 	}
 
 	/**
+	 * List multiple properties shortcode
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function properties( $atts ) {
+		$atts = shortcode_atts( array(
+			'columns' 			=> '2',
+			'orderby' 			=> 'title',
+			'order'  			=> 'asc',
+			'ids'     			=> '',
+			'department'		=> '', // residential-sales / residential-lettings
+			'posts_per_page'	=> 10
+		), $atts );
+
+		$meta_query = array(
+			array(
+				'key' 		=> '_on_market',
+				'value' 	=> 'yes',
+			)
+		);
+
+		if ( isset($atts['department']) && $atts['department'] != '' )
+		{
+			$meta_query[] = array(
+				'key' => '_department',
+				'value' => $atts['department'],
+				'compare' => '='
+			);
+		}
+
+		$args = array(
+			'post_type'           => 'property',
+			'post_status'         => 'publish',
+			'ignore_sticky_posts' => 1,
+			'orderby'             => $atts['orderby'],
+			'order'               => $atts['order'],
+			'posts_per_page'      => $atts['posts_per_page'],
+			'meta_query'		  => $meta_query
+		);
+
+		if ( ! empty( $atts['ids'] ) ) {
+			$args['post__in'] = array_map( 'trim', explode( ',', $atts['ids'] ) );
+		}
+
+		ob_start();
+
+		$properties = new WP_Query( apply_filters( 'propertyhive_properties_query', $args, $atts ) );
+
+		$propertyhive_loop['columns'] = $atts['columns'];
+
+		if ( $properties->have_posts() ) : ?>
+
+			<?php propertyhive_property_loop_start(); ?>
+
+				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
+
+					<?php ph_get_template_part( 'content', 'property' ); ?>
+
+				<?php endwhile; // end of the loop. ?>
+
+			<?php propertyhive_property_loop_end(); ?>
+
+		<?php endif;
+
+		wp_reset_postdata();
+
+		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+	}
+
+	/**
 	 * Recent Properties shortcode
 	 *
 	 * @access public
@@ -90,7 +161,7 @@ class PH_Shortcodes {
 
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_properties_query', $args, $atts ) );
 
-		$propertyhive_loop['columns'] = $columns;
+		$propertyhive_loop['columns'] = $atts['columns'];
 
 		if ( $properties->have_posts() ) : ?>
 
@@ -102,13 +173,13 @@ class PH_Shortcodes {
 
 				<?php endwhile; // end of the loop. ?>
 
-			<?php propertyhive_property_loop_start(); ?>
+			<?php propertyhive_property_loop_end(); ?>
 
 		<?php endif;
 
 		wp_reset_postdata();
 
-		return '<div class="propertyhive columns-' . $columns . '">' . ob_get_clean() . '</div>';
+		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
 	}
 
 	/**
@@ -151,7 +222,7 @@ class PH_Shortcodes {
 
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_properties_query', $args, $atts ) );
 
-		$propertyhive_loop['columns'] = $columns;
+		$propertyhive_loop['columns'] = $atts['columns'];
 
 		if ( $properties->have_posts() ) : ?>
 
@@ -163,13 +234,13 @@ class PH_Shortcodes {
 
 				<?php endwhile; // end of the loop. ?>
 
-			<?php propertyhive_property_loop_start(); ?>
+			<?php propertyhive_property_loop_end(); ?>
 
 		<?php endif;
 
 		wp_reset_postdata();
 
-		return '<div class="propertyhive columns-' . $columns . '">' . ob_get_clean() . '</div>';
+		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
 	}
 
 	/**
