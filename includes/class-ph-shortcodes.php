@@ -66,8 +66,9 @@ class PH_Shortcodes {
 	public static function properties( $atts ) {
 		$atts = shortcode_atts( array(
 			'columns' 			=> '2',
-			'orderby' 			=> 'title',
-			'order'  			=> 'asc',
+			'orderby' 			=> 'meta_value_num',
+			'order'  			=> 'desc',
+			'meta_key' 			=> '_price_actual',
 			'ids'     			=> '',
 			'department'		=> '', // residential-sales / residential-lettings
 			'posts_per_page'	=> 10
