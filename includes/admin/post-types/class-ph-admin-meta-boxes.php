@@ -513,6 +513,32 @@ class PH_Admin_Meta_Boxes {
 
         $tabs = apply_filters( 'propertyhive_tabs', $tabs );
 
+        // Force order of meta boxes
+        $meta_box_ids = array();
+        if ( get_post_type($post->ID) == 'property' || get_post_type($post->ID) == 'contact' || get_post_type($post->ID) == 'enquiry' )
+        {
+            foreach ( $tabs as $tab_id => $tab_options)
+            {
+                if ( isset($tab_options['post_type']) && $tab_options['post_type'] == get_post_type($post->ID) )
+                {
+                    $meta_box_ids = array_merge( $meta_box_ids, $tab_options['metabox_ids'] );
+                }
+            }
+        }
+        if (!empty($meta_box_ids) )
+        {
+            $existing_meta_box_order = get_user_meta( get_current_user_id(), 'meta-box-order_' . get_post_type($post->ID), TRUE );
+            if ( $existing_meta_box_order == '' )
+            {
+                $existing_meta_box_order = array();
+                $existing_meta_box_order['side'] = '';
+                $existing_meta_box_order['advanced'] = '';
+            }
+            $existing_meta_box_order['normal'] = implode(",", $meta_box_ids);
+
+            update_user_meta( get_current_user_id(), 'meta-box-order_' . get_post_type($post->ID), $existing_meta_box_order );
+        }
+
         // TO DO: move this so it works when in one column
         add_action( 'edit_form_after_title', array( $this, 'draw_meta_box_tabs' ), 31, 1);
     }
