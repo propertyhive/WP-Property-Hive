@@ -158,7 +158,7 @@ class PH_Query {
 		// Special check for sites with the property search results on front page
 		/*if ( $q->is_page() && 'page' == get_option( 'show_on_front' ) && $q->get('page_id') == ph_get_page_id('search_results') ) {
 
-			// This is a front-page shop
+			// This is a front-page property listings
 			$q->set( 'post_type', 'property' );
 			$q->set( 'page_id', '' );
 			if ( isset( $q->query['paged'] ) )
@@ -209,7 +209,7 @@ class PH_Query {
 
 		add_filter( 'posts_where', array( $this, 'exclude_protected_properties' ) );
 
-		// We're on a shop page so queue the propertyhive_get_properties_in_view function
+		// We're on a property search page so queue the propertyhive_get_properties_in_view function
 		add_action( 'wp', array( $this, 'get_properties_in_view' ), 2);
 
 		// And remove the pre_get_posts hook
