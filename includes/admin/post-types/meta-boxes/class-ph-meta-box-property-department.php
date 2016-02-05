@@ -48,6 +48,10 @@ class PH_Meta_Box_Property_Department {
         {
             $departments['residential-lettings'] = __( 'Residential Lettings', 'propertyhive' );
         }
+        if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+        {
+            $departments['commercial'] = __( 'Commercial', 'propertyhive' );
+        }
         $value = get_post_meta( $post->ID, '_department', TRUE );
         if ($value == '')
         {
@@ -85,8 +89,20 @@ class PH_Meta_Box_Property_Department {
             {
                  jQuery(\'#propertyhive-property-residential-sales-details\').hide();
                  jQuery(\'#propertyhive-property-residential-lettings-details\').hide();
+                 jQuery(\'#propertyhive-property-commercial-details\').hide();
+
+                 var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
                  
-                 jQuery(\'#propertyhive-property-\' + jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val() + \'-details\').show();
+                 jQuery(\'#propertyhive-property-\' + selectedDepartment + \'-details\').show();
+
+                 if (selectedDepartment == \'commercial\')
+                 {
+                    jQuery(\'#propertyhive-property-residential-details\').hide();
+                 }
+                 else
+                 {
+                    jQuery(\'#propertyhive-property-residential-details\').show();
+                 }
             }
             
         </script>';
