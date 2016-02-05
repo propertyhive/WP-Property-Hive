@@ -42,6 +42,7 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Details::save', 20, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Lettings_details::save', 25, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Sales_details::save', 30, 2 );
+        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Commercial_details::save', 30, 2 );
         
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Marketing::save', 35, 2 );
         
@@ -291,6 +292,7 @@ class PH_Admin_Meta_Boxes {
             'post_type' => 'property'
         );
         
+
         /* PROPERTY DETAILS META BOXES */
         $meta_boxes = array();
         $meta_boxes[5] = array(
@@ -321,6 +323,14 @@ class PH_Admin_Meta_Boxes {
             'id' => 'propertyhive-property-residential-details',
             'title' => __( 'Residential Details', 'propertyhive' ),
             'callback' => 'PH_Meta_Box_Property_Residential_Details::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[25] = array(
+            'id' => 'propertyhive-property-commercial-details',
+            'title' => __( 'Commercial Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Commercial_Details::output',
             'screen' => 'property',
             'context' => 'normal',
             'priority' => 'high'
