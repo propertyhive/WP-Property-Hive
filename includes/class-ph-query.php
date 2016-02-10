@@ -793,6 +793,7 @@ class PH_Query {
             $tax_query = array();
 
         $tax_query[] = $this->property_type_tax_query();
+        $tax_query[] = $this->marketing_flag_tax_query();
         
         return array_filter( $tax_query );
     }
@@ -807,11 +808,32 @@ class PH_Query {
         
         $tax_query = array();
         
-        if ( isset( $_REQUEST['property_type'] ) && $_REQUEST['property_type'] != '' )
+        if ( isset( $_REQUEST['property_type'] ) && !empty($_REQUEST['property_type']) )
         {
             $tax_query = array(
-                'taxonomy'  => '_property_type',
-                'terms' => array( $_REQUEST['property_type'] )
+                'taxonomy'  => 'property_type',
+                'terms' => ( (is_array($_REQUEST['property_type'])) ? $_REQUEST['property_type'] : array( $_REQUEST['property_type'] ) )
+            );
+        }
+        
+        return $tax_query;
+    }
+
+    /**
+     * Returns a taxonomy query to handle marketing flags
+     *
+     * @access public
+     * @return array
+     */
+    public function marketing_flag_tax_query( ) {
+        
+        $tax_query = array();
+        
+        if ( isset( $_REQUEST['marketing_flag'] ) && !empty($_REQUEST['marketing_flag']) )
+        {
+            $tax_query = array(
+                'taxonomy'  => 'marketing_flag',
+                'terms' => ( (is_array($_REQUEST['marketing_flag'])) ? $_REQUEST['marketing_flag'] : array( $_REQUEST['marketing_flag'] ) )
             );
         }
         

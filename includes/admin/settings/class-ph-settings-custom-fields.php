@@ -72,6 +72,10 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         $sections[ 'furnished' ] = __( 'Furnished', 'propertyhive' );
         add_action( 'propertyhive_admin_field_custom_fields_furnished', array( $this, 'custom_fields_furnished_setting' ) );
 
+        // Other
+        $sections[ 'marketing-flag' ] = __( 'Marketing Flags', 'propertyhive' );
+        add_action( 'propertyhive_admin_field_custom_fields_marketing_flag', array( $this, 'custom_fields_marketing_flag_setting' ) );
+
         return $sections;
     }
     
@@ -150,6 +154,9 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     
                     case "furnished": { $settings = $this->get_custom_fields_furnished_setting(); break; }
                     case "furnished-delete": { $settings = $this->get_custom_fields_delete($current_id, 'furnished', __( 'Furnished', 'propertyhive' )); break; }
+
+                    case "marketing-flag": { $settings = $this->get_custom_fields_marketing_flag_setting(); break; }
+                    case "marketing-flag-delete": { $settings = $this->get_custom_fields_delete($current_id, 'marketing_flag', __( 'Marketing Flag', 'propertyhive' )); break; }
                     
                     default: { echo 'UNKNOWN CUSTOM FIELD'; }
                 }
@@ -963,6 +970,83 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     }
 
     /**
+     * Output list of marketing flag options
+     *
+     * @access public
+     * @return void
+     */
+    public function custom_fields_marketing_flag_setting() {
+        global $post;
+    ?>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                &nbsp;
+            </th>
+            <td class="forminp forminp-button">
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Marketing Flag', 'propertyhive' ); ?></a>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row" class="titledesc"><?php _e( 'Marketing Flags', 'propertyhive' ) ?></th>
+            <td class="forminp">
+                <table class="ph_customfields widefat" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="type"><?php _e( 'Marketing Flag', 'propertyhive' ); ?></th>
+                            <th class="settings">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => 0
+                        );
+                        $terms = get_terms( 'marketing_flag', $args );
+                        
+                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                        {
+                            foreach ($terms as $term)
+                            { 
+                        ?>
+                        <tr>
+                            <td class="type"><?php echo $term->name; ?></td>
+                            <td class="settings">
+                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
+                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
+                            </td>
+                        </tr>
+                        <?php
+                            }
+                        }
+                        else
+                        {
+                        ?>
+                        <tr>
+                            <td><?php echo __( 'No marketing flags found', 'propertyhive' ); ?></td>
+                            <td class="settings">
+                                
+                            </td>
+                        </tr>
+                        <?php
+                        }
+                    ?>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                &nbsp;
+            </th>
+            <td class="forminp forminp-button">
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Marketing Flag', 'propertyhive' ); ?></a>
+            </td>
+        </tr>
+    <?php
+    }
+
+    /**
      * Show availability add/edit options
      *
      * @access public
@@ -1642,6 +1726,49 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     }
 
     /**
+     * Show marketing flag add/edit options
+     *
+     * @access public
+     * @return string
+     */
+    public function get_custom_fields_marketing_flag_setting()
+    {
+        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        
+        $taxonomy = 'marketing_flag';
+        $term_name = '';
+        if ($current_id != '')
+        {
+            $term = get_term( $current_id, $taxonomy );
+            $term_name = $term->name;
+        }
+
+        $args = array(
+
+            array( 'title' => __( ( $current_id == '' ? 'Add New Marketing Flag' : 'Edit Marketing Flag' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_marketing_flag_settings' ),
+            
+            array(
+                'title' => __( 'Marketing Flag', 'propertyhive' ),
+                'id'        => 'marketing_flag_name',
+                'default'   => $term_name,
+                'type'      => 'text',
+                'desc_tip'  =>  false,
+            ),
+            
+            array(
+                'type'      => 'hidden',
+                'id'        => 'taxonomy',
+                'default'     => $taxonomy
+            ),
+            
+            array( 'type' => 'sectionend', 'id' => 'custom_field_marketing_flag_settings' )
+            
+        );
+        
+        return apply_filters( 'propertyhive_custom_field_marketing_flag_settings', $args );
+    }
+
+    /**
      * Save settings
      */
     public function save() {
@@ -1697,6 +1824,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "sale-by":
                     case "tenure":
                     case "furnished":
+                    case "marketing-flag":
                     {
                         // TODO: Validate (check for blank fields)
                         
@@ -1732,6 +1860,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "sale-by-delete":
                     case "tenure-delete":
                     case "furnished-delete":
+                    case "marketing-flag-delete":
                     {
                         if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == '1' )
                         {
