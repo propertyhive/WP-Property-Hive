@@ -413,6 +413,20 @@ class PH_Install {
                     'name' => 'Unfurnished'
                 )
             ),
+            'marketing_flag' => array(
+                array(
+                    'name' => 'Recently Sold'
+                ),
+                array(
+                    'name' => 'Recently Let'
+                ),
+                array(
+                    'name' => 'New Instruction'
+                ),
+                array(
+                    'name' => 'Chain Free'
+                )
+            ),
 		);
 
         $previous_term_id = '';

@@ -143,6 +143,18 @@ class PH_Post_types {
                 'public'                => true
             )
         );
+
+        register_taxonomy( 'marketing_flag',
+            'property',
+            array(
+                'hierarchical'          => true,
+                'show_ui'               => false,
+                'show_in_nav_menus'     => false,
+                'query_var'             => is_admin(),
+                'rewrite'               => false,
+                'public'                => true
+            )
+        );
 			
 		do_action( 'do_action_after_register_taxonomies' );
 	}

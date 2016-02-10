@@ -143,6 +143,35 @@ function propertyhive_wp_checkbox( $field ) {
 }
 
 /**
+ * Output a groupd of checkbox input boxes.
+ *
+ * @access public
+ * @param array $field
+ * @return void
+ */
+function propertyhive_wp_checkboxes( $field ) {
+	global $thepostid, $post;
+
+	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
+	$field['class']         = isset( $field['class'] ) ? $field['class'] : 'checkbox';
+	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
+	$field['value']         = isset( $field['value'] ) ? $field['value'] : get_post_meta( $thepostid, $field['name'], true );
+	$field['name']          = isset( $field['name'] ) ? $field['name'] : $field['id'];
+
+	echo '<fieldset class="form-field ' . esc_attr( $field['wrapper_class'] ) . '"><legend>' . wp_kses_post( $field['label'] ) . '</legend><ul class="ph-radios">';
+
+	foreach ( $field['options'] as $key => $value ) {
+		echo '<li><label><input type="checkbox" class="' . esc_attr( $field['class'] ) . '" name="' . esc_attr( $field['name'] ) . '[]" id="' . esc_attr( $field['name'] ) . '_' . $key . '" value="' . esc_attr( $key ) . '" ' . ( ( !empty($field['value']) && in_array( $key, $field['value'] ) ) ? 'checked' : '' ) . ' /> ' . $value . '</label></li>';
+	}
+
+	echo '</ul>';
+
+	if ( ! empty( $field['description'] ) ) echo '<span class="description">' . wp_kses_post( $field['description'] ) . '</span>';
+
+	echo '</fieldset>';
+}
+
+/**
  * Output a select input box.
  *
  * @access public

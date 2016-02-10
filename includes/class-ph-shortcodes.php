@@ -70,7 +70,8 @@ class PH_Shortcodes {
 			'order'  			=> 'desc',
 			'meta_key' 			=> '_price_actual',
 			'ids'     			=> '',
-			'department'		=> '', // residential-sales / residential-lettings
+			'department'		=> '', // residential-sales / residential-lettings,
+			'marketing_flag'	=> '',
 			'posts_per_page'	=> 10
 		), $atts );
 
@@ -90,6 +91,16 @@ class PH_Shortcodes {
 			);
 		}
 
+		$tax_query = array();
+
+		if ( isset($atts['marketing_flag']) && $atts['marketing_flag'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'marketing_flag',
+                'terms' => array( $atts['marketing_flag'] )
+            );
+		}
+
 		$args = array(
 			'post_type'           => 'property',
 			'post_status'         => 'publish',
@@ -97,7 +108,8 @@ class PH_Shortcodes {
 			'orderby'             => $atts['orderby'],
 			'order'               => $atts['order'],
 			'posts_per_page'      => $atts['posts_per_page'],
-			'meta_query'		  => $meta_query
+			'meta_query'		  => $meta_query,
+			'tax_query'		  	  => $tax_query
 		);
 
 		if ( ! empty( $atts['ids'] ) ) {
@@ -106,6 +118,7 @@ class PH_Shortcodes {
 
 		ob_start();
 
+		//$properties = new WP_Query( apply_filters( 'propertyhive_properties_query', $args, $atts ) );
 		$properties = new WP_Query( apply_filters( 'propertyhive_properties_query', $args, $atts ) );
 
 		$propertyhive_loop['columns'] = $atts['columns'];

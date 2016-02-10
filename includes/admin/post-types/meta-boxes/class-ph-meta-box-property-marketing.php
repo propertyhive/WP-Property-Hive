@@ -71,16 +71,44 @@ class PH_Meta_Box_Property_Marketing {
                 // Featured
                 propertyhive_wp_checkbox( array( 
                     'id' => '_featured', 
-                    'label' => __( 'Featured', 'propertyhive' ), 
-                    //'desc_tip' => true,
+                    'label' => __( 'Featured', 'propertyhive' ),
                     //'description' => __( 'Setting the property to be on the market enables it to be displayed on the website and in applicant matches', 'propertyhive' ), 
                 ) );
                 
-                /*propertyhive_wp_checkbox( array( 
-                    'id' => 'on_website', 
-                    'label' => __( 'Display On Website (disable if on market not set)', 'propertyhive' ), 
-                    'desc_tip' => false
-                ) );*/
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => 0
+                );
+                $terms = get_terms( 'marketing_flag', $args );
+
+                if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                {
+                    $options = array();
+                    $selected_values = array();
+
+                    foreach ($terms as $term)
+                    {
+                        $options[$term->term_id] = $term->name;
+
+                        $term_list = wp_get_post_terms($post->ID, 'marketing_flag', array("fields" => "ids"));
+                    
+                        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+                        {
+                            if (in_array($term->term_id, $term_list))
+                            {
+                                $selected_values[] = $term->term_id;
+                            }
+                        }
+                    }
+
+                    propertyhive_wp_checkboxes( array( 
+                        'name' => '_marketing_flags', 
+                        'label' => __( 'Marketing Flags', 'propertyhive' ), 
+                        'options' => $options,
+                        'value' => $selected_values,
+                        //'description' => __( 'Setting the property to be on the market enables it to be displayed on the website and in applicant matches', 'propertyhive' ), 
+                    ) );
+                }
         
             do_action('propertyhive_property_marketing_fields');
     	   
@@ -107,6 +135,12 @@ class PH_Meta_Box_Property_Marketing {
         {
             // Setting to blank
             wp_delete_object_term_relationships( $post_id, 'availability' );
+        }
+
+        wp_delete_object_term_relationships( $post_id, 'marketing_flag' );
+        if ( !empty($_POST['_marketing_flags']) )
+        {
+            wp_set_post_terms( $post_id, $_POST['_marketing_flags'], 'marketing_flag' );
         }
 
         do_action( 'propertyhive_save_property_marketing', $post_id );

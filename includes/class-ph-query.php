@@ -158,7 +158,7 @@ class PH_Query {
 		// Special check for sites with the property search results on front page
 		/*if ( $q->is_page() && 'page' == get_option( 'show_on_front' ) && $q->get('page_id') == ph_get_page_id('search_results') ) {
 
-			// This is a front-page shop
+			// This is a front-page property listings
 			$q->set( 'post_type', 'property' );
 			$q->set( 'page_id', '' );
 			if ( isset( $q->query['paged'] ) )
@@ -209,7 +209,7 @@ class PH_Query {
 
 		add_filter( 'posts_where', array( $this, 'exclude_protected_properties' ) );
 
-		// We're on a shop page so queue the propertyhive_get_properties_in_view function
+		// We're on a property search page so queue the propertyhive_get_properties_in_view function
 		add_action( 'wp', array( $this, 'get_properties_in_view' ), 2);
 
 		// And remove the pre_get_posts hook
@@ -793,6 +793,7 @@ class PH_Query {
             $tax_query = array();
 
         $tax_query[] = $this->property_type_tax_query();
+        $tax_query[] = $this->marketing_flag_tax_query();
         
         return array_filter( $tax_query );
     }
@@ -807,11 +808,32 @@ class PH_Query {
         
         $tax_query = array();
         
-        if ( isset( $_REQUEST['property_type'] ) && $_REQUEST['property_type'] != '' )
+        if ( isset( $_REQUEST['property_type'] ) && !empty($_REQUEST['property_type']) )
         {
             $tax_query = array(
-                'taxonomy'  => '_property_type',
-                'terms' => array( $_REQUEST['property_type'] )
+                'taxonomy'  => 'property_type',
+                'terms' => ( (is_array($_REQUEST['property_type'])) ? $_REQUEST['property_type'] : array( $_REQUEST['property_type'] ) )
+            );
+        }
+        
+        return $tax_query;
+    }
+
+    /**
+     * Returns a taxonomy query to handle marketing flags
+     *
+     * @access public
+     * @return array
+     */
+    public function marketing_flag_tax_query( ) {
+        
+        $tax_query = array();
+        
+        if ( isset( $_REQUEST['marketing_flag'] ) && !empty($_REQUEST['marketing_flag']) )
+        {
+            $tax_query = array(
+                'taxonomy'  => 'marketing_flag',
+                'terms' => ( (is_array($_REQUEST['marketing_flag'])) ? $_REQUEST['marketing_flag'] : array( $_REQUEST['marketing_flag'] ) )
             );
         }
         
