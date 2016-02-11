@@ -22,6 +22,7 @@ class PH_Shortcodes {
 			'recent_properties'            => __CLASS__ . '::recent_properties',
 			'featured_properties'          => __CLASS__ . '::featured_properties',
 			'related_properties'           => __CLASS__ . '::related_properties',
+			'property_search_form'         => __CLASS__ . '::property_search_form',
 		);
 
 		foreach ( $shortcodes as $shortcode => $function ) {
@@ -55,6 +56,24 @@ class PH_Shortcodes {
 		echo $after;
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Output property search form
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function property_search_form( $atts ) {
+		$atts = shortcode_atts( array(
+			'id' 				=> 'shortcode'
+		), $atts );
+
+		$form_controls = ph_get_search_form_fields();
+
+		$form_controls = apply_filters( 'propertyhive_search_form_fields_' . $atts['id'], $form_controls );
+
+		ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $atts['id'] ) );
 	}
 
 	/**
