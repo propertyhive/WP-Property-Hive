@@ -40,7 +40,7 @@ class PH_Shortcodes {
 		$function,
 		$atts    = array(),
 		$wrapper = array(
-			'class'  => 'proprtyhive',
+			'class'  => 'propertyhive',
 			'before' => null,
 			'after'  => null
 		)
