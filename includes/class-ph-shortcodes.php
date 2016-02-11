@@ -171,12 +171,12 @@ class PH_Shortcodes {
 	public static function recent_properties( $atts ) {
 		global $propertyhive_loop;
 
-		extract( shortcode_atts( array(
+		$atts = shortcode_atts( array(
 			'per_page' 	=> '12',
 			'columns' 	=> '4',
 			'orderby' 	=> 'date',
 			'order' 	=> 'desc'
-		), $atts ) );
+		), $atts );
 
 		$meta_query = PH()->query->get_meta_query();
 
@@ -184,9 +184,9 @@ class PH_Shortcodes {
 			'post_type'				=> 'property',
 			'post_status'			=> 'publish',
 			'ignore_sticky_posts'	=> 1,
-			'posts_per_page' 		=> $per_page,
-			'orderby' 				=> $orderby,
-			'order' 				=> $order,
+			'posts_per_page' 		=> $atts['per_page'],
+			'orderby' 				=> $atts['orderby'],
+			'order' 				=> $atts['order'],
 			'meta_query' 			=> $meta_query
 		);
 
@@ -225,20 +225,20 @@ class PH_Shortcodes {
 	public static function featured_properties( $atts ) {
 		global $propertyhive_loop;
 
-		extract( shortcode_atts( array(
+		$atts = shortcode_atts( array(
 			'per_page' 	=> '12',
 			'columns' 	=> '4',
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc'
-		), $atts ) );
+		), $atts );
 
 		$args = array(
 			'post_type'				=> 'property',
 			'post_status' 			=> 'publish',
 			'ignore_sticky_posts'	=> 1,
-			'posts_per_page' 		=> $per_page,
-			'orderby' 				=> $orderby,
-			'order' 				=> $order,
+			'posts_per_page' 		=> $atts['per_page'],
+			'orderby' 				=> $atts['orderby'],
+			'order' 				=> $atts['order'],
 			'meta_query'			=> array(
 				array(
 					'key' 		=> '_on_market',
