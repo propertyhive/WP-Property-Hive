@@ -21,7 +21,7 @@ class PH_Shortcodes {
 			'properties'                   => __CLASS__ . '::properties',
 			'recent_properties'            => __CLASS__ . '::recent_properties',
 			'featured_properties'          => __CLASS__ . '::featured_properties',
-			'related_properties'           => __CLASS__ . '::related_properties',
+			'similar_properties'           => __CLASS__ . '::similar_properties',
 			'property_search_form'         => __CLASS__ . '::property_search_form',
 		);
 
@@ -277,21 +277,100 @@ class PH_Shortcodes {
 	}
 
 	/**
+	 * Output similar properties
+	 *
 	 * @param array $atts
 	 * @return string
 	 */
-	public static function related_properties( $atts ) {
+	public static function similar_properties( $atts ) {
 
 		$atts = shortcode_atts( array(
-			'posts_per_page' => '2',
+			'per_page' => '2',
 			'columns' 	     => '2',
 			'orderby'        => 'rand',
+			'order'        => 'asc',
+			'property_id'    => '',
 		), $atts );
 
-		ob_start();
+		if ($atts['property_id'] != '')
+		{
+			$department = get_post_meta( $atts['property_id'], '_department', true );
+			$price = get_post_meta( $atts['property_id'], '_price_actual', true );
+			$lower_price = $price - ($price / 10);
+			$higher_price = $price + ($price / 10);
+			$bedrooms = get_post_meta( $atts['property_id'], '_bedrooms', true );
 
-		propertyhive_related_properties( $atts );
+			$args = array(
+				'post_type'				=> 'property',
+				'post__not_in' 			=> array($atts['property_id']),
+				'post_status' 			=> 'publish',
+				'ignore_sticky_posts'	=> 1,
+				'posts_per_page' 		=> $atts['per_page'],
+				'orderby' 				=> $atts['orderby'],
+				'order' 				=> $atts['order'],
+			);
 
-		return ob_get_clean();
+			$meta_query = array();
+
+			$meta_query[] = array(
+				'key' 		=> '_department',
+				'value' 	=> $department,
+			);
+
+			$meta_query[] = array(
+				'key' 		=> '_on_market',
+				'value' 	=> 'yes',
+			);
+
+			$meta_query[] = array(
+				'key' 		=> '_bedrooms',
+				'value' 	=> $bedrooms,
+				'type'      => 'NUMERIC'
+			);
+
+			$meta_query[] = array(
+				'key' 		=> '_price_actual',
+				'value' 	=> $lower_price,
+				'compare'   => '>=',
+				'type'      => 'NUMERIC'
+			);
+
+			$meta_query[] = array(
+				'key' 		=> '_price_actual',
+				'value' 	=> $higher_price,
+				'compare'   => '<=',
+				'type'      => 'NUMERIC'
+			);
+
+			$args['meta_query'] = $meta_query;
+
+			ob_start();
+
+			$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_properties_query', $args, $atts ) );
+
+			$propertyhive_loop['columns'] = $atts['columns'];
+
+			if ( $properties->have_posts() ) : ?>
+
+				<?php propertyhive_property_loop_start(); ?>
+
+					<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
+
+						<?php ph_get_template_part( 'content', 'property-featured' ); ?>
+
+					<?php endwhile; // end of the loop. ?>
+
+				<?php propertyhive_property_loop_end(); ?>
+
+			<?php endif;
+
+			wp_reset_postdata();
+		}
+		else
+		{
+			echo 'No property_id passed into similar_properties shortcode';
+		}
+
+		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
 	}
 }
