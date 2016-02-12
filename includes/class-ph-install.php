@@ -432,20 +432,25 @@ class PH_Install {
         $previous_term_id = '';
 		foreach ( $taxonomies as $taxonomy => $terms ) 
 		{
-			foreach ( $terms as $term ) 
+			// Make sure no terms for this taxonomy exist already
+			$existing_terms = get_terms( $taxonomy );
+			if ( is_wp_error( $existing_terms ) || (!is_wp_error( $existing_terms ) && empty( $existing_terms ) ) )
 			{
-				if ( ! get_term_by( 'slug', sanitize_title( $term['name'] ), $taxonomy ) ) 
+				foreach ( $terms as $term ) 
 				{
-				    $args = array();
-                    if ($term['child_of_previous'])
-                    {
-                        $args = array('parent' => $previous_term_id);
-                    }
-					$return = wp_insert_term( $term['name'], $taxonomy, $args );
-                    if (!isset($term['child_of_previous']) || (isset($term['child_of_previous']) && !$term['child_of_previous']))
-                    {
-                        $previous_term_id = $return['term_id'];
-                    }
+					if ( ! get_term_by( 'slug', sanitize_title( $term['name'] ), $taxonomy ) ) 
+					{
+					    $args = array();
+	                    if (isset($term['child_of_previous']) && $term['child_of_previous'])
+	                    {
+	                        $args = array('parent' => $previous_term_id);
+	                    }
+						$return = wp_insert_term( $term['name'], $taxonomy, $args );
+	                    if (!isset($term['child_of_previous']) || (isset($term['child_of_previous']) && !$term['child_of_previous']))
+	                    {
+	                        $previous_term_id = $return['term_id'];
+	                    }
+					}
 				}
 			}
 		}
@@ -488,7 +493,7 @@ class PH_Install {
 	 * @access public
 	 */
 	function create_options() {
-	    
+
         add_option( 'propertyhive_active_departments_sales', 'yes', '', 'yes' );
         add_option( 'propertyhive_active_departments_lettings', 'yes', '',  'yes' );
 
