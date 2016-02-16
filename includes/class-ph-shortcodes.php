@@ -73,7 +73,11 @@ class PH_Shortcodes {
 
 		$form_controls = apply_filters( 'propertyhive_search_form_fields_' . $atts['id'], $form_controls );
 
+		ob_start();
+
 		ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $atts['id'] ) );
+
+		return ob_get_clean();
 	}
 
 	/**
