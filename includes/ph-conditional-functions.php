@@ -31,7 +31,7 @@ if ( ! function_exists( 'is_search_results' ) ) {
      * @return bool
      */
     function is_search_results() {
-        return ( is_post_type_archive( 'property' ) || is_page( ph_get_page_id( 'property' ) ) ) ? true : false;
+        return ( is_post_type_archive( 'property' ) || is_page( ph_get_page_id( 'search_results' ) ) ) ? true : false;
     }
 }
 
