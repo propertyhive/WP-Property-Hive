@@ -4,7 +4,7 @@ Tags: property, real estate, software, estate agents, estate agent, property man
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.4.2
-Stable tag: 1.0.12
+Stable tag: 1.0.13
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -30,7 +30,7 @@ By default PropertyHive is a property and contact management tool, allowing you 
  
 Want to send your properties to property portals? There's an add-on for that.
 
-Our add-ons are priced individually from just £150 meaning you only pay for what you use.
+Our add-ons are priced individually from just £24.99 meaning you only pay for what you use.
 
 You can [view all of our add-ons](http://wp-property-hive.com/add-ons/ "PropertyHive Add-Ons") on our website.
 
@@ -76,6 +76,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.0.13 =
+* Add new latitude and longitude fields to office for displaying office map on website.
+* Add new action 'propertyhive_save_office' for when saving office details
+* Include street when searching for address keyword
+* Fix entire enquiries section not showing
 
 = 1.0.12 =
 * Return [property_search_form] shortcode output as opposed to echoing it direct
