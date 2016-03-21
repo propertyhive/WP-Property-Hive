@@ -169,6 +169,28 @@ class PH_Settings_Offices extends PH_Settings_Page {
         }
         
         $args[] = array( 'type' => 'sectionend', 'id' => 'office_contact_options' );
+
+        $args[] = array( 'title' => __( 'Office Location', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'office_location_options' );
+
+        $args[] = array(
+            'title' => __( 'Latitude', 'propertyhive' ),
+            'id'        => '_office_latitude',
+            //'css'       => 'width:50px;',
+            'default'   => get_post_meta($current_id, '_office_latitude', TRUE),
+            'type'      => 'text',
+            'desc_tip'  =>  false,
+        );
+
+        $args[] = array(
+            'title' => __( 'Longitude', 'propertyhive' ),
+            'id'        => '_office_longitude',
+            //'css'       => 'width:50px;',
+            'default'   => get_post_meta($current_id, '_office_longitude', TRUE),
+            'type'      => 'text',
+            'desc_tip'  =>  false,
+        );
+
+        $args[] = array( 'type' => 'sectionend', 'id' => 'office_location_options' );
         
         return apply_filters( 'propertyhive_office_settings', $args );
         
@@ -607,6 +629,10 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 update_post_meta($office_post_id, '_office_email_address_sales', wp_strip_all_tags( $_POST['_office_email_address_sales'] ));
                 update_post_meta($office_post_id, '_office_telephone_number_lettings', wp_strip_all_tags( $_POST['_office_telephone_number_lettings'] ));
                 update_post_meta($office_post_id, '_office_email_address_lettings', wp_strip_all_tags( $_POST['_office_email_address_lettings'] ));
+
+                update_post_meta($office_post_id, '_office_latitude', wp_strip_all_tags( $_POST['_office_latitude'] ));
+                update_post_meta($office_post_id, '_office_longitude', wp_strip_all_tags( $_POST['_office_longitude'] ));
+
             }
         }
     }
