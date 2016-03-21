@@ -282,7 +282,7 @@ class PH_Post_types {
                             'parent'                => __( 'Parent Enquiry', 'propertyhive' )
                         ),
                     'public'                => false,
-                    'show_ui'               => false,
+                    'show_ui'               => true,
                     'capability_type'       => 'post',
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
