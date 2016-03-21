@@ -625,10 +625,10 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 update_post_meta($office_post_id, '_office_address_4', wp_strip_all_tags( $_POST['_office_address_4'] ));
                 update_post_meta($office_post_id, '_office_address_postcode', wp_strip_all_tags( $_POST['_office_address_postcode'] ));
                 
-                update_post_meta($office_post_id, '_office_telephone_number_sales', wp_strip_all_tags( $_POST['_office_telephone_number_sales'] ));
-                update_post_meta($office_post_id, '_office_email_address_sales', wp_strip_all_tags( $_POST['_office_email_address_sales'] ));
-                update_post_meta($office_post_id, '_office_telephone_number_lettings', wp_strip_all_tags( $_POST['_office_telephone_number_lettings'] ));
-                update_post_meta($office_post_id, '_office_email_address_lettings', wp_strip_all_tags( $_POST['_office_email_address_lettings'] ));
+                update_post_meta($office_post_id, '_office_telephone_number_sales', (isset($_POST['_office_telephone_number_sales'])) ? wp_strip_all_tags( $_POST['_office_telephone_number_sales'] ) : '');
+                update_post_meta($office_post_id, '_office_email_address_sales', (isset($_POST['_office_email_address_sales'])) ? wp_strip_all_tags( $_POST['_office_email_address_sales'] ) : '');
+                update_post_meta($office_post_id, '_office_telephone_number_lettings', (isset($_POST['_office_telephone_number_lettings'])) ? wp_strip_all_tags( $_POST['_office_telephone_number_lettings'] ) : '');
+                update_post_meta($office_post_id, '_office_email_address_lettings', (isset($_POST['_office_email_address_lettings'])) ? wp_strip_all_tags( $_POST['_office_email_address_lettings'] ) : '');
 
                 update_post_meta($office_post_id, '_office_latitude', wp_strip_all_tags( $_POST['_office_latitude'] ));
                 update_post_meta($office_post_id, '_office_longitude', wp_strip_all_tags( $_POST['_office_longitude'] ));
