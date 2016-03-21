@@ -633,6 +633,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 update_post_meta($office_post_id, '_office_latitude', wp_strip_all_tags( $_POST['_office_latitude'] ));
                 update_post_meta($office_post_id, '_office_longitude', wp_strip_all_tags( $_POST['_office_longitude'] ));
 
+                do_action( 'propertyhive_save_office', $office_post_id );
             }
         }
     }
