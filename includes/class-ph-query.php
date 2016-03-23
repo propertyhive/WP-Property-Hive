@@ -799,6 +799,7 @@ class PH_Query {
 
         $tax_query[] = $this->property_type_tax_query();
         $tax_query[] = $this->marketing_flag_tax_query();
+        $tax_query[] = $this->location_tax_query();
         
         return array_filter( $tax_query );
     }
@@ -839,6 +840,27 @@ class PH_Query {
             $tax_query = array(
                 'taxonomy'  => 'marketing_flag',
                 'terms' => ( (is_array($_REQUEST['marketing_flag'])) ? $_REQUEST['marketing_flag'] : array( $_REQUEST['marketing_flag'] ) )
+            );
+        }
+        
+        return $tax_query;
+    }
+
+    /**
+     * Returns a taxonomy query to handle location
+     *
+     * @access public
+     * @return array
+     */
+    public function location_tax_query( ) {
+        
+        $tax_query = array();
+        
+        if ( isset( $_REQUEST['location'] ) && !empty($_REQUEST['location']) )
+        {
+            $tax_query = array(
+                'taxonomy'  => 'location',
+                'terms' => ( (is_array($_REQUEST['location'])) ? $_REQUEST['location'] : array( $_REQUEST['location'] ) )
             );
         }
         

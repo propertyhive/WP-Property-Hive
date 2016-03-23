@@ -399,6 +399,90 @@ function ph_form_field( $key, $field )
             
             break;
         }
+        case "location": 
+        {
+            $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
+            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
+            $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
+            $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
+            $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            
+            $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
+            if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
+            {
+                $field['value'] = $_GET[$key];
+            }
+            
+            $output .= $field['before'];
+            
+            if ($field['show_label'])
+            {
+                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+            }
+            
+            $output .= '<select 
+                name="' . esc_attr( $key ) . '" 
+                id="' . esc_attr( $key ) . '" 
+                class="' . esc_attr( $field['class'] ) . '"
+             >';
+
+            $options = array( '' => __( 'No preference', 'propertyhive' ) );
+            $args = array(
+                'hide_empty' => false,
+                'parent' => 0
+            );
+            $terms = get_terms( 'location', $args );
+            
+            $selected_value = '';
+            if ( !empty( $terms ) && !is_wp_error( $terms ) )
+            {
+                foreach ($terms as $term)
+                {
+                    $options[$term->term_id] = $term->name;
+                    
+                    $args = array(
+                        'hide_empty' => false,
+                        'parent' => $term->term_id
+                    );
+                    $subterms = get_terms( 'location', $args );
+                    
+                    if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                    {
+                        foreach ($subterms as $term)
+                        {
+                            $options[$term->term_id] = '- ' . $term->name;
+                            
+                            $args = array(
+                                'hide_empty' => false,
+                                'parent' => $term->term_id
+                            );
+                            $subsubterms = get_terms( 'location', $args );
+                            
+                            if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                            {
+                                foreach ($subsubterms as $term)
+                                {
+                                    $options[$term->term_id] = '- ' . $term->name;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach ( $options as $option_key => $value ) 
+            {
+                $output .= '<option 
+                    value="' . esc_attr( $option_key ) . '" 
+                    ' . selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false ) . '
+                >' . esc_html( $value ) . '</option>';
+            }
+
+            $output .= '</select>';
+            
+            $output .= $field['after'];
+            break;
+        }
         case "hidden": 
         {
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
