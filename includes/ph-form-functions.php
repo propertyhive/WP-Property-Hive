@@ -235,6 +235,8 @@ function ph_get_property_enquiry_form_fields()
  */
 function ph_form_field( $key, $field )
 {
+    global $post;
+
     $output = '';
     
     switch ($field['type'])
@@ -481,6 +483,69 @@ function ph_form_field( $key, $field )
             $output .= '</select>';
             
             $output .= $field['after'];
+            break;
+        }
+        case "office": 
+        {
+            $key = 'officeID';
+            
+            $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
+            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
+            $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
+            $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
+            $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            
+            $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
+            if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
+            {
+                $field['value'] = $_GET[$key];
+            }
+            
+            $output .= $field['before'];
+            
+            if ($field['show_label'])
+            {
+                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+            }
+            
+            $output .= '<select 
+                name="' . esc_attr( $key ) . '" 
+                id="' . esc_attr( $key ) . '" 
+                class="' . esc_attr( $field['class'] ) . '"
+             >';
+
+             $output .= '<option 
+                        value="" 
+                        ' . selected( esc_attr( $field['value'] ), esc_attr( '' ), false ) . '
+                    >' . esc_html( __( 'No preference', 'propertyhive' ) ) . '</option>';
+
+             $args = array(
+                'post_type' => 'office',
+                'nopaging' => true,
+                'orderby' => 'title',
+                'order' => 'ASC'
+            );
+            $office_query = new WP_Query($args);
+            
+            if ($office_query->have_posts())
+            {
+                while ($office_query->have_posts())
+                {
+                    $office_query->the_post();
+            
+                    $output .= '<option 
+                        value="' . esc_attr( $post->ID ) . '" 
+                        ' . selected( esc_attr( $field['value'] ), esc_attr( $post->ID ), false ) . '
+                    >' . esc_html( get_the_title() ) . '</option>';
+                
+                }
+            }
+            wp_reset_postdata();
+            
+            $output .= '</select>';
+            
+            $output .= $field['after'];
+            
             break;
         }
         case "hidden": 

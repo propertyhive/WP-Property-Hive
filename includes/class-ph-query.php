@@ -534,6 +534,7 @@ class PH_Query {
         $meta_query[] = $this->minimum_rent_meta_query();
         $meta_query[] = $this->maximum_rent_meta_query();
         $meta_query[] = $this->minimum_bedrooms_meta_query();
+        $meta_query[] = $this->office_meta_query();
         
         $meta_query = array_filter($meta_query); // Get rid of empty array elements
 
@@ -786,6 +787,29 @@ class PH_Query {
         
         return $meta_query;
     }
+
+    /**
+	 * Returns a meta query to handle property office
+	 *
+	 * @access public
+	 * @param string $compare (default: 'IN')
+	 * @return array
+	 */
+	public function office_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( isset( $_REQUEST['officeID'] ) && $_REQUEST['officeID'] != '' )
+        {
+    		$meta_query = array(
+    		    'key'     => '_office_id',
+    		    'value'   => $_REQUEST['officeID'],
+    		    'compare' => '='
+    		);
+		}
+
+		return $meta_query;
+	}
 
     /**
      * Appends taxonomy queries to an array.
