@@ -1,8 +1,24 @@
 function toggleDepartmentFields()
     {
         var selectedDepartment = "";
-        var selected = jQuery('input[type=\'radio\'][name=\'department\']:checked');
-        
+
+        var departmentEl = jQuery('input[name=\'department\']')
+        if (departmentEl.length > 0)
+        {
+            switch (departmentEl.prop('tagName').toLowerCase())
+            {
+                case "select":
+                {
+                    var selected = departmentEl;
+                    break;
+                }
+                default:
+                {
+                    var selected = departmentEl.filter(':checked');
+                }
+            }
+        }
+
         jQuery('.sales-only').hide();
         jQuery('.lettings-only').hide();
         
