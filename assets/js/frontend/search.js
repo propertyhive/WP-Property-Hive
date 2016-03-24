@@ -1,8 +1,10 @@
 function toggleDepartmentFields()
+{
+    if (jQuery('form.property-search-form').length > 0)
     {
-        var selectedDepartment = "";
+        var selectedDepartment = "resiential-sales"; // TODO: Use default from settings
 
-        var departmentEl = jQuery('input[name=\'department\']')
+        var departmentEl = jQuery('form.property-search-form [name=\'department\']')
         if (departmentEl.length > 0)
         {
             switch (departmentEl.prop('tagName').toLowerCase())
@@ -48,6 +50,7 @@ function toggleDepartmentFields()
             }
         }
     }
+}
 
 jQuery( function(jQuery){
 
