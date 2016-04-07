@@ -192,7 +192,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
 
         $args[] = array( 'type' => 'sectionend', 'id' => 'office_location_options' );
         
-        return apply_filters( 'propertyhive_office_settings', $args );
+        return apply_filters( 'propertyhive_office_details_settings', $args );
         
     }
     
