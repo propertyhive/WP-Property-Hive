@@ -2,7 +2,7 @@ function toggleDepartmentFields()
 {
     if (jQuery('form.property-search-form').length > 0)
     {
-        var selectedDepartment = "resiential-sales"; // TODO: Use default from settings
+        var selectedDepartment = "residential-sales"; // TODO: Use default from settings
 
         var departmentEl = jQuery('form.property-search-form [name=\'department\']')
         if (departmentEl.length > 0)
