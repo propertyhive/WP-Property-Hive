@@ -496,6 +496,7 @@ class PH_Install {
 
         add_option( 'propertyhive_active_departments_sales', 'yes', '', 'yes' );
         add_option( 'propertyhive_active_departments_lettings', 'yes', '',  'yes' );
+        add_option( 'propertyhive_primary_department', 'residential-sales', '',  'yes' );
 
 	}
 
