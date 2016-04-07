@@ -62,7 +62,7 @@ jQuery( function(jQuery){
     
     toggleDepartmentFields();
     
-    jQuery('input[type=\'radio\'][name=\'department\']').change(function()
+    jQuery('form.property-search-form [name=\'department\']').change(function()
     {
         toggleDepartmentFields();
     });
