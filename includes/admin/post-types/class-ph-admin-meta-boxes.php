@@ -330,7 +330,7 @@ class PH_Admin_Meta_Boxes {
         
         global $post, $tabs;
         
-        if (!empty($tabs))
+        if (!empty($tabs) && in_array($post->post_type, array('property', 'contact', 'enquiry')))
         {
             $meta_boxes_under_tabs = array();
             
