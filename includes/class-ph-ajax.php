@@ -75,7 +75,11 @@ class PH_AJAX {
                 
                 for ($i = 0; $i < $num_property_features; ++$i)
                 {
-                    $return[] = get_post_meta($post->ID, '_feature_' . $i, TRUE);
+                    $feature = get_post_meta($post->ID, '_feature_' . $i, TRUE);
+                    if (!in_array($feature, $return) && trim($feature) != '')
+                    {
+                        $return[] = $feature;
+                    }
                 }
             }
         }
