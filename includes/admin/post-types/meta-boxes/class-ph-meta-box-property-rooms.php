@@ -170,7 +170,7 @@ class PH_Meta_Box_Property_Rooms {
                     return false;
                 });
                 
-                jQuery(\'.remove_room\').click(function()
+                jQuery(document).on(\'click\', \'.remove_room\', function()
                 {
                     jQuery(this).parent().parent().fadeOut(\'slow\', function()
                     {

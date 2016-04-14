@@ -79,7 +79,7 @@ class PH_Meta_Box_Property_Features {
                     return false;
                 });
                 
-                jQuery(\'.remove_feature\').click(function()
+                jQuery(document).on(\'click\', \'.remove_feature\', function()
                 {
                     jQuery(this).parent().fadeOut(\'slow\', function()
                     {
