@@ -66,6 +66,8 @@ class PH_Meta_Box_Property_Features {
         
         echo '<script>
             
+            var obtaining_features = true;
+            var existing_features = new Array;
             jQuery(document).ready(function()
             {
                 jQuery(\'.add_property_feature\').click(function()
@@ -86,6 +88,41 @@ class PH_Meta_Box_Property_Features {
                     
                     return false;
                 });
+
+                jQuery(document).on(\'keypress\', \'.feature_field input\', function(e)
+                {
+                    var keyCode = e.keyCode || e.which;
+                    if (keyCode === 13) { 
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    if (!obtaining_features && existing_features.length > 0)
+                    {
+                        var options = {
+                            source: existing_features,
+                            minLength: 2
+                        };
+
+                        jQuery(this).autocomplete(options);
+                    }
+                });
+
+                // get list of previously used features
+                // Do AJAX request
+                var data = {
+                    action:         \'propertyhive_load_existing_features\',
+                    security:       \'' . wp_create_nonce("load-existing-features") . '\',
+                };
+    
+                jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
+                    
+                    obtaining_features = false;
+                    existing_features = response;
+                  
+                });
+
+
             });
             
         </script>';

@@ -26,6 +26,7 @@ class PH_AJAX {
 			'delete_note'   => false,
 			'search_contacts'   => false,
 			'load_existing_owner_contact'   => false,
+            'load_existing_features'   => false,
             'load_applicant_matching_properties'   => false,
 			'make_property_enquiry'   => true
 		);
@@ -45,6 +46,45 @@ class PH_AJAX {
 	private function json_headers() {
 		header( 'Content-Type: application/json; charset=utf-8' );
 	}
+
+    /**
+     * Load existing features
+     */
+    public function load_existing_features() {
+
+        global $post, $wpdb;
+
+        $this->json_headers();
+
+        $return = array();
+
+        $property_query = new WP_Query(array(
+            'post_type' => 'property',
+            'post_status' => 'any',
+            'nopaging' => true
+        ));
+
+        if ($property_query->have_posts())
+        {
+            while ($property_query->have_posts())
+            {
+                $property_query->the_post();
+
+                $num_property_features = get_post_meta($post->ID, '_features', TRUE);
+                if ($num_property_features == '') { $num_property_features = 0; }
+                
+                for ($i = 0; $i < $num_property_features; ++$i)
+                {
+                    $return[] = get_post_meta($post->ID, '_feature_' . $i, TRUE);
+                }
+            }
+        }
+
+        echo json_encode($return);
+
+        // Quit out
+        die();
+    }
 
     /**
      * Load matching applicant properties
