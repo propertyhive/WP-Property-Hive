@@ -59,6 +59,7 @@
 
 .propertyhive_meta_box .room{ border-radius:3px;background:#FFF;border:1px solid #dfdfdf; margin:9px 0;}
 .propertyhive_meta_box .room .room-details{background:#fafafa;border:1px solid #eee;padding:6px;}
+.propertyhive_meta_box .room h3 { padding-left:10px; padding-right:10px; }
 .propertyhive_meta_box .room h3 button{float:right}
 .propertyhive_meta_box .room h3 .handlediv{ background-position:6px 0px!important;height:28px; }
 .propertyhive_meta_box .room h3 strong{line-height:28px;}
