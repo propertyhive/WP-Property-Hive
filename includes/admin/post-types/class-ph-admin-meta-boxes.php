@@ -239,51 +239,235 @@ class PH_Admin_Meta_Boxes {
         
 		// PROPERTY
 		if (!isset($tabs)) $tabs = array();
+
+        /* PROPERTY SUMMARY META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-property-address',
+            'title' => __( 'Property Address', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Address::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-property-owner',
+            'title' => __( 'Property Owner / Landlord', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Owner::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-property-record-details',
+            'title' => __( 'Record Details / Landlord', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Record_Details::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[20] = array(
+            'id' => 'propertyhive-property-coordinates',
+            'title' => __( 'Property Location', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Coordinates::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_property_summary_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
         
-        add_meta_box( 'propertyhive-property-address', __( 'Property Address', 'propertyhive' ), 'PH_Meta_Box_Property_Address::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-owner', __( 'Property Owner / Landlord', 'propertyhive' ), 'PH_Meta_Box_Property_Owner::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-record-details', __( 'Record Details', 'propertyhive' ), 'PH_Meta_Box_Property_Record_Details::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-coordinates', __( 'Property Location', 'propertyhive' ), 'PH_Meta_Box_Property_Coordinates::output', 'property', 'normal', 'high' );
-        $tabs['tab_address'] = array(
+        $tabs['tab_summary'] = array(
             'name' => __( 'Summary', 'propertyhive' ),
-            'metabox_ids' => array('propertyhive-property-address', 'propertyhive-property-owner', 'propertyhive-property-record-details', 'propertyhive-property-coordinates'),
+            'metabox_ids' => $ids,
             'post_type' => 'property'
         );
         
-        add_meta_box( 'propertyhive-property-department', __( 'Property Department', 'propertyhive' ), 'PH_Meta_Box_Property_Department::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-residential-sales-details', __( 'Residential Sales Details', 'propertyhive' ), 'PH_Meta_Box_Property_Residential_Sales_Details::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-residential-lettings-details', __( 'Residential Lettings Details', 'propertyhive' ), 'PH_Meta_Box_Property_Residential_Lettings_Details::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-residential-details', __( 'Residential Details', 'propertyhive' ), 'PH_Meta_Box_Property_Residential_Details::output', 'property', 'normal', 'high' );
+        /* PROPERTY DETAILS META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-property-department',
+            'title' => __( 'Property Department', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Department::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-property-residential-sales-details',
+            'title' => __( 'Residential Sales Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Residential_Sales_Details::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-property-residential-lettings-details',
+            'title' => __( 'Residential Lettings Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Residential_Lettings_Details::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[20] = array(
+            'id' => 'propertyhive-property-residential-details',
+            'title' => __( 'Residential Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Residential_Details::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_property_details_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+        
         $tabs['tab_details'] = array(
             'name' => __( 'Details', 'propertyhive' ),
-            'metabox_ids' => array('propertyhive-property-department', 'propertyhive-property-residential-sales-details', 'propertyhive-property-residential-lettings-details', 'propertyhive-property-residential-details'),
+            'metabox_ids' => $ids,
             'post_type' => 'property'
         );
+
+        /* PROPERTY MARKETING META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-property-marketing',
+            'title' => __( 'Property Marketing', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Marketing::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_property_marketing_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
         
-        add_meta_box( 'propertyhive-property-marketing', __( 'Property Marketing', 'propertyhive' ), 'PH_Meta_Box_Property_Marketing::output', 'property', 'normal', 'high' );
         $tabs['tab_marketing'] = array(
             'name' => __( 'Marketing', 'propertyhive' ),
-            'metabox_ids' => array('propertyhive-property-marketing'),
+            'metabox_ids' => $ids,
             'post_type' => 'property'
         );
+
+        /* PROPERTY DESCRIPTIONS META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-property-features',
+            'title' => __( 'Property Features', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Features::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[10] = array(
+            'id' => 'postexcerpt',
+            'title' => __( 'Property Summary Description', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Summary_Description::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-property-rooms',
+            'title' => __( 'Property Rooms', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Rooms::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_property_descriptions_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
         
-        add_meta_box( 'propertyhive-property-features', __( 'Property Features', 'propertyhive' ), 'PH_Meta_Box_Property_Features::output', 'property', 'normal' );
-        add_meta_box( 'postexcerpt', __( 'Property Summary Description', 'propertyhive' ), 'PH_Meta_Box_Property_Summary_Description::output', 'property', 'normal' );
-		add_meta_box( 'propertyhive-property-rooms', __( 'Property Rooms', 'propertyhive' ), 'PH_Meta_Box_Property_Rooms::output', 'property', 'normal' );
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+
         $tabs['tab_descriptions'] = array(
             'name' => __( 'Descriptions', 'propertyhive' ),
-            'metabox_ids' => array('propertyhive-property-features', 'postexcerpt', 'propertyhive-property-rooms'),
+            'metabox_ids' => $ids,
             'post_type' => 'property'
         );
+
+        /* PROPERTY MEDIA META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-property-photos',
+            'title' => __( 'Property Photos', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Photos::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-property-floorplans',
+            'title' => __( 'Property Floorplans', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Floorplans::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-property-brochures',
+            'title' => __( 'Property Brochures', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Brochures::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[20] = array(
+            'id' => 'propertyhive-property-epcs',
+            'title' => __( 'Property EPCs', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Epcs::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[25] = array(
+            'id' => 'propertyhive-property-virtual-tours',
+            'title' => __( 'Property Virtual Tours', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Virtual_Tours::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_property_media_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
         
-        add_meta_box( 'propertyhive-property-photos', __( 'Property Photos', 'propertyhive' ), 'PH_Meta_Box_Property_Photos::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-floorplans', __( 'Property Floorplans', 'propertyhive' ), 'PH_Meta_Box_Property_Floorplans::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-brochures', __( 'Property Brochures', 'propertyhive' ), 'PH_Meta_Box_Property_Brochures::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-epcs', __( 'Property EPCs', 'propertyhive' ), 'PH_Meta_Box_Property_Epcs::output', 'property', 'normal', 'high' );
-        add_meta_box( 'propertyhive-property-virtual-tours', __( 'Property Virtual Tours', 'propertyhive' ), 'PH_Meta_Box_Property_Virtual_Tours::output', 'property', 'normal', 'high' );
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+        
         $tabs['tab_media'] = array(
             'name' => __( 'Media', 'propertyhive' ),
-            'metabox_ids' => array('propertyhive-property-photos', 'propertyhive-property-floorplans', 'propertyhive-property-brochures', 'propertyhive-property-epcs', 'propertyhive-property-virtual-tours'),
+            'metabox_ids' => $ids,
             'post_type' => 'property'
         );
         
