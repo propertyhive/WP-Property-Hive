@@ -176,13 +176,23 @@ class PH_Shortcodes {
 		global $propertyhive_loop;
 
 		$atts = shortcode_atts( array(
-			'per_page' 	=> '12',
-			'columns' 	=> '4',
-			'orderby' 	=> 'date',
-			'order' 	=> 'desc'
+			'per_page' 		=> '12',
+			'columns' 		=> '4',
+			'department' 	=> '',
+			'orderby' 		=> 'date',
+			'order' 		=> 'desc'
 		), $atts );
 
 		$meta_query = PH()->query->get_meta_query();
+
+		if ( isset($atts['department']) && $atts['department'] != '' )
+		{
+			$meta_query[] = array(
+				'key' => '_department',
+				'value' => $atts['department'],
+				'compare' => '='
+			);
+		}
 
 		$args = array(
 			'post_type'				=> 'property',
