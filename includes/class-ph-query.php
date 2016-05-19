@@ -537,8 +537,6 @@ class PH_Query {
         $meta_query[] = $this->maximum_bedrooms_meta_query();
         $meta_query[] = $this->office_meta_query();
         
-        $meta_query = array_filter($meta_query); // Get rid of empty array elements
-
 		return array_filter( $meta_query );
 	}
 
