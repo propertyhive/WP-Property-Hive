@@ -345,6 +345,9 @@ class PH_Query {
         // Tax query
         $tax_query = $this->get_tax_query( $q->get( 'tax_query' ) );
 
+        // Date query
+		$date_query = $this->get_date_query();
+
 		// Ordering
 		$ordering   = $this->get_search_results_ordering_args();
 
@@ -361,6 +364,7 @@ class PH_Query {
 		// Query vars that affect posts shown
 		$q->set( 'meta_query', $meta_query );
         $q->set( 'tax_query', $tax_query );
+        $q->set( 'date_query', $date_query );
 		$q->set( 'post__in', $post__in );
 		$q->set( 'posts_per_page', $q->get( 'posts_per_page' ) ? $q->get( 'posts_per_page' ) : apply_filters( 'loop_search_results_per_page', get_option( 'posts_per_page' ) ) );
 
@@ -507,6 +511,27 @@ class PH_Query {
 		}
 
 		return apply_filters( 'propertyhive_get_search_results_ordering_args', $args );
+	}
+
+	/**
+	 * Appends date queries to an array.
+	 * @access public
+	 * @param array $meta_query
+	 * @return array
+	 */
+	public function get_date_query() {
+
+		$date_query = array();
+
+		if ( isset( $_REQUEST['added_from_hours'] ) && $_REQUEST['added_from_hours'] != '' )
+        {
+            $date_query = array(
+                'column'  => 'post_date_gmt',
+                'after'   => sanitize_text_field( $_REQUEST['added_from_hours'] . ' hours ago' )
+            );
+        }
+
+        return array_filter( $date_query );
 	}
 
 	/**
