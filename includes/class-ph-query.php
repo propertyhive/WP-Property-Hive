@@ -534,6 +534,7 @@ class PH_Query {
         $meta_query[] = $this->minimum_rent_meta_query();
         $meta_query[] = $this->maximum_rent_meta_query();
         $meta_query[] = $this->minimum_bedrooms_meta_query();
+        $meta_query[] = $this->maximum_bedrooms_meta_query();
         $meta_query[] = $this->office_meta_query();
         
         $meta_query = array_filter($meta_query); // Get rid of empty array elements
@@ -781,6 +782,29 @@ class PH_Query {
                 'key'     => '_bedrooms',
                 'value'   => sanitize_text_field( $_REQUEST['minimum_bedrooms'] ),
                 'compare' => '>=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle maximum bedrooms
+     *
+     * @access public
+     * @return array
+     */
+    public function maximum_bedrooms_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( isset( $_REQUEST['maximum_bedrooms'] ) && $_REQUEST['maximum_bedrooms'] != '' )
+        {
+            $meta_query = array(
+                'key'     => '_bedrooms',
+                'value'   => sanitize_text_field( $_REQUEST['maximum_bedrooms'] ),
+                'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
         }
