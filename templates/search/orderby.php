@@ -15,20 +15,28 @@ if ( $wp_query->found_posts < 2 )
 	return;
 ?>
 <form class="propertyhive-ordering" method="get">
-	<select name="orderby" class="orderby">
-		<?php
-			$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
-				'price-desc' => __( 'Default sorting', 'propertyhive' ),
-				'date'       => __( 'Sort by date added', 'propertyhive' ),
-				'price-asc'      => __( 'Sort by price: low to high', 'propertyhive' ),
-				'price-desc' => __( 'Sort by price: high to low', 'propertyhive' )
-			) );
-            
-			foreach ( $results_orderby as $id => $name )
-				echo '<option value="' . esc_attr( $id ) . '" ' . selected( $orderby, $id, false ) . '>' . esc_attr( $name ) . '</option>';
-		?>
+	<?php
+		$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
+			'price-desc' => __( 'Default sorting', 'propertyhive' ),
+			'date'       => __( 'Sort by date added', 'propertyhive' ),
+			'price-asc'      => __( 'Sort by price: low to high', 'propertyhive' ),
+			'price-desc' => __( 'Sort by price: high to low', 'propertyhive' )
+		) );
+
+        if ( !empty($results_orderby) )
+        {
+    ?>
+    <select name="orderby" class="orderby">
+    <?php
+		foreach ( $results_orderby as $id => $name )
+		{
+			echo '<option value="' . esc_attr( $id ) . '" ' . selected( $orderby, $id, false ) . '>' . esc_attr( $name ) . '</option>';
+		}
+	?>
 	</select>
 	<?php
+		}
+		
 		// Keep query string vars intact
 		foreach ( $_GET as $key => $val ) {
 			if ( 'orderby' === $key || 'submit' === $key )
