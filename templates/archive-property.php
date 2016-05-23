@@ -37,22 +37,30 @@ get_header(); global $wpdb; ?>
              */
             do_action( 'propertyhive_before_search_results_loop' );
         ?>
+
+        <?php 
+            // Output results. Filter allows us to not display the results whilst maintaining the main query. True by default
+            // Used primarily by the Map Search add on - http://wp-property-hive.com/addons/map-search/
+            if ( apply_filters( 'propertyhive_show_results', true ) ) : 
+        ?>
         
-        <?php if ( have_posts() ) : ?>
+            <?php if ( have_posts() ) : ?>
 
-            <?php propertyhive_property_loop_start(); ?>
+                <?php propertyhive_property_loop_start(); ?>
 
-                <?php while ( have_posts() ) : the_post(); ?>
+                    <?php while ( have_posts() ) : the_post(); ?>
 
-                    <?php ph_get_template_part( 'content', 'property' ); ?>
+                        <?php ph_get_template_part( 'content', 'property' ); ?>
 
-                <?php endwhile; // end of the loop. ?>
+                    <?php endwhile; // end of the loop. ?>
 
-            <?php propertyhive_property_loop_end(); ?>
+                <?php propertyhive_property_loop_end(); ?>
 
-        <?php else: ?>
+            <?php else: ?>
 
-            <?php ph_get_template( 'search/no-properties-found.php' ); ?>
+                <?php ph_get_template( 'search/no-properties-found.php' ); ?>
+
+            <?php endif; ?>
 
         <?php endif; ?>
 
