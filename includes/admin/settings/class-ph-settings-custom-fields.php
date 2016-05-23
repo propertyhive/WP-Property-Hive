@@ -306,6 +306,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <?php do_action( 'propertyhive_custom_field_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php _e( 'Property Type', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -322,13 +323,16 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         {
                             foreach ($terms as $term)
                             {
+                                $parent_term_id = $term->term_id;
+
                                 $args = array(
                                     'hide_empty' => false,
-                                    'parent' => $term->term_id
+                                    'parent' => $parent_term_id
                                 );
                                 $subterms = get_terms( 'property_type', $args );
                         ?>
                         <tr>
+                            <?php do_action( 'propertyhive_custom_field_property_type_table_before_row_column', $term->term_id ); ?>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-type&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -344,6 +348,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     {
                                         ?>
                                         <tr>
+                                            <?php do_action( 'propertyhive_custom_field_property_type_table_before_row_column', $term->term_id, $parent_term_id ); ?>
                                             <td class="type subtype">&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                             <td class="settings">
                                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-type&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
