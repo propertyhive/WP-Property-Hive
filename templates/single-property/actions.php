@@ -52,7 +52,3 @@ global $post, $property;
 	<?php do_action( 'propertyhive_property_actions_end' ); ?>
     
 </div>
-
-<!-- LIGHTBOXES REQUIRED FOR VARIOUS ACTIONS -->
-
-<!-- FLOORPLANS -->
