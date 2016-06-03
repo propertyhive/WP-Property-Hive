@@ -536,9 +536,9 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
             'class' => 'action-street-view'
         );*/
         
-        $actions = apply_filters( 'propertyhive_single_property_actions', array( 'actions' => $actions ) );
-    
-        ph_get_template( 'single-property/actions.php', $actions );
+        $actions = apply_filters( 'propertyhive_single_property_actions', $actions );
+        
+        ph_get_template( 'single-property/actions.php', array( 'actions' => $actions ) );
     }
 }
 
