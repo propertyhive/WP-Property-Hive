@@ -194,7 +194,11 @@ if ( ! class_exists( 'PropertyHive' ) )
             if ( ! is_admin() || defined( 'DOING_AJAX' ) ) {
                 $this->frontend_includes();
             }
-    
+            
+            include_once( 'includes/ph-form-functions.php' );               // Form Renderers
+            include_once( 'includes/class-ph-form-handler.php' );           // Form Handlers
+            include_once( 'includes/class-ph-shortcodes.php' );             // Shortcodes class
+
             $this->query = include( 'includes/class-ph-query.php' );                // The main query class
     
             include_once( 'includes/class-ph-post-types.php' );                     // Registers post types
@@ -215,9 +219,6 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/ph-template-hooks.php' );
             include_once( 'includes/class-ph-template-loader.php' );        // Template Loader
             include_once( 'includes/class-ph-frontend-scripts.php' );       // Frontend Scripts
-            include_once( 'includes/ph-form-functions.php' );               // Form Renderers
-            include_once( 'includes/class-ph-form-handler.php' );           // Form Handlers
-            include_once( 'includes/class-ph-shortcodes.php' );             // Shortcodes class
         }
     
         /**
