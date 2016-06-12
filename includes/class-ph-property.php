@@ -190,7 +190,7 @@ class PH_Property {
 
         return apply_filters( 'propertyhive_property_virtual_tour_urls', array_filter( $virtual_tour_urls ), $this );
     }
-    
+
     /**
      * Get the formatted price based on department. Show POA if on frontend and 'POA' ticked
      *
@@ -199,41 +199,284 @@ class PH_Property {
      */
     public function get_formatted_price( ) {
         
-        if (!is_admin() && $this->_poa == 'yes')
+        if ( $this->_department == 'commercial' )
         {
-            return __( 'POA', 'propertyhive' );
+            $price = '';
+
+            // Price Details
+            $price .= $this->get_formatted_commercial_price();
+
+            // Rent Details
+            $rent = $this->get_formatted_commercial_rent();
+            if ( $price != '' )
+            {
+                $price .= '<br>' . $rent;
+            }
+
+            return $price;
         }
         else
         {
-            $ph_countries = new PH_Countries();
-            if ($this->_currency != '')
+            if (!is_admin() && $this->_poa == 'yes')
             {
-                $currency = $ph_countries->get_currency( $this->_currency );
+                return __( 'POA', 'propertyhive' );
             }
             else
             {
-                $currency = $ph_countries->get_currency( 'GBP' );
-            }
-            $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
-            $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
-            switch ($this->_department)
-            {
-                case "residential-sales":
+                $ph_countries = new PH_Countries();
+                if ($this->_currency != '')
                 {
-                    return ( ( $this->_price != '' ) ? $prefix . number_format($this->_price, 0) . $suffix : '-' );
-                    break;
+                    $currency = $ph_countries->get_currency( $this->_currency );
                 }
-                case "residential-lettings":
+                else
                 {
-                    return ( ( $this->_rent != '' ) ? $prefix . number_format($this->_rent, 0) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
-                    break;
+                    $currency = $ph_countries->get_currency( 'GBP' );
+                }
+                $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+                $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+                switch ($this->_department)
+                {
+                    case "residential-sales":
+                    {
+                        return ( ( $this->_price != '' ) ? $prefix . number_format($this->_price, 0) . $suffix : '-' );
+                        break;
+                    }
+                    case "residential-lettings":
+                    {
+                        return ( ( $this->_rent != '' ) ? $prefix . number_format($this->_rent, 0) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                        break;
+                    }
                 }
             }
         }
         
         return '';
     }
-    
+
+    /**
+     * Get the formatted commercial price. Show POA if on frontend and 'POA' ticked
+     *
+     * @access public
+     * @return string
+     */
+    public function get_formatted_commercial_price( ) {
+
+        $price = '';
+
+        if ( $this->_for_sale == 'yes' )
+        {
+            if ( !is_admin() && $this->_price_poa == 'yes' )
+            {
+                $price .= __( 'POA', 'propertyhive' );
+            }
+            else
+            {
+                $ph_countries = new PH_Countries();
+                if ( $this->_commercial_price_currency != '' )
+                {
+                    $currency = $ph_countries->get_currency( $this->_commercial_price_currency );
+                }
+                else
+                {
+                    $currency = $ph_countries->get_currency( 'GBP' );
+                }
+                $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+                $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+
+                if ( $this->_price_from != '' )
+                {
+                    $explode_price = explode(".", $this->_price_from);
+                    if ( count($explode_price) == 2 )
+                    {
+                        $price .= $prefix . number_format($explode_price[0], 0) . '.' . $explode_price[1] . $suffix;
+                    }
+                    else
+                    {
+                        $price .= $prefix . number_format($this->_price_from, 0) . $suffix;
+                    }
+                }
+                if ( $this->_price_to != '' && $this->_price_to != $this->_price_from )
+                {
+                    if ( $price != '' )
+                    {
+                        $price .= ' - ';
+                    }
+                    $explode_price = explode(".", $this->_price_to);
+                    if ( count($explode_price) == 2 )
+                    {
+                        $price .= $prefix . number_format($explode_price[0], 0) . '.' . $explode_price[1] . $suffix;
+                    }
+                    else
+                    {
+                        $price .= $prefix . number_format($this->_price_to, 0) . $suffix;
+                    }
+                }
+                if ( $price != '' )
+                {
+                    $price_units = get_commercial_price_units( );
+                    $price .= ( isset($price_units[$this->_price_units]) ) ? ' ' . $price_units[$this->_price_units] : '';
+                }
+            }
+        }
+
+        return $price;
+    }
+
+    /**
+     * Get the formatted commercial rent. Show POA if on frontend and 'POA' ticked
+     *
+     * @access public
+     * @return string
+     */
+    public function get_formatted_commercial_rent( ) {
+
+        $rent = '';
+
+        if ( $this->_to_rent == 'yes' )
+        {
+            if ( !is_admin() && $this->_rent_poa == 'yes' )
+            {
+                $rent .= __( 'POA', 'propertyhive' );
+            }
+            else
+            {
+                $ph_countries = new PH_Countries();
+                if ( $this->_commercial_rent_currency != '' )
+                {
+                    $currency = $ph_countries->get_currency( $this->_commercial_rent_currency );
+                }
+                else
+                {
+                    $currency = $ph_countries->get_currency( 'GBP' );
+                }
+                $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+                $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+
+                if ( $this->_rent_from != '' )
+                {
+                    $explode_rent = explode(".", $this->_rent_from);
+                    if ( count($explode_rent) == 2 )
+                    {
+                        $rent .= $prefix . number_format($explode_rent[0], 0) . '.' . $explode_rent[1] . $suffix;
+                    }
+                    else
+                    {
+                        $rent .= $prefix . number_format($this->_rent_from, 0) . $suffix;
+                    }
+                }
+                if ( $this->_rent_to != '' && $this->_rent_to != $this->_rent_from )
+                {
+                    if ( $rent != '' )
+                    {
+                        $rent .= ' - ';
+                    }
+                    $explode_rent = explode(".", $this->_rent_to);
+                    if ( count($explode_rent) == 2 )
+                    {
+                        $rent .= $prefix . number_format($explode_rent[0], 0) . '.' . $explode_rent[1] . $suffix;
+                    }
+                    else
+                    {
+                        $rent .= $prefix . number_format($this->_rent_to, 0) . $suffix;
+                    }
+                }
+                if ( $rent != '' )
+                {
+                    $price_units = get_commercial_price_units( );
+                    $rent .= ' ' . ( isset($price_units[$this->_rent_units]) ? $price_units[$this->_rent_units] : $this->_rent_units );
+                }
+            }
+        }
+
+        return $rent;
+    }
+
+    public function get_formatted_floor_area( ) {
+        
+        $area = '';
+
+        if ( $this->_floor_area_from != '' )
+        {
+            $explode_area = explode(".", $this->_floor_area_from);
+            if ( count($explode_area) == 2 )
+            {
+                $area .= number_format($explode_area[0], 0) . '.' . $explode_area[1];
+            }
+            else
+            {
+                $area .=  number_format($this->_floor_area_from, 0);
+            }
+        }
+        if ( $this->_floor_area_to != '' && $this->_floor_area_to != $this->_floor_area_from )
+        {
+            if ( $area != '' )
+            {
+                $area .= ' - ';
+            }
+            $explode_area = explode(".", $this->_floor_area_to);
+            if ( count($explode_area) == 2 )
+            {
+                $area .= number_format($explode_area[0], 0) . '.' . $explode_area[1];
+            }
+            else
+            {
+                $area .=  number_format($this->_floor_area_to, 0);
+            }
+        }
+
+        if ( $area != '' )
+        {
+            $area_units = get_area_units( );
+            $area .= ( isset($area_units[$this->_floor_area_units]) ) ? ' ' . $area_units[$this->_floor_area_units] : '';
+        }
+
+        return $area;
+
+    }
+
+    public function get_formatted_site_area( ) {
+        
+        $area = '';
+
+        if ( $this->_site_area_from != '' )
+        {
+            $explode_area = explode(".", $this->_site_area_from);
+            if ( count($explode_area) == 2 )
+            {
+                $area .= number_format($explode_area[0], 0) . '.' . $explode_area[1];
+            }
+            else
+            {
+                $area .=  number_format($this->_site_area_from, 0);
+            }
+        }
+        if ( $this->_site_area_to != '' && $this->_site_area_to != $this->_site_area_from )
+        {
+            if ( $area != '' )
+            {
+                $area .= ' - ';
+            }
+            $explode_area = explode(".", $this->_site_area_to);
+            if ( count($explode_area) == 2 )
+            {
+                $area .= number_format($explode_area[0], 0) . '.' . $explode_area[1];
+            }
+            else
+            {
+                $area .=  number_format($this->_site_area_to, 0);
+            }
+        }
+
+        if ( $area != '' )
+        {
+            $area_units = get_area_units( );
+            $area .= ( isset($area_units[$this->_site_area_units]) ) ? ' ' . $area_units[$this->_site_area_units] : '';
+        }
+
+        return $area;
+
+    }
+
     /**
      * Get the formatted deposit
      *
@@ -269,6 +512,24 @@ class PH_Property {
         }
     }
     
+    /**
+     * Get the full description by constructing the rooms or commercial description (dependant on department)
+     *
+     * @access public
+     * @return string
+     */
+    public function get_formatted_description( ) {
+
+        if ( $this->_department == 'commercial' )
+        {
+            return $this->get_formatted_descriptions(); // Haven't called this commercial_descriptions as we might use generic descriptions for other area going forward
+        }
+        else
+        {
+            return $this->get_formatted_rooms();
+        }
+    }
+
     /**
      * Get the full description by constructing the rooms
      *
@@ -306,6 +567,40 @@ class PH_Property {
         
         return $return;
     }
+
+    /**
+     * Get the full description by constructing the descriptions
+     *
+     * @access public
+     * @return string
+     */
+    public function get_formatted_descriptions( ) {
+        
+        $descriptions = $this->_descriptions;
+        
+        $return = '';
+        
+        if (isset($descriptions) && $descriptions != '' && $descriptions > 0)
+        {
+            for ($i = 0; $i < $descriptions; ++$i)
+            {
+                $return .= '<p class="description-section">';
+                if ($this->{'_description_name_' . $i} != '')
+                {
+                    $return .= '<strong class="description-title">' . $this->{'_description_name_' . $i} . '</strong>';
+                }
+                if ($this->{'_description_' . $i} != '')
+                {
+                    $return .= '<br>';
+                }
+                $return .= nl2br($this->{'_description_' . $i}) . '
+                </p>
+                ';
+            }
+        }
+        
+        return $return;
+    }
     
     /**
      * Get the property type taxononmy
@@ -315,7 +610,7 @@ class PH_Property {
      */
     public function get_property_type()
     {
-        $term_list = wp_get_post_terms($this->id, 'property_type', array("fields" => "names"));
+        $term_list = wp_get_post_terms($this->id, ( ( $this->_department == 'commercial' ) ? 'commercial_' : '' ) . 'property_type', array("fields" => "names"));
         
         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
         {

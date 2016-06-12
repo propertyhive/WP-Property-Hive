@@ -21,6 +21,8 @@ global $post, $property;
         
         <li class="type"><?php _e( 'Type:', 'propertyhive' ); echo ' ' . $property->get_property_type(); ?></li>
         
+        <?php if ( $property->department != 'commercial' ) { ?>
+
         <?php if ($property->bedrooms > 0) { ?><li class="bedrooms"><?php _e( 'Bedrooms:', 'propertyhive' ); echo ' ' . $property->bedrooms; ?></li><?php } ?>
         
         <?php if ($property->bathrooms > 0) { ?><li class="bathrooms"><?php _e( 'Bathrooms:', 'propertyhive' ); echo ' ' . $property->bathrooms; ?></li><?php } ?>
@@ -49,6 +51,8 @@ global $post, $property;
                 }
             }
         ?>
+
+        <?php } // end if residential ?>
 
     </ul>
 

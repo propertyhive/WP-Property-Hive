@@ -257,6 +257,20 @@ if ( ! function_exists( 'propertyhive_get_property_thumbnail' ) ) {
     }
 }
 
+if ( ! function_exists( 'propertyhive_template_loop_floor_area' ) ) {
+
+    /**
+     * Get the property floor area for the loop.
+     *
+     * @access public
+     * @subpackage  Loop
+     * @return void
+     */
+    function propertyhive_template_loop_floor_area() {
+        ph_get_template( 'search/floor-area.php' );
+    }
+}
+
 if ( ! function_exists( 'propertyhive_template_loop_price' ) ) {
 
     /**
@@ -398,6 +412,20 @@ if ( ! function_exists( 'propertyhive_template_single_title' ) ) {
      */
     function propertyhive_template_single_title() {
         ph_get_template( 'single-property/title.php' );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_template_single_floor_area' ) ) {
+
+    /**
+     * Output the property floor area.
+     *
+     * @access public
+     * @subpackage  Property
+     * @return void
+     */
+    function propertyhive_template_single_floor_area() {
+        ph_get_template( 'single-property/floor-area.php' );
     }
 }
 
@@ -570,17 +598,17 @@ if ( ! function_exists( 'propertyhive_template_single_summary' ) ) {
     }
 }
 
-if ( ! function_exists( 'propertyhive_template_single_rooms' ) ) {
+if ( ! function_exists( 'propertyhive_template_single_description' ) ) {
     
     /**
-     * Output the product rooms to form a full description
+     * Output the product rooms or descriptions to form a full description
      *
      * @access public
      * @subpackage  Property
      * @return void
      */
-    function propertyhive_template_single_rooms() {
-        ph_get_template( 'single-property/rooms.php' );
+    function propertyhive_template_single_description() {
+        ph_get_template( 'single-property/description.php' );
     }
 }
 

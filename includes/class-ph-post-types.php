@@ -59,6 +59,18 @@ class PH_Post_types {
 	            'public'                => true
 	        )
 	    );
+
+        register_taxonomy( 'commercial_property_type',
+            'property',
+            array(
+                'hierarchical'          => true,
+                'show_ui'               => false,
+                'show_in_nav_menus'     => false,
+                'query_var'             => is_admin(),
+                'rewrite'               => false,
+                'public'                => true
+            )
+        );
         
         register_taxonomy( 'location',
             'property',
@@ -109,6 +121,18 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'tenure',
+            'property',
+            array(
+                'hierarchical'          => true,
+                'show_ui'               => false,
+                'show_in_nav_menus'     => false,
+                'query_var'             => is_admin(),
+                'rewrite'               => false,
+                'public'                => true
+            )
+        );
+
+        register_taxonomy( 'commercial_tenure',
             'property',
             array(
                 'hierarchical'          => true,

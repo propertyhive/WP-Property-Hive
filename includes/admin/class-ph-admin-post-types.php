@@ -216,6 +216,15 @@ class PH_Admin_Post_Types {
                 }
                 $output .= '>' . __( 'Residential Lettings', 'propertyhive' ) . '</option>';
             }
+            if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+            {
+                $output .= '<option value="commercial"';
+                if ( isset( $_GET['_department'] ) && ! empty( $_GET['_department'] ) )
+                {
+                    $output .= selected( 'commercial', $_GET['_department'], false );
+                }
+                $output .= '>' . __( 'Commercial', 'propertyhive' ) . '</option>';
+            }
         $output .= '</select>';
 
         return $output;

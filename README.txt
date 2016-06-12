@@ -14,7 +14,7 @@ Property Hive is estate agency software for WP. Use it to market your properties
 
 Property Hive is the first plugin that aims to bring all of the features you'd normally find in estate agency software into WordPress.
 
-From managing properties, owners and landlords, to tracking applicants and matching them to suitable properties, we want to do it all.
+From managing residential and commercial properties, owners and landlords, to tracking applicants and matching them to suitable properties, we want to do it all.
 
 = Why Property Hive? =
 

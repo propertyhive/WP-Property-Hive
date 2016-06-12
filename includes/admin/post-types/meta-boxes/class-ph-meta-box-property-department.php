@@ -32,6 +32,12 @@ class PH_Meta_Box_Property_Department {
             $thepostid = $post->ID;
             setup_postdata($post);
         }
+
+        $parent_post = false;
+        if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
+        {
+            $parent_post = $_GET['post_parent'];
+        }
         
         echo '<div class="propertyhive_meta_box">';
         
@@ -52,7 +58,33 @@ class PH_Meta_Box_Property_Department {
         {
             $departments['commercial'] = __( 'Commercial', 'propertyhive' );
         }
+        if ( $parent_post !== FALSE || ( isset($post->post_parent) && $post->post_parent != '' && $post->post_parent != 0 ) )
+        {
+            unset($departments['residential-sales']);
+            unset($departments['residential-lettings']);
+        }
+        else
+        {
+            // Make sure property doesn't have any children
+            $args = array(
+                'post_parent'       => $post->ID,
+                'post_type'         => 'property', 
+                'posts_per_page'    => 1,
+            );
+            $unit_query = new WP_Query( $args );
+
+            if ( $unit_query->have_posts() )
+            {
+                unset($departments['residential-sales']);
+                unset($departments['residential-lettings']);
+            }
+            wp_reset_postdata();
+        }
         $value = get_post_meta( $post->ID, '_department', TRUE );
+        if ( $parent_post !== FALSE )
+        {
+            $value = get_post_meta( $parent_post, '_department', TRUE );
+        }
         if ($value == '')
         {
             $value = get_option( 'propertyhive_primary_department' );

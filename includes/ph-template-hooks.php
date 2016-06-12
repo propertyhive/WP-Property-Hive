@@ -56,12 +56,14 @@ add_action( 'propertyhive_after_search_results_loop', 'propertyhive_pagination',
  * Property Loop Items
  *
  * @see propertyhive_template_loop_property_thumbnail()
+ * @see propertyhive_template_loop_floor_area()
  * @see propertyhive_template_loop_price()
  * @see propertyhive_template_loop_summary()
  * @see propertyhive_template_loop_actions()
  */
 add_action( 'propertyhive_before_search_results_loop_item_title', 'propertyhive_template_loop_property_thumbnail', 10 );
 
+add_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_floor_area', 5 ); // commercial only
 add_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_price', 10 );
 add_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_summary', 20 );
 add_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_actions', 30 );
@@ -103,12 +105,14 @@ add_action( 'propertyhive_product_thumbnails', 'propertyhive_show_property_thumb
  * Property Summary Box
  *
  * @see propertyhive_template_single_title()
+ * @see propertyhive_template_single_floor_area()
  * @see propertyhive_template_single_price()
  * @see propertyhive_template_single_meta()
  * @see propertyhive_template_single_actions()
  * @see propertyhive_template_single_sharing()
  */
 add_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_title', 5 );
+add_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_floor_area', 7 ); // commercial only
 add_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_price', 10 );
 add_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_meta', 20 );
 add_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_sharing', 30 );
@@ -119,12 +123,12 @@ add_action( 'propertyhive_single_property_summary', 'propertyhive_template_singl
  * @see propertyhive_template_loop_actions()
  * @see propertyhive_template_single_features()
  * @see propertyhive_template_single_summary()
- * @see propertyhive_template_single_rooms()
+ * @see propertyhive_template_single_description()
  */
 add_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_actions', 10 );
 add_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_features', 20 );
 add_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_summary', 30 );
-add_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_rooms', 40 );
+add_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_description', 40 );
 
 /**
  * Property Actions Box

@@ -62,6 +62,7 @@ if ( $property->featured == 'yes' )
     		/**
     		 * propertyhive_after_search_results_loop_item_title hook
     		 *
+             * @hooked propertyhive_template_loop_floor_area - 5 (commercial only)
     		 * @hooked propertyhive_template_loop_price - 10
              * @hooked propertyhive_template_loop_summary - 20
              * @hooked propertyhive_template_loop_actions - 30

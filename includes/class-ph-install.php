@@ -338,6 +338,32 @@ class PH_Install {
                     'child_of_previous' => true
                 ),
 			),
+			'commercial_property_type' => array(
+				array(
+                    'name' => 'Office'
+                ),
+                array(
+                    'name' => 'Industrial'
+                ),
+                array(
+                    'name' => 'Retail'
+                ),
+                array(
+                    'name' => 'Land'
+                ),
+                array(
+                    'name' => 'Health'
+                ),
+                array(
+                    'name' => 'Motoring'
+                ),
+                array(
+                    'name' => 'Leisure'
+                ),
+                array(
+                    'name' => 'Investment'
+                ),
+			),
 			'outside_space' => array(
                 array(
                     'name' => 'Balcony'
@@ -395,6 +421,14 @@ class PH_Install {
                 ),
             ),
             'tenure' => array(
+                array(
+                    'name' => 'Freehold'
+                ),
+                array(
+                    'name' => 'Leasehold'
+                )
+            ),
+            'commercial_tenure' => array(
                 array(
                     'name' => 'Freehold'
                 ),

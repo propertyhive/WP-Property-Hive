@@ -41,36 +41,81 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         $sections = array(
             ''         => __( 'Custom Fields', 'propertyhive' )
         );
+
+        $residential_active  = false;
+        $residential_sales_active  = false;
+        $residential_lettings_active  = false;
+        $commercial_active  = false;
+
+        if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' || get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
+        {
+            $residential_active  = true;
+            if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+            {
+                $residential_sales_active  = true;
+            }
+            if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
+            {
+                $residential_lettings_active  = true;
+            }
+        }
+        if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+        {
+            $commercial_active  = true;
+        }
         
         // Residential Custom Fields
         $sections[ 'availability' ] = __( 'Availabilities', 'propertyhive' );
         add_action( 'propertyhive_admin_field_custom_fields_availability', array( $this, 'custom_fields_availability_setting' ) );
 
-        $sections[ 'property-type' ] = __( 'Property Types', 'propertyhive' );
-        add_action( 'propertyhive_admin_field_custom_fields_property_type', array( $this, 'custom_fields_property_type_setting' ) );
-        
+        if ( $residential_active )
+        {
+            $sections[ 'property-type' ] = ( $commercial_active ? __( 'Residential ', 'propertyhive' ) . ' ' : '' ) . __( 'Property Types', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_property_type', array( $this, 'custom_fields_property_type_setting' ) );
+        }
+        if ( $commercial_active )
+        {
+            $sections[ 'commercial-property-type' ] = ( $residential_active ? __( 'Commercial', 'propertyhive' ) . ' ' : '' ) . __( 'Property Types', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_commercial_property_type', array( $this, 'custom_fields_commercial_property_type_setting' ) );
+        }
+
         $sections[ 'location' ] = __( 'Locations', 'propertyhive' );
         add_action( 'propertyhive_admin_field_custom_fields_location', array( $this, 'custom_fields_location_setting' ) );
         
-        $sections[ 'parking' ] = __( 'Parking', 'propertyhive' );
-        add_action( 'propertyhive_admin_field_custom_fields_parking', array( $this, 'custom_fields_parking_setting' ) );
-        
-        $sections[ 'outside-space' ] = __( 'Outside Spaces', 'propertyhive' );
-        add_action( 'propertyhive_admin_field_custom_fields_outside_space', array( $this, 'custom_fields_outside_space_setting' ) );
-        
-        // Residential Sales Custom Fields
-        $sections[ 'price-qualifier' ] = __( 'Price Qualifiers', 'propertyhive' );
-        add_action( 'propertyhive_admin_field_custom_fields_price_qualifier', array( $this, 'custom_fields_price_qualifier_setting' ) );
-        
-        $sections[ 'sale-by' ] = __( 'Sale By', 'propertyhive' );
-        add_action( 'propertyhive_admin_field_custom_fields_sale_by', array( $this, 'custom_fields_sale_by_setting' ) );
-        
-        $sections[ 'tenure' ] = __( 'Tenures', 'propertyhive' );
-        add_action( 'propertyhive_admin_field_custom_fields_tenure', array( $this, 'custom_fields_tenure_setting' ) );
-        
-        // Residential Lettings Custom Fields
-        $sections[ 'furnished' ] = __( 'Furnished', 'propertyhive' );
-        add_action( 'propertyhive_admin_field_custom_fields_furnished', array( $this, 'custom_fields_furnished_setting' ) );
+        if ( $residential_active )
+        {
+            $sections[ 'parking' ] = __( 'Parking', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_parking', array( $this, 'custom_fields_parking_setting' ) );
+            
+            $sections[ 'outside-space' ] = __( 'Outside Spaces', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_outside_space', array( $this, 'custom_fields_outside_space_setting' ) );
+        }
+
+        if ( $residential_sales_active || $commercial_active )
+        {
+            $sections[ 'price-qualifier' ] = __( 'Price Qualifiers', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_price_qualifier', array( $this, 'custom_fields_price_qualifier_setting' ) );
+            
+            $sections[ 'sale-by' ] = __( 'Sale By', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_sale_by', array( $this, 'custom_fields_sale_by_setting' ) );
+        }
+
+        if ( $residential_active )
+        {
+            $sections[ 'tenure' ] = ( $commercial_active ? __( 'Residential', 'propertyhive' ) . ' ' : '' ) . __( 'Tenures', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_tenure', array( $this, 'custom_fields_tenure_setting' ) );
+        }
+        if ( $commercial_active )
+        {
+            $sections[ 'commercial-tenure' ] = ( $residential_active ? __( 'Commercial', 'propertyhive' ) . ' ' : '' ) . __( 'Tenures', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_commercial_tenure', array( $this, 'custom_fields_commercial_tenure_setting' ) );
+        }
+
+        if ( $residential_lettings_active )
+        {
+            $sections[ 'furnished' ] = __( 'Furnished', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_furnished', array( $this, 'custom_fields_furnished_setting' ) );
+        }
 
         // Other
         $sections[ 'marketing-flag' ] = __( 'Marketing Flags', 'propertyhive' );
@@ -138,6 +183,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "availability-delete": { $settings = $this->get_custom_fields_delete($current_id, 'availability', __( 'Availability', 'propertyhive' )); break; }
                     case "property-type": { $settings = $this->get_custom_fields_property_type_setting(); break; }
                     case "property-type-delete": { $settings = $this->get_custom_fields_delete($current_id, 'property_type', __( 'Property Type', 'propertyhive' )); break; }
+                    case "commercial-property-type": { $settings = $this->get_custom_fields_commercial_property_type_setting(); break; }
+                    case "commercial-property-type-delete": { $settings = $this->get_custom_fields_delete($current_id, 'commercial_property_type', __( 'Property Type', 'propertyhive' )); break; }
                     case "location": { $settings = $this->get_custom_fields_location_setting(); break; }
                     case "location-delete": { $settings = $this->get_custom_fields_delete($current_id, 'location', __( 'Location', 'propertyhive' )); break; }
                     case "parking": { $settings = $this->get_custom_fields_parking_setting(); break; }
@@ -151,6 +198,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "sale-by-delete": { $settings = $this->get_custom_fields_delete($current_id, 'sale_by', __( 'Sale By', 'propertyhive' )); break; }
                     case "tenure": { $settings = $this->get_custom_fields_tenure_setting(); break; }
                     case "tenure-delete": { $settings = $this->get_custom_fields_delete($current_id, 'tenure', __( 'Tenure', 'propertyhive' )); break; }
+                    case "commercial-tenure": { $settings = $this->get_custom_fields_commercial_tenure_setting(); break; }
+                    case "commercial-tenure-delete": { $settings = $this->get_custom_fields_delete($current_id, 'commercial_tenure', __( 'Tenure', 'propertyhive' )); break; }
                     
                     case "furnished": { $settings = $this->get_custom_fields_furnished_setting(); break; }
                     case "furnished-delete": { $settings = $this->get_custom_fields_delete($current_id, 'furnished', __( 'Furnished', 'propertyhive' )); break; }
@@ -284,7 +333,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     }
     
     /**
-     * Output list of property types
+     * Output list of residential property types
      *
      * @access public
      * @return void
@@ -384,6 +433,112 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             </th>
             <td class="forminp forminp-button">
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Type', 'propertyhive' ); ?></a>
+            </td>
+        </tr>
+    <?php
+    }
+
+    /**
+     * Output list of commercial property types
+     *
+     * @access public
+     * @return void
+     */
+    public function custom_fields_commercial_property_type_setting() {
+        global $post;
+    ?>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                &nbsp;
+            </th>
+            <td class="forminp forminp-button">
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-property-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Type', 'propertyhive' ); ?></a>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row" class="titledesc"><?php _e( 'Property Types', 'propertyhive' ) ?></th>
+            <td class="forminp">
+                <table class="ph_customfields widefat" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_header_column' ); ?>
+                            <th class="type"><?php _e( 'Property Type', 'propertyhive' ); ?></th>
+                            <th class="settings">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => 0
+                        );
+                        $terms = get_terms( 'commercial_property_type', $args );
+                        
+                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                        {
+                            foreach ($terms as $term)
+                            {
+                                $parent_term_id = $term->term_id;
+
+                                $args = array(
+                                    'hide_empty' => false,
+                                    'parent' => $parent_term_id
+                                );
+                                $subterms = get_terms( 'commercial_property_type', $args );
+                        ?>
+                        <tr>
+                            <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_row_column', $term->term_id ); ?>
+                            <td class="type"><?php echo $term->name; ?></td>
+                            <td class="settings">
+                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-property-type&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
+                                <?php if ( empty( $subterms ) ) { ?>
+                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-property-type-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
+                                <?php } ?>
+                            </td>
+                        </tr>
+                        <?php
+                                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                                {
+                                    foreach ($subterms as $term)
+                                    {
+                                        ?>
+                                        <tr>
+                                            <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_row_column', $term->term_id, $parent_term_id ); ?>
+                                            <td class="type subtype">&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
+                                            <td class="settings">
+                                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-property-type&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
+                                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-property-type-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
+                                            </td>
+                                        </tr>
+                                        <?php   
+                                    }
+                                }
+                        ?>
+                        <?php
+                            }
+                        }
+                        else
+                        {
+                        ?>
+                        <tr>
+                            <td><?php echo __( 'No property types found', 'propertyhive' ); ?></td>
+                            <td class="settings">
+                                
+                            </td>
+                        </tr>
+                        <?php
+                        }
+                    ?>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                &nbsp;
+            </th>
+            <td class="forminp forminp-button">
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-property-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Type', 'propertyhive' ); ?></a>
             </td>
         </tr>
     <?php
@@ -821,7 +976,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     }
 
     /**
-     * Output list of tenure options
+     * Output list of residential tenure options
      *
      * @access public
      * @return void
@@ -892,6 +1047,83 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             </th>
             <td class="forminp forminp-button">
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=tenure&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Tenure', 'propertyhive' ); ?></a>
+            </td>
+        </tr>
+    <?php
+    }
+
+    /**
+     * Output list of commercial tenure options
+     *
+     * @access public
+     * @return void
+     */
+    public function custom_fields_commercial_tenure_setting() {
+        global $post;
+    ?>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                &nbsp;
+            </th>
+            <td class="forminp forminp-button">
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-tenure&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Tenure', 'propertyhive' ); ?></a>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row" class="titledesc"><?php _e( 'Tenures', 'propertyhive' ) ?></th>
+            <td class="forminp">
+                <table class="ph_customfields widefat" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="type"><?php _e( 'Tenure', 'propertyhive' ); ?></th>
+                            <th class="settings">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => 0
+                        );
+                        $terms = get_terms( 'commercial_tenure', $args );
+                        
+                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                        {
+                            foreach ($terms as $term)
+                            { 
+                        ?>
+                        <tr>
+                            <td class="type"><?php echo $term->name; ?></td>
+                            <td class="settings">
+                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-tenure&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
+                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-tenure-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
+                            </td>
+                        </tr>
+                        <?php
+                            }
+                        }
+                        else
+                        {
+                        ?>
+                        <tr>
+                            <td><?php echo __( 'No tenure found', 'propertyhive' ); ?></td>
+                            <td class="settings">
+                                
+                            </td>
+                        </tr>
+                        <?php
+                        }
+                    ?>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                &nbsp;
+            </th>
+            <td class="forminp forminp-button">
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-tenure&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Tenure', 'propertyhive' ); ?></a>
             </td>
         </tr>
     <?php
@@ -1095,7 +1327,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     }
 
     /**
-     * Show property type add/edit options
+     * Show residential property type add/edit options
      *
      * @access public
      * @return string
@@ -1163,6 +1395,77 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         );
         
         return apply_filters( 'propertyhive_custom_field_property_type_settings', $args );
+    }
+
+    /**
+     * Show commercial property type add/edit options
+     *
+     * @access public
+     * @return string
+     */
+    public function get_custom_fields_commercial_property_type_setting()
+    {
+        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        
+        $taxonomy = 'commercial_property_type';
+        $term_name = '';
+        $term_parent = '';
+        if ($current_id != '')
+        {
+            $term = get_term( $current_id, $taxonomy );
+            $term_name = $term->name;
+            $term_parent = $term->parent;
+        }
+        
+        $existing_terms = array('' => '(' . __ ( 'no parent', 'propertyhive') . ')');
+        
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0,
+            'exclude' => array($current_id)
+        );
+        $terms = get_terms( 'commercial_property_type', $args );
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            {
+                $existing_terms[$term->term_id] = $term->name;
+            }
+        }
+        
+        $args = array(
+
+            array( 'title' => __( ( $current_id == '' ? 'Add New Property Type' : 'Edit Property Type' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_commercial_property_type_settings' ),
+            
+            array(
+                'title' => __( 'Property Type', 'propertyhive' ),
+                'id'        => 'commercial_property_type_name',
+                'default'   => $term_name,
+                'type'      => 'text',
+                'desc_tip'  =>  false,
+            ),
+            
+            array(
+                'title' => __( 'Parent', 'propertyhive' ),
+                'id'        => 'parent_commercial_property_type_id',
+                'default'   => $term_parent,
+                'options'   => $existing_terms,
+                'type'      => 'select',
+                'desc_tip'  =>  false,
+                'desc'      => ''
+            ),
+            
+            array(
+                'type'      => 'hidden',
+                'id'        => 'taxonomy',
+                'default'     => $taxonomy
+            ),
+            
+            array( 'type' => 'sectionend', 'id' => 'custom_field_commercial_property_type_settings' )
+            
+        );
+        
+        return apply_filters( 'propertyhive_custom_field_commercial_property_type_settings', $args );
     }
 
     /**
@@ -1418,7 +1721,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     
                     // Get number of applicants assigned to this term
                     $num_applicants = 0;
-                    if ( $taxonomy == 'property_type' || $taxonomy == 'location' )
+                    if ( $taxonomy == 'property_type' || $taxonomy == 'commercial_property_type' ||  $taxonomy == 'location' )
                     {
                         $query_args = array(
                             'post_type' => 'contact',
@@ -1688,6 +1991,49 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     }
 
     /**
+     * Show commercial tenure add/edit options
+     *
+     * @access public
+     * @return string
+     */
+    public function get_custom_fields_commercial_tenure_setting()
+    {
+        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        
+        $taxonomy = 'commercial_tenure';
+        $term_name = '';
+        if ($current_id != '')
+        {
+            $term = get_term( $current_id, $taxonomy );
+            $term_name = $term->name;
+        }
+
+        $args = array(
+
+            array( 'title' => __( ( $current_id == '' ? 'Add New Tenure' : 'Edit Tenure' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_commercial_tenure_settings' ),
+            
+            array(
+                'title' => __( 'Tenure', 'propertyhive' ),
+                'id'        => 'commercial_tenure_name',
+                'default'   => $term_name,
+                'type'      => 'text',
+                'desc_tip'  =>  false,
+            ),
+            
+            array(
+                'type'      => 'hidden',
+                'id'        => 'taxonomy',
+                'default'     => $taxonomy
+            ),
+            
+            array( 'type' => 'sectionend', 'id' => 'custom_field_commercial_tenure_settings' )
+            
+        );
+        
+        return apply_filters( 'propertyhive_custom_field_commercial_tenure_settings', $args );
+    }
+
+    /**
      * Show furnished add/edit options
      *
      * @access public
@@ -1789,6 +2135,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 {
                     // With heirarchy
                     case "property-type":
+                    case "commercial-property-type":
                     case "location":
                     {
                         // TODO: Validate (check for blank fields)
@@ -1828,6 +2175,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "price-qualifier":
                     case "sale-by":
                     case "tenure":
+                    case "commercial-tenure":
                     case "furnished":
                     case "marketing-flag":
                     {
@@ -1859,6 +2207,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     }
                     case "availability-delete":
                     case "property-type-delete":
+                    case "commercial-property-type-delete":
                     case "location-delete":
                     case "parking-delete":
                     case "price-qualifier-delete":
@@ -1906,7 +2255,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             
                             wp_reset_postdata();
 
-                            if ( $_POST['taxonomy'] == 'property_type' || $_POST['taxonomy'] == 'location' )
+                            if ( $_POST['taxonomy'] == 'property_type' || $_POST['taxonomy'] == 'commercial_property_type' || $_POST['taxonomy'] == 'location' )
                             {
                                 $query_args = array(
                                     'post_type' => 'contact',

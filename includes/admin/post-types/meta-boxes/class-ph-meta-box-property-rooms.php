@@ -182,6 +182,35 @@ class PH_Meta_Box_Property_Rooms {
             });
             
         </script>';
+
+        echo '
+        <script>
+            
+            jQuery(document).ready(function()
+            {
+                //showHideRoomsMetaBox();
+                
+                jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']\').change(function()
+                {
+                     showHideRoomsMetaBox();
+                });
+            });
+            
+            function showHideRoomsMetaBox()
+            {
+                 var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
+                 
+                 if (selectedDepartment == \'commercial\')
+                 {
+                    jQuery(\'#propertyhive-property-rooms\').hide();
+                 }
+                 else
+                 {
+                    jQuery(\'#propertyhive-property-rooms\').show();
+                 }
+            }
+            
+        </script>';
            
     }
 
