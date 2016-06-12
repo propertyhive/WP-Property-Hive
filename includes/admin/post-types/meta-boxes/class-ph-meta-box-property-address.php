@@ -40,57 +40,103 @@ class PH_Meta_Box_Property_Address {
         
         echo '<div class="options_group">';
         
-        propertyhive_wp_text_input( array( 
+        $post_parent_id = ( ( isset($post->post_parent) ) ? $post->post_parent : 0 );
+        $parent_post = false;
+        if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
+        {
+            $post_parent_id = $_GET['post_parent'];
+            $parent_post = $post_parent_id;
+        }
+        propertyhive_wp_hidden_input( array( 
+            'id' => 'post_parent', 
+            'value' => $post_parent_id
+        ) );
+
+        $args = array( 
             'id' => '_reference_number', 
             'label' => __( 'Reference Number', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'text'
-        ) );
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $args['value'] = get_post_meta( $parent_post, '_reference_number', TRUE );
+        }
+        propertyhive_wp_text_input( $args );
         
-        propertyhive_wp_text_input( array( 
+        $args = array( 
             'id' => '_address_name_number', 
             'label' => __( 'Building Name / Number', 'propertyhive' ), 
             'desc_tip' => false, 
             'placeholder' => __( 'e.g. Thistle Cottage, or Flat 10', 'propertyhive' ), 
-            //'description' => __( 'Stock quantity. If this is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.', 'propertyhive' ), 
             'type' => 'text'
-        ) );
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $args['value'] = get_post_meta( $parent_post, '_address_name_number', TRUE );
+        }
+        propertyhive_wp_text_input( $args );
         
-        propertyhive_wp_text_input( array( 
+        $args = array( 
             'id' => '_address_street', 
             'label' => __( 'Street', 'propertyhive' ), 
             'desc_tip' => false, 
             'placeholder' => __( 'e.g. High Street', 'propertyhive' ), 
-            'type' => 'text'
-        ) );
+            'type' => 'text',
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $args['value'] = get_post_meta( $parent_post, '_address_street', TRUE );
+        }
+        propertyhive_wp_text_input( $args );
         
-        propertyhive_wp_text_input( array( 
+        $args = array( 
             'id' => '_address_two', 
             'label' => __( 'Address Line 2', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'text'
-        ) );
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $args['value'] = get_post_meta( $parent_post, '_address_two', TRUE );
+        }
+        propertyhive_wp_text_input( $args );
         
-        propertyhive_wp_text_input( array( 
+        $args = array( 
             'id' => '_address_three', 
             'label' => __( 'Town / City', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'text'
-        ) );
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $args['value'] = get_post_meta( $parent_post, '_address_three', TRUE );
+        }
+        propertyhive_wp_text_input( $args );
         
-        propertyhive_wp_text_input( array( 
+        $args = array( 
             'id' => '_address_four', 
             'label' => __( 'County / State', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'text'
-        ) );
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $args['value'] = get_post_meta( $parent_post, '_address_four', TRUE );
+        }
+        propertyhive_wp_text_input( $args );
         
-        propertyhive_wp_text_input( array( 
+        $args = array( 
             'id' => '_address_postcode', 
             'label' => __( 'Postcode / Zip Code', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'text'
-        ) );
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $args['value'] = get_post_meta( $parent_post, '_address_postcode', TRUE );
+        }
+        propertyhive_wp_text_input( $args );
 
         // Country dropdown
         $countries = get_option( 'propertyhive_countries', array( 'GB' ) );
@@ -108,10 +154,16 @@ class PH_Meta_Box_Property_Address {
                 $country = $ph_countries->get_country( $countries[0] );
                 $country_js[$countries[0]] = $country;
             }
-            propertyhive_wp_hidden_input( array( 
+
+            $args = array( 
                 'id' => '_address_country',
                 'value' => $property_country,
-            ) );
+            );
+            if ( $parent_post !== FALSE )
+            {
+                $args['value'] = get_post_meta( $parent_post, '_address_country', TRUE );
+            }
+            propertyhive_wp_hidden_input( $args );
         }
         else
         {
@@ -127,13 +179,19 @@ class PH_Meta_Box_Property_Address {
                     $country_js[$country_code] = $country;
                 }
             }
-            propertyhive_wp_select( array( 
+
+            $args = array( 
                 'id' => '_address_country', 
                 'label' => __( 'Country', 'propertyhive' ), 
                 'desc_tip' => false,
                 'options' => $country_options,
                 'value' => $property_country,
-            ) );
+            );
+            if ( $parent_post !== FALSE )
+            {
+                $args['value'] = get_post_meta( $parent_post, '_address_country', TRUE );
+            }
+            propertyhive_wp_select( $args );
         }
         
         // Location
@@ -363,7 +421,7 @@ class PH_Meta_Box_Property_Address {
      */
     public static function save( $post_id, $post ) {
         global $wpdb;
-        
+
         update_post_meta( $post_id, '_reference_number', $_POST['_reference_number'] );
         update_post_meta( $post_id, '_address_name_number', $_POST['_address_name_number'] );
         update_post_meta( $post_id, '_address_street', $_POST['_address_street'] );

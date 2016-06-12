@@ -1,6 +1,6 @@
 <?php
 /**
- * Single Property Rooms, also known as the full description
+ * Single Property Description, also known as the full description
  *
  * @author      PropertyHive
  * @package     PropertyHive/Templates
@@ -11,16 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 global $post, $property;
 
-$rooms = $property->get_formatted_rooms();
+$description = $property->get_formatted_description();
 
-if ( $rooms != '' )
+if ( $description != '' )
 {
 ?>
-<div class="rooms">
+<div class="description">
     
     <h4><?php _e( 'Full Details', 'propertyhive' ); ?></h4>
     
-    <?php echo $rooms; ?>
+    <?php echo $description; ?>
 
 </div>
 <?php

@@ -20,6 +20,12 @@ class PH_Meta_Box_Property_Record_Details {
 	 */
 	public static function output( $post ) {
         global $post, $wpdb, $thepostid;
+
+        $parent_post = false;
+        if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
+        {
+            $parent_post = $_GET['post_parent'];
+        }
         
         echo '<div class="propertyhive_meta_box">';
         
@@ -28,6 +34,10 @@ class PH_Meta_Box_Property_Record_Details {
         // Negotiator
         $negotiator_id = get_post_meta($post->ID, '_negotiator_id', TRUE);
         
+        if ( $parent_post !== FALSE )
+        {
+            $negotiator_id = get_post_meta( $parent_post, '_negotiator_id', TRUE );
+        }
         if ($negotiator_id == '')
         {
             // if neg isn't set then default to current user
@@ -51,10 +61,13 @@ class PH_Meta_Box_Property_Record_Details {
         
         $office_id = get_post_meta($post->ID, '_office_id', TRUE);
         
+        if ( $parent_post !== FALSE )
+        {
+            $office_id = get_post_meta( $parent_post, '_office_id', TRUE );
+        }
         if ($office_id == '')
         {
-            // if neg isn't set then default to current users offices
-            //$negotiator_id = get_current_user_id();
+            // TO DO: Get primary office
         }
         
         echo '<p class="form-field negotiator_field">

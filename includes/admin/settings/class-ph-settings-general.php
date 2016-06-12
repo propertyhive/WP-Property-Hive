@@ -67,6 +67,14 @@ class PH_Settings_General extends PH_Settings_Page {
                 'id'      => 'propertyhive_active_departments_lettings',
                 'type'    => 'checkbox',
                 'default' => 'yes',
+                'checkboxgroup' => 'middle'
+            ),
+
+            array(
+                'title'   => __( 'Active Departments', 'propertyhive' ),
+                'desc'    => __( 'Commercial', 'propertyhive' ),
+                'id'      => 'propertyhive_active_departments_commercial',
+                'type'    => 'checkbox',
                 'checkboxgroup' => 'end'
             ),
 
@@ -77,7 +85,8 @@ class PH_Settings_General extends PH_Settings_Page {
                 'default' => 'residential-sales',
                 'options' => array(
                 	'residential-sales' => 'Residential Sales',
-                	'residential-lettings' => 'Residential Lettings'
+                	'residential-lettings' => 'Residential Lettings',
+                	'commercial' => 'Commercial'
                 )
             ),
             
@@ -213,6 +222,8 @@ class PH_Settings_General extends PH_Settings_Page {
 				update_option( 'propertyhive_default_country', $_POST['propertyhive_default_country'] );
 			}
 		}
+
+		flush_rewrite_rules();
 
 		do_action( 'propertyhive_update_currency_exchange_rates' );
 	}

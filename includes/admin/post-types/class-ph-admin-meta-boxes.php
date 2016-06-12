@@ -40,13 +40,15 @@ class PH_Admin_Meta_Boxes {
         
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Department::save', 15, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Details::save', 20, 2 );
-        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Lettings_details::save', 25, 2 );
-        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Sales_details::save', 30, 2 );
+        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Lettings_Details::save', 25, 2 );
+        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Sales_Details::save', 30, 2 );
+        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Commercial_Details::save', 30, 2 );
         
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Marketing::save', 35, 2 );
         
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Rooms::save', 40, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Features::save', 45, 2 );
+        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Commercial_Description::save', 45, 2 );
         
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Photos::save', 50, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Floorplans::save', 55, 2 );
@@ -188,11 +190,6 @@ class PH_Admin_Meta_Boxes {
                 }
             }
         }
-
-
-
-
-        
     }
 
 	/**
@@ -291,6 +288,7 @@ class PH_Admin_Meta_Boxes {
             'post_type' => 'property'
         );
         
+
         /* PROPERTY DETAILS META BOXES */
         $meta_boxes = array();
         $meta_boxes[5] = array(
@@ -325,6 +323,14 @@ class PH_Admin_Meta_Boxes {
             'context' => 'normal',
             'priority' => 'high'
         );
+        $meta_boxes[25] = array(
+            'id' => 'propertyhive-property-commercial-details',
+            'title' => __( 'Commercial Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Commercial_Details::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
 
         $meta_boxes = apply_filters( 'propertyhive_property_details_meta_boxes', $meta_boxes );
         ksort($meta_boxes);
@@ -341,6 +347,35 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'property'
         );
+
+        if ( get_post_meta( $post->ID, '_department', TRUE ) == 'commercial' && isset($post->post_parent) && $post->post_parent == 0 )
+        {
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-property-commercial-units',
+                'title' => __( 'Commercial Units', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Property_Commercial_Units::output',
+                'screen' => 'property',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_property_commercial_units_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_units'] = array(
+                'name' => __( 'Units', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'property'
+            );
+        }
 
         /* PROPERTY MARKETING META BOXES */
         $meta_boxes = array();
@@ -391,6 +426,14 @@ class PH_Admin_Meta_Boxes {
             'id' => 'propertyhive-property-rooms',
             'title' => __( 'Property Rooms', 'propertyhive' ),
             'callback' => 'PH_Meta_Box_Property_Rooms::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[20] = array(
+            'id' => 'propertyhive-property-commercial-description',
+            'title' => __( 'Property Description', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Commercial_Description::output',
             'screen' => 'property',
             'context' => 'normal',
             'priority' => 'high'
@@ -503,6 +546,32 @@ class PH_Admin_Meta_Boxes {
 
         $tabs = apply_filters( 'propertyhive_tabs', $tabs );
 
+        // Force order of meta boxes
+        $meta_box_ids = array();
+        if ( get_post_type($post->ID) == 'property' || get_post_type($post->ID) == 'contact' || get_post_type($post->ID) == 'enquiry' )
+        {
+            foreach ( $tabs as $tab_id => $tab_options)
+            {
+                if ( isset($tab_options['post_type']) && $tab_options['post_type'] == get_post_type($post->ID) )
+                {
+                    $meta_box_ids = array_merge( $meta_box_ids, $tab_options['metabox_ids'] );
+                }
+            }
+        }
+        if (!empty($meta_box_ids) )
+        {
+            $existing_meta_box_order = get_user_meta( get_current_user_id(), 'meta-box-order_' . get_post_type($post->ID), TRUE );
+            if ( $existing_meta_box_order == '' )
+            {
+                $existing_meta_box_order = array();
+                $existing_meta_box_order['side'] = '';
+                $existing_meta_box_order['advanced'] = '';
+            }
+            $existing_meta_box_order['normal'] = implode(",", $meta_box_ids);
+
+            update_user_meta( get_current_user_id(), 'meta-box-order_' . get_post_type($post->ID), $existing_meta_box_order );
+        }
+
         // TO DO: move this so it works when in one column
         add_action( 'edit_form_after_title', array( $this, 'draw_meta_box_tabs' ), 31, 1);
     }
@@ -570,6 +639,8 @@ class PH_Admin_Meta_Boxes {
                             jQuery(this).addClass(\'button-primary\');
                             
                             ' . ( ( $post->post_type == 'property' ) ? 'if (jQuery(this).attr(\'id\') == \'tab_details\') { showHideDepartmentMetaBox(); }' : '' ) . '
+                            ' . ( ( $post->post_type == 'property' ) ? 'if (jQuery(this).attr(\'id\') == \'tab_descriptions\') { showHideRoomsMetaBox(); }' : '' ) . '
+                            ' . ( ( $post->post_type == 'property' ) ? 'if (jQuery(this).attr(\'id\') == \'tab_descriptions\') { showHideCommercialDescriptionsMetaBox(); }' : '' ) . '
                             
                             return false;
                         });
@@ -662,6 +733,23 @@ class PH_Admin_Meta_Boxes {
 		if ( ! in_array( $post->post_type, array( 'property', 'contact' ) ) ) {
 			return;
 		}
+
+        // unhook this function so it doesn't loop infinitely
+        remove_action('save_post', array( $this, 'save_meta_boxes' ), 1);
+
+        if ( $_POST['post_parent'] != '' && $_POST['post_parent'] != '0' )
+        {
+            $property_post = array(
+                'ID'           => $post_id,
+                'post_parent'  => $_POST['post_parent']
+            );
+
+            // Update the post into the database
+            wp_update_post( $property_post );
+        }
+
+        // re-hook this function
+        add_action( 'save_post', array( $this, 'save_meta_boxes' ), 1, 2 );
 
 		do_action( 'propertyhive_process_' . $post->post_type . '_meta', $post_id, $post );
 	}

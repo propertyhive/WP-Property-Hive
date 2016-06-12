@@ -29,6 +29,9 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	public function __construct() {
 		$this->type = 'property';
 
+		// Admin notices
+		add_action( 'admin_notices', array( $this, 'property_admin_notices') );
+
 		// Post title fields
 		add_filter( 'enter_title_here', array( $this, 'enter_title_here' ), 1, 2 );
 
@@ -79,6 +82,21 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
 	}
+
+	/**
+     * Output admin notices relating to property
+     */
+    public function property_admin_notices() 
+    {
+    	global $post;
+
+		$screen = get_current_screen();
+        if ($screen->id == 'property' && $post->post_type == 'property' && $post->post_parent != 0 && $post->post_parent != '')
+        {
+            $message = __( "This property is a commercial unit belonging to", 'propertyhive' ) . ' <a href="' . get_edit_post_link( $post->post_parent ) . '">' . get_the_title($post->post_parent) . '</a>';
+            echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
+        }
+    }
 
 	/**
 	 * Check if we're editing or adding a property
@@ -148,6 +166,11 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		$columns['thumb'] = '<span class="ph-image tips" data-tip="' . __( 'Image', 'propertyhive' ) . '">' . __( 'Image', 'propertyhive' ) . '</span>';
 
 		$columns['address'] = __( 'Address', 'propertyhive' );
+
+		if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+        {
+            $columns['size'] = __( 'Size', 'propertyhive' );
+        }
 
 		$columns['price'] = __( 'Price', 'propertyhive' );
 
@@ -261,9 +284,33 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 				';*/
 
 			break;
+			case 'size' :
+			    
+                $floor_area = $the_property->get_formatted_floor_area();
+                if ( $floor_area != '' )
+                {
+                	echo 'Floor Area: ' . $floor_area . '<br>';
+            	}
+                $site_area = $the_property->get_formatted_site_area();
+                if ( $site_area != '' )
+                {
+                	echo 'Site Area: ' . $site_area;
+            	}
+
+            	if ( $floor_area == '' && $site_area == '' )
+            	{
+            		echo '-';
+            	}
+                
+				break;
 			case 'price' :
 			    
-                echo $the_property->get_formatted_price();
+                $price = $the_property->get_formatted_price();
+                if ( $price == '' )
+                {
+                	$price = '-';
+                }
+                echo $price;
                 
 				break;
 			case 'status' :

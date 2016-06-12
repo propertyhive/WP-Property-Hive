@@ -491,9 +491,24 @@ class PH_Query {
 		$args = array();
 
 		// default - menu_order
-		$args['orderby']  = 'meta_value_num';
-		$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
-		$args['meta_key'] = '_price_actual';
+		if (
+			( isset($_REQUEST['department']) && $_REQUEST['department'] != 'commercial' ) ||
+			( !isset($_REQUEST['department']) && get_option( 'propertyhive_primary_department' ) != 'commercial' )
+		)
+		{
+			$args['orderby']  = 'meta_value_num';
+			$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+			$args['meta_key'] = '_price_actual';
+		}
+		elseif (
+			( isset($_REQUEST['department']) && $_REQUEST['department'] == 'commercial' ) ||
+			( !isset($_REQUEST['department']) && get_option( 'propertyhive_primary_department' ) == 'commercial' )
+		)
+		{
+			$args['orderby']  = 'meta_value_num';
+			$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+			$args['meta_key'] = '_floor_area_from_sqft';
+		}
 
 		switch ( $orderby ) {
 			case 'rand' :
@@ -507,6 +522,10 @@ class PH_Query {
 				$args['orderby']  = 'meta_value_num';
 				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
 				$args['meta_key'] = '_price_actual';
+			case 'floor_area' :
+				$args['orderby']  = 'meta_value_num';
+				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+				$args['meta_key'] = '_floor_area_from_sqft';
 			break;
 		}
 
@@ -560,6 +579,8 @@ class PH_Query {
         $meta_query[] = $this->maximum_rent_meta_query();
         $meta_query[] = $this->minimum_bedrooms_meta_query();
         $meta_query[] = $this->maximum_bedrooms_meta_query();
+        $meta_query[] = $this->minimum_floor_area_meta_query();
+        $meta_query[] = $this->maximum_floor_area_meta_query();
         $meta_query[] = $this->office_meta_query();
         
 		return array_filter( $meta_query );
@@ -623,6 +644,10 @@ class PH_Query {
 	                if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
 	                {
 	                    $departments[] = 'residential-lettings';
+	                }
+	                if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+	                {
+	                    $departments[] = 'commercial';
 	                }
 	                
 	                $department = $departments[0];
@@ -799,7 +824,13 @@ class PH_Query {
         
         $meta_query = array();
         
-        if ( isset( $_REQUEST['minimum_bedrooms'] ) && $_REQUEST['minimum_bedrooms'] != '' )
+        if ( 
+        	(
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-sales') ||
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings')
+        	) &&
+        	isset( $_REQUEST['minimum_bedrooms'] ) && $_REQUEST['minimum_bedrooms'] != '' 
+        )
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
@@ -822,11 +853,69 @@ class PH_Query {
         
         $meta_query = array();
         
-        if ( isset( $_REQUEST['maximum_bedrooms'] ) && $_REQUEST['maximum_bedrooms'] != '' )
+        if ( 
+        	(
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-sales') ||
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings')
+        	) &&
+        	isset( $_REQUEST['maximum_bedrooms'] ) && $_REQUEST['maximum_bedrooms'] != '' 
+        )
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
                 'value'   => sanitize_text_field( $_REQUEST['maximum_bedrooms'] ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle minimum floor area
+     *
+     * @access public
+     * @return array
+     */
+    public function minimum_floor_area_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            isset( $_REQUEST['minimum_floor_area'] ) && $_REQUEST['minimum_floor_area'] != '' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_floor_area_from_sqft',
+                'value'   => sanitize_text_field( $_REQUEST['minimum_floor_area'] ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+    
+    /**
+     * Returns a meta query to handle maximum floor area
+     *
+     * @access public
+     * @return array
+     */
+    public function maximum_floor_area_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] != '' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_floor_area_to_sqft',
+                'value'   => sanitize_text_field( $_REQUEST['maximum_floor_area'] ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -890,6 +979,14 @@ class PH_Query {
             $tax_query = array(
                 'taxonomy'  => 'property_type',
                 'terms' => ( (is_array($_REQUEST['property_type'])) ? $_REQUEST['property_type'] : array( $_REQUEST['property_type'] ) )
+            );
+        }
+
+        if ( isset( $_REQUEST['commercial_property_type'] ) && !empty($_REQUEST['commercial_property_type']) )
+        {
+            $tax_query = array(
+                'taxonomy'  => 'commercial_property_type',
+                'terms' => ( (is_array($_REQUEST['commercial_property_type'])) ? $_REQUEST['commercial_property_type'] : array( $_REQUEST['commercial_property_type'] ) )
             );
         }
         

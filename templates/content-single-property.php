@@ -40,6 +40,7 @@ global $property;
              * propertyhive_single_property_summary hook
              *
              * @hooked propertyhive_template_single_title - 5
+             * @hooked propertyhive_template_single_floor_area - 7
              * @hooked propertyhive_template_single_price - 10
              * @hooked propertyhive_template_single_meta - 20
              * @hooked propertyhive_template_single_sharing - 30
@@ -56,7 +57,7 @@ global $property;
          * @hooked propertyhive_template_single_actions - 10
          * @hooked propertyhive_template_single_features - 20
          * @hooked propertyhive_template_single_summary - 30
-         * @hooked propertyhive_template_single_rooms - 40
+         * @hooked propertyhive_template_single_description - 40
          */
        do_action( 'propertyhive_after_single_property_summary' );
     ?>

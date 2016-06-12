@@ -23,6 +23,8 @@ function toggleDepartmentFields()
 
         jQuery('.sales-only').hide();
         jQuery('.lettings-only').hide();
+        jQuery('.residential-only').hide();
+        jQuery('.commercial-only').hide();
         
         if (selected.length > 0)
         {
@@ -34,7 +36,7 @@ function toggleDepartmentFields()
             var display = 'block';
             jQuery('form.property-search-form .control').each(function()
             {
-                if (!jQuery(this).hasClass('.sales-only') && !jQuery(this).hasClass('.lettings-only') && jQuery(this).css('display') != 'none')
+                if (!jQuery(this).hasClass('.sales-only') && !jQuery(this).hasClass('.lettings-only') && !jQuery(this).hasClass('.residential-only') && !jQuery(this).hasClass('.commercial-only') && jQuery(this).css('display') != 'none')
                 {
                     display = jQuery(this).css('display');
                 }
@@ -43,10 +45,16 @@ function toggleDepartmentFields()
             if (selectedDepartment == 'residential-sales')
             {
                 jQuery('.sales-only').css('display', display);
+                jQuery('.residential-only').css('display', display);
             }
             else if (selectedDepartment == 'residential-lettings')
             {
                 jQuery('.lettings-only').css('display', display);
+                jQuery('.residential-only').css('display', display);
+            }
+            else if (selectedDepartment == 'commercial')
+            {
+                jQuery('.commercial-only').css('display', display);
             }
         }
     }

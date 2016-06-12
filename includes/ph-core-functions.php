@@ -168,3 +168,43 @@ function ph_get_image_size( $image_size ) {
 
     return $size;
 }
+
+function get_area_units( )
+{
+    $size_options = array(
+        'sqft' => __( 'Sq Ft', 'propertyhive' ),
+        'sqm' => __( 'Sq M', 'propertyhive' ),
+        'acre' => __( 'Acres', 'propertyhive' ),
+        'hectare' => __( 'Hectares', 'propertyhive' ),
+    );
+
+    // $size_options = apply_filters( 'propertyhive_commercial_size_units', $size_options ).
+    // Above filter not in use as we need a way to add the conversion rate to sqft also
+    // If it's a commonly used unit we could just add it for everyones benefit
+
+    return $size_options;
+}
+
+function convert_size_to_sqft( $size, $unit = 'sqft' )
+{
+    $size_sqft = $size;
+    switch ( $unit )
+    {
+        case "sqm": { $size_sqft = $size * 1; break; }
+        case "acre": { $size_sqft = $size * 43560; break; }
+        case "hectare": { $size_sqft = $size * 107639; break; }
+    }
+    return $size_sqft;
+}
+
+function get_commercial_price_units( )
+{
+    $price_options = array(
+        'psqft' => __( 'Per Sq Ft', 'propertyhive' ),
+        'psqm' => __( 'Per Sq M', 'propertyhive' ),
+        'pacre' => __( 'Per Acre', 'propertyhive' ),
+        'phectare' => __( 'Per Hectare', 'propertyhive' ),
+    );
+    
+    return $price_options;
+}

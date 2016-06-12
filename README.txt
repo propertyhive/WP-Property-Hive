@@ -1,20 +1,20 @@
 === PropertyHive ===
 Contributors: PropertyHive,BIOSTALL
-Tags: property, real estate, software, estate agents, estate agent, property management, propertyhive, property hive
+Tags: property, real estate, software, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.5.2
-Stable tag: 1.0.25
+Stable tag: 1.1.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Property Hive is estate agency software for WP. Use it to market your properties on the website, manage contacts and applicants, or expand the features through additional add-ons
+Property Hive is estate agency software for WP. Market properties on your website, manage contacts and applicants, or expand the features through add-ons
 
 == Description ==
 
 Property Hive is the first plugin that aims to bring all of the features you'd normally find in estate agency software into WordPress.
 
-From managing properties, owners and landlords, to tracking applicants and matching them to suitable properties, we want to do it all.
+From managing residential and commercial properties, owners and landlords, to tracking applicants and matching them to suitable properties, we want to do it all.
 
 = Why Property Hive? =
 
@@ -28,6 +28,9 @@ Want to send your properties to property portals? There's an add-on for that.
 Our add-ons are priced individually from just £24.99 meaning you only pay for what you use.
 
 You can [view all of our add-ons](http://wp-property-hive.com/add-ons/ "Property Hive Add-Ons") on our website.
+
+**Works with any new or existing theme**
+Property Hive isn't a theme. It's a platform allowing you integrate property search into any website, new or existing. For more details on supported themes [click here](http://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/) or view our [pre-built themes](https://wp-property-hive.com/property-hive-website-themes/).
 
 **Millions of developers**
 Property Hive isn't developed by one person, or a small team. It's built by the world. Property Hive is open-source meaning anyone can contribute, regardless of which country they're in, or how much existing knowledge of the plugin they have already. 
@@ -74,6 +77,10 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.1.0 =
+* Support for commercial properties added to Property Hive
+* Flush rewrite rules when the settings are updated and the property search page is set or changed. Was causing issues with search page not showing when first installing Property Hive
 
 = 1.0.25 =
 * Updated single property gallery to use wp_get_attachment_image() to enable RWD images (thanks to CHEWX - https://github.com/CHEWX)

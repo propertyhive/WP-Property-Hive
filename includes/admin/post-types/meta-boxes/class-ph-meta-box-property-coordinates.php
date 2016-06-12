@@ -20,29 +20,49 @@ class PH_Meta_Box_Property_Coordinates {
 	 */
 	public static function output( $post ) {
         global $post, $wpdb, $wp_query, $thepostid;
+
+        $parent_post = false;
+        if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
+        {
+            $parent_post = $_GET['post_parent'];
+        }
         
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
+
+        $latitude = get_post_meta($thepostid, '_latitude', TRUE);
+        $longitude = get_post_meta($thepostid, '_longitude', TRUE);
         
-        propertyhive_wp_text_input( array( 
+        $args = array( 
             'id' => '_latitude', 
             'label' => __( 'Latitude', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'text'
-        ) );
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $latitude = get_post_meta( $parent_post, '_latitude', TRUE );
+            $args['value'] = $latitude;
+        }
+        propertyhive_wp_text_input( $args );
         
-        propertyhive_wp_text_input( array( 
+        $args = array( 
             'id' => '_longitude', 
             'label' => __( 'Longitude', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'text'
-        ) );
+        );
+        if ( $parent_post !== FALSE )
+        {
+            $longitude = get_post_meta( $parent_post, '_longitude', TRUE );
+            $args['value'] = $longitude;
+        }
+        propertyhive_wp_text_input( $args );
         
         echo '<div class="map_canvas" id="map_canvas" style="height:350px;"></div>';
         
-        $latitude = get_post_meta($thepostid, '_latitude', TRUE);
-        $longitude = get_post_meta($thepostid, '_longitude', TRUE);
+        
         $zoom = 16;
         
         $markerSet = true;

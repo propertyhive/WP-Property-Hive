@@ -54,6 +54,14 @@ function ph_get_search_form_fields()
             $value = 'residential-lettings';
         }
     }
+    if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+    {
+        $departments['commercial'] = __( 'Commercial', 'propertyhive' );
+        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'commercial')
+        {
+            $value = 'commercial';
+        }
+    }
     
     $fields['department'] = array(
         'type' => 'radio',
@@ -61,111 +69,186 @@ function ph_get_search_form_fields()
         'value' => $value
     );
     
-    if ( array_key_exists('residential-sales', $departments) )
+    if ( array_key_exists('residential-sales', $departments) || array_key_exists('residential-lettings', $departments) )
     {
-        $prices = array(
-            '' => __( 'No preference', 'propertyhive' ),
-            '100000' => '&pound;100,000',
-            '150000' => '&pound;150,000',
-            '200000' => '&pound;200,000',
-            '250000' => '&pound;250,000',
-            '300000' => '&pound;300,000',
-            '500000' => '&pound;500,000',
-            '750000' => '&pound;750,000',
-            '1000000' => '&pound;1,000,000'
-        );
-        
-        $fields['minimum_price'] = array(
-            'type' => 'select',
-            'show_label' => true, 
-            'label' => __( 'Min Price', 'propertyhive' ),
-            'before' => '<div class="control control-minimum_price sales-only">',
-            'options' => $prices
-        );
-        
-        $fields['maximum_price'] = array(
-            'type' => 'select',
-            'show_label' => true, 
-            'label' => __( 'Max Price', 'propertyhive' ),
-            'before' => '<div class="control control-maximum_price sales-only">',
-            'options' => $prices
-        );
-    }
-    
-    if ( array_key_exists('residential-lettings', $departments) )
-    {
-        $prices = array(
-            '' => __( 'No preference', 'propertyhive' ),
-            '500' => '&pound;500 PCM',
-            '600' => '&pound;600 PCM',
-            '750' => '&pound;750 PCM',
-            '1000' => '&pound;1000 PCM',
-            '1250' => '&pound;1250 PCM',
-            '1500' => '&pound;1500 PCM',
-            '2000' => '&pound;2000 PCM'
-        );
-        
-        $fields['minimum_rent'] = array(
-            'type' => 'select',
-            'show_label' => true, 
-            'label' => __( 'Min Rent', 'propertyhive' ),
-            'before' => '<div class="control control-minimum_rent lettings-only">',
-            'options' => $prices
-        );
-        
-        $fields['maximum_rent'] = array(
-            'type' => 'select',
-            'show_label' => true, 
-            'label' => __( 'Max Rent', 'propertyhive' ),
-            'before' => '<div class="control control-maximum_rent lettings-only">',
-            'options' => $prices
-        );
-    }
-    
-    $fields['minimum_bedrooms'] = array(
-        'type' => 'select',
-        'show_label' => true, 
-        'label' => __( 'Min Bedrooms', 'propertyhive' ),
-        'options' => array( '' => __( 'No preference', 'propertyhive' ), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)
-    );
-    
-    // Property Type
-    $options = array( '' => __( 'No preference', 'propertyhive' ) );
-    $args = array(
-        'hide_empty' => false,
-        'parent' => 0
-    );
-    $terms = get_terms( 'property_type', $args );
-    
-    $selected_value = '';
-    if ( !empty( $terms ) && !is_wp_error( $terms ) )
-    {
-        foreach ($terms as $term)
+        if ( array_key_exists('residential-sales', $departments) )
         {
-            $options[$term->term_id] = $term->name;
-            
-            $args = array(
-                'hide_empty' => false,
-                'parent' => $term->term_id
+            $prices = array(
+                '' => __( 'No preference', 'propertyhive' ),
+                '100000' => '&pound;100,000',
+                '150000' => '&pound;150,000',
+                '200000' => '&pound;200,000',
+                '250000' => '&pound;250,000',
+                '300000' => '&pound;300,000',
+                '500000' => '&pound;500,000',
+                '750000' => '&pound;750,000',
+                '1000000' => '&pound;1,000,000'
             );
-            $subterms = get_terms( 'property_type', $args );
             
-            if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+            $fields['minimum_price'] = array(
+                'type' => 'select',
+                'show_label' => true, 
+                'label' => __( 'Min Price', 'propertyhive' ),
+                'before' => '<div class="control control-minimum_price sales-only">',
+                'options' => $prices
+            );
+            
+            $fields['maximum_price'] = array(
+                'type' => 'select',
+                'show_label' => true, 
+                'label' => __( 'Max Price', 'propertyhive' ),
+                'before' => '<div class="control control-maximum_price sales-only">',
+                'options' => $prices
+            );
+        }
+        
+        if ( array_key_exists('residential-lettings', $departments) )
+        {
+            $prices = array(
+                '' => __( 'No preference', 'propertyhive' ),
+                '500' => '&pound;500 PCM',
+                '600' => '&pound;600 PCM',
+                '750' => '&pound;750 PCM',
+                '1000' => '&pound;1000 PCM',
+                '1250' => '&pound;1250 PCM',
+                '1500' => '&pound;1500 PCM',
+                '2000' => '&pound;2000 PCM'
+            );
+            
+            $fields['minimum_rent'] = array(
+                'type' => 'select',
+                'show_label' => true, 
+                'label' => __( 'Min Rent', 'propertyhive' ),
+                'before' => '<div class="control control-minimum_rent lettings-only">',
+                'options' => $prices
+            );
+            
+            $fields['maximum_rent'] = array(
+                'type' => 'select',
+                'show_label' => true, 
+                'label' => __( 'Max Rent', 'propertyhive' ),
+                'before' => '<div class="control control-maximum_rent lettings-only">',
+                'options' => $prices
+            );
+        }
+
+        $fields['minimum_bedrooms'] = array(
+            'type' => 'select',
+            'show_label' => true, 
+            'label' => __( 'Min Bedrooms', 'propertyhive' ),
+            'before' => '<div class="control control-minimum_bedrooms residential-only">',
+            'options' => array( '' => __( 'No preference', 'propertyhive' ), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)
+        );
+        
+        // Property Type
+        $options = array( '' => __( 'No preference', 'propertyhive' ) );
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'property_type', $args );
+        
+        $selected_value = '';
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
             {
-                foreach ($subterms as $term)
+                $options[$term->term_id] = $term->name;
+                
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $term->term_id
+                );
+                $subterms = get_terms( 'property_type', $args );
+                
+                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
-                    $options[$term->term_id] = '- ' . $term->name;
+                    foreach ($subterms as $term)
+                    {
+                        $options[$term->term_id] = '- ' . $term->name;
+                    }
                 }
             }
         }
+        
+        $fields['property_type'] = array(
+            'type' => 'select',
+            'show_label' => true, 
+            'before' => '<div class="control control-property_type residential-only">',
+            'label' => __( 'Type', 'propertyhive' ),
+            'options' => $options
+        );
     }
-    
-    $fields['property_type'] = array(
-        'type' => 'select',
-        'show_label' => true, 
-        'label' => __( 'Type', 'propertyhive' ),
-        'options' => $options
-    );
+
+    if ( array_key_exists('commercial', $departments) )
+    {
+        $sizes = array(
+            '' => __( 'No preference', 'propertyhive' ),
+            '250' => '250 sq ft',
+            '500' => '500 sq ft',
+            '1000' => '1,000 sq ft',
+            '2500' => '2,500 sq ft',
+            '5000' => '5,000 sq ft',
+            '10000' => '10,000 sq ft',
+            '25000' => '25,000 sq ft',
+            '50000' => '50,000 sq ft'
+        );
+        
+        $fields['minimum_floor_area'] = array(
+            'type' => 'select',
+            'show_label' => true, 
+            'label' => __( 'Min Floor Area', 'propertyhive' ),
+            'before' => '<div class="control control-minimum_floor_area commercial-only">',
+            'options' => $sizes
+        );
+        
+        $fields['maximum_floor_area'] = array(
+            'type' => 'select',
+            'show_label' => true, 
+            'label' => __( 'Max Floor Area', 'propertyhive' ),
+            'before' => '<div class="control control-maximum_floor_area commercial-only">',
+            'options' => $sizes
+        );
+
+        // Property Type
+        $options = array( '' => __( 'No preference', 'propertyhive' ) );
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'commercial_property_type', $args );
+        
+        $selected_value = '';
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            {
+                $options[$term->term_id] = $term->name;
+                
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $term->term_id
+                );
+                $subterms = get_terms( 'commercial_property_type', $args );
+                
+                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                {
+                    foreach ($subterms as $term)
+                    {
+                        $options[$term->term_id] = '- ' . $term->name;
+                    }
+                }
+            }
+        }
+        
+        $fields['commercial_property_type'] = array(
+            'type' => 'select',
+            'show_label' => true, 
+            'before' => '<div class="control control-commercial_property_type commercial-only">',
+            'label' => __( 'Type', 'propertyhive' ),
+            'options' => $options
+        );
+    }
     
     return $fields;
 }
