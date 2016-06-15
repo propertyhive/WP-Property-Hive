@@ -48,7 +48,7 @@ class PH_Admin_Meta_Boxes {
         
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Rooms::save', 40, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Features::save', 45, 2 );
-        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Commercial_Description::save', 45, 2 );
+        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Description::save', 45, 2 );
         
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Photos::save', 50, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Floorplans::save', 55, 2 );
@@ -431,9 +431,9 @@ class PH_Admin_Meta_Boxes {
             'priority' => 'high'
         );
         $meta_boxes[20] = array(
-            'id' => 'propertyhive-property-commercial-description',
+            'id' => 'propertyhive-property-description',
             'title' => __( 'Property Description', 'propertyhive' ),
-            'callback' => 'PH_Meta_Box_Property_Commercial_Description::output',
+            'callback' => 'PH_Meta_Box_Property_Description::output',
             'screen' => 'property',
             'context' => 'normal',
             'priority' => 'high'
