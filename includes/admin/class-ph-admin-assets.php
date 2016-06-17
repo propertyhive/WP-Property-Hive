@@ -160,7 +160,11 @@ class PH_Admin_Assets {
             wp_enqueue_script( 'propertyhive_admin_settings' );
         
             $params = array(
-                'confirm_not_selected_warning'          => __( 'Please check the box to confirm that you are happy to remove this term', 'propertyhive' )
+                'confirm_not_selected_warning'              => __( 'Please check the box to confirm that you are happy to remove this term', 'propertyhive' ),
+                'no_departments_selected_warning'           => __( 'Please select at least one active department', 'propertyhive' ),
+                'primary_department_not_active_warning'     => __( 'The chosen primary department has not been selected as active', 'propertyhive' ),
+                'no_countries_selected'                     => __( 'Please select which countries you operate in', 'propertyhive' ),
+                'default_country_not_in_selected'           => __( 'The default country hasn\'t been selected as a country you operate in', 'propertyhive' ),
             );
             wp_localize_script( 'propertyhive_admin_settings', 'propertyhive_admin_settings', $params );
         }
