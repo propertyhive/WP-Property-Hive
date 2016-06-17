@@ -28,7 +28,7 @@ function ph_setup_property_data( $post ) {
         return;
 
     $GLOBALS['property'] = get_property( $post );
-    
+
     return $GLOBALS['property'];
 }
 add_action( 'the_post', 'ph_setup_property_data' );
@@ -227,8 +227,8 @@ if ( ! function_exists( 'propertyhive_template_loop_property_thumbnail' ) ) {
      * @subpackage  Loop
      * @return void
      */
-    function propertyhive_template_loop_property_thumbnail($size = 'thumbnail', $class = '') {
-        echo propertyhive_get_property_thumbnail($size, $class);
+    function propertyhive_template_loop_property_thumbnail() {
+        echo propertyhive_get_property_thumbnail();
     }
 }
 
@@ -244,14 +244,14 @@ if ( ! function_exists( 'propertyhive_get_property_thumbnail' ) ) {
      * @param int $placeholder_height (default: 0)
      * @return string
      */
-    function propertyhive_get_property_thumbnail( $size = 'thumbnail', $class = '', $placeholder_width = 0, $placeholder_height = 0  ) {
+    function propertyhive_get_property_thumbnail( $size = 'medium', $class = '', $placeholder_width = 0, $placeholder_height = 0  ) {
         global $post, $property;
-        
+
         $photo_url = $property->get_main_photo_src( $size);
-        
+
         if ($photo_url !== FALSE)
             return '<img src="' . $photo_url . '" alt="' . get_the_title($post->ID) . '" class="' . $class . '">';
-        
+
         if ( ph_placeholder_img_src() )
             return ph_placeholder_img( $size );
     }
@@ -481,11 +481,11 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
      * @return void
      */
     function propertyhive_template_single_actions() {
-        
+
         global $post, $property;
-        
+
         $actions = array();
-        
+
         $floorplan_ids = $property->get_floorplan_attachment_ids();
         if ( !empty( $floorplan_ids ) )
         {
@@ -503,7 +503,7 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
                 )
             );
         }
-        
+
         $brochure_ids = $property->get_brochure_attachment_ids();
         if ( !empty( $brochure_ids ) )
         {
@@ -519,7 +519,7 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
                 );
             }
         }
-        
+
         $epc_ids = $property->get_epc_attachment_ids();
         if ( !empty( $epc_ids ) )
         {
@@ -551,19 +551,19 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
                 );
             }
         }
-        
+
         /*$actions[] = array(
             'href' => '',
             'label' => __( 'View on Map', 'propertyhive' ),
             'class' => 'action-map'
         );
-        
+
         $actions[] = array(
             'href' => '',
             'label' => __( 'Street View', 'propertyhive' ),
             'class' => 'action-street-view'
         );*/
-        
+
         $actions = apply_filters( 'propertyhive_single_property_actions', $actions );
         
         ph_get_template( 'single-property/actions.php', array( 'actions' => $actions ) );
@@ -585,7 +585,7 @@ if ( ! function_exists( 'propertyhive_template_single_features' ) ) {
 }
 
 if ( ! function_exists( 'propertyhive_template_single_summary' ) ) {
-    
+
     /**
      * Output the product summary description.
      *
@@ -597,6 +597,7 @@ if ( ! function_exists( 'propertyhive_template_single_summary' ) ) {
         ph_get_template( 'single-property/summary-description.php' );
     }
 }
+
 
 if ( ! function_exists( 'propertyhive_template_single_description' ) ) {
     
@@ -613,7 +614,7 @@ if ( ! function_exists( 'propertyhive_template_single_description' ) ) {
 }
 
 if ( ! function_exists( 'propertyhive_make_enquiry_button' ) ) {
-    
+
     /**
      * Output the make enquiry button and lightbox
      *
