@@ -49,18 +49,18 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		// Admin Columns
 		add_filter( 'manage_edit-property_columns', array( $this, 'edit_columns' ) );
 		add_action( 'manage_property_posts_custom_column', array( $this, 'custom_columns' ), 2 );
-		/*add_filter( 'manage_edit-property_sortable_columns', array( $this, 'custom_columns_sort' ) );
+		add_filter( 'manage_edit-property_sortable_columns', array( $this, 'custom_columns_sort' ) );
 		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
 
 		// Sort link
-		add_filter( 'views_edit-property', array( $this, 'default_sorting_link' ) );
+		/*add_filter( 'views_edit-property', array( $this, 'default_sorting_link' ) );
 
 		// Prouct filtering
-		add_action( 'restrict_manage_posts', array( $this, 'product_filters' ) );
+		add_action( 'restrict_manage_posts', array( $this, 'property_filters' ) );
 		add_filter( 'parse_query', array( $this, 'property_filters_query' ) );
 
 		// Enhanced search
-		add_filter( 'posts_search', array( $this, 'product_search' ) );
+		add_filter( 'posts_search', array( $this, 'property_search' ) );
 
 		// Maintain hierarchy of terms
 		add_filter( 'wp_terms_checklist_args', array( $this, 'disable_checked_ontop' ) );*/
@@ -389,8 +389,8 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	 */
 	public function custom_columns_sort( $columns ) {
 		$custom = array(
-			'price'			=> 'price',
-			'name'			=> 'title'
+			'price'			=> '_price_actual',
+			'size'			=> '_floor_area_from_sqft'
 		);
 		return wp_parse_args( $custom, $columns );
 	}
@@ -406,9 +406,15 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	 */
 	public function custom_columns_orderby( $vars ) {
 		if ( isset( $vars['orderby'] ) ) {
-			if ( 'price' == $vars['orderby'] ) {
+			if ( '_price_actual' == $vars['orderby'] ) {
 				$vars = array_merge( $vars, array(
-					'meta_key' 	=> '_price',
+					'meta_key' 	=> '_price_actual',
+					'orderby' 	=> 'meta_value_num'
+				) );
+			}
+			elseif ( '_floor_area_from_sqft' == $vars['orderby'] ) {
+				$vars = array_merge( $vars, array(
+					'meta_key' 	=> '_floor_area_from_sqft',
 					'orderby' 	=> 'meta_value_num'
 				) );
 			}
