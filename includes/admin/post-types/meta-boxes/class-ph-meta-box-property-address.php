@@ -246,18 +246,83 @@ class PH_Meta_Box_Property_Address {
             }
         }
         
-        $args = array( 
-            'id' => 'location_id', 
-            'label' => __( 'Location', 'propertyhive' ), 
-            'desc_tip' => false,
-            'desc' => '',
-            'options' => $options
-        );
-        if ($selected_value != '')
-        {
-            $args['value'] = $selected_value;
-        }
-        propertyhive_wp_select( $args );
+?>
+<p class="form-field"><label for="location_id"><?php _e( 'Location', 'propertyhive' ); ?></label>
+        <select id="location_id" name="location_id[]" multiple="multiple" data-placeholder="<?php _e( 'Select location(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
+            <?php
+
+                $options = array( '' => '' );
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => 0
+                );
+                $terms = get_terms( 'location', $args );
+                
+                $selected_values = array();
+                $term_list = wp_get_post_terms($post->ID, 'location', array("fields" => "ids"));
+                if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+                {
+                    foreach ( $term_list as $term_id )
+                    {
+                        $selected_values[] = $term_id;
+                    }
+                }
+
+                if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                {
+                    foreach ($terms as $term)
+                    {
+                        $options[$term->term_id] = $term->name;
+
+                        echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                        if ( in_array( $term->term_id, $selected_values ) )
+                        {
+                            echo ' selected';
+                        }
+                        echo '>' . esc_html( $term->name ) . '</option>';
+                        
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => $term->term_id
+                        );
+                        $subterms = get_terms( 'location', $args );
+                        
+                        if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                        {
+                            foreach ($subterms as $term)
+                            {
+                                echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                                if ( in_array( $term->term_id, $selected_values ) )
+                                {
+                                    echo ' selected';
+                                }
+                                echo '>- ' . esc_html( $term->name ) . '</option>';
+                                
+                                $args = array(
+                                    'hide_empty' => false,
+                                    'parent' => $term->term_id
+                                );
+                                $subsubterms = get_terms( 'location', $args );
+                                
+                                if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                                {
+                                    foreach ($subsubterms as $term)
+                                    {
+                                        echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                                        if ( in_array( $term->term_id, $selected_values ) )
+                                        {
+                                            echo ' selected';
+                                        }
+                                        echo '>- - ' . esc_html( $term->name ) . '</option>';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ?>
+        </select>
+<?php
 
         do_action('propertyhive_property_address_fields');
 	    
