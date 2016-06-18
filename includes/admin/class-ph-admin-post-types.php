@@ -438,6 +438,14 @@ class PH_Admin_Post_Types {
                 $vars['meta_key'] = '_department';
                 $vars['meta_value'] = sanitize_text_field( $_GET['_department'] );
             }
+            if ( ! empty( $_GET['_office_id'] ) ) {
+                $vars['meta_key'] = '_office_id';
+                $vars['meta_value'] = sanitize_text_field( $_GET['_office_id'] );
+            }
+            if ( ! empty( $_GET['_negotiator_id'] ) ) {
+                $vars['meta_key'] = '_negotiator_id';
+                $vars['meta_value'] = sanitize_text_field( $_GET['_negotiator_id'] );
+            }
 
         }
         elseif ( 'contact' === $typenow ) 
@@ -461,7 +469,7 @@ class PH_Admin_Post_Types {
                 $vars['meta_key'] = '_status';
                 $vars['meta_value'] = sanitize_text_field( $_GET['_status'] );
             }
-            if ( ! empty( $_GET['_status'] ) ) {
+            if ( ! empty( $_GET['_source'] ) ) {
                 $vars['meta_key'] = '_source';
                 $vars['meta_value'] = sanitize_text_field( $_GET['_source'] );
             }
