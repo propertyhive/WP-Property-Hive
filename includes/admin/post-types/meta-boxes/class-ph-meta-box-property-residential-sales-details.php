@@ -259,6 +259,8 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
                 // Setting to blank
                 wp_delete_object_term_relationships( $post_id, 'tenure' );
             }
+
+            do_action( 'propertyhive_save_property_residential_sales_details', $post_id );
         }
     }
 

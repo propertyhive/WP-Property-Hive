@@ -575,12 +575,15 @@ class PH_Query {
         $meta_query[] = $this->address_keyword_meta_query();
         $meta_query[] = $this->minimum_price_meta_query();
         $meta_query[] = $this->maximum_price_meta_query();
+        $meta_query[] = $this->price_range_meta_query();
         $meta_query[] = $this->minimum_rent_meta_query();
         $meta_query[] = $this->maximum_rent_meta_query();
+        $meta_query[] = $this->rent_range_meta_query();
         $meta_query[] = $this->minimum_bedrooms_meta_query();
         $meta_query[] = $this->maximum_bedrooms_meta_query();
         $meta_query[] = $this->minimum_floor_area_meta_query();
         $meta_query[] = $this->maximum_floor_area_meta_query();
+        $meta_query[] = $this->floor_area_range_meta_query();
         $meta_query[] = $this->office_meta_query();
         
 		return array_filter( $meta_query );
@@ -761,6 +764,46 @@ class PH_Query {
         
         return $meta_query;
     }
+
+    /**
+     * Returns a meta query to handle price range
+     *
+     * @access public
+     * @return array
+     */
+    public function price_range_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-sales' && 
+            isset( $_REQUEST['price_range'] ) && $_REQUEST['price_range'] != '' 
+        )
+        {
+        	$explode_price_range = explode("-", $_REQUEST['price_range']);
+
+        	if ( isset($explode_price_range[0]) && $explode_price_range[0] != '' )
+        	{
+	            $meta_query = array(
+	                'key'     => '_price_actual',
+	                'value'   => sanitize_text_field( $explode_price_range[0] ),
+	                'compare' => '>=',
+	                'type'    => 'NUMERIC' 
+	            );
+	        }
+	        if ( isset($explode_price_range[1]) && $explode_price_range[1] != '' )
+        	{
+	            $meta_query = array(
+	                'key'     => '_price_actual',
+	                'value'   => sanitize_text_field( $explode_price_range[1] ),
+	                'compare' => '<=',
+	                'type'    => 'NUMERIC' 
+	            );
+	        }
+        }
+        
+        return $meta_query;
+    }
     
     /**
      * Returns a meta query to handle minimum rent
@@ -809,6 +852,46 @@ class PH_Query {
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle rent range
+     *
+     * @access public
+     * @return array
+     */
+    public function rent_range_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings' && 
+            isset( $_REQUEST['rent_range'] ) && $_REQUEST['rent_range'] != '' 
+        )
+        {
+        	$explode_rent_range = explode("-", $_REQUEST['rent_range']);
+
+        	if ( isset($explode_rent_range[0]) && $explode_rent_range[0] != '' )
+        	{
+	            $meta_query = array(
+	                'key'     => '_price_actual',
+	                'value'   => sanitize_text_field( $explode_rent_range[0] ),
+	                'compare' => '>=',
+	                'type'    => 'NUMERIC' 
+	            );
+	        }
+	        if ( isset($explode_rent_range[1]) && $explode_rent_range[1] != '' )
+        	{
+	            $meta_query = array(
+	                'key'     => '_price_actual',
+	                'value'   => sanitize_text_field( $explode_rent_range[1] ),
+	                'compare' => '<=',
+	                'type'    => 'NUMERIC' 
+	            );
+	        }
         }
         
         return $meta_query;
@@ -919,6 +1002,46 @@ class PH_Query {
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle floor area range
+     *
+     * @access public
+     * @return array
+     */
+    public function floor_area_range_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            isset( $_REQUEST['floor_area_range'] ) && $_REQUEST['floor_area_range'] != '' 
+        )
+        {
+        	$explode_floor_area_range = explode("-", $_REQUEST['floor_area_range']);
+
+        	if ( isset($explode_floor_area_range[0]) && $explode_floor_area_range[0] != '' )
+        	{
+	            $meta_query = array(
+	                'key'     => '_floor_area_from_sqft',
+	                'value'   => sanitize_text_field( $explode_floor_area_range[0] ),
+	                'compare' => '>=',
+	                'type'    => 'NUMERIC' 
+	            );
+	        }
+	        if ( isset($explode_floor_area_range[1]) && $explode_floor_area_range[1] != '' )
+        	{
+	            $meta_query = array(
+	                'key'     => '_floor_area_to_sqft',
+	                'value'   => sanitize_text_field( $explode_floor_area_range[1] ),
+	                'compare' => '<=',
+	                'type'    => 'NUMERIC' 
+	            );
+	        }
         }
         
         return $meta_query;

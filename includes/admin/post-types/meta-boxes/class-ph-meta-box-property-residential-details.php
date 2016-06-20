@@ -242,6 +242,8 @@ class PH_Meta_Box_Property_Residential_Details {
         {
             wp_delete_object_term_relationships( $post_id, 'outside_space' );
         }
+
+        do_action( 'propertyhive_save_property_residential_details', $post_id );
     }
 
 }

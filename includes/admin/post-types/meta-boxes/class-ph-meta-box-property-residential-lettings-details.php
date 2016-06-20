@@ -189,6 +189,8 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
                 // Setting to blank
                 wp_delete_object_term_relationships( $post_id, 'furnished' );
             }
+
+            do_action( 'propertyhive_save_property_residential_lettings_details', $post_id );
         }
     }
 
