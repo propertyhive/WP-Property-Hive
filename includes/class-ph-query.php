@@ -1081,6 +1081,7 @@ class PH_Query {
             $tax_query = array();
 
         $tax_query[] = $this->property_type_tax_query();
+        $tax_query[] = $this->availability_tax_query();
         $tax_query[] = $this->marketing_flag_tax_query();
         $tax_query[] = $this->location_tax_query();
         
@@ -1110,6 +1111,27 @@ class PH_Query {
             $tax_query = array(
                 'taxonomy'  => 'commercial_property_type',
                 'terms' => ( (is_array($_REQUEST['commercial_property_type'])) ? $_REQUEST['commercial_property_type'] : array( $_REQUEST['commercial_property_type'] ) )
+            );
+        }
+        
+        return $tax_query;
+    }
+
+    /**
+     * Returns a taxonomy query to handle availability
+     *
+     * @access public
+     * @return array
+     */
+    public function availability_tax_query( ) {
+        
+        $tax_query = array();
+        
+        if ( isset( $_REQUEST['availability'] ) && !empty($_REQUEST['availability']) )
+        {
+            $tax_query = array(
+                'taxonomy'  => 'availability',
+                'terms' => ( (is_array($_REQUEST['availability'])) ? $_REQUEST['availability'] : array( $_REQUEST['availability'] ) )
             );
         }
         
