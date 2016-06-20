@@ -512,6 +512,8 @@ class PH_Meta_Box_Property_Address {
         {
             update_post_meta( $post_id, '_status', 'instructed' );
         }
+
+        do_action( 'propertyhive_save_property_address', $post_id );
     }
 
 }
