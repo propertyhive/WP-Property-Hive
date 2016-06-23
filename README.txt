@@ -81,6 +81,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 = 1.1.5 =
 * Added support for currency calculators meaning prices can be shown in different currencies. Can be achieved by passing '&currency=USD' for example in query string on results page
 * Corrected issue with ordering residential properties by price following recent commercial property support
+* Add support for separate headers and footers on proeprty pages. You can now have a header-propertyhive.php, for example, if you want a different header on property pages
 * Declared compatibility with WordPress 4.5.3
 
 = 1.1.4 =
