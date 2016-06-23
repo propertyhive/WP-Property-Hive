@@ -75,7 +75,7 @@ class PH_Meta_Box_Property_Commercial_Details {
             }
         }
 
-        $selected_sale_currency = get_post_meta( $post->ID, '_commercial_sale_currency', true );
+        $selected_sale_currency = get_post_meta( $post->ID, '_commercial_price_currency', true );
         if ( $selected_sale_currency == '' )
         {
             $country = $ph_countries->get_country( $default_country );
@@ -559,16 +559,6 @@ class PH_Meta_Box_Property_Commercial_Details {
                     }
                     update_post_meta( $post_id, '_rent_from', $rent );
 
-                    $converted_rent = $_POST['_rent_from'];
-                    switch ($_POST['_rent_units'])
-                    {
-                        case "pw": { $converted_rent = ($converted_rent * 52) / 12; break; }
-                        case "pcm": { $converted_rent = $converted_rent; break; }
-                        case "pq": { $converted_rent = ($converted_rent * 4) / 52; break; }
-                        case "pa": { $converted_rent = ($converted_rent / 52); break; }
-                    }
-                    update_post_meta( $postID, '_rent_from_actual', $converted_rent );
-
                     $rent = preg_replace("/[^0-9.]/", '', $_POST['_rent_to']);
                     if ( $rent == '' )
                     {
@@ -576,21 +566,15 @@ class PH_Meta_Box_Property_Commercial_Details {
                     }
                     update_post_meta( $post_id, '_rent_to', $rent );
 
-                    $converted_rent = $_POST['_rent_to'];
-                    switch ($_POST['_rent_units'])
-                    {
-                        case "pw": { $converted_rent = ($converted_rent * 52) / 12; break; }
-                        case "pcm": { $converted_rent = $converted_rent; break; }
-                        case "pq": { $converted_rent = ($converted_rent * 4) / 52; break; }
-                        case "pa": { $converted_rent = ($converted_rent / 52); break; }
-                    }
-                    update_post_meta( $postID, '_rent_to_actual', $converted_rent );
-
                     update_post_meta( $post_id, '_rent_units', $_POST['_rent_units'] );
 
                     update_post_meta( $post_id, '_rent_poa', ( isset($_POST['_commercial_rent_poa']) ? $_POST['_commercial_rent_poa'] : '' ) );
                 }
             }
+
+            // Store price in common currency (GBP) used for ordering
+            $ph_countries = new PH_Countries();
+            $ph_countries->update_property_price_actual( $post_id );
 
             $property_types = array();
             if ( isset( $_POST['property_type_ids'] ) && !empty( $_POST['property_type_ids'] ) )

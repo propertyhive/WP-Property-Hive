@@ -190,6 +190,11 @@ class PH_Countries {
 
 	public function convert_price_to_gbp( $price, $currency_code )
 	{
+		if ( trim($price) == '' )
+		{
+			return $price;
+		}
+
 		$exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
 
 		if ( isset($exchange_rates[$currency_code]) )
@@ -206,21 +211,22 @@ class PH_Countries {
 
 		$department = get_post_meta( $postID, '_department', true );
 		$country = get_post_meta( $postID, '_address_country', true );
-		$currency = get_post_meta( $postID, '_currency', true );
-		if ( $country == '' )
-		{
-			$country = get_option( 'propertyhive_default_country', 'GB' );
-		}
-		if ( $currency == '' )
-		{
-			$currency = $this->get_country($country);
-			$currency = $currency['currency_code'];
-		}
 
 		if (isset($countries[$country]))
 		{
 			if ( $department == 'residential-sales' )
 			{
+				$currency = get_post_meta( $postID, '_currency', true );
+				if ( $country == '' )
+				{
+					$country = get_option( 'propertyhive_default_country', 'GB' );
+				}
+				if ( $currency == '' )
+				{
+					$currency = $this->get_country($country);
+					$currency = $currency['currency_code'];
+				}
+
 				$price = get_post_meta( $postID, '_price', true );
 				
 				$converted_price = $this->convert_price_to_gbp( $price, $currency );
@@ -229,6 +235,17 @@ class PH_Countries {
 			}
 			elseif ( $department == 'residential-lettings' )
 			{
+				$currency = get_post_meta( $postID, '_currency', true );
+				if ( $country == '' )
+				{
+					$country = get_option( 'propertyhive_default_country', 'GB' );
+				}
+				if ( $currency == '' )
+				{
+					$currency = $this->get_country($country);
+					$currency = $currency['currency_code'];
+				}
+
 				$rent = get_post_meta( $postID, '_rent', true );
 				$rent_frequency = get_post_meta( $postID, '_rent_frequency', true );
 
@@ -244,6 +261,75 @@ class PH_Countries {
 	            $converted_price = $this->convert_price_to_gbp( $price, $currency );
 
 	            update_post_meta( $postID, '_price_actual', $converted_price );
+			}
+			if ( $department == 'commercial' )
+			{
+				if ( get_post_meta( $postID, '_for_sale', true ) == 'yes' )
+				{
+					$currency = get_post_meta( $postID, '_commercial_price_currency', true );
+					if ( $country == '' )
+					{
+						$country = get_option( 'propertyhive_default_country', 'GB' );
+					}
+					if ( $currency == '' )
+					{
+						$currency = $this->get_country($country);
+						$currency = $currency['currency_code'];
+					}
+
+					$price = get_post_meta( $postID, '_price_from', true );
+
+					$converted_price = $this->convert_price_to_gbp( $price, $currency );
+
+					update_post_meta( $postID, '_price_from_actual', $converted_price );
+
+					$price = get_post_meta( $postID, '_price_to', true );
+
+					$converted_price = $this->convert_price_to_gbp( $price, $currency );
+
+					update_post_meta( $postID, '_price_to_actual', $converted_price );
+				}
+				if ( get_post_meta( $postID, '_to_rent', true ) == 'yes' )
+				{
+					$currency = get_post_meta( $postID, '_commercial_rent_currency', true );
+					if ( $country == '' )
+					{
+						$country = get_option( 'propertyhive_default_country', 'GB' );
+					}
+					if ( $currency == '' )
+					{
+						$currency = $this->get_country($country);
+						$currency = $currency['currency_code'];
+					}
+
+					$rent_units = get_post_meta( $postID, '_rent_units', true );
+
+					$price = get_post_meta( $postID, '_rent_from', true );
+		            switch ($rent_units)
+		            {
+		                case "pw": { $price = ($price * 52) / 12; break; }
+		                case "pcm": { $price = $price; break; }
+		                case "pq": { $price = ($price * 4) / 52; break; }
+		                case "pa": { $price = ($price / 52); break; }
+		            }
+
+		            $converted_price = $this->convert_price_to_gbp( $price, $currency );
+
+		            update_post_meta( $postID, '_rent_from_actual', $converted_price );
+
+		            $price = get_post_meta( $postID, '_rent_to', true );
+		            switch ($rent_units)
+		            {
+		                case "pw": { $price = ($price * 52) / 12; break; }
+		                case "pcm": { $price = $price; break; }
+		                case "pq": { $price = ($price * 4) / 52; break; }
+		                case "pa": { $price = ($price / 52); break; }
+		            }
+
+		            $converted_price = $this->convert_price_to_gbp( $price, $currency );
+
+		            update_post_meta( $postID, '_rent_to_actual', $converted_price );
+				}
 			}
 		}
 	}
