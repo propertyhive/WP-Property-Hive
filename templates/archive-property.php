@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-get_header(); global $wpdb; ?>
+get_header( 'propertyhive' ); global $wpdb; ?>
 
     <?php
         /**
@@ -82,4 +82,4 @@ get_header(); global $wpdb; ?>
         do_action( 'propertyhive_after_main_content' );
     ?>
 
-<?php get_footer(); ?>
+<?php get_footer( 'propertyhive' ); ?>

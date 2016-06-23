@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-get_header(); ?>
+get_header( 'propertyhive' ); ?>
 
     <?php
         /**
@@ -37,4 +37,4 @@ get_header(); ?>
         do_action( 'propertyhive_after_main_content' );
     ?>
 
-<?php get_footer(); ?>
+<?php get_footer( 'propertyhive' ); ?>
