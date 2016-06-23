@@ -19,6 +19,8 @@ class PH_Countries {
 
 	public function __construct() {
 
+		add_action( 'template_redirect', array( $this, 'ph_check_currency_change' ) );
+
 		add_action( 'propertyhive_update_currency_exchange_rates', array( $this, 'ph_update_currency_exchange_rates' ) );
 
 	}
@@ -33,6 +35,43 @@ class PH_Countries {
 			return $this->get_countries();
 		}
 	}
+
+	public function ph_check_currency_change()
+	{
+		if ( is_post_type_archive('property') && isset($_GET['currency']) )
+		{
+			if ( $_GET['currency'] == '' )
+			{
+				// Set to blank to reset back to properties entered currency
+				unset( $_COOKIE['propertyhive_currency'] );
+  				setcookie( 'propertyhive_currency', '', time() - ( 15 * 60 ) );
+				return true;
+			}
+
+			// TO DO: Make sure currency passed in is in list of countries they operate in
+			// so we can get the exchange rate
+
+			$currency = $this->get_currency( $_GET['currency'] );
+			if ( $currency === FALSE )
+			{
+				$default_country = get_option( 'propertyhive_default_country', 'GB' );
+				$default_country = $this->get_country( $default_country );
+
+				$currency = $this->get_currency( (isset($default_country['currency_code'])) ? $default_country['currency_code'] : 'GBP' );
+			}
+
+			$currency['exchange_rate'] = 1;
+			$exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
+			if ( isset($exchange_rates[$_GET['currency']]) )
+			{
+				$currency['exchange_rate'] = $exchange_rates[$_GET['currency']];
+			}
+			
+			ph_setcookie( 'propertyhive_currency', htmlentities(serialize($currency)), time() + (30 * DAY_IN_SECONDS), is_ssl() );
+		}
+	}
+
+
 
 	public function get_country( $country_code ) {
 
