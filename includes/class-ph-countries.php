@@ -60,6 +60,8 @@ class PH_Countries {
 				);
 			}
 		}
+
+		return false;
 	}
 
 	/**
