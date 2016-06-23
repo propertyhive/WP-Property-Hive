@@ -224,13 +224,80 @@ class PH_Property {
             else
             {
                 $ph_countries = new PH_Countries();
-                if ($this->_currency != '')
+
+                $currency = array();
+
+                if ( !is_admin() )
                 {
-                    $currency = $ph_countries->get_currency( $this->_currency );
+                    if ( isset($_GET['currency']) )
+                    {
+                        if ( $_GET['currency'] != '' )
+                        {
+                            $requested_currency = $ph_countries->get_currency( $_GET['currency'] );
+                            if ( $requested_currency !== FALSE )
+                            {
+                                $currency = $requested_currency;
+                                $currency['exchange_rate'] = 1;
+                                $exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
+                                if ( isset($exchange_rates[$_GET['currency']]) )
+                                {
+                                    $currency['exchange_rate'] = $exchange_rates[$_GET['currency']];
+                                }
+                            }
+                        }
+                        else
+                        {
+                            $default_currency = apply_filters( 'propertyhive_default_display_currency', '' );
+                            if ( $default_currency != '' )
+                            {
+                                $requested_currency = $ph_countries->get_currency( $default_currency );
+                                if ( $requested_currency !== FALSE )
+                                {
+                                    $currency = $requested_currency;
+                                    $currency['exchange_rate'] = 1;
+                                    $exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
+                                    if ( isset($exchange_rates[$default_currency]) )
+                                    {
+                                        $currency['exchange_rate'] = $exchange_rates[$default_currency];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    elseif ( isset($_COOKIE['propertyhive_currency']) && $_COOKIE['propertyhive_currency'] != '' )
+                    {
+                        $currency = unserialize(html_entity_decode($_COOKIE['propertyhive_currency']));
+                    }
+                    else
+                    {
+                        $default_currency = apply_filters( 'propertyhive_default_display_currency', '' );
+                        if ( $default_currency != '' )
+                        {
+                            $requested_currency = $ph_countries->get_currency( $default_currency );
+                            if ( $requested_currency !== FALSE )
+                            {
+                                $currency = $requested_currency;
+                                $currency['exchange_rate'] = 1;
+                                $exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
+                                if ( isset($exchange_rates[$default_currency]) )
+                                {
+                                    $currency['exchange_rate'] = $exchange_rates[$default_currency];
+                                }
+                            }
+                        }
+                    }
                 }
-                else
+
+                if ( empty($currency) )
                 {
-                    $currency = $ph_countries->get_currency( 'GBP' );
+                    if ($this->_currency != '')
+                    {
+                        $currency = $ph_countries->get_currency( $this->_currency );
+                    }
+                    else
+                    {
+                        $currency = $ph_countries->get_currency( 'GBP' );
+                    }
                 }
                 $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
                 $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
@@ -238,12 +305,22 @@ class PH_Property {
                 {
                     case "residential-sales":
                     {
-                        return ( ( $this->_price != '' ) ? $prefix . number_format($this->_price, 0) . $suffix : '-' );
+                        $price = $this->_price;
+                        if ( isset($currency['exchange_rate']) && $price != '' )
+                        {
+                            $price = $this->_price_actual * $currency['exchange_rate'];
+                        }
+                        return ( ( $price != '' ) ? $prefix . number_format($price , 0) . $suffix : '-' );
                         break;
                     }
                     case "residential-lettings":
                     {
-                        return ( ( $this->_rent != '' ) ? $prefix . number_format($this->_rent, 0) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                        $price = $this->_rent;
+                        if ( isset($currency['exchange_rate']) && $price != '' )
+                        {
+                            $price = $this->_price_actual * $currency['exchange_rate'];
+                        }
+                        return ( ( $price != '' ) ? $prefix . number_format($price, 0) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                         break;
                     }
                 }
