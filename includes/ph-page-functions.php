@@ -10,6 +10,10 @@
  * @version     1.0.0
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 /**
  * Retrieve page ids - used for search results, property. returns -1 if no page is found
  *
