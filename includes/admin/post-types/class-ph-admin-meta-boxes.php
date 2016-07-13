@@ -734,22 +734,12 @@ class PH_Admin_Meta_Boxes {
 			return;
 		}
 
-        // unhook this function so it doesn't loop infinitely
-        remove_action('save_post', array( $this, 'save_meta_boxes' ), 1);
-
         if ( $_POST['post_parent'] != '' && $_POST['post_parent'] != '0' )
         {
-            $property_post = array(
-                'ID'           => $post_id,
-                'post_parent'  => $_POST['post_parent']
-            );
+            global $wpdb;
 
-            // Update the post into the database
-            wp_update_post( $property_post );
+            $wpdb->update( $wpdb->posts, array( 'post_parent' => $_POST['post_parent'] ), array( 'ID' => $post_id ) );
         }
-
-        // re-hook this function
-        add_action( 'save_post', array( $this, 'save_meta_boxes' ), 1, 2 );
 
 		do_action( 'propertyhive_process_' . $post->post_type . '_meta', $post_id, $post );
 	}
