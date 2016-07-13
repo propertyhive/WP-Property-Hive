@@ -295,8 +295,8 @@ class PH_Countries {
 	            {
 	                case "pw": { $price = ($rent * 52) / 12; break; }
 	                case "pcm": { $price = $rent; break; }
-	                case "pq": { $price = ($rent * 4) / 52; break; }
-	                case "pa": { $price = ($rent / 52); break; }
+	                case "pq": { $price = ($rent * 4) / 12; break; }
+	                case "pa": { $price = ($rent / 12); break; }
 	            }
 
 	            $converted_price = $this->convert_price_to_gbp( $price, $currency );

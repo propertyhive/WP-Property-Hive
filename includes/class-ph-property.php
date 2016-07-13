@@ -322,6 +322,12 @@ class PH_Property {
                         if ( isset($currency['exchange_rate']) && $price != '' )
                         {
                             $price = $this->_price_actual * $currency['exchange_rate'];
+                            switch ( $this->_rent_frequency )
+                            {
+                                case "pw": { $price = ($price * 12) / 52; break; }
+                                case "pq": { $price = ($price * 12) / 4; break; }
+                                case "pa": { $price = ($price * 12); break; }
+                            }
                         }
                         return ( ( $price != '' ) ? $prefix . number_format($price, 0) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                         break;
