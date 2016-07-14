@@ -18,11 +18,7 @@ global $post, $property;
 	<?php
        if ($property->department == 'residential-sales')
        {
-           $term_list = wp_get_post_terms($post->ID, 'price_qualifier', array("fields" => "names"));
-           if ( isset($term_list[0]) )
-           {
-	           echo '<span class="price-qualifier">' . $term_list[0] . '</span>';
-	       }
+           echo ' <span class="price-qualifier">' . $property->price_qualifier . '</span>';
        }
     ?>
 
