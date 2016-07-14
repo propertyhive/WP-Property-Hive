@@ -81,6 +81,32 @@ class PH_Property {
      * @return mixed
      */
     public function __get( $key ) {
+
+        if ( 'property_type' == $key ) 
+        {
+            return $this->get_property_type();
+        }
+        if ( 'availability' == $key ) 
+        {
+            return $this->get_availability();
+        }
+        if ( 'location' == $key ) 
+        {
+            return $this->get_location();
+        }
+        if ( 'price_qualifier' == $key ) 
+        {
+            return $this->get_price_qualifier();
+        }
+        if ( 'tenure' == $key ) 
+        {
+            return $this->get_tenure();
+        }
+        if ( 'sale_by' == $key ) 
+        {
+            return $this->get_sale_by();
+        }
+
         // Get values or default if not set
         $value = get_post_meta( $this->id, $key, true );
         if ($value == '')
