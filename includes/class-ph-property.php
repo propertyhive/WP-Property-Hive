@@ -725,6 +725,78 @@ class PH_Property {
     }
 
     /**
+     * Get the location taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_location()
+    {
+        $term_list = wp_get_post_terms($this->id, 'location', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
+     * Get the price qualifier taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_price_qualifier()
+    {
+        $term_list = wp_get_post_terms($this->id, 'price_qualifier', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
+     * Get the tenure taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_tenure()
+    {
+        $term_list = wp_get_post_terms($this->id, 'tenure', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
+     * Get the sale by taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_sale_by()
+    {
+        $term_list = wp_get_post_terms($this->id, 'sale_by', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
      * Get an array of property features
      *
      * @access public
