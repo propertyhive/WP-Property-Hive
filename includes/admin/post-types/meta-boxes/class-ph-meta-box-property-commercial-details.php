@@ -165,7 +165,7 @@ class PH_Meta_Box_Property_Commercial_Details {
         }
         
         $args = array( 
-            'id' => 'price_qualifier_id', 
+            'id' => 'commercial_price_qualifier_id', 
             'label' => __( 'Price Qualifier', 'propertyhive' ), 
             'desc_tip' => false,
             'options' => $options
@@ -201,7 +201,7 @@ class PH_Meta_Box_Property_Commercial_Details {
         }
         
         $args = array( 
-            'id' => 'sale_by_id', 
+            'id' => 'commercial_sale_by_id', 
             'label' => __( 'Sale By', 'propertyhive' ), 
             'desc_tip' => false,
             'options' => $options
@@ -237,7 +237,7 @@ class PH_Meta_Box_Property_Commercial_Details {
         }
         
         $args = array( 
-            'id' => 'tenure_id', 
+            'id' => 'commercial_tenure_id', 
             'label' => __( 'Tenure', 'propertyhive' ), 
             'desc_tip' => false,
             'options' => $options
@@ -516,9 +516,9 @@ class PH_Meta_Box_Property_Commercial_Details {
 
                     update_post_meta( $post_id, '_price_poa', ( isset($_POST['_commercial_price_poa']) ? $_POST['_commercial_price_poa'] : '' ) );
 
-                    if ( !empty($_POST['price_qualifier_id']) )
+                    if ( !empty($_POST['commercial_price_qualifier_id']) )
                     {
-                        wp_set_post_terms( $post_id, $_POST['price_qualifier_id'], 'price_qualifier' );
+                        wp_set_post_terms( $post_id, $_POST['commercial_price_qualifier_id'], 'price_qualifier' );
                     }
                     else
                     {
@@ -526,9 +526,9 @@ class PH_Meta_Box_Property_Commercial_Details {
                         wp_delete_object_term_relationships( $post_id, 'price_qualifier' );
                     }
                     
-                    if ( !empty($_POST['sale_by_id']) )
+                    if ( !empty($_POST['commercial_sale_by_id']) )
                     {
-                        wp_set_post_terms( $post_id, $_POST['sale_by_id'], 'sale_by' );
+                        wp_set_post_terms( $post_id, $_POST['commercial_sale_by_id'], 'sale_by' );
                     }
                     else
                     {
@@ -536,9 +536,9 @@ class PH_Meta_Box_Property_Commercial_Details {
                         wp_delete_object_term_relationships( $post_id, 'sale_by' );
                     }
                     
-                    if ( !empty($_POST['tenure_id']) )
+                    if ( !empty($_POST['commercial_tenure_id']) )
                     {
-                        wp_set_post_terms( $post_id, $_POST['tenure_id'], 'commercial_tenure' );
+                        wp_set_post_terms( $post_id, $_POST['commercial_tenure_id'], 'commercial_tenure' );
                     }
                     else
                     {
