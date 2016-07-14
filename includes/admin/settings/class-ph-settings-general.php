@@ -118,15 +118,26 @@ class PH_Settings_General extends PH_Settings_Page {
                 'css'       => 'min-width:300px;',
             ),
 
-            array(
-                'title'   => __( 'Countries Where You Operate', 'propertyhive' ),
-                'id'      => 'propertyhive_countries',
-                'type'    => 'multi_select_countries',
-                'css'       => 'min-width:300px;',
-                'desc'	=> __( 'Hold ctrl/cmd whilst clicking to select multiple', 'propertyhive' )
-            ),
+			array(
+					'title'   => __( 'Countries Where You Operate', 'propertyhive' ),
+					'id'      => 'propertyhive_countries',
+					'type'    => 'multi_select_countries',
+					'css'       => 'min-width:300px;',
+					'desc'	=> __( 'Hold ctrl/cmd whilst clicking to select multiple', 'propertyhive' )
+			),
 
 			array( 'type' => 'sectionend', 'id' => 'international_options'),
+			
+			array( 'title' => __( 'Google Maps', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'google_maps_options' ),
+			
+			array(
+					'title'   => __( 'API Key', 'propertyhive' ),
+					'id'      => 'propertyhive_google_map_api_key',
+					'type'    => 'text',
+					'css'	  => 'min-width:400px;'
+			),
+
+			array( 'type' => 'sectionend', 'id' => 'google_maps_options'),
 
 		) ); // End general settings
 	}
