@@ -106,9 +106,20 @@ class PH_Admin_Assets {
             wp_enqueue_script( 'ajax-chosen' );
             wp_enqueue_script( 'chosen' );
             wp_enqueue_script( 'jquery-ui-sortable' );
-            
-            wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' /*. $locale . '&key=' . GOOGLE_MAPS_V3_API_KEY*/ . '&sensor=false', false, '3');
-            wp_enqueue_script('googlemaps');
+						
+						{
+						
+							$propertyhive_google_map_api_key = get_option( 'propertyhive_google_map_api_key', '' );
+
+							if( !empty( $propertyhive_google_map_api_key ) ) {
+								wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . '&key=' . $propertyhive_google_map_api_key . '&sensor=false', false, '3');
+							} else {
+								wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . '&sensor=false', false, '3');
+							}           
+
+							wp_enqueue_script('googlemaps');
+						
+						}
             
             /*$locale  = localeconv();
             $decimal = isset( $locale['decimal_point'] ) ? $locale['decimal_point'] : '.';
