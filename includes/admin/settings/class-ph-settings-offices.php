@@ -167,6 +167,27 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 'desc_tip'  =>  false,
             );
         }
+
+        if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+        {
+            $args[] = array(
+                'title' => __( 'Telephone Number (Commercial)', 'propertyhive' ),
+                'id'        => '_office_telephone_number_commercial',
+                //'css'       => 'width:50px;',
+                'default'   => get_post_meta($current_id, '_office_telephone_number_commercial', TRUE),
+                'type'      => 'text',
+                'desc_tip'  =>  false,
+            );
+            
+            $args[] = array(
+                'title' => __( 'Email Address (Commercial)', 'propertyhive' ),
+                'id'        => '_office_email_address_commercial',
+                //'css'       => 'width:50px;',
+                'default'   => get_post_meta($current_id, '_office_email_address_commercial', TRUE),
+                'type'      => 'text',
+                'desc_tip'  =>  false,
+            );
+        }
         
         $args[] = array( 'type' => 'sectionend', 'id' => 'office_contact_options' );
 
@@ -441,6 +462,11 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                         $contact_details .= 'T: ' . get_post_meta($post->ID, '_office_telephone_number_lettings', TRUE) . '<br>';
                                         $contact_details .= 'E: ' . get_post_meta($post->ID, '_office_email_address_lettings', TRUE) . '<br>';
                                     }
+                                    if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+                                    {
+                                        $contact_details .= 'T: ' . get_post_meta($post->ID, '_office_telephone_number_commercial', TRUE) . '<br>';
+                                        $contact_details .= 'E: ' . get_post_meta($post->ID, '_office_email_address_commercial', TRUE) . '<br>';
+                                    }
                                     
                                     echo '<tr>
                                         <td width="1%" class="primary">
@@ -629,6 +655,8 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 update_post_meta($office_post_id, '_office_email_address_sales', (isset($_POST['_office_email_address_sales'])) ? wp_strip_all_tags( $_POST['_office_email_address_sales'] ) : '');
                 update_post_meta($office_post_id, '_office_telephone_number_lettings', (isset($_POST['_office_telephone_number_lettings'])) ? wp_strip_all_tags( $_POST['_office_telephone_number_lettings'] ) : '');
                 update_post_meta($office_post_id, '_office_email_address_lettings', (isset($_POST['_office_email_address_lettings'])) ? wp_strip_all_tags( $_POST['_office_email_address_lettings'] ) : '');
+                update_post_meta($office_post_id, '_office_telephone_number_commercial', (isset($_POST['_office_telephone_number_commercial'])) ? wp_strip_all_tags( $_POST['_office_telephone_number_commercial'] ) : '');
+                update_post_meta($office_post_id, '_office_email_address_commercial', (isset($_POST['_office_email_address_commercial'])) ? wp_strip_all_tags( $_POST['_office_email_address_commercial'] ) : '');
 
                 update_post_meta($office_post_id, '_office_latitude', wp_strip_all_tags( $_POST['_office_latitude'] ));
                 update_post_meta($office_post_id, '_office_longitude', wp_strip_all_tags( $_POST['_office_longitude'] ));

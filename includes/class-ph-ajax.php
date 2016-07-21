@@ -542,10 +542,19 @@ class PH_AJAX {
                         {
                             $fields_to_check[] = '_office_email_address_sales';
                             $fields_to_check[] = '_office_email_address_lettings';
+                            $fields_to_check[] = '_office_email_address_commercial';
                             break;
                         }
                         case "residential-lettings":
                         {
+                            $fields_to_check[] = '_office_email_address_lettings';
+                            $fields_to_check[] = '_office_email_address_sales';
+                            $fields_to_check[] = '_office_email_address_commercial';
+                            break;
+                        }
+                        case "commercial":
+                        {
+                            $fields_to_check[] = '_office_email_address_commercial';
                             $fields_to_check[] = '_office_email_address_lettings';
                             $fields_to_check[] = '_office_email_address_sales';
                             break;
