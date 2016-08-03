@@ -579,7 +579,7 @@ class PH_AJAX {
             $subject = __( 'New Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] );
             $message = __( "You have received a property enquiry via your website. Please find details of the enquiry below", 'propertyhive' ) . "\n\n";
             
-            $message .= __( 'Property', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] ) . " (" . get_permalink( $_POST['property_id'] ) . ")";
+            $message .= __( 'Property', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] ) . " (" . get_permalink( $_POST['property_id'] ) . ")\n\n";
             
             unset($form_controls['action']);
             unset($form_controls['property_id']); // Unset so the fields dosn't get shown in the enquiry details
