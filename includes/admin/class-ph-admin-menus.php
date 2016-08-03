@@ -62,7 +62,7 @@ class PH_Admin_Menus {
 	 * Add menu item
 	 */
 	public function settings_menu() {
-		$settings_page = add_submenu_page( 'propertyhive', __( 'Property Hive Settings', 'propertyhive' ),  __( 'Settings', 'propertyhive' ) , 'manage_propertyhive', 'ph-settings', array( $this, 'settings_page' ) );
+		$settings_page = add_submenu_page( 'propertyhive', __( 'Property Hive Settings', 'propertyhive' ),  __( 'Settings', 'propertyhive' ) , 'manage_options', 'ph-settings', array( $this, 'settings_page' ) );
 
 		//add_action( 'load-' . $settings_page, array( $this, 'settings_page_init' ) );
 	}

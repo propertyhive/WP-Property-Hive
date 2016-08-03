@@ -581,6 +581,7 @@ class PH_Install {
 			foreach ( $capabilities as $cap_group ) {
 				foreach ( $cap_group as $cap ) {
 					$wp_roles->add_cap( 'administrator', $cap );
+					$wp_roles->add_cap( 'editor', $cap );
 				}
 			}
 		}
