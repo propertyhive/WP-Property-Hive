@@ -27,27 +27,34 @@ class PH_Settings_General extends PH_Settings_Page {
 		$this->label = __( 'General', 'propertyhive' );
 
 		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 5 );
+		add_action( 'propertyhive_sections_' . $this->id, array( $this, 'output_sections' ) );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
 		add_action( 'propertyhive_settings_save_' . $this->id, array( $this, 'save' ) );
-
-		/*if ( ( $styles = PH_Frontend_Scripts::get_styles() ) && array_key_exists( 'propertyhive-general', $styles ) ) {
-			add_action( 'propertyhive_admin_field_frontend_styles', array( $this, 'frontend_styles_setting' ) );
-		}*/
 	}
 
 	/**
-	 * Get settings array
+     * Get sections
+     *
+     * @return array
+     */
+    public function get_sections() {
+        $sections = array(
+            ''         => __( 'General', 'propertyhive' ),
+            'international'         => __( 'International', 'propertyhive' ),
+            'map'         => __( 'Map', 'propertyhive' )
+        );
+
+        return $sections;
+    }
+
+	
+	/**
+	 * Get general settings array
 	 *
 	 * @return array
 	 */
 	public function get_settings() {
 		    
-		/*$currency_code_options = get_propertyhive_currencies();
-
-		foreach ( $currency_code_options as $code => $name ) {
-			$currency_code_options[ $code ] = $name . ' (' . get_propertyhive_currency_symbol( $code ) . ')';
-		}*/
-
 		return apply_filters( 'propertyhive_general_settings', array(
 
 			array( 'title' => __( 'General Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'general_options' ),
@@ -109,6 +116,18 @@ class PH_Settings_General extends PH_Settings_Page {
             
 			array( 'type' => 'sectionend', 'id' => 'general_options'),
 
+		) ); // End general settings
+	}
+
+	/**
+	 * Get international settings array
+	 *
+	 * @return array
+	 */
+	public function get_general_international_setting() {
+
+		return apply_filters( 'propertyhive_general_international_settings', array(
+
 			array( 'title' => __( 'International Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'international_options' ),
 
 			array(
@@ -128,61 +147,54 @@ class PH_Settings_General extends PH_Settings_Page {
 
 			array( 'type' => 'sectionend', 'id' => 'international_options'),
 
-		) ); // End general settings
+		) ); // End general international settings
 	}
 
 	/**
-	 * Output the frontend styles settings.
+	 * Get map settings array
 	 *
-	 * @access public
-	 * @return void
+	 * @return array
 	 */
-	public function frontend_styles_setting() {
-		/*?><tr valign="top" class="propertyhive_frontend_css_colors">
-			<th scope="row" class="titledesc">
-				<?php _e( 'Frontend Styles', 'propertyhive' ); ?>
-			</th>
-			<td class="forminp"><?php
+	public function get_general_map_setting() {
+		    
+		return apply_filters( 'propertyhive_general_map_settings', array(
 
-				$base_file = PH()->plugin_path() . '/assets/css/propertyhive-base.less';
-				$css_file  = PH()->plugin_path() . '/assets/css/propertyhive.css';
+			array( 'title' => __( 'Map Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'map_options' ),
 
-				if ( is_writable( $base_file ) && is_writable( $css_file ) ) {
+            array(
+                'title'   => __( 'Google Maps API Key', 'propertyhive' ),
+                'id'      => 'propertyhive_google_maps_api_key',
+                'type'    => 'text',
+                'desc'	=> __( 'If you have a Google Maps API key you can enter it here. A map is displayed when adding/editing properties, and if using our <a href="https://wp-property-hive.com/addons/map-search/" target="_blank">Map Search Add On</a>. You can generate an API key <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">here</a>.', 'propertyhive' )
+            ),
 
-					// Get settings
-					$colors = array_map( 'esc_attr', (array) get_option( 'propertyhive_frontend_css_colors' ) );
+			array( 'type' => 'sectionend', 'id' => 'map_options'),
 
-					// Defaults
-					if ( empty( $colors['primary'] ) ) {
-						$colors['primary'] = '#ad74a2';
-					}
-					if ( empty( $colors['secondary'] ) ) {
-						$colors['secondary'] = '#f7f6f7';
-					}
-					if ( empty( $colors['highlight'] ) ) {
-						$colors['highlight'] = '#85ad74';
-					}
-					if ( empty( $colors['content_bg'] ) ) {
-						$colors['content_bg'] = '#ffffff';
-					}
-					if ( empty( $colors['subtext'] ) ) {
-						$colors['subtext'] = '#777777';
-					}
-
-					// Show inputs
-					$this->color_picker( __( 'Primary', 'propertyhive' ), 'propertyhive_frontend_css_primary', $colors['primary'], __( 'Call to action buttons/price slider/layered nav UI', 'propertyhive' ) );
-					$this->color_picker( __( 'Secondary', 'propertyhive' ), 'propertyhive_frontend_css_secondary', $colors['secondary'], __( 'Buttons and tabs', 'propertyhive' ) );
-					$this->color_picker( __( 'Highlight', 'propertyhive' ), 'propertyhive_frontend_css_highlight', $colors['highlight'], __( 'Price labels and Sale Flashes', 'propertyhive' ) );
-					$this->color_picker( __( 'Content', 'propertyhive' ), 'propertyhive_frontend_css_content_bg', $colors['content_bg'], __( 'Your themes page background - used for tab active states', 'propertyhive' ) );
-					$this->color_picker( __( 'Subtext', 'propertyhive' ), 'propertyhive_frontend_css_subtext', $colors['subtext'], __( 'Used for certain text and asides - breadcrumbs, small text etc.', 'propertyhive' ) );
-
-				} else {
-					echo '<span class="description">' . __( 'To edit colours <code>propertyhive/assets/css/propertyhive-base.less</code> and <code>propertyhive.css</code> need to be writable. See <a href="http://codex.wordpress.org/Changing_File_Permissions">the Codex</a> for more information.', 'propertyhive' ) . '</span>';
-				}
-
-			?></td>
-		</tr><?php*/
+		) ); // End general map settings
 	}
+
+	/**
+     * Output the settings
+     */
+    public function output() {
+    	global $current_section;
+
+        if ( $current_section ) 
+        {
+        	switch ($current_section)
+            {
+                case "international": { $settings = $this->get_general_international_setting(); break; }
+                case "map": { $settings = $this->get_general_map_setting(); break; }
+                default: { die("Unknown setting section"); }
+            }
+        }
+        else
+        {
+        	$settings = $this->get_settings(); 
+        }
+
+        PH_Admin_Settings::output_fields( $settings );
+    }
 
 	/**
 	 * Output a colour picker input box.
@@ -204,28 +216,51 @@ class PH_Settings_General extends PH_Settings_Page {
 	 * Save settings
 	 */
 	public function save() {
-		$settings = $this->get_settings();
+		global $current_section;
 
-		PH_Admin_Settings::save_fields( $settings );
+		if ( $current_section != '' ) 
+        {
+        	switch ($current_section)
+        	{
+				case 'international':
+				{
+					if (!isset($_POST['propertyhive_countries']) || (isset($_POST['propertyhive_countries']) && empty($_POST['propertyhive_countries'])))
+					{
+						// If we haven't selected which countries we operate in
+						update_option( 'propertyhive_countries', array( $_POST['propertyhive_default_country'] ) );
+					}
+					else
+					{
+						// We have default country and countries set
+						// Make sure default country is in list of countries selected
+						if ( !in_array($_POST['propertyhive_default_country'], $_POST['propertyhive_countries']) ) {
+							$_POST['propertyhive_default_country'] = $_POST['propertyhive_countries'][0];
+							update_option( 'propertyhive_default_country', $_POST['propertyhive_default_country'] );
+						}
+					}
 
-		if (!isset($_POST['propertyhive_countries']) || (isset($_POST['propertyhive_countries']) && empty($_POST['propertyhive_countries'])))
-		{
-			// If we haven't selected which countries we operate in
-			update_option( 'propertyhive_countries', array( $_POST['propertyhive_default_country'] ) );
+					do_action( 'propertyhive_update_currency_exchange_rates' );
+
+					break;
+				}
+				case 'map':
+				{
+					$settings = $this->get_general_map_setting();
+
+					PH_Admin_Settings::save_fields( $settings );
+					break;
+				}
+				default: { die("Unknown setting section"); }
+			}
 		}
 		else
 		{
-			// We have default country and countries set
-			// Make sure default country is in list of countries selected
-			if ( !in_array($_POST['propertyhive_default_country'], $_POST['propertyhive_countries']) ) {
-				$_POST['propertyhive_default_country'] = $_POST['propertyhive_countries'][0];
-				update_option( 'propertyhive_default_country', $_POST['propertyhive_default_country'] );
-			}
+			$settings = $this->get_settings();
+
+			PH_Admin_Settings::save_fields( $settings );
+
+			flush_rewrite_rules();
 		}
-
-		flush_rewrite_rules();
-
-		do_action( 'propertyhive_update_currency_exchange_rates' );
 	}
 
 }

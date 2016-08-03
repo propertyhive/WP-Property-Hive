@@ -107,7 +107,8 @@ class PH_Admin_Assets {
             wp_enqueue_script( 'chosen' );
             wp_enqueue_script( 'jquery-ui-sortable' );
             
-            wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' /*. $locale . '&key=' . GOOGLE_MAPS_V3_API_KEY*/ . '&sensor=false', false, '3');
+            $api_key = get_option('propertyhive_google_maps_api_key');
+            wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
             wp_enqueue_script('googlemaps');
             
             /*$locale  = localeconv();
