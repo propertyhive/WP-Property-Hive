@@ -181,6 +181,8 @@ class PH_Admin_Post_Types {
         $output = '';
         
         $output .= $this->property_department_filter();
+        $output .= $this->property_availability_filter();
+        $output .= $this->property_location_filter();
         $output .= $this->property_office_filter();
         $output .= $this->property_negotiator_filter();
 
@@ -291,6 +293,122 @@ class PH_Admin_Post_Types {
             'echo' => false
         );
         $output = wp_dropdown_users($args);
+
+        return $output;
+    }
+
+    /**
+     * Show a property location filter box
+     */
+    public function property_location_filter() {
+        global $wp_query, $post;
+        
+        // Department filtering
+        $output  = '<select name="_location_id" id="dropdown_property_location_id">';
+
+        $options = array( );
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'location', $args );
+        
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            {
+                $options[$term->term_id] = $term->name;
+                
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $term->term_id
+                );
+                $subterms = get_terms( 'location', $args );
+                
+                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                {
+                    foreach ($subterms as $term)
+                    {
+                        $options[$term->term_id] = '- ' . $term->name;
+                        
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => $term->term_id
+                        );
+                        $subsubterms = get_terms( 'location', $args );
+                        
+                        if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                        {
+                            foreach ($subsubterms as $term)
+                            {
+                                $options[$term->term_id] = '- ' . $term->name;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        $output .= '<option value="">' . __( 'All Locations', 'propertyhive' ) . '</option>';
+        
+        if ( !empty($options) )
+        {
+            foreach ( $options as $value => $label )
+            {
+                $output .= '<option value="' . $value . '"';
+                if ( isset( $_GET['_location_id'] ) && ! empty( $_GET['_location_id'] ) )
+                {
+                    $output .= selected( $value, $_GET['_location_id'], false );
+                }
+                $output .= '>' . $label . '</option>';
+            }
+        }
+        
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show a property availability filter box
+     */
+    public function property_availability_filter() {
+        global $wp_query, $post;
+        
+        // Department filtering
+        $output  = '<select name="_availability_id" id="dropdown_property_availability_id">';
+
+        $options = array( );
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'availability', $args );
+        
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            {
+                $options[$term->term_id] = $term->name;
+            }
+        }
+        
+        $output .= '<option value="">' . __( 'All Availabilities', 'propertyhive' ) . '</option>';
+        
+        if ( !empty($options) )
+        {
+            foreach ( $options as $value => $label )
+            {
+                $output .= '<option value="' . $value . '"';
+                if ( isset( $_GET['_availability_id'] ) && ! empty( $_GET['_availability_id'] ) )
+                {
+                    $output .= selected( $value, $_GET['_availability_id'], false );
+                }
+                $output .= '>' . $label . '</option>';
+            }
+        }
+        
+        $output .= '</select>';
 
         return $output;
     }
@@ -434,19 +552,38 @@ class PH_Admin_Post_Types {
 
         if ( 'property' === $typenow ) 
         {
+            $vars['meta_query'] = array();
+            $vars['tax_query'] = array();
             if ( ! empty( $_GET['_department'] ) ) {
-                $vars['meta_key'] = '_department';
-                $vars['meta_value'] = sanitize_text_field( $_GET['_department'] );
+                $vars['meta_query'][] = array(
+                    'key' => '_department',
+                    'value' => sanitize_text_field( $_GET['_department'] ),
+                );
             }
             if ( ! empty( $_GET['_office_id'] ) ) {
-                $vars['meta_key'] = '_office_id';
-                $vars['meta_value'] = sanitize_text_field( $_GET['_office_id'] );
+                $vars['meta_query'][] = array(
+                    'key' => '_office_id',
+                    'value' => sanitize_text_field( $_GET['_office_id'] ),
+                );
             }
             if ( ! empty( $_GET['_negotiator_id'] ) ) {
-                $vars['meta_key'] = '_negotiator_id';
-                $vars['meta_value'] = sanitize_text_field( $_GET['_negotiator_id'] );
+                $vars['meta_query'][] = array(
+                    'key' => '_negotiator_id',
+                    'value' => sanitize_text_field( $_GET['_negotiator_id'] ),
+                );
             }
-
+            if ( ! empty( $_GET['_location_id'] ) ) {
+                $vars['tax_query'][] = array(
+                    'taxonomy'  => 'location',
+                    'terms' => ( (is_array($_GET['_location_id'])) ? $_GET['_location_id'] : array( $_GET['_location_id'] ) )
+                );
+            }
+            if ( ! empty( $_GET['_availability_id'] ) ) {
+                $vars['tax_query'][] = array(
+                    'taxonomy'  => 'availability',
+                    'terms' => ( (is_array($_GET['_availability_id'])) ? $_GET['_availability_id'] : array( $_GET['_availability_id'] ) )
+                );
+            }
         }
         elseif ( 'contact' === $typenow ) 
         {
