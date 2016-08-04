@@ -70,4 +70,32 @@ jQuery( function($){
         $('p.submit input[type=\'submit\']').attr('disabled', 'disabled');
     });
 
+    $('a.batch-delete').click(function()
+    {
+        var term_ids = new Array;
+
+        $('input[name=\'term_id[]\']:checked').each(function()
+        {
+            term_ids.push( $(this).val() );
+        });
+        
+        if ( term_ids.length > 0 )
+        {
+            window.location.href = propertyhive_admin_settings.admin_url + 'admin.php?page=ph-settings&tab=customfields&section=' + propertyhive_admin_settings.taxonomy_section + '-delete&id=' + term_ids.join("-");
+        }
+
+        return false;
+    });
+
+    $('input[name=\'term_id[]\']').change(function()
+    {
+        if ( $('input[name=\'term_id[]\']:checked').length > 0 )
+        {
+            $('a.batch-delete').attr('disabled', false);
+        }
+        else
+        {
+            $('a.batch-delete').attr('disabled', 'disabled');
+        }
+    });
 });

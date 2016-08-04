@@ -269,6 +269,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=availability&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Availability', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -278,6 +279,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Availability', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -296,6 +298,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=availability&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -326,6 +329,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=availability&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Availability', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -346,6 +350,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Type', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -355,6 +360,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <?php do_action( 'propertyhive_custom_field_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php _e( 'Property Type', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -381,6 +387,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                 $subterms = get_terms( 'property_type', $args );
                         ?>
                         <tr>
+                            <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"><?php }else{ echo '&nbsp;'; } ?></td>
                             <?php do_action( 'propertyhive_custom_field_property_type_table_before_row_column', $term->term_id ); ?>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
@@ -397,6 +404,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     {
                                         ?>
                                         <tr>
+                                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                                             <?php do_action( 'propertyhive_custom_field_property_type_table_before_row_column', $term->term_id, $parent_term_id ); ?>
                                             <td class="type subtype">&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                             <td class="settings">
@@ -432,6 +440,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Type', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -452,6 +461,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-property-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Type', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -461,6 +471,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php _e( 'Property Type', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -487,6 +498,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                 $subterms = get_terms( 'commercial_property_type', $args );
                         ?>
                         <tr>
+                            <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"><?php }else{ echo '&nbsp;'; } ?></td>
                             <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_row_column', $term->term_id ); ?>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
@@ -503,6 +515,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     {
                                         ?>
                                         <tr>
+                                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                                             <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_row_column', $term->term_id, $parent_term_id ); ?>
                                             <td class="type subtype">&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                             <td class="settings">
@@ -538,6 +551,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-property-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Type', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -558,6 +572,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=location&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Location', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -567,6 +582,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Location', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -590,6 +606,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                 $subterms = get_terms( 'location', $args );
                         ?>
                         <tr>
+                            <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"><?php }else{ echo '&nbsp;'; } ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=location&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -610,6 +627,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                         $subsubterms = get_terms( 'location', $args );
                                         ?>
                                         <tr>
+                                            <td class="cb"><?php if ( empty( $subsubterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"><?php }else{ echo '&nbsp;'; } ?></td>
                                             <td class="type subtype">&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                             <td class="settings">
                                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=location&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -625,6 +643,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                             {
                                                 ?>
                                                 <tr>
+                                                    <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                                                     <td class="type subtype">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                                     <td class="settings">
                                                         <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=location&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -661,6 +680,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=location&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Location', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -681,6 +701,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=parking&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Parking', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -690,6 +711,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Parking', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -708,6 +730,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=parking&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -738,6 +761,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=parking&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Parking', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -758,6 +782,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=outside-space&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Outside Space', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -767,6 +792,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Outside Space', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -785,6 +811,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=outside-space&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -815,6 +842,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=outside-space&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Outside Space', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -835,6 +863,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=price-qualifier&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Price Qualifier', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -844,6 +873,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Price Qualifier', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -862,6 +892,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=price-qualifier&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -892,6 +923,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=price-qualifier&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Price Qualifier', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -912,6 +944,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=sale-by&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Sale By', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -921,6 +954,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Sale By', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -939,6 +973,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=sale-by&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -969,6 +1004,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=sale-by&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Sale By', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -989,6 +1025,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=tenure&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Tenure', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -998,6 +1035,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Tenure', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1016,6 +1054,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=tenure&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1046,6 +1085,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=tenure&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Tenure', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -1066,6 +1106,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-tenure&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Tenure', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -1075,6 +1116,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Tenure', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1093,6 +1135,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-tenure&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1123,6 +1166,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-tenure&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Tenure', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -1143,6 +1187,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=furnished&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Furnished Option', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -1152,6 +1197,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Furnished', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1170,6 +1216,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=furnished&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1200,6 +1247,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=furnished&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Furnished Option', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -1220,6 +1268,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Marketing Flag', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -1229,6 +1278,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="type"><?php _e( 'Marketing Flag', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1247,6 +1297,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             { 
                         ?>
                         <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1277,6 +1328,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Marketing Flag', 'propertyhive' ); ?></a>
             </td>
         </tr>
@@ -1686,175 +1738,194 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             }
             else
             {
-                $term = get_term( $current_id, $taxonomy );
-                
-                if ( is_null($term) || is_wp_error($term) )
-                {
-                    die("Invalid term trying to be deleted");
-                }
-                else
-                {
-                    $term_name = $term->name;
-                    
-                    $args = array();
-                    
-                    $args[] = array( 'title' => __( 'Delete', 'propertyhive' ) . ' ' . $taxonomy_name . ': ' . $term_name, 'type' => 'title', 'desc' => '', 'id' => 'custom_field_' . $taxonomy . '_delete' );
-                    
-                    // Get number of properties assigned to this term
-                    $query_args = array(
-                        'post_type' => 'property',
-                        'nopaging' => true,
-                        'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
-                        'tax_query' => array(
-                            array(
-                                'taxonomy' => $taxonomy,
-                                'field'    => 'id',
-                                'terms'    => $current_id,
-                            ),
-                        ),
-                    );
-                    $property_query = new WP_Query( $query_args );
-                    
-                    $num_properties = $property_query->found_posts;
+                $term_ids = explode("-", $current_id);
 
-                    wp_reset_postdata();
+                $args = array();
+
+                foreach ( $term_ids as $current_id )
+                {
+                    $term = get_term( $current_id, $taxonomy );
                     
-                    // Get number of applicants assigned to this term
-                    $num_applicants = 0;
-                    if ( $taxonomy == 'property_type' || $taxonomy == 'commercial_property_type' ||  $taxonomy == 'location' )
+                    if ( is_null($term) || is_wp_error($term) )
                     {
+                        die("Invalid term trying to be deleted");
+                    }
+                    else
+                    {
+                        $term_name = $term->name;
+                        
+                        $args[] = array( 'title' => __( 'Delete', 'propertyhive' ) . ' ' . $taxonomy_name . ': ' . $term_name, 'type' => 'title', 'desc' => '', 'id' => 'custom_field_' . $taxonomy . '_' . $current_id . '_delete' );
+                        
+                        // Get number of properties assigned to this term
                         $query_args = array(
-                            'post_type' => 'contact',
+                            'post_type' => 'property',
                             'nopaging' => true,
                             'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
-                            'meta_query' => array(
+                            'tax_query' => array(
                                 array(
-                                    'key' => '_contact_types',
-                                    'value' => 'applicant',
-                                    'compare' => 'LIKE'
+                                    'taxonomy' => $taxonomy,
+                                    'field'    => 'id',
+                                    'terms'    => $current_id,
                                 ),
                             ),
                         );
-                        $applicant_query = new WP_Query( $query_args );
-
-                        if ( $applicant_query->have_posts() )
-                        {
-                            while ( $applicant_query->have_posts() )
-                            {
-                                $applicant_query->the_post();
-
-                                $applicant_has_taxonomy = false;
-
-                                $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
-                                if ( $num_applicant_profiles == '' )
-                                {
-                                    $num_applicant_profiles = 0;
-                                }
-
-                                if ( $num_applicant_profiles > 0 )
-                                {
-                                    for ( $i = 0; $i < $num_applicant_profiles; ++$i )
-                                    {
-                                        $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
-
-                                        if ( isset($applicant_profile[$taxonomy.'s']) && is_array($applicant_profile[$taxonomy.'s']) && !empty($applicant_profile[$taxonomy.'s']) )
-                                        {
-                                            if (in_array($current_id, $applicant_profile[$taxonomy.'s']))
-                                            {
-                                                $applicant_has_taxonomy = true;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if ( $applicant_has_taxonomy )
-                                {
-                                    ++$num_applicants;
-                                }
-                            }
-                        }
+                        $property_query = new WP_Query( $query_args );
+                        
+                        $num_properties = $property_query->found_posts;
 
                         wp_reset_postdata();
-                    }
-
-                    if ($num_properties > 0 || $num_applicants > 0)
-                    {
-                        $alternative_terms = array();
                         
-                        $alternative_terms['none'] = '-- ' . __( 'Don\'t Reassign', 'propertyhive' ) . ' --';
-                        
-                        $term_args = array(
-                            'hide_empty' => false,
-                            'exclude' => array($current_id),
-                            'parent' => 0
-                        );
-                        $terms = get_terms( $taxonomy, $term_args );
-                        
-                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                        // Get number of applicants assigned to this term
+                        $num_applicants = 0;
+                        if ( $taxonomy == 'property_type' || $taxonomy == 'commercial_property_type' ||  $taxonomy == 'location' )
                         {
-                            foreach ($terms as $term)
+                            $query_args = array(
+                                'post_type' => 'contact',
+                                'nopaging' => true,
+                                'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                                'meta_query' => array(
+                                    array(
+                                        'key' => '_contact_types',
+                                        'value' => 'applicant',
+                                        'compare' => 'LIKE'
+                                    ),
+                                ),
+                            );
+                            $applicant_query = new WP_Query( $query_args );
+
+                            if ( $applicant_query->have_posts() )
                             {
-                                $alternative_terms[$term->term_id] = $term->name;
-
-                                $term_args = array(
-                                    'hide_empty' => false,
-                                    'exclude' => array($current_id),
-                                    'parent' => $term->term_id
-                                );
-                                $subterms = get_terms( $taxonomy, $term_args );
-                                
-                                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                                while ( $applicant_query->have_posts() )
                                 {
-                                    foreach ($subterms as $term)
-                                    {
-                                        $alternative_terms[$term->term_id] = '- ' . $term->name;
+                                    $applicant_query->the_post();
 
-                                        $term_args = array(
-                                            'hide_empty' => false,
-                                            'exclude' => array($current_id),
-                                            'parent' => $term->term_id
-                                        );
-                                        $subsubterms = get_terms( $taxonomy, $term_args );
-                                        
-                                        if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                                    $applicant_has_taxonomy = false;
+
+                                    $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
+                                    if ( $num_applicant_profiles == '' )
+                                    {
+                                        $num_applicant_profiles = 0;
+                                    }
+
+                                    if ( $num_applicant_profiles > 0 )
+                                    {
+                                        for ( $i = 0; $i < $num_applicant_profiles; ++$i )
                                         {
-                                            foreach ($subsubterms as $term)
+                                            $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
+
+                                            if ( isset($applicant_profile[$taxonomy.'s']) && is_array($applicant_profile[$taxonomy.'s']) && !empty($applicant_profile[$taxonomy.'s']) )
                                             {
-                                                $alternative_terms[$term->term_id] = '- - ' . $term->name;
+                                                if (in_array($current_id, $applicant_profile[$taxonomy.'s']))
+                                                {
+                                                    $applicant_has_taxonomy = true;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if ( $applicant_has_taxonomy )
+                                    {
+                                        ++$num_applicants;
+                                    }
+                                }
+                            }
+
+                            wp_reset_postdata();
+                        }
+
+                        if ($num_properties > 0 || $num_applicants > 0)
+                        {
+                            $alternative_terms = array();
+                            
+                            $alternative_terms['none'] = '-- ' . __( 'Don\'t Reassign', 'propertyhive' ) . ' --';
+                            
+                            $term_args = array(
+                                'hide_empty' => false,
+                                'exclude' => $term_ids,
+                                'parent' => 0
+                            );
+                            $terms = get_terms( $taxonomy, $term_args );
+                            
+                            if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                            {
+                                foreach ($terms as $term)
+                                {
+                                    $alternative_terms[$term->term_id] = $term->name;
+
+                                    $term_args = array(
+                                        'hide_empty' => false,
+                                        'exclude' => $term_ids,
+                                        'parent' => $term->term_id
+                                    );
+                                    $subterms = get_terms( $taxonomy, $term_args );
+                                    
+                                    if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                                    {
+                                        foreach ($subterms as $term)
+                                        {
+                                            $alternative_terms[$term->term_id] = '- ' . $term->name;
+
+                                            $term_args = array(
+                                                'hide_empty' => false,
+                                                'exclude' => $term_ids,
+                                                'parent' => $term->term_id
+                                            );
+                                            $subsubterms = get_terms( $taxonomy, $term_args );
+                                            
+                                            if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                                            {
+                                                foreach ($subsubterms as $term)
+                                                {
+                                                    $alternative_terms[$term->term_id] = '- - ' . $term->name;
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        } 
-                        
-                        // There are properties assigned to this term
-                        $args[] = array(
-                            'title' => __( 'Re-assign to', 'propertyhive' ),
-                            'id'        => 'reassign_to',
-                            'default'   => '',
-                            'options'   => $alternative_terms,
-                            'type'      => 'select',
-                            'desc_tip'  =>  false,
-                            'desc'      => __( 'There are properties or applicants that have this term assigned to them. Which, if any, term should they be reassigned to?' , 'propertyhive' )
-                        );
+                            } 
+                            
+                            // There are properties assigned to this term
+                            $args[] = array(
+                                'title' => __( 'Re-assign to', 'propertyhive' ),
+                                'id'        => 'reassign_to_' . $current_id,
+                                'default'   => '',
+                                'options'   => $alternative_terms,
+                                'type'      => 'select',
+                                'desc_tip'  =>  false,
+                                'desc'      => __( 'There are properties or applicants that have this term assigned to them. Which, if any, term should they be reassigned to?' , 'propertyhive' )
+                            );
+                        }
+                        else
+                        {
+                            // There are properties assigned to this term
+                            $args[] = array(
+                                'title' => __( 'Re-assign to', 'propertyhive' ),
+                                'id'        => 'reassign_to',
+                                'type'      => 'html',
+                                'html'      => __( 'No properties or applicants assigned to this term' , 'propertyhive' )
+                            );    
+                        }
+
+                        $args[] = array( 'type' => 'sectionend', 'id' => 'custom_field_' . $taxonomy . '_' . $current_id . '_delete' );
                     }
-                    
-                    $args[] = array(
-                            'title' => __( 'Confirm removal?', 'propertyhive' ),
-                            'id'        => 'confirm_removal',
-                            'type'      => 'checkbox',
-                            'desc_tip'  =>  false,
-                        );
-                        
-                    $args[] = array(
-                            'type'      => 'hidden',
-                            'id'        => 'taxonomy',
-                            'default'     => $taxonomy
-                        );
-                        
-                    $args[] = array( 'type' => 'sectionend', 'id' => 'custom_field_' . $taxonomy . '_delete' );
                 }
+
+                $args[] = array( 'title' => __( 'Confirm Removal', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_confirm_delete' );
+
+                $args[] = array(
+                    'title' => __( 'Confirm Removal?', 'propertyhive' ),
+                    'id'        => 'confirm_removal',
+                    'type'      => 'checkbox',
+                    'desc_tip'  =>  false,
+                );
+
+                $args[] = array(
+                    'type'      => 'hidden',
+                    'id'        => 'taxonomy',
+                    'default'     => $taxonomy
+                );
+
+                $args[] = array( 'type' => 'sectionend', 'id' => 'custom_field_confirm_delete' );
             }
         }
 
@@ -2218,104 +2289,109 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     {
                         if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == '1' )
                         {
-                            // Update properties that have this taxonomy term set
-                            $query_args = array(
-                                'post_type' => 'property',
-                                'nopaging' => true,
-                                'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
-                                'tax_query' => array(
-                                    array(
-                                        'taxonomy' => $_POST['taxonomy'],
-                                        'field'    => 'id',
-                                        'terms'    => $current_id,
-                                    ),
-                                ),
-                            );
-                            $property_query = new WP_Query( $query_args );
-                            
-                            if ( $property_query->have_posts() )
-                            {
-                                while ( $property_query->have_posts() )
-                                {
-                                    $property_query->the_post();
-                                    
-                                    wp_remove_object_terms( $post->ID, $current_id, $_POST['taxonomy'] );
-                                    
-                                    // Re-assign to another term
-                                    if ( isset($_POST['reassign_to']) && ! empty( $_POST['reassign_to'] ) && $_POST['reassign_to'] != 'none' )
-                                    {
-                                        $new_id = $_POST['reassign_to'];
-                                        
-                                        wp_set_post_terms( $post->ID, $new_id, $_POST['taxonomy'], TRUE );
-                                        
-                                        // TODO: Check for WP_ERROR
-                                    }
-                                }
-                            }
-                            
-                            wp_reset_postdata();
+                            $term_ids = explode("-", $current_id);
 
-                            if ( $_POST['taxonomy'] == 'property_type' || $_POST['taxonomy'] == 'commercial_property_type' || $_POST['taxonomy'] == 'location' )
+                            foreach ( $term_ids as $current_id )
                             {
+                                // Update properties that have this taxonomy term set
                                 $query_args = array(
-                                    'post_type' => 'contact',
+                                    'post_type' => 'property',
                                     'nopaging' => true,
                                     'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
-                                    'meta_query' => array(
+                                    'tax_query' => array(
                                         array(
-                                            'key' => '_contact_types',
-                                            'value' => 'applicant',
-                                            'compare' => 'LIKE'
+                                            'taxonomy' => $_POST['taxonomy'],
+                                            'field'    => 'id',
+                                            'terms'    => $current_id,
                                         ),
                                     ),
                                 );
-                                $applicant_query = new WP_Query( $query_args );
-
-                                if ( $applicant_query->have_posts() )
+                                $property_query = new WP_Query( $query_args );
+                                
+                                if ( $property_query->have_posts() )
                                 {
-                                    while ( $applicant_query->have_posts() )
+                                    while ( $property_query->have_posts() )
                                     {
-                                        $applicant_query->the_post();
-                                    
-                                        $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
-                                        if ( $num_applicant_profiles == '' )
+                                        $property_query->the_post();
+                                        
+                                        wp_remove_object_terms( $post->ID, $current_id, $_POST['taxonomy'] );
+                                        
+                                        // Re-assign to another term
+                                        if ( isset($_POST['reassign_to_' . $current_id]) && ! empty( $_POST['reassign_to_' . $current_id] ) && $_POST['reassign_to_' . $current_id] != 'none' )
                                         {
-                                            $num_applicant_profiles = 0;
+                                            $new_id = $_POST['reassign_to_' . $current_id];
+                                            
+                                            wp_set_post_terms( $post->ID, $new_id, $_POST['taxonomy'], TRUE );
+                                            
+                                            // TODO: Check for WP_ERROR
                                         }
+                                    }
+                                }
+                                
+                                wp_reset_postdata();
 
-                                        if ( $num_applicant_profiles > 0 )
+                                if ( $_POST['taxonomy'] == 'property_type' || $_POST['taxonomy'] == 'commercial_property_type' || $_POST['taxonomy'] == 'location' )
+                                {
+                                    $query_args = array(
+                                        'post_type' => 'contact',
+                                        'nopaging' => true,
+                                        'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                                        'meta_query' => array(
+                                            array(
+                                                'key' => '_contact_types',
+                                                'value' => 'applicant',
+                                                'compare' => 'LIKE'
+                                            ),
+                                        ),
+                                    );
+                                    $applicant_query = new WP_Query( $query_args );
+
+                                    if ( $applicant_query->have_posts() )
+                                    {
+                                        while ( $applicant_query->have_posts() )
                                         {
-                                            for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+                                            $applicant_query->the_post();
+                                        
+                                            $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
+                                            if ( $num_applicant_profiles == '' )
                                             {
-                                                $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
+                                                $num_applicant_profiles = 0;
+                                            }
 
-                                                if ( isset($applicant_profile[$_POST['taxonomy'].'s']) && is_array($applicant_profile[$_POST['taxonomy'].'s']) && !empty($applicant_profile[$_POST['taxonomy'].'s']) )
+                                            if ( $num_applicant_profiles > 0 )
+                                            {
+                                                for ( $i = 0; $i < $num_applicant_profiles; ++$i )
                                                 {
-                                                    if (in_array($current_id, $applicant_profile[$_POST['taxonomy'].'s']))
+                                                    $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
+
+                                                    if ( isset($applicant_profile[$_POST['taxonomy'].'s']) && is_array($applicant_profile[$_POST['taxonomy'].'s']) && !empty($applicant_profile[$_POST['taxonomy'].'s']) )
                                                     {
-                                                        // This profile has this term set
-                                                        unset($applicant_profile[$_POST['taxonomy'].'s'][$current_id]);
-
-                                                        if ( isset($_POST['reassign_to']) && ! empty( $_POST['reassign_to'] ) && $_POST['reassign_to'] != 'none' )
+                                                        if (in_array($current_id, $applicant_profile[$_POST['taxonomy'].'s']))
                                                         {
-                                                            $applicant_profile[$_POST['taxonomy'].'s'][] = $_POST['reassign_to'];
-                                                            $applicant_profile[$_POST['taxonomy'].'s'] = array_unique($applicant_profile[$_POST['taxonomy'].'s']);
+                                                            // This profile has this term set
+                                                            unset($applicant_profile[$_POST['taxonomy'].'s'][$current_id]);
+
+                                                            if ( isset($_POST['reassign_to_' . $current_id]) && ! empty( $_POST['reassign_to_' . $current_id] ) && $_POST['reassign_to_' . $current_id] != 'none' )
+                                                            {
+                                                                $applicant_profile[$_POST['taxonomy'].'s'][] = $_POST['reassign_to_' . $current_id];
+                                                                $applicant_profile[$_POST['taxonomy'].'s'] = array_unique($applicant_profile[$_POST['taxonomy'].'s']);
+                                                            }
+
+                                                            $applicant_profile[$_POST['taxonomy'].'s'] = array_values($applicant_profile[$_POST['taxonomy'].'s']);
+
+                                                            update_post_meta( get_the_ID(), '_applicant_profile_' . $i, $applicant_profile );
                                                         }
-
-                                                        $applicant_profile[$_POST['taxonomy'].'s'] = array_values($applicant_profile[$_POST['taxonomy'].'s']);
-
-                                                        update_post_meta( get_the_ID(), '_applicant_profile_' . $i, $applicant_profile );
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
+
+                                wp_reset_postdata();
+
+                                wp_delete_term( $current_id, $_POST['taxonomy'] );
                             }
-
-                            wp_reset_postdata();
-
-                            wp_delete_term( $current_id, $_POST['taxonomy'] );
                         }
 
                         break;

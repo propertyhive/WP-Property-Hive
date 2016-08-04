@@ -166,6 +166,8 @@ class PH_Admin_Assets {
                 'primary_department_not_active_warning'     => __( 'The chosen primary department has not been selected as active', 'propertyhive' ),
                 'no_countries_selected'                     => __( 'Please select which countries you operate in', 'propertyhive' ),
                 'default_country_not_in_selected'           => __( 'The default country hasn\'t been selected as a country you operate in', 'propertyhive' ),
+                'admin_url'                                 => admin_url(),
+                'taxonomy_section'                          => ( ( isset($_GET['section']) ) ? $_GET['section'] : '' ),
             );
             wp_localize_script( 'propertyhive_admin_settings', 'propertyhive_admin_settings', $params );
         }
