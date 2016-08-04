@@ -106,6 +106,10 @@ class PH_Property {
         {
             return $this->get_sale_by();
         }
+        if ( 'marketing_flag' == $key ) 
+        {
+            return $this->get_marketing_flag();
+        }
 
         // Get values or default if not set
         $value = get_post_meta( $this->id, $key, true );
@@ -814,6 +818,24 @@ class PH_Property {
     public function get_sale_by()
     {
         $term_list = wp_get_post_terms($this->id, 'sale_by', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
+     * Get the marketing flag taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_marketing_flag()
+    {
+        $term_list = wp_get_post_terms($this->id, 'marketing_flag', array("fields" => "names"));
         
         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
         {
