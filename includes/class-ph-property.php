@@ -106,6 +106,10 @@ class PH_Property {
         {
             return $this->get_sale_by();
         }
+        if ( 'furnished' == $key ) 
+        {
+            return $this->get_furnished();
+        }
         if ( 'marketing_flag' == $key ) 
         {
             return $this->get_marketing_flag();
@@ -818,6 +822,24 @@ class PH_Property {
     public function get_sale_by()
     {
         $term_list = wp_get_post_terms($this->id, 'sale_by', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
+     * Get the furnished taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_furnished()
+    {
+        $term_list = wp_get_post_terms($this->id, 'furnished', array("fields" => "names"));
         
         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
         {
