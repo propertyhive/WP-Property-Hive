@@ -75,7 +75,7 @@ class PH_Meta_Box_Property_Epcs {
                         
                         echo '<li id="epc_' . $epcs_attachment_id . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
-                            echo '<img src="' . $image . '" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '">';
+                            echo '<a href="' . wp_get_attachment_url( $epcs_attachment_id ) . '" target="_blank"><img src="' . $image . '" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></a>';
                         echo '</li>';
                     }
                 }
