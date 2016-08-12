@@ -4,7 +4,7 @@ Tags: property, real estate, software, estate agents, estate agent, property man
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.5.3
-Stable tag: 1.1.12
+Stable tag: 1.1.13
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,13 +78,17 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 == Changelog ==
 
+= 1.1.13 =
+* Add new method and shortcut for obtaining a property's furnishing option (i.e. $property->furnished)
+* Add selected furnished option to property details meta.php template
+
 = 1.1.12 =
 * Fix recurring issue where properties don't appear on search page by default after updating settings
 * Small tweak to default CSS to make single column layout 100% width
 
 = 1.1.11 =
 * Add new batch delete functionality on custom fields
-* Add new method and shortcut to obtaining a property's marketing flags (i.e. $property->marketing_flag)
+* Add new method and shortcut for obtaining a property's marketing flags (i.e. $property->marketing_flag)
 
 = 1.1.10 =
 * Give users with the Editor role access to Property Hive, excluding the settings area
