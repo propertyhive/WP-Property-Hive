@@ -46,6 +46,8 @@ global $post, $property;
                 case "residential-lettings": 
                 {
         ?>
+
+        <?php if ( $property->furnished != '' ) { ?><li class="furnished"><?php _e( 'Furnished', 'propertyhive' ); echo ': ' . $property->furnished; ?></li><?php } ?>
         
         <?php if ( $property->deposit > 0 ) { ?><li class="deposit"><?php _e( 'Deposit', 'propertyhive' ); echo ': ' . $property->get_formatted_deposit(); ?></li><?php } ?>
         
