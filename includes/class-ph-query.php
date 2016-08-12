@@ -143,6 +143,19 @@ class PH_Query {
 		// We only want to affect the main query
 		if ( ! $q->is_main_query() )
 			return;
+
+		// Fix for verbose page rules
+		if ( $GLOBALS['wp_rewrite']->use_verbose_page_rules && isset( $q->queried_object->ID ) && $q->queried_object->ID == ph_get_page_id( 'search_results' ) ) {
+			$q->set( 'post_type', 'property' );
+			$q->set( 'page', '' );
+			$q->set( 'pagename', '' );
+
+			// Fix conditional Functions
+			$q->is_archive           = true;
+			$q->is_post_type_archive = true;
+			$q->is_singular          = false;
+			$q->is_page              = false;
+		}
         
 		// When orderby is set, WordPress shows posts. Get around that here.
 		/*if ( $q->is_home() && 'page' == get_option('show_on_front') && get_option('page_on_front') == ph_get_page_id('search_results') ) {
