@@ -26,6 +26,7 @@ class PH_Shortcodes {
 			'featured_properties'          => __CLASS__ . '::featured_properties',
 			'similar_properties'           => __CLASS__ . '::similar_properties',
 			'property_search_form'         => __CLASS__ . '::property_search_form',
+			'property_map'                 => __CLASS__ . '::property_map',
 		);
 
 		foreach ( $shortcodes as $shortcode => $function ) {
@@ -389,5 +390,29 @@ class PH_Shortcodes {
 		}
 
 		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+	}
+
+	/**
+	 * Output property map
+	 * Should only be used on a property page or where the $property var is set
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function property_map( $atts ) {
+
+		global $property;
+
+		$atts = shortcode_atts( array(
+			'height'        => '400',
+			'zoom'          => '14',
+			'scrollwheel'   => 'true'
+		), $atts );
+
+		ob_start();
+
+		echo get_property_map( $atts );
+
+		return ob_get_clean();
 	}
 }

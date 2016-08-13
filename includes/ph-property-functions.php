@@ -14,15 +14,15 @@
  * Main function for returning properties, uses the PH_Property_Factory class.
  *
  * @param mixed $the_property Post object or post ID of the property.
- * @param array $args (default: array()) Contains all arguments to be used to get this product.
- * @return PH_Product
+ * @param array $args (default: array()) Contains all arguments to be used to get this property.
+ * @return PH_Property
  */
 function get_property( $the_property = false, $args = array() ) {
 	return new PH_Property( $the_property );
 }
 
 /**
- * Function that returns an array containing the IDs of the featured products.
+ * Function that returns an array containing the IDs of the featured properties.
  *
  * @access public
  * @return array
@@ -89,7 +89,7 @@ function ph_track_property_view() {
 	if ( ! is_singular( 'property' ) )
 		return;
 
-	global $post, $product;
+	global $post;
 
 	if ( empty( $_COOKIE['propertyhive_recently_viewed'] ) )
 		$viewed_properties = array();
@@ -107,3 +107,46 @@ function ph_track_property_view() {
 }
 
 add_action( 'template_redirect', 'ph_track_property_view', 20 );
+
+function get_property_map( $args = array() )
+{
+	global $property;
+
+	if ( $property->latitude != '' && $property->latitude != '0' && $property->longitude != '' && $property->longitude != '0' )
+	{
+		$api_key = get_option('propertyhive_google_maps_api_key');
+	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+	    wp_enqueue_script('googlemaps');
+
+	    echo '<div id="property_map_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
+?>
+<script>
+
+	var property_map; // Global declaration of the map
+			
+	function initialize_property_map() {
+				
+		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
+		var myOptions = {
+	  		zoom: <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?>,
+			center: myLatlng,
+	  		mapTypeId: google.maps.MapTypeId.ROADMAP,
+	  		scrollwheel: <?php echo ( ( isset($args['scrollwheel']) && ($args['scrollwheel'] === 'false' || $args['scrollwheel'] === FALSE) ) ? 'false' : 'true' ); ?>
+	  	}
+		property_map = new google.maps.Map(document.getElementById("property_map_canvas"), myOptions);
+				
+		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
+			
+		var markerOptions = {
+			map: property_map,
+			position: myLatlng		
+		};
+		new google.maps.Marker(markerOptions);
+	}
+		
+	window.onload = initialize_property_map;
+
+</script>
+<?php
+	}
+}
