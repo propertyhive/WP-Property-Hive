@@ -4,7 +4,7 @@ Tags: property, real estate, software, estate agents, estate agent, property man
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.5.3
-Stable tag: 1.1.13
+Stable tag: 1.1.14
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -77,6 +77,11 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.1.14 =
+* Add new shortcode [property_map] and function get_property_map() to output a property map
+* Made EPC's clickable under 'Media' tab on property record
+* Add support for any taxonomy (i.e. location, furnished, tenure) to be added as search form dropdown
 
 = 1.1.13 =
 * Add new method and shortcut for obtaining a property's furnishing option (i.e. $property->furnished)
