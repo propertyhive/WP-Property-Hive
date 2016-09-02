@@ -293,13 +293,26 @@ class PH_Countries {
 				$price = $rent; // Stored in pcm
 	            switch ($rent_frequency)
 	            {
-	                case "pw": { $price = ($rent * 52) / 12; break; }
-	                case "pcm": { $price = $rent; break; }
-	                case "pq": { $price = ($rent * 4) / 12; break; }
-	                case "pa": { $price = ($rent / 12); break; }
+                    case "pppw":
+                    {
+                        $bedrooms = get_post_meta( $postID, '_bedrooms', true );
+                        if ( $bedrooms !== FALSE && $bedrooms != 0 && $bedrooms != '' )
+                        {
+                            $price = (($rent * 52) / 12) * $bedrooms;
+                        }
+                        else
+                        {
+                            $price = ($rent * 52) / 12;
+                        }
+                        break;
+                    }
+                    case "pw": { $price = ($rent * 52) / 12; break; }
+                    case "pcm": { $price = $rent; break; }
+                    case "pq": { $price = ($rent * 4) / 12; break; }
+                    case "pa": { $price = ($rent / 12); break; }
 	            }
 
-	            $converted_price = $this->convert_price_to_gbp( $price, $currency );
+                $converted_price = $this->convert_price_to_gbp( $price, $currency );
 
 	            update_post_meta( $postID, '_price_actual', $converted_price );
 			}

@@ -70,6 +70,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         echo '<input type="text" class="" name="_rent" id="_rent" value="' . get_post_meta( $post->ID, '_rent', true ) . '" placeholder="" style="width:20%;">
             
             <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:auto">
+                <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . __('Per Person Per Week', 'propertyhive') . '</option>
                 <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
                 <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
                 <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
