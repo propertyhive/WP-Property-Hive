@@ -1094,106 +1094,23 @@ class PH_Query {
         if ( ! is_array( $tax_query ) )
             $tax_query = array();
 
-        $tax_query[] = $this->property_type_tax_query();
-        $tax_query[] = $this->availability_tax_query();
-        $tax_query[] = $this->marketing_flag_tax_query();
-        $tax_query[] = $this->location_tax_query();
+        if ( isset($_REQUEST) && !empty($_REQUEST) )
+        {
+            foreach ( $_REQUEST as $key => $value )
+            {
+                if ( taxonomy_exists($key) && isset( $_REQUEST[$key] ) && !empty($_REQUEST[$key]) )
+                {
+                    $tax_query[] = array(
+                        'taxonomy'  => $key,
+                        'terms' => ( (is_array($value)) ? $value : array( $value ) )
+                    );
+                }
+            }
+        }
         
         return array_filter( $tax_query );
     }
     
-    /**
-     * Returns a taxonomy query to handle property type
-     *
-     * @access public
-     * @return array
-     */
-    public function property_type_tax_query( ) {
-        
-        $tax_query = array();
-        
-        if ( isset( $_REQUEST['property_type'] ) && !empty($_REQUEST['property_type']) )
-        {
-            $tax_query = array(
-                'taxonomy'  => 'property_type',
-                'terms' => ( (is_array($_REQUEST['property_type'])) ? $_REQUEST['property_type'] : array( $_REQUEST['property_type'] ) )
-            );
-        }
-
-        if ( isset( $_REQUEST['commercial_property_type'] ) && !empty($_REQUEST['commercial_property_type']) )
-        {
-            $tax_query = array(
-                'taxonomy'  => 'commercial_property_type',
-                'terms' => ( (is_array($_REQUEST['commercial_property_type'])) ? $_REQUEST['commercial_property_type'] : array( $_REQUEST['commercial_property_type'] ) )
-            );
-        }
-        
-        return $tax_query;
-    }
-
-    /**
-     * Returns a taxonomy query to handle availability
-     *
-     * @access public
-     * @return array
-     */
-    public function availability_tax_query( ) {
-        
-        $tax_query = array();
-        
-        if ( isset( $_REQUEST['availability'] ) && !empty($_REQUEST['availability']) )
-        {
-            $tax_query = array(
-                'taxonomy'  => 'availability',
-                'terms' => ( (is_array($_REQUEST['availability'])) ? $_REQUEST['availability'] : array( $_REQUEST['availability'] ) )
-            );
-        }
-        
-        return $tax_query;
-    }
-
-    /**
-     * Returns a taxonomy query to handle marketing flags
-     *
-     * @access public
-     * @return array
-     */
-    public function marketing_flag_tax_query( ) {
-        
-        $tax_query = array();
-        
-        if ( isset( $_REQUEST['marketing_flag'] ) && !empty($_REQUEST['marketing_flag']) )
-        {
-            $tax_query = array(
-                'taxonomy'  => 'marketing_flag',
-                'terms' => ( (is_array($_REQUEST['marketing_flag'])) ? $_REQUEST['marketing_flag'] : array( $_REQUEST['marketing_flag'] ) )
-            );
-        }
-        
-        return $tax_query;
-    }
-
-    /**
-     * Returns a taxonomy query to handle location
-     *
-     * @access public
-     * @return array
-     */
-    public function location_tax_query( ) {
-        
-        $tax_query = array();
-        
-        if ( isset( $_REQUEST['location'] ) && !empty($_REQUEST['location']) )
-        {
-            $tax_query = array(
-                'taxonomy'  => 'location',
-                'terms' => ( (is_array($_REQUEST['location'])) ? $_REQUEST['location'] : array( $_REQUEST['location'] ) )
-            );
-        }
-        
-        return $tax_query;
-    }
-
 	/**
 	 * Layered Nav Init
 	 */
