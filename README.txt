@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, software, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 4.6
-Stable tag: 1.1.15
+Tested up to: 4.6.1
+Stable tag: 1.1.16
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -77,6 +77,11 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.1.16 =
+* Added view/edit property link to WP admin bar
+* Updated single-property/summary-description.php template to include line breaks
+* Declared compatibility with WordPress 4.6.1
 
 = 1.1.15 =
 * Added support for PPPW rent frequency on properties. This marks the beginning of better support for student accommodation including the new [StuRents integration](https://wp-property-hive.com/addons/sturents-wordpress-import-export/)
