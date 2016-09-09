@@ -20,7 +20,7 @@ if ( $summary != '' )
     
     <h4><?php _e( 'Property Summary', 'propertyhive' ); ?></h4>
     
-    <?php echo $summary; ?>
+    <?php echo nl2br($summary); ?>
 
 </div>
 <?php
