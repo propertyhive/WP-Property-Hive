@@ -147,7 +147,16 @@ class PH_Property {
      */
     public function get_gallery_attachment_ids() 
     {
-        return apply_filters( 'propertyhive_property_gallery_attachment_ids', array_filter( $this->photos ), $this );
+        $photos = $this->photos;
+        if ( is_array($photos) )
+        {
+            $photos = array_filter( $photos );
+        }
+        else
+        {
+            $photos = array();
+        }
+        return apply_filters( 'propertyhive_property_gallery_attachment_ids', $photos, $this );
     }
     
     /**
@@ -183,7 +192,16 @@ class PH_Property {
      */
     public function get_floorplan_attachment_ids() 
     {
-        return apply_filters( 'propertyhive_property_floorplan_attachment_ids', array_filter( $this->_floorplans ), $this );
+        $floorplans = $this->_floorplans;
+        if ( is_array($floorplans) )
+        {
+            $floorplans = array_filter( $floorplans );
+        }
+        else
+        {
+            $floorplans = array();
+        }
+        return apply_filters( 'propertyhive_property_floorplan_attachment_ids', $floorplans, $this );
     }
     
     /**
@@ -194,7 +212,16 @@ class PH_Property {
      */
     public function get_brochure_attachment_ids() 
     {
-        return apply_filters( 'propertyhive_property_brochure_attachment_ids', array_filter( $this->_brochures ), $this );
+        $brochures = $this->_brochures;
+        if ( is_array($brochures) )
+        {
+            $brochures = array_filter( $brochures );
+        }
+        else
+        {
+            $brochures = array();
+        }
+        return apply_filters( 'propertyhive_property_brochure_attachment_ids', $brochures, $this );
     }
     
     /**
@@ -205,7 +232,16 @@ class PH_Property {
      */
     public function get_epc_attachment_ids() 
     {
-        return apply_filters( 'propertyhive_property_epc_attachment_ids', array_filter( $this->_epcs ), $this );
+        $epcs = $this->_epcs;
+        if ( is_array($epcs) )
+        {
+            $epcs = array_filter( $epcs );
+        }
+        else
+        {
+            $epcs = array();
+        }
+        return apply_filters( 'propertyhive_property_epc_attachment_ids', $epcs, $this );
     }
 
     /**
