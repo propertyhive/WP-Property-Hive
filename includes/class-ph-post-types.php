@@ -228,7 +228,8 @@ class PH_Post_types {
 					'supports' 				=> array( 'title', 'excerpt' ),
 					'has_archive' 			=> ( $search_results_page_id = ph_get_page_id( 'search_results' ) ) && get_page( $search_results_page_id ) ? get_page_uri( $search_results_page_id ) : 'search_results',
 					'show_in_nav_menus' 	=> false,
-					'show_in_menu'          => false
+					'show_in_menu'          => false,
+					'show_in_admin_bar'     => true
 				)
 			)
 		);
