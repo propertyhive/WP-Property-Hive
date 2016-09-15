@@ -114,6 +114,22 @@ class PH_Property {
         {
             return $this->get_marketing_flag();
         }
+        if ( 'office_name' == $key ) 
+        {
+            return $this->get_office_name();
+        }
+        if ( 'office_address' == $key ) 
+        {
+            return $this->get_office_address();
+        }
+        if ( 'office_telephone_number' == $key ) 
+        {
+            return $this->get_office_telephone_number();
+        }
+        if ( 'office_email_address' == $key ) 
+        {
+            return $this->get_office_email_address();
+        }
 
         // Get values or default if not set
         $value = get_post_meta( $this->id, $key, true );
@@ -1025,6 +1041,44 @@ class PH_Property {
         }
         
         return $return;
+    }
+
+    public function get_office_name()
+    {
+        return get_the_title( $this->_office_id );
+    }
+
+    public function get_office_address( $separator = ', ' )
+    {
+        $return = '';
+        
+        for ( $i = 1; $i <= 4; ++$i )
+        {
+            $address = get_post_meta( $this->_office_id, '_office_address_' . $i, TRUE );
+            if ($address != '')
+            {
+                if ($return != '') { $return .= ' '; }
+                $return .= $address;
+            }
+        }
+        $address = get_post_meta( $this->_office_id, '_office_address_postcode', TRUE );
+        if ($address != '')
+        {
+            if ($return != '') { $return .= $separator; }
+            $return .= $address;
+        }
+
+        return $return;
+    }
+
+    public function get_office_telephone_number()
+    {
+        return get_post_meta( $this->_office_id, '_office_telephone_number_' . ( str_replace("residential-", "", $this->_department) ), TRUE );
+    }
+
+    public function get_office_email_address()
+    {
+        return get_post_meta( $this->_office_id, '_office_email_address_' . ( str_replace("residential-", "", $this->_department) ), TRUE );
     }
 
     /**
