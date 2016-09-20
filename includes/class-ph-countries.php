@@ -163,6 +163,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => true
 			),
+			'IT' => array(
+				'name' => 'Italy',
+				'currency_code' => 'EUR',
+				'currency_symbol' => '&euro;',
+				'currency_prefix' => true
+			),
 			'JP' => array(
 				'name' => 'Japan',
 				'currency_code' => 'JPY',
@@ -179,6 +185,12 @@ class PH_Countries {
 				'name' => 'Russia',
 				'currency_code' => 'RUB',
 				'currency_symbol' => '₽',
+				'currency_prefix' => true
+			),
+			'ZA' => array(
+				'name' => 'South Africa',
+				'currency_code' => 'ZAR',
+				'currency_symbol' => 'R',
 				'currency_prefix' => true
 			),
 			'ES' => array(
