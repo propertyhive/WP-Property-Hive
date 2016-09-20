@@ -235,8 +235,10 @@ class PH_Settings_General extends PH_Settings_Page {
 						// Make sure default country is in list of countries selected
 						if ( !in_array($_POST['propertyhive_default_country'], $_POST['propertyhive_countries']) ) {
 							$_POST['propertyhive_default_country'] = $_POST['propertyhive_countries'][0];
-							update_option( 'propertyhive_default_country', $_POST['propertyhive_default_country'] );
 						}
+
+						update_option( 'propertyhive_default_country', $_POST['propertyhive_default_country'] );
+						update_option( 'propertyhive_countries', $_POST['propertyhive_countries'] );
 					}
 
 					do_action( 'propertyhive_update_currency_exchange_rates' );
