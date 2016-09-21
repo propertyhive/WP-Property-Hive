@@ -587,6 +587,7 @@ class PH_Query {
 		$meta_query[] = $this->on_market_meta_query();
         $meta_query[] = $this->department_meta_query($q);
         $meta_query[] = $this->address_keyword_meta_query();
+        $meta_query[] = $this->country_meta_query();
         $meta_query[] = $this->minimum_price_meta_query();
         $meta_query[] = $this->maximum_price_meta_query();
         $meta_query[] = $this->price_range_meta_query();
@@ -726,6 +727,26 @@ class PH_Query {
 		return $meta_query;
 	}
 
+	/**
+     * Returns a meta query to handle country
+     *
+     * @access public
+     * @return array
+     */
+    public function country_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( isset( $_REQUEST['country'] ) && $_REQUEST['country'] != '' )
+        {
+            $meta_query = array(
+                'key'     => '_address_country',
+                'value'   => sanitize_text_field( $_REQUEST['country'] )
+            );
+        }
+        
+        return $meta_query;
+    }
     
     /**
      * Returns a meta query to handle minimum price

@@ -547,6 +547,65 @@ function ph_form_field( $key, $field )
             
             break;
         }
+        case "country": 
+        {
+            $key = 'country';
+            
+            $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
+            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
+            $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
+            $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
+            $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            
+            $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
+            if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
+            {
+                $field['value'] = $_GET[$key];
+            }
+            
+            $output .= $field['before'];
+            
+            if ($field['show_label'])
+            {
+                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+            }
+            
+            $output .= '<select 
+                name="' . esc_attr( $key ) . '" 
+                id="' . esc_attr( $key ) . '" 
+                class="' . esc_attr( $field['class'] ) . '"
+             >';
+
+             $output .= '<option 
+                        value="" 
+                        ' . selected( esc_attr( $field['value'] ), esc_attr( '' ), false ) . '
+                    >' . esc_html( __( 'No preference', 'propertyhive' ) ) . '</option>';
+
+            $countries = get_option( 'propertyhive_countries', array() );
+            if ( is_array($countries) && !empty($countries) )
+            {
+                $ph_countries = new PH_Countries;
+
+                foreach ( $countries as $country )
+                {
+                    $ph_country = $ph_countries->get_country( $country );
+
+                    if ( $ph_country !== FALSE )
+                    {
+                        $output .= '<option 
+                        value="' . esc_attr( $country ) . '" 
+                        ' . selected( esc_attr( $field['value'] ), esc_attr( $country ), false ) . '
+                        >' . esc_html( $ph_country['name'] ) . '</option>';
+                    }
+                }
+            }
+            
+            $output .= '</select>';
+            
+            $output .= $field['after'];
+            
+            break;
+        }
         case "hidden": 
         {
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
