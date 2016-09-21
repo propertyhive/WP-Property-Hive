@@ -107,43 +107,42 @@ class PH_Meta_Box_Property_Residential_Details {
             $args['value'] = $selected_value;
         }
         propertyhive_wp_select( $args );
-        
-        // Parking
-        $options = array( '' => '' );
-        $args = array(
-            'hide_empty' => false,
-            'parent' => 0
-        );
-        $terms = get_terms( 'parking', $args );
-        
-        $selected_value = '';
-        if ( !empty( $terms ) && !is_wp_error( $terms ) )
-        {
-            foreach ($terms as $term)
-            {
-                $options[$term->term_id] = $term->name;
-            }
-
-            $term_list = wp_get_post_terms($post->ID, 'parking', array("fields" => "ids"));
-            
-            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
-            {
-                $selected_value = $term_list[0];
-            }
-        }
-        
-        $args = array( 
-            'id' => 'parking_id', 
-            'label' => __( 'Parking', 'propertyhive' ), 
-            'desc_tip' => false,
-            'options' => $options
-        );
-        if ($selected_value != '')
-        {
-            $args['value'] = $selected_value;
-        }
-        propertyhive_wp_select( $args );
 ?>
+        <p class="form-field"><label for="parking_ids"><?php _e( 'Parking', 'propertyhive' ); ?></label>
+        <select id="parking_ids" name="parking_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select parking', 'propertyhive' ); ?>" class="multiselect attribute_values">
+            <?php
+                $options = array( '' => '' );
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => 0
+                );
+                $terms = get_terms( 'parking', $args );
+                
+                $selected_values = array();
+                $term_list = wp_get_post_terms($post->ID, 'parking', array("fields" => "ids"));
+                if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+                {
+                    foreach ( $term_list as $term_id )
+                    {
+                        $selected_values[] = $term_id;
+                    }
+                }
+                
+                if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                {
+                    foreach ( $terms as $term )
+                    {
+                        echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                        if ( in_array( $term->term_id, $selected_values ) )
+                        {
+                            echo ' selected';
+                        }
+                        echo '>' . esc_html( $term->name ) . '</option>';
+                    }
+                }
+            ?>
+        </select>
+
         <p class="form-field"><label for="outside_space_ids"><?php _e( 'Outside Space', 'propertyhive' ); ?></label>
         <select id="outside_space_ids" name="outside_space_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select outside space', 'propertyhive' ); ?>" class="multiselect attribute_values">
             <?php
@@ -216,13 +215,20 @@ class PH_Meta_Box_Property_Residential_Details {
             wp_delete_object_term_relationships( $post_id, 'property_type' );
         }
 
-        if ( !empty($_POST['parking_id']) )
+        $parkings = array();
+        if ( isset( $_POST['parking_ids'] ) && !empty( $_POST['parking_ids'] ) )
         {
-            wp_set_post_terms( $post_id, $_POST['parking_id'], 'parking' );
+            foreach ( $_POST['parking_ids'] as $parking_id )
+            {
+                $parkings[] = $parking_id;
+            }
+        }
+        if ( !empty($parkings) )
+        {
+            wp_set_post_terms( $post_id, $parkings, 'parking' );
         }
         else
         {
-            // Setting to blank
             wp_delete_object_term_relationships( $post_id, 'parking' );
         }
         
