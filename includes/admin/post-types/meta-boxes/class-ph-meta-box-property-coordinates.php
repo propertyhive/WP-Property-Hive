@@ -94,7 +94,16 @@ class PH_Meta_Box_Property_Coordinates {
             {
                 jQuery(\'#_address_postcode\').change(function()
                 {
-                    if (!markerSet && jQuery(\'#_address_postcode\').val() != \'\')
+                    do_address_lookup();
+                });
+                jQuery(\'#_address_country\').change(function()
+                {
+                    do_address_lookup();
+                });
+
+                function do_address_lookup()
+                {
+                    if (!markerSet && jQuery(\'#_address_postcode\').val() != \'\' && jQuery(\'#_address_country\').val() != \'\')
                     {
                         var address = jQuery(\'#_address_postcode\').val();
                         if (jQuery(\'#_address_street\').val() != \'\')
@@ -105,8 +114,13 @@ class PH_Meta_Box_Property_Coordinates {
                         {
                             address = jQuery(\'#_address_name_number\').val() + \' \' + address;
                         }
+                        if (jQuery(\'#_address_country\').val() != \'\')
+                        {
+                            address = address + \', \' + jQuery(\'#_address_country\').val();
+                        }
                         
                         geocoder.geocode( { \'address\': address}, function(results, status) {
+
                             if (status == google.maps.GeocoderStatus.OK) 
                             {
                                 map.panTo(results[0].geometry.location);
@@ -122,9 +136,9 @@ class PH_Meta_Box_Property_Coordinates {
                             {
                                 alert(\'Geocode was not successful for the following reason: \' + status);
                             }
-                          });
+                        });
                     }
-                });
+                }
                 
                 function ph_initialize() {
                     
@@ -146,12 +160,9 @@ class PH_Meta_Box_Property_Coordinates {
 
                     google.maps.event.addListener(map, \'click\', function(event) 
                     {
-                        if (!markerSet)
-                        {
-                            marker = ph_create_marker(event.latLng.lat(), event.latLng.lng());
-                            jQuery(\'#_latitude\').val(event.latLng.lat());
-                            jQuery(\'#_longitude\').val(event.latLng.lng());
-                        }
+                        marker = ph_create_marker(event.latLng.lat(), event.latLng.lng());
+                        jQuery(\'#_latitude\').val(event.latLng.lat());
+                        jQuery(\'#_longitude\').val(event.latLng.lng());
                     });
                 }
                 google.maps.event.addDomListener(window, \'load\', ph_initialize);
@@ -170,6 +181,8 @@ class PH_Meta_Box_Property_Coordinates {
                         if (!markerSet)
                         {
                             marker = ph_create_marker(latitude, longitude);
+
+                            markerSet = true;
                         }
                         else
                         {
@@ -192,6 +205,8 @@ class PH_Meta_Box_Property_Coordinates {
                         if (!markerSet)
                         {
                             marker = ph_create_marker(latitude, longitude);
+
+                            markerSet = true;
                         }
                         else
                         {
@@ -204,14 +219,17 @@ class PH_Meta_Box_Property_Coordinates {
             
             function ph_create_marker(lat, lng)
             {
+                if ( marker != null )
+                {
+                    marker.setMap(null);
+                }
+
                 marker = new google.maps.Marker({
                     position: new google.maps.LatLng(lat, lng),
                     map: map,
                     draggable: true,
                     title: \''. __( 'Click and drag me to set the exact coordinates', 'propertyhive') . '\'
                 });
-                
-                markerSet = true;
                 
                 jQuery(\'#help-marker-not-set\').fadeOut(\'fast\', function()
                 {
