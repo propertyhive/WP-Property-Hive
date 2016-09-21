@@ -69,21 +69,6 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         echo '<input type="text" class="" name="_price" id="_price" value="' . get_post_meta( $post->ID, '_price', true ) . '" placeholder="" style="width:15%;">
             
         </p>';
-
-
-
-        // Price
-        /*propertyhive_wp_text_input( array( 
-            'id' => '_price', 
-            'label' => __( 'Price', 'propertyhive' ) . ' (<span class="currency-symbol">&pound;</span>)', 
-            'desc_tip' => false, 
-            //'description' => __( 'Stock quantity. If this is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.', 'propertyhive' ), 
-            'type' => 'text',
-            'class' => '',
-            'custom_attributes' => array(
-                'style' => 'width:14%'
-            )
-        ) );*/
         
         // POA
         propertyhive_wp_checkbox( array( 
