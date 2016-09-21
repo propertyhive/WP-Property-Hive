@@ -40,8 +40,9 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             }
         }
 
+        // Cater for when no currency selected or currencies have been updated in settings so existing currency doesn't exist
         $selected_currency = get_post_meta( $post->ID, '_currency', true );
-        if ( $selected_currency == '' )
+        if ( $selected_currency == '' || !isset($currencies[$selected_currency]) )
         {
             $country = $ph_countries->get_country( $default_country );
             $selected_currency = $country['currency_code'];
