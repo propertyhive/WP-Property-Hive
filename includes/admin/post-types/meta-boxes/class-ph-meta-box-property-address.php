@@ -141,11 +141,19 @@ class PH_Meta_Box_Property_Address {
         // Country dropdown
         $countries = get_option( 'propertyhive_countries', array( 'GB' ) );
         $property_country = get_post_meta( $thepostid, '_address_country', TRUE );
+        $default_country = get_option( 'propertyhive_default_country', 'GB' );
         $country_js = array();
         if ( $property_country == '' )
         {
-            $property_country = get_option( 'propertyhive_default_country', 'GB' );
+            $property_country = $default_country;
         }
+
+        // Make sure country is in list of countries we operate in
+        if ( !in_array($property_country, $countries) )
+        {
+            $property_country = $default_country;
+        }
+
         if ( empty($countries) || count($countries) < 2 )
         {
             if ( count($countries) == 1 )
@@ -338,12 +346,19 @@ class PH_Meta_Box_Property_Address {
             // Change currency symbol shown on sales and lettings details meta boxes
             function countryChange(country_code)
             {
-                jQuery(\'.currency-symbol\').html(countries[country_code].currency_symbol);
+                if (typeof countries[country_code] != \'undefined\')
+                {
+                    jQuery(\'.currency-symbol\').html(countries[country_code].currency_symbol);
+                }
+                else
+                {
+                    jQuery(\'.currency-symbol\').html(countries[jQuery(\'#_address_country\').val()].currency_symbol);
+                }
             }
 
             jQuery(document).ready(function()
             {
-                countryChange(\'' . $property_country . '\');
+                countryChange(jQuery(\'#_address_country\').val());
 
                 jQuery(\'select[id=\\\'_address_country\\\']\').change(function()
                 {
@@ -463,7 +478,6 @@ class PH_Meta_Box_Property_Address {
                                             }
                                         }
                                     }
-                                    //console.log(address_fields);
                                 }
 
                                 jQuery(\'#_address_postcode\').trigger(\'change\');
