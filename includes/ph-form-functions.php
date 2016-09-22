@@ -340,6 +340,14 @@ function ph_form_field( $key, $field )
             {
                 $field['value'] = $_GET[$key];
             }
+            else
+            {
+                $value = get_post_meta( $post->ID, '_' . $key, true );
+                if ( $value != '' )
+                {
+                    $field['value'] = $value;
+                }
+            }
             
             $output .= $field['before'];
             
