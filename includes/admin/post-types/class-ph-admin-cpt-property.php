@@ -218,12 +218,26 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 $title            = $the_property->get_formatted_summary_address();
                 if ( empty($title) )
                 {
-                    $title = __( '(no title)' );
+                    $title = __( '(no address entered)' );
                 }
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
-				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title.'</a></strong>';
+				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title.'</a>';
+
+				$post_status = get_post_status( $post->ID );
+				$post_title_output = '';
+				if ( $post_status == 'draft' || $post_status == 'private' )
+				{
+					$post_title_output = ucfirst($post_status);
+				}
+				$post_title_output = apply_filters( 'propertyhive_admin_property_column_post_address_output', $post_title_output );
+				if ( $post_title_output != '' )	
+				{
+					echo ' - ' . $post_title_output;
+				}
+
+				echo '</strong>';
 
 				// Excerpt view
 				if ( isset( $_GET['mode'] ) && 'excerpt' == $_GET['mode'] ) {
