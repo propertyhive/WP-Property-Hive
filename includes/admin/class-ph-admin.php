@@ -22,6 +22,7 @@ class PH_Admin {
         add_action( 'init', array( $this, 'includes' ) );
         add_action( 'current_screen', array( $this, 'disable_propertyhive_meta_box_dragging' ) );
         add_action( 'current_screen', array( $this, 'remove_propertyhive_meta_boxes_from_screen_options' ) );
+        add_action( 'admin_notices', array( $this, 'review_admin_notices') );
     }
     
     /**
@@ -80,6 +81,31 @@ class PH_Admin {
         if ( in_array( $screen->id, array( 'property' ) ) ) 
         {
             //wp_deregister_script('postbox');
+        }
+    }
+
+    public function review_admin_notices()
+    {
+        if ( current_user_can( 'manage_options' ) )
+        {
+            $propertyhive_review_prompt_due_timestamp = get_option( 'propertyhive_review_prompt_due_timestamp', 0 );
+            if ( $propertyhive_review_prompt_due_timestamp != '' && $propertyhive_review_prompt_due_timestamp != 0 )
+            {
+                if ( $propertyhive_review_prompt_due_timestamp < time() )
+                {
+                    echo "<div class=\"notice notice-info is-dismissible\" id=\"ph_leave_review_admin_notice\">
+                        <p>
+                            " . __( '<strong>Finding Property Hive useful?</strong> Please take a minute to <a href="https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post" target="_blank">leave us a ★★★★★ review</a>', 'propertyhive' ) . "
+                        </p>
+                        <p>
+                            <a href=\"https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post\" target=\"_blank\" class=\"button-primary\">Leave a Review</a>
+                            <a href=\"\" class=\"button\">No Thanks</a>
+                        </p>
+                    </div>";
+
+                    update_option( 'propertyhive_review_prompt_due_timestamp', 0 );
+                }
+            }
         }
     }
     
