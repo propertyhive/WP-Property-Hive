@@ -38,7 +38,6 @@ class PH_Meta_Box_Enquiry_Record_Details {
         
         // Negotiator
         $negotiator_id = get_post_meta($post->ID, '_negotiator_id', TRUE);
-        var_dump($negotiator_id);
         
         echo '<p class="form-field negotiator_id_field">
         
