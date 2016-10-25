@@ -91,9 +91,9 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'    => 'radio',
                 'default' => 'residential-sales',
                 'options' => array(
-                	'residential-sales' => 'Residential Sales',
-                	'residential-lettings' => 'Residential Lettings',
-                	'commercial' => 'Commercial'
+                	'residential-sales' => __( 'Residential Sales', 'propertyhive' ),
+                	'residential-lettings' => __( 'Residential Lettings', 'propertyhive' ),
+                	'commercial' => __( 'Commercial', 'propertyhive' )
                 )
             ),
             
