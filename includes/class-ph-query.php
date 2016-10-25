@@ -601,7 +601,7 @@ class PH_Query {
         $meta_query[] = $this->floor_area_range_meta_query();
         $meta_query[] = $this->office_meta_query();
         
-		return array_filter( $meta_query );
+		return array_filter( apply_filters( 'propertyhive_property_query_meta_query', $meta_query, $this ) );
 	}
 
 	/**
