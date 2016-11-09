@@ -147,7 +147,7 @@ class PH_Meta_Box_Contact_Relationships {
                     
                 echo '</ul>';
                 
-                $contact_id = $post->ID;
+                $contact_id = $thepostid;
                 
                 $tab = 0;
                 foreach ($owner_profiles as $property_post)
@@ -404,7 +404,7 @@ class PH_Meta_Box_Contact_Relationships {
                         </select></p>
                     <?php
 
-                        // Bedrooms
+                        // Additional Requirement Notes
                         propertyhive_wp_textarea_input( array( 
                             'id' => '_applicant_requirement_notes_' . $key, 
                             'label' => __( 'Additional Requirements', 'propertyhive' ), 
@@ -413,6 +413,26 @@ class PH_Meta_Box_Contact_Relationships {
                             'value' => ( ( isset($applicant_profile['notes']) ) ? $applicant_profile['notes'] : '' )
                         ) );
 
+                        propertyhive_wp_checkbox( array( 
+                            'id' => '_send_matching_properties_' . $key, 
+                            'label' => __( 'Send Matching Properties', 'propertyhive' ), 
+                            'desc_tip' => false, 
+                            'value' => ( ( ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == 'yes' ) || !isset($applicant_profile['send_matching_properties']) ) ? 'yes' : '' )
+                        ) );
+
+                        $auto_property_match = get_option( 'propertyhive_auto_property_match', '' );
+
+                        if ( $auto_property_match == 'yes' )
+                        {
+                            // Auto match emails are enabled. Add ability to disable on per-applicant basis
+                            propertyhive_wp_checkbox( array( 
+                                'id' => '_auto_match_disabled_' . $key, 
+                                'label' => __( 'Disable Auto-Match', 'propertyhive' ), 
+                                'desc_tip' => false, 
+                                'value' => ( ( isset($applicant_profile['auto_match_disabled']) && $applicant_profile['auto_match_disabled'] == 'yes' ) ? 'yes' : '' )
+                            ) );
+                        }
+
                         echo '
 
                         </div>
@@ -420,12 +440,13 @@ class PH_Meta_Box_Contact_Relationships {
                         <div class="actions">
 
                             <a 
-                                href="#TB_inline?width=900&height=550&inlineId=view_matching_properties_' . $key . '" 
-                                class="button thickbox view-matching-properties" 
+                                href="' . admin_url('admin.php?page=ph-matching-properties&contact_id=' . $contact_id . '&applicant_profile=' . $key) . '" 
+                                class="button view-matching-properties-' . $key . '" 
+                                ' . ( ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == '' ) ? ' disabled title="Send Matching Properties not selected"' : '' ) . '
                             >' . __('View Matching Properties', 'propertyhive') . '</a>
 
                             <a 
-                                href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit#propertyhive-contact-relationships' ), $key, 'delete_applicant_relationship' ) . '" 
+                                href="' . wp_nonce_url( admin_url( 'post.php?post=' . $contact_id . '&action=edit#propertyhive-contact-relationships' ), $key, 'delete_applicant_relationship' ) . '" 
                                 class="button"
                                 onclick="var confirmBox = confirm(\'' . __('Are you sure you wish to delete this applicant relationship?', 'propertyhive') . '\'); return confirmBox;"
                             >' . __('Delete Relationship', 'propertyhive') . '</a>
@@ -448,7 +469,7 @@ class PH_Meta_Box_Contact_Relationships {
 
                     <script>
 
-                        var applicant_details_changed = false;
+                        var applicant_details_changed_' . $key . ' = false;
                         jQuery(document).ready(function()
                         {
                             showHideApplicantDepartmentMetaBox_' . $key . '();
@@ -460,29 +481,18 @@ class PH_Meta_Box_Contact_Relationships {
 
                             jQuery(\'.applicant-fields-' . $key . ' input, .applicant-fields-' . $key . ' select, .applicant-fields-' . $key . ' textarea\').change(function()
                             {
-                                applicant_details_changed = true;
+                                applicant_details_changed_' . $key . ' = true;
                             });
 
-                            jQuery(\'a.view-matching-properties.thickbox\').click(function(e)
+                            jQuery(\'a.view-matching-properties-' . $key . '\').click(function(e)
                             {
-                                e.preventDefault();
-
-                                jQuery(\'.matching-properties\').hide();
-                                jQuery(\'.need-to-save-changes\').hide();
-                                jQuery(\'.loading-properties\').show();
-
-                                if (applicant_details_changed)
+                                if (applicant_details_changed_' . $key . ')
                                 {
-                                    jQuery(\'.matching-properties\').hide();
-                                    jQuery(\'.need-to-save-changes\').show();
-                                    jQuery(\'.loading-properties\').hide();
-                                }
-                                else
-                                {
-                                    // Make AJAX request for matching properties
-                                    load_applicant_matching_properties_' . $key . '();
+                                    alert(\'You\\\'ve made changes to the requirements. Please save the changes before viewing matching properties\');
+                                    return false;
                                 }
 
+                                return true;
                             });
                         });
                         
@@ -493,28 +503,7 @@ class PH_Meta_Box_Contact_Relationships {
                              
                             jQuery(\'#propertyhive-applicant-\' + jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . $key . '\\\']:checked\').val() + \'-details-' . $key . '\').show();
                         }
-
-                        function load_applicant_matching_properties_' . $key . '()
-                        {
-                              // Do AJAX request
-                              var data = {
-                                  action:         \'propertyhive_load_applicant_matching_properties\',
-                                  contact_id:        ' . $post->ID . ',
-                                  applicant_profile:     ' . $key . ',
-                                  security:       \'' . wp_create_nonce("load-applicant-matching-properties") . '\',
-                              };
-                    
-                              jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
-
-                                  jQuery(\'#matching_properties_' . $key . '\').html( response );
-
-                                  jQuery(\'.matching-properties\').show();
-                                  jQuery(\'.need-to-save-changes\').hide();
-                                  jQuery(\'.loading-properties\').hide();
-                                  
-                              });
-                        }
-
+                        
                     </script>';
                     ++$tab;
                 }
@@ -639,6 +628,9 @@ class PH_Meta_Box_Contact_Relationships {
                 }
 
                 $applicant_profile['notes'] = $_POST['_applicant_requirement_notes_' . $i];
+
+                $applicant_profile['send_matching_properties'] = ( ( isset($_POST['_send_matching_properties_' . $i]) ) ? $_POST['_send_matching_properties_' . $i] : '' );
+                $applicant_profile['auto_match_disabled'] = ( ( isset($_POST['_auto_match_disabled_' . $i]) ) ? $_POST['_auto_match_disabled_' . $i] : '' );
 
                 update_post_meta( $post_id, '_applicant_profile_' . $i, $applicant_profile );
             }
