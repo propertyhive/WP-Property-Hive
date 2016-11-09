@@ -285,18 +285,18 @@ class PH_Admin_Settings {
 	            case 'text':
 	            case 'email':
 	            case 'number':
-	            //case 'color' :
+	            case 'color' :
 	            case 'password' :
 
 	            	$type 			= $value['type'];
 	            	$class 			= '';
 	            	$option_value 	= self::get_option( $value['id'], $value['default'] );
 
-	            	/*if ( $value['type'] == 'color' ) {
+	            	if ( $value['type'] == 'color' ) {
 	            		$type = 'text';
 	            		$value['class'] .= 'colorpick';
 		            	$description .= '<div id="colorPickerDiv_' . esc_attr( $value['id'] ) . '" class="colorpickdiv" style="z-index: 100;background:#eee;border:1px solid #ccc;position:absolute;display:none;"></div>';
-	            	}*/
+	            	}
 
 	            	?><tr valign="top">
 						<th scope="row" class="titledesc">
