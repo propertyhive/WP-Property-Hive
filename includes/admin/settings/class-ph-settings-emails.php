@@ -140,13 +140,8 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	public function output() {
 		global $current_section;
 
-		// Define emails that can be customised here
-		$mailer          = PH()->mailer();
-		//$email_templates = $mailer->get_emails();
-
 		$settings = $this->get_settings();
 		PH_Admin_Settings::output_fields( $settings );
-		
 	}
 
 	/**
