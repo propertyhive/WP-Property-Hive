@@ -73,36 +73,22 @@ class PH_Admin_Assets {
         $suffix       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
         // Register scripts
-        //wp_register_script( 'propertyhive_admin', PH()->plugin_url() . '/assets/js/admin/propertyhive_admin' . $suffix . '.js', array( 'jquery', 'jquery-blockui', 'jquery-ui-sortable', 'jquery-ui-widget', 'jquery-ui-core', 'jquery-tiptip' ), PH_VERSION );
+        wp_register_script( 'propertyhive_admin', PH()->plugin_url() . '/assets/js/admin/admin' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-tiptip' ), PH_VERSION );
 
-        //wp_register_script( 'jquery-blockui', PH()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js', array( 'jquery' ), '2.66', true );
-
-        //wp_register_script( 'jquery-tiptip', PH()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
-
-        //wp_register_script( 'accounting', PH()->plugin_url() . '/assets/js/admin/accounting' . $suffix . '.js', array( 'jquery' ), '0.3.2' );
-
-        //wp_register_script( 'round', PH()->plugin_url() . '/assets/js/admin/round' . $suffix . '.js', array( 'jquery' ), PH_VERSION );
+        wp_register_script( 'jquery-tiptip', PH()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
 
         wp_register_script( 'propertyhive_admin_meta_boxes', PH()->plugin_url() . '/assets/js/admin/meta-boxes' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker', 'jquery-ui-sortable' ), PH_VERSION );
 
-        wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
+        wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery', 'wp-color-picker' ), PH_VERSION );
 
         wp_register_script( 'ajax-chosen', PH()->plugin_url() . '/assets/js/chosen/ajax-chosen.jquery' . /*$suffix .*/ '.js', array('jquery', 'chosen'), PH_VERSION );
 
         wp_register_script( 'chosen', PH()->plugin_url() . '/assets/js/chosen/chosen.jquery' . /*$suffix .*/ '.js', array('jquery'), PH_VERSION );
 
-        // Accounting
-        //$params = array(
-        //    'mon_decimal_point' => get_option( 'propertyhive_price_decimal_sep' )
-        //);
-
-        //wp_localize_script( 'accounting', 'accounting_params', $params );
-
         // PropertyHive admin pages
-        if ( in_array( $screen->id, ph_get_screen_ids() ) ) {
-
-            /*wp_enqueue_script( 'propertyhive_admin' );
-            wp_enqueue_script( 'iris' );*/
+        if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
+        {
+            wp_enqueue_script( 'propertyhive_admin' );
             wp_enqueue_script( 'ajax-chosen' );
             wp_enqueue_script( 'chosen' );
             wp_enqueue_script( 'jquery-ui-sortable' );
@@ -110,21 +96,8 @@ class PH_Admin_Assets {
             $api_key = get_option('propertyhive_google_maps_api_key');
             wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
             wp_enqueue_script('googlemaps');
-            
-            /*$locale  = localeconv();
-            $decimal = isset( $locale['decimal_point'] ) ? $locale['decimal_point'] : '.';
-
-            $params = array(
-                'i18n_decimal_error'     => sprintf( __( 'Please enter in decimal (%s) format without thousand separators.', 'propertyhive' ), $decimal ),
-                'i18n_mon_decimal_error' => sprintf( __( 'Please enter in monetary decimal (%s) format without thousand separators and currency symbols.', 'propertyhive' ), get_option( 'propertyhive_price_decimal_sep' ) ),
-                'decimal_point'          => $decimal,
-                'mon_decimal_point'      => get_option( 'propertyhive_price_decimal_sep' )
-            );
-
-            wp_localize_script( 'propertyhive_admin', 'propertyhive_admin', $params );*/
         }
 
-        // Edit product category pages
         if ( in_array( $screen->id, array( 'property', 'contact' ) ) )
         {
             wp_enqueue_media();
@@ -147,13 +120,6 @@ class PH_Admin_Assets {
             {
                 wp_enqueue_script( 'chosen-rtl', PH()->plugin_url() . '/assets/js/chosen/chosen-rtl' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
             }
-        }
-        
-        if ( in_array( $screen->id, array( 'contact' ) ) )
-        {
-            wp_enqueue_script( 'jquery-ui-dialog' );
-
-            add_thickbox();
         }
         
         if ( in_array( $screen->id, array( 'property-hive_page_ph-settings' ) ) )
