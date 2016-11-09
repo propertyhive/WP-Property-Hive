@@ -1,5 +1,7 @@
 jQuery( function($){
 
+    $('input.colorpick').wpColorPicker();
+
     $('form').submit(function()
     {
         // Check for confirm removal checkbox

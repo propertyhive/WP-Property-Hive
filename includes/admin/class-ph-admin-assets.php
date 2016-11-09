@@ -46,7 +46,7 @@ class PH_Admin_Assets {
             wp_enqueue_style( 'font_awesome', PH()->plugin_url() . '/assets/css/font-awesome.min.css', array(), PH_VERSION );
             
             wp_enqueue_style( 'jquery-ui-style', '//ajax.googleapis.com/ajax/libs/jqueryui/' . $jquery_version . '/themes/smoothness/jquery-ui.css', array(), PH_VERSION );
-            //wp_enqueue_style( 'wp-color-picker' );
+            wp_enqueue_style( 'wp-color-picker' );
         }
         
         if ( in_array( $screen->id, array( 'property', 'contact' ) ) )
