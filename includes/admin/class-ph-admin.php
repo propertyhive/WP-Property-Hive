@@ -20,9 +20,12 @@ class PH_Admin {
     public function __construct() 
     {
         add_action( 'init', array( $this, 'includes' ) );
+        add_action( 'current_screen', array( $this, 'conditional_includes' ) );
         add_action( 'current_screen', array( $this, 'disable_propertyhive_meta_box_dragging' ) );
         add_action( 'current_screen', array( $this, 'remove_propertyhive_meta_boxes_from_screen_options' ) );
         add_action( 'admin_notices', array( $this, 'review_admin_notices') );
+        add_action( 'admin_init', array( $this, 'view_email' ) );
+        add_action( 'admin_init', array( $this, 'preview_emails' ) );
     }
     
     /**
@@ -40,22 +43,25 @@ class PH_Admin {
         // Classes we only need if the ajax is not-ajax
         if ( ! is_ajax() ) {
             include( 'class-ph-admin-menus.php' );
-            /*include( 'class-ph-admin-welcome.php' );
-            include( 'class-ph-admin-notices.php' );*/
             include( 'class-ph-admin-assets.php' );
-            /*include( 'class-ph-admin-permalink-settings.php' );
-            include( 'class-ph-admin-editor.php' );*/
+        }
+    }
 
-            // Help
-            //if ( apply_filters( 'propertyhive_enable_admin_help_tab', true ) )
-                //include( 'class-ph-admin-help.php' );
+    /**
+     * Include admin files conditionally.
+     */
+    public function conditional_includes() {
+        if ( ! $screen = get_current_screen() ) {
+            return;
         }
 
-        // Importers
-        //if ( defined( 'WP_LOAD_IMPORTERS' ) )
-            //include( 'class-ph-admin-importers.php' );
+        switch ( $screen->id ) {
+            case 'dashboard' :
+                include( 'class-ph-admin-dashboard.php' );
+            break;
+        }
     }
-    
+
     /**
      * Include admin files conditionally
      */
@@ -108,17 +114,90 @@ class PH_Admin {
             }
         }
     }
-    
-    /**
-     * Include admin files conditionally
-     */
-    public function conditonal_includes() {
-        $screen = get_current_screen();
 
-        switch ( $screen->id ) {
-            case 'dashboard' :
-                //include( 'class-ph-admin-dashboard.php' );
-            break;
+    /**
+     * View previously sent email
+     *
+     * @return string
+     */
+    public function view_email() {
+
+        global $wpdb;
+
+        if ( isset( $_GET['view_propertyhive_email'] ) ) 
+        {
+            if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'view-email' ) ) 
+            {
+                die( 'Security check' );
+            }
+
+            if ( isset( $_GET['email_id'] ) )
+            {
+                $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . esc_sql( $_GET['email_id'] ) . "'" );
+                if ( null !== $email_log ) 
+                {
+                    echo apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $email_log->body ) ) );
+                    
+                }
+                else
+                {
+                    die("Email not found");
+                }
+            }
+            
+            exit;
+        }
+    }
+
+    /**
+     * Preview email template.
+     *
+     * @return string
+     */
+    public function preview_emails() {
+        if ( isset( $_GET['preview_propertyhive_email'] ) ) 
+        {
+            if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-properties' ) ) 
+            {
+                die( 'Security check' );
+            }
+
+            // get the preview email content
+            ob_start();
+
+            include( 'views/html-preview-applicant-matches-email.php' );
+
+            $email_property_ids = explode(",", $_POST['email_property_id']);
+
+            $body       = ob_get_clean();
+
+            $body = str_replace("[contact_name]", get_the_title($_GET['contact_id']), $body);
+            $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
+
+            if ( strpos($body, '[properties]') !== FALSE )
+            {
+                ob_start();
+                
+                if ( !empty($email_property_ids) )
+                {
+                    foreach ( $email_property_ids as $email_property_id )
+                    {
+                        $property = new PH_Property((int)$email_property_id);
+                        ph_get_template( 'emails/applicant-match-property.php', array( 'property' => $property ) );
+                    }
+                }
+                $body = str_replace("[properties]", ob_get_clean(), $body);
+            }
+
+            // create a new email
+            $email         = new PH_Emails();
+
+            // wrap the content with the email template and then add styles
+            $message       = apply_filters( 'propertyhive_mail_content', $email->style_inline( $email->wrap_message( $body ) ) );
+
+            // print the preview email
+            echo $message;
+            exit;
         }
     }
 }
