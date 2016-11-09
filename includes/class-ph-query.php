@@ -1169,5 +1169,3 @@ class PH_Query {
 }
 
 endif;
-
-return new PH_Query();

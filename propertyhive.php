@@ -40,6 +40,20 @@ if ( ! class_exists( 'PropertyHive' ) )
          * @var PropertyHive The single instance of the class
          */
         protected static $_instance = null;
+
+        /**
+         * Query instance.
+         *
+         * @var PH_Query
+         */
+        public $query = null;
+
+        /**
+         * Email instance.
+         *
+         * @var PH_Emails
+         */
+        public $email = null;
         
         /**
          * Main PropertyHive Instance
@@ -104,6 +118,7 @@ if ( ! class_exists( 'PropertyHive' ) )
             //add_action( 'widgets_init', array( $this, 'include_widgets' ) );
             add_action( 'init', array( $this, 'init' ), 0 );
             add_action( 'init', array( $this, 'include_template_functions' ) );
+            add_action( 'init', array( $this, 'unsubscribe_contact' ), 0 );
             add_action( 'init', array( 'PH_Shortcodes', 'init' ) );
             add_action( 'after_setup_theme', array( $this, 'setup_environment' ) );
     
@@ -121,8 +136,8 @@ if ( ! class_exists( 'PropertyHive' ) )
         {
             return array_merge( array(
                 '<a href="' . admin_url( 'admin.php?page=ph-settings' ) . '">' . __( 'Settings', 'propertyhive' ) . '</a>',
-                '<a href="' . esc_url( apply_filters( 'propertyhive_url', 'http://wp-property-hive.com/', 'propertyhive' ) ) . '">' . __( 'Website', 'propertyhive' ) . '</a>',
-                //'<a href="' . esc_url( apply_filters( 'propertyhive_support_url', 'http://support.woothemes.com/' ) ) . '">' . __( 'Premium Support', 'propertyhive' ) . '</a>',
+                '<a href="' . esc_url( apply_filters( 'propertyhive_url', 'http://wp-property-hive.com/', 'propertyhive' ) ) . '" target="_blank">' . __( 'Website', 'propertyhive' ) . '</a>',
+                '<a href="' . esc_url( apply_filters( 'propertyhive_addons_url', 'http://wp-property-hive.com/add-ons' ) ) . '" target="_blank">' . __( 'Add Ons', 'propertyhive' ) . '</a>',
             ), $links );
         }
     
@@ -181,6 +196,8 @@ if ( ! class_exists( 'PropertyHive' ) )
         private function includes() {
             include_once( 'includes/ph-core-functions.php' );
             include_once( 'includes/class-ph-install.php' );
+            include_once( 'includes/class-ph-comments.php' );
+            include_once( 'includes/class-ph-emails.php' );
     
             if ( is_admin() ) {
                 include_once( 'includes/admin/class-ph-admin.php' );
@@ -199,10 +216,13 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/class-ph-form-handler.php' );           // Form Handlers
             include_once( 'includes/class-ph-shortcodes.php' );             // Shortcodes class
 
-            $this->query = include( 'includes/class-ph-query.php' );                // The main query class
+            include( 'includes/class-ph-query.php' );                // The main query class
     
             include_once( 'includes/class-ph-post-types.php' );                     // Registers post types
             include_once( 'includes/class-ph-countries.php' );                     // Manages interaction with countries and currency
+
+            $this->query = new PH_Query();
+            $this->email = new PH_Emails();
         }
     
         /**
@@ -235,7 +255,73 @@ if ( ! class_exists( 'PropertyHive' ) )
             /*include_once( 'includes/abstracts/abstract-ph-widget.php' );
             include_once( 'includes/widgets/class-ph-widget-properties.php' );*/
         }
-    
+        
+        /**
+         * Unsubscribe contact if ph_unsubscribe param set in query string. Might be a better place for this
+         */
+        public function unsubscribe_contact() {
+            if ( isset($_GET['ph_unsubscribe']) && !empty($_GET['ph_unsubscribe']) )
+            {
+                $ph_unsubscribe = base64_decode($_GET['ph_unsubscribe']);
+                if ( $ph_unsubscribe === FALSE )
+                {
+                    die("Invalid token passed 1");
+                    return false;
+                }
+
+                $explode_ph_unsubscribe = explode("|", $ph_unsubscribe);
+                if ( count($explode_ph_unsubscribe) != 2 )
+                {
+                    die("Invalid token passed 2");
+                    return false;
+                }
+
+                $contact_id = $explode_ph_unsubscribe[0];
+                if ( FALSE === get_post_status( $contact_id ) )
+                {
+                    die("Invalid token passed 3");
+                    return false;
+                }
+                $contact_email = get_post_meta( $contact_id, '_email_address', TRUE );
+
+                if (md5($contact_email) != $explode_ph_unsubscribe[1])
+                {
+                    die("Invalid token passed 4");
+                    return false;
+                }
+
+                // TODO: Make sure not already unsubscribed
+
+                // We've got this far. We received a valid token and email address
+                $forbidden_contact_methods = get_post_meta( $contact_id, '_forbidden_contact_methods', TRUE );
+                if (!is_array($forbidden_contact_methods))
+                {
+                    $forbidden_contact_methods = array();
+                }
+                $forbidden_contact_methods[] = 'email';
+                update_post_meta( $contact_id, '_forbidden_contact_methods', array_unique($forbidden_contact_methods) );
+
+                // Write note to applicant
+                $comment = array(
+                    'note_type' => 'unsubscribe'
+                );
+
+                $data = array(
+                    'comment_post_ID'      => $contact_id,
+                    'comment_author'       => 'Property Hive',
+                    'comment_author_email' => 'propertyhive@noreply.com',
+                    'comment_author_url'   => '',
+                    'comment_date'         => date("Y-m-d H:i:s"),
+                    'comment_content'      => serialize($comment),
+                    'comment_approved'     => 1,
+                    'comment_type'         => 'propertyhive_note',
+                );
+                wp_insert_comment( $data );
+
+                die("You have been unsubscribed successfully. Please allow up to 24 hours for this to take effect.");
+            }
+        }
+
         /**
          * Init PropertyHive when WordPress Initialises.
          */
@@ -384,55 +470,7 @@ if ( ! class_exists( 'PropertyHive' ) )
                 return esc_url_raw( add_query_arg( 'ph-api', $request, trailingslashit( home_url( '', $scheme ) ) ) );
             }
         }
-    
-        /**
-         * Init the mailer and call the notifications for the current filter.
-         * @internal param array $args (default: array())
-         * @return void
-         */
-        /*public function send_transactional_email() {
-            $this->mailer();
-            $args = func_get_args();
-            do_action_ref_array( current_filter() . '_notification', $args );
-        }*/
-    
-        /** Load Instances on demand **********************************************/
-    
-        /**
-         * Get Checkout Class.
-         *
-         * @return PH_Checkout
-         */
-        /*public function checkout() {
-            return PH_Checkout::instance();
-        }*/
-    
-        /**
-         * Get gateways class
-         *
-         * @return PH_Payment_Gateways
-         */
-        /*public function payment_gateways() {
-            return PH_Payment_Gateways::instance();
-        }*/
-    
-        /**
-         * Get shipping class
-         *
-         * @return PH_Shipping
-         */
-        /*public function shipping() {
-            return PH_Shipping::instance();
-        }*/
-    
-        /**
-         * Email Class.
-         *
-         * @return PH_Email
-         */
-        /*public function mailer() {
-            return PH_Emails::instance();
-        }|*/
+
     }
 
 }
