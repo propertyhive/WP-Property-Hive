@@ -49,6 +49,9 @@ class PH_Admin_Menus {
         add_submenu_page( 'propertyhive', __( 'Third Party Contacts', 'propertyhive' ), __( 'Third Party Contacts', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=thirdparty'/*, array( $this, 'attributes_page' )*/ );
         add_submenu_page( 'propertyhive', __( 'Enquiries', 'propertyhive' ), __( 'Enquiries', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=enquiry'/*, array( $this, 'attributes_page' )*/ );
         //add_submenu_page( 'propertyhive', __( 'Reports', 'propertyhive' ), __( 'Reports', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=reports'/*, array( $this, 'attributes_page' )*/ );
+
+        add_submenu_page( null, __( 'Applicant Matching Properties', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-properties', array($this, 'matching_properties_page'));
+        //remove_submenu_page( 'propertyhive', 'ph-matching-properties' );
     }
 
 	/**
@@ -168,6 +171,15 @@ class PH_Admin_Menus {
 	public function settings_page() {
 		include_once( 'class-ph-admin-settings.php' );
 		PH_Admin_Settings::output();
+	}
+
+	/**
+	 * Init the applicant matching properties page
+	 */
+	public function matching_properties_page() {
+		include_once( 'class-ph-admin-matching-properties.php' );
+		$ph_admin_matching_properties = new PH_Admin_Matching_Properties();
+		$ph_admin_matching_properties->output();
 	}
 
 	/**

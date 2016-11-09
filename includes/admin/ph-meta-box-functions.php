@@ -276,9 +276,9 @@ function propertyhive_wp_checkboxes( $field ) {
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
 	$field['class']         = isset( $field['class'] ) ? $field['class'] : 'checkbox';
 	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
-	$field['value']         = isset( $field['value'] ) ? $field['value'] : get_post_meta( $thepostid, $field['name'], true );
 	$field['name']          = isset( $field['name'] ) ? $field['name'] : $field['id'];
-
+	$field['value']         = isset( $field['value'] ) ? $field['value'] : get_post_meta( $thepostid, $field['name'], true );
+	
 	echo '<fieldset class="form-field ' . esc_attr( $field['wrapper_class'] ) . '"><legend>' . wp_kses_post( $field['label'] ) . '</legend><ul class="ph-radios">';
 
 	foreach ( $field['options'] as $key => $value ) {

@@ -76,9 +76,38 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		// Download permissions
 		//add_action( 'propertyhive_process_product_file_download_paths', array( $this, 'process_product_file_download_paths' ), 10, 3 );*/
 
+		add_action( 'admin_notices', array( $this, 'ph_message_admin_notice') );
+
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
 	}
+
+	public function ph_message_admin_notice()
+    {
+        $message = '';
+
+        if ( isset($_GET['ph_message']) )
+        {
+	        switch ( $_GET['ph_message'] )
+	        {
+	        	case "1": {
+	        		$message = __( 'All done! The selected properties will be emailed to the applicant shortly.', 'propertyhive' );
+	        		break;
+	        	}
+	        	case "2": {
+	        		$message = __( 'Selected properties successfully removed from applicant matches', 'propertyhive' );
+	        		break;
+	        	}
+	        }
+	    }
+
+	    if ( $message != '' )
+	    {
+	        echo "<div class=\"notice notice-success\">
+	            <p>" . $message . "</p>
+	        </div>";
+	    }
+    }
 
 	/**
 	 * Check if we're editing or adding a contact

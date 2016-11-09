@@ -93,7 +93,7 @@ class PH_Install {
 	public function install() {
         
 		$this->create_options();
-		/*$this->create_tables();*/
+		$this->create_tables();
 		$this->create_roles();
         
 		// Register post types
@@ -143,6 +143,8 @@ class PH_Install {
 	public function deactivate() {
 		// Cron jobs
 		wp_clear_scheduled_hook( 'propertyhive_update_currency_exchange_rates' );
+        wp_clear_scheduled_hook( 'propertyhive_process_email_log' );
+        wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
 	}
 
 	/**
@@ -169,13 +171,25 @@ class PH_Install {
 	 * Create cron jobs (clear them first)
 	 */
 	private function create_cron_jobs() {
-		// Cron jobs
+		
+        // Cron jobs
 		wp_clear_scheduled_hook( 'propertyhive_update_currency_exchange_rates' );
+        wp_clear_scheduled_hook( 'propertyhive_process_email_log' );
+        wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
 
 		$ve = get_option( 'gmt_offset' ) > 0 ? '+' : '-';
 
 		// Schedule for midnight as it's likely traffic will be quieter at that time
 		wp_schedule_event( strtotime( '00:00 today ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_update_currency_exchange_rates' );
+        
+        wp_schedule_event( time(), 'hourly', 'propertyhive_process_email_log' );
+
+        $auto_property_match_enabled = get_option( 'propertyhive_auto_property_match', '' );
+
+        if ( $auto_property_match_enabled == 'yes' )
+        {
+            wp_schedule_event( strtotime( '02:00 today ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_auto_email_match' );
+        }
 	}
 
 	/**
@@ -535,34 +549,63 @@ class PH_Install {
         add_option( 'propertyhive_install_timestamp', time(), '', 'no' );
         add_option( 'propertyhive_review_prompt_due_timestamp', strtotime('+30 days'), '', 'no' );
 
+        add_option( 'propertyhive_property_match_default_email_subject', __( 'We found [property_count] that might be of interest to you', 'propertyhive' ), '', 'no' );
+        add_option( 'propertyhive_property_match_default_email_body', __( "Hi [contact_name],
+
+Based on your requirements, we've found [property_count] below that we believe might be suitable for you:
+
+[properties]
+
+If you have any questions or require more information about any of the properties shown above please let me know.
+
+Kind regards, 
+
+" . get_bloginfo('name'), 'propertyhive' ), '', 'no' );
+
 	}
 
 	/**
 	 * Set up the database tables which the plugin needs to function.
 	 *
 	 * Tables:
-	 *		propertyhive_x_table_name - Table description
+	 *		ph_email_log - Queueing table for emails
 	 *
 	 * @access public
 	 * @return void
 	 */
 	private function create_tables() {
-		/*global $wpdb, $propertyhive;
+		global $wpdb, $propertyhive;
 
 		$wpdb->hide_errors();
 
 		$collate = '';
 
 		if ( $wpdb->has_cap( 'collation' ) ) {
-			if ( ! empty($wpdb->charset ) ) {
-				$collate .= "DEFAULT CHARACTER SET $wpdb->charset";
-			}
-			if ( ! empty($wpdb->collate ) ) {
-				$collate .= " COLLATE $wpdb->collate";
-			}
-		}
+            $collate = $wpdb->get_charset_collate();
+        }
 
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );*/
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+        $tables = "
+        CREATE TABLE {$wpdb->prefix}ph_email_log (
+            email_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            contact_id bigint(20) unsigned NOT NULL,
+            property_ids text NOT NULL,
+            applicant_profile_id tinyint(3) unsigned NOT NULL,
+            to_email_address varchar(255) NOT NULL,
+            from_name varchar(255) NOT NULL,
+            from_email_address varchar(255) NOT NULL,
+            subject varchar(255) NOT NULL,
+            body longtext NOT NULL,
+            lock_id varchar(23) NOT NULL,
+            locked_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+            status varchar(5) NOT NULL,
+            send_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+            sent_by bigint(20) unsigned NOT NULL,
+            PRIMARY KEY  (email_id)
+        ) $collate;";
+
+        dbDelta( $tables );
 	}
 
 	/**

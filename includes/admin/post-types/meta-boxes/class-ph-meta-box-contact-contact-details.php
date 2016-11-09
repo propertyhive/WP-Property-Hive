@@ -39,6 +39,15 @@ class PH_Meta_Box_Contact_Contact_Details {
             'description' => __( 'If the contact has multiple email addresses simply separate them using a comma', 'propertyhive' ), 
             'type' => 'text'
         ) );
+
+        propertyhive_wp_checkboxes( array( 
+            'id' => '_forbidden_contact_methods', 
+            'label' => __( 'Do Not Contact Via', 'propertyhive' ), 
+            'options' => array(
+                'telephone' => 'Telephone',
+                'email' => 'Email'
+            )
+        ) );
         
         propertyhive_wp_textarea_input( array( 
             'id' => '_contact_notes', 
@@ -65,6 +74,9 @@ class PH_Meta_Box_Contact_Contact_Details {
         update_post_meta( $post_id, '_telephone_number', $_POST['_telephone_number'] );
         update_post_meta( $post_id, '_email_address', $_POST['_email_address'] );
         update_post_meta( $post_id, '_contact_notes', $_POST['_contact_notes'] );
+        update_post_meta( $post_id, '_forbidden_contact_methods', ( (isset($_POST['_forbidden_contact_methods'])) ? $_POST['_forbidden_contact_methods'] : '' ) );
+
+        do_action( 'propertyhive_save_contact_contact_details', $post_id );
     }
 
 }

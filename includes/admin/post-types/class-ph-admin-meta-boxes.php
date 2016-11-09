@@ -535,6 +535,16 @@ class PH_Admin_Meta_Boxes {
             );
         }
 
+        if ( get_post_type($post->ID) == 'contact' )
+        {
+            $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
+
+            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
+            {
+                add_meta_box( 'propertyhive-contact-notes', __( 'Match History', 'propertyhive' ), 'PH_Meta_Box_Contact_Notes::output', 'contact', 'side' );
+            }
+        } 
+
         // ENQUIRY
         add_meta_box( 'propertyhive-enquiry-record-details', __( 'Record Details', 'propertyhive' ), 'PH_Meta_Box_Enquiry_Record_details::output', 'enquiry', 'normal', 'high' );
         add_meta_box( 'propertyhive-enquiry-details', __( 'Enquiry Details', 'propertyhive' ), 'PH_Meta_Box_Enquiry_details::output', 'enquiry', 'normal', 'high' );
