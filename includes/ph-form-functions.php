@@ -342,10 +342,13 @@ function ph_form_field( $key, $field )
             }
             else
             {
-                $value = get_post_meta( $post->ID, '_' . $key, true );
-                if ( $value != '' )
+                if ( isset($post->ID) )
                 {
-                    $field['value'] = $value;
+                    $value = get_post_meta( $post->ID, '_' . $key, true );
+                    if ( $value != '' )
+                    {
+                        $field['value'] = $value;
+                    }
                 }
             }
             
