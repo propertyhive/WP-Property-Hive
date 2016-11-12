@@ -19,8 +19,6 @@ class PH_Shortcodes {
 	public static function init() {
 		// Define shortcodes
 		$shortcodes = array(
-			/*'property'                    => __CLASS__ . '::property',
-			'property_page'               => __CLASS__ . '::property_page',*/
 			'properties'                   => __CLASS__ . '::properties',
 			'recent_properties'            => __CLASS__ . '::recent_properties',
 			'featured_properties'          => __CLASS__ . '::featured_properties',
@@ -145,7 +143,6 @@ class PH_Shortcodes {
 
 		ob_start();
 
-		//$properties = new WP_Query( apply_filters( 'propertyhive_properties_query', $args, $atts ) );
 		$properties = new WP_Query( apply_filters( 'propertyhive_properties_query', $args, $atts ) );
 
 		$propertyhive_loop['columns'] = $atts['columns'];
