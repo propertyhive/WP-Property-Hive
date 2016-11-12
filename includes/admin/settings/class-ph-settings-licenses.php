@@ -23,8 +23,8 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->id    = 'licenses';
-		$this->label = __( 'Licenses', 'propertyhive' );
+		$this->id    = 'licensekey';
+		$this->label = __( 'License Key', 'propertyhive' );
 
 		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
@@ -38,7 +38,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 */
 	public function get_sections() {
 		$sections = array(
-			'' => __( 'Licenses', 'propertyhive' ),
+			'' => __( 'License Key', 'propertyhive' ),
 		);
 		return apply_filters( 'propertyhive_get_sections_' . $this->id, $sections );
 	}
@@ -49,20 +49,67 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 * @return array
 	 */
 	public function get_settings() {
+
+		$license = PH()->license->get_current_license();
+
+		$output = '';
+		$input_border_color = '';
+		$renew_link = '<a href="" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
+		$valid_license = false;
+
+		if ( isset($license['active']) && $license['active'] != '1' )
+		{
+			$output = '<span style="color:#900">' . __( 'License inactive.', 'propertyhive' ) . '</span>';
+			$input_border_color = '#900';
+		}
+		else
+		{
+			if ( isset($license['expires_at']) && $license['expires_at'] != '' )
+			{
+				if ( strtotime($license['expires_at']) <= time() )
+				{
+					// Expired
+					$output = '<span style="color:#900">' . __( 'License expired on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. ' . $renew_link . '</span>';
+					$input_border_color = '#900';
+				}
+				elseif ( 
+					strtotime($license['expires_at']) > time() &&
+					strtotime($license['expires_at']) < (time() + 30 * 24 * 60 * 60)
+				)
+				{
+					// Expires in less than 30 days
+					$output = '<span style="color:#F90">' . __( 'License expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. ' . $renew_link . '</span>';
+					$input_border_color = '#F90';
+				}
+				elseif (strtotime($license['expires_at']) > time())
+				{
+					// Valid
+					$output = '<span style="color:#090">' . __( 'License valid. Expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '.</span>';
+					$input_border_color = '#090';
+					$valid_license = true;
+				}
+			}
+		}
+
 		$settings = apply_filters( 'propertyhive_licenses_settings', array(
 
-			array( 'title' => __( 'Licenses', 'propertyhive' ), 'type' => 'title', 'id' => 'license_options' ),
+			array( 'title' => __( 'License Key', 'propertyhive' ), 'type' => 'title', 'id' => 'license_options' ),
 
 			array(
-				'title'       => __( 'Header Image URL', 'propertyhive' ),
-				'desc'        => __( 'URL to an image you want to show in the email header. Upload images using the media uploader (Admin > Media).', 'propertyhive' ),
-				'id'          => 'propertyhive_email_header_image',
+				'type'        => 'html',
+				'html' 		  => __( '<p>License keys last for 12 months and mean you continue to receive support and regular updates to purchased add ons during this time.</p>
+
+					<p>Should a license key not exist, your website will still function as it does now, it just means no support or updates will be received for previously purchased add on.</p>
+
+					' . ( (!$valid_license) ? '<br><p><a href="" class="button button-primary" target="_blank">Purchase License Key</a></p>' : '' ), 'propertyhive' ),
+			),
+
+			array(
+				'title'       => __( 'License Key', 'propertyhive' ),
+				'id'          => 'propertyhive_license_key',
 				'type'        => 'text',
-				'css'         => 'min-width:300px;',
-				'placeholder' => 'http://',
-				'default'     => '',
-				'autoload'    => false,
-				'desc_tip'    => true,
+				'css'         => 'min-width:300px; border:1px solid ' . $input_border_color,
+				'desc' 		  => $output,
 			),
 
 			array( 'type' => 'sectionend', 'id' => 'license_options' ),
@@ -87,6 +134,8 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 */
 	public function save() {
 		PH_Admin_Settings::save_fields( $this->get_settings() );
+
+		PH()->license->ph_check_licenses(true);
 	}
 }
 

@@ -66,13 +66,18 @@ class PH_Licenses {
 	 * Automated check for licenses
 	 *
 	 */
-	public function ph_check_licenses()
+	public function ph_check_licenses( $force_check = false )
 	{
 		// Do a maximum of once per week
-		$last_send = get_option( 'propertyhive_last_license_check' );
-		if( is_numeric( $last_send ) && $last_send > strtotime( '-1 week' ) ) {
+		$last_send = get_option( 'propertyhive_last_license_check', '' );
+		if( !$force_check && is_numeric( $last_send ) && $last_send > strtotime( '-1 week' ) ) {
 			return false;
 		}
+
+		update_option( 'propertyhive_last_license_check', time() );
+
+		// Start be removing what we already know about the license
+		update_option( 'propertyhive_license_key_details', '', 'no' );
 
 		$data = array();
 
@@ -95,6 +100,7 @@ class PH_Licenses {
 		$data['url']         = home_url();
 		$data['theme']       = $theme;
 		$data['email']       = get_bloginfo( 'admin_email' );
+		$data['license_key'] = get_option( 'propertyhive_license_key', '' );
 
 		// Retrieve current plugin information
 		if( ! function_exists( 'get_plugins' ) ) {
@@ -115,7 +121,7 @@ class PH_Licenses {
 		$data['inactive_plugins'] = $plugins;
 		$data['locale']           = get_locale();
 
-		$request = wp_remote_post( 'https://wp-property-hive.com/check-licenses.php', array(
+		$request = wp_remote_post( 'http://license.wp-property-hive.com/check-license.php', array(
 			'method'      => 'POST',
 			'timeout'     => 20,
 			'redirection' => 5,
@@ -125,10 +131,25 @@ class PH_Licenses {
 			'user-agent'  => 'PH/' . PH_VERSION . '; ' . get_bloginfo( 'url' )
 		) );
 
-		if( is_wp_error( $request ) ) {
-			return $request;
+		if ( is_wp_error( $request ) || ( !is_wp_error( $request ) && isset($request['body']) && $request['body'] == '' ) )
+		{
+			update_option( 'propertyhive_license_key_details', array(), 'no' );
+			return false;
 		}
 
-		update_option( 'propertyhive_last_license_check', time() );
+		$body = unserialize($request['body']);
+		if ( $body !== FALSE && is_array($body) && !empty($body) )
+		{
+			update_option( 'propertyhive_license_key_details', $body, 'no' );
+		}
+	}
+
+	public function get_current_license()
+	{
+		$license = get_option( 'propertyhive_license_key_details', array() );
+
+		if ( !is_array( $license ) ) { $license = array(); }
+
+		return $license;
 	}
 }

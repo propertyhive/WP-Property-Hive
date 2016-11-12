@@ -224,7 +224,7 @@ if ( ! class_exists( 'PropertyHive' ) )
 
             $this->query = new PH_Query();
             $this->email = new PH_Emails();
-            $this->licenses = new PH_Licenses();
+            $this->license = new PH_Licenses();
         }
     
         /**
