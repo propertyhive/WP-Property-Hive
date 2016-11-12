@@ -145,6 +145,7 @@ class PH_Install {
 		wp_clear_scheduled_hook( 'propertyhive_update_currency_exchange_rates' );
         wp_clear_scheduled_hook( 'propertyhive_process_email_log' );
         wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
+        wp_clear_scheduled_hook( 'propertyhive_check_licenses' );
 	}
 
 	/**
@@ -176,11 +177,12 @@ class PH_Install {
 		wp_clear_scheduled_hook( 'propertyhive_update_currency_exchange_rates' );
         wp_clear_scheduled_hook( 'propertyhive_process_email_log' );
         wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
+        wp_clear_scheduled_hook( 'propertyhive_check_licenses' );
 
 		$ve = get_option( 'gmt_offset' ) > 0 ? '+' : '-';
 
 		// Schedule for midnight as it's likely traffic will be quieter at that time
-		wp_schedule_event( strtotime( '00:00 today ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_update_currency_exchange_rates' );
+		wp_schedule_event( strtotime( '00:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_update_currency_exchange_rates' );
         
         wp_schedule_event( time(), 'hourly', 'propertyhive_process_email_log' );
 
@@ -188,8 +190,12 @@ class PH_Install {
 
         if ( $auto_property_match_enabled == 'yes' )
         {
-            wp_schedule_event( strtotime( '02:00 today ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_auto_email_match' );
+            wp_schedule_event( strtotime( '02:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_auto_email_match' );
         }
+
+        // Schedule for 1am as it's likely traffic will be quieter at that time
+        // 1am so it doesn't run at exactly the same time as the exchange rate cron
+        wp_schedule_event( strtotime( '01:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_check_licenses' );
 	}
 
 	/**

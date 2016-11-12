@@ -198,6 +198,7 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/class-ph-install.php' );
             include_once( 'includes/class-ph-comments.php' );
             include_once( 'includes/class-ph-emails.php' );
+            include_once( 'includes/class-ph-licenses.php' );
     
             if ( is_admin() ) {
                 include_once( 'includes/admin/class-ph-admin.php' );
@@ -223,6 +224,7 @@ if ( ! class_exists( 'PropertyHive' ) )
 
             $this->query = new PH_Query();
             $this->email = new PH_Emails();
+            $this->licenses = new PH_Licenses();
         }
     
         /**
