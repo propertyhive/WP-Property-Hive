@@ -461,6 +461,7 @@ function ph_form_field( $key, $field )
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            $field['options'] = ( isset( $field['options'] ) && is_array( $field['options'] ) ) ? $field['options'] : array();
             
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )

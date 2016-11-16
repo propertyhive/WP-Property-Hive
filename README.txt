@@ -87,6 +87,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 = 1.2.1 =
 * Improve searching by postcode. Now caters for when search by first part of postcode only (e.g. SC1)
 * Added 'blank_option' option to taxonomy form fields, for when no label shown
+* Prevent error from being shown when added dropdown to search form with no options
 
 = 1.2.0 =
 * Applicant matching and emailing introduced
