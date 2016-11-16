@@ -122,7 +122,9 @@ function get_property_map( $args = array() )
 ?>
 <script>
 
+	// We declare both of the above globally so developers can access them
 	var property_map; // Global declaration of the map
+	var property_marker; // Global declaration of the marker
 			
 	function initialize_property_map() {
 				
@@ -141,7 +143,7 @@ function get_property_map( $args = array() )
 			map: property_map,
 			position: myLatlng		
 		};
-		new google.maps.Marker(markerOptions);
+		var property_marker = new google.maps.Marker(markerOptions);
 	}
 		
 	window.onload = initialize_property_map;
