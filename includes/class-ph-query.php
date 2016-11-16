@@ -694,6 +694,8 @@ class PH_Query {
       	
       	if ( isset( $_REQUEST['address_keyword'] ) && $_REQUEST['address_keyword'] != '' )
         {
+        	$_REQUEST['address_keyword'] = trim($_REQUEST['address_keyword']);
+
 	      	$meta_query = array(
 	      		'relation' => 'OR',
 	      		array(
@@ -716,12 +718,28 @@ class PH_Query {
 				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
 				    'compare' => 'LIKE'
 				),
-				array(
+	      	);
+	      	if ( strlen($_REQUEST['address_keyword']) <= 4 )
+	      	{
+	      		$meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
+				    'compare' => '='
+				);
+	      		$meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ) . '[ ]',
+				    'compare' => 'RLIKE'
+				);
+	      	}
+	      	else
+	      	{
+	      		$meta_query[] = array(
 				    'key'     => '_address_postcode',
 				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
 				    'compare' => 'LIKE'
-				),
-	      	);
+				);
+	      	}
       	}
 
 		return $meta_query;
