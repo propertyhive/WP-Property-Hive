@@ -637,6 +637,7 @@ function ph_form_field( $key, $field )
                 $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
                 $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
                 $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+                $field['blank_option'] = isset( $field['blank_option'] ) ? $field['blank_option'] : __( 'No preference', 'propertyhive' );
                 
                 $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
                 if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
@@ -657,7 +658,7 @@ function ph_form_field( $key, $field )
                     class="' . esc_attr( $field['class'] ) . '"
                  >';
 
-                $options = array( '' => __( 'No preference', 'propertyhive' ) );
+                $options = array( '' => $field['blank_option'] );
                 $args = array(
                     'hide_empty' => false,
                     'parent' => 0
