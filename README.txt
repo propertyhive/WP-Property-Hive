@@ -4,7 +4,7 @@ Tags: property, real estate, software, estate agents, estate agent, property man
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.6.1
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -14,25 +14,31 @@ Estate agency software for WP. Market properties on your website, manage contact
 
 Property Hive is the first plugin that aims to bring all of the features you'd normally find in estate agency software into WordPress.
 
-From managing residential and commercial properties, owners and landlords, to tracking applicants and matching them to suitable properties, we want to do it all.
+From managing residential and commercial properties, owners and landlords, to tracking applicants, matching and emailing them suitable properties, we want to do it all.
 
 = Why Property Hive? =
 
 There are many estate agency software options available on the market, but here's why we think you'll love Property Hive:
 
 **Only use the features your business needs**
-By default Property Hive is a property and contact management tool, allowing you to manage your property stock, list properties on your website, record owners details, and store applicants requirements. Through use of premium add-ons however, you can choose which features you want to bolt on. The add-ons fit seamlessly into the existing plugin, and with each other.
+
+By default Property Hive is a property and contact management tool, allowing you to manage your property stock, list properties on your website, record owners details, store applicants requirements and email suitable properties to them.
+
+Through use of premium add-ons however, you can choose which features you want to bolt on. The add ons fit seamlessly into the existing plugin, and with each other.
  
 Want to send your properties to property portals? There's an add-on for that.
+Want to add Draw-A-Search functionality to your website? There's an add-on for that.
 
-Our add-ons are priced individually from just £24.99 meaning you only pay for what you use.
+Our add-ons are priced individually from just £14.99 meaning you only pay for what you use.
 
 You can [view all of our add-ons](http://wp-property-hive.com/add-ons/ "Property Hive Add-Ons") on our website.
 
 **Works with any new or existing theme**
-Property Hive isn't a theme. It's a platform allowing you integrate property search into any website, new or existing. For more details on supported themes [click here](http://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/) or view our [pre-built themes](https://wp-property-hive.com/property-hive-website-themes/).
+
+Property Hive isn't a theme. It's a platform allowing you to integrate property search into any website, new or existing. For more details on supported themes [click here](http://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/) or view our [pre-built themes](https://wp-property-hive.com/property-hive-website-themes/).
 
 **Millions of developers**
+
 Property Hive isn't developed by one person, or a small team. It's built by the world. Property Hive is open-source meaning anyone can contribute, regardless of which country they're in, or how much existing knowledge of the plugin they have already. 
 
 Want to build a new feature? Maybe fix a bug you've found? As long as you have an understanding of PHP and WordPress, or know someone that does, you can make the changes yourself. What's more, your hard work will be received gratefully by everyone else that uses the plugin.
@@ -72,11 +78,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 9. Editing a contact record - The 'Contact Details' tab is where you store contact information for the contact
 10. Editing a contact record - The 'Relationships' tab contains all of the relationships that you have with this contact (i.e. in the event they're a landlord of two properties)
 11. Record an applicants' requirements. Allows for one or more set of requirements in the case where someone is looking to buy and rent.
-12. View a list of properties that match the applicant's requirements.
+12. View a list of properties that match the applicant's requirements. You can them email these properties to the applicant.
 13. Enquiries made on the site are available from within WordPress. Assign them to a negotiator and mark them as 'Closed' once complete.
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.2.1 =
+* Improve searching by postcode. Now caters for when search by first part of postcode only (e.g. SC1)
+* Added 'blank_option' option to taxonomy form fields, for when no label shown
 
 = 1.2.0 =
 * Applicant matching and emailing introduced
