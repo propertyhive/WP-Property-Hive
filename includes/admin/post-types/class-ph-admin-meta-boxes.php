@@ -744,7 +744,7 @@ class PH_Admin_Meta_Boxes {
 			return;
 		}
 
-        if ( $_POST['post_parent'] != '' && $_POST['post_parent'] != '0' )
+        if ( isset($_POST['post_parent']) && $_POST['post_parent'] != '' && $_POST['post_parent'] != '0' )
         {
             global $wpdb;
 
