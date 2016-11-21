@@ -30,23 +30,65 @@
                     &pound;' . number_format($applicant_profile['max_rent']) . ' ' . $applicant_profile['rent_frequency'] . '
                 </div>';
             }
-            if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
+            if ( 
+                isset($applicant_profile['department']) && 
+                ( $applicant_profile['department'] == 'residential-sales' || $applicant_profile['department'] == 'residential-lettings' )
+            )
             {
-                echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                    <strong>Minimum Beds:</strong><br>
-                    ' . $applicant_profile['min_beds'] . '
-                </div>';
-            }
-            if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
-            {
-                $terms = get_terms('property_type', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['property_types']));
-                if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
+                if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
                 {
-                    $sliced_terms = array_slice( $terms, 0, 2 );
                     echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                        <strong>Property Types:</strong><br>
-                        ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ) . '
+                        <strong>Minimum Beds:</strong><br>
+                        ' . $applicant_profile['min_beds'] . '
                     </div>';
+                }
+                if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+                {
+                    $terms = get_terms('property_type', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['property_types']));
+                    if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
+                    {
+                        $sliced_terms = array_slice( $terms, 0, 2 );
+                        echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                            <strong>Property Types:</strong><br>
+                            ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ) . '
+                        </div>';
+                    }
+                }
+            }
+            if ( 
+                isset($applicant_profile['department']) && 
+                ( $applicant_profile['department'] == 'commercial' )
+            )
+            {
+                if ( isset($applicant_profile['available_as']) && is_array($applicant_profile['available_as']) && !empty($applicant_profile['available_as']) )
+                {
+                    $available_as = array();
+                    if ( in_array('sale', $applicant_profile['available_as']) )
+                    {
+                        $available_as[] = 'For Sale';
+                    }
+                    if ( in_array('rent', $applicant_profile['available_as']) )
+                    {
+                        $available_as[] = 'To Rent';
+                    }
+
+                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                        <strong>Available As:</strong><br>
+                        ' . implode(", ", $available_as) .'
+                    </div>';
+                }
+
+                if ( isset($applicant_profile['commercial_property_types']) && is_array($applicant_profile['commercial_property_types']) && !empty($applicant_profile['commercial_property_types']) )
+                {
+                    $terms = get_terms('commercial_property_type', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['commercial_property_types']));
+                    if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
+                    {
+                        $sliced_terms = array_slice( $terms, 0, 2 );
+                        echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                            <strong>Property Types:</strong><br>
+                            ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ) . '
+                        </div>';
+                    }
                 }
             }
             if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
@@ -94,10 +136,25 @@
 
                             echo '<div style="margin-bottom:7px; font-size:15px;">
                                 <strong>' . ( ($property->_department == 'residential-lettings') ? __('Rent', 'propertyhive') : __('Price', 'propertyhive') ) . ': ' . $property->price_qualifier . ' ' . $property->get_formatted_price() . '</strong>
-                                |
-                                ' . $property->bedrooms . ' bed ' . $property->get_property_type() . '
-                                |
-                                ' . $property->get_availability() . '
+                                | ';
+                            if ($property->department != 'commercial')
+                            {
+                                echo $property->bedrooms . ' bed | ';
+                            }
+                            else
+                            {
+                                $floor_area = $property->get_formatted_floor_area();
+                                if ( $floor_area != '' )
+                                {
+                                    echo $floor_area . ' | ';
+                                }
+                            }
+                            $property_type = $property->get_property_type();
+                            if ( $property_type != '' )
+                            {
+                                echo $property_type . ' | ';
+                            }
+                            echo ' ' . $property->get_availability() . '
                             </div>';
 
                             echo '<div style="margin-bottom:7px;">' . strip_tags(get_the_excerpt()) . '</div>';

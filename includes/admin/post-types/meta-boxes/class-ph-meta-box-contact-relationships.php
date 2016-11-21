@@ -116,6 +116,10 @@ class PH_Meta_Box_Contact_Relationships {
                     {
                         $label = __( 'Lettings Applicant', 'propertyhive' );
                     }
+                    elseif ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'commercial' )
+                    {
+                        $label = __( 'Commercial Applicant', 'propertyhive' );
+                    }
                     echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
                         <a href="#tab_applicant_data_' . $key . '">' . $label . '</a>
                     </li>';
@@ -197,17 +201,21 @@ class PH_Meta_Box_Contact_Relationships {
                         $departments = array();
                         if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
                         {
-                            $departments['residential-sales'] = __( 'Buy', 'propertyhive' );
+                            $departments['residential-sales'] = __( 'Residential Sales', 'propertyhive' );
                         }
                         if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
                         {
-                            $departments['residential-lettings'] = __( 'Rent', 'propertyhive' );
+                            $departments['residential-lettings'] = __( 'Residential Lettings', 'propertyhive' );
+                        }
+                        if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+                        {
+                            $departments['commercial'] = __( 'Commercial', 'propertyhive' );
                         }
 
                         $value = ( ( isset($applicant_profile['department']) && $applicant_profile['department'] != '' ) ? $applicant_profile['department'] : get_option( 'propertyhive_primary_department' ));
                         $args = array( 
                             'id' => '_applicant_department_' . $key,
-                            'label' => 'Looking To',
+                            'label' => 'Looking For',
                             'value' => $value,
                             'options' => $departments
                         );
@@ -220,7 +228,7 @@ class PH_Meta_Box_Contact_Relationships {
                         }
                         propertyhive_wp_radio( $args );
                         
-                        echo '<div id="propertyhive-applicant-residential-sales-details-' . $key . '">';
+                        echo '<div class="propertyhive-applicant-residential-sales-details-' . $key . '">';
 
                         // Price
                         propertyhive_wp_text_input( array( 
@@ -237,7 +245,7 @@ class PH_Meta_Box_Contact_Relationships {
 
                         echo '</div>';
 
-                        echo '<div id="propertyhive-applicant-residential-lettings-details-' . $key . '">';
+                        echo '<div class="propertyhive-applicant-residential-lettings-details-' . $key . '">';
 
                         // Rent / Rent Frequency
                         $rent_frequency = ( ( isset($applicant_profile['rent_frequency']) ) ? $applicant_profile['rent_frequency'] : '' );
@@ -258,6 +266,8 @@ class PH_Meta_Box_Contact_Relationships {
 
                         echo '</div>';
 
+                        echo '<div class="propertyhive-applicant-residential-details-' . $key . '">';
+
                         // Bedrooms
                         propertyhive_wp_text_input( array( 
                             'id' => '_applicant_minimum_bedrooms_' . $key, 
@@ -271,7 +281,7 @@ class PH_Meta_Box_Contact_Relationships {
                             'value' => ( ( isset($applicant_profile['min_beds']) ) ? $applicant_profile['min_beds'] : '' )
                         ) );
 
-                        // Types
+                        // Residential Types
                     ?>
                         <p class="form-field"><label for="_applicant_property_types_<?php echo $key; ?>"><?php _e( 'Property Types', 'propertyhive' ); ?></label>
                         <select id="_applicant_property_types_<?php echo $key; ?>" name="_applicant_property_types_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add property types..." class="multiselect attribute_values">
@@ -327,6 +337,88 @@ class PH_Meta_Box_Contact_Relationships {
                             ?>
                         </select></p>
                     <?php
+
+                        echo '</div>'; // end 'propertyhive-applicant-residential-details-' . $key
+
+                        echo '<div class="propertyhive-applicant-commercial-details-' . $key . '">';
+
+                        $args = array( 
+                            'id' => '_applicant_available_as_' . $key,
+                            'label' => 'Available As',
+                            'value' => array('sale', 'rent'),
+                            'options' => array(
+                                'sale' => 'For Sale',
+                                'rent' => 'To Rent'
+                            )
+                        );
+                        if ( isset($applicant_profile['available_as']) && is_array($applicant_profile['available_as']) )
+                        {
+                            $args['value'] = array();
+                            foreach ($applicant_profile['available_as'] as $value)
+                            {
+                                $args['value'][] = $value;
+                            }
+                        }
+                        propertyhive_wp_checkboxes( $args );
+
+                        // Commercial Types
+                    ?>
+                        <p class="form-field"><label for="_applicant_commercial_property_types_<?php echo $key; ?>"><?php _e( 'Property Types', 'propertyhive' ); ?></label>
+                        <select id="_applicant_commercial_property_types_<?php echo $key; ?>" name="_applicant_commercial_property_types_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add property types..." class="multiselect attribute_values">
+                            <?php
+                                $options = array( '' => '' );
+                                $args = array(
+                                    'hide_empty' => false,
+                                    'parent' => 0
+                                );
+                                $terms = get_terms( 'commercial_property_type', $args );
+                                
+                                $selected_values = array();
+                                $term_list = ( ( isset($applicant_profile['commercial_property_types']) ) ? $applicant_profile['commercial_property_types'] : array() );
+                                if ( is_array($term_list) && !empty($term_list) )
+                                {
+                                    foreach ( $term_list as $term_id )
+                                    {
+                                        $selected_values[] = $term_id;
+                                    }
+                                }
+
+                                if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                                {
+                                    foreach ($terms as $term)
+                                    {
+                                        echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                                        if ( in_array( $term->term_id, $selected_values ) )
+                                        {
+                                            echo ' selected';
+                                        }
+                                        echo '>' . esc_html( $term->name ) . '</option>';
+                                        
+                                        $args = array(
+                                            'hide_empty' => false,
+                                            'parent' => $term->term_id
+                                        );
+                                        $subterms = get_terms( 'property_type', $args );
+                                        
+                                        if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                                        {
+                                            foreach ($subterms as $term)
+                                            {
+                                                echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                                                if ( in_array( $term->term_id, $selected_values ) )
+                                                {
+                                                    echo ' selected';
+                                                }
+                                                echo '>- ' . esc_html( $term->name ) . '</option>';
+                                            }
+                                        }
+                                    }
+                                }
+                            ?>
+                        </select></p>
+                    <?php
+
+                        echo '</div>'; // end 'propertyhive-applicant-commercial-details-' . $key
 
                         // Locations
                     ?>
@@ -498,10 +590,32 @@ class PH_Meta_Box_Contact_Relationships {
                         
                         function showHideApplicantDepartmentMetaBox_' . $key . '()
                         {
-                            jQuery(\'#propertyhive-applicant-residential-sales-details-' . $key . '\').hide();
-                            jQuery(\'#propertyhive-applicant-residential-lettings-details-' . $key . '\').hide();
-                             
-                            jQuery(\'#propertyhive-applicant-\' + jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . $key . '\\\']:checked\').val() + \'-details-' . $key . '\').show();
+                            jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').hide();
+                            jQuery(\'.propertyhive-applicant-residential-sales-details-' . $key . '\').hide();
+                            jQuery(\'.propertyhive-applicant-residential-lettings-details-' . $key . '\').hide();
+                            jQuery(\'.propertyhive-applicant-commercial-details-' . $key . '\').hide();
+                            
+                            switch (jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . $key . '\\\']:checked\').val())
+                            {
+                                case "residential-sales":
+                                {
+                                    jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').show();
+                                    jQuery(\'.propertyhive-applicant-residential-sales-details-' . $key . '\').show();
+                                    break;
+                                }
+                                case "residential-lettings":
+                                {
+                                    jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').show();
+                                    jQuery(\'.propertyhive-applicant-residential-lettings-details-' . $key . '\').show();
+                                    break;
+                                }
+                                case "commercial":
+                                {
+                                    jQuery(\'.propertyhive-applicant-commercial-details-' . $key . '\').show();
+                                    break;
+                                }
+                            }
+                            
                         }
                         
                     </script>';
@@ -614,12 +728,25 @@ class PH_Meta_Box_Contact_Relationships {
                     $applicant_profile['max_price_actual'] = $price_actual;
                 }
 
-                $beds = preg_replace("/[^0-9]/", '', $_POST['_applicant_minimum_bedrooms_' . $i]);
-                $applicant_profile['min_beds'] = $beds;
-
-                if ( isset($_POST['_applicant_property_types_' . $i]) && is_array($_POST['_applicant_property_types_' . $i]) && !empty($_POST['_applicant_property_types_' . $i]) )
+                if ( $_POST['_applicant_department_' . $i] == 'residential-sales' || $_POST['_applicant_department_' . $i] == 'residential-lettings' )
                 {
-                    $applicant_profile['property_types'] = $_POST['_applicant_property_types_' . $i];
+                    $beds = preg_replace("/[^0-9]/", '', $_POST['_applicant_minimum_bedrooms_' . $i]);
+                    $applicant_profile['min_beds'] = $beds;
+
+                    if ( isset($_POST['_applicant_property_types_' . $i]) && is_array($_POST['_applicant_property_types_' . $i]) && !empty($_POST['_applicant_property_types_' . $i]) )
+                    {
+                        $applicant_profile['property_types'] = $_POST['_applicant_property_types_' . $i];
+                    }
+                }
+
+                if ( $_POST['_applicant_department_' . $i] == 'commercial' )
+                {
+                    $applicant_profile['available_as'] = ( isset($_POST['_applicant_available_as_' . $i]) && !empty($_POST['_applicant_available_as_' . $i]) ) ? $_POST['_applicant_available_as_' . $i] : array();
+
+                    if ( isset($_POST['_applicant_commercial_property_types_' . $i]) && is_array($_POST['_applicant_commercial_property_types_' . $i]) && !empty($_POST['_applicant_commercial_property_types_' . $i]) )
+                    {
+                        $applicant_profile['commercial_property_types'] = $_POST['_applicant_commercial_property_types_' . $i];
+                    }
                 }
 
                 if ( isset($_POST['_applicant_locations_' . $i]) && is_array($_POST['_applicant_locations_' . $i]) && !empty($_POST['_applicant_locations_' . $i]) )

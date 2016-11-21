@@ -220,27 +220,70 @@ class PH_Admin_Matching_Properties {
                     );
                 }
             }
-            if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
+
+            if ( isset($applicant_profile['department']) && ( $applicant_profile['department'] == 'residential-sales' || $applicant_profile['department'] == 'residential-lettings' ) )
             {
-                $meta_query[] = array(
-                    'key' => '_bedrooms',
-                    'value' => $applicant_profile['min_beds'],
-                    'compare' => '>=',
-                    'type' => 'NUMERIC'
-                );
+                if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
+                {
+                    $meta_query[] = array(
+                        'key' => '_bedrooms',
+                        'value' => $applicant_profile['min_beds'],
+                        'compare' => '>=',
+                        'type' => 'NUMERIC'
+                    );
+                }
+            }
+            if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'commercial' )
+            {
+                if ( isset($applicant_profile['available_as']) && is_array($applicant_profile['available_as']) && !empty($applicant_profile['available_as']) )
+                {
+                    if ( in_array('sale', $applicant_profile['available_as']) && !in_array('rent', $applicant_profile['available_as']) )
+                    {
+                        $meta_query[] = array(
+                            'key' => '_for_sale',
+                            'value' => 'yes',
+                        );
+                    }
+                    if ( !in_array('sale', $applicant_profile['available_as']) && in_array('rent', $applicant_profile['available_as']) )
+                    {
+                        $meta_query[] = array(
+                            'key' => '_to_rent',
+                            'value' => 'yes',
+                        );
+                    }
+                    if ( in_array('sale', $applicant_profile['available_as']) && in_array('rent', $applicant_profile['available_as']) )
+                    {
+                        // Do nothing as both are ticked
+                    }
+                }
             }
             $args['meta_query'] = $meta_query;
 
             // Term query
             $tax_query = array('relation' => 'AND');
-            if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+            if ( isset($applicant_profile['department']) && ( $applicant_profile['department'] == 'residential-sales' || $applicant_profile['department'] == 'residential-lettings' ) )
             {
-                $tax_query[] = array(
-                    'taxonomy' => 'property_type',
-                    'field'    => 'term_id',
-                    'terms'    => $applicant_profile['property_types'],
-                    'operator' => 'IN',
-                );
+                if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+                {
+                    $tax_query[] = array(
+                        'taxonomy' => 'property_type',
+                        'field'    => 'term_id',
+                        'terms'    => $applicant_profile['property_types'],
+                        'operator' => 'IN',
+                    );
+                }
+            }
+            if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'commercial' )
+            {
+                if ( isset($applicant_profile['commercial_property_types']) && is_array($applicant_profile['commercial_property_types']) && !empty($applicant_profile['commercial_property_types']) )
+                {
+                    $tax_query[] = array(
+                        'taxonomy' => 'commercial_property_type',
+                        'field'    => 'term_id',
+                        'terms'    => $applicant_profile['commercial_property_types'],
+                        'operator' => 'IN',
+                    );
+                }
             }
             if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
             {

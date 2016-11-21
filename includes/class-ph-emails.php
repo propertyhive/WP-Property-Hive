@@ -357,8 +357,7 @@ class PH_Emails {
 				$emogrifier = new Emogrifier( $content, $css );
 				$content    = $emogrifier->emogrify();
 			} catch ( Exception $e ) {
-				//$logger = wc_get_logger();
-				//$logger->add( 'emogrifier', $e->getMessage() );
+				die("Error converting CSS styles to be inline. Error as follows: " . $e->getMessage());
 			}
 		}
 		return $content;

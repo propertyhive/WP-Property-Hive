@@ -163,13 +163,9 @@ class PH_Admin {
             }
 
             // get the preview email content
-            ob_start();
-
-            include( 'views/html-preview-applicant-matches-email.php' );
-
             $email_property_ids = explode(",", $_POST['email_property_id']);
 
-            $body       = ob_get_clean();
+            $body = stripslashes($_POST['body']);
 
             $body = str_replace("[contact_name]", get_the_title($_GET['contact_id']), $body);
             $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
@@ -190,10 +186,10 @@ class PH_Admin {
             }
 
             // create a new email
-            $email         = new PH_Emails();
+            $email = new PH_Emails();
 
             // wrap the content with the email template and then add styles
-            $message       = apply_filters( 'propertyhive_mail_content', $email->style_inline( $email->wrap_message( $body ) ) );
+            $message = apply_filters( 'propertyhive_mail_content', $email->style_inline( $email->wrap_message( $body ) ) );
 
             // print the preview email
             echo $message;

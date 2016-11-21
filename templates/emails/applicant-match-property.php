@@ -11,7 +11,17 @@
 		?></td>
 		<td>
 			<h2><a href="<?php echo get_the_permalink( $property->id ); ?>"><?php echo get_the_title( $property->id ); ?></a></h2>
-			<p><strong><?php echo $property->get_formatted_price(); ?></strong> | <?php echo $property->bedrooms . ' bed ' . $property->get_property_type(); ?> | <?php echo $property->get_availability(); ?></p>
+			<p>
+				<strong><?php echo $property->get_formatted_price(); ?></strong> | <?php 
+					if ( $property->department != 'commercial' )
+					{
+						echo $property->bedrooms . ' bed ';
+					}
+					else
+					{
+						echo $property->get_formatted_floor_area() . ' | ';
+					}
+					echo $property->get_property_type(); ?> | <?php echo $property->get_availability(); ?></p>
 			<p><?php echo $property->post_excerpt; ?></p>
 		</td>
 	</tr>
