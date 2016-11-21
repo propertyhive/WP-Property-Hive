@@ -12,7 +12,7 @@
             controlNav: false,
             animationLoop: false,
             slideshow: false,
-            itemWidth: 210,
+            itemWidth: 150,
             itemMargin: 5,
             asNavFor: '#slider'
           });
