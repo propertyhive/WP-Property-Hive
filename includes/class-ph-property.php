@@ -297,7 +297,7 @@ class PH_Property {
 
             // Rent Details
             $rent = $this->get_formatted_commercial_rent();
-            if ( $price != '' )
+            if ( $price != '' && $rent != '' )
             {
                 $price .= '<br>';
             }
