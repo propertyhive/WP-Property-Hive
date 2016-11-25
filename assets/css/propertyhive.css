@@ -25,3 +25,8 @@
 .propertyhive ul.properties li .thumbnail img { max-width:100%; }
 .propertyhive ul.properties li .details { float:right; width:77%; }
 .propertyhive ul.properties li .details h3 { padding:0; margin:0 0 0.3rem; }
+
+.propertyhive-pagination {  }
+.propertyhive-pagination ul { list-style-type:none; margin:0; padding:0; }
+.propertyhive-pagination ul li { display:inline-block; }
+.propertyhive-pagination ul li a {  }
