@@ -13,6 +13,9 @@ global $property;
 ?>
 <div class="summary">
 
-	<?php echo $property->post_excerpt; ?>
+	<?php 
+		echo substr(strip_tags($property->post_excerpt), 0, 300);
+		if ( strlen(strip_tags($property->post_excerpt)) > 300 ) { echo '...'; } 
+	?>
 
 </div>
