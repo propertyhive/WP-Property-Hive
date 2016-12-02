@@ -192,7 +192,7 @@ class PH_Meta_Box_Property_Rooms {
                 
                 jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']\').change(function()
                 {
-                     showHideRoomsMetaBox();
+                     //showHideRoomsMetaBox();
                 });
             });
             

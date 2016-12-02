@@ -170,7 +170,7 @@ class PH_Meta_Box_Property_Description {
                 
                 jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']\').change(function()
                 {
-                     showHideDescriptionsMetaBox();
+                     //showHideDescriptionsMetaBox();
                 });
             });
             
