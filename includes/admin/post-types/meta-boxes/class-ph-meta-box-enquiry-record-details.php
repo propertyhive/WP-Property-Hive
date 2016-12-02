@@ -20,6 +20,8 @@ class PH_Meta_Box_Enquiry_Record_Details {
 	 */
 	public static function output( $post ) {
         global $post, $wpdb, $thepostid;
+
+        wp_nonce_field( 'propertyhive_save_data', 'propertyhive_meta_nonce' );
         
         echo '<div class="propertyhive_meta_box">';
         
@@ -123,12 +125,12 @@ class PH_Meta_Box_Enquiry_Record_Details {
     public static function save( $post_id, $post ) {
         global $wpdb;
 
-        var_dump($_POST['_negotiator_id']); die();
-        
         update_post_meta( $post_id, '_status', $_POST['_status'] );
         update_post_meta( $post_id, '_negotiator_id', $_POST['_negotiator_id'] );
         update_post_meta( $post_id, '_office_id', $_POST['_office_id'] );
         update_post_meta( $post_id, '_source', $_POST['_source'] );
+
+        do_action( 'propertyhive_save_enquiry_record_details', $post_id );
     }
 
 }

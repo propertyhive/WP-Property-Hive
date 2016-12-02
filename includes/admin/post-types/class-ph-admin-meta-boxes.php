@@ -63,7 +63,7 @@ class PH_Admin_Meta_Boxes {
         
         // Save Enquiry Meta Boxes
         add_action( 'propertyhive_process_enquiry_meta', 'PH_Meta_Box_Enquiry_Record_Details::save', 10, 2 );
-        add_action( 'propertyhive_process_enquiry_meta', 'PH_Meta_Box_Enquiry_Details::save', 15, 2 );
+        //add_action( 'propertyhive_process_enquiry_meta', 'PH_Meta_Box_Enquiry_Details::save', 15, 2 );
 
 		// Error handling (for showing errors from meta boxes on next page load)
 		add_action( 'admin_notices', array( $this, 'output_errors' ) );
@@ -723,12 +723,12 @@ class PH_Admin_Meta_Boxes {
 		if ( defined( 'DOING_AUTOSAVE' ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
 			return;
 		}
-		
+
 		// Check the nonce
 		if ( empty( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( $_POST['propertyhive_meta_nonce'], 'propertyhive_save_data' ) ) {
 			return;
-		} 
-
+		}
+        
 		// Check the post being saved == the $post_id to prevent triggering this call for other save_post events
 		if ( empty( $_POST['post_ID'] ) || $_POST['post_ID'] != $post_id ) {
 			return;
@@ -740,7 +740,7 @@ class PH_Admin_Meta_Boxes {
 		}
 
 		// Check the post type
-		if ( ! in_array( $post->post_type, array( 'property', 'contact' ) ) ) {
+		if ( ! in_array( $post->post_type, array( 'property', 'contact', 'enquiry' ) ) ) {
 			return;
 		}
 
