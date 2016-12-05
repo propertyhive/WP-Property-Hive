@@ -110,6 +110,14 @@ class PH_Property {
         {
             return $this->get_furnished();
         }
+        if ( 'parking' == $key ) 
+        {
+            return $this->get_parking();
+        }
+        if ( 'outside_space' == $key ) 
+        {
+            return $this->get_outside_space();
+        }
         if ( 'marketing_flag' == $key ) 
         {
             return $this->get_marketing_flag();
@@ -892,6 +900,42 @@ class PH_Property {
     public function get_furnished()
     {
         $term_list = wp_get_post_terms($this->id, 'furnished', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
+     * Get the parking taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_parking()
+    {
+        $term_list = wp_get_post_terms($this->id, 'parking', array("fields" => "names"));
+        
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            return implode(", ", $term_list);
+        }
+        
+        return '';
+    }
+
+    /**
+     * Get the outside space taxononmy
+     *
+     * @access public
+     * @return string
+     */
+    public function get_outside_space()
+    {
+        $term_list = wp_get_post_terms($this->id, 'outside_space', array("fields" => "names"));
         
         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
         {
