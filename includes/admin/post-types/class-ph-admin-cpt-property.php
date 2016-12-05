@@ -447,13 +447,13 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 					post_type='property'
 				GROUP BY ID
 				",
-				'%' . $wpdb->esc_like( wc_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( wc_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( wc_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( wc_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( wc_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( wc_clean( $term ) ) . '%',
-				'' . $wpdb->esc_like( wc_clean( $term ) ) . ''
+				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
+				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
+				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
+				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
+				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
+				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
+				'' . $wpdb->esc_like( ph_clean( $term ) ) . ''
 			);
 			$search_posts = $wpdb->get_results( $query );
 			$search_posts = wp_list_pluck( $search_posts, 'ID' );
