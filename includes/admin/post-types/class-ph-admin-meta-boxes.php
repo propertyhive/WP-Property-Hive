@@ -513,6 +513,33 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'property'
         );
+
+        /* PROPERTY ENQUIRIES META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-property-enquiries',
+            'title' => __( 'Enquiries', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Enquiries::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_property_enquiries_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+        
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+        
+        $tabs['tab_enquiries'] = array(
+            'name' => __( 'Enquiries', 'propertyhive' ),
+            'metabox_ids' => $ids,
+            'post_type' => 'property'
+        );
         
         //add_meta_box( 'propertyhive-property-notes', __( 'Property Notes', 'propertyhive' ), 'PH_Meta_Box_Property_Notes::output', 'property', 'side' );
         
