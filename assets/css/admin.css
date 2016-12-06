@@ -100,7 +100,6 @@ table.ph_offices .primary input {
     margin: 0;
 }
 
-#poststuff #propertyhive-property-notes .inside { padding:0; margin:0; }
 .add_note {border-top:1px solid #ddd;padding:10px 10px 0;}
 .add_note h4 {margin-top:5px!important;}
 .add_note textarea {width:100%;height:50px;}
