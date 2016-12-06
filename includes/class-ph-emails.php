@@ -16,10 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @author 		PropertyHive
  */
 class PH_Emails {
-
-	/** @var array Array of email notification classes */
-	public $emails;
-
+	
 	/** @var PH_Emails The single instance of the class */
 	protected static $_instance = null;
 
