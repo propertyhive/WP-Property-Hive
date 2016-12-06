@@ -54,7 +54,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
 		$output = '';
 		$input_border_color = '';
-		$renew_link = '<a href="" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
+		$renew_link = '<a href=https://wp-property-hive.com/product/12-month-license-key/"" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
 		$valid_license = false;
 
 		if ( isset($license['active']) && $license['active'] != '1' )
@@ -101,7 +101,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
 					<p>Should a license key not exist, your website will still function as it does now, it just means no support or updates will be received for previously purchased add on.</p>
 
-					' . ( (!$valid_license) ? '<br><p><a href="" class="button button-primary" target="_blank">Purchase License Key</a></p>' : '' ), 'propertyhive' ),
+					' . ( (!$valid_license) ? '<br><p><a href="https://wp-property-hive.com/product/12-month-license-key/" class="button button-primary" target="_blank">Purchase License Key</a></p>' : '' ), 'propertyhive' ),
 			),
 
 			array(
