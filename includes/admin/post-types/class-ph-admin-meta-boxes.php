@@ -232,7 +232,7 @@ class PH_Admin_Meta_Boxes {
 	 */
 	public function add_meta_boxes() {
 	    
-        global $tabs, $post;
+        global $tabs, $post, $pagenow;
         
 		// PROPERTY
 		if (!isset($tabs)) $tabs = array();
@@ -541,8 +541,11 @@ class PH_Admin_Meta_Boxes {
             'post_type' => 'property'
         );
         
-        //add_meta_box( 'propertyhive-property-notes', __( 'Property Notes', 'propertyhive' ), 'PH_Meta_Box_Property_Notes::output', 'property', 'side' );
-        
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            add_meta_box( 'propertyhive-property-notes', __( 'Property Notes', 'propertyhive' ), 'PH_Meta_Box_Property_Notes::output', 'property', 'side' );
+        }
+
         // CONTACT
         add_meta_box( 'propertyhive-contact-correspondence-address', __( 'Correspondence Address', 'propertyhive' ), 'PH_Meta_Box_Contact_Correspondence_Address::output', 'contact', 'normal', 'high' );
         add_meta_box( 'propertyhive-contact-contact-details', __( 'Contact Details', 'propertyhive' ), 'PH_Meta_Box_Contact_Contact_Details::output', 'contact', 'normal', 'high' );
@@ -562,14 +565,9 @@ class PH_Admin_Meta_Boxes {
             );
         }
 
-        if ( get_post_type($post->ID) == 'contact' )
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'contact' )
         {
-            $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-
-            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
-            {
-                add_meta_box( 'propertyhive-contact-notes', __( 'Match History', 'propertyhive' ), 'PH_Meta_Box_Contact_Notes::output', 'contact', 'side' );
-            }
+            add_meta_box( 'propertyhive-contact-notes', __( 'Contact Notes', 'propertyhive' ), 'PH_Meta_Box_Contact_Notes::output', 'contact', 'side' );
         } 
 
         // ENQUIRY
@@ -581,11 +579,16 @@ class PH_Admin_Meta_Boxes {
             'post_type' => 'enquiry'
         );
 
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'enquiry' )
+        {
+            add_meta_box( 'propertyhive-enquiry-notes', __( 'Enquiry Notes', 'propertyhive' ), 'PH_Meta_Box_Enquiry_Notes::output', 'enquiry', 'side' );
+        }
+
         $tabs = apply_filters( 'propertyhive_tabs', $tabs );
 
         // Force order of meta boxes
         $meta_box_ids = array();
-        if ( get_post_type($post->ID) == 'property' || get_post_type($post->ID) == 'contact' || get_post_type($post->ID) == 'enquiry' )
+        if ( in_array(get_post_type($post->ID), array('property', 'contact', 'enquiry')) )
         {
             foreach ( $tabs as $tab_id => $tab_options)
             {

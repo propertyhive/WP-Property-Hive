@@ -52,35 +52,39 @@ jQuery( function($){
     $('ul.ph-tabs li:visible').eq(0).find('a').click();
     
     // Property notes
-    $('#propertyhive-property-notes').on( 'click', 'a.add_note', function() {
-        if ( ! $('textarea#add_property_note').val() ) return;
+    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes').on( 'click', 'a.add_note', function() {
+        if ( ! $('textarea#add_note').val() ) return;
 
         //$('#propertyhive-property-notes').block({ message: null, overlayCSS: { background: '#fff url(' + propertyhive_admin_meta_boxes.plugin_url + '/assets/images/ajax-loader.gif) no-repeat center', opacity: 0.6 } });
         
         var data = {
             action:         'propertyhive_add_note',
             post_id:        propertyhive_admin_meta_boxes.post_id,
-            note:           $('textarea#add_property_note').val(),
+            note:           $('textarea#add_note').val(),
             note_type:      'propertyhive_note',
             security:       propertyhive_admin_meta_boxes.add_note_nonce,
         };
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             $('ul.record_notes').prepend( response );
-            //$('#propertyhive-property-notes').unblock();
-            $('#add_property_note').val('');
+            $('li#no_notes').hide();
+            $('#add_note').val('');
         });
 
         return false;
 
     });
 
-    $('#propertyhive-property-notes').on( 'click', 'a.delete_note', function() {
+    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes').on( 'click', 'a.delete_note', function() {
         
+        var confirm_box = confirm('Are you sure you wish to delete this note?');
+        if (!confirm_box)
+        {
+            return false;
+        }
+
         var note = $(this).closest('li.note');
         
-        //$(note).block({ message: null, overlayCSS: { background: '#fff url(' + propertyhive_admin_meta_boxes.plugin_url + '/assets/images/ajax-loader.gif) no-repeat center', opacity: 0.6 } });
-
         var data = {
             action:         'propertyhive_delete_note',
             note_id:        $(note).attr('rel'),
@@ -89,6 +93,11 @@ jQuery( function($){
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             $(note).remove();
+
+            if ($('ul.record_notes li').length <= 1)
+            {
+                $('li#no_notes').show();
+            }
         });
 
         return false;

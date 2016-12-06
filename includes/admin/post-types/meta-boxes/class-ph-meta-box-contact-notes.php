@@ -28,7 +28,7 @@ class PH_Meta_Box_Contact_Notes {
 
         $notes = get_comments( $args );
 
-        echo '<ul class="record_notes" style="max-height:300px; overflow-y:scroll">';
+        echo '<ul class="record_notes" style="max-height:300px; overflow-y:auto">';
 
         if ( !empty($notes) ) 
         {
@@ -41,6 +41,11 @@ class PH_Meta_Box_Contact_Notes {
                 $note_body = 'Unknown note type';
                 switch ( $comment_content['note_type'] )
                 {
+                    case "note":
+                    {
+                        $note_body = $comment_content['note'];
+                        break;
+                    }
                     case "mailout": 
                     { 
                         if ( isset($comment_content['method']) && $comment_content['method'] == 'email' && isset($comment_content['email_log_id']) )
@@ -69,27 +74,27 @@ class PH_Meta_Box_Contact_Notes {
                     <p class="meta">
                         <abbr class="exact-date" title="<?php echo $note->comment_date_gmt; ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $note->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
                         <?php if ( $note->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $note->comment_author ); ?>
-                        <?php /*<a href="#" class="delete_note"><?php _e( 'Delete note', 'propertyhive' ); ?></a>*/ ?>
+                        <?php if ($comment_content['note_type'] == 'note') { ?><a href="#" class="delete_note"><?php _e( 'Delete', 'propertyhive' ); ?></a><?php } ?>
                     </p>
                 </li>
 <?php
             }
-        } else {
-            echo '<li style="text-align:center;">' . __( 'No property matches performed for this contact yet.', 'propertyhive' ) . '</li>';
         }
+
+        echo '<li id="no_notes" style="text-align:center;' . ( (!empty($notes)) ? 'display:none;' : '' ) . '">' . __( 'There are no notes to display', 'propertyhive' ) . '</li>';
 
         echo '</ul>';
         
-        /*?>
+        ?>
         <div class="add_note">
             <h4><?php _e( 'Add Note', 'propertyhive' ); ?></h4>
             <p>
-                <textarea type="text" name="property_note" id="add_property_note" class="input-text" cols="20" rows="5"></textarea>
+                <textarea type="text" name="note" id="add_note" class="input-text" cols="20" rows="6"></textarea>
             </p>
             <p>
                 <a href="#" class="add_note button"><?php _e( 'Add', 'propertyhive' ); ?></a>
             </p>
         </div>
-        <?php */
+        <?php
     }
 }

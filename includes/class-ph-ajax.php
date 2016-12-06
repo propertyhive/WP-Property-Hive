@@ -203,32 +203,55 @@ class PH_AJAX {
     }
     
 	/**
-	 * Add order note via ajax
+	 * Add note via ajax
 	 */
 	public function add_note() {
     
 		check_ajax_referer( 'add-note', 'security' );
         
 		$post_id   = (int) $_POST['post_id'];
-		$note      = wp_kses_post( trim( stripslashes( $_POST['note'] ) ) );
-		$note_type = $_POST['note_type'];
 
 		if ( $post_id > 0 ) {
-			$property      = new PH_Property( $post_id );
-			$comment_id = $property->add_note( $note );
-            
-            $comment = get_comment($comment_id);
-            
-			echo '<li rel="' . esc_attr( $comment_id ) . '" class="note"><div class="note_content">';
-			echo wpautop( wptexturize( $note ) );
-			echo '</div>
-			<p class="meta">
-			 <abbr class="exact-date" title="' . $comment->comment_date_gmt . ' GMT">' . printf( __( 'added %s ago', 'propertyhive' ), human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ) . '</abbr>
-			 ';
-			 if ( $comment->comment_author !== __( 'PropertyHive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $comment->comment_author );
-			 echo '<a href="#" class="delete_note">'.__( 'Delete note', 'propertyhive' ).'</a>
-			</p>';
-			echo '</li>';
+
+            $current_user = wp_get_current_user();
+
+            $note = wp_kses_post( trim( stripslashes( $_POST['note'] ) ) );
+
+            // Add note/comment to property
+            $comment = array(
+                'note_type' => 'note',
+                'note' => $note
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+
+            if ($comment_id !== FALSE)
+            {            
+                $comment = get_comment($comment_id);
+
+?>
+                <li rel="<?php echo absint( $comment_id ) ; ?>" class="note">
+                    <div class="note_content">
+                        <?php echo wpautop( wptexturize( wp_kses_post( $note ) ) ); ?>
+                    </div>
+                    <p class="meta">
+                        <abbr class="exact-date" title="<?php echo $comment->comment_date_gmt; ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
+                        <?php if ( $comment->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $comment->comment_author ); ?>
+                        <a href="#" class="delete_note"><?php _e( 'Delete', 'propertyhive' ); ?></a>
+                    </p>
+                </li>
+<?php
+            }
 		}
 
 		// Quit out
