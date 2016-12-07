@@ -27,7 +27,8 @@ class PH_AJAX {
 			'search_contacts'   => false,
 			'load_existing_owner_contact'   => false,
             'load_existing_features'   => false,
-			'make_property_enquiry'   => true
+			'make_property_enquiry'   => true,
+            'create_contact_from_enquiry' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -393,6 +394,7 @@ class PH_AJAX {
             $message .= __( 'Property', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] ) . " (" . get_permalink( $_POST['property_id'] ) . ")\n\n";
             
             unset($form_controls['action']);
+            unset($_POST['action']);
             unset($form_controls['property_id']); // Unset so the fields dosn't get shown in the enquiry details
             
             foreach ($form_controls as $key => $control)
@@ -456,6 +458,78 @@ class PH_AJAX {
         
         // Quit out
         die();
+    }
+
+    /**
+     * Create contact from enquiry
+     */
+    public function create_contact_from_enquiry()
+    {
+        global $post;
+
+        $enquiry_post_id = ( (isset($_POST['post_id'])) ? $_POST['post_id'] : '' );
+        $nonce = ( (isset($_POST['security'])) ? $_POST['security'] : '' );
+
+        if ( ! wp_verify_nonce( $nonce, 'create-content-from-enquiry-nonce-' . $enquiry_post_id ) ) 
+        {
+            // This nonce is not valid.
+            die( json_encode( array('error' => 'Invalid nonce. Please refresh and try again') ) ); 
+        }
+
+        $enquiry_meta = get_metadata( 'post', $enquiry_post_id );
+
+        $name = false;
+        $email = false;
+        $telephone = false;
+
+        foreach ($enquiry_meta as $key => $value)
+        {
+            if ( strpos($key, 'name') !== false )
+            {
+                $name = $value[0];
+            }
+            elseif ( strpos($key, 'email') !== false )
+            {
+                $email = $value[0];
+            }
+            elseif ( strpos($key, 'telephone') !== false )
+            {
+                $telephone = $value[0];
+            }
+        }
+
+        if ( $name === false || $email === false )
+        {
+            // This nonce is not valid.
+            die( json_encode( array('error' => 'Name or email address not found') ) );
+        }
+
+        // We've not imported this property before
+        $postdata = array(
+            'post_excerpt'   => '',
+            'post_content'   => '',
+            'post_title'     => utf8_encode(wp_strip_all_tags( $name )),
+            'post_status'    => 'publish',
+            'post_type'      => 'contact',
+            'ping_status'    => 'closed',
+            'comment_status' => 'closed',
+        );
+
+        $contact_post_id = wp_insert_post( $postdata, true );
+
+        if ( is_wp_error( $contact_post_id ) ) 
+        {
+            die( json_encode( array('error' => 'Error creating contact') ) );
+        }
+        elseif ( $contact_post_id == 0 )
+        {
+            die( json_encode( array('error' => 'Error creating contact') ) );
+        }
+
+        if ( $telephone !== FALSE ) { update_post_meta( $contact_post_id, '_telephone_number', $telephone ); }
+        if ( $email !== FALSE ) { update_post_meta( $contact_post_id, '_email_address', $email ); }
+
+        die( json_encode( array('success' => get_edit_post_link($contact_post_id, '')) ) );
     }
 }
 

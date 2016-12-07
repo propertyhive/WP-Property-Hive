@@ -21,6 +21,8 @@ class PH_Meta_Box_Enquiry_Record_Details {
 	public static function output( $post ) {
         global $post, $wpdb, $thepostid;
 
+        $enquiry_post = $post;
+
         wp_nonce_field( 'propertyhive_save_data', 'propertyhive_meta_nonce' );
         
         echo '<div class="propertyhive_meta_box">';
@@ -95,6 +97,8 @@ class PH_Meta_Box_Enquiry_Record_Details {
         }
         
         wp_reset_postdata();
+
+        $post = $enquiry_post;
         
         echo '</select>
             
