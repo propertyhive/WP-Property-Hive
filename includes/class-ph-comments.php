@@ -50,9 +50,9 @@ class PH_Comments {
 		{
 			$screen = get_current_screen();
 
-			if ( isset($screen->id) && in_array( $screen->id, array( 'contact' ) ) )
+			if ( isset($screen->id) && in_array( $screen->id, array( 'property', 'contact', 'enquiry' ) ) )
 			{
-				return $clauses; // Don't hide when viewing contact record
+				return $clauses; // Don't hide when viewing property, contact and enquiry record
 			}
 		}
 

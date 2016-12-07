@@ -1,6 +1,6 @@
 <?php
 /**
- * Property Notes
+ * Enquiry Notes
  *
  * @author      PropertyHive
  * @category    Admin
@@ -11,15 +11,15 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * PH_Meta_Box_Property_Notes
+ * PH_Meta_Box_Enquiryy_Notes
  */
-class PH_Meta_Box_Property_Notes {
+class PH_Meta_Box_Enquiry_Notes {
 
     /**
      * Output the metabox
      */
     public static function output( $post ) {
-        global $wpdb, $propertyhive, $post;
+        global $propertyhive, $post;
 
         $args = array(
             'post_id'   => $post->ID,
@@ -32,7 +32,7 @@ class PH_Meta_Box_Property_Notes {
 
         if ( !empty($notes) ) 
         {
-            foreach( $notes as $note )
+            foreach( $notes as $note ) 
             {
                 $note_classes = array( 'note' );
 
@@ -41,20 +41,6 @@ class PH_Meta_Box_Property_Notes {
                 $note_body = 'Unknown note type';
                 switch ( $comment_content['note_type'] )
                 {
-                    case "mailout": 
-                    { 
-                        if ( isset($comment_content['method']) && $comment_content['method'] == 'email' && isset($comment_content['email_log_id']) )
-                        {
-                            $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . $comment_content['email_log_id'] . "'" );
-                            if ( null !== $email_log ) 
-                            {
-                                $property_ids = unserialize($email_log->property_ids);
-                                $note_body = 'Included in email mailout to ' . get_the_title($email_log->contact_id) . '.';
-                                $note_body .= ' <a href="' . wp_nonce_url( admin_url('?view_propertyhive_email=' . $comment_content['email_log_id'] . '&email_id=' . $comment_content['email_log_id'] ), 'view-email' ) . '" target="_blank">View Email Sent</a>';
-                            }                                
-                        }
-                        break;
-                    }
                     case "note":
                     {
                         $note_body = $comment_content['note'];
@@ -75,8 +61,8 @@ class PH_Meta_Box_Property_Notes {
                 <?php
             }
         }
-
-         echo '<li id="no_notes" style="text-align:center;' . ( (!empty($notes)) ? 'display:none;' : '' ) . '">' . __( 'There are no notes to display', 'propertyhive' ) . '</li>';
+        
+        echo '<li id="no_notes" style="text-align:center;' . ( (!empty($notes)) ? 'display:none;' : '' ) . '">' . __( 'There are no notes to display', 'propertyhive' ) . '</li>';
 
         echo '</ul>';
         
