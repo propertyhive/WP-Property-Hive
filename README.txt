@@ -86,6 +86,8 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 1.2.6 =
 * Added ability to record notes against properties, contacts and enquiries
+* Added ability to create new contact from an enquiry
+* Added ability to edit existing photos, be it changing the alt description or replacing the photo altogether
 * Declared compatibility for WordPress 4.7
 
 = 1.2.5 =
