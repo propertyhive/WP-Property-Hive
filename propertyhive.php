@@ -120,6 +120,7 @@ if ( ! class_exists( 'PropertyHive' ) )
             add_action( 'init', array( $this, 'include_template_functions' ) );
             add_action( 'init', array( $this, 'unsubscribe_contact' ), 0 );
             add_action( 'init', array( 'PH_Shortcodes', 'init' ) );
+            add_action( 'rest_api_init', array( $this, 'rest_api_includes' ) );
             add_action( 'after_setup_theme', array( $this, 'setup_environment' ) );
     
             // Loaded action
@@ -189,7 +190,7 @@ if ( ! class_exists( 'PropertyHive' ) )
                 define( 'PH_TEMPLATE_PATH', $this->template_path() );
             }
         }
-        
+
         /**
          * Include required core files used in admin and on the frontend.
          */
@@ -225,6 +226,12 @@ if ( ! class_exists( 'PropertyHive' ) )
             $this->query = new PH_Query();
             $this->email = new PH_Emails();
             $this->license = new PH_Licenses();
+        }
+
+        public function rest_api_includes()
+        {
+            include_once( 'includes/class-ph-rest-api.php' );
+            $this->rest_api = new PH_Rest_Api();
         }
     
         /**
