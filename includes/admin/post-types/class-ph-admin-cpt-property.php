@@ -489,9 +489,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	}
 
 	/**
-	 * Product column orderby
-	 *
-	 * http://scribu.net/wordpress/custom-sortable-columns.html#comment-4732
+	 * Property column orderby
 	 *
 	 * @access public
 	 * @param mixed $vars

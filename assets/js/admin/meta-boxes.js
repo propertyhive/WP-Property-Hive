@@ -24,18 +24,7 @@ jQuery( function($){
         numberOfMonths: 1,
         showButtonPanel: true
     });
-    
-    // Contact relationship modals
-    /*$( ".open-modal" ).click(function() {
-        $( $(this).attr('href') ).dialog({
-            autoOpen: false,
-            resizable: false,
-            draggable: false
-        });
-        $( $(this).attr('href') ).dialog( "open" );
-        return false;
-    });*/
-    
+
     // TABS
     $('ul.ph-tabs').show();
     $('div.panel-wrap').each(function(){
@@ -51,8 +40,8 @@ jQuery( function($){
     });
     $('ul.ph-tabs li:visible').eq(0).find('a').click();
     
-    // Property notes
-    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes').on( 'click', 'a.add_note', function() {
+    // Notes
+    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes').on( 'click', 'a.add_note', function() {
         if ( ! $('textarea#add_note').val() ) return;
 
         //$('#propertyhive-property-notes').block({ message: null, overlayCSS: { background: '#fff url(' + propertyhive_admin_meta_boxes.plugin_url + '/assets/images/ajax-loader.gif) no-repeat center', opacity: 0.6 } });
@@ -75,7 +64,7 @@ jQuery( function($){
 
     });
 
-    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes').on( 'click', 'a.delete_note', function() {
+    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes').on( 'click', 'a.delete_note', function() {
         
         var confirm_box = confirm('Are you sure you wish to delete this note?');
         if (!confirm_box)

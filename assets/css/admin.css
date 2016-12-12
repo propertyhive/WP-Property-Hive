@@ -64,6 +64,13 @@
 .propertyhive_meta_box .room h3 .handlediv{ background-position:6px 0px!important;height:28px; }
 .propertyhive_meta_box .room h3 strong{line-height:28px;}
 
+.propertyhive_meta_box_actions .form-field { padding:0 !important; margin-bottom:16px; }
+.propertyhive_meta_box_actions .form-field label { float:none; display:block; margin:0 0 3px; width:100%; }
+.propertyhive_meta_box_actions input[type=email], 
+.propertyhive_meta_box_actions input[type=number],
+.propertyhive_meta_box_actions input[type=text] { float:none; }
+.propertyhive_meta_box_actions hr { margin:12px 0; }
+
 ul.record_notes{padding:2px 0 0}
 ul.record_notes li { padding:0 10px; }
 ul.record_notes li .note_content{padding:10px;background:#efefef;position:relative}

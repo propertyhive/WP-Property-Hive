@@ -51,6 +51,7 @@ class PH_Admin_Post_Types {
         include( 'post-types/class-ph-admin-cpt-contact.php' );
         include( 'post-types/class-ph-admin-cpt-enquiry.php' );
         include( 'post-types/class-ph-admin-cpt-office.php' );
+        include( 'post-types/class-ph-admin-cpt-viewing.php' );
 	}
 
 	/**

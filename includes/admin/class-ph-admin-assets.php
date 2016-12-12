@@ -49,7 +49,7 @@ class PH_Admin_Assets {
             wp_enqueue_style( 'wp-color-picker' );
         }
         
-        if ( in_array( $screen->id, array( 'property', 'contact' ) ) )
+        if ( in_array( $screen->id, array( 'property', 'contact', 'viewing' ) ) )
         {
             wp_enqueue_style( 'chosen', PH()->plugin_url() . '/assets/css/chosen.css', array(), PH_VERSION );
         }
@@ -110,7 +110,7 @@ class PH_Admin_Assets {
             wp_enqueue_script('googlemaps');
         }
 
-        if ( in_array( $screen->id, array( 'property', 'contact', 'enquiry' ) ) )
+        if ( in_array( $screen->id, array( 'property', 'contact', 'enquiry', 'viewing' ) ) )
         {
             wp_enqueue_media();
             wp_enqueue_script( 'propertyhive_admin_meta_boxes' );

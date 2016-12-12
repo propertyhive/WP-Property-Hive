@@ -333,6 +333,40 @@ class PH_Post_types {
                 )
             )
         );
+
+        register_post_type( "viewing",
+            apply_filters( 'propertyhive_register_post_type_viewing',
+                array(
+                    'labels' => array(
+                            'name'                  => __( 'Viewings', 'propertyhive' ),
+                            'singular_name'         => __( 'Viewing', 'propertyhive' ),
+                            'menu_name'             => _x( 'Viewings', 'Admin menu name', 'propertyhive' ),
+                            'add_new'               => __( 'Add Viewing', 'propertyhive' ),
+                            'add_new_item'          => __( 'Add New Viewing', 'propertyhive' ),
+                            'edit'                  => __( 'Edit', 'propertyhive' ),
+                            'edit_item'             => __( 'Edit Viewing', 'propertyhive' ),
+                            'new_item'              => __( 'New Viewing', 'propertyhive' ),
+                            'view'                  => __( 'View Viewing', 'propertyhive' ),
+                            'view_item'             => __( 'View Viewing', 'propertyhive' ),
+                            'search_items'          => __( 'Search Viewings', 'propertyhive' ),
+                            'not_found'             => __( 'No viewings found', 'propertyhive' ),
+                            'not_found_in_trash'    => __( 'No viewings found in trash', 'propertyhive' ),
+                            'parent'                => __( 'Parent Viewing', 'propertyhive' )
+                        ),
+                    'public'                => false,
+                    'show_ui'               => true,
+                    'capability_type'       => 'post',
+                    'map_meta_cap'          => true,
+                    'publicly_queryable'    => false,
+                    'exclude_from_search'   => true,
+                    'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
+                    'query_var'             => true,
+                    'supports'              => false,
+                    'show_in_nav_menus'     => false,
+                    'show_in_menu'          => false
+                )
+            )
+        );
         
         do_action( 'propertyhive_after_register_post_types' );
 	}

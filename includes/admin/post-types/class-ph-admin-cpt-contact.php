@@ -378,7 +378,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 	public function contact_filters_query( $query ) {
 		global $typenow, $wp_query;
 
-		if ( 'property' == $typenow ) {
+		if ( 'contact' == $typenow ) {
 
 			/*if ( isset( $query->query_vars['product_type'] ) ) {
 				// Subtypes

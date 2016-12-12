@@ -5,9 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Contact
  *
- * The PropertyHive contact class handles contact data.
+ * The Property Hive contact class handles contact data.
  *
- * @class       PH_Property
+ * @class       PH_Contact
  * @version     1.0.0
  * @package     PropertyHive/Classes
  * @category    Class
@@ -92,38 +92,5 @@ class PH_Contact {
         $this->id                  = $result->ID;
         $this->post_title          = $result->post_title;
         $this->post_status         = $result->post_status;
-    }
-    
-    /**
-     * Adds a note (comment) to the contact
-     *
-     * @access public
-     * @param string $note Note to add
-     * @return id Comment ID
-     */
-    public function add_note( $note ) {
-
-        if ( is_user_logged_in() ) 
-        {
-            $user = get_user_by( 'id', get_current_user_id() );
-        
-            $commentdata = array(
-                'comment_post_ID' => $this->id,
-                'comment_author' => $user->display_name,
-                'comment_author_email' => $user->user_email,
-                'comment_author_url' => '',
-                'comment_content' => $note,
-                'comment_type' => 'propertyhive_note',
-                'comment_parent' => 0,
-                'user_id' => $user->ID,
-                'comment_agent' => 'PropertyHive',
-                'comment_date' => current_time('mysql'),
-                'comment_approved' => 1,
-            );
-            
-            $comment_id = wp_insert_comment( $commentdata );
-            
-            return $comment_id;
-        }
     }
 }
