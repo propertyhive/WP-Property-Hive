@@ -29,6 +29,7 @@ class PH_AJAX {
             'load_existing_features'   => false,
 			'make_property_enquiry'   => true,
             'create_contact_from_enquiry' => false,
+            'get_news' => false
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -530,6 +531,43 @@ class PH_AJAX {
         if ( $email !== FALSE ) { update_post_meta( $contact_post_id, '_email_address', $email ); }
 
         die( json_encode( array('success' => get_edit_post_link($contact_post_id, '')) ) );
+    }
+
+    public function get_news()
+    {
+        $this->json_headers();
+
+        include_once( ABSPATH . WPINC . '/feed.php' );
+
+        $return = array();
+
+        // Get a SimplePie feed object from the specified feed source.
+        $rss = fetch_feed( 'https://wp-property-hive.com/feed/' );
+
+        $maxitems = 0;
+
+        if ( ! is_wp_error( $rss ) ) : // Checks that the object is created correctly
+
+            // Figure out how many total items there are, but limit it to 5. 
+            $maxitems = $rss->get_item_quantity( 5 ); 
+
+            // Build an array of all the items, starting with element 0 (first element).
+            $rss_items = $rss->get_items( 0, $maxitems );
+
+            foreach ( $rss_items as $item )
+            {
+                $return[] = array(
+                    'title' => esc_html( $item->get_title() ),
+                    'permalink' => esc_url( $item->get_permalink() ),
+                    'date' => $item->get_date('F d, Y')
+                );
+            }
+
+        endif;
+
+        echo json_encode($return);
+
+        die();
     }
 }
 

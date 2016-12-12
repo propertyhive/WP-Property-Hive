@@ -73,6 +73,8 @@ class PH_Admin_Assets {
         $suffix       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
         // Register scripts
+        wp_register_script( 'propertyhive_dashboard', PH()->plugin_url() . '/assets/js/admin/dashboard' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
+
         wp_register_script( 'propertyhive_admin', PH()->plugin_url() . '/assets/js/admin/admin' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-tiptip' ), PH_VERSION );
 
         wp_register_script( 'jquery-tiptip', PH()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
@@ -86,6 +88,16 @@ class PH_Admin_Assets {
         wp_register_script( 'chosen', PH()->plugin_url() . '/assets/js/chosen/chosen.jquery' . /*$suffix .*/ '.js', array('jquery'), PH_VERSION );
 
         // PropertyHive admin pages
+        if ( in_array( $screen->id, array( 'dashboard' ) ) )
+        {
+            wp_enqueue_script( 'propertyhive_dashboard' );
+
+            $params = array(
+                'ajax_url'                      => admin_url('admin-ajax.php'),
+            );
+            wp_localize_script( 'propertyhive_dashboard', 'propertyhive_dashboard', $params );
+        }
+
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
         {
             wp_enqueue_script( 'propertyhive_admin' );
