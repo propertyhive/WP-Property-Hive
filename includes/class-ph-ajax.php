@@ -542,7 +542,7 @@ class PH_AJAX {
         $return = array();
 
         // Get a SimplePie feed object from the specified feed source.
-        $rss = fetch_feed( 'https://wp-property-hive.com/feed/' );
+        $rss = fetch_feed( 'https://wp-property-hive.com/category/property-hive-news/feed/' );
 
         $maxitems = 0;
 
