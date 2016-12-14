@@ -51,7 +51,7 @@ global $post, $property;
         
         <?php if ( $property->deposit > 0 ) { ?><li class="deposit"><?php _e( 'Deposit', 'propertyhive' ); echo ': ' . $property->get_formatted_deposit(); ?></li><?php } ?>
         
-        <?php if ( $property->available_date > 0) { ?><li class="available"><?php _e( 'Available', 'propertyhive' ); echo ': ' . $property->get_available_date(); ?></li><?php } ?>
+        <?php if ( $property->available_date != '') { ?><li class="available"><?php _e( 'Available', 'propertyhive' ); echo ': ' . $property->get_available_date(); ?></li><?php } ?>
         
         
         <?php
