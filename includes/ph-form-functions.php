@@ -263,9 +263,9 @@ function propertyhive_enquiry_form()
 {
     $form_controls = ph_get_property_enquiry_form_fields();
     
-    $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', array( 'form_controls' => $form_controls ) );
+    $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
     
-    ph_get_template( 'global/make-enquiry-form.php', $form_controls );
+    ph_get_template( 'global/make-enquiry-form.php', array( 'form_controls' => $form_controls ) );
 }
 
 /**
@@ -627,6 +627,14 @@ function ph_form_field( $key, $field )
             }
             
             $output .= '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . $field['value'] . '">';
+            break;
+        }
+        case "recaptcha": 
+        {
+            $field['site_key'] = isset( $field['site_key'] ) ? $field['site_key'] : '';
+            
+            $output .= '<script src="https://www.google.com/recaptcha/api.js"></script>
+            <div class="g-recaptcha" data-sitekey="' . $field['site_key'] . '"></div>';
             break;
         }
         default:

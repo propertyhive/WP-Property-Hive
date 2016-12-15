@@ -286,28 +286,22 @@ class PH_AJAX {
         
         $return = array();
         
-        
         // Validate
         $errors = array();
-        //if ( ! array_key_exists( 'property_id', $form_controls ) )
-        //{
-        //    $errors[] = __( 'Property ID is a required field and must be supplied when making an enquiry', 'propertyhive' );
-        //}
-        //else
-        //{
-            if ( ! isset( $_POST['property_id'] ) || ( isset( $_POST['property_id'] ) && empty( $_POST['property_id'] ) ) )
-            {
-                $errors[] = __( 'Property ID is a required field and must be supplied when making an enquiry', 'propertyhive' ) . ': ' . $key;
-            }
-            else
-            {
-                $post = get_post($_POST['property_id']);
-                
-                $form_controls = ph_get_property_enquiry_form_fields();
-    
-                $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
-            }
-        //}
+        $form_controls = array();
+        
+        if ( ! isset( $_POST['property_id'] ) || ( isset( $_POST['property_id'] ) && empty( $_POST['property_id'] ) ) )
+        {
+            $errors[] = __( 'Property ID is a required field and must be supplied when making an enquiry', 'propertyhive' ) . ': ' . $key;
+        }
+        else
+        {
+            $post = get_post($_POST['property_id']);
+            
+            $form_controls = ph_get_property_enquiry_form_fields();
+
+            $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
+        }
         
         foreach ( $form_controls as $key => $control )
         {
@@ -322,6 +316,42 @@ class PH_AJAX {
             if ( isset( $control['type'] ) && $control['type'] == 'email' && isset( $_POST[$key] ) && ! empty( $_POST[$key] ) && ! is_email( $_POST[$key] ) )
             {
                 $errors[] = __( 'Invalid email address provided', 'propertyhive' ) . ': ' . $key;
+            }
+            if ( $key == 'recaptcha' )
+            {
+                $secret = isset( $control['secret'] ) ? $control['secret'] : '';
+                $response = isset( $_POST['response'] ) ? $_POST['response'] : '';
+
+                $response = wp_remote_post( 
+                    'https://www.google.com/recaptcha/api/siteverify',
+                    array(
+                        'method' => 'POST',
+                        'body' => array( 'secret' => $site_key, 'response' => $response ),
+                    )
+                );
+                if ( is_wp_error( $response ) ) 
+                {
+                    $errors[] = $response->get_error_message();
+                }
+                else
+                {
+                    $response = json_decode($response['body'], TRUE);
+                    if ( $response === FALSE )
+                    {
+                        $errors[] = 'Error decoding response from reCAPTCHA check';
+                    }
+                    else
+                    {
+                        if ( isset($response['success']) && $response['success'] == true )
+                        {
+
+                        }
+                        else
+                        {
+                            $errors[] = 'Failed reCAPTCHA validation';
+                        }
+                    }
+                }
             }
         }
         
@@ -397,6 +427,8 @@ class PH_AJAX {
             unset($form_controls['action']);
             unset($_POST['action']);
             unset($form_controls['property_id']); // Unset so the fields dosn't get shown in the enquiry details
+            unset($_POST['response']);
+            unset($form_controls['recaptcha']);
             
             foreach ($form_controls as $key => $control)
             {

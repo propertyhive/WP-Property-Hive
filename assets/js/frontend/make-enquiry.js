@@ -11,6 +11,11 @@ jQuery( function($){
             
             var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_make_property_enquiry' });
 
+            if ( $(this).find('#recaptcha-token').length > 0 )
+            {
+                data += '&' + $.param({ 'response': grecaptcha.getResponse() });
+            }
+
             form_obj = $(this);
 
             form_obj.find('#enquirySuccess').hide();
