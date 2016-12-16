@@ -25,6 +25,8 @@ function ph_get_screen_ids() {
         'contact',
         'enquiry',
         'viewing',
+        'offer',
+        'sale',
         'property-hive_page_ph-settings'
     ) );
 }

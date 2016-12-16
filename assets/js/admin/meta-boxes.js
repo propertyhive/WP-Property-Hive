@@ -17,13 +17,8 @@ jQuery( function($){
          revert: true,
          handle: 'label'
      });
-     
-    // DATE PICKER FIELDS
-    $( ".date-picker" ).datepicker({
-        dateFormat: "yy-mm-dd",
-        numberOfMonths: 1,
-        showButtonPanel: true
-    });
+
+    initialise_datepicker();
 
     // TABS
     $('ul.ph-tabs').show();
@@ -41,11 +36,9 @@ jQuery( function($){
     $('ul.ph-tabs li:visible').eq(0).find('a').click();
     
     // Notes
-    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes').on( 'click', 'a.add_note', function() {
+    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes, #propertyhive-offer-notes, #propertyhive-sale-notes').on( 'click', 'a.add_note', function() {
         if ( ! $('textarea#add_note').val() ) return;
-
-        //$('#propertyhive-property-notes').block({ message: null, overlayCSS: { background: '#fff url(' + propertyhive_admin_meta_boxes.plugin_url + '/assets/images/ajax-loader.gif) no-repeat center', opacity: 0.6 } });
-        
+ 
         var data = {
             action:         'propertyhive_add_note',
             post_id:        propertyhive_admin_meta_boxes.post_id,
@@ -64,7 +57,7 @@ jQuery( function($){
 
     });
 
-    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes').on( 'click', 'a.delete_note', function() {
+    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes, #propertyhive-offer-notes, #propertyhive-sale-notes').on( 'click', 'a.delete_note', function() {
         
         var confirm_box = confirm('Are you sure you wish to delete this note?');
         if (!confirm_box)
@@ -96,3 +89,11 @@ jQuery( function($){
     $(".propertyhive_meta_box select.multiselect").chosen();
 
 });
+
+function initialise_datepicker() {
+    jQuery( ".date-picker" ).datepicker({
+        dateFormat: "yy-mm-dd",
+        numberOfMonths: 1,
+        showButtonPanel: true
+    });
+}

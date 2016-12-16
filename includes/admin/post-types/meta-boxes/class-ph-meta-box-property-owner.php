@@ -382,6 +382,8 @@ class PH_Meta_Box_Property_Owner {
                     'post_content'  => '',
                     'post_status'   => 'publish',
                     'post_type'  => 'contact',
+                    'comment_status'    => 'closed',
+                    'ping_status'    => 'closed',
                 );
               
                 // Insert the post into the database

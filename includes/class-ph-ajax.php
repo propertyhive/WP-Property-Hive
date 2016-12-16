@@ -32,6 +32,8 @@ class PH_AJAX {
 			'make_property_enquiry' => true,
             'create_contact_from_enquiry' => false,
             'get_news' => false,
+
+            // Viewing actions
             'book_viewing_property' => false,
             'book_viewing_contact' => false,
             'get_viewing_details_meta_box' => false,
@@ -46,6 +48,24 @@ class PH_AJAX {
             'viewing_feedback_passed_on' => false,
             'get_property_viewings_meta_box' => false,
             'get_contact_viewings_meta_box' => false,
+
+            // Offer actions
+            'record_offer_property' => false,
+            'record_offer_contact' => false,
+            'get_offer_details_meta_box' => false,
+            'get_offer_actions' => false,
+            'get_property_offers_meta_box' => false,
+            'offer_accepted' => false,
+            'offer_declined' => false,
+            'offer_revert_pending' => false,
+            'get_contact_offers_meta_box' => false,
+            
+            // Sale actions
+            'get_sale_details_meta_box' => false,
+            'get_sale_actions' => false,
+            'get_sale_details_meta_box' => false,
+            'get_property_sales_meta_box' => false,
+            'get_contact_sales_meta_box' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -182,6 +202,16 @@ class PH_AJAX {
                 'post_status' => array( 'publish' ),
                 'fields' => 'ids'
             );
+            if ( isset($_POST['contact_type']) && $_POST['contact_type'] != '' )
+            {
+                $args['meta_query'] = array(
+                    array(
+                        'key' => '_contact_types',
+                        'value' => $_POST['contact_type'],
+                        'compare' => 'LIKE',
+                    )
+                );
+            }
             
             add_filter( 'posts_where', array( $this, 'search_contacts_where' ), 10, 2 );
             
@@ -599,7 +629,9 @@ class PH_AJAX {
                   'post_title'    => $title,
                   'post_content'  => '',
                   'post_type'  => 'enquiry',
-                  'post_status'   => 'publish'
+                  'post_status'   => 'publish',
+                  'comment_status'    => 'closed',
+                  'ping_status'    => 'closed',
                 );
                 
                 // Insert the post into the database
@@ -733,6 +765,7 @@ class PH_AJAX {
         die();
     }
 
+    // Viewing related functions
     public function book_viewing_property()
     {
         check_ajax_referer( 'book-viewing', 'security' );
@@ -760,6 +793,8 @@ class PH_AJAX {
                 'post_content'  => '',
                 'post_type'     => 'contact',
                 'post_status'   => 'publish',
+                'comment_status'    => 'closed',
+                'ping_status'    => 'closed',
             );
                     
             // Insert the post into the database
@@ -868,6 +903,8 @@ class PH_AJAX {
                 'post_content'  => '',
                 'post_type'  => 'viewing',
                 'post_status'   => 'publish',
+                'comment_status'    => 'closed',
+                'ping_status'    => 'closed',
             );
                     
             // Insert the post into the database
@@ -952,6 +989,8 @@ class PH_AJAX {
                 'post_content'  => '',
                 'post_type'  => 'viewing',
                 'post_status'   => 'publish',
+                'comment_status'    => 'closed',
+                'ping_status'    => 'closed',
             );
                     
             // Insert the post into the database
@@ -1597,6 +1636,905 @@ class PH_AJAX {
             wp_reset_postdata();
 
         do_action('propertyhive_contact_viewings_fields');
+        
+        echo '</div>';
+        
+        echo '</div>';
+
+        die();
+    }
+
+    // Offer related functions
+    public function record_offer_property()
+    {
+        check_ajax_referer( 'record-offer', 'security' );
+
+        $this->json_headers();
+
+        // TO DO: Should do validation on server side also
+        if (empty($_POST['property_id']))
+        {
+            $return = array('error' => 'No property selected');
+            echo json_encode( $return );
+            die();
+        }
+
+        $property = new PH_Property((int)$_POST['property_id']);
+        
+        $applicant_contact_ids = array();
+
+        // Create applicant record if required
+        if (empty($_POST['applicant_ids']) && !empty($_POST['applicant_name']))
+        {
+            // Need to create contact/applicant
+            $contact_post = array(
+                'post_title'    => wp_strip_all_tags($_POST['applicant_name']),
+                'post_content'  => '',
+                'post_type'     => 'contact',
+                'post_status'   => 'publish',
+                'comment_status'    => 'closed',
+                'ping_status'    => 'closed',
+            );
+                    
+            // Insert the post into the database
+            $contact_post_id = wp_insert_post( $contact_post );
+
+            if ( is_wp_error($contact_post_id) || $contact_post_id == 0 )
+            {
+                $return = array('error' => 'Failed to create contact post. Please try again');
+                echo json_encode( $return );
+                die();
+            }
+
+            update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
+
+            update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
+            update_post_meta( $contact_post_id, '_applicant_profile_0', array( 'department' => $property->department, 'send_matching_properties' => '' ) );
+
+            $applicant_contact_ids[] = $contact_post_id;
+        }
+
+        if (!empty($_POST['applicant_ids']) && empty($_POST['applicant_name']))
+        {
+            // This is an existing contact
+            if ( !is_array($_POST['applicant_ids']) )
+            {
+                $_POST['applicant_ids'] = array($_POST['applicant_ids']);
+            }
+
+            foreach ( $_POST['applicant_ids'] as $applicant_id )
+            {
+                $applicant_contact_ids[] = $applicant_id;
+            }
+        }
+
+        $applicant_contact_ids = array_unique($applicant_contact_ids);
+
+        if ( empty($applicant_contact_ids) )
+        {
+            $return = array('error' => 'No applicant selected, or unable to create applicant record');
+            echo json_encode( $return );
+            die();
+        }
+
+        // Loop through contacts and create one offer each
+        // At the moment it's a 1-to-1 relationship, but might support multiple in the future
+        foreach ( $applicant_contact_ids as $applicant_contact_id )
+        {
+            // Insert offer record
+            $offer_post = array(
+                'post_title'    => '',
+                'post_content'  => '',
+                'post_type'  => 'offer',
+                'post_status'   => 'publish',
+                'comment_status'    => 'closed',
+                'ping_status'    => 'closed',
+            );
+                    
+            // Insert the post into the database
+            $offer_post_id = wp_insert_post( $offer_post );
+
+            if ( is_wp_error($offer_post_id) || $offer_post_id == 0 )
+            {
+                $return = array('error' => 'Failed to create offer post. Please try again');
+                echo json_encode( $return );
+                die();
+            }
+
+            $amount = preg_replace("/[^0-9]/", '', $_POST['amount']);
+            
+            add_post_meta( $offer_post_id, '_offer_date_time', $_POST['offer_date'] . ' ' . $_POST['offer_time'] );
+            add_post_meta( $offer_post_id, '_property_id', $_POST['property_id'] );
+            add_post_meta( $offer_post_id, '_applicant_contact_id', $applicant_contact_id );
+            add_post_meta( $offer_post_id, '_amount', $amount );
+            add_post_meta( $offer_post_id, '_status', 'pending' );
+        }
+
+        $applicant_contacts = array();
+        foreach ( $applicant_contact_ids  as $applicant_contact_id )
+        {
+            $applicant_contacts[] = array(
+                'ID' => $applicant_contact_id,
+                'post_title' => get_the_title($applicant_contact_id),
+                'edit_link' => get_edit_post_link( $applicant_contact_id, '' ),
+            );
+        }
+
+        $return = array('success' => array(
+            'offer' => array(
+                'ID' => $offer_post_id,
+                'edit_link' => get_edit_post_link( $offer_post_id, '' ),
+            ),
+            'applicant_contacts' => $applicant_contacts,
+        ));
+
+        echo json_encode( $return );
+
+        die();
+    }
+
+    public function record_offer_contact()
+    {
+        check_ajax_referer( 'record-offer', 'security' );
+
+        $this->json_headers();
+
+        // TO DO: Should do validation on server side also
+        if (empty($_POST['contact_id']))
+        {
+            $return = array('error' => 'No contact selected');
+            echo json_encode( $return );
+            die();
+        }
+
+        if (empty($_POST['property_ids']))
+        {
+            $return = array('error' => 'No property selected');
+            echo json_encode( $return );
+            die();
+        }
+
+        // Loop through contacts and create one offer each
+        // At the moment it's a 1-to-1 relationship, but might support multiple in the future
+        foreach ( $_POST['property_ids'] as $property_id )
+        {
+            // Insert offer record
+            $offer_post = array(
+                'post_title'    => '',
+                'post_content'  => '',
+                'post_type'  => 'offer',
+                'post_status'   => 'publish',
+                'comment_status'    => 'closed',
+                'ping_status'    => 'closed',
+            );
+                    
+            // Insert the post into the database
+            $offer_post_id = wp_insert_post( $offer_post );
+
+            if ( is_wp_error($offer_post_id) || $offer_post_id == 0 )
+            {
+                $return = array('error' => 'Failed to create offer post. Please try again');
+                echo json_encode( $return );
+                die();
+            }
+
+            $amount = preg_replace("/[^0-9]/", '', $_POST['amount']);
+            
+            add_post_meta( $offer_post_id, '_offer_date_time', $_POST['offer_date'] . ' ' . $_POST['offer_time'] );
+            add_post_meta( $offer_post_id, '_property_id', $property_id );
+            add_post_meta( $offer_post_id, '_applicant_contact_id', $_POST['contact_id'] );
+            add_post_meta( $offer_post_id, '_amount', $amount );
+            add_post_meta( $offer_post_id, '_status', 'pending' );
+        }
+
+        $properties = array();
+        foreach ( $_POST['property_ids'] as $property_id )
+        {
+            $properties[] = array(
+                'ID' => $property_id,
+                'post_title' => get_the_title($property_id),
+                'edit_link' => get_edit_post_link( $property_id, '' ),
+            );
+        }
+
+        $return = array('success' => array(
+            'offer' => array(
+                'ID' => $offer_post_id,
+                'edit_link' => get_edit_post_link( $offer_post_id, '' ),
+            ),
+            'properties' => $properties,
+        ));
+
+        echo json_encode( $return );
+
+        die();
+    }
+
+    public function get_offer_details_meta_box()
+    {
+        check_ajax_referer( 'offer-details-meta-box', 'security' );
+
+        $offer = new PH_Offer((int)$_POST['offer_id']);
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+        if ( $offer->status != '' )
+        {
+            echo '<p class="form-field">
+            
+                <label for="">' . __('Status', 'propertyhive') . '</label>
+                
+                ' . ucwords(str_replace("_", " ", $offer->status)) . '    
+            
+            </p>';
+        }
+
+        $offer_date_time = get_post_meta( $offer->id, $offer->offer_date_time, true );
+        if ( $offer_date_time == '' )
+        {
+            $offer_date_time = date("Y-m-d H:i:s");
+        }
+
+        echo '<p class="form-field offer_date_time_field">
+    
+            <label for="_offer_date">' . __('Offer Date / Time', 'propertyhive') . '</label>
+            
+            <input type="text" id="_offer_date" name="_offer_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="' . date("Y-m-d", strtotime($offer_date_time)) . '">
+            <select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="width:55px">';
+        
+        if ( $offer_date_time == '' )
+        {
+            $value = date("H");
+        }
+        else
+        {
+            $value = date( "H", strtotime( $offer_date_time ) );
+        }
+        for ( $i = 0; $i < 23; ++$i )
+        {
+            $j = str_pad($i, 2, '0', STR_PAD_LEFT);
+            echo '<option value="' . $j . '"';
+            if ($i == $value) { echo ' selected'; }
+            echo '>' . $j . '</option>';
+        }
+        
+        echo '</select>
+        :
+        <select id="_offer_time_minutes" name="_offer_time_minutes" class="select short" style="width:55px">';
+        
+        if ( $offer_date_time == '' )
+        {
+            $value = '';
+        }
+        else
+        {
+            $value = date( "i", strtotime( $offer_date_time ) );
+        }
+        for ( $i = 0; $i < 60; $i+=5 )
+        {
+            $j = str_pad($i, 2, '0', STR_PAD_LEFT);
+            echo '<option value="' . $j . '"';
+            if ($i == $value) { echo ' selected'; }
+            echo '>' . $j . '</option>';
+        }
+        
+        echo '</select>
+            
+        </p>';
+
+        $args = array( 
+            'id' => '_amount', 
+            'label' => __( 'Offer Amount', 'propertyhive' ) . ' (&pound;)', 
+            'desc_tip' => false, 
+            'class' => 'short',
+            'value' => ( is_numeric($offer->amount) ? number_format($offer->amount) : '' ),
+            'custom_attributes' => array(
+                //'style' => 'width:95%; max-width:500px;'
+            )
+        );
+        propertyhive_wp_text_input( $args );
+
+        do_action('propertyhive_offer_details_fields');
+        
+        echo '</div>';
+        
+        echo '</div>';
+
+        die();
+    }
+
+    public function get_offer_actions()
+    {
+        check_ajax_referer( 'offer-actions', 'security' );
+
+        $post_id = $_POST['offer_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        echo '<div class="propertyhive_meta_box" id="propertyhive_offer_actions_meta_box">
+
+        <div class="options_group" style="padding-top:8px;">';
+
+        if ( $status == 'pending' )
+        {
+            echo '<a 
+                    href="#action_panel_offer_accepted" 
+                    class="button offer-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Accept Offer', 'propertyhive') . '</a>';
+            echo '<a 
+                    href="#action_panel_offer_declined" 
+                    class="button offer-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Decline Offer', 'propertyhive') . '</a>';
+        }
+
+        if ( $status == 'accepted' )
+        {
+            // See if a sale has this offer id associated with it
+            $sale_id = get_post_meta( $post_id, '_sale_id', TRUE );
+            if ( $sale_id != '' && get_post_status($sale_id) == 'publish' )
+            {
+                $sale_id = '';
+            }
+
+            if ( $sale_id != '' )
+            {
+                echo '<a 
+                        href="' . get_edit_post_link( $sale_id, '' ) . '" 
+                        class="button"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . __('View Sale', 'propertyhive') . '</a>';
+            }
+            else
+            {
+                echo '<a 
+                        href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' ) . '" 
+                        class="button"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . __('Create Sale', 'propertyhive') . '</a>';
+            }
+        }
+
+        if ( $status == 'declined' )
+        {
+            
+        }
+
+        if ( $status == 'accepted' || $status == 'declined' )
+        {
+            echo '<a 
+                    href="#action_panel_offer_revert_pending" 
+                    class="button offer-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Revert To Pending', 'propertyhive') . '</a>';
+        }
+
+        echo '</div>
+
+        </div>';
+
+        die();
+    }
+
+    public function offer_accepted()
+    {
+        check_ajax_referer( 'offer-actions', 'security' );
+
+        $post_id = $_POST['offer_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'pending' )
+        {
+            update_post_meta( $post_id, '_status', 'accepted' );
+        }
+
+        die();
+    }
+
+    public function offer_declined()
+    {
+        check_ajax_referer( 'offer-actions', 'security' );
+
+        $post_id = $_POST['offer_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'pending' )
+        {
+            update_post_meta( $post_id, '_status', 'declined' );
+        }
+
+        die();
+    }
+
+    public function offer_revert_pending()
+    {
+        check_ajax_referer( 'offer-actions', 'security' );
+
+        $post_id = $_POST['offer_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'accepted' || $status == 'declined' )
+        {
+            update_post_meta( $post_id, '_status', 'pending' );
+        }
+
+        die();
+    }
+
+    public function get_property_offers_meta_box()
+    {
+        check_ajax_referer( 'get_property_offers_meta_box', 'security' );
+
+        global $post;
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+            $args = array(
+                'post_type'   => 'offer', 
+                'nopaging'    => true,
+                'orderby'   => 'meta_value',
+                'order'       => 'DESC',
+                'meta_key'  => '_offer_date_time',
+                'post_status'   => 'publish',
+                'meta_query'  => array(
+                    array(
+                        'key' => '_property_id',
+                        'value' => $_POST['post_id']
+                    )
+                )
+            );
+            $offers_query = new WP_Query( $args );
+
+            if ( $offers_query->have_posts() )
+            {
+                echo '<table style="width:100%">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">' . __( 'Offer Date', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Applicant', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Offer Amount', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Status', 'propertyhive' ) . '</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+                while ( $offers_query->have_posts() )
+                {
+                    $offers_query->the_post();
+
+                    $offer = new PH_Offer(get_the_ID());
+
+                    echo '<tr>';
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a></td>';
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a></td>';
+                        echo '<td style="text-align:left;">' . $offer->get_formatted_amount() . '</td>';
+                        echo '<td style="text-align:left;">';
+                        $status = get_post_meta(get_the_ID(), '_status', TRUE);
+                        echo ucwords(str_replace("_", " ", $status));
+                        echo '</td>';
+                    echo '</tr>';
+                }
+
+                echo '
+                    </tbody>
+                </table>
+                <br>';
+            }
+            else
+            {
+                echo '<p>' . __( 'No offers exist for this property', 'propertyhive') . '</p>';
+            }
+            wp_reset_postdata();
+
+        do_action('propertyhive_property_offers_fields');
+        
+        echo '</div>';
+        
+        echo '</div>';
+
+        die();
+    }
+
+    public function get_contact_offers_meta_box()
+    {
+        check_ajax_referer( 'get_contact_offers_meta_box', 'security' );
+
+        global $post;
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+            $args = array(
+                'post_type'   => 'offer', 
+                'nopaging'    => true,
+                'orderby'   => 'meta_value',
+                'order'       => 'DESC',
+                'post_status'   => 'publish',
+                'meta_key'  => '_offer_date_time',
+                'meta_query'  => array(
+                    array(
+                        'key' => '_applicant_contact_id',
+                        'value' => $_POST['post_id']
+                    )
+                )
+            );
+            $offers_query = new WP_Query( $args );
+
+            if ( $offers_query->have_posts() )
+            {
+                echo '<table style="width:100%">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">' . __( 'Offer Date', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Property', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Property Owner', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Offer Amount', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Status', 'propertyhive' ) . '</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+                while ( $offers_query->have_posts() )
+                {
+                    $offers_query->the_post();
+
+                    $property = new PH_Property((int)get_post_meta(get_the_ID(), '_property_id', TRUE));
+                    $offer = new PH_Offer(get_the_ID());
+
+                    echo '<tr>';
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a></td>';
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a></td>';
+                        echo '<td style="text-align:left;">';
+                        $owner_contact_id = $property->_owner_contact_id;
+                        if ($owner_contact_id !='' && $owner_contact_id != 0)
+                        {
+                            echo get_the_title($owner_contact_id) . '<br>';
+                            echo '<div style="color:#BBB">';
+                            echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
+                            echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+                            echo '</div>';
+                        }
+                        echo '</td>';
+                        echo '<td style="text-align:left;">' . $offer->get_formatted_amount() . '</td>';
+                        echo '<td style="text-align:left;">';
+                        $status = get_post_meta(get_the_ID(), '_status', TRUE);
+                        echo ucwords(str_replace("_", " ", $status));
+                        echo '</td>';
+                    echo '</tr>';
+                }
+
+                echo '
+                    </tbody>
+                </table>
+                <br>';
+            }
+            else
+            {
+                echo '<p>' . __( 'No offers exist for this contact', 'propertyhive') . '</p>';
+            }
+            wp_reset_postdata();
+
+        do_action('propertyhive_contact_offers_fields');
+        
+        echo '</div>';
+        
+        echo '</div>';
+
+        die();
+    }
+
+    // Sale related functions
+    public function get_sale_details_meta_box()
+    {
+        check_ajax_referer( 'sale-details-meta-box', 'security' );
+
+        $sale = new PH_Offer((int)$_POST['sale_id']);
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+        if ( $sale->status != '' )
+        {
+            echo '<p class="form-field">
+            
+                <label for="">' . __('Status', 'propertyhive') . '</label>
+                
+                ' . ucwords(str_replace("_", " ", $sale->status)) . '    
+            
+            </p>';
+        }
+
+        $sale_date_time = get_post_meta( $offer->id, $sale->sale_date_time, true );
+        if ( $sale_date_time == '' )
+        {
+            $sale_date_time = date("Y-m-d H:i:s");
+        }
+
+        echo '<p class="form-field sale_date_field">
+    
+            <label for="_sale_date">' . __('Sale Date', 'propertyhive') . '</label>
+            
+            <input type="text" id="_sale_date" name="_sale_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="' . date("Y-m-d", strtotime($sale_date_time)) . '">
+            
+        </p>';
+
+        $args = array( 
+            'id' => '_amount', 
+            'label' => __( 'Sale Amount', 'propertyhive' ) . ' (&pound;)', 
+            'desc_tip' => false, 
+            'class' => 'short',
+            'value' => ( is_numeric($sale->amount) ? number_format($sale->amount) : '' ),
+            'custom_attributes' => array(
+                //'style' => 'width:95%; max-width:500px;'
+            )
+        );
+        propertyhive_wp_text_input( $args );
+
+        do_action('propertyhive_sale_details_fields');
+        
+        echo '</div>';
+        
+        echo '</div>';
+
+        die();
+    }
+
+    public function get_sale_actions()
+    {
+        check_ajax_referer( 'sale-actions', 'security' );
+
+        $post_id = $_POST['sale_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        echo '<div class="propertyhive_meta_box" id="propertyhive_sale_actions_meta_box">
+
+        <div class="options_group" style="padding-top:8px;">';
+
+        if ( $status == 'current' )
+        {
+            echo '<a 
+                    href="#action_panel_sale_exchanged" 
+                    class="button offer-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Sale Exchanged', 'propertyhive') . '</a>';
+            
+        }
+
+        if ( $status == 'exchanged' )
+        {
+            echo '<a 
+                    href="#action_panel_sale_completed" 
+                    class="button offer-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Sale Completed', 'propertyhive') . '</a>';
+        }
+
+        if ( $status == 'completed' )
+        {
+            
+        }
+
+        if ( $status == 'current' || $status == 'exchanged' )
+        {
+            echo '<a 
+                    href="#action_panel_sale_fallen_through" 
+                    class="button offer-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Sale Fallen Through', 'propertyhive') . '</a>';
+        }
+
+        echo '</div>
+
+        </div>';
+
+        die();
+    }
+
+    public function sale_exchanged()
+    {
+        check_ajax_referer( 'sale-actions', 'security' );
+
+        $post_id = $_POST['sale_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'current' )
+        {
+            update_post_meta( $post_id, '_status', 'exchanged' );
+        }
+
+        die();
+    }
+
+    public function sale_completed()
+    {
+        check_ajax_referer( 'sale-actions', 'security' );
+
+        $post_id = $_POST['sale_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'exchanged' )
+        {
+            update_post_meta( $post_id, '_status', 'completed' );
+        }
+
+        die();
+    }
+
+    public function sale_fallen_through()
+    {
+        check_ajax_referer( 'sale-actions', 'security' );
+
+        $post_id = $_POST['sale_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'current' || $status == 'exchanged' )
+        {
+            update_post_meta( $post_id, '_status', 'fallen_through' );
+        }
+
+        die();
+    }
+
+    public function get_property_sales_meta_box()
+    {
+        check_ajax_referer( 'get_property_sales_meta_box', 'security' );
+
+        global $post;
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+            $args = array(
+                'post_type'   => 'sale', 
+                'nopaging'    => true,
+                'orderby'   => 'meta_value',
+                'order'       => 'DESC',
+                'meta_key'  => '_sale_date_time',
+                'post_status'   => 'publish',
+                'meta_query'  => array(
+                    array(
+                        'key' => '_property_id',
+                        'value' => $_POST['post_id']
+                    )
+                )
+            );
+            $sales_query = new WP_Query( $args );
+
+            if ( $sales_query->have_posts() )
+            {
+                echo '<table style="width:100%">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">' . __( 'Sale Date', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Applicant', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Sale Amount', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Status', 'propertyhive' ) . '</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+                while ( $sales_query->have_posts() )
+                {
+                    $sales_query->the_post();
+
+                    $sale = new PH_Sale(get_the_ID());
+
+                    echo '<tr>';
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a></td>';
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a></td>';
+                        echo '<td style="text-align:left;">' . $sale->get_formatted_amount() . '</td>';
+                        echo '<td style="text-align:left;">';
+                        $status = get_post_meta(get_the_ID(), '_status', TRUE);
+                        echo ucwords(str_replace("_", " ", $status));
+                        echo '</td>';
+                    echo '</tr>';
+                }
+
+                echo '
+                    </tbody>
+                </table>
+                <br>';
+            }
+            else
+            {
+                echo '<p>' . __( 'No sales exist for this property', 'propertyhive') . '</p>';
+            }
+            wp_reset_postdata();
+
+        do_action('propertyhive_property_sales_fields');
+        
+        echo '</div>';
+        
+        echo '</div>';
+
+        die();
+    }
+
+    public function get_contact_sales_meta_box()
+    {
+        check_ajax_referer( 'get_contact_sales_meta_box', 'security' );
+
+        global $post;
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+            $args = array(
+                'post_type'   => 'sale', 
+                'nopaging'    => true,
+                'orderby'   => 'meta_value',
+                'order'       => 'DESC',
+                'post_status'   => 'publish',
+                'meta_key'  => '_sale_date_time',
+                'meta_query'  => array(
+                    array(
+                        'key' => '_applicant_contact_id',
+                        'value' => $_POST['post_id']
+                    )
+                )
+            );
+            $viewings_query = new WP_Query( $args );
+
+            if ( $viewings_query->have_posts() )
+            {
+                echo '<table style="width:100%">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">' . __( 'Offer Date', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Property', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Property Owner', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Offer Amount', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Status', 'propertyhive' ) . '</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+                while ( $viewings_query->have_posts() )
+                {
+                    $viewings_query->the_post();
+
+                    $property = new PH_Property((int)get_post_meta(get_the_ID(), '_property_id', TRUE));
+
+                    echo '<tr>';
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a></td>';
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a></td>';
+                        echo '<td style="text-align:left;">OWNER DETAILS</td>';
+                        echo '<td style="text-align:left;">' . get_post_meta(get_the_ID(), '_amount', TRUE) . '</td>';
+                        echo '<td style="text-align:left;">';
+                        $status = get_post_meta(get_the_ID(), '_status', TRUE);
+                        echo ucwords(str_replace("_", " ", $status));
+                        echo '</td>';
+                    echo '</tr>';
+                }
+
+                echo '
+                    </tbody>
+                </table>
+                <br>';
+            }
+            else
+            {
+                echo '<p>' . __( 'No sales exist for this contact', 'propertyhive') . '</p>';
+            }
+            wp_reset_postdata();
+
+        do_action('propertyhive_contact_sales_fields');
         
         echo '</div>';
         

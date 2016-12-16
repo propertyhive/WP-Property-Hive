@@ -29,7 +29,14 @@ class PH_Meta_Box_Property_Actions {
 		                style="width:100%; margin-bottom:7px; text-align:center" 
 		            >' . __('Book Viewing', 'propertyhive') . '</a>';
 
-		        
+		        if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-sales' )
+		        {
+			        echo '<a 
+			                href="#action_panel_record_offer" 
+			                class="button property-action"
+			                style="width:100%; margin-bottom:7px; text-align:center" 
+			            >' . __('Record Offer', 'propertyhive') . '</a>';
+		        }
 
 	        echo '</div>';
 
@@ -42,9 +49,9 @@ class PH_Meta_Box_Property_Actions {
 
 	    		<div class="form-field">
 
-		            <label for="_viewing_start_time_date">' . __( 'Viewing Date/Time', 'propertyhive' ) . '</label>
+		            <label for="_viewing_start_date">' . __( 'Viewing Date/Time', 'propertyhive' ) . '</label>
 		            
-	            	<input type="text" id="_viewing_start_time_date" name="_viewing_start_time_date" class="date-picker" style="width:50%" placeholder="yyyy-mm-dd" value="' . date("Y-m-d") . '">
+	            	<input type="text" id="_viewing_start_date" name="_viewing_start_date" class="date-picker" style="width:50%" placeholder="yyyy-mm-dd" value="' . date("Y-m-d") . '">
 	            	<select id="_viewing_start_time_hours" name="_viewing_start_time_hours" class="select short" style="max-width:22%">';
 	            	for ( $i = 0; $i <= 23; ++$i )
 	            	{
@@ -110,12 +117,83 @@ class PH_Meta_Box_Property_Actions {
 
 		</div>';
 
-		// Book viewing succes action panel
-        echo '<div id="action_panel_book_viewing_success" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
+		// Record offer action panel
+        echo '<div id="action_panel_record_offer" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
+		             
+    		<div class="options_group">
+
+	    		<div class="form-field">
+
+		            <label for="_offer_date">' . __( 'Offer Date/Time', 'propertyhive' ) . '</label>
+		            
+	            	<input type="text" id="_offer_date" name="_offer_date" class="date-picker" style="width:50%" placeholder="yyyy-mm-dd" value="' . date("Y-m-d") . '">
+	            	<select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="max-width:22%">';
+	            	for ( $i = 0; $i <= 23; ++$i )
+	            	{
+	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
+	            		echo '<option value="' . $j . '"';
+	            		if ( $j == date("H") ) { echo ' selected'; }
+	            		echo '>' . $j . '</option>';
+	            	}
+	            	echo '</select><select id="_offer_time_minutes" name="_offer_time_minutes" class="select short" style="max-width:22%">';
+	            	for ( $i = 0; $i <= 59; $i+=5 )
+	            	{
+	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
+	            		echo '<option value="' . $j . '">' . $j . '</option>';
+	            	}
+	            	echo '</select>
+
+		        </div>
+
+		        <hr>
+
+		        <div class="form-field">
+
+		            <label for="offer_applicant_search">
+		            	<div style="float:right;"><a href="#" id="offer-applicant-search-new-toggle" style="text-decoration:none;">' . __( 'Applicant Doesn\'t Exist', 'propertyhive' ) . '</a></div>
+		            	' . __( 'Applicant', 'propertyhive' ) . '
+		            </label>
+
+		            <div id="offer_existing_applicant_search" style="position:relative">
+
+		            	<input type="text" name="offer_applicant_search" id="offer_applicant_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
+
+		            	<div id="offer_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
+
+		            	<div id="offer_selected_applicants" style="display:none;"></div>
+
+		            </div>
+
+		            <div id="offer_new_applicant" style="display:none">
+		            	<input type="text" name="offer_applicant_name" id="offer_applicant_name" style="width:100%;" placeholder="' . __( 'Enter Applicant Name', 'propertyhive' ) . '">
+		            	<em>Upon booking a new ' . str_replace("-", " ", get_post_meta( $post->ID, '_department', TRUE)) . ' applicant will be created with this name.</em>
+		            </div>
+
+		        </div>
+
+		        <hr>
+
+		        <div class="form-field" style="position:relative">
+
+		            <label for="_offer_amount">' . __( 'Offer Amount', 'propertyhive' ) . ' (&pound;)</label>
+
+		            <input type="text" name="_offer_amount" id="_offer_amount" style="width:100%;">
+
+		        </div>
+
+		        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+		        <a class="button button-primary offer-action-submit" href="#">' . __( 'Record Offer', 'propertyhive' ) . '</a>
+
+			</div>
+
+		</div>';
+
+		// Success action panel
+        echo '<div id="action_panel_success" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
 		             
     		<div class="options_group" style="padding-top:8px;">
 
-    			<div id="book_viewing_success_actions"></div>
+    			<div id="success_actions"></div>
 
     			<a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
 
@@ -123,10 +201,13 @@ class PH_Meta_Box_Property_Actions {
 
     	</div>';
 
+
+
 ?>
 <script>
 
 var viewing_selected_applicants = {};
+var offer_selected_applicants = {};
 
 var viewing_selected_negotiators = {<?php echo get_current_user_id(); ?>: { post_title: '<?php $user_data = get_userdata(get_current_user_id()); echo $user_data->display_name; ?>' } };
 
@@ -144,7 +225,7 @@ jQuery(document).ready(function($)
 		{
 			$(this_href).stop().fadeIn(300, function()
 			{
-				$('input#viewing_applicant_search').focus();
+				//$(this).find('input').eq(0).focus();
 			});
 		});
 	});
@@ -192,6 +273,16 @@ jQuery(document).ready(function($)
 			$(this).text('<?php echo addslashes(__( 'Applicant Doesn\'t Exist', 'propertyhive' )); ?>');
 		}
 	});
+
+	$('#_viewing_start_date').on('keyup keypress', function(e)
+	{
+    	var keyCode = e.charCode || e.keyCode || e.which;
+    	if (keyCode == 13)
+    	{
+      		event.preventDefault();
+      		return false;
+    	}
+  	});
 
 	$('#viewing_applicant_search').on('keyup keypress', function(e)
 	{
@@ -369,12 +460,12 @@ jQuery(document).ready(function($)
 		e.preventDefault();
 
 		// Validation
-		if ($('#_viewing_start_time_date').val() == '')
+		if ($('#_viewing_start_date').val() == '')
 		{
-			$('#_viewing_start_time_date').focus();
-			$('#_viewing_start_time_date').css('transition', 'background 0.6s');
-			$('#_viewing_start_time_date').css('background', '#ff9999');
-			setTimeout(function() { $('#_viewing_start_time_date').css('background', '#FFF'); }, 1000);
+			$('#_viewing_start_date').focus();
+			$('#_viewing_start_date').css('transition', 'background 0.6s');
+			$('#_viewing_start_date').css('background', '#ff9999');
+			setTimeout(function() { $('#_viewing_start_date').css('background', '#FFF'); }, 1000);
 			return false;
 		}
 
@@ -403,16 +494,6 @@ jQuery(document).ready(function($)
 			new_applicant = true;
 		}
 
-		// Don't validate on negotiator becuase it could be an unattended viewing
-		/*if (Object.keys(viewing_selected_negotiators).length == 0)
-		{
-			$('#viewing_negotiator_search').focus();
-			$('#viewing_negotiator_search').css('transition', 'background 0.6s');
-			$('#viewing_negotiator_search').css('background', '#ff9999');
-			setTimeout(function() { $('#viewing_negotiator_search').css('background', '#FFF'); }, 1000);
-			return false;
-		}*/
-
 		$(this).attr('disabled', 'disabled');
 		$(this).text('Booking...');
 
@@ -420,7 +501,7 @@ jQuery(document).ready(function($)
 		var data = {
             action:         'propertyhive_book_viewing_property',
             property_id:    <?php echo $post->ID; ?>,
-            start_date: 	$('#_viewing_start_time_date').val(),
+            start_date: 	$('#_viewing_start_date').val(),
             start_time: 	$('#_viewing_start_time_hours').val() + ':' + $('#_viewing_start_time_minutes').val() + ':00',
             applicant_name: ( (new_applicant) ? $('#viewing_applicant_name').val() : '' ),
             applicant_ids: 	( (!new_applicant) ? Object.keys(viewing_selected_applicants) : '' ),
@@ -437,18 +518,18 @@ jQuery(document).ready(function($)
         	}
         	if (response.success)
         	{
-        		$('#book_viewing_success_actions').html('');
+        		$('#success_actions').html('');
 
-        		$('#book_viewing_success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Viewing</a>');
+        		$('#success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Viewing</a>');
         		
         		for ( var i in response.success.applicant_contacts )
         		{
-        			$('#book_viewing_success_actions').append('<a href="' + response.success.applicant_contacts[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Applicant - ' + response.success.applicant_contacts[i].post_title + '</a>');
+        			$('#success_actions').append('<a href="' + response.success.applicant_contacts[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Applicant - ' + response.success.applicant_contacts[i].post_title + '</a>');
         		}
 
         		$('#action_panel_book_viewing').stop().fadeOut(300, function()
 				{
-					$('#action_panel_book_viewing_success').stop().fadeIn(300);
+					$('#action_panel_success').stop().fadeIn(300);
 				});
         	}
 
@@ -457,6 +538,231 @@ jQuery(document).ready(function($)
         });
 	});
 
+
+
+
+
+
+
+	// offer specific actions
+	$('a#offer-applicant-search-new-toggle').click(function(e)
+	{
+		e.preventDefault();
+
+		if ($('#offer_existing_applicant_search').css('display') == 'block')
+		{
+			$('#offer_existing_applicant_search').stop().fadeOut(300, function()
+			{
+				$('#offer_new_applicant').stop().fadeIn(300, function()
+				{
+					$('input#offer_applicant_name').focus();
+				});
+			});
+
+			$(this).text('<?php echo __( 'Search Existing Applicants', 'propertyhive' ); ?>');
+		}
+		else
+		{
+			$('#offer_new_applicant').stop().fadeOut(300, function()
+			{
+				$('#offer_existing_applicant_search').stop().fadeIn(300, function()
+				{
+					$('input#offer_applicant_search').focus();
+				});
+			});
+
+			$(this).text('<?php echo addslashes(__( 'Applicant Doesn\'t Exist', 'propertyhive' )); ?>');
+		}
+	});
+
+	$('#_offer_date').on('keyup keypress', function(e)
+	{
+    	var keyCode = e.charCode || e.keyCode || e.which;
+    	if (keyCode == 13)
+    	{
+      		event.preventDefault();
+      		return false;
+    	}
+  	});
+
+	$('#offer_applicant_search').on('keyup keypress', function(e)
+	{
+    	var keyCode = e.charCode || e.keyCode || e.which;
+    	if (keyCode == 13)
+    	{
+      		event.preventDefault();
+      		return false;
+    	}
+  	});
+
+  	$('#_offer_amount').on('keyup keypress', function(e)
+	{
+    	var keyCode = e.charCode || e.keyCode || e.which;
+    	if (keyCode == 13)
+    	{
+      		event.preventDefault();
+      		return false;
+    	}
+  	});
+
+	$('#offer_applicant_search').keyup(function(e)
+	{
+		e.preventDefault();
+
+		var keyword = $(this).val();
+
+		if (keyword.length == 0)
+		{
+			$('#offer_search_applicant_results').html('');
+			$('#offer_search_applicant_results').hide();
+			return false;
+		}
+
+		if (keyword.length < 3)
+		{
+			$('#offer_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+			$('#offer_search_applicant_results').show();
+			return false;
+		}
+
+		// Do search
+		var data = {
+            action:         'propertyhive_search_contacts',
+            keyword:    	keyword,
+            security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+        };
+
+        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        {
+        	if (response == '' || response.length == 0)
+        	{
+	        	$('#offer_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+	        }
+	        else
+	        {
+	        	$('#offer_search_applicant_results').html('<ul style="margin:0; padding:0;"></ul>');
+	        	for ( var i in response )
+	        	{
+	        		$('#offer_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;">' + response[i].post_title + '</a></li>');
+	        	}
+	        }
+			$('#offer_search_applicant_results').show();
+        }, 'json');
+	});
+
+	$('#offer_applicant_search').on('blur', function(e)
+	{
+    	//$('#offer_search_applicant_results').hide();
+  	});
+
+	$('body').on('click', '#offer_search_applicant_results ul li a', function(e)
+	{
+		e.preventDefault();
+
+		offer_selected_applicants = []; // reset to only allow one applicant for now
+		offer_selected_applicants[$(this).attr('href')] = ({ post_title: $(this).text() });
+
+		$('#offer_search_applicant_results').html('');
+		$('#offer_search_applicant_results').hide();
+
+		$('#offer_applicant_search').val('');
+
+		offer_update_selected_applicants();
+	});
+
+	$('body').on('click', 'a.offer-remove-applicant', function(e)
+	{
+		e.preventDefault();
+
+		var applicant_id = $(this).attr('href');
+
+		delete(offer_selected_applicants[applicant_id]);
+
+		offer_update_selected_applicants();
+	});
+
+	$('a.offer-action-submit').click(function(e)
+	{
+		e.preventDefault();
+
+		// Validation
+		if ($('#_offer_date').val() == '')
+		{
+			$('#_offer_date').focus();
+			$('#_offer_date').css('transition', 'background 0.6s');
+			$('#_offer_date').css('background', '#ff9999');
+			setTimeout(function() { $('#_offer_date').css('background', '#FFF'); }, 1000);
+			return false;
+		}
+
+		var new_applicant = false;
+		if ($('#offer_existing_applicant_search').css('display') == 'block')
+		{
+			if (Object.keys(offer_selected_applicants).length == 0)
+			{
+				$('#offer_applicant_search').focus();
+				$('#offer_applicant_search').css('transition', 'background 0.6s');
+				$('#offer_applicant_search').css('background', '#ff9999');
+				setTimeout(function() { $('#offer_applicant_search').css('background', '#FFF'); }, 1000);
+				return false;
+			}
+		}
+		if ($('#offer_new_applicant').css('display') == 'block')
+		{
+			if ($('#offer_applicant_name').val() == '')
+			{
+				$('#offer_applicant_name').focus();
+				$('#offer_applicant_name').css('transition', 'background 0.6s');
+				$('#offer_applicant_name').css('background', '#ff9999');
+				setTimeout(function() { $('#offer_applicant_name').css('background', '#FFF'); }, 1000);
+				return false;
+			}
+			new_applicant = true;
+		}
+
+		$(this).attr('disabled', 'disabled');
+		$(this).text('Saving...');
+
+		// Validation passed. Submit form
+		var data = {
+            action:         'propertyhive_record_offer_property',
+            property_id:    <?php echo $post->ID; ?>,
+            offer_date: 	$('#_offer_date').val(),
+            offer_time: 	$('#_offer_time_hours').val() + ':' + $('#_offer_time_minutes').val() + ':00',
+            applicant_name: ( (new_applicant) ? $('#offer_applicant_name').val() : '' ),
+            applicant_ids: 	( (!new_applicant) ? Object.keys(offer_selected_applicants) : '' ),
+            amount: 		$('#_offer_amount').val(),
+            security:       '<?php echo wp_create_nonce( 'record-offer' ); ?>',
+        };
+
+        var that = this;
+		$.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        {
+        	if (response.error)
+        	{
+        		alert(response.error);
+        	}
+        	if (response.success)
+        	{
+        		$('#success_actions').html('');
+
+        		$('#success_actions').append('<a href="' + response.success.offer.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Offer</a>');
+        		
+        		for ( var i in response.success.applicant_contacts )
+        		{
+        			$('#success_actions').append('<a href="' + response.success.applicant_contacts[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Applicant - ' + response.success.applicant_contacts[i].post_title + '</a>');
+        		}
+
+        		$('#action_panel_record_offer').stop().fadeOut(300, function()
+				{
+					$('#action_panel_success').stop().fadeIn(300);
+				});
+        	}
+
+        	$(that).attr('disabled', false);
+        	$(that).text('Record Offer');
+        });
+	});
 });
 
 function viewing_update_selected_applicants()
@@ -493,6 +799,24 @@ function viewing_update_selected_negotiators()
 	{
 		jQuery('#viewing_selected_negotiators').html('<ul><li><em>Unattended</em></li></ul>');
 		jQuery('#viewing_selected_negotiators').show();
+	}
+}
+
+function offer_update_selected_applicants()
+{
+	if ( Object.keys(offer_selected_applicants).length > 0 )
+	{
+		jQuery('#offer_selected_applicants').html('<ul></ul>');
+		for ( var i in offer_selected_applicants )
+		{
+			jQuery('#offer_selected_applicants ul').append('<li><a href="' + i + '" class="offer-remove-applicant" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + offer_selected_applicants[i].post_title + '</li>');
+		}
+		jQuery('#offer_selected_applicants').show();
+	}
+	else
+	{
+		jQuery('#offer_selected_applicants').html('');
+		jQuery('#offer_selected_applicants').hide();
 	}
 }
 

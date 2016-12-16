@@ -50,6 +50,8 @@ class PH_Admin_Menus {
         add_submenu_page( 'propertyhive', __( 'Enquiries', 'propertyhive' ), __( 'Enquiries', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=enquiry'/*, array( $this, 'attributes_page' )*/ );
         //add_submenu_page( 'propertyhive', __( 'Reports', 'propertyhive' ), __( 'Reports', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=reports'/*, array( $this, 'attributes_page' )*/ );
         add_submenu_page( 'propertyhive', __( 'Viewings', 'propertyhive' ), __( 'Viewings', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=viewing'/*, array( $this, 'attributes_page' )*/ );
+        add_submenu_page( 'propertyhive', __( 'Offers', 'propertyhive' ), __( 'Offers', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=offer'/*, array( $this, 'attributes_page' )*/ );
+        add_submenu_page( 'propertyhive', __( 'Sales', 'propertyhive' ), __( 'Sales', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=sale'/*, array( $this, 'attributes_page' )*/ );
 
         add_submenu_page( null, __( 'Applicant Matching Properties', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-properties', array($this, 'matching_properties_page'));
         //remove_submenu_page( 'propertyhive', 'ph-matching-properties' );

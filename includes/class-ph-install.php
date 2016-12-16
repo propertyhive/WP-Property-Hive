@@ -211,7 +211,9 @@ class PH_Install {
           'post_title'    => __( 'Property Search', 'propertyhive' ),
           'post_content'  => '',
           'post_status'   => 'publish',
-          'post_type'     => 'page'
+          'post_type'     => 'page',
+          'comment_status'    => 'closed',
+          'ping_status'    => 'closed',
         );
         
         // Insert the post into the database

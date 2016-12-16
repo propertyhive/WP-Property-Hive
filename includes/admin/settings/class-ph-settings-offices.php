@@ -526,6 +526,8 @@ class PH_Settings_Offices extends PH_Settings_Page {
               'post_content'  => '',
               'post_status'   => 'publish',
               'post_type'     => 'office',
+              'comment_status'    => 'closed',
+              'ping_status'    => 'closed',
             );
             
             // Insert the post into the database

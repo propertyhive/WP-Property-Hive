@@ -367,6 +367,74 @@ class PH_Post_types {
                 )
             )
         );
+
+        register_post_type( "offer",
+            apply_filters( 'propertyhive_register_post_type_offer',
+                array(
+                    'labels' => array(
+                            'name'                  => __( 'Offers', 'propertyhive' ),
+                            'singular_name'         => __( 'Offer', 'propertyhive' ),
+                            'menu_name'             => _x( 'Offers', 'Admin menu name', 'propertyhive' ),
+                            'add_new'               => __( 'Add Offer', 'propertyhive' ),
+                            'add_new_item'          => __( 'Add New Offer', 'propertyhive' ),
+                            'edit'                  => __( 'Edit', 'propertyhive' ),
+                            'edit_item'             => __( 'Edit Offer', 'propertyhive' ),
+                            'new_item'              => __( 'New Offer', 'propertyhive' ),
+                            'view'                  => __( 'View Offer', 'propertyhive' ),
+                            'view_item'             => __( 'View Offer', 'propertyhive' ),
+                            'search_items'          => __( 'Search Offers', 'propertyhive' ),
+                            'not_found'             => __( 'No offers found', 'propertyhive' ),
+                            'not_found_in_trash'    => __( 'No offers found in trash', 'propertyhive' ),
+                            'parent'                => __( 'Parent Offer', 'propertyhive' )
+                        ),
+                    'public'                => false,
+                    'show_ui'               => true,
+                    'capability_type'       => 'post',
+                    'map_meta_cap'          => true,
+                    'publicly_queryable'    => false,
+                    'exclude_from_search'   => true,
+                    'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
+                    'query_var'             => true,
+                    'supports'              => false,
+                    'show_in_nav_menus'     => false,
+                    'show_in_menu'          => false
+                )
+            )
+        );
+
+        register_post_type( "sale",
+            apply_filters( 'propertyhive_register_post_type_sale',
+                array(
+                    'labels' => array(
+                            'name'                  => __( 'Sales', 'propertyhive' ),
+                            'singular_name'         => __( 'Sale', 'propertyhive' ),
+                            'menu_name'             => _x( 'Sales', 'Admin menu name', 'propertyhive' ),
+                            'add_new'               => __( 'Add Sale', 'propertyhive' ),
+                            'add_new_item'          => __( 'Add New Sale', 'propertyhive' ),
+                            'edit'                  => __( 'Edit', 'propertyhive' ),
+                            'edit_item'             => __( 'Edit Sale', 'propertyhive' ),
+                            'new_item'              => __( 'New Sale', 'propertyhive' ),
+                            'view'                  => __( 'View Sale', 'propertyhive' ),
+                            'view_item'             => __( 'View Sale', 'propertyhive' ),
+                            'search_items'          => __( 'Search Sales', 'propertyhive' ),
+                            'not_found'             => __( 'No sales found', 'propertyhive' ),
+                            'not_found_in_trash'    => __( 'No sales found in trash', 'propertyhive' ),
+                            'parent'                => __( 'Parent Sale', 'propertyhive' )
+                        ),
+                    'public'                => false,
+                    'show_ui'               => true,
+                    'capability_type'       => 'post',
+                    'map_meta_cap'          => true,
+                    'publicly_queryable'    => false,
+                    'exclude_from_search'   => true,
+                    'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
+                    'query_var'             => true,
+                    'supports'              => false,
+                    'show_in_nav_menus'     => false,
+                    'show_in_menu'          => false
+                )
+            )
+        );
         
         do_action( 'propertyhive_after_register_post_types' );
 	}

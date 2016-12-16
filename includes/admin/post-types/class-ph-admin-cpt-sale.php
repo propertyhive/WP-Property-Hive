@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin functions for the viewing post type
+ * Admin functions for the sale post type
  *
  * @author 		PropertyHive
  * @category 	Admin
@@ -16,31 +16,31 @@ if ( ! class_exists( 'PH_Admin_CPT' ) ) {
 	include( 'class-ph-admin-cpt.php' );
 }
 
-if ( ! class_exists( 'PH_Admin_CPT_Viewing' ) ) :
+if ( ! class_exists( 'PH_Admin_CPT_Sale' ) ) :
 
 /**
- * PH_Admin_CPT_Viewing Class
+ * PH_Admin_CPT_Sale Class
  */
-class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
+class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->type = 'viewing';
+		$this->type = 'sale';
 
 		// Before data updates
 		add_action( 'pre_post_update', array( $this, 'pre_post_update' ) );
 		add_filter( 'wp_insert_post_data', array( $this, 'wp_insert_post_data' ) );
 
 		// Admin Columns
-		add_filter( 'manage_edit-viewing_columns', array( $this, 'edit_columns' ) );
-		add_action( 'manage_viewing_posts_custom_column', array( $this, 'custom_columns' ), 2 );
-		add_filter( 'manage_edit-viewing_sortable_columns', array( $this, 'custom_columns_sort' ) );
+		add_filter( 'manage_edit-sale_columns', array( $this, 'edit_columns' ) );
+		add_action( 'manage_sale_posts_custom_column', array( $this, 'custom_columns' ), 2 );
+		add_filter( 'manage_edit-property_sortable_columns', array( $this, 'custom_columns_sort' ) );
 		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
 
 		// Bulk / quick edit
-		add_filter( 'bulk_actions-edit-viewing', array( $this, 'remove_bulk_actions') );
+		add_filter( 'bulk_actions-edit-sale', array( $this, 'remove_bulk_actions') );
 		/*add_action( 'bulk_edit_custom_box', array( $this, 'bulk_edit' ), 10, 2 );
 		add_action( 'quick_edit_custom_box',  array( $this, 'quick_edit' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'bulk_and_quick_edit_save_post' ), 10, 2 );*/
@@ -50,17 +50,17 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	}
 
 	/**
-	 * Check if we're editing or adding a viewing
+	 * Check if we're editing or adding a sale
 	 * @return boolean
 	 */
-	private function is_editing_viewing() {
-		if ( ! empty( $_GET['post_type'] ) && 'viewing' == $_GET['post_type'] ) {
+	private function is_editing_sale() {
+		if ( ! empty( $_GET['post_type'] ) && 'sale' == $_GET['post_type'] ) {
 			return true;
 		}
-		if ( ! empty( $_GET['post'] ) && 'viewing' == get_post_type( $_GET['post'] ) ) {
+		if ( ! empty( $_GET['post'] ) && 'sale' == get_post_type( $_GET['post'] ) ) {
 			return true;
 		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'viewing' == get_post_type( $_REQUEST['post_id'] ) ) {
+		if ( ! empty( $_REQUEST['post_id'] ) && 'sale' == get_post_type( $_REQUEST['post_id'] ) ) {
 			return true;
 		}
 		return false;
@@ -96,9 +96,11 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 		$columns = array();
 		$columns['cb'] = '<input type="checkbox" />';
-		$columns['start_date_time'] = __( 'Viewing Date / Time', 'propertyhive' );
+		$columns['sale_date_time'] = __( 'Sale Date / Time', 'propertyhive' );
         $columns['property'] = __( 'Property', 'propertyhive' );
+        $columns['property_owner'] = __( 'Property Owner', 'propertyhive' );
         $columns['applicant'] = __( 'Applicant', 'propertyhive' );
+        $columns['amount'] = __( 'Amount', 'propertyhive' );
         $columns['status'] = __( 'Status', 'propertyhive' );
 
 		return array_merge( $columns, $existing_columns );
@@ -109,19 +111,19 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	 * @param  string $column
 	 */
 	public function custom_columns( $column ) {
-		global $post, $propertyhive, $the_viewing;
+		global $post, $propertyhive, $the_sale;
 
-		if ( empty( $the_viewing ) || $the_viewing->ID != $post->ID ) 
+		if ( empty( $the_sale ) || $the_sale->ID != $post->ID ) 
 		{
-			$the_viewing = new PH_Viewing( $post->ID );
+			$the_sale = new PH_Sale( $post->ID );
 		}
 
 		switch ( $column ) {
-			case 'start_date_time' :
+			case 'sale_date_time' :
 				
 				$edit_link        = get_edit_post_link( $post->ID );
 				//$title            = _draft_or_post_title();
-                $title            = date("H:i jS F Y", strtotime($the_viewing->start_date_time));
+                $title            = date("H:i jS F Y", strtotime($the_sale->sale_date_time));
                 
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
@@ -171,34 +173,44 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 			 break;
             case 'property' :
                 
-                $property = new PH_Property((int)$the_viewing->property_id);
+                $property = new PH_Property((int)$the_sale->property_id);
                 echo $property->get_formatted_full_address();
+                
+                break;
+             case 'property_owner' :
+                
+                $property = new PH_Property((int)$the_offer->property_id);
+                if ($property->owner_contact_id !='' && $property->owner_contact_id != 0)
+                {
+                	echo get_the_title($property->owner_contact_id) . '<br>';
+	                echo '<div class="row-actions">';
+	                echo 'T: ' . get_post_meta($property->owner_contact_id, '_telephone_number', TRUE) . '<br>';
+	                echo 'E: ' . get_post_meta($property->owner_contact_id, '_email_address', TRUE);
+	                echo '</div>';
+                }
+                else
+                {
+                	echo '-';
+                }
                 
                 break;
             case 'applicant' :
                 
-                echo get_the_title($the_viewing->applicant_contact_id);
+                echo get_the_title($the_offer->applicant_contact_id);
+                echo '<div class="row-actions">';
+                echo 'T: ' . get_post_meta($the_offer->applicant_contact_id, '_telephone_number', TRUE) . '<br>';
+                echo 'E: ' . get_post_meta($the_offer->applicant_contact_id, '_email_address', TRUE);
+                echo '</div>';
+                
+                break;
+            case 'amount' :
+                
+                echo $the_offer->get_formatted_amount();
                 
                 break;
             case 'status' :
                 
-                echo ucwords(str_replace("_", " ", $the_viewing->status));
-                if ( $the_viewing->status == 'carried_out' )
-                {
-                    echo '<br>';
-                    switch ( $the_viewing->feedback_status )
-                    {
-                        case "interested": { echo 'Applicant Interested'; break; }
-                        case "not_interested": { echo 'Applicant Not Interested'; break; }
-                        case "not_required": { echo 'Feedback Not Required'; break; }
-                        default: { echo 'Awaiting Feedback'; }
-                    }
-
-                    if ( $the_viewing->feedback_status == 'interested' || $the_viewing->feedback_status == 'not_interested' )
-                    {
-                    	echo '<br>' . ( ($the_viewing->feedback_passed_on == 'yes') ? 'Feedback Passed On' : 'Feedback Not Passed On' );
-                    }
-                }
+                echo ucwords(str_replace("_", " ", $the_sale->status));
                 
                 break;
 			default :
@@ -207,7 +219,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	}
 
 	/**
-	 * Make viewing columns sortable
+	 * Make sale columns sortable
 	 *
 	 * @access public
 	 * @param mixed $columns
@@ -221,14 +233,14 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	}
 
 	/**
-	 * Viewing column orderby
+	 * Sale column orderby
 	 *
 	 * @access public
 	 * @param mixed $vars
 	 * @return array
 	 */
 	public function custom_columns_orderby( $vars ) {
-		if ( is_admin() && $vars['post_type'] == 'viewing' )
+		if ( is_admin() && $vars['post_type'] == 'sale' )
 		{
 			$vars = array_merge( $vars, array(
 				'meta_key' 	=> '_start_date_time',
@@ -253,22 +265,22 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	public function propertyhive_filters() {
 		global $typenow, $wp_query;
 
-		if ( 'viewing' != $typenow ) {
+		if ( 'sale' != $typenow ) {
 			return;
 		}
 
-		echo apply_filters( 'propertyhive_viewing_filters', $output );
+		echo apply_filters( 'propertyhive_sale_filters', $output );
 	}
 
 	/**
-	 * Filter the viewings in admin based on options
+	 * Filter the sales in admin based on options
 	 *
 	 * @param mixed $query
 	 */
-	public function viewing_filters_query( $query ) {
+	public function sale_filters_query( $query ) {
 		global $typenow, $wp_query;
 
-		if ( 'viewing' == $typenow ) {
+		if ( 'sale' == $typenow ) {
 
 		}
 	}
@@ -276,4 +288,4 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 endif;
 
-return new PH_Admin_CPT_Viewing();
+return new PH_Admin_CPT_Sale();

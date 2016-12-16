@@ -109,8 +109,8 @@ class PH_Admin_Assets {
             wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
             wp_enqueue_script('googlemaps');
         }
-
-        if ( in_array( $screen->id, array( 'property', 'contact', 'enquiry', 'viewing' ) ) )
+        
+        if ( in_array( $screen->id, array( 'property', 'contact', 'enquiry', 'viewing', 'offer', 'sale' ) ) )
         {
             wp_enqueue_media();
             wp_enqueue_script( 'propertyhive_admin_meta_boxes' );
