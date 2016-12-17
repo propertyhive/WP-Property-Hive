@@ -25,6 +25,7 @@ class PH_Shortcodes {
 			'similar_properties'           => __CLASS__ . '::similar_properties',
 			'property_search_form'         => __CLASS__ . '::property_search_form',
 			'property_map'                 => __CLASS__ . '::property_map',
+			'property_street_view'         => __CLASS__ . '::property_street_view',
 		);
 
 		foreach ( $shortcodes as $shortcode => $function ) {
@@ -409,6 +410,28 @@ class PH_Shortcodes {
 		ob_start();
 
 		echo get_property_map( $atts );
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Output property street view
+	 * Should only be used on a property page or where the $property var is set
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function property_street_view( $atts ) {
+
+		global $property;
+
+		$atts = shortcode_atts( array(
+			'height'        => '400',
+		), $atts );
+
+		ob_start();
+
+		echo get_property_street_view( $atts );
 
 		return ob_get_clean();
 	}
