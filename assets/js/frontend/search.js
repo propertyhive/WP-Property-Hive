@@ -19,11 +19,18 @@ function toggleDepartmentFields()
                     }
                     default:
                     {
-                        var selected = departmentEl.filter(':checked');
+                        if ( departmentEl.attr('type') == 'hidden' )
+                        {
+                            var selected = departmentEl;
+                        }
+                        else
+                        {
+                            var selected = departmentEl.filter(':checked');
+                        }
                     }
                 }
             }
-
+            
             jQuery(this).find('.sales-only').hide();
             jQuery(this).find('.lettings-only').hide();
             jQuery(this).find('.residential-only').hide();
