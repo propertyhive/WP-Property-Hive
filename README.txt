@@ -4,7 +4,7 @@ Tags: property, real estate, software, estate agents, estate agent, property man
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.7
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -83,6 +83,13 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.2.8 =
+* Support for Yoast SEO added. Includes exluding taxonomies from XML sitemap, adding first property photo as og:image, removing SEO columns from property list, and changing priority of Yoast option meta box to be at the bottom of the edit property page.
+* New [property_street_view] shortcode for use on property pages
+* New 'From' email address setting in 'Settings > Emails'. Changes the 'From' address of property enquiries. Should improve reliability of sending enquiries when sent from the same domain.
+* In conjunction with the above, added a Reply-To header to enquiry emails
+* Catered for the scenario when the department option in search forms is a hidden input field
 
 = 1.2.7 =
 * Added support for the WordPress REST API introduced into core in WordPress 4.7. Means you can now obtain properties via the API for use with third party applications
