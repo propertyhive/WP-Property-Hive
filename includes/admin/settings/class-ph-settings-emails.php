@@ -51,6 +51,20 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	public function get_settings() {
 		$settings = apply_filters( 'propertyhive_email_settings', array(
 
+			array( 'title' => __( 'Email Sender Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'email_sender_options' ),
+
+			array(
+				'title'       => __( '"From" Email Address', 'propertyhive' ),
+				'id'          => 'propertyhive_email_from_address',
+				'type'        => 'text',
+				'css'         => 'min-width:300px;',
+				'default'     => get_option('admin_email'),
+				'autoload'    => false,
+				'desc_tip'    => false,
+			),
+
+			array( 'type' => 'sectionend', 'id' => 'email_sender_options' ),
+
 			array( 'title' => __( 'Email Template Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'email_template_options' ),
 
 			array(

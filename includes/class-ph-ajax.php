@@ -404,15 +404,27 @@ class PH_AJAX {
                 $message .= $label . ": " . $_POST[$key] . "\n";
             }
             
+            $from_email_address = get_option('propertyhive_email_from_address', '');
+            if ( $from_email_address == '' )
+            {
+                $from_email_address = get_option('admin_email');
+            }
+            if ( $from_email_address == '' )
+            {
+                // Should never get here
+                $from_email_address = $_POST['email_address'];
+            }
+
             $headers = array();
-            if ( isset($_POST['name']) && isset($_POST['email_address']) && ! empty($_POST['name']) && ! empty($_POST['email_address']) )
+            if ( isset($_POST['name']) && ! empty($_POST['name']) )
             {
-                $headers[] = 'From: ' . $_POST['name'] . ' <' . $_POST['email_address'] . '>';
+                $headers[] = 'From: ' . $_POST['name'] . ' <' . $from_email_address . '>';
             }
-            elseif ( isset($_POST['email_address']) && ! empty($_POST['email_address']) )
+            else
             {
-                $headers[] = 'From: <' . $_POST['email_address'] . '>';
+                $headers[] = 'From: <' . $from_email_address . '>';
             }
+            $headers[] = 'Reply-To: ' . $_POST['email_address'];
             $sent = wp_mail( $to, $subject, $message, $headers );
             
             if ( ! $sent )
