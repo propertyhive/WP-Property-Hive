@@ -122,7 +122,7 @@ function get_property_map( $args = array() )
 ?>
 <script>
 
-	// We declare both of the above globally so developers can access them
+	// We declare vars globally so developers can access them
 	var property_map; // Global declaration of the map
 	var property_marker; // Global declaration of the marker
 			
@@ -145,10 +145,63 @@ function get_property_map( $args = array() )
 		};
 		var property_marker = new google.maps.Marker(markerOptions);
 	}
-		
-	window.onload = initialize_property_map;
+	
+	if(window.addEventListener) {
+		window.addEventListener('load', initialize_property_map);
+	}else{
+		window.attachEvent('onload', initialize_property_map);
+	}
 
 </script>
 <?php
 	}
 }
+
+function get_property_street_view( $args = array() )
+{
+	global $property;
+
+	if ( $property->latitude != '' && $property->latitude != '0' && $property->longitude != '' && $property->longitude != '0' )
+	{
+		$api_key = get_option('propertyhive_google_maps_api_key');
+	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+	    wp_enqueue_script('googlemaps');
+
+	    echo '<div id="property_street_view_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
+?>
+<script>
+
+	// We declare vars globally so developers can access them
+	var property_street_view; // Global declaration of the map
+			
+	function initialize_property_street_view() {
+				
+		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
+		var myOptions = {
+			center: myLatlng
+	  	}
+		property_street_view = new google.maps.Map(document.getElementById("property_street_view_canvas"), myOptions);
+				
+		var streetViewOptions = {
+	    	position: myLatlng,
+			pov: {
+				heading: 90,
+				pitch: 0,
+				zoom: 0
+			}
+		};
+		var streetView = new google.maps.StreetViewPanorama(document.getElementById("property_street_view_canvas"), streetViewOptions);
+		streetView.setVisible(true);
+	}
+		
+	if(window.addEventListener) {
+		window.addEventListener('load', initialize_property_street_view);
+	}else{
+		window.attachEvent('onload', initialize_property_street_view);
+	}
+
+</script>
+<?php
+	}
+}
+
