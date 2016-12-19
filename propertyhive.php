@@ -223,6 +223,8 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/class-ph-post-types.php' );                     // Registers post types
             include_once( 'includes/class-ph-countries.php' );                     // Manages interaction with countries and currency
 
+            include_once( 'includes/class-ph-yoast-seo.php' );              // Yoast SEO
+            
             $this->query = new PH_Query();
             $this->email = new PH_Emails();
             $this->license = new PH_Licenses();
