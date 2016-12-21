@@ -133,10 +133,11 @@ function ph_locate_template( $template_name, $template_path = '', $default_path 
  */
 function ph_setcookie( $name, $value, $expire = 0, $secure = false ) {
     if ( ! headers_sent() ) {
-        setcookie( $name, $value, $expire, COOKIEPATH, COOKIE_DOMAIN, $secure );
+        return setcookie( $name, $value, $expire, COOKIEPATH, COOKIE_DOMAIN, $secure );
     } elseif ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
         trigger_error( "Cookie cannot be set - headers already sent", E_USER_NOTICE );
     }
+    return false;
 }
 
 /**
