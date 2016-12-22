@@ -32,6 +32,11 @@ class PH_Admin_Dashboard {
 	 */
 	public function init() {
 		wp_add_dashboard_widget( 'propertyhive_dashboard_news', __( 'Property Hive News', 'propertyhive' ), array( $this, 'news_widget' ) );
+
+		if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+        {
+        	wp_add_dashboard_widget( 'propertyhive_dashboard_viewings_awaiting_applicant_feedback', __( 'Viewings Awaiting Applicant Feedback', 'propertyhive' ), array( $this, 'viewings_awaiting_applicant_feedback_widget' ) );
+        }
 	}
 
 	/*
@@ -40,6 +45,14 @@ class PH_Admin_Dashboard {
 	public function news_widget()
 	{
 		echo '<div id="ph_dashboard_news">Loading...</div>';
+	}
+
+	/*
+	 * Property Hive News Widget
+	 */
+	public function viewings_awaiting_applicant_feedback_widget()
+	{
+		echo '<div id="ph_dashboard_viewings_awaiting_applicant_feedback">Loading...</div>';
 	}
 }
 

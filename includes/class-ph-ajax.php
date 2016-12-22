@@ -31,7 +31,10 @@ class PH_AJAX {
             'load_existing_features' => false,
 			'make_property_enquiry' => true,
             'create_contact_from_enquiry' => false,
+
+            // Dashboard components
             'get_news' => false,
+            'get_viewings_awaiting_applicant_feedback' => false,
 
             // Viewing actions
             'book_viewing_property' => false,
@@ -745,6 +748,7 @@ class PH_AJAX {
         die( json_encode( array('success' => get_edit_post_link($contact_post_id, '')) ) );
     }
 
+    // Dashboard related functionas
     public function get_news()
     {
         $this->json_headers();
@@ -776,6 +780,63 @@ class PH_AJAX {
             }
 
         endif;
+
+        echo json_encode($return);
+
+        die();
+    }
+
+    public function get_viewings_awaiting_applicant_feedback()
+    {
+        global $post;
+
+        $this->json_headers();
+
+        $return = array();
+
+        $args = array(
+            'post_type' => 'viewing',
+            'fields' => 'ids',
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_status',
+                    'value' => 'carried_out'
+                ),
+                array(
+                    'key' => '_feedback_status',
+                    'value' => ''
+                )
+            )
+        );
+
+        $viewings_query = new WP_Query( $args );
+
+        if ( $viewings_query->have_posts() )
+        {
+            while ( $viewings_query->have_posts() )
+            {
+                $viewings_query->the_post();
+
+                $property_id = get_post_meta( get_the_ID(), '_property_id', TRUE );
+                $property = new PH_Property((int)$property_id);
+
+                $applicant_contact_id = get_post_meta( get_the_ID(), '_applicant_contact_id', TRUE );
+
+                $return[] = array(
+                    'ID' => get_the_ID(),
+                    'edit_link' => get_edit_post_link( get_the_ID() ),
+                    'start_date_time' => get_post_meta( get_the_ID(), '_start_date_time', TRUE ),
+                    'start_date_time_formatted_Hi_jSFY' => date("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
+                    'property_id' => $property_id,
+                    'property_address' => $property->get_formatted_full_address(),
+                    'applicant_contact_id' => $applicant_contact_id,
+                    'applicant_name' => get_the_title( $applicant_contact_id ),
+                );
+            }
+        }
+
+        wp_reset_postdata();
 
         echo json_encode($return);
 
