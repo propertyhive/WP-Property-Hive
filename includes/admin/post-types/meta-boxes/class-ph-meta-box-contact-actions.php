@@ -26,49 +26,66 @@ class PH_Meta_Box_Contact_Actions {
 	        
 		        echo '<div class="options_group" style="padding-top:8px;">';
 
-		        	echo '<a 
-			                href="#action_panel_book_viewing" 
-			                class="button contact-action"
-			                style="width:100%; margin-bottom:7px; text-align:center" 
-			            >' . __('Book Viewing', 'propertyhive') . '</a>';
+		        	$actions = array();
 
-			        $show_offers = false;
-		            $show_sales = false;
+		        	if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+	            	{
+			        	$actions[] = '<a 
+				                href="#action_panel_book_viewing" 
+				                class="button contact-action"
+				                style="width:100%; margin-bottom:7px; text-align:center" 
+				            >' . __('Book Viewing', 'propertyhive') . '</a>';
+			        }
 
-		            $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-		            if ( in_array('applicant', $contact_types) )
-		            {
-		                $show_viewings = true;
+			        if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
+	            	{
+				        $show_offers = false;
+			            $show_sales = false;
 
-		                $num_applicant_profiles = get_post_meta( $post->ID, '_applicant_profiles', TRUE );
-		                if ( $num_applicant_profiles == '' )
-		                {
-		                    $num_applicant_profiles = 0;
-		                }
+			            $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
+			            if ( in_array('applicant', $contact_types) )
+			            {
+			                $show_viewings = true;
 
-		                if ( $num_applicant_profiles > 0 ) 
-		                {
-		                    for ( $i = 0; $i < $num_applicant_profiles; ++$i )
-		                    {
-		                        $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
+			                $num_applicant_profiles = get_post_meta( $post->ID, '_applicant_profiles', TRUE );
+			                if ( $num_applicant_profiles == '' )
+			                {
+			                    $num_applicant_profiles = 0;
+			                }
 
-		                        if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
-		                        {
-		                            $show_offers = true;
-		                            $show_sales = true;
-		                        }
-		                    }
-		                }
-		            }
+			                if ( $num_applicant_profiles > 0 ) 
+			                {
+			                    for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+			                    {
+			                        $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
 
-		            if ( $show_offers )
-		            {
-		            	echo '<a 
-			                href="#action_panel_record_offer" 
-			                class="button contact-action"
-			                style="width:100%; margin-bottom:7px; text-align:center" 
-			            >' . __('Record Offer', 'propertyhive') . '</a>';
-		            }
+			                        if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
+			                        {
+			                            $show_offers = true;
+			                            $show_sales = true;
+			                        }
+			                    }
+			                }
+			            }
+
+			            if ( $show_offers )
+			            {
+			            	$actions[] = '<a 
+				                href="#action_panel_record_offer" 
+				                class="button contact-action"
+				                style="width:100%; margin-bottom:7px; text-align:center" 
+				            >' . __('Record Offer', 'propertyhive') . '</a>';
+			            }
+			        }
+
+			        if ( !empty($actions) )
+			        {
+			        	echo implode("", $actions);
+			        }
+			        else
+			        {
+			        	echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+			        }
 
 		        echo '</div>';
 

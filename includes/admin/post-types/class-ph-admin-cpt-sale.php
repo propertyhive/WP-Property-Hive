@@ -179,7 +179,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
                 break;
              case 'property_owner' :
                 
-                $property = new PH_Property((int)$the_offer->property_id);
+                $property = new PH_Property((int)$the_sale->property_id);
                 if ($property->owner_contact_id !='' && $property->owner_contact_id != 0)
                 {
                 	echo get_the_title($property->owner_contact_id) . '<br>';
@@ -196,16 +196,16 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
                 break;
             case 'applicant' :
                 
-                echo get_the_title($the_offer->applicant_contact_id);
+                echo get_the_title($the_sale->applicant_contact_id);
                 echo '<div class="row-actions">';
-                echo 'T: ' . get_post_meta($the_offer->applicant_contact_id, '_telephone_number', TRUE) . '<br>';
-                echo 'E: ' . get_post_meta($the_offer->applicant_contact_id, '_email_address', TRUE);
+                echo 'T: ' . get_post_meta($the_sale->applicant_contact_id, '_telephone_number', TRUE) . '<br>';
+                echo 'E: ' . get_post_meta($the_sale->applicant_contact_id, '_email_address', TRUE);
                 echo '</div>';
                 
                 break;
             case 'amount' :
                 
-                echo $the_offer->get_formatted_amount();
+                echo $the_sale->get_formatted_amount();
                 
                 break;
             case 'status' :
@@ -227,7 +227,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 	 */
 	public function custom_columns_sort( $columns ) {
 		$custom = array(
-			'start_date_time' => '_start_date_time',
+			'sale_date_time' => '_sale_date_time',
 		);
 		return wp_parse_args( $custom, $columns );
 	}
@@ -243,7 +243,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 		if ( is_admin() && $vars['post_type'] == 'sale' )
 		{
 			$vars = array_merge( $vars, array(
-				'meta_key' 	=> '_start_date_time',
+				'meta_key' 	=> '_sale_date_time',
 				'orderby' 	=> 'meta_value'
 			) );
 		}

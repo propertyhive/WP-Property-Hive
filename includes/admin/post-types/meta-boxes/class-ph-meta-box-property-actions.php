@@ -23,19 +23,36 @@ class PH_Meta_Box_Property_Actions {
         
 	        echo '<div class="options_group" style="padding-top:8px;">';
 
-	        	echo '<a 
-		                href="#action_panel_book_viewing" 
-		                class="button property-action"
-		                style="width:100%; margin-bottom:7px; text-align:center" 
-		            >' . __('Book Viewing', 'propertyhive') . '</a>';
+	        	$actions = array();
 
-		        if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-sales' )
-		        {
-			        echo '<a 
-			                href="#action_panel_record_offer" 
+	        	if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+            	{
+		        	$actions[] = '<a 
+			                href="#action_panel_book_viewing" 
 			                class="button property-action"
 			                style="width:100%; margin-bottom:7px; text-align:center" 
-			            >' . __('Record Offer', 'propertyhive') . '</a>';
+			            >' . __('Book Viewing', 'propertyhive') . '</a>';
+		        }
+
+		        if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
+            	{
+			        if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-sales' )
+			        {
+				        $actions[] = '<a 
+				                href="#action_panel_record_offer" 
+				                class="button property-action"
+				                style="width:100%; margin-bottom:7px; text-align:center" 
+				            >' . __('Record Offer', 'propertyhive') . '</a>';
+			        }
+			    }
+
+		        if ( !empty($actions) )
+		        {
+		        	echo implode("", $actions);
+		        }
+		        else
+		        {
+		        	echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
 		        }
 
 	        echo '</div>';

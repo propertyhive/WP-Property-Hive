@@ -1140,15 +1140,18 @@ class PH_AJAX {
 
         if ( $viewing->status == 'offer_made' )
         {
-            $offer_id = get_post_meta( $viewing->id, '_offer_id', TRUE );
-            if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+            if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
             {
-                $offer_id = '';
-            }
+                $offer_id = get_post_meta( $viewing->id, '_offer_id', TRUE );
+                if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+                {
+                    $offer_id = '';
+                }
 
-            if ( $offer_id != '' )
-            {
-                echo ' (<a href="' . get_edit_post_link($offer_id) . '">' . __('View Offer', 'propertyhive') . '</a>)';
+                if ( $offer_id != '' )
+                {
+                    echo ' (<a href="' . get_edit_post_link($offer_id) . '">' . __('View Offer', 'propertyhive') . '</a>)';
+                }
             }
         }
         
@@ -1236,14 +1239,16 @@ class PH_AJAX {
 
         $show_feedback_meta_boxes = false;
 
+        $actions = array();
+
         if ( $status == 'pending' )
         {
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_viewing_carried_out" 
                     class="button button-success viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Viewing Carried Out', 'propertyhive') . '</a>';
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_viewing_cancelled" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
@@ -1254,19 +1259,19 @@ class PH_AJAX {
         {
             if ( $feedback_status == '' )
             {
-                echo '<a 
+                $actions[] = '<a 
                     href="#action_panel_viewing_interested" 
                     class="button button-success viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Applicant Interested', 'propertyhive') . '</a>';
 
-                echo '<a 
+                $actions[] = '<a 
                     href="#action_panel_viewing_not_interested" 
                     class="button button-danger viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Applicant Not Interested', 'propertyhive') . '</a>';
 
-                echo '<a 
+                $actions[] = '<a 
                     href="#action_panel_viewing_feedback_not_required" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
@@ -1277,44 +1282,47 @@ class PH_AJAX {
 
             if ( $feedback_status == 'interested' )
             {
-                echo '<a 
+                $actions[] = '<a 
                     href="' . trim(admin_url(), '/') . '/post-new.php?post_type=viewing&applicant_contact_id=' . get_post_meta( $post_id, '_applicant_contact_id', TRUE ) . '&property_id=' . get_post_meta( $post_id, '_property_id', TRUE ) . '&viewing_id=' . $post_id .'" 
                     class="button button-success"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Book Second Viewing', 'propertyhive') . '</a>';
 
-                $property_id = get_post_meta( $post_id, '_property_id', TRUE );
-                if ( get_post_meta( $property_id, '_department', TRUE ) == 'residential-sales' )
+                if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
                 {
-                    // See if an offer has this viewing id associated with it
-                    $offer_id = get_post_meta( $post_id, '_offer_id', TRUE );
-                    if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+                    $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+                    if ( get_post_meta( $property_id, '_department', TRUE ) == 'residential-sales' )
                     {
-                        $offer_id = '';
-                    }
+                        // See if an offer has this viewing id associated with it
+                        $offer_id = get_post_meta( $post_id, '_offer_id', TRUE );
+                        if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+                        {
+                            $offer_id = '';
+                        }
 
-                    if ( $offer_id != '' )
-                    {
-                        echo '<a 
-                                href="' . get_edit_post_link( $offer_id, '' ) . '" 
-                                class="button"
-                                style="width:100%; margin-bottom:7px; text-align:center" 
-                            >' . __('View Offer', 'propertyhive') . '</a>';
-                    }
-                    else
-                    {
-                        echo '<a 
-                                href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_offer' ) . '" 
-                                class="button button-success"
-                                style="width:100%; margin-bottom:7px; text-align:center" 
-                            >' . __('Record Offer', 'propertyhive') . '</a>';
+                        if ( $offer_id != '' )
+                        {
+                            $actions[] = '<a 
+                                    href="' . get_edit_post_link( $offer_id, '' ) . '" 
+                                    class="button"
+                                    style="width:100%; margin-bottom:7px; text-align:center" 
+                                >' . __('View Offer', 'propertyhive') . '</a>';
+                        }
+                        else
+                        {
+                            $actions[] = '<a 
+                                    href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_offer' ) . '" 
+                                    class="button button-success"
+                                    style="width:100%; margin-bottom:7px; text-align:center" 
+                                >' . __('Record Offer', 'propertyhive') . '</a>';
+                        }
                     }
                 }
             }
 
             if ( get_post_meta( $post_id, '_feedback_passed_on', TRUE ) != 'yes' && ( $feedback_status == 'interested' || $feedback_status == 'not_interested' ) )
             {
-                echo '<a 
+                $actions[] = '<a 
                     href="#action_panel_viewing_revert_feedback_passed_on" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
@@ -1323,7 +1331,7 @@ class PH_AJAX {
 
             if ( $feedback_status == 'interested' || $feedback_status == 'not_interested' || $feedback_status == 'not_required' )
             {
-                echo '<a 
+                $actions[] = '<a 
                     href="#action_panel_viewing_revert_feedback_pending" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
@@ -1333,29 +1341,41 @@ class PH_AJAX {
 
         if ( $status == 'offer_made' )
         {
-            $offer_id = get_post_meta( $post_id, '_offer_id', TRUE );
-            if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+            if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
             {
-                $offer_id = '';
-            }
+                $offer_id = get_post_meta( $post_id, '_offer_id', TRUE );
+                if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+                {
+                    $offer_id = '';
+                }
 
-            if ( $offer_id != '' )
-            {
-                echo '<a 
-                        href="' . get_edit_post_link( $offer_id, '' ) . '" 
-                        class="button"
-                        style="width:100%; margin-bottom:7px; text-align:center" 
-                    >' . __('View Offer', 'propertyhive') . '</a>';
+                if ( $offer_id != '' )
+                {
+                    $actions[] = '<a 
+                            href="' . get_edit_post_link( $offer_id, '' ) . '" 
+                            class="button"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . __('View Offer', 'propertyhive') . '</a>';
+                }
             }
         }
 
         if ( ( $status == 'carried_out' && $feedback_status == '' ) || $status == 'cancelled' )
         {
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_viewing_revert_pending" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Revert To Pending', 'propertyhive') . '</a>';
+        }
+
+        if ( !empty($actions) )
+        {
+            echo implode("", $actions);
+        }
+        else
+        {
+            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
         }
 
         echo '</div>
@@ -2680,7 +2700,7 @@ class PH_AJAX {
 
         if ( $status == 'completed' )
         {
-            echo '<div style="text-align:center">No actions to display</div>';
+            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
         }
 
         if ( $status == 'current' || $status == 'exchanged' )

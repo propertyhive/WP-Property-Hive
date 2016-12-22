@@ -40,9 +40,10 @@ class PH_Settings_General extends PH_Settings_Page {
     public function get_sections() {
         $sections = array(
             ''         => __( 'General', 'propertyhive' ),
+            'modules'         => __( 'Modules', 'propertyhive' ),
             'international'         => __( 'International', 'propertyhive' ),
             'map'         => __( 'Map', 'propertyhive' ),
-            'misc'         => __( 'Miscellaneous', 'propertyhive' )
+            'misc'         => __( 'Miscellaneous', 'propertyhive' ),
         );
 
         return $sections;
@@ -118,6 +119,63 @@ class PH_Settings_General extends PH_Settings_Page {
 			array( 'type' => 'sectionend', 'id' => 'general_options'),
 
 		) ); // End general settings
+	}
+
+	/**
+	 * Get general modules settings array
+	 *
+	 * @return array
+	 */
+	public function get_general_modules_setting() {
+		    
+		return apply_filters( 'propertyhive_general_modules_settings', array(
+
+			array( 'title' => __( 'Disabled Modules', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'modules_options' ),
+
+			array(
+                'type'    => 'html',
+                'html'    => __( 'Here you can choose which modules are enabled or disabledUnknow within Property Hive. Check the modules you <strong>DO NOT</strong> wish to use from the list below', 'propertyhive' ) . ':',
+            ),
+            
+            array(
+                'title'   => __( 'Disabled Modules', 'propertyhive' ),
+                'desc'    => __( 'Contacts (Applicants, Owners/Landlords and Third Party Contacts)', 'propertyhive' ),
+                'id'      => 'propertyhive_module_disabled_contacts',
+                'type'    => 'checkbox',
+                'default' => '',
+                'checkboxgroup' => 'start'
+            ),
+            
+            array(
+                'title'   => __( 'Disabled Modules', 'propertyhive' ),
+                'desc'    => __( 'Viewings', 'propertyhive' ),
+                'id'      => 'propertyhive_module_disabled_viewings',
+                'type'    => 'checkbox',
+                'default' => '',
+                'checkboxgroup' => 'middle'
+            ),
+
+            array(
+                'title'   => __( 'Disabled Modules', 'propertyhive' ),
+                'desc'    => __( 'Offers and Sales', 'propertyhive' ),
+                'id'      => 'propertyhive_module_disabled_offers_sales',
+                'type'    => 'checkbox',
+                'default' => '',
+                'checkboxgroup' => 'middle'
+            ),
+
+            array(
+                'title'   => __( 'Disabled Modules', 'propertyhive' ),
+                'desc'    => __( 'Enquiries', 'propertyhive' ),
+                'id'      => 'propertyhive_module_disabled_enquiries',
+                'type'    => 'checkbox',
+                'default' => '',
+                'checkboxgroup' => 'end'
+            ),
+            
+			array( 'type' => 'sectionend', 'id' => 'modules_options'),
+
+		) ); // End general module settings
 	}
 
 	/**
@@ -211,6 +269,7 @@ class PH_Settings_General extends PH_Settings_Page {
         {
         	switch ($current_section)
             {
+            	case "modules": { $settings = $this->get_general_modules_setting(); break; }
                 case "international": { $settings = $this->get_general_international_setting(); break; }
                 case "map": { $settings = $this->get_general_map_setting(); break; }
                 case "misc": { $settings = $this->get_general_misc_setting(); break; }
@@ -251,6 +310,13 @@ class PH_Settings_General extends PH_Settings_Page {
         {
         	switch ($current_section)
         	{
+        		case 'modules':
+				{
+					$settings = $this->get_general_modules_setting();
+
+					PH_Admin_Settings::save_fields( $settings );
+					break;
+				}
 				case 'international':
 				{
 					if (!isset($_POST['propertyhive_countries']) || (isset($_POST['propertyhive_countries']) && empty($_POST['propertyhive_countries'])))

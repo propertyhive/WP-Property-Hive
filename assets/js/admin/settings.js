@@ -43,6 +43,22 @@ jQuery( function($){
             }
         }
 
+        // Validate disabled modules
+        if ( $('input[type=\'checkbox\'][name^=\'propertyhive_module_disabled_\']').length > 0 )
+        {
+            if ( 
+                $('input[type=\'checkbox\'][name=\'propertyhive_module_disabled_contacts\']').is( ":checked" ) &&
+                (
+                    !$('input[type=\'checkbox\'][name=\'propertyhive_module_disabled_viewings\']').is( ":checked" ) ||
+                    !$('input[type=\'checkbox\'][name=\'propertyhive_module_disabled_offers_sales\']').is( ":checked" )
+                )
+            )
+            {
+                alert( 'The contacts module must be enabled in order to use the viewings, offers and sales modules' );
+                return false;
+            }
+        };
+
         if ( $('select[name=\'propertyhive_default_country\']').length > 0 )
         {
             // Make sure default country is in list of selected countries

@@ -44,16 +44,36 @@ class PH_Admin_Menus {
 	    add_menu_page( __( 'Property Hive', 'propertyhive' ), __( 'Property Hive', 'propertyhive' ), 'manage_propertyhive', 'propertyhive' , array( $this, 'settings_page' ), PH()->plugin_url() . '/assets/images/menu-icon.png', '54.5' );
 
 	    add_submenu_page( 'propertyhive', __( 'Properties', 'propertyhive' ), __( 'Properties', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=property'/*, array( $this, 'attributes_page' )*/ );
-	    add_submenu_page( 'propertyhive', __( 'Property Owners and Landlords', 'propertyhive' ), __( 'Owners &amp; Landlords', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=owner'/*, array( $this, 'attributes_page' )*/ );
-        add_submenu_page( 'propertyhive', __( 'Applicants', 'propertyhive' ), __( 'Applicants', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=applicant'/*, array( $this, 'attributes_page' )*/ );
-        add_submenu_page( 'propertyhive', __( 'Third Party Contacts', 'propertyhive' ), __( 'Third Party Contacts', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=thirdparty'/*, array( $this, 'attributes_page' )*/ );
-        add_submenu_page( 'propertyhive', __( 'Enquiries', 'propertyhive' ), __( 'Enquiries', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=enquiry'/*, array( $this, 'attributes_page' )*/ );
-        //add_submenu_page( 'propertyhive', __( 'Reports', 'propertyhive' ), __( 'Reports', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=reports'/*, array( $this, 'attributes_page' )*/ );
-        add_submenu_page( 'propertyhive', __( 'Viewings', 'propertyhive' ), __( 'Viewings', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=viewing'/*, array( $this, 'attributes_page' )*/ );
-        add_submenu_page( 'propertyhive', __( 'Offers', 'propertyhive' ), __( 'Offers', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=offer'/*, array( $this, 'attributes_page' )*/ );
-        add_submenu_page( 'propertyhive', __( 'Sales', 'propertyhive' ), __( 'Sales', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=sale'/*, array( $this, 'attributes_page' )*/ );
+	    
+	    if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
+	    {
+		    add_submenu_page( 'propertyhive', __( 'Property Owners and Landlords', 'propertyhive' ), __( 'Owners &amp; Landlords', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=owner'/*, array( $this, 'attributes_page' )*/ );
+	        add_submenu_page( 'propertyhive', __( 'Applicants', 'propertyhive' ), __( 'Applicants', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=applicant'/*, array( $this, 'attributes_page' )*/ );
+	        add_submenu_page( 'propertyhive', __( 'Third Party Contacts', 'propertyhive' ), __( 'Third Party Contacts', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=contact&_contact_type=thirdparty'/*, array( $this, 'attributes_page' )*/ );
+        }
 
-        add_submenu_page( null, __( 'Applicant Matching Properties', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-properties', array($this, 'matching_properties_page'));
+        if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
+	    {
+        	add_submenu_page( 'propertyhive', __( 'Enquiries', 'propertyhive' ), __( 'Enquiries', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=enquiry'/*, array( $this, 'attributes_page' )*/ );
+        }
+
+        //add_submenu_page( 'propertyhive', __( 'Reports', 'propertyhive' ), __( 'Reports', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=reports'/*, array( $this, 'attributes_page' )*/ );
+        
+        if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+	    {
+        	add_submenu_page( 'propertyhive', __( 'Viewings', 'propertyhive' ), __( 'Viewings', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=viewing'/*, array( $this, 'attributes_page' )*/ );
+        }
+
+        if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
+	    {
+	        add_submenu_page( 'propertyhive', __( 'Offers', 'propertyhive' ), __( 'Offers', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=offer'/*, array( $this, 'attributes_page' )*/ );
+	        add_submenu_page( 'propertyhive', __( 'Sales', 'propertyhive' ), __( 'Sales', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=sale'/*, array( $this, 'attributes_page' )*/ );
+	    }
+
+    	if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
+	    {
+	        add_submenu_page( null, __( 'Applicant Matching Properties', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-properties', array($this, 'matching_properties_page'));
+	    }
         //remove_submenu_page( 'propertyhive', 'ph-matching-properties' );
     }
 
