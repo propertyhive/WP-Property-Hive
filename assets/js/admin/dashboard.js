@@ -32,7 +32,6 @@ jQuery(window).load(function()
 
 		jQuery.post(propertyhive_dashboard.ajax_url, data, function(response)
 		{
-			console.log(response);
 			if ( response == '' || response.length == 0 )
 			{
 				jQuery('#ph_dashboard_viewings_awaiting_applicant_feedback').html('No viewings found awaiting feedback');
