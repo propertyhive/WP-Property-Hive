@@ -119,6 +119,7 @@ jQuery(document).ready(function($)
         var data = {
             action:         'propertyhive_search_properties',
             keyword:        keyword,
+            department:     'residential-sales',
             security:       '<?php echo wp_create_nonce( 'search-properties' ); ?>',
         };
         $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 

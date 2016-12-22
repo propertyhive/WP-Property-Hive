@@ -424,6 +424,9 @@ class PH_Post_types {
                     'public'                => false,
                     'show_ui'               => true,
                     'capability_type'       => 'post',
+                    'capabilities' => array(
+                        'create_posts' => false
+                    ),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,

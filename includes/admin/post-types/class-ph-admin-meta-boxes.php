@@ -90,6 +90,7 @@ class PH_Admin_Meta_Boxes {
         $this->check_contact_create_relationship();
         $this->check_contact_delete_relationship();
         $this->check_remove_solicitor();
+        $this->check_create_offer();
         $this->check_create_sale();
 	}
 
@@ -231,6 +232,65 @@ class PH_Admin_Meta_Boxes {
         }
     }
 
+    public function check_create_offer()
+    {
+        if ( isset($_GET['create_offer']) && isset($_GET['post']) )
+        {
+            if ( get_post_type($_GET['post']) != 'viewing')
+                return;
+
+            $viewing = new PH_Viewing((int)$_GET['post']);
+
+            $offer_post = array(
+              'post_title'    => '',
+              'post_content'  => '',
+              'post_type'  => 'offer',
+              'post_status'   => 'publish',
+              'comment_status'    => 'closed',
+              'ping_status'    => 'closed',
+            );
+            
+            // Insert the post into the database
+            $offer_post_id = wp_insert_post( $offer_post );
+            
+            add_post_meta( $offer_post_id, '_status', 'pending' );
+            add_post_meta( $offer_post_id, '_amount', '' );
+            add_post_meta( $offer_post_id, '_applicant_contact_id', $viewing->applicant_contact_id );
+            add_post_meta( $offer_post_id, '_applicant_solicitor_contact_id', '' );
+            add_post_meta( $offer_post_id, '_property_id', $viewing->property_id );
+            add_post_meta( $offer_post_id, '_property_owner_solicitor_contact_id', '' );
+            add_post_meta( $offer_post_id, '_offer_date_time', date("Y-m-d H:i:s") );
+
+            update_post_meta( $_GET['post'], '_offer_id', $offer_post_id );
+            update_post_meta( $_GET['post'], '_status', 'offer_made' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_offer_made',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $_GET['post'],
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+
+            // Do redirect
+            wp_redirect( admin_url( 'post.php?post=' . $offer_post_id . '&action=edit' ) );
+            exit();
+        }
+
+    }
+
     public function check_create_sale()
     {
         if ( isset($_GET['create_sale']) && isset($_GET['post']) )
@@ -261,6 +321,26 @@ class PH_Admin_Meta_Boxes {
             add_post_meta( $sale_post_id, '_sale_date_time', date("Y-m-d H:i:s") );
 
             update_post_meta( $_GET['post'], '_sale_id', $sale_post_id );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to offer
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'offer_sale_created',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $_GET['post'],
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
 
             // Do redirect
             wp_redirect( admin_url( 'post.php?post=' . $sale_post_id . '&action=edit' ) );
@@ -714,7 +794,7 @@ class PH_Admin_Meta_Boxes {
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
         {
             add_meta_box( 'propertyhive-property-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Property_Actions::output', 'property', 'side' );
-            add_meta_box( 'propertyhive-property-notes', __( 'Property Notes', 'propertyhive' ), 'PH_Meta_Box_Property_Notes::output', 'property', 'side' );
+            add_meta_box( 'propertyhive-property-notes', __( 'Property History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Property_Notes::output', 'property', 'side' );
         }
 
         // CONTACT
@@ -872,7 +952,7 @@ class PH_Admin_Meta_Boxes {
             {
                 add_meta_box( 'propertyhive-contact-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Contact_Actions::output', 'contact', 'side' );
             }
-            add_meta_box( 'propertyhive-contact-notes', __( 'Contact Notes', 'propertyhive' ), 'PH_Meta_Box_Contact_Notes::output', 'contact', 'side' );
+            add_meta_box( 'propertyhive-contact-notes', __( 'Contact History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Contact_Notes::output', 'contact', 'side' );
         } 
 
         // ENQUIRY
@@ -949,7 +1029,7 @@ class PH_Admin_Meta_Boxes {
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'viewing' )
         {
             add_meta_box( 'propertyhive-viewing-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Viewing_Actions::output', 'viewing', 'side' );
-            add_meta_box( 'propertyhive-viewing-notes', __( 'Viewing Notes', 'propertyhive' ), 'PH_Meta_Box_Viewing_Notes::output', 'viewing', 'side' );
+            add_meta_box( 'propertyhive-viewing-notes', __( 'Viewing History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Viewing_Notes::output', 'viewing', 'side' );
         }
 
         // OFFER
@@ -1018,7 +1098,7 @@ class PH_Admin_Meta_Boxes {
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'offer' )
         {
             add_meta_box( 'propertyhive-offer-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Offer_Actions::output', 'offer', 'side' );
-            add_meta_box( 'propertyhive-offer-notes', __( 'Offer Notes', 'propertyhive' ), 'PH_Meta_Box_Offer_Notes::output', 'offer', 'side' );
+            add_meta_box( 'propertyhive-offer-notes', __( 'Offer History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Offer_Notes::output', 'offer', 'side' );
         }
 
         // SALE
@@ -1087,7 +1167,7 @@ class PH_Admin_Meta_Boxes {
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'sale' )
         {
             add_meta_box( 'propertyhive-sale-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Sale_Actions::output', 'sale', 'side' );
-            add_meta_box( 'propertyhive-sale-notes', __( 'Sale Notes', 'propertyhive' ), 'PH_Meta_Box_Sale_Notes::output', 'sale', 'side' );
+            add_meta_box( 'propertyhive-sale-notes', __( 'Sale History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Sale_Notes::output', 'sale', 'side' );
         }
 
         $tabs = apply_filters( 'propertyhive_tabs', $tabs );

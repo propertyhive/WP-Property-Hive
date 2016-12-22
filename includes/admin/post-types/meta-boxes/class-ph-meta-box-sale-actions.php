@@ -39,10 +39,10 @@ jQuery(document).ready(function($)
 
 		$(this).attr('disabled', 'disabled');
 
-		if ( this_href == '#action_panel_sale_accepted' )
+		if ( this_href == '#action_panel_sale_exchanged' )
 		{
 			var data = {
-		        action:         'propertyhive_sale_accepted',
+		        action:         'propertyhive_sale_exchanged',
 		        sale_id:    	<?php echo $post->ID; ?>,
 		        security:       '<?php echo wp_create_nonce( 'sale-actions' ); ?>',
 		    };
@@ -53,10 +53,10 @@ jQuery(document).ready(function($)
 			return;
 		}
 
-		if ( this_href == '#action_panel_sale_declined' )
+		if ( this_href == '#action_panel_sale_completed' )
 		{
 			var data = {
-		        action:         'propertyhive_sale_declined',
+		        action:         'propertyhive_sale_completed',
 		        sale_id:    	<?php echo $post->ID; ?>,
 		        security:       '<?php echo wp_create_nonce( 'sale-actions' ); ?>',
 		    };
@@ -67,10 +67,10 @@ jQuery(document).ready(function($)
 			return;
 		}
 
-		if ( this_href == '#action_panel_sale_revert_pending' )
+		if ( this_href == '#action_panel_sale_fallen_through' )
 		{
 			var data = {
-		        action:         'propertyhive_sale_revert_pending',
+		        action:         'propertyhive_sale_fallen_through',
 		        sale_id:    	<?php echo $post->ID; ?>,
 		        security:       '<?php echo wp_create_nonce( 'sale-actions' ); ?>',
 		    };

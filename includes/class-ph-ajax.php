@@ -64,6 +64,10 @@ class PH_AJAX {
             'get_sale_details_meta_box' => false,
             'get_sale_actions' => false,
             'get_sale_details_meta_box' => false,
+            'sale_exchanged' => false,
+            'sale_completed' => false,
+            'sale_fallen_through' => false,
+            'offer_declined' => false,
             'get_property_sales_meta_box' => false,
             'get_contact_sales_meta_box' => false,
 		);
@@ -273,7 +277,20 @@ class PH_AJAX {
                 'post_status' => array( 'publish' ),
                 'fields' => 'ids'
             );
-            
+
+            $meta_query = array();
+            if ( isset($_POST['department']) && $_POST['department'] != '' )
+            {
+                $meta_query[] = array(
+                    'key' => '_department',
+                    'value' => $_POST['department'],
+                );
+            }
+            if ( !empty($meta_query) )
+            {
+                $args['meta_query'] = $meta_query;
+            }
+
             add_filter( 'posts_join', array( $this, 'search_properties_join' ), 10, 2 );
             add_filter( 'posts_where', array( $this, 'search_properties_where' ), 10, 2 );
             
@@ -1058,9 +1075,23 @@ class PH_AJAX {
         
             <label for="">' . __('Status', 'propertyhive') . '</label>
             
-            ' . ucwords(str_replace("_", " ", $viewing->status)) . '    
+            ' . ucwords(str_replace("_", " ", $viewing->status));
+
+        if ( $viewing->status == 'offer_made' )
+        {
+            $offer_id = get_post_meta( $viewing->id, '_offer_id', TRUE );
+            if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+            {
+                $offer_id = '';
+            }
+
+            if ( $offer_id != '' )
+            {
+                echo ' (<a href="' . get_edit_post_link($offer_id) . '">' . __('View Offer', 'propertyhive') . '</a>)';
+            }
+        }
         
-        </p>';
+        echo '</p>';
 
         if ( $viewing->status == 'carried_out' )
         {
@@ -1138,7 +1169,7 @@ class PH_AJAX {
         $status = get_post_meta( $post_id, '_status', TRUE );
         $feedback_status = get_post_meta( $post_id, '_feedback_status', TRUE );
 
-        echo '<div class="propertyhive_meta_box" id="propertyhive_viewing_actions_meta_box">
+        echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="propertyhive_viewing_actions_meta_box">
 
         <div class="options_group" style="padding-top:8px;">';
 
@@ -1148,7 +1179,7 @@ class PH_AJAX {
         {
             echo '<a 
                     href="#action_panel_viewing_carried_out" 
-                    class="button viewing-action"
+                    class="button button-success viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Viewing Carried Out', 'propertyhive') . '</a>';
             echo '<a 
@@ -1164,13 +1195,13 @@ class PH_AJAX {
             {
                 echo '<a 
                     href="#action_panel_viewing_interested" 
-                    class="button viewing-action"
+                    class="button button-success viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Applicant Interested', 'propertyhive') . '</a>';
 
                 echo '<a 
                     href="#action_panel_viewing_not_interested" 
-                    class="button viewing-action"
+                    class="button button-danger viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Applicant Not Interested', 'propertyhive') . '</a>';
 
@@ -1187,9 +1218,37 @@ class PH_AJAX {
             {
                 echo '<a 
                     href="' . trim(admin_url(), '/') . '/post-new.php?post_type=viewing&applicant_contact_id=' . get_post_meta( $post_id, '_applicant_contact_id', TRUE ) . '&property_id=' . get_post_meta( $post_id, '_property_id', TRUE ) . '&viewing_id=' . $post_id .'" 
-                    class="button"
+                    class="button button-success"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Book Second Viewing', 'propertyhive') . '</a>';
+
+                $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+                if ( get_post_meta( $property_id, '_department', TRUE ) == 'residential-sales' )
+                {
+                    // See if an offer has this viewing id associated with it
+                    $offer_id = get_post_meta( $post_id, '_offer_id', TRUE );
+                    if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+                    {
+                        $offer_id = '';
+                    }
+
+                    if ( $offer_id != '' )
+                    {
+                        echo '<a 
+                                href="' . get_edit_post_link( $offer_id, '' ) . '" 
+                                class="button"
+                                style="width:100%; margin-bottom:7px; text-align:center" 
+                            >' . __('View Offer', 'propertyhive') . '</a>';
+                    }
+                    else
+                    {
+                        echo '<a 
+                                href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_offer' ) . '" 
+                                class="button button-success"
+                                style="width:100%; margin-bottom:7px; text-align:center" 
+                            >' . __('Record Offer', 'propertyhive') . '</a>';
+                    }
+                }
             }
 
             if ( get_post_meta( $post_id, '_feedback_passed_on', TRUE ) != 'yes' && ( $feedback_status == 'interested' || $feedback_status == 'not_interested' ) )
@@ -1208,6 +1267,24 @@ class PH_AJAX {
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Revert To Feedback Pending', 'propertyhive') . '</a>';
+            }
+        }
+
+        if ( $status == 'offer_made' )
+        {
+            $offer_id = get_post_meta( $post_id, '_offer_id', TRUE );
+            if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
+            {
+                $offer_id = '';
+            }
+
+            if ( $offer_id != '' )
+            {
+                echo '<a 
+                        href="' . get_edit_post_link( $offer_id, '' ) . '" 
+                        class="button"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . __('View Offer', 'propertyhive') . '</a>';
             }
         }
 
@@ -1279,6 +1356,26 @@ class PH_AJAX {
         if ( $status == 'pending' )
         {
             update_post_meta( $post_id, '_status', 'carried_out' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_carried_out',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -1295,6 +1392,26 @@ class PH_AJAX {
         if ( $status == 'pending' )
         {
             update_post_meta( $post_id, '_status', 'cancelled' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_cancelled',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -1312,6 +1429,26 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_feedback_status', 'interested' );
             update_post_meta( $post_id, '_feedback', $_POST['feedback'] );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_applicant_interested',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -1329,6 +1466,26 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_feedback_status', 'not_interested' );
             update_post_meta( $post_id, '_feedback', $_POST['feedback'] );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_applicant_not_interested',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -1345,6 +1502,26 @@ class PH_AJAX {
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_feedback_status', 'not_required' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_feedback_not_required',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -1362,6 +1539,26 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_feedback_status', '' );
             update_post_meta( $post_id, '_feedback_passed_on', '' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_revert_feedback_pending',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -1379,6 +1576,26 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'pending' );
             update_post_meta( $post_id, '_feedback_status', '' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_revert_pending',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -1395,6 +1612,26 @@ class PH_AJAX {
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_feedback_passed_on', 'yes' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_feedback_passed_on',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -1953,7 +2190,7 @@ class PH_AJAX {
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
-        echo '<div class="propertyhive_meta_box" id="propertyhive_offer_actions_meta_box">
+        echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="propertyhive_offer_actions_meta_box">
 
         <div class="options_group" style="padding-top:8px;">';
 
@@ -1961,12 +2198,12 @@ class PH_AJAX {
         {
             echo '<a 
                     href="#action_panel_offer_accepted" 
-                    class="button offer-action"
+                    class="button button-success offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Accept Offer', 'propertyhive') . '</a>';
             echo '<a 
                     href="#action_panel_offer_declined" 
-                    class="button offer-action"
+                    class="button button-danger offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Decline Offer', 'propertyhive') . '</a>';
         }
@@ -1975,7 +2212,7 @@ class PH_AJAX {
         {
             // See if a sale has this offer id associated with it
             $sale_id = get_post_meta( $post_id, '_sale_id', TRUE );
-            if ( $sale_id != '' && get_post_status($sale_id) == 'publish' )
+            if ( $sale_id != '' && get_post_status($sale_id) != 'publish' )
             {
                 $sale_id = '';
             }
@@ -1992,7 +2229,7 @@ class PH_AJAX {
             {
                 echo '<a 
                         href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' ) . '" 
-                        class="button"
+                        class="button button-success"
                         style="width:100%; margin-bottom:7px; text-align:center" 
                     >' . __('Create Sale', 'propertyhive') . '</a>';
             }
@@ -2030,6 +2267,26 @@ class PH_AJAX {
         if ( $status == 'pending' )
         {
             update_post_meta( $post_id, '_status', 'accepted' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to offer
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'offer_accepted',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -2046,6 +2303,26 @@ class PH_AJAX {
         if ( $status == 'pending' )
         {
             update_post_meta( $post_id, '_status', 'declined' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to offer
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'offer_declined',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -2062,6 +2339,26 @@ class PH_AJAX {
         if ( $status == 'accepted' || $status == 'declined' )
         {
             update_post_meta( $post_id, '_status', 'pending' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to offer
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'offer_revert_pending',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -2297,7 +2594,7 @@ class PH_AJAX {
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
-        echo '<div class="propertyhive_meta_box" id="propertyhive_sale_actions_meta_box">
+        echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="propertyhive_sale_actions_meta_box">
 
         <div class="options_group" style="padding-top:8px;">';
 
@@ -2305,7 +2602,7 @@ class PH_AJAX {
         {
             echo '<a 
                     href="#action_panel_sale_exchanged" 
-                    class="button offer-action"
+                    class="button button-success sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Sale Exchanged', 'propertyhive') . '</a>';
             
@@ -2315,21 +2612,21 @@ class PH_AJAX {
         {
             echo '<a 
                     href="#action_panel_sale_completed" 
-                    class="button offer-action"
+                    class="button button-success sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Sale Completed', 'propertyhive') . '</a>';
         }
 
         if ( $status == 'completed' )
         {
-            
+            echo '<div style="text-align:center">No actions to display</div>';
         }
 
         if ( $status == 'current' || $status == 'exchanged' )
         {
             echo '<a 
                     href="#action_panel_sale_fallen_through" 
-                    class="button offer-action"
+                    class="button sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Sale Fallen Through', 'propertyhive') . '</a>';
         }
@@ -2352,6 +2649,26 @@ class PH_AJAX {
         if ( $status == 'current' )
         {
             update_post_meta( $post_id, '_status', 'exchanged' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'sale_exchanged',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -2368,6 +2685,26 @@ class PH_AJAX {
         if ( $status == 'exchanged' )
         {
             update_post_meta( $post_id, '_status', 'completed' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'sale_completed',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();
@@ -2384,6 +2721,26 @@ class PH_AJAX {
         if ( $status == 'current' || $status == 'exchanged' )
         {
             update_post_meta( $post_id, '_status', 'fallen_through' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'sale_fallen_through',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
         }
 
         die();

@@ -28,6 +28,12 @@ class PH_Meta_Box_Property_Notes {
 
         $notes = get_comments( $args );
 
+        // Get notes for all viewings
+        
+        // Get notes for all offers
+
+        // Get notes for all sales
+
         echo '<ul class="record_notes" style="max-height:300px; overflow-y:auto">';
 
         if ( !empty($notes) ) 

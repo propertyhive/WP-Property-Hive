@@ -290,6 +290,13 @@ jQuery(document).ready(function($)
     	if (keyCode == 13)
     	{
       		event.preventDefault();
+
+      		// Select first applicant in the list if one exists
+      		if ( $.isNumeric( $('#viewing_search_applicant_results ul li:first-child a').attr('href') ) )
+      		{
+      			$('#viewing_search_applicant_results ul li:first-child a').trigger('click');
+      		}
+
       		return false;
     	}
   	});
@@ -325,7 +332,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+	        	$('#viewing_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'<br><a href="new-applicant" data-name="' + keyword + '">Add as new applicant?</a></div>');
 	        }
 	        else
 	        {
@@ -337,6 +344,21 @@ jQuery(document).ready(function($)
 	        }
 			$('#viewing_search_applicant_results').show();
         }, 'json');
+	});
+
+	$('body').on('click', '#viewing_search_applicant_results a[href=\'new-applicant\']', function(e)
+	{
+		e.preventDefault();
+
+		var name = $(this).attr('data-name');
+
+		$('#viewing_search_applicant_results').html('');
+		$('#viewing_search_applicant_results').hide();
+
+		$('#viewing_applicant_search').val('');
+		$('#viewing_applicant_name').val(name);
+
+		$('a#viewing-applicant-search-new-toggle').trigger('click');
 	});
 
 	$('#viewing_applicant_search').on('blur', function(e)
@@ -365,6 +387,13 @@ jQuery(document).ready(function($)
     	if (keyCode == 13)
     	{
       		event.preventDefault();
+
+      		// Select first applicant in the list if one exists
+      		if ( $.isNumeric( $('#viewing_search_negotiator_results ul li:first-child a').attr('href') ) )
+      		{
+      			$('#viewing_search_negotiator_results ul li:first-child a').trigger('click');
+      		}
+
       		return false;
     	}
   	});
@@ -591,6 +620,13 @@ jQuery(document).ready(function($)
     	if (keyCode == 13)
     	{
       		event.preventDefault();
+
+      		// Select first applicant in the list if one exists
+      		if ( $.isNumeric( $('#offer_search_applicant_results ul li:first-child a').attr('href') ) )
+      		{
+      			$('#offer_search_applicant_results ul li:first-child a').trigger('click');
+      		}
+
       		return false;
     	}
   	});
@@ -636,7 +672,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#offer_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+	        	$('#offer_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'<br><a href="new-applicant" data-name="' + keyword + '">Add as new applicant?</a></div>');
 	        }
 	        else
 	        {
@@ -648,6 +684,21 @@ jQuery(document).ready(function($)
 	        }
 			$('#offer_search_applicant_results').show();
         }, 'json');
+	});
+
+	$('body').on('click', '#offer_search_applicant_results a[href=\'new-applicant\']', function(e)
+	{
+		e.preventDefault();
+
+		var name = $(this).attr('data-name');
+
+		$('#offer_search_applicant_results').html('');
+		$('#offer_search_applicant_results').hide();
+
+		$('#offer_applicant_search').val('');
+		$('#offer_applicant_name').val(name);
+
+		$('a#offer-applicant-search-new-toggle').trigger('click');
 	});
 
 	$('#offer_applicant_search').on('blur', function(e)

@@ -261,6 +261,13 @@ jQuery(document).ready(function($)
     	if (keyCode == 13)
     	{
       		event.preventDefault();
+
+      		// Select first property in the list if one exists
+      		if ( $.isNumeric( $('#viewing_search_property_results ul li:first-child a').attr('href') ) )
+      		{
+      			$('#viewing_search_property_results ul li:first-child a').trigger('click');
+      		}
+
       		return false;
     	}
   	});
@@ -336,6 +343,13 @@ jQuery(document).ready(function($)
     	if (keyCode == 13)
     	{
       		event.preventDefault();
+
+      		// Select first negotiator in the list if one exists
+      		if ( $.isNumeric( $('#viewing_search_negotiator_results ul li:first-child a').attr('href') ) )
+      		{
+      			$('#viewing_search_negotiator_results ul li:first-child a').trigger('click');
+      		}
+
       		return false;
     	}
   	});
@@ -517,6 +531,13 @@ jQuery(document).ready(function($)
     	if (keyCode == 13)
     	{
       		event.preventDefault();
+
+      		// Select first property in the list if one exists
+      		if ( $.isNumeric( $('#offer_search_property_results ul li:first-child a').attr('href') ) )
+      		{
+      			$('#offer_search_property_results ul li:first-child a').trigger('click');
+      		}
+      		
       		return false;
     	}
   	});
