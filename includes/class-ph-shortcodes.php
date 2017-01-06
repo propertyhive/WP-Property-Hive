@@ -26,6 +26,7 @@ class PH_Shortcodes {
 			'property_search_form'         => __CLASS__ . '::property_search_form',
 			'property_map'                 => __CLASS__ . '::property_map',
 			'property_street_view'         => __CLASS__ . '::property_street_view',
+			'applicant_registration_form'  => __CLASS__ . '::applicant_registration_form',
 		);
 
 		foreach ( $shortcodes as $shortcode => $function ) {
@@ -556,6 +557,47 @@ class PH_Shortcodes {
 		ob_start();
 
 		echo get_property_street_view( $atts );
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Output applicant registration form
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function applicant_registration_form( $atts ) {
+
+		global $property;
+
+		$atts = shortcode_atts( array(
+
+		), $atts );
+
+		$assets_path          = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
+        wp_enqueue_script( 'ph-applicant-registration', $assets_path . 'js/frontend/applicant-registration.js', array( 'jquery' ), PH_VERSION, true );
+
+		ob_start();
+
+		$form_controls = ph_get_applicant_registration_form_fields();
+    
+    	$form_controls = apply_filters( 'propertyhive_applicant_registration_form_fields', $form_controls );
+?>
+	
+<form name="ph_applicant_registration_form" class="applicant-registration-form" action="" method="post">
+ 
+    <?php foreach ( $form_controls as $key => $field ) : ?>
+
+        <?php ph_form_field( $key, $field ); ?>
+
+    <?php endforeach; ?>
+
+    <input type="submit" value="<?php _e( 'Register', 'propertyhive' ); ?>">
+
+</form>
+
+<?php
 
 		return ob_get_clean();
 	}

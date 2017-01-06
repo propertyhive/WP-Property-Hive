@@ -91,7 +91,7 @@ class PH_Install {
 	 * Install Property Hive
 	 */
 	public function install() {
-        
+
 		$this->create_options();
 		$this->create_tables();
 		$this->create_roles();
@@ -639,11 +639,18 @@ Kind regards,
 	public function create_roles() {
 		global $wp_roles;
 
-		if ( class_exists( 'WP_Roles' ) ) {
-			if ( ! isset( $wp_roles ) ) {
-				$wp_roles = new WP_Roles();
-			}
+        if ( ! class_exists( 'WP_Roles' ) ) {
+            return;
+        }
+
+		if ( ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
 		}
+
+        // Customer role
+        add_role( 'property_hive_contact', __( 'Property Hive Contact', 'propertyhive' ), array(
+            'read' => true,
+        ) );
 
 		if ( is_object( $wp_roles ) ) {
 

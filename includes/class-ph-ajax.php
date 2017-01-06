@@ -73,6 +73,8 @@ class PH_AJAX {
             'offer_declined' => false,
             'get_property_sales_meta_box' => false,
             'get_contact_sales_meta_box' => false,
+
+            'validate_save_contact' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -773,7 +775,82 @@ class PH_AJAX {
         die( json_encode( array('success' => get_edit_post_link($contact_post_id, '')) ) );
     }
 
-    // Dashboard related functionas
+    public function validate_save_contact()
+    {
+        global $post;
+
+        check_ajax_referer( 'contact-save-validation', 'security' );
+
+        $this->json_headers();
+
+        parse_str($_POST['form_data']);
+        var_dump();
+        $return = array('errors' => array());
+
+        if ( isset($_email_address) && $_email_address != '' )
+        {
+            $email_addresses = explode( ",", $_email_address );
+
+            foreach ( $email_addresses as $email_address )
+            {
+                $email_address = trim( $email_address );
+
+                if ( !is_email($email_address) )
+                {
+                    $return['errors'][] = __( 'Email address is invalid', 'propertyhive' ) . ' - ' . $email_address;
+                }
+
+                // Check it doesn't exist already
+                $args = array(
+                    'post_type' => 'contact',
+                    'post_status' => 'any',
+                    'posts_per_page' => 1,
+                    'fields' => 'ids',
+                    'meta_query' => array(
+                        'relation' => 'OR',
+                        array(
+                            'key' => '_email_address',
+                            'value' => $email_address,
+                            'compare' => '='
+                        ),
+                        array(
+                            'key' => '_email_address',
+                            'value' => ',' . $email_address,
+                            'compare' => 'LIKE'
+                        )
+                        ,
+                        array(
+                            'key' => '_email_address',
+                            'value' => $email_address . ',',
+                            'compare' => 'LIKE'
+                        )
+                    )
+                );
+                if ( isset($post_ID) && $post_ID != '' )
+                {
+                    $args['post__not_in'] = array( $post_ID );
+                }
+
+                $contact_query = new WP_Query( $args );
+
+                if ( $contact_query->have_posts() )
+                {
+                    while ( $contact_query->have_posts() )
+                    {
+                        $contact_query->the_post();
+
+                        $return['errors'][] = __( 'A contact, ' . get_the_title() . ', already exists with email address', 'propertyhive' ) . ' ' . $email_address;
+                    }
+                }
+            }
+        }
+
+        echo json_encode($return);
+
+        die();
+    }
+
+    // Dashboard related functions
     public function get_news()
     {
         $this->json_headers();
