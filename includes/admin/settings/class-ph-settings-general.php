@@ -41,7 +41,8 @@ class PH_Settings_General extends PH_Settings_Page {
         $sections = array(
             ''         => __( 'General', 'propertyhive' ),
             'international'         => __( 'International', 'propertyhive' ),
-            'map'         => __( 'Map', 'propertyhive' )
+            'map'         => __( 'Map', 'propertyhive' ),
+            'misc'         => __( 'Miscellaneous', 'propertyhive' )
         );
 
         return $sections;
@@ -174,6 +175,33 @@ class PH_Settings_General extends PH_Settings_Page {
 	}
 
 	/**
+	 * Get misc settings array
+	 *
+	 * @return array
+	 */
+	public function get_general_misc_setting() {
+		    
+		return apply_filters( 'propertyhive_general_map_settings', array(
+
+			array( 'title' => __( 'Property Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'property_options' ),
+
+            array(
+                'title'   => __( 'When Entering Features', 'propertyhive' ),
+                'id'      => 'propertyhive_features_type',
+                'type'    => 'radio',
+                'options' => array(
+                	'' => __( 'Allow Features To Be Freetyped', 'propertyhive' ),
+                	'checkbox' => __( 'Select From A Predefined List (Editable from \'Custom Fields\')', 'propertyhive' ),
+                ),
+                'desc'	=> __( '', 'propertyhive' )
+            ),
+
+			array( 'type' => 'sectionend', 'id' => 'property_options'),
+
+		) ); // End general misc settings
+	}
+
+	/**
      * Output the settings
      */
     public function output() {
@@ -185,6 +213,7 @@ class PH_Settings_General extends PH_Settings_Page {
             {
                 case "international": { $settings = $this->get_general_international_setting(); break; }
                 case "map": { $settings = $this->get_general_map_setting(); break; }
+                case "misc": { $settings = $this->get_general_misc_setting(); break; }
                 default: { die("Unknown setting section"); }
             }
         }
@@ -248,6 +277,13 @@ class PH_Settings_General extends PH_Settings_Page {
 				case 'map':
 				{
 					$settings = $this->get_general_map_setting();
+
+					PH_Admin_Settings::save_fields( $settings );
+					break;
+				}
+				case 'misc':
+				{
+					$settings = $this->get_general_misc_setting();
 
 					PH_Admin_Settings::save_fields( $settings );
 					break;
