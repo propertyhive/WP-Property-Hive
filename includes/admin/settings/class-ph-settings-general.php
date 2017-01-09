@@ -134,7 +134,7 @@ class PH_Settings_General extends PH_Settings_Page {
 
 			array(
                 'type'    => 'html',
-                'html'    => __( 'Here you can choose which modules are enabled or disabledUnknow within Property Hive. Check the modules you <strong>DO NOT</strong> wish to use from the list below', 'propertyhive' ) . ':',
+                'html'    => __( 'Here you can choose which modules are enabled or disabled within Property Hive. Check the modules you <strong>DO NOT</strong> wish to use from the list below', 'propertyhive' ) . ':',
             ),
             
             array(
