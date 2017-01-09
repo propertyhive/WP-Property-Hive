@@ -2197,8 +2197,8 @@ class PH_AJAX {
             </p>';
         }
 
-        $offer_date_time = get_post_meta( $offer->id, $offer->offer_date_time, true );
-        if ( $offer_date_time == '' )
+        $offer_date_time = $offer->offer_date_time;
+        if ( empty($offer_date_time) )
         {
             $offer_date_time = date("Y-m-d H:i:s");
         }
@@ -2210,7 +2210,7 @@ class PH_AJAX {
             <input type="text" id="_offer_date" name="_offer_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="' . date("Y-m-d", strtotime($offer_date_time)) . '">
             <select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="width:55px">';
         
-        if ( $offer_date_time == '' )
+        if ( empty($offer_date_time) )
         {
             $value = date("H");
         }
@@ -2230,7 +2230,7 @@ class PH_AJAX {
         :
         <select id="_offer_time_minutes" name="_offer_time_minutes" class="select short" style="width:55px">';
         
-        if ( $offer_date_time == '' )
+        if ( empty($offer_date_time) )
         {
             $value = '';
         }
@@ -2640,8 +2640,8 @@ class PH_AJAX {
             </p>';
         }
 
-        $sale_date_time = get_post_meta( $offer->id, $sale->sale_date_time, true );
-        if ( $sale_date_time == '' )
+        $sale_date_time = $sale->sale_date_time;
+        if ( empty($sale_date_time) )
         {
             $sale_date_time = date("Y-m-d H:i:s");
         }
