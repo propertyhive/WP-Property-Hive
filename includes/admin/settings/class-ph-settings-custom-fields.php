@@ -121,6 +121,12 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         $sections[ 'marketing-flag' ] = __( 'Marketing Flags', 'propertyhive' );
         add_action( 'propertyhive_admin_field_custom_fields_marketing_flag', array( $this, 'custom_fields_marketing_flag_setting' ) );
 
+        if ( get_option('propertyhive_features_type') == 'checkbox' )
+        {
+            $sections[ 'property-feature' ] = __( 'Property Features', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_property_feature', array( $this, 'custom_fields_property_feature_setting' ) );
+        }
+
         return $sections;
     }
     
@@ -207,6 +213,10 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "marketing-flag": { $settings = $this->get_custom_fields_marketing_flag_setting(); break; }
                     case "marketing-flag-delete": { $settings = $this->get_custom_fields_delete($current_id, 'marketing_flag', __( 'Marketing Flag', 'propertyhive' )); break; }
                     
+                    case "property-feature": { $settings = $this->get_custom_fields_property_feature_setting(); break; }
+                    case "property-feature-delete": { $settings = $this->get_custom_fields_delete($current_id, 'property_feature', __( 'Property Feature', 'propertyhive' )); break; }
+                    
+
                     default: { echo 'UNKNOWN CUSTOM FIELD'; }
                 }
                 
@@ -423,10 +433,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         {
                         ?>
                         <tr>
-                            <td><?php echo __( 'No property types found', 'propertyhive' ); ?></td>
-                            <td class="settings">
-                                
-                            </td>
+                            <td colspan="3"><?php echo __( 'No property types found', 'propertyhive' ); ?></td>
                         </tr>
                         <?php
                         }
@@ -534,10 +541,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         {
                         ?>
                         <tr>
-                            <td><?php echo __( 'No property types found', 'propertyhive' ); ?></td>
-                            <td class="settings">
-                                
-                            </td>
+                            <td colspan="3"><?php echo __( 'No property types found', 'propertyhive' ); ?></td>
                         </tr>
                         <?php
                         }
@@ -1330,6 +1334,84 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             <td class="forminp forminp-button">
                 <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
                 <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Marketing Flag', 'propertyhive' ); ?></a>
+            </td>
+        </tr>
+    <?php
+    }
+
+    /**
+     * Output list of property feature options
+     *
+     * @access public
+     * @return void
+     */
+    public function custom_fields_property_feature_setting() {
+        global $post;
+    ?>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                &nbsp;
+            </th>
+            <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-feature&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Feature', 'propertyhive' ); ?></a>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row" class="titledesc"><?php _e( 'Property Features', 'propertyhive' ) ?></th>
+            <td class="forminp">
+                <table class="ph_customfields widefat" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="type"><?php _e( 'Property Feature', 'propertyhive' ); ?></th>
+                            <th class="settings">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => 0
+                        );
+                        $terms = get_terms( 'property_feature', $args );
+                        
+                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                        {
+                            foreach ($terms as $term)
+                            { 
+                        ?>
+                        <tr>
+                            <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="type"><?php echo $term->name; ?></td>
+                            <td class="settings">
+                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-feature&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
+                                <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-feature-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
+                            </td>
+                        </tr>
+                        <?php
+                            }
+                        }
+                        else
+                        {
+                        ?>
+                        <tr>
+                            <td colspan="3"><?php echo __( 'No property features found', 'propertyhive' ); ?></td>
+                        </tr>
+                        <?php
+                        }
+                    ?>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                &nbsp;
+            </th>
+            <td class="forminp forminp-button">
+                <a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-feature&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Property Feature', 'propertyhive' ); ?></a>
             </td>
         </tr>
     <?php
@@ -2191,6 +2273,49 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     }
 
     /**
+     * Show property feature add/edit options
+     *
+     * @access public
+     * @return string
+     */
+    public function get_custom_fields_property_feature_setting()
+    {
+        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        
+        $taxonomy = 'property_feature';
+        $term_name = '';
+        if ($current_id != '')
+        {
+            $term = get_term( $current_id, $taxonomy );
+            $term_name = $term->name;
+        }
+
+        $args = array(
+
+            array( 'title' => __( ( $current_id == '' ? 'Add New Property Feature' : 'Edit Property Feature' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_property_feature_settings' ),
+            
+            array(
+                'title' => __( 'Property Feature', 'propertyhive' ),
+                'id'        => 'property_feature_name',
+                'default'   => $term_name,
+                'type'      => 'text',
+                'desc_tip'  =>  false,
+            ),
+            
+            array(
+                'type'      => 'hidden',
+                'id'        => 'taxonomy',
+                'default'     => $taxonomy
+            ),
+            
+            array( 'type' => 'sectionend', 'id' => 'custom_field_property_feature_settings' )
+            
+        );
+        
+        return apply_filters( 'propertyhive_custom_field_property_feature_settings', $args );
+    }
+
+    /**
      * Save settings
      */
     public function save() {
@@ -2249,6 +2374,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "commercial-tenure":
                     case "furnished":
                     case "marketing-flag":
+                    case "property-feature":
                     {
                         // TODO: Validate (check for blank fields)
                         
@@ -2286,6 +2412,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "tenure-delete":
                     case "furnished-delete":
                     case "marketing-flag-delete":
+                    case "property-feature-delete":
                     {
                         if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == '1' )
                         {
