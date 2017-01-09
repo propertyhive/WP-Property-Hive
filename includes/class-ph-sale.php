@@ -3,23 +3,23 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Enquiry
+ * Sale
  *
- * The PropertyHive enquiry class handles enquiry data.
+ * The Property Hive sale class handles sale data.
  *
- * @class       PH_Property
+ * @class       PH_Sale
  * @version     1.0.0
  * @package     PropertyHive/Classes
  * @category    Class
  * @author      PropertyHive
  */
-class PH_Enquiry {
+class PH_Sale {
 
-    /** @public int Enquiry (post) ID */
+    /** @public int Sale (post) ID */
     public $id;
 
     /**
-     * Get the enquiry if ID is passed, otherwise the enquiry is new and empty.
+     * Get the sale if ID is passed, otherwise the sale is new and empty.
      *
      * @access public
      * @param string $id (default: '')
@@ -27,18 +27,18 @@ class PH_Enquiry {
      */
     public function __construct( $id = '' ) {
         if ( $id > 0 ) {
-            $this->get_enquiry( $id );
+            $this->get_sale( $id );
         }
     }
 
     /**
-     * Gets a enquiry from the database.
+     * Gets a sale from the database.
      *
      * @access public
      * @param int $id (default: 0)
      * @return bool
      */
-    public function get_enquiry( $id = 0 ) {
+    public function get_sale( $id = 0 ) {
         if ( ! $id ) {
             return false;
         }
@@ -81,7 +81,7 @@ class PH_Enquiry {
     }
     
     /**
-     * Populates a enquiry from the loaded post data.
+     * Populates a sale from the loaded post data.
      *
      * @access public
      * @param mixed $result
@@ -92,5 +92,19 @@ class PH_Enquiry {
         $this->id                  = $result->ID;
         $this->post_title          = $result->post_title;
         $this->post_status         = $result->post_status;
+    }
+
+    /**
+     * Get the formatted sale amount
+     *
+     * @access public
+     * @return string
+     */
+    public function get_formatted_amount( ) {
+
+        $amount = $this->_amount;
+        $prefix = '&pound;';
+        return ( ( $amount != '' ) ? $prefix . number_format($amount , 0) : '-' );
+
     }
 }
