@@ -973,14 +973,28 @@ class PH_Property {
     {
         $features = array();
         
-        $num_property_features = $this->_features;
-        if ($num_property_features == '') { $num_property_features = 0; }
-        
-        for ($i = 0; $i < $num_property_features; ++$i)
-        {   
-            if ( $this->{'_feature_' . $i} != '' )
+        if ( get_option('propertyhive_features_type') == 'checkbox' )
+        {
+            $term_list = wp_get_post_terms($this->id, 'property_feature', array("fields" => "names"));
+            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
             {
-                $features[] = $this->{'_feature_' . $i};
+                foreach ( $term_list as $term_name )
+                {
+                    $features[] = $term_name;
+                }
+            }
+        }
+        else
+        {
+            $num_property_features = $this->_features;
+            if ($num_property_features == '') { $num_property_features = 0; }
+            
+            for ($i = 0; $i < $num_property_features; ++$i)
+            {   
+                if ( $this->{'_feature_' . $i} != '' )
+                {
+                    $features[] = $this->{'_feature_' . $i};
+                }
             }
         }
         
