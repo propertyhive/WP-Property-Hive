@@ -36,23 +36,19 @@ class PH_Comments {
 	 * Exclude propertyhive notes from queries and RSS.
 	 *
 	 * This code should exclude propertyhive_note comments from queries. Some queries (like the recent comments widget on the dashboard) are hardcoded.
-	 * and are not filtered, however, the code current_user_can( 'read_post', $comment->comment_post_ID ) should keep them safe since only admin and.
-	 * shop managers can view orders anyway.
-	 *
-	 * The frontend view order pages get around this filter by using remove_filter('comments_clauses', array( 'PH_Comments' ,'exclude_note_comments'), 10, 1 );
 	 * @param  array $clauses
 	 * @return array
 	 */
 	public static function exclude_note_comments( $clauses ) {
 		//global $wpdb, $typenow;
 
-		if ( is_admin() )
+		if ( is_admin() && function_exists( 'get_current_screen' ) )
 		{
 			$screen = get_current_screen();
 
 			if ( isset($screen->id) && in_array( $screen->id, array( 'property', 'contact', 'enquiry', 'viewing', 'offer', 'sale' ) ) )
 			{
-				return $clauses; // Don't hide when viewing property, contact and enquiry record
+				return $clauses; // Don't hide when viewing Property Hive record
 			}
 		}
 
