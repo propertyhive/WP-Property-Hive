@@ -22,6 +22,16 @@ function ph_get_search_form( $id = 'default' ) {
     $form_controls = ph_get_search_form_fields();
     
     $form_controls = apply_filters( 'propertyhive_search_form_fields_' . $id, $form_controls );
+
+    // We 100% need department so make sure it exists. If it doesn't, set a hidden field
+    if ( !isset($form_controls['department']) )
+    {
+        $original_form_controls = ph_get_search_form_fields();
+        $original_department = $original_form_controls['department'];
+        $original_department['type'] = 'hidden';
+
+        $form_controls['department'] = $original_department;
+    }
     
     ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $id ) );
 
