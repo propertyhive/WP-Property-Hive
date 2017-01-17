@@ -1,10 +1,5 @@
 (function($) {
-    $(function() {
-    
-        
-    
-    });
-    
+
     $(window).load(function() {
           // The slider being synced must be initialized first
           $('#carousel').flexslider({
@@ -22,7 +17,8 @@
             controlNav: false,
             animationLoop: false,
             slideshow: false,
-            sync: "#carousel"
+            sync: "#carousel",
+            smoothHeight: true
           });
     });
     
