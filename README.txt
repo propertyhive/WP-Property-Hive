@@ -4,7 +4,7 @@ Tags: property, real estate, software, estate agents, estate agent, property man
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.7.1
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -83,6 +83,11 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.3.2 =
+* Start tracking property views for use with future reports
+* Fix PHP notices on contact record, shown when error reporting was cranked up
+* Fix filter for  modifying enquiry form  fields
 
 = 1.3.1 =
 * Cater for when no dpeartment field is present on a search form. Previously it would result in no fields being shown at all
