@@ -91,6 +91,7 @@ function ph_track_property_view() {
 
 	global $post;
 
+	// Track in cookie
 	if ( empty( $_COOKIE['propertyhive_recently_viewed'] ) )
 		$viewed_properties = array();
 	else
@@ -104,6 +105,28 @@ function ph_track_property_view() {
 
 	// Store for session only
 	ph_setcookie( 'propertyhive_recently_viewed', implode( '|', $viewed_properties ) );
+
+	// Track in database
+	if ( !is_user_logged_in() || ( is_user_logged_in() && !current_user_can('manage_propertyhive') ) )
+	{
+		// User isn't logged in
+
+		$view_counts = get_post_meta( $post->ID, '_view_statistics', TRUE );
+
+		if ( $view_counts == '' || !is_array($view_counts) )
+		{
+			$view_counts = array();
+		}
+
+		if ( !isset($view_counts[date("Y-m-d")]) )
+		{
+			$view_counts[date("Y-m-d")] = 0;
+		}
+
+		++$view_counts[date("Y-m-d")];
+
+		update_post_meta( $post->ID, '_view_statistics', $view_counts );
+	}
 }
 
 add_action( 'template_redirect', 'ph_track_property_view', 20 );
