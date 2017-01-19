@@ -275,7 +275,7 @@ function propertyhive_enquiry_form()
     
     $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
     
-    ph_get_template( 'global/make-enquiry-form.php', $form_controls );
+    ph_get_template( 'global/make-enquiry-form.php',array( 'form_controls' => $form_controls ) );
 }
 
 /**
