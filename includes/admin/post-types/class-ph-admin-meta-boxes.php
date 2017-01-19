@@ -838,7 +838,7 @@ class PH_Admin_Meta_Boxes {
             $show_sales = false;
 
             $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-            if ( in_array('applicant', $contact_types) )
+            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
             {
                 $show_viewings = true;
 
@@ -970,7 +970,7 @@ class PH_Admin_Meta_Boxes {
         {
             // If an applicant show the 'actions' and therefore 'book viewing' functionality
             $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-            if ( in_array('applicant', $contact_types) )
+            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
             {
                 add_meta_box( 'propertyhive-contact-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Contact_Actions::output', 'contact', 'side' );
             }

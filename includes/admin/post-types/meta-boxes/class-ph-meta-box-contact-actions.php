@@ -20,7 +20,7 @@ class PH_Meta_Box_Contact_Actions {
         global $wpdb, $thepostid;
         
         $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-        if ( in_array('applicant', $contact_types) )
+        if ( is_array($contact_types) && in_array('applicant', $contact_types) )
         {
 	        echo '<div class="propertyhive_meta_box" id="propertyhive_contact_actions_meta_box">';
 	        
@@ -43,7 +43,7 @@ class PH_Meta_Box_Contact_Actions {
 			            $show_sales = false;
 
 			            $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-			            if ( in_array('applicant', $contact_types) )
+			            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
 			            {
 			                $show_viewings = true;
 
