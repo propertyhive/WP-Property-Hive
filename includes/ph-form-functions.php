@@ -299,12 +299,24 @@ function ph_get_property_enquiry_form_fields()
         'label' => __( 'Full Name', 'propertyhive' ),
         'required' => true
     );
+    if ( is_user_logged_in() )
+    {
+        $current_user = wp_get_current_user();
+
+        $fields['name']['value'] = $current_user->display_name;
+    }
     
     $fields['email_address'] = array(
         'type' => 'email',
         'label' => __( 'Email Address', 'propertyhive' ),
         'required' => true
     );
+    if ( is_user_logged_in() )
+    {
+        $current_user = wp_get_current_user();
+
+        $fields['email_address']['value'] = $current_user->user_email;
+    }
     
     $fields['telephone_number'] = array(
         'type' => 'text',
