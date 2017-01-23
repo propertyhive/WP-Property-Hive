@@ -87,6 +87,12 @@ class PH_Admin_Assets {
 
         wp_register_script( 'chosen', PH()->plugin_url() . '/assets/js/chosen/chosen.jquery' . /*$suffix .*/ '.js', array('jquery'), PH_VERSION );
 
+        wp_register_script( 'flot', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot' . $suffix . '.js', array( 'jquery' ), PH_VERSION );
+        wp_register_script( 'flot-resize', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.resize' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
+        //wp_register_script( 'flot-time', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.time' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
+        //wp_register_script( 'flot-pie', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.pie' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
+        //wp_register_script( 'flot-stack', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.stack' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
+
         // PropertyHive admin pages
         if ( in_array( $screen->id, array( 'dashboard' ) ) )
         {
@@ -149,7 +155,19 @@ class PH_Admin_Assets {
             );
             wp_localize_script( 'propertyhive_admin_settings', 'propertyhive_admin_settings', $params );
         }
-    
+        
+        // Reports Pages
+        if ( in_array( $screen->id, array( 'property-hive_page_ph-reports' ) ) )
+        {
+           //wp_register_script( 'ph-reports', PH()->plugin_url() . '/assets/js/admin/reports' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker' ), PH_VERSION );
+
+            //wp_enqueue_script( 'ph-reports' );
+            wp_enqueue_script( 'flot' );
+            wp_enqueue_script( 'flot-resize' );
+            //wp_enqueue_script( 'flot-time' );
+            //wp_enqueue_script( 'flot-pie' );
+            //wp_enqueue_script( 'flot-stack' );
+        }
     }
 
 }
