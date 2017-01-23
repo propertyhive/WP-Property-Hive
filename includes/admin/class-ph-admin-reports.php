@@ -42,24 +42,43 @@ class PH_Admin_Reports {
 	public static function get_reports() 
 	{
 		$reports = array(
-			'properties'     => array(
-				'title'  => __( 'Properties', 'propertyhive' ),
-				'reports' => array(
-					"sales_property_stock_analysis" => array(
-						'title'       => __( 'Sales Property Stock Analysis', 'propertyhive' ),
-						'description' => '',
-						'hide_title'  => true,
-						'callback'    => array( __CLASS__, 'get_report' )
-					),
-					"sales_property_popularity" => array(
-						'title'       => __( 'Sales Property Popularity', 'propertyhive' ),
-						'description' => '',
-						'hide_title'  => true,
-						'callback'    => array( __CLASS__, 'get_report' )
-					)
-				)
+			'properties' => array(
+				'title' => __( 'Properties', 'propertyhive' ),
+				'reports' => array()
 			)
 		);
+
+		if ( get_option('propertyhive_active_department_sales', '') != 'yes' )
+	    {
+	    	$reports['properties']['reports']['sales_property_stock_analysis'] = array(
+					'title'       => __( 'Sales Property Stock Analysis', 'propertyhive' ),
+					'description' => '',
+					'hide_title'  => true,
+					'callback'    => array( __CLASS__, 'get_report' )
+				);
+			$reports['properties']['reports']['sales_property_popularity'] = array(
+				'title'       => __( 'Sales Property Popularity', 'propertyhive' ),
+				'description' => '',
+				'hide_title'  => true,
+				'callback'    => array( __CLASS__, 'get_report' )
+			);
+	    }
+
+	    if ( get_option('propertyhive_active_department_lettings', '') != 'yes' )
+	    {
+	    	$reports['properties']['reports']['lettings_property_stock_analysis'] = array(
+					'title'       => __( 'Lettings Property Stock Analysis', 'propertyhive' ),
+					'description' => '',
+					'hide_title'  => true,
+					'callback'    => array( __CLASS__, 'get_report' )
+				);
+			$reports['properties']['reports']['lettings_property_popularity'] = array(
+				'title'       => __( 'Lettings Property Popularity', 'propertyhive' ),
+				'description' => '',
+				'hide_title'  => true,
+				'callback'    => array( __CLASS__, 'get_report' )
+			);
+	    }
 
 		/*if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
 	    {
