@@ -1047,6 +1047,11 @@ class PH_Property {
             if ($return != '') { $return .= $separator; }
             $return .= $address_postcode;
         }
+
+        if ( $return == '' )
+        {
+            $return = $this->post_title;
+        }
         
         return $return;
     }
@@ -1096,6 +1101,11 @@ class PH_Property {
         {
             if ($return != '') { $return .= $separator; }
             $return .= $address_postcode;
+        }
+
+        if ( $return == '' )
+        {
+            $return = $this->post_title;
         }
         
         return $return;

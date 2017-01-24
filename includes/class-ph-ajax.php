@@ -593,7 +593,7 @@ class PH_AJAX {
             $subject = __( 'New Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] );
             $message = __( "You have received a property enquiry via your website. Please find details of the enquiry below", 'propertyhive' ) . "\n\n";
             
-            $message = apply_filters( 'propertyhive_property_enquiry_pre_body', $message, $to, $_POST['property_id'] );
+            $message = apply_filters( 'propertyhive_property_enquiry_pre_body', $message, $_POST['property_id'] );
 
             $message .= __( 'Property', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] ) . " (" . get_permalink( $_POST['property_id'] ) . ")\n\n";
             
@@ -630,9 +630,9 @@ class PH_AJAX {
             $headers[] = 'Reply-To: ' . $_POST['email_address'];
 
             $to = apply_filters( 'propertyhive_property_enquiry_to', $to, $_POST['property_id'] );
-            $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, $to, $_POST['property_id'] );
-            $message = apply_filters( 'propertyhive_property_enquiry_body', $message, $to, $_POST['property_id'] );
-            $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, $to, $_POST['property_id'] );
+            $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subjecto, $_POST['property_id'] );
+            $message = apply_filters( 'propertyhive_property_enquiry_body', $message, $_POST['property_id'] );
+            $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, $_POST['property_id'] );
 
             $sent = wp_mail( $to, $subject, $message, $headers );
             

@@ -124,7 +124,7 @@ function ph_track_property_view() {
 		}
 
 		++$view_counts[date("Y-m-d")];
-
+		
 		update_post_meta( $post->ID, '_view_statistics', $view_counts );
 	}
 }
