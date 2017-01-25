@@ -78,6 +78,34 @@ class PH_Settings_Add_Ons extends PH_Settings_Page {
 ?>
 <tr>
     <td class="add-ons">
+
+        <style type="text/css">
+
+            .add-ons ul { list-style-type:none; margin:0; padding:0; }
+            .add-ons ul li { float:left; width:25%; padding:0 10px; margin-bottom:25px; box-sizing:border-box; }
+            .add-ons ul li:nth-child(4n+1) { clear:left; }
+            .add-ons ul li .padding { background:#FFF; padding:15px; box-sizing:border-box; border:1px solid #CCC; box-shadow:0px 0px 9px 0px rgba(0,0,0,0.2); -webkit-box-shadow:0px 0px 9px 0px rgba(0,0,0,0.2); }
+            .add-ons ul li .thumbnail { text-align:center; }
+
+            @media (max-width:1450px) {
+                .add-ons ul li { width:33.3333%; }
+                .add-ons ul li:nth-child(4n+1) { clear:none; }
+                .add-ons ul li:nth-child(3n+1) { clear:left; }
+            }
+
+            @media (max-width:1024px) {
+                .add-ons ul li { width:50%; }
+                .add-ons ul li:nth-child(3n+1) { clear:none; }
+                .add-ons ul li:nth-child(2n+1) { clear:left; }
+            }
+
+            @media (max-width:550px) {
+                .add-ons ul li { width:100%; padding:0; }
+                .add-ons ul li:nth-child(3n+1) { clear:none; }
+                .add-ons ul li:nth-child(2n+1) { clear:left; }
+            }
+
+        </style>
         
         <?php
             if ($add_ons !== FALSE && $add_ons !== '')
@@ -86,32 +114,32 @@ class PH_Settings_Add_Ons extends PH_Settings_Page {
                 
                 if ($add_ons !== FALSE && !empty($add_ons))
                 {
-                    echo '<table>';
+                    echo '<ul>';
                     
                     $i = 0;
                     foreach ($add_ons as $add_on)
                     {
-                        echo '<tr>
-                            <td class="thumbnail">';
+                        echo '<li>
+                            <div class="padding">
+                            <div class="thumbnail">';
                         if (isset($add_on->image) && $add_on->image != '')
                         {
                             echo '<a href="' . $add_on->url . '" target="_blank"><img src="' . $add_on->image . '" alt="' . $add_on->name . '"></a>';
                         }
-                        echo '</td>
-                        <td class="details">
+                        echo '</div>
+                        <div class="details">
                             <h3><a href="' . $add_on->url . '" target="_blank">' . $add_on->name . '</a></h3>
                             <p>' . $add_on->description . '</p>
                             <br>
-                            <a href="' . $add_on->url . '" target="_blank" class="button">'. __('View / Download', 'propertyhive') .'</a>
-                        </td>
-                        </tr>';
+                            <a href="' . $add_on->url . '" target="_blank" class="button">'. __('View Add On', 'propertyhive') .'</a>
+                        </div>
+                        </div>
+                        </li>';
                         
                         ++$i;
                     }
                     
-                    echo '</tr>';
-                    
-                    echo '</table>';
+                    echo '</ul>';
                 }
                 else
                 {
