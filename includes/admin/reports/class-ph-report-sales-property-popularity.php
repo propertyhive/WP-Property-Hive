@@ -128,7 +128,7 @@ class PH_Report_Sales_Property_Popularity extends PH_Admin_Report {
 .chart-tabs ul li.active a { background:#FFF; font-weight:700; }
 .chart-tabs ul li a:hover { background:#FFF; }
 .chart-container { padding:12px 12px 12px 12px; background:#FFF; border:1px solid #DDD; }
-.chart-panel { float:left; width:48%; border:1px solid #DDD; padding:0 12px 12px 12px; }
+.chart-panel { float:left; width:48%; border:1px solid #DDD; padding:0 12px 12px 12px; box-sizing:border-box; }
 .chart-container .chart-panel:nth-child(2) { float:right;  }
 .chart-container .chart-panel ul li { padding:8px; margin:0; }
 .chart-container .chart-panel ul li:nth-child(odd) { background:#EEE; }
