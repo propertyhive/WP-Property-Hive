@@ -25,7 +25,7 @@ class PH_Admin_Menus {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
 		add_action( 'admin_menu', array( $this, 'reports_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'settings_menu' ), 50 );
-		//add_action( 'admin_menu', array( $this, 'status_menu' ), 60 );
+		add_action( 'admin_menu', array( $this, 'add_ons_menu' ), 60 );
 
 		add_action( 'admin_head', array( $this, 'menu_highlight' ) );
 		//add_filter( 'menu_order', array( $this, 'menu_order' ) );
@@ -91,19 +91,18 @@ class PH_Admin_Menus {
 	}
 
 	/**
+	 * Add menu item
+	 */
+	public function add_ons_menu() {
+		$settings_page = add_submenu_page( 'propertyhive', __( 'Add Ons', 'propertyhive' ),  __( 'Add Ons', 'propertyhive' ) , 'manage_options', 'admin.php?page=ph-settings&tab=addons'/*, array( $this, 'settings_page' )*/ );
+	}
+
+	/**
 	 * Loads gateways and shipping methods into memory for use within settings.
 	 */
 	public function settings_page_init() {
 		
 	}
-
-	/**
-	 * Add menu item
-	 */
-	/*public function status_menu() {
-		add_submenu_page( 'propertyhive', __( 'PropertyHive Status', 'propertyhive' ),  __( 'System Status', 'propertyhive' ) , 'manage_propertyhive', 'ph-status', array( $this, 'status_page' ) );
-		register_setting( 'propertyhive_status_settings_fields', 'propertyhive_status_options' );
-	}*/
 
 	/**
 	 * Highlights the correct top level admin menu item for post type add screens.
