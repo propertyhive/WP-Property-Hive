@@ -66,10 +66,9 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		/*add_filter( 'wp_terms_checklist_args', array( $this, 'disable_checked_ontop' ) );*/
 
 		// Bulk / quick edit
-		add_filter( 'bulk_actions-edit-property', array( $this, 'remove_bulk_actions') );
-		/*add_action( 'bulk_edit_custom_box', array( $this, 'bulk_edit' ), 10, 2 );
-		add_action( 'quick_edit_custom_box',  array( $this, 'quick_edit' ), 10, 2 );
-		add_action( 'save_post', array( $this, 'bulk_and_quick_edit_save_post' ), 10, 2 );*/
+		add_action( 'bulk_edit_custom_box', array( $this, 'bulk_edit' ), 10, 2 );
+		/*add_action( 'quick_edit_custom_box',  array( $this, 'quick_edit' ), 10, 2 );*/
+		add_action( 'save_post', array( $this, 'bulk_and_quick_edit_save_post' ), 10, 2 );
 
 		// Uploads
 		add_filter( 'upload_dir', array( $this, 'upload_dir' ) );
@@ -288,12 +287,13 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 				}
 				echo '</div>';
 
-				/*get_inline_data( $post );*/
+				get_inline_data( $post );
 
 				/* Custom inline data for propertyhive */
 				/*echo '
 					<div class="hidden" id="propertyhive_inline_' . $post->ID . '">
-						<div class="menu_order">' . $post->menu_order . '</div>
+						<div class="on_market">' . $the_property->on_market . '</div>
+						<div class="featured">' . $the_property->featured . '</div>
 					</div>
 				';*/
 
@@ -382,15 +382,6 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 				break;
 		}
 	}
-
-	/**
-	 * Remove bulk edit option
-	 * @param  array $actions
-	 */
-	public function remove_bulk_actions( $actions ) {
-        unset( $actions['edit'] );
-        return $actions;
-    }
 
     /**
 	 * Search by ID, address and reference number
@@ -607,11 +598,11 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	 * @param mixed $post_type
 	 */
 	public function bulk_edit( $column_name, $post_type ) {
-		if ( 'price' != $column_name || 'product' != $post_type ) {
+		if ( 'price' != $column_name || 'property' != $post_type ) {
 			return;
 		}
 
-		include( HP()->plugin_path() . '/includes/admin/views/html-bulk-edit-product.php' );
+		include( PH()->plugin_path() . '/includes/admin/views/html-bulk-edit-property.php' );
 	}
 
 	/**
@@ -622,11 +613,11 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	 * @param mixed $post_type
 	 */
 	public function quick_edit( $column_name, $post_type ) {
-		if ( 'price' != $column_name || 'product' != $post_type ) {
+		if ( 'price' != $column_name || 'property' != $post_type ) {
 			return;
 		}
 
-		include( HP()->plugin_path() . '/includes/admin/views/html-quick-edit-property.php' );
+		include( PH()->plugin_path() . '/includes/admin/views/html-quick-edit-property.php' );
 	}
 
 	/**
@@ -691,13 +682,12 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		global $wpdb;
 
 		/*
-
 		// Save fields
 		if ( isset( $_REQUEST['_address_name_number'] ) ) {
 			update_post_meta( $post_id, '_address_name_number', ph_clean( $_REQUEST['_address_name_number'] ) );
 		}*/
 
-		do_action( 'propertyhive_product_quick_edit_save', $property );
+		do_action( 'propertyhive_property_quick_edit_save', $property );
 	}
 
 	/**
@@ -706,10 +696,17 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	public function bulk_edit_save( $post_id, $property ) {
 
 		// Save fields
-		/*
-		if ( isset( $_REQUEST['_address_name_number'] ) ) {
-			update_post_meta( $post_id, '_address_name_number', ph_clean( $_REQUEST['_address_name_number'] ) );
-		}*/
+		if ( ! empty( $_REQUEST['_on_market'] ) ) 
+		{
+			$on_market = $_REQUEST['_on_market'];
+			if ( $_REQUEST['_on_market'] != 'yes' ) { $on_market = ''; } // can only be 'yes' or blank
+			update_post_meta( $post_id, '_on_market', ph_clean( $on_market ) );
+		}
+
+		if ( ! empty( $_REQUEST['_availability'] ) ) 
+		{
+			wp_set_post_terms( $post_id, ph_clean( $_REQUEST['_availability'] ), 'availability' );
+		}
 
 		do_action( 'propertyhive_property_bulk_edit_save', $property );
 	}
