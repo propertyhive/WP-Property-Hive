@@ -56,11 +56,12 @@ class PH_Template_Loader {
 		}
 
 		if ( $file ) {
-			$template       = locate_template( array_unique($find) );
-			$status_options = get_option( 'propertyhive_status_options', array() );
-			if ( ! $template || ( ! empty( $status_options['template_debug_mode'] ) && current_user_can( 'manage_options' ) ) )
+			$template = locate_template( array_unique($find) );
+			if ( ! $template )
 				$template = PH()->plugin_path() . '/templates/' . $file;
 		}
+
+		$template = apply_filters( 'propertyhive_loaded_template', $template );
 
 		return $template;
 	}
