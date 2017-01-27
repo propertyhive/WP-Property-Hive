@@ -699,6 +699,11 @@ class PH_Query {
 	      	$meta_query = array(
 	      		'relation' => 'OR',
 	      		array(
+				    'key'     => '_reference_number',
+				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
+				    'compare' => '='
+				),
+	      		array(
 				    'key'     => '_address_street',
 				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
 				    'compare' => 'LIKE'
