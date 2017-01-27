@@ -553,10 +553,11 @@ class PH_Admin_Post_Types {
     public function request_query( $vars ) {
         global $typenow, $wp_query;
 
+        if ( !isset($vars['meta_query']) ) { $vars['meta_query'] = array(); }
+        if ( !isset($vars['tax_query']) ) { $vars['tax_query'] = array(); }
+
         if ( 'property' === $typenow ) 
         {
-            $vars['meta_query'] = array();
-            $vars['tax_query'] = array();
             if ( ! empty( $_GET['_department'] ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_department',
