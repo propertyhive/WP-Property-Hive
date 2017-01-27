@@ -133,7 +133,7 @@ class PH_Admin_Post_Types {
     public function remove_month_filter() {
         global $typenow;
         
-        if ($typenow == 'property' || $typenow == 'contact')
+        if ($typenow == 'property' || $typenow == 'contact' || $typenow == 'viewing' || $typenow == 'offer' || $typenow == 'sale')
         {
             add_filter('months_dropdown_results', '__return_empty_array');
         }
