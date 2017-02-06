@@ -22,7 +22,7 @@ global $post, $property;
            /**
              * propertyhive_single_property_summary hook
              *
-             * @hooked propertyhive_template_single_action_enquiry - 10
+             * @hooked propertyhive_make_enquiry_button - 10
              * 
              */
             do_action( 'propertyhive_property_actions_list_start' ); 
