@@ -13,7 +13,7 @@ global $post, $property;
 
 $description = $property->get_formatted_description();
 
-if ( $description != '' )
+if ( trim(strip_tags($description)) != '' )
 {
 ?>
 <div class="description">
