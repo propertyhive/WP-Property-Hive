@@ -596,6 +596,10 @@ class PH_Query {
         $meta_query[] = $this->rent_range_meta_query();
         $meta_query[] = $this->minimum_bedrooms_meta_query();
         $meta_query[] = $this->maximum_bedrooms_meta_query();
+        $meta_query[] = $this->minimum_bathrooms_meta_query();
+        $meta_query[] = $this->maximum_bathrooms_meta_query();
+        $meta_query[] = $this->minimum_reception_rooms_meta_query();
+        $meta_query[] = $this->maximum_reception_rooms_meta_query();
         $meta_query[] = $this->minimum_floor_area_meta_query();
         $meta_query[] = $this->maximum_floor_area_meta_query();
         $meta_query[] = $this->floor_area_range_meta_query();
@@ -1012,6 +1016,163 @@ class PH_Query {
         
         return $meta_query;
     }
+
+	/**
+     * Returns a meta query to handle minimum bathrooms
+     *
+     * @access public
+     * @return array
+     */
+    public function minimum_bathrooms_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+        	(
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-sales') ||
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings')
+        	) &&
+        	isset( $_REQUEST['minimum_bathrooms'] ) && $_REQUEST['minimum_bathrooms'] != '' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_bathrooms',
+                'value'   => sanitize_text_field( $_REQUEST['minimum_bathrooms'] ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle maximum bathrooms
+     *
+     * @access public
+     * @return array
+     */
+    public function maximum_bathrooms_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+        	(
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-sales') ||
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings')
+        	) &&
+        	isset( $_REQUEST['maximum_bathrooms'] ) && $_REQUEST['maximum_bathrooms'] != '' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_bathrooms',
+                'value'   => sanitize_text_field( $_REQUEST['maximum_bathrooms'] ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+
+	/**
+     * Returns a meta query to handle minimum reception rooms
+     *
+     * @access public
+     * @return array
+     */
+    public function minimum_reception_rooms_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+        	(
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-sales') ||
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings')
+        	) &&
+        	isset( $_REQUEST['minimum_reception_rooms'] ) && $_REQUEST['minimum_reception_rooms'] != '' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_reception_rooms',
+                'value'   => sanitize_text_field( $_REQUEST['minimum_reception_rooms'] ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle maximum reception rooms
+     *
+     * @access public
+     * @return array
+     */
+    public function maximum_reception_rooms_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+        	(
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-sales') ||
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings')
+        	) &&
+        	isset( $_REQUEST['maximum_reception_rooms'] ) && $_REQUEST['maximum_reception_rooms'] != '' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_reception_rooms',
+                'value'   => sanitize_text_field( $_REQUEST['maximum_reception_rooms'] ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Returns a meta query to handle minimum floor area
