@@ -28,14 +28,25 @@ class PH_Meta_Box_Contact_Relationships {
         $args = array(
             'post_type' => 'property',
             'meta_query' => array(
+                'relation' => 'OR',
                 array(
                     'key' => '_owner_contact_id',
                     'value' => $post->ID,
                     'compare' => '='
+                ),
+                array(
+                    'key' => '_owner_contact_id',
+                    'value' => ':"' . $post->ID . '"',
+                    'compare' => 'LIKE'
+                ),
+                array(
+                    'key' => '_owner_contact_id',
+                    'value' => ':' . $post->ID . ';',
+                    'compare' => 'LIKE'
                 )
             )
         );
-        
+
         $property_query = new WP_Query($args);
         
         if ($property_query->have_posts())

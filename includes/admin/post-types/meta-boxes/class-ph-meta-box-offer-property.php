@@ -41,18 +41,30 @@ class PH_Meta_Box_Offer_Property {
             
                 <label>' . ( ( $property->department == 'lettings' ) ? __('Landlord', 'propertyhive') : __('Owner', 'propertyhive') ) . '</label>';
 
-            $owner_contact_id = $property->owner_contact_id;
-
-            if ( empty($owner_contact_id) )
+            $owner_contact_ids = $property->_owner_contact_id;
+            if ( 
+                ( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 ) 
+                ||
+                ( is_array($owner_contact_ids) && !empty($owner_contact_ids) )
+            )
             {
-                echo 'No ' . ( ( $property->department == 'lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified';
+                if ( !is_array($owner_contact_ids) )
+                {
+                    $owner_contact_ids = array($owner_contact_ids);
+                }
+
+                foreach ( $owner_contact_ids as $owner_contact_id )
+                {
+                    $owner = new PH_Contact((int)$owner_contact_id);
+                    echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '">' . get_the_title($owner_contact_id) . '</a><br>';
+                    echo 'Telephone: ' . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
+                    echo 'Email: ' . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
+                    echo '<br><br>';
+                }
             }
             else
             {
-                $owner = new PH_Contact((int)$owner_contact_id);
-                echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '">' . get_the_title($owner_contact_id) . '</a><br>';
-                echo 'Telephone: ' . $owner->telephone_number . '<br>';
-                echo 'Email: <a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>';
+                echo 'No ' . ( ( $property->department == 'lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified';
             }
                 
             echo '</p>';

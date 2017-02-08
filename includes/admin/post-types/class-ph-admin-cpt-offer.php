@@ -179,14 +179,30 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
                 break;
             case 'property_owner' :
                 
-                $property = new PH_Property((int)$the_offer->property_id);
-                if ($property->owner_contact_id !='' && $property->owner_contact_id != 0)
+                $the_property = new PH_Property((int)$the_offer->property_id);
+                $owner_contact_ids = $the_property->_owner_contact_id;
+                if ( 
+                	( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 ) 
+                	||
+                	( is_array($owner_contact_ids) && !empty($owner_contact_ids) )
+                )
                 {
-                	echo get_the_title($property->owner_contact_id) . '<br>';
-	                echo '<div class="row-actions">';
-	                echo 'T: ' . get_post_meta($property->owner_contact_id, '_telephone_number', TRUE) . '<br>';
-	                echo 'E: ' . get_post_meta($property->owner_contact_id, '_email_address', TRUE);
-	                echo '</div>';
+                	if ( !is_array($owner_contact_ids) )
+                	{
+                		$owner_contact_ids = array($owner_contact_ids);
+                	}
+
+                	foreach ( $owner_contact_ids as $owner_contact_id )
+                	{
+	                	echo get_the_title($owner_contact_id) . '<br>';
+	                	if ( count($owner_contact_ids) == 1 )
+		                {
+			                echo '<div class="row-actions">';
+			                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
+			                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+			                echo '</div>';
+			            }
+			        }
                 }
                 else
                 {

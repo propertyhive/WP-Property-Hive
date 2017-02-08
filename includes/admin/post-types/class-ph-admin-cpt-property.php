@@ -368,7 +368,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 	foreach ( $owner_contact_ids as $owner_contact_id )
                 	{
 		                echo get_the_title($owner_contact_id) . '<br>';
-		                if ( count($owner_contact_id) == 1 )
+		                if ( count($owner_contact_ids) == 1 )
 		                {
 			                echo '<div class="row-actions">';
 			                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
