@@ -145,6 +145,8 @@ class PH_AJAX {
         
         $contact = get_post($contact_id);
         
+        echo '<div id="existing-owner-details-' . $contact_id . '">';
+        
         if ( !is_null( $contact ) )
         {
             echo '<p class="form-field">';
@@ -179,8 +181,11 @@ class PH_AJAX {
         
         echo '<p class="form-field">';
             echo '<label></label>';
-            echo '<a href="" class="button" id="remove-owner-contact">Remove Owner</a>';
+            echo '<a href="" class="button" id="remove-owner-contact-' . $contact_id . '">Remove Owner</a> ';
+            echo '<a href="" class="button add-additional-owner-contact">Add Additional Owner</a>';
         echo '</p>';
+
+        echo '</div>';
         
         // Quit out
         die();

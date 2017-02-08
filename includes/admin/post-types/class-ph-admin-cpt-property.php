@@ -353,14 +353,33 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 				break;
             case 'owner' :
                 
-                $owner_contact_id = $the_property->_owner_contact_id;
-                if ($owner_contact_id !='' && $owner_contact_id != 0)
+                $owner_contact_ids = $the_property->_owner_contact_id;
+                if ( 
+                	( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 ) 
+                	||
+                	( is_array($owner_contact_ids) && !empty($owner_contact_ids) )
+                )
                 {
-	                echo get_the_title($owner_contact_id) . '<br>';
-	                echo '<div class="row-actions">';
-	                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
-	                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
-	                echo '</div>';
+                	if ( !is_array($owner_contact_ids) )
+                	{
+                		$owner_contact_ids = array($owner_contact_ids);
+                	}
+
+                	foreach ( $owner_contact_ids as $owner_contact_id )
+                	{
+		                echo get_the_title($owner_contact_id) . '<br>';
+		                if ( count($owner_contact_id) == 1 )
+		                {
+			                echo '<div class="row-actions">';
+			                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
+			                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+			                echo '</div>';
+			            }
+		            }
+	            }
+	            else
+	            {
+	            	echo '-';
 	            }
                 break;
             case 'negotiator_office' :

@@ -33,27 +33,33 @@ class PH_Meta_Box_Property_Owner {
             setup_postdata($post);
         }
         
+        $owner_contact_ids = array();
         if ( isset($_GET['owner_contact_id']) && ! empty( $_GET['owner_contact_id'] ) )
         {
             if ( get_post_type( $_GET['owner_contact_id'] ) == 'contact' )
             {
-                $owner_contact_id = $_GET['owner_contact_id'];
+                $owner_contact_ids = $_GET['owner_contact_id'];
             }   
         }
         else
         {
-            $owner_contact_id = get_post_meta($post->ID, '_owner_contact_id', TRUE);
+            $owner_contact_ids = get_post_meta($post->ID, '_owner_contact_id', TRUE);
+        }
+
+        if ( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 )
+        {
+            $owner_contact_ids = array($owner_contact_ids);
         }
         
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
         
-        echo '<input type="hidden" name="_owner_contact_id" id="_owner_contact_id" value="' . $owner_contact_id . '">';
+        echo '<input type="hidden" name="_owner_contact_id" id="_owner_contact_id" value="' . implode("|", $owner_contact_ids) . '">';
 
             // No owner currently selected
             
-            echo '<div id="search_propertyhive_contacts"' . ( ($owner_contact_id != '') ? ' style="display:none"' : '' ) . '>';
+            echo '<div id="search_propertyhive_contacts"' . ( !empty($owner_contact_ids) ? ' style="display:none"' : '' ) . '>';
 
                 echo '<p class="form-field search_propertyhive_contacts_keyword_field">
                     <label for="search_propertyhive_contacts_keyword">' . __('Search Existing Contacts', 'propertyhive') . '</label>
@@ -78,29 +84,53 @@ class PH_Meta_Box_Property_Owner {
             
                       function load_existing_owner_contact(contact_id)
                       {
-                          // Do AJAX request
-                          var data = {
-                              action:         \'propertyhive_load_existing_owner_contact\',
-                              contact_id:     contact_id,
-                              security:       \'' . wp_create_nonce("load-existing-owner-contact") . '\',
-                          };
-                
-                          jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
+                          var existing_contact_ids = jQuery(\'#_owner_contact_id\').val().split(\'|\');
+                          var exists_as_owner_already = false;
+console.log(contact_id);
+console.log(exists_as_owner_already);
+                          if ( existing_contact_ids.length > 0 )
+                          {
+                              for ( var i in existing_contact_ids )
+                              {
+                                 if ( existing_contact_ids[i] == contact_id )
+                                 {
+                                    exists_as_owner_already = true;
+                                 }
+                              }
+                          }
+
+                          if ( !exists_as_owner_already )
+                          {
+                              // Do AJAX request
+                              var data = {
+                                  action:         \'propertyhive_load_existing_owner_contact\',
+                                  contact_id:     contact_id,
+                                  security:       \'' . wp_create_nonce("load-existing-owner-contact") . '\',
+                              };
+                    
+                              jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
+                                  
+                                  jQuery(\'#existing-owner-details\').append( response );
+                                  
+                              });
+
+                              jQuery(\'#search_propertyhive_contacts_keyword\').val(\'\');
+                              jQuery(\'#search_propertyhive_contacts_results\').stop(true, true).hide();
                               
-                              jQuery(\'#existing-owner-details\').html( response );
-                              
-                          });
-                          
-                          jQuery(\'#_owner_contact_id\').val(contact_id);
+                              jQuery(\'#_owner_contact_id\').val(existing_contact_ids.join(\'|\'));
+                          }
                       }
             
                       jQuery(document).ready(function()
                       {
                           ';
                           
-                          if ($owner_contact_id != '')
+                          if ( !empty($owner_contact_ids) )
                           {
-                              echo 'load_existing_owner_contact(' . $owner_contact_id . ');';
+                              foreach ( $owner_contact_ids as $owner_contact_id )
+                              {
+                                echo 'load_existing_owner_contact(' . $owner_contact_id . ');';
+                              }
                           }
                           
                           echo '
@@ -109,6 +139,16 @@ class PH_Meta_Box_Property_Owner {
                               jQuery(\'#search_propertyhive_contacts\').fadeOut(\'fast\', function()
                               {
                                   jQuery(\'#add_new_property_owner_contact\').fadeIn();
+                              });
+                              
+                              return false;
+                          });
+
+                          jQuery(\'body\').on(\'click\', \'a.add-additional-owner-contact\', function()
+                          {
+                              jQuery(\'#existing-owner-details\').fadeOut(\'fast\', function()
+                              {
+                                  jQuery(\'#search_propertyhive_contacts\').fadeIn();
                               });
                               
                               return false;
@@ -139,14 +179,33 @@ class PH_Meta_Box_Property_Owner {
                               return false;
                           });
                           
-                          jQuery(\'body\').on(\'click\', \'a#remove-owner-contact\', function()
+                          jQuery(\'body\').on(\'click\', \'a[id^="remove-owner-contact-"]\', function()
                           {
-                              jQuery(\'#existing-owner-details\').fadeOut(\'fast\', function()
+                              var contact_id = jQuery(this).attr(\'id\');
+                              contact_id = contact_id.replace(\'remove-owner-contact-\', \'\');
+
+                              // Remove this ID from hidden field
+                              var existing_contact_ids = jQuery(\'#_owner_contact_id\').val().split(\'|\');
+                              var new_contact_ids = new Array();
+                              if ( existing_contact_ids.length > 0 )
                               {
-                                    jQuery(\'#search_propertyhive_contacts\').fadeIn();
-                              });
+                                  for ( var i in existing_contact_ids )
+                                  {
+                                     if ( existing_contact_ids[i] != contact_id )
+                                     {
+                                        new_contact_ids.push(existing_contact_ids[i]);
+                                     }
+                                  }
+                              }
+                              jQuery(\'#_owner_contact_id\').val( new_contact_ids.join(\'|\') );
                               
-                              jQuery(\'#_owner_contact_id\').val(\'\');
+                              jQuery(\'#existing-owner-details-\' + contact_id).fadeOut(\'fast\', function()
+                              {
+                                  if ( jQuery(\'#_owner_contact_id\').val() == \'\' )
+                                  {
+                                      jQuery(\'#search_propertyhive_contacts\').fadeIn();
+                                  }
+                              });
                               
                               return false;
                           });
@@ -189,11 +248,6 @@ class PH_Meta_Box_Property_Owner {
                                             {
                                                 jQuery(\'#search_propertyhive_contacts_results\').html(\'' . __( 'No contacts found', 'propertyhive' ) . '\');
                                             }
-                                            
-                                            
-                                            //$(\'ul.record_notes\').prepend( response );
-                                            //$(\'#propertyhive-property-notes\').unblock();
-                                            //$(\'#add_property_note\').val(\'\');
                                         });
                                   }
                                   else
@@ -319,7 +373,7 @@ class PH_Meta_Box_Property_Owner {
     
             do_action('propertyhive_property_owner_fields');
         
-            echo '<div id="existing-owner-details"' . ( ($owner_contact_id == '') ? ' style="display:none"' : '' ) . '>';
+            echo '<div id="existing-owner-details"' . ( empty($owner_contact_ids) ? ' style="display:none"' : '' ) . '>';
                 
             echo '</div>';
 	    
