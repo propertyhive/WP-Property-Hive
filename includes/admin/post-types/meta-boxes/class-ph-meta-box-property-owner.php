@@ -33,27 +33,38 @@ class PH_Meta_Box_Property_Owner {
             setup_postdata($post);
         }
         
+        $owner_contact_ids = array();
         if ( isset($_GET['owner_contact_id']) && ! empty( $_GET['owner_contact_id'] ) )
         {
             if ( get_post_type( $_GET['owner_contact_id'] ) == 'contact' )
             {
-                $owner_contact_id = $_GET['owner_contact_id'];
+                $owner_contact_ids = $_GET['owner_contact_id'];
             }   
         }
         else
         {
-            $owner_contact_id = get_post_meta($post->ID, '_owner_contact_id', TRUE);
+            $owner_contact_ids = get_post_meta($post->ID, '_owner_contact_id', TRUE);
+        }
+
+        if ( $owner_contact_ids == '' )
+        {
+            $owner_contact_ids = array();
+        }
+        if ( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 )
+        {
+            $owner_contact_ids = array($owner_contact_ids);
         }
         
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
         
-        echo '<input type="hidden" name="_owner_contact_id" id="_owner_contact_id" value="' . $owner_contact_id . '">';
+        echo '<input type="hidden" name="_owner_contact_id" id="_owner_contact_id" value="' . implode("|", $owner_contact_ids) . '">';
+        echo '<input type="hidden" name="_owner_contact_add_new" id="_owner_contact_add_new" value="">';
 
             // No owner currently selected
             
-            echo '<div id="search_propertyhive_contacts"' . ( ($owner_contact_id != '') ? ' style="display:none"' : '' ) . '>';
+            echo '<div id="search_propertyhive_contacts"' . ( !empty($owner_contact_ids) ? ' style="display:none"' : '' ) . '>';
 
                 echo '<p class="form-field search_propertyhive_contacts_keyword_field">
                     <label for="search_propertyhive_contacts_keyword">' . __('Search Existing Contacts', 'propertyhive') . '</label>
@@ -76,31 +87,60 @@ class PH_Meta_Box_Property_Owner {
             
             echo '<script>
             
-                      function load_existing_owner_contact(contact_id)
+                      function load_existing_owner_contact(contact_id, initial_load)
                       {
-                          // Do AJAX request
-                          var data = {
-                              action:         \'propertyhive_load_existing_owner_contact\',
-                              contact_id:     contact_id,
-                              security:       \'' . wp_create_nonce("load-existing-owner-contact") . '\',
-                          };
-                
-                          jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
+                          var initial_load = initial_load || false;
+
+                          var existing_contact_ids = jQuery(\'#_owner_contact_id\').val().split(\'|\');
+                          var exists_as_owner_already = false;
+
+                          if ( !initial_load )
+                          {
+                              if ( existing_contact_ids.length > 0 )
+                              {
+                                  for ( var i in existing_contact_ids )
+                                  {
+                                     if ( existing_contact_ids[i] == contact_id )
+                                     {
+                                        exists_as_owner_already = true;
+                                     }
+                                  }
+                              }
+                          }
+
+                          if ( !exists_as_owner_already )
+                          {
+                              // Do AJAX request
+                              var data = {
+                                  action:         \'propertyhive_load_existing_owner_contact\',
+                                  contact_id:     contact_id,
+                                  security:       \'' . wp_create_nonce("load-existing-owner-contact") . '\',
+                              };
+                    
+                              jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
+                                  
+                                  jQuery(\'#existing-owner-details\').append( response );
+                                  
+                              });
+
+                              jQuery(\'#search_propertyhive_contacts_keyword\').val(\'\');
+                              jQuery(\'#search_propertyhive_contacts_results\').stop(true, true).hide();
                               
-                              jQuery(\'#existing-owner-details\').html( response );
-                              
-                          });
-                          
-                          jQuery(\'#_owner_contact_id\').val(contact_id);
+                              if ( !initial_load ) { existing_contact_ids.push(contact_id); }
+                              jQuery(\'#_owner_contact_id\').val(existing_contact_ids.join(\'|\'));
+                          }
                       }
             
                       jQuery(document).ready(function()
                       {
                           ';
                           
-                          if ($owner_contact_id != '')
+                          if ( !empty($owner_contact_ids) )
                           {
-                              echo 'load_existing_owner_contact(' . $owner_contact_id . ');';
+                              foreach ( $owner_contact_ids as $owner_contact_id )
+                              {
+                                echo 'load_existing_owner_contact(' . $owner_contact_id . ', true);';
+                              }
                           }
                           
                           echo '
@@ -109,6 +149,17 @@ class PH_Meta_Box_Property_Owner {
                               jQuery(\'#search_propertyhive_contacts\').fadeOut(\'fast\', function()
                               {
                                   jQuery(\'#add_new_property_owner_contact\').fadeIn();
+                                  jQuery(\'#_owner_contact_add_new\').val(\'1\');
+                              });
+                              
+                              return false;
+                          });
+
+                          jQuery(\'body\').on(\'click\', \'a.add-additional-owner-contact\', function()
+                          {
+                              jQuery(\'#existing-owner-details\').fadeOut(\'fast\', function()
+                              {
+                                  jQuery(\'#search_propertyhive_contacts\').fadeIn();
                               });
                               
                               return false;
@@ -120,6 +171,7 @@ class PH_Meta_Box_Property_Owner {
                               {
                                   jQuery(\'#search_propertyhive_contacts\').fadeIn();
                                   jQuery(\'#search_propertyhive_contacts_keyword\').focus();
+                                  jQuery(\'#_owner_contact_add_new\').val(\'\');
                               });
                               
                               return false;
@@ -139,14 +191,33 @@ class PH_Meta_Box_Property_Owner {
                               return false;
                           });
                           
-                          jQuery(\'body\').on(\'click\', \'a#remove-owner-contact\', function()
+                          jQuery(\'body\').on(\'click\', \'a[id^="remove-owner-contact-"]\', function()
                           {
-                              jQuery(\'#existing-owner-details\').fadeOut(\'fast\', function()
+                              var contact_id = jQuery(this).attr(\'id\');
+                              contact_id = contact_id.replace(\'remove-owner-contact-\', \'\');
+
+                              // Remove this ID from hidden field
+                              var existing_contact_ids = jQuery(\'#_owner_contact_id\').val().split(\'|\');
+                              var new_contact_ids = new Array();
+                              if ( existing_contact_ids.length > 0 )
                               {
-                                    jQuery(\'#search_propertyhive_contacts\').fadeIn();
-                              });
+                                  for ( var i in existing_contact_ids )
+                                  {
+                                     if ( existing_contact_ids[i] != contact_id )
+                                     {
+                                        new_contact_ids.push(existing_contact_ids[i]);
+                                     }
+                                  }
+                              }
+                              jQuery(\'#_owner_contact_id\').val( new_contact_ids.join(\'|\') );
                               
-                              jQuery(\'#_owner_contact_id\').val(\'\');
+                              jQuery(\'#existing-owner-details-\' + contact_id).fadeOut(\'fast\', function()
+                              {
+                                  if ( jQuery(\'#_owner_contact_id\').val() == \'\' )
+                                  {
+                                      jQuery(\'#search_propertyhive_contacts\').fadeIn();
+                                  }
+                              });
                               
                               return false;
                           });
@@ -189,11 +260,6 @@ class PH_Meta_Box_Property_Owner {
                                             {
                                                 jQuery(\'#search_propertyhive_contacts_results\').html(\'' . __( 'No contacts found', 'propertyhive' ) . '\');
                                             }
-                                            
-                                            
-                                            //$(\'ul.record_notes\').prepend( response );
-                                            //$(\'#propertyhive-property-notes\').unblock();
-                                            //$(\'#add_property_note\').val(\'\');
                                         });
                                   }
                                   else
@@ -319,7 +385,7 @@ class PH_Meta_Box_Property_Owner {
     
             do_action('propertyhive_property_owner_fields');
         
-            echo '<div id="existing-owner-details"' . ( ($owner_contact_id == '') ? ' style="display:none"' : '' ) . '>';
+            echo '<div id="existing-owner-details"' . ( empty($owner_contact_ids) ? ' style="display:none"' : '' ) . '>';
                 
             echo '</div>';
 	    
@@ -357,12 +423,11 @@ class PH_Meta_Box_Property_Owner {
      */
     public static function save( $post_id, $post ) {
         global $wpdb;
+
+        $contact_post_ids = explode( "|", $_POST['_owner_contact_id'] );
         
-        $contact_post_id = $_POST['_owner_contact_id'];
-        
-        if ($contact_post_id == '')
+        if ($_POST['_owner_contact_add_new'] == '1')
         {
-            // If no owner passed in, only add if new fields have been filled in
             if (
                 $_POST['_owner_name'] != '' ||
                 $_POST['_owner_address_name_number'] != '' ||
@@ -388,32 +453,41 @@ class PH_Meta_Box_Property_Owner {
               
                 // Insert the post into the database
                 $contact_post_id = wp_insert_post( $owner_post );
-              
-                update_post_meta( $contact_post_id, '_address_name_number', $_POST['_owner_address_name_number'] );
-                update_post_meta( $contact_post_id, '_address_street', $_POST['_owner_address_street'] );
-                update_post_meta( $contact_post_id, '_address_two', $_POST['_owner_address_two'] );
-                update_post_meta( $contact_post_id, '_address_three', $_POST['_owner_address_three'] );
-                update_post_meta( $contact_post_id, '_address_four', $_POST['_owner_address_four'] );
-                update_post_meta( $contact_post_id, '_address_postcode', $_POST['_owner_address_postcode'] );
-                update_post_meta( $contact_post_id, '_address_country', $_POST['_owner_address_country'] );
-              
-                update_post_meta( $contact_post_id, '_telephone_number', $_POST['_owner_telephone_number'] );
-                update_post_meta( $contact_post_id, '_email_address', $_POST['_owner_email_address'] );
+                if ( !is_wp_error($contact_post_id) && $contact_post_id != 0 )
+                {
+                    $contact_post_ids[] = $contact_post_id;
+                  
+                    update_post_meta( $contact_post_id, '_address_name_number', $_POST['_owner_address_name_number'] );
+                    update_post_meta( $contact_post_id, '_address_street', $_POST['_owner_address_street'] );
+                    update_post_meta( $contact_post_id, '_address_two', $_POST['_owner_address_two'] );
+                    update_post_meta( $contact_post_id, '_address_three', $_POST['_owner_address_three'] );
+                    update_post_meta( $contact_post_id, '_address_four', $_POST['_owner_address_four'] );
+                    update_post_meta( $contact_post_id, '_address_postcode', $_POST['_owner_address_postcode'] );
+                    update_post_meta( $contact_post_id, '_address_country', $_POST['_owner_address_country'] );
+                  
+                    update_post_meta( $contact_post_id, '_telephone_number', $_POST['_owner_telephone_number'] );
+                    update_post_meta( $contact_post_id, '_email_address', $_POST['_owner_email_address'] );
+                }
             }
         }
 
-        $existing_contact_types = get_post_meta( $contact_post_id, '_contact_types', TRUE );
-        if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
+        $contact_post_ids = array_filter($contact_post_ids);
+
+        foreach ( $contact_post_ids as $contact_post_id )
         {
-            $existing_contact_types = array();
-        }
-        if ( !in_array( 'owner', $existing_contact_types ) )
-        {
-            $existing_contact_types[] = 'owner';
-            update_post_meta( $contact_post_id, '_contact_types', $existing_contact_types );
+            $existing_contact_types = get_post_meta( $contact_post_id, '_contact_types', TRUE );
+            if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
+            {
+                $existing_contact_types = array();
+            }
+            if ( !in_array( 'owner', $existing_contact_types ) )
+            {
+                $existing_contact_types[] = 'owner';
+                update_post_meta( $contact_post_id, '_contact_types', $existing_contact_types );
+            }
         }
         
-        update_post_meta( $post_id, '_owner_contact_id', $contact_post_id );
+        update_post_meta( $post_id, '_owner_contact_id', $contact_post_ids );
     }
 
 }

@@ -145,6 +145,8 @@ class PH_AJAX {
         
         $contact = get_post($contact_id);
         
+        echo '<div id="existing-owner-details-' . $contact_id . '">';
+        
         if ( !is_null( $contact ) )
         {
             echo '<p class="form-field">';
@@ -152,24 +154,29 @@ class PH_AJAX {
                 echo '<a href="' . get_edit_post_link( $contact_id ) . '">' . get_the_title($contact_id) . '</a>';
             echo '</p>';
             
+            $address = array();
+            $address_elements = array( '_address_name_number', '_address_street', '_address_two', '_address_three', '_address_four', '_address_postcode' );
+            foreach ( $address_elements as $address_element )
+            {
+                if ( get_post_meta($contact_id, $address_element, TRUE) != '' )
+                {
+                    $address[] = get_post_meta($contact_id, $address_element, TRUE);
+                }
+            }
+
             echo '<p class="form-field">';
                 echo '<label>' . __('Address', 'propertyhive') . '</label>';
-                echo get_post_meta($contact_id, '_address_name_number', TRUE) . ' ';
-                echo get_post_meta($contact_id, '_address_street', TRUE) . ', ';
-                echo get_post_meta($contact_id, '_address_two', TRUE) . ', ';
-                echo get_post_meta($contact_id, '_address_three', TRUE) . ', ';
-                echo get_post_meta($contact_id, '_address_four', TRUE) . ', ';
-                echo get_post_meta($contact_id, '_address_postcode', TRUE);
+                echo ( ( !empty($address) ) ? implode(", ", $address) : '-' );
             echo '</p>';
             
             echo '<p class="form-field">';
                 echo '<label>' . __('Telephone Number', 'propertyhive') . '</label>';
-                echo get_post_meta($contact_id, '_telephone_number', TRUE);
+                echo ( ( get_post_meta($contact_id, '_telephone_number', TRUE) != '' ) ? get_post_meta($contact_id, '_telephone_number', TRUE) : '-' );
             echo '</p>';
             
             echo '<p class="form-field">';
                 echo '<label>' . __('Email Address', 'propertyhive') . '</label>';
-                echo get_post_meta($contact_id, '_email_address', TRUE);
+                echo ( ( get_post_meta($contact_id, '_email_address', TRUE) != '' ) ? get_post_meta($contact_id, '_email_address', TRUE) : '-' );
             echo '</p>';
         }
         else
@@ -179,8 +186,11 @@ class PH_AJAX {
         
         echo '<p class="form-field">';
             echo '<label></label>';
-            echo '<a href="" class="button" id="remove-owner-contact">Remove Owner</a>';
+            echo '<a href="" class="button" id="remove-owner-contact-' . $contact_id . '">Remove Owner</a> ';
+            echo '<a href="" class="button add-additional-owner-contact">Add Additional Owner</a>';
         echo '</p>';
+
+        echo '</div>';
         
         // Quit out
         die();
@@ -2580,15 +2590,29 @@ class PH_AJAX {
                         echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a></td>';
                         echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a></td>';
                         echo '<td style="text-align:left;">';
-                        $owner_contact_id = $property->_owner_contact_id;
-                        if ($owner_contact_id !='' && $owner_contact_id != 0)
+
+                        $owner_contact_ids = $property->_owner_contact_id;
+                        if ( 
+                            ( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 ) 
+                            ||
+                            ( is_array($owner_contact_ids) && !empty($owner_contact_ids) )
+                        )
                         {
-                            echo get_the_title($owner_contact_id) . '<br>';
-                            echo '<div style="color:#BBB">';
-                            echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
-                            echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
-                            echo '</div>';
+                            if ( !is_array($owner_contact_ids) )
+                            {
+                                $owner_contact_ids = array($owner_contact_ids);
+                            }
+
+                            foreach ( $owner_contact_ids as $owner_contact_id )
+                            {
+                                echo get_the_title($owner_contact_id) . '<br>';
+                                echo '<div style="color:#BBB">';
+                                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
+                                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+                                echo '</div>';
+                            }
                         }
+
                         echo '</td>';
                         echo '<td style="text-align:left;">' . $offer->get_formatted_amount() . '</td>';
                         echo '<td style="text-align:left;">';
@@ -2935,9 +2959,9 @@ class PH_AJAX {
                     )
                 )
             );
-            $viewings_query = new WP_Query( $args );
+            $sales_query = new WP_Query( $args );
 
-            if ( $viewings_query->have_posts() )
+            if ( $sales_query->have_posts() )
             {
                 echo '<table style="width:100%">
                     <thead>
@@ -2951,17 +2975,43 @@ class PH_AJAX {
                     </thead>
                     <tbody>';
 
-                while ( $viewings_query->have_posts() )
+                while ( $sales_query->have_posts() )
                 {
-                    $viewings_query->the_post();
+                    $sales_query->the_post();
+
+                    $sale = new PH_Sale(get_the_ID());
 
                     $property = new PH_Property((int)get_post_meta(get_the_ID(), '_property_id', TRUE));
 
                     echo '<tr>';
                         echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a></td>';
                         echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a></td>';
-                        echo '<td style="text-align:left;">OWNER DETAILS</td>';
-                        echo '<td style="text-align:left;">' . get_post_meta(get_the_ID(), '_amount', TRUE) . '</td>';
+                        echo '<td style="text-align:left;">';
+
+                        $owner_contact_ids = $property->_owner_contact_id;
+                        if ( 
+                            ( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 ) 
+                            ||
+                            ( is_array($owner_contact_ids) && !empty($owner_contact_ids) )
+                        )
+                        {
+                            if ( !is_array($owner_contact_ids) )
+                            {
+                                $owner_contact_ids = array($owner_contact_ids);
+                            }
+
+                            foreach ( $owner_contact_ids as $owner_contact_id )
+                            {
+                                echo get_the_title($owner_contact_id) . '<br>';
+                                echo '<div style="color:#BBB">';
+                                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
+                                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+                                echo '</div>';
+                            }
+                        }
+
+                        echo '</td>';
+                        echo '<td style="text-align:left;">' . $sale->get_formatted_amount() . '</td>';
                         echo '<td style="text-align:left;">';
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
                         echo ucwords(str_replace("_", " ", $status));
