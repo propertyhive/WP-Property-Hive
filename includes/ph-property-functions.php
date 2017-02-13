@@ -228,3 +228,33 @@ function get_property_street_view( $args = array() )
 	}
 }
 
+add_filter( 'get_post_metadata', function ( $value, $post_id, $meta_key, $single ) 
+{
+	static $is_recursing = false; // Used to prevent infinite loop
+
+	// Only filter if we're not recursing and if it is a post thumbnail ID
+	if ( ! $is_recursing && $meta_key === '_thumbnail_id' && get_post_type( $post_id ) == 'property' ) 
+	{
+		$is_recursing = true;
+
+		$value = get_post_thumbnail_id( $post_id );
+
+		$is_recursing = false;
+
+		if ( $value == '' ) // If we haven't already get a thumbnail ID (i.e. in the case where someone has added theme support)
+		{
+			$photos = get_post_meta( $post_id, '_photos', TRUE );
+	        if ( is_array($photos) && !empty($photos) )
+	        {
+	            $photos = array_filter( $photos );
+	            $value = $photos[0];
+	        }
+		}
+
+		if ( ! $single ) 
+		{
+			$value = array( $value );
+		}
+	}
+	return $value;
+}, 10, 4);
