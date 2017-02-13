@@ -147,6 +147,9 @@ class PH_Shortcodes {
 			'meta_query'		  => $meta_query,
 			'tax_query'		  	  => $tax_query
 		);
+		if ( ! empty( $atts['meta_key'] ) ) {
+			$args['meta_key'] = $atts['meta_key'];
+		}
 
 		if ( ! empty( $atts['ids'] ) ) {
 			$args['post__in'] = array_map( 'trim', explode( ',', $atts['ids'] ) );
