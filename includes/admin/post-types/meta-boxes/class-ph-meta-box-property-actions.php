@@ -46,6 +46,8 @@ class PH_Meta_Box_Property_Actions {
 			        }
 			    }
 
+			    $actions = apply_filters( 'propertyhive_admin_property_actions', $actions, $post->ID );
+
 		        if ( !empty($actions) )
 		        {
 		        	echo implode("", $actions);

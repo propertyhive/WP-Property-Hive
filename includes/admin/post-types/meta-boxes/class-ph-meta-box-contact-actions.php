@@ -78,6 +78,8 @@ class PH_Meta_Box_Contact_Actions {
 			            }
 			        }
 
+			        $actions = apply_filters( 'propertyhive_admin_contact_actions', $actions, $post->ID );
+
 			        if ( !empty($actions) )
 			        {
 			        	echo implode("", $actions);
