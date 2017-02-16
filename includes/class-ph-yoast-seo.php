@@ -22,29 +22,9 @@ class PH_Yoast_API {
 	 * Hook in methods
 	 */
 	public static function init() {
-		add_action( 'wpseo_opengraph', array( __CLASS__, 'wpseo_opengraph_image' ) );
 		add_filter( 'wpseo_sitemap_exclude_taxonomy', array( __CLASS__, 'sitemap_exclude_taxonomy' ), 10, 2 );
 		add_filter( 'wpseo_metabox_prio', array( __CLASS__, 'yoast_meta_box_to_bottom') );
 		add_filter( 'manage_edit-property_columns', array( __CLASS__, 'yoast_remove_columns') );
-	}
-
-	public static function wpseo_opengraph_image() {
-		global $post;
-
-		if ( is_singular('property') )
-		{
-			if ( !has_post_thumbnail($post->ID) )
-			{
-				// If no image set already, use the main photo for the property
-				$property = new PH_Property($post->ID);
-
-				$image_src = $property->get_main_photo_src( 'full' );
-				if ( $image_src != '' )
-				{
-					$GLOBALS['wpseo_og']->image_output( $image_src );
-				}
-			}
-		}
 	}
 
 	public static function sitemap_exclude_taxonomy( $value, $taxonomy ) {
