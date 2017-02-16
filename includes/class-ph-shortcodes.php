@@ -107,7 +107,9 @@ class PH_Shortcodes {
 			'meta_key' 			=> '_price_actual',
 			'ids'     			=> '',
 			'department'		=> '', // residential-sales / residential-lettings,
-			'marketing_flag'	=> '',
+			'marketing_flag'	=> '', // Should be marketing_flag_id. Might deprecate this in the future
+			'property_type_id'	=> '',
+			'location_id'		=> '',
 			'posts_per_page'	=> 10
 		), $atts );
 
@@ -134,6 +136,22 @@ class PH_Shortcodes {
 			$tax_query[] = array(
                 'taxonomy'  => 'marketing_flag',
                 'terms' => array( $atts['marketing_flag'] )
+            );
+		}
+
+		if ( isset($atts['property_type_id']) && $atts['property_type_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'property_type',
+                'terms' => array( $atts['property_type_id'] )
+            );
+		}
+
+		if ( isset($atts['location_id']) && $atts['location_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'location',
+                'terms' => array( $atts['location_id'] )
             );
 		}
 
