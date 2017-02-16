@@ -1387,6 +1387,8 @@ class PH_AJAX {
                 >' . __('Revert To Pending', 'propertyhive') . '</a>';
         }
 
+        $actions = apply_filters( 'propertyhive_admin_viewing_actions', $actions, $post->ID );
+
         if ( !empty($actions) )
         {
             echo implode("", $actions);
@@ -2293,14 +2295,16 @@ class PH_AJAX {
 
         <div class="options_group" style="padding-top:8px;">';
 
+        $actions = array();
+
         if ( $status == 'pending' )
         {
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_offer_accepted" 
                     class="button button-success offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Accept Offer', 'propertyhive') . '</a>';
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_offer_declined" 
                     class="button button-danger offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
@@ -2318,7 +2322,7 @@ class PH_AJAX {
 
             if ( $sale_id != '' )
             {
-                echo '<a 
+                $actions[] = '<a 
                         href="' . get_edit_post_link( $sale_id, '' ) . '" 
                         class="button"
                         style="width:100%; margin-bottom:7px; text-align:center" 
@@ -2326,7 +2330,7 @@ class PH_AJAX {
             }
             else
             {
-                echo '<a 
+                $actions[] = '<a 
                         href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' ) . '" 
                         class="button button-success"
                         style="width:100%; margin-bottom:7px; text-align:center" 
@@ -2341,11 +2345,22 @@ class PH_AJAX {
 
         if ( $status == 'accepted' || $status == 'declined' )
         {
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_offer_revert_pending" 
                     class="button offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Revert To Pending', 'propertyhive') . '</a>';
+        }
+
+        $actions = apply_filters( 'propertyhive_admin_offer_actions', $actions, $post->ID );
+
+        if ( !empty($actions) )
+        {
+            echo implode("", $actions);
+        }
+        else
+        {
+            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
         }
 
         echo '</div>
@@ -2711,9 +2726,11 @@ class PH_AJAX {
 
         <div class="options_group" style="padding-top:8px;">';
 
+        $actions = array();
+
         if ( $status == 'current' )
         {
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_sale_exchanged" 
                     class="button button-success sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
@@ -2723,7 +2740,7 @@ class PH_AJAX {
 
         if ( $status == 'exchanged' )
         {
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_sale_completed" 
                     class="button button-success sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
@@ -2732,16 +2749,27 @@ class PH_AJAX {
 
         if ( $status == 'completed' )
         {
-            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+            
         }
 
         if ( $status == 'current' || $status == 'exchanged' )
         {
-            echo '<a 
+            $actions[] = '<a 
                     href="#action_panel_sale_fallen_through" 
                     class="button sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Sale Fallen Through', 'propertyhive') . '</a>';
+        }
+
+        $actions = apply_filters( 'propertyhive_admin_sale_actions', $actions, $post->ID );
+
+        if ( !empty($actions) )
+        {
+            echo implode("", $actions);
+        }
+        else
+        {
+            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
         }
 
         echo '</div>
