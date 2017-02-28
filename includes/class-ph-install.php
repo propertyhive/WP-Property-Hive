@@ -497,15 +497,23 @@ class PH_Install {
 					if ( ! get_term_by( 'slug', sanitize_title( $term['name'] ), $taxonomy ) ) 
 					{
 					    $args = array();
-	                    if (isset($term['child_of_previous']) && $term['child_of_previous'])
+	                    if ( isset($term['child_of_previous']) && $term['child_of_previous'] === true )
 	                    {
 	                        $args = array('parent' => $previous_term_id);
 	                    }
 						$return = wp_insert_term( $term['name'], $taxonomy, $args );
-	                    if (!isset($term['child_of_previous']) || (isset($term['child_of_previous']) && !$term['child_of_previous']))
-	                    {
-	                        $previous_term_id = $return['term_id'];
-	                    }
+                        if ( !is_wp_error($return) )
+                        {
+    	                    if ( !isset($term['child_of_previous']) || (isset($term['child_of_previous']) && !$term['child_of_previous']) )
+    	                    {
+    	                        $previous_term_id = $return['term_id'];
+    	                    }
+                        }
+                        else
+                        {
+                            // Hmm... an error occurred
+                            // $error_string = $result->get_error_message(); // do something with this?
+                        }
 					}
 				}
 			}
