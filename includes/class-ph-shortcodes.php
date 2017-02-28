@@ -195,7 +195,7 @@ class PH_Shortcodes {
 
 		wp_reset_postdata();
 
-		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+		return '<div class="propertyhive propertyhive-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
 	}
 
 	/**
@@ -259,7 +259,7 @@ class PH_Shortcodes {
 
 		wp_reset_postdata();
 
-		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+		return '<div class="propertyhive propertyhive-recent-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
 	}
 
 	/**
@@ -320,7 +320,7 @@ class PH_Shortcodes {
 
 		wp_reset_postdata();
 
-		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+		return '<div class="propertyhive propertyhive-featured-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
 	}
 
 	/**
@@ -418,7 +418,7 @@ class PH_Shortcodes {
 			echo 'No property_id passed into similar_properties shortcode';
 		}
 
-		return '<div class="propertyhive columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+		return '<div class="propertyhive propertyhive-similar-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
 	}
 
 	/**
