@@ -2407,6 +2407,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "commercial-property-type-delete":
                     case "location-delete":
                     case "parking-delete":
+                    case "outside-space-delete":
                     case "price-qualifier-delete":
                     case "sale-by-delete":
                     case "tenure-delete":
