@@ -25,9 +25,9 @@ global $propertyhive, $wp_query;
 	if ( 1 == $total ) {
 		_e( 'Showing the single result', 'propertyhive' );
 	} elseif ( $total <= $per_page || -1 == $per_page ) {
-		printf( __( 'Showing %d properties', 'propertyhive' ), $total );
+		printf( __( 'Showing %s properties', 'propertyhive' ), number_format($total) );
 	} else {
-		printf( _x( 'Showing %1$d–%2$d of %3$d properties', '%1$d = first, %2$d = last, %3$d = total', 'propertyhive' ), $first, $last, $total );
+		printf( _x( 'Showing %1$s–%2$s of %3$s properties', '%1$s = first, %2$s = last, %3$s = total', 'propertyhive' ), number_format($first), number_format($last), number_format($total) );
 	}
 	?>
 </p>
