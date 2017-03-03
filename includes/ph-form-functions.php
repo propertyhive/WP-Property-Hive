@@ -145,7 +145,7 @@ function ph_get_search_form_fields()
         $fields['minimum_bedrooms'] = array(
             'type' => 'select',
             'show_label' => true, 
-            'label' => __( 'Min Bedrooms', 'propertyhive' ),
+            'label' => __( 'Min Beds', 'propertyhive' ),
             'before' => '<div class="control control-minimum_bedrooms residential-only">',
             'options' => array( '' => __( 'No preference', 'propertyhive' ), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)
         );
@@ -320,7 +320,7 @@ function ph_get_property_enquiry_form_fields()
     
     $fields['telephone_number'] = array(
         'type' => 'text',
-        'label' => __( 'Telephone Number', 'propertyhive' ),
+        'label' => __( 'Number', 'propertyhive' ),
         'required' => true
     );
     
