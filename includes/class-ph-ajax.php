@@ -631,16 +631,16 @@ class PH_AJAX {
             $headers = array();
             if ( isset($_POST['name']) && ! empty($_POST['name']) )
             {
-                $headers[] = 'From: ' . $_POST['name'] . ' <' . $from_email_address . '>';
+                $headers[] = 'From: ' . sanitize_text_field( $_POST['name'] ) . ' <' . sanitize_email( $from_email_address ) . '>';
             }
             else
             {
-                $headers[] = 'From: <' . $from_email_address . '>';
+                $headers[] = 'From: <' . sanitize_email( $from_email_address ) . '>';
             }
-            $headers[] = 'Reply-To: ' . $_POST['email_address'];
+            $headers[] = 'Reply-To: ' . sanitize_email( $_POST['email_address'] );
 
             $to = apply_filters( 'propertyhive_property_enquiry_to', $to, $_POST['property_id'] );
-            $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subjecto, $_POST['property_id'] );
+            $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, $_POST['property_id'] );
             $message = apply_filters( 'propertyhive_property_enquiry_body', $message, $_POST['property_id'] );
             $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, $_POST['property_id'] );
 
@@ -683,6 +683,13 @@ class PH_AJAX {
                 foreach ($_POST as $key => $value)
                 {
                     add_post_meta( $enquiry_post_id, $key, $value );
+                }
+
+                // Send auto-responder
+                if ( get_option( 'propertyhive_enquiry_auto_responder', '' ) == 'yes' )
+                {
+                    // Auto-responder enabled
+                    PH()->email->send_enquiry_auto_responder( $_POST );
                 }
             }
         }

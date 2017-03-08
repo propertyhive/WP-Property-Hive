@@ -402,4 +402,120 @@ class PH_Emails {
 
 		return $message;
 	}
+
+	public function send_enquiry_auto_responder( $data = array() )
+	{
+		if ( isset($data['property_id']) && sanitize_text_field($data['property_id']) != '' )
+		{
+			$property_id = $data['property_id'];
+			$to = sanitize_email( $_POST['email_address'] );
+			$subject = get_option( 'propertyhive_enquiry_auto_responder_email_subject', '' );
+			$body = get_option( 'propertyhive_enquiry_auto_responder_email_body', '' );
+
+			if ( $to != '' && $subject != '' && $body != '' )
+			{
+				$headers = array();
+				$headers[] = 'From: ' . get_option( 'propertyhive_email_from_address', get_option( 'admin_email' ) ) . '';
+				$headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+				$body = str_replace( "[property_address_hyperlinked]", '<a href="' . get_permalink($property_id) . '">' . get_the_title($property_id) . '</a>', $body );
+
+				if ( strpos( $body, '[similar_properties]' ) !== FALSE )
+				{
+					$similar_html = '';
+
+					$department = get_post_meta( $property_id, '_department', TRUE );
+					$bedrooms = get_post_meta( $property_id, '_bedrooms', TRUE );
+					$price = get_post_meta( $property_id, '_price_actual', true );
+					$lower_price = $price - ($price / 10);
+					$higher_price = $price + ($price / 10);
+
+					// Get two similar properties
+					$args = array(
+						'post_type' => 'property',
+						'post_status' => 'publish',
+						'posts_per_page' => 3,
+						'orderby' => 'rand',
+						'post__not_in' => array($property_id),
+					);
+
+					$meta_query = array();
+
+					$meta_query[] = array(
+						'key' 		=> '_department',
+						'value' 	=> $department,
+					);
+
+					$meta_query[] = array(
+						'key' 		=> '_on_market',
+						'value' 	=> 'yes',
+					);
+
+					$meta_query[] = array(
+						'key' 		=> '_bedrooms',
+						'value' 	=> $bedrooms,
+						'type'      => 'NUMERIC'
+					);
+
+					$meta_query[] = array(
+						'key' 		=> '_price_actual',
+						'value' 	=> $lower_price,
+						'compare'   => '>=',
+						'type'      => 'NUMERIC'
+					);
+
+					$meta_query[] = array(
+						'key' 		=> '_price_actual',
+						'value' 	=> $higher_price,
+						'compare'   => '<=',
+						'type'      => 'NUMERIC'
+					);
+
+					$args['meta_query'] = $meta_query;
+
+					$properties_query = new WP_Query( apply_filters( 'propertyhive_auto_responder_similar_properties_query', $args ) );
+
+					if ( $properties_query->have_posts() )
+					{
+						$similar_html = '<br><hr><br><h3>Similar Properties You Might Like:</h3>';
+
+						while ( $properties_query->have_posts() )
+						{
+							$properties_query->the_post();
+
+							$property = new PH_Property( get_the_ID() );
+
+							$similar_html .= '<table width="100%" cellpadding="5" cellspacing="0">';
+							$similar_html .= '<tr>';
+							$similar_html .= '<td width="20%" valign="top">';
+							$image = $property->get_main_photo_src();
+							if ( $image !== false )
+							{
+								$similar_html .= '<a href="' . get_permalink() . '"><img src="' . $image . '" alt="' . get_the_title() . '"></a>';
+							}
+							$similar_html .= '</td>';
+							$similar_html .= '<td valign="top" class="text">';
+							$similar_html .= '<p style="margin-bottom:8px !important;"><strong><a href="' . get_permalink() . '">' . get_the_title() . '</a></strong></p>';
+							$similar_html .= '<p style="margin-bottom:8px !important; font-size:14px;"><strong>' . $property->get_formatted_price() . '</strong></p>';
+							$similar_html .= '<p style="margin-bottom:8px !important; font-size:14px;">' . $property->bedrooms . ' bed ' . $property->property_type . ' ' . $property->availability . '</p>';
+							if ( strip_tags($property->post_excerpt) != '' )
+							{
+								$similar_html .= '<p style="margin-bottom:0 !important; font-size:14px;">' . substr(strip_tags($property->post_excerpt), 0, 300);
+								if ( strlen(strip_tags($property->post_excerpt)) > 300 ) { $similar_html .= '...'; } 
+								$similar_html .= '</p>';
+							}
+							$similar_html .= '</td>';
+							$similar_html .= '</tr>';
+							$similar_html .= '</table><br>';
+						}
+					}
+					$body = str_replace( "[similar_properties]", $similar_html, $body );
+				}
+
+	        	$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $body ) ) );
+
+				wp_mail( $to, $subject, $body, $headers );
+			}
+		}
+	}
 }
