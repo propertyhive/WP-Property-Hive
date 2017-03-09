@@ -473,7 +473,7 @@ class PH_Emails {
 
 					$args['meta_query'] = $meta_query;
 
-					$properties_query = new WP_Query( apply_filters( 'propertyhive_auto_responder_similar_properties_query', $args ) );
+					$properties_query = new WP_Query( apply_filters( 'propertyhive_auto_responder_similar_properties_query', $args, $property_id ) );
 
 					if ( $properties_query->have_posts() )
 					{
