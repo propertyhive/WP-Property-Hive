@@ -114,6 +114,31 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
 			array( 'type' => 'sectionend', 'id' => 'email_template_options' ),
 
+			array( 'title' => __( 'Enquiry Auto Responder Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'enquiry_auto_responder_email_options' ),
+
+            array(
+                'title'   => __( 'Auto Responder Enabled', 'propertyhive' ),
+                'id'      => 'propertyhive_enquiry_auto_responder',
+                'type'    => 'checkbox',
+                'default' => '',
+            ),
+
+            array(
+                'title'   => __( 'Auto Responder Email Subject', 'propertyhive' ),
+                'id'      => 'propertyhive_enquiry_auto_responder_email_subject',
+                'type'    => 'text',
+                'css'         => 'min-width:300px;',
+            ),
+
+            array(
+                'title'   => __( 'Auto Responder Email Body', 'propertyhive' ),
+                'id'      => 'propertyhive_enquiry_auto_responder_email_body',
+                'type'    => 'textarea',
+                'css'         => 'min-width:300px; height:110px;',
+            ),
+
+            array( 'type' => 'sectionend', 'id' => 'enquiry_auto_responder_email_options' ),
+
 			array( 'title' => __( 'Property Match Email Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_match_email_options' ),
 
             array(
