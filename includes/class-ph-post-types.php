@@ -22,6 +22,8 @@ class PH_Post_types {
 	public function __construct() {
 	    add_action( 'init', array( __CLASS__, 'register_taxonomies' ), 5 );
 		add_action( 'init', array( __CLASS__, 'register_post_types' ), 5 );
+
+        add_action( 'before_delete_post', array( __CLASS__, 'delete_property_media' ), 5 );
 	}
 
 	/**
@@ -441,6 +443,91 @@ class PH_Post_types {
         
         do_action( 'propertyhive_after_register_post_types' );
 	}
+
+    public static function delete_property_media( $post_id ) {
+
+        $property = new PH_Property( (int)$post_id );
+
+        $media_ids = $property->get_gallery_attachment_ids();
+        self::do_delete_media_attachments( $post_id, $media_ids );
+
+        $media_ids = $property->get_floorplan_attachment_ids();
+        self::do_delete_media_attachments( $post_id, $media_ids );
+
+        $media_ids = $property->get_brochure_attachment_ids();
+        self::do_delete_media_attachments( $post_id, $media_ids );
+
+        $media_ids = $property->get_epc_attachment_ids();
+        self::do_delete_media_attachments( $post_id, $media_ids );
+    }
+
+    private static function do_delete_media_attachments( $post_id, $media_ids = array() )
+    {
+        if ( is_array($media_ids) && !empty($media_ids) )
+        {
+            foreach ( $media_ids as $media_id )
+            {
+                // Make sure this media isn't used anywhere else
+                $args = array(
+                    'post_type' => 'property',
+                    'fields' => 'ids',
+                    'posts_per_page' => 1,
+                    'post__not_in' => array( $post_id ),
+                    'meta_query' => array(
+                        'relation' => 'OR',
+                        array(
+                            'key' => '_photos',
+                            'value' => ':' . $media_id . ';',
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => '_photos',
+                            'value' => ':"' . $media_id . '";',
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => '_floorplans',
+                            'value' => ':' . $media_id . ';',
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => '_floorplans',
+                            'value' => ':"' . $media_id . '";',
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => '_epcs',
+                            'value' => ':' . $media_id . ';',
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => '_epcs',
+                            'value' => ':"' . $media_id . '";',
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => '_brochures',
+                            'value' => ':' . $media_id . ';',
+                            'compare' => 'LIKE'
+                        ),
+                        array(
+                            'key' => '_brochures',
+                            'value' => ':"' . $media_id . '";',
+                            'compare' => 'LIKE'
+                        ),
+                    )
+                );
+
+                $property_query = new WP_Query( $args );
+
+                if ( !$property_query->have_posts() )
+                {
+                    // We're ok to delete
+                    wp_delete_attachment( $media_id, true );
+                }
+            }
+        }
+    }
 }
 
 new PH_Post_types();
