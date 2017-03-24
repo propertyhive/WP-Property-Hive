@@ -600,6 +600,7 @@ class PH_Query {
         $meta_query[] = $this->maximum_bathrooms_meta_query();
         $meta_query[] = $this->minimum_reception_rooms_meta_query();
         $meta_query[] = $this->maximum_reception_rooms_meta_query();
+        $meta_query[] = $this->available_date_from_meta_query();
         $meta_query[] = $this->minimum_floor_area_meta_query();
         $meta_query[] = $this->maximum_floor_area_meta_query();
         $meta_query[] = $this->floor_area_range_meta_query();
@@ -1133,46 +1134,40 @@ class PH_Query {
         return $meta_query;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * Returns a meta query to handle available date from
+     *
+     * @access public
+     * @return array
+     */
+    public function available_date_from_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+        	isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings' &&
+        	isset( $_REQUEST['available_date_from'] ) && $_REQUEST['available_date_from'] != '' 
+        )
+        {
+        	$available_date = $_REQUEST['available_date_from'];
+        	if ( strpos($available_date, '/') !== FALSE )
+        	{
+        		// it's been provided in the format dd/mm/yyyy
+        		$explode_available_date = explode("/", $available_date);
+        		if ( count($explode_available_date) ==  3 )
+        		{
+        			$available_date = $explode_available_date[0] . '-' . $explode_available_date[1] . '-' . $explode_available_date[2];
+        		}
+        	}
+            $meta_query = array(
+                'key'     => '_available_date',
+                'value'   => sanitize_text_field( $available_date ),
+                'compare' => '<=', 
+            );
+        }
+        
+        return $meta_query;
+    }
 
     /**
      * Returns a meta query to handle minimum floor area
