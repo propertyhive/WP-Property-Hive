@@ -166,7 +166,7 @@ function get_property_map( $args = array() )
 			map: property_map,
 			position: myLatlng		
 		};
-		var property_marker = new google.maps.Marker(markerOptions);
+		property_marker = new google.maps.Marker(markerOptions);
 	}
 	
 	if(window.addEventListener) {
