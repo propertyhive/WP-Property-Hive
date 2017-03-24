@@ -348,13 +348,14 @@ function ph_form_field( $key, $field )
     {
         case "text": 
         case "email": 
+        case "date": 
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
-            $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
+            $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : ( ( $field['type'] == 'date' ) ? 'dd/mm/yyyy' : '' );
             $field['required'] = isset( $field['required'] ) ? $field['label'] : false;
             
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
