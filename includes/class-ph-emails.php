@@ -371,7 +371,7 @@ class PH_Emails {
 	 * Get the email footer.
 	 */
 	public function email_footer( $contact_id = '' ) {
-		$unsubscribe_link = '#';
+		$unsubscribe_link = '';
 		if ($contact_id != '')
 		{
 			$unsubscribe_link = site_url() .'?ph_unsubscribe=' . base64_encode($contact_id . '|' . md5( get_post_meta( $contact_id, '_email_address', TRUE ) ) );
