@@ -163,6 +163,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => true
 			),
+			'DE' => array(
+				'name' => 'Germany',
+				'currency_code' => 'EUR',
+				'currency_symbol' => '&euro;',
+				'currency_prefix' => true
+			),
 			'IT' => array(
 				'name' => 'Italy',
 				'currency_code' => 'EUR',
