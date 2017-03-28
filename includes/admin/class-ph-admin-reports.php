@@ -48,7 +48,7 @@ class PH_Admin_Reports {
 			)
 		);
 
-		if ( get_option('propertyhive_active_department_sales', '') != 'yes' )
+		if ( get_option('propertyhive_active_departments_sales', '') == 'yes' )
 	    {
 	    	$reports['properties']['reports']['sales_property_stock_analysis'] = array(
 					'title'       => __( 'Sales Property Stock Analysis', 'propertyhive' ),
@@ -64,7 +64,7 @@ class PH_Admin_Reports {
 			);
 	    }
 
-	    if ( get_option('propertyhive_active_department_lettings', '') != 'yes' )
+	    if ( get_option('propertyhive_active_departments_lettings', '') == 'yes' )
 	    {
 	    	$reports['properties']['reports']['lettings_property_stock_analysis'] = array(
 					'title'       => __( 'Lettings Property Stock Analysis', 'propertyhive' ),
@@ -79,6 +79,13 @@ class PH_Admin_Reports {
 				'callback'    => array( __CLASS__, 'get_report' )
 			);
 	    }
+
+	    $reports['properties']['reports']['incomplete_properties'] = array(
+			'title'       => __( 'Incomplete Properties', 'propertyhive' ),
+			'description' => '',
+			'hide_title'  => true,
+			'callback'    => array( __CLASS__, 'get_report' )
+		);
 
 		/*if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
 	    {
