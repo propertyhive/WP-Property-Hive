@@ -1,6 +1,6 @@
 === PropertyHive ===
 Contributors: PropertyHive,BIOSTALL
-Tags: property, real estate, software, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, reapit
+Tags: property, real estate, software, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, reapit, reaxml
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.7.3
@@ -35,7 +35,13 @@ You can [view all of our add-ons](http://wp-property-hive.com/add-ons/ "Property
 
 **Works with any new or existing theme**
 
-Property Hive isn't a theme. It's a platform allowing you to integrate property search into any website, new or existing. For more details on supported themes [click here](http://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/) or view our [pre-built themes](https://wp-property-hive.com/property-hive-website-themes/).
+Property Hive isn't a theme. It's a platform allowing you to integrate property search into any website, new or existing. For more details on supported themes [click here](http://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/) or get started with our very own free open-source theme [Honeycomb](https://wp-property-hive.com/property-hive-website-themes/honeycomb//).
+
+**Integrates with the major software providers and property portals**
+
+If you already use software such as Jupix, Vebra, Dezrez, Reapit, ExpertAgent, LetMC and more then it's easy to get your properties imported on an automatic basis at regular intervals so they display on your website. Our [Property Import Add On](https://wp-property-hive.com/addons/property-import/) can have you and running in minutes.
+
+Likewise, if you send properties to the portals such as Rightmove, Zoopla, OnTheMarket and Gumtree, we have various add ons to allow the exporting of properties to these sites.
 
 **Millions of developers**
 
