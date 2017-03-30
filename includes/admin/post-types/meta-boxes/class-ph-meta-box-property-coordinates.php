@@ -60,6 +60,11 @@ class PH_Meta_Box_Property_Coordinates {
         }
         propertyhive_wp_text_input( $args );
         
+        echo '<p class="form-field">
+            <label>&nbsp;</label>
+            <a href="#" onclick="do_address_lookup( true ); return false;">' . __( 'Obtain Co-ordinates', 'propertyhive' ) . '</a>
+        </p>';
+
         echo '<div class="map_canvas" id="map_canvas" style="height:350px;"></div>';
         
         
@@ -101,45 +106,6 @@ class PH_Meta_Box_Property_Coordinates {
                     do_address_lookup();
                 });
 
-                function do_address_lookup()
-                {
-                    if (!markerSet && jQuery(\'#_address_postcode\').val() != \'\' && jQuery(\'#_address_country\').val() != \'\')
-                    {
-                        var address = jQuery(\'#_address_postcode\').val();
-                        if (jQuery(\'#_address_street\').val() != \'\')
-                        {
-                            address = jQuery(\'#_address_street\').val() + \', \' + address;
-                        }
-                        if (jQuery(\'#_address_name_number\').val() != \'\')
-                        {
-                            address = jQuery(\'#_address_name_number\').val() + \' \' + address;
-                        }
-                        if (jQuery(\'#_address_country\').val() != \'\')
-                        {
-                            address = address + \', \' + jQuery(\'#_address_country\').val();
-                        }
-                        
-                        geocoder.geocode( { \'address\': address}, function(results, status) {
-
-                            if (status == google.maps.GeocoderStatus.OK) 
-                            {
-                                map.panTo(results[0].geometry.location);
-                                
-                                map.setZoom(16);
-                                
-                                jQuery(\'#_latitude\').val(results[0].geometry.location.lat());
-                                jQuery(\'#_longitude\').val(results[0].geometry.location.lng());
-                                
-                                marker = ph_create_marker(results[0].geometry.location.lat(), results[0].geometry.location.lng());
-                            }
-                            else
-                            {
-                                alert(\'Geocode was not successful for the following reason: \' + status);
-                            }
-                        });
-                    }
-                }
-                
                 function ph_initialize() {
                     
                     geocoder = new google.maps.Geocoder();
@@ -216,6 +182,47 @@ class PH_Meta_Box_Property_Coordinates {
                     }
                 });
             });
+
+            function do_address_lookup( force )
+            {
+                var force = force || false;
+
+                if ((!markerSet || force) && jQuery(\'#_address_postcode\').val() != \'\' && jQuery(\'#_address_country\').val() != \'\')
+                {
+                    var address = jQuery(\'#_address_postcode\').val();
+                    if (jQuery(\'#_address_street\').val() != \'\')
+                    {
+                        address = jQuery(\'#_address_street\').val() + \', \' + address;
+                    }
+                    if (jQuery(\'#_address_name_number\').val() != \'\')
+                    {
+                        address = jQuery(\'#_address_name_number\').val() + \' \' + address;
+                    }
+                    if (jQuery(\'#_address_country\').val() != \'\')
+                    {
+                        address = address + \', \' + jQuery(\'#_address_country\').val();
+                    }
+                    
+                    geocoder.geocode( { \'address\': address}, function(results, status) {
+
+                        if (status == google.maps.GeocoderStatus.OK) 
+                        {
+                            map.panTo(results[0].geometry.location);
+                            
+                            map.setZoom(16);
+                            
+                            jQuery(\'#_latitude\').val(results[0].geometry.location.lat());
+                            jQuery(\'#_longitude\').val(results[0].geometry.location.lng());
+                            
+                            marker = ph_create_marker(results[0].geometry.location.lat(), results[0].geometry.location.lng());
+                        }
+                        else
+                        {
+                            alert(\'Geocode was not successful for the following reason: \' + status);
+                        }
+                    });
+                }
+            }
             
             function ph_create_marker(lat, lng)
             {
