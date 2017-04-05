@@ -106,7 +106,9 @@ class PH_Shortcodes {
 			'order'  			=> 'desc',
 			'meta_key' 			=> '_price_actual',
 			'ids'     			=> '',
-			'department'		=> '', // residential-sales / residential-lettings,
+			'department'		=> '', // residential-sales / residential-lettings / commercial
+			'bedrooms'			=> '',
+			'address_keyword'	=> '',
 			'marketing_flag'	=> '', // Should be marketing_flag_id. Might deprecate this in the future
 			'property_type_id'	=> '',
 			'location_id'		=> '',
@@ -120,13 +122,77 @@ class PH_Shortcodes {
 			)
 		);
 
-		if ( isset($atts['department']) && $atts['department'] != '' )
+		if ( isset($atts['department']) && in_array($atts['department'], array("residential-sales", "residential-lettings", "commercial")) )
 		{
 			$meta_query[] = array(
 				'key' => '_department',
 				'value' => $atts['department'],
 				'compare' => '='
 			);
+		}
+
+		if ( isset($atts['bedrooms']) && $atts['bedrooms'] != '' && is_numeric($atts['bedrooms']) )
+		{
+			$meta_query[] = array(
+				'key' => '_bedrooms',
+				'value' => sanitize_text_field( $atts['bedrooms'] ),
+				'compare' => '='
+			);
+		}
+
+		if ( isset($atts['address_keyword']) && $atts['address_keyword'] != '' )
+		{
+			$sub_meta_query = array(
+	      		'relation' => 'OR',
+	      		array(
+				    'key'     => '_reference_number',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => '='
+				),
+	      		array(
+				    'key'     => '_address_street',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => 'LIKE'
+				),
+      			array(
+				    'key'     => '_address_two',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => 'LIKE'
+				),
+				array(
+				    'key'     => '_address_three',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => 'LIKE'
+				),
+				array(
+				    'key'     => '_address_four',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => 'LIKE'
+				),
+	      	);
+	      	if ( strlen($atts['address_keyword']) <= 4 )
+	      	{
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => '='
+				);
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ) . '[ ]',
+				    'compare' => 'RLIKE'
+				);
+	      	}
+	      	else
+	      	{
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => 'LIKE'
+				);
+	      	}
+
+	      	$meta_query[] = $sub_meta_query;
 		}
 
 		$tax_query = array();
