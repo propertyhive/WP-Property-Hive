@@ -403,19 +403,26 @@ class PH_Shortcodes {
 	public static function similar_properties( $atts ) {
 
 		$atts = shortcode_atts( array(
-			'per_page' => '2',
-			'columns' 	     => '2',
-			'orderby'        => 'rand',
-			'order'        => 'asc',
-			'property_id'    => '',
+			'per_page'					=> '2',
+			'columns'					=> '2',
+			'orderby'					=> 'rand',
+			'order'						=> 'asc',
+			'price_percentage_bounds'	=> 10,
+			'property_id'				=> '',
 		), $atts );
 
 		if ($atts['property_id'] != '')
 		{
 			$department = get_post_meta( $atts['property_id'], '_department', true );
 			$price = get_post_meta( $atts['property_id'], '_price_actual', true );
-			$lower_price = $price - ($price / 10);
-			$higher_price = $price + ($price / 10);
+			$lower_price = $price;
+			$higher_price = $price;
+			$atts['price_percentage_bounds'] = str_replace("%", "", $atts['price_percentage_bounds']);
+			if ( isset($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] != '' && is_numeric($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] > 0 )
+			{
+				$lower_price = $price - ($price * $atts['price_percentage_bounds'] / 100);
+				$higher_price = $price + ($price * $atts['price_percentage_bounds'] / 100);
+			}
 			$bedrooms = get_post_meta( $atts['property_id'], '_bedrooms', true );
 
 			$args = array(
