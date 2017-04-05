@@ -155,6 +155,11 @@ class PH_Shortcodes {
             );
 		}
 
+		if ( isset($atts['department']) && $atts['department'] == 'commercial' )
+		{
+			$atts['meta_key'] = '_floor_area_from_sqft';
+		}
+
 		$args = array(
 			'post_type'           => 'property',
 			'post_status'         => 'publish',
