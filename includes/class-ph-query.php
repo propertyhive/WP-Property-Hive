@@ -711,22 +711,22 @@ class PH_Query {
 	      		array(
 				    'key'     => '_address_street',
 				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => 'LIKE'
+				    'compare' => '='
 				),
       			array(
 				    'key'     => '_address_two',
 				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => 'LIKE'
+				    'compare' => '='
 				),
 				array(
 				    'key'     => '_address_three',
 				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => 'LIKE'
+				    'compare' => '='
 				),
 				array(
 				    'key'     => '_address_four',
 				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => 'LIKE'
+				    'compare' => '='
 				),
 	      	);
 	      	if ( strlen($_REQUEST['address_keyword']) <= 4 )

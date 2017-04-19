@@ -152,22 +152,22 @@ class PH_Shortcodes {
 	      		array(
 				    'key'     => '_address_street',
 				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
-				    'compare' => 'LIKE'
+				    'compare' => '='
 				),
       			array(
 				    'key'     => '_address_two',
 				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
-				    'compare' => 'LIKE'
+				    'compare' => '='
 				),
 				array(
 				    'key'     => '_address_three',
 				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
-				    'compare' => 'LIKE'
+				    'compare' => '='
 				),
 				array(
 				    'key'     => '_address_four',
 				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
-				    'compare' => 'LIKE'
+				    'compare' => '='
 				),
 	      	);
 	      	if ( strlen($atts['address_keyword']) <= 4 )
