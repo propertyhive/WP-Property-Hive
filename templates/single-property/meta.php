@@ -16,6 +16,8 @@ global $post, $property;
 	<?php do_action( 'propertyhive_property_meta_start' ); ?>
     
     <ul>
+
+        <?php do_action( 'propertyhive_property_meta_list_start' ); ?>
     
     	<?php if ( $property->reference_number != '' ) : ?><li class="ref"><?php _e( 'Ref', 'propertyhive' ); echo ': ' . $property->reference_number; ?></li><?php endif; ?>
         
@@ -61,6 +63,8 @@ global $post, $property;
         ?>
 
         <?php } // end if residential ?>
+
+        <?php do_action( 'propertyhive_property_meta_list_end' ); ?>
 
     </ul>
 
