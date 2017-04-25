@@ -415,7 +415,7 @@ class PH_Emails {
 			if ( $to != '' && $subject != '' && $body != '' )
 			{
 				$headers = array();
-				$headers[] = 'From: ' . get_option( 'propertyhive_email_from_address', get_option( 'admin_email' ) ) . '';
+				$headers[] = 'From: ' . get_bloginfo('name') . ' <' . get_option( 'propertyhive_email_from_address', get_option( 'admin_email' ) ) . '>';
 				$headers[] = 'Content-Type: text/html; charset=UTF-8';
 
 				$body = str_replace( "[property_address_hyperlinked]", '<a href="' . get_permalink($property_id) . '">' . get_the_title($property_id) . '</a>', $body );
