@@ -699,34 +699,45 @@ class PH_Query {
       	
       	if ( isset( $_REQUEST['address_keyword'] ) && $_REQUEST['address_keyword'] != '' )
         {
-        	$_REQUEST['address_keyword'] = trim($_REQUEST['address_keyword']);
+        	$_REQUEST['address_keyword'] = sanitize_text_field( trim( $_REQUEST['address_keyword'] ) );
+
+        	$address_keywords = array( $_REQUEST['address_keyword'] );
+
+        	if ( strpos( $_REQUEST['address_keyword'], ' ' ) !== FALSE )
+        	{
+        		$address_keywords[] = str_replace(" ", "-", $_REQUEST['address_keyword']);
+        	}
+        	if ( strpos( $_REQUEST['address_keyword'], '-' ) !== FALSE )
+        	{
+        		$address_keywords[] = str_replace("-", " ", $_REQUEST['address_keyword']);
+        	}
 
 	      	$meta_query = array(
 	      		'relation' => 'OR',
 	      		array(
 				    'key'     => '_reference_number',
-				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => '='
+				    'value'   => $address_keywords,
+				    'compare' => 'IN'
 				),
 	      		array(
 				    'key'     => '_address_street',
-				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => '='
+				    'value'   => $address_keywords,
+				    'compare' => 'IN'
 				),
       			array(
 				    'key'     => '_address_two',
-				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => '='
+				    'value'   => $address_keywords,
+				    'compare' => 'IN'
 				),
 				array(
 				    'key'     => '_address_three',
-				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => '='
+				    'value'   => $address_keywords,
+				    'compare' => 'IN'
 				),
 				array(
 				    'key'     => '_address_four',
-				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
-				    'compare' => '='
+				    'value'   => $address_keywords,
+				    'compare' => 'IN'
 				),
 	      	);
 	      	if ( strlen($_REQUEST['address_keyword']) <= 4 )
