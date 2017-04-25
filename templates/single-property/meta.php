@@ -32,6 +32,10 @@ global $post, $property;
         <?php if ( $property->bathrooms > 0 ) { ?><li class="bathrooms"><?php _e( 'Bathrooms', 'propertyhive' ); echo ': ' . $property->bathrooms; ?></li><?php } ?>
         
         <?php if ( $property->reception_rooms > 0 ) { ?><li class="receptions"><?php _e( 'Reception Rooms', 'propertyhive' ); echo ': ' . $property->reception_rooms; ?></li><?php } ?>
+
+        <?php if ( $property->parking != '' ) { ?><li class="parking"><?php _e( 'Parking', 'propertyhive' ); echo ': ' . $property->parking; ?></li><?php } ?>
+
+        <?php if ( $property->outside_space != '' ) { ?><li class="outside-space"><?php _e( 'Outside Space', 'propertyhive' ); echo ': ' . $property->outside_space; ?></li><?php } ?>
         
         <?php
             switch ( $property->department )
@@ -54,7 +58,6 @@ global $post, $property;
         <?php if ( $property->deposit > 0 ) { ?><li class="deposit"><?php _e( 'Deposit', 'propertyhive' ); echo ': ' . $property->get_formatted_deposit(); ?></li><?php } ?>
         
         <?php if ( $property->available_date != '') { ?><li class="available"><?php _e( 'Available', 'propertyhive' ); echo ': ' . $property->get_available_date(); ?></li><?php } ?>
-        
         
         <?php
                     break;
