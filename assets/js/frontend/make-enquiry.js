@@ -21,9 +21,16 @@ jQuery( function($){
                 
                 if (response.success == true)
                 {
-                    form_obj.find('#enquirySuccess').fadeIn();
-                    
-                    form_obj.trigger("reset");
+                    if ( propertyhive_make_property_enquiry_params.redirect_url && propertyhive_make_property_enquiry_params.redirect_url != '' )
+                    {
+                        window.location.href = propertyhive_make_property_enquiry_params.redirect_url;
+                    }
+                    else
+                    {
+                        form_obj.find('#enquirySuccess').fadeIn();
+                        
+                        form_obj.trigger("reset");
+                    }
                 }
                 else
                 {
