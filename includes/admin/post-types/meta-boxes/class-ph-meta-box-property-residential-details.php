@@ -108,7 +108,7 @@ class PH_Meta_Box_Property_Residential_Details {
         }
         propertyhive_wp_select( $args );
 ?>
-        <p class="form-field"><label for="parking_ids"><?php _e( 'Parking', 'propertyhive' ); ?></label>
+        <p class="form-field parking_ids_field"><label for="parking_ids"><?php _e( 'Parking', 'propertyhive' ); ?></label>
         <select id="parking_ids" name="parking_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select parking', 'propertyhive' ); ?>" class="multiselect attribute_values">
             <?php
                 $options = array( '' => '' );
@@ -143,7 +143,7 @@ class PH_Meta_Box_Property_Residential_Details {
             ?>
         </select>
 
-        <p class="form-field"><label for="outside_space_ids"><?php _e( 'Outside Space', 'propertyhive' ); ?></label>
+        <p class="form-field outside_space_ids_field"><label for="outside_space_ids"><?php _e( 'Outside Space', 'propertyhive' ); ?></label>
         <select id="outside_space_ids" name="outside_space_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select outside space', 'propertyhive' ); ?>" class="multiselect attribute_values">
             <?php
                 $options = array( '' => '' );

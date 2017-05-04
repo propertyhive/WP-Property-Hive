@@ -255,7 +255,7 @@ class PH_Meta_Box_Property_Address {
         }
         
 ?>
-<p class="form-field"><label for="location_id"><?php _e( 'Location', 'propertyhive' ); ?></label>
+<p class="form-field location_id_field"><label for="location_id"><?php _e( 'Location', 'propertyhive' ); ?></label>
         <select id="location_id" name="location_id[]" multiple="multiple" data-placeholder="<?php _e( 'Select location(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
             <?php
 
