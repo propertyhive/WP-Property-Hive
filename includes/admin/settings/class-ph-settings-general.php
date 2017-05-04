@@ -244,6 +244,18 @@ class PH_Settings_General extends PH_Settings_Page {
 			array( 'title' => __( 'Property Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'property_options' ),
 
             array(
+                'title'   => __( 'Search By Address Should', 'propertyhive' ),
+                'id'      => 'propertyhive_address_keyword_compare',
+                'type'    => 'radio',
+                'default' => '=',
+                'options' => array(
+                    '=' => __( 'Match Keyword Exactly', 'propertyhive' ),
+                    'LIKE' => __( 'Perform Loose Search', 'propertyhive' ),
+                ),
+                'desc_tip'  => __( 'Applicable if you allow users to search by entering a location. If \'Match Keyword Exactly\' is selected a search for \'Walton\' would not return properties in \'Walton On Thames\', but would prevent properties in \'Lincolnshire\' appearing when searching for \'Lincoln\'. \'Perform Loose Search\' would do the opposite.', 'propertyhive' )
+            ),
+
+            array(
                 'title'   => __( 'When Entering Features', 'propertyhive' ),
                 'id'      => 'propertyhive_features_type',
                 'type'    => 'radio',

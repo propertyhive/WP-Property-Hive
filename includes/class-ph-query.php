@@ -712,34 +712,36 @@ class PH_Query {
         		$address_keywords[] = str_replace("-", " ", $_REQUEST['address_keyword']);
         	}
 
-	      	$meta_query = array(
-	      		'relation' => 'OR',
-	      		array(
+	      	$meta_query = array('relation' => 'OR');
+
+	      	foreach ( $address_keywords as $address_keyword )
+	      	{
+		      	$meta_query[] = array(
 				    'key'     => '_reference_number',
-				    'value'   => $address_keywords,
-				    'compare' => 'IN'
-				),
-	      		array(
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+	      		$meta_query[] = array(
 				    'key'     => '_address_street',
-				    'value'   => $address_keywords,
-				    'compare' => 'IN'
-				),
-      			array(
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+      			$meta_query[] = array(
 				    'key'     => '_address_two',
-				    'value'   => $address_keywords,
-				    'compare' => 'IN'
-				),
-				array(
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+				$meta_query[] = array(
 				    'key'     => '_address_three',
-				    'value'   => $address_keywords,
-				    'compare' => 'IN'
-				),
-				array(
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+				$meta_query[] = array(
 				    'key'     => '_address_four',
-				    'value'   => $address_keywords,
-				    'compare' => 'IN'
-				),
-	      	);
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+			}
 	      	if ( strlen($_REQUEST['address_keyword']) <= 4 )
 	      	{
 	      		$meta_query[] = array(
