@@ -268,6 +268,17 @@ class PH_Settings_General extends PH_Settings_Page {
 
 			array( 'type' => 'sectionend', 'id' => 'property_options'),
 
+            array( 'title' => __( 'Applicant Registration Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'applicant_registration_options' ),
+
+            array(
+                'title'   => __( 'Allow Applicants To Login and Manage Account', 'propertyhive' ),
+                'id'      => 'propertyhive_applicant_users',
+                'type'    => 'checkbox',
+                'desc'  => __( 'Selecting this will allow applicants to create a password when registering, then login to manage their details and requirements. They will be created as a WordPress user with \'Property Hive Contact\' role.', 'propertyhive' )
+            ),
+
+            array( 'type' => 'sectionend', 'id' => 'applicant_registration_options'),
+
 		) ); // End general misc settings
 	}
 
