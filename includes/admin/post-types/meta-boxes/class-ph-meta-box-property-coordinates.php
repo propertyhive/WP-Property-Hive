@@ -190,6 +190,14 @@ class PH_Meta_Box_Property_Coordinates {
                 if ((!markerSet || force) && jQuery(\'#_address_postcode\').val() != \'\' && jQuery(\'#_address_country\').val() != \'\')
                 {
                     var address = jQuery(\'#_address_postcode\').val();
+                    if (jQuery(\'#_address_four\').val() != \'\')
+                    {
+                        address = jQuery(\'#_address_four\').val() + \', \' + address;
+                    }
+                    if (jQuery(\'#_address_three\').val() != \'\')
+                    {
+                        address = jQuery(\'#_address_three\').val() + \', \' + address;
+                    }
                     if (jQuery(\'#_address_street\').val() != \'\')
                     {
                         address = jQuery(\'#_address_street\').val() + \', \' + address;
