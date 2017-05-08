@@ -71,13 +71,72 @@ function toggleApplicantRegistrationDepartmentFields()
     }
 }
 
-jQuery( function(jQuery){
+var is_submitting = false;
+
+jQuery( function($){
 
     toggleApplicantRegistrationDepartmentFields();
     
-    jQuery('form.applicant-registration-form [name=\'department\']').change(function()
+    $('form.applicant-registration-form [name=\'department\']').change(function()
     {
         toggleApplicantRegistrationDepartmentFields();
+    });
+
+    // Enquiry form being submitted
+    $('body').on('submit', 'form[name=\'ph_applicant_registration_form\']', function()
+    {
+        if (!is_submitting)
+        {
+            is_submitting = true;
+            
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_applicant_registration' });
+            
+            var form_obj = $(this);
+
+            form_obj.find('#enquirySuccess').hide();
+            form_obj.find('#enquiryValidation').hide();
+            form_obj.find('#enquiryError').hide();
+
+            $.post( propertyhive_applicant_registration_params.ajax_url, data, function(response)
+            {
+                if (response.success == true)
+                {
+                    if ( propertyhive_applicant_registration_params.redirect_url && propertyhive_applicant_registration_params.redirect_url != '' )
+                    {
+                        window.location.href = propertyhive_applicant_registration_params.redirect_url;
+                    }
+                    else
+                    {
+                        if ( propertyhive_applicant_registration_params.my_account_url && propertyhive_applicant_registration_params.my_account_url != '' )
+                        {
+                            window.location.href = propertyhive_applicant_registration_params.my_account_url;
+                        }
+                        else
+                        {
+                            form_obj.find('#enquirySuccess').fadeIn();
+                            
+                            form_obj.trigger("reset");
+                        }
+                    }
+                }
+                else
+                {
+                    if (response.reason == 'validation')
+                    {
+                        form_obj.find('#enquiryValidation').fadeIn();
+                    }
+                    else if (response.reason == 'nosend')
+                    {
+                        form_obj.find('#enquiryError').fadeIn();
+                    }
+                }
+                
+                is_submitting = false;
+                
+            });
+        }
+
+        return false;
     });
 
 });

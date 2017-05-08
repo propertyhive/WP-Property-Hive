@@ -24,9 +24,9 @@ class PH_User_Contacts {
 		add_action( 'save_post', array( __CLASS__, 'save_post' ), 10, 3 );
 
 		// Hide users with role 'property_hive_contact' by excluding them from user queries
-		add_action( 'pre_user_query', array( __CLASS__, 'pre_user_query' ) );
+		//add_action( 'pre_user_query', array( __CLASS__, 'pre_user_query' ) );
 
-		add_filter( 'editable_roles', array( __CLASS__, 'remove_ph_contact_role_from_dropdown' ) );
+		//add_filter( 'editable_roles', array( __CLASS__, 'remove_ph_contact_role_from_dropdown' ) );
 	}
 
 	/**
@@ -93,7 +93,7 @@ class PH_User_Contacts {
 		{
 			// No associated user. Need to create one
 			$userdata = array(
-			    'user_login'  	=> 'contact_' . $post_id,
+			    'user_login'  	=> $contact->email_address,
 			    'user_email'  	=> $contact->email_address,
 			    'display_name' 	=> get_the_title( $post_id ),
 			);

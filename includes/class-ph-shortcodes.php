@@ -575,29 +575,16 @@ class PH_Shortcodes {
 
 		), $atts );
 
-		$assets_path          = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
-        wp_enqueue_script( 'ph-applicant-registration', $assets_path . 'js/frontend/applicant-registration.js', array( 'jquery' ), PH_VERSION, true );
+		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
+        wp_enqueue_script( 'propertyhive_applicant_registration', $assets_path . 'js/frontend/applicant-registration.js', array( 'jquery' ), PH_VERSION, true );
 
 		ob_start();
 
 		$form_controls = ph_get_applicant_registration_form_fields();
     
     	$form_controls = apply_filters( 'propertyhive_applicant_registration_form_fields', $form_controls );
-?>
-	
-<form name="ph_applicant_registration_form" class="applicant-registration-form" action="" method="post">
- 
-    <?php foreach ( $form_controls as $key => $field ) : ?>
 
-        <?php ph_form_field( $key, $field ); ?>
-
-    <?php endforeach; ?>
-
-    <input type="submit" value="<?php _e( 'Register', 'propertyhive' ); ?>">
-
-</form>
-
-<?php
+    	ph_get_template( 'global/applicant-registration-form.php', array( 'form_controls' => $form_controls ) );
 
 		return ob_get_clean();
 	}

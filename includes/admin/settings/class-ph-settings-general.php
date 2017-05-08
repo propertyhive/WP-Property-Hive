@@ -274,7 +274,17 @@ class PH_Settings_General extends PH_Settings_Page {
                 'title'   => __( 'Allow Applicants To Login and Manage Account', 'propertyhive' ),
                 'id'      => 'propertyhive_applicant_users',
                 'type'    => 'checkbox',
-                'desc'  => __( 'Selecting this will allow applicants to create a password when registering, then login to manage their details and requirements. They will be created as a WordPress user with \'Property Hive Contact\' role.', 'propertyhive' )
+                'desc'  => __( 'Applicable when you allow users to register on a form using the [applicant_registration_form] shortcode.<br><br>Selecting this will allow applicants to create a password when registering, then login to manage their details and requirements. They will be created as a WordPress user with \'Property Hive Contact\' role.<br><br>If unticked applicants will still be able to register, it will just be emailed through to the office and no user account created.', 'propertyhive' )
+            ),
+
+            array(
+                'title' => __( 'My Account Page', 'propertyhive' ),
+                //'desc'      => '<br/>' . sprintf( __( 'The base page can also be used in your <a href="%s">product permalinks</a>.', 'propertyhive' ), admin_url( 'options-permalink.php' ) ),
+                'id'        => 'propertyhive_my_account_page_id',
+                'type'      => 'single_select_page',
+                'default'   => '',
+                'css'       => 'min-width:300px;',
+                'desc'  => __( 'This sets the \'My Account\' page. This page should contain the [propertyhive_my_account] shortcode', 'propertyhive' ),
             ),
 
             array( 'type' => 'sectionend', 'id' => 'applicant_registration_options'),

@@ -355,6 +355,21 @@ function ph_get_applicant_registration_form_fields()
         'label' => __( 'Email Address', 'propertyhive' ),
         'required' => true
     );
+
+    if ( get_option( 'propertyhive_applicant_users', '' ) == 'yes' )
+    {
+        $fields['password'] = array(
+            'type' => 'password',
+            'label' => __( 'Password', 'propertyhive' ),
+            'required' => true
+        );
+
+        $fields['password2'] = array(
+            'type' => 'password',
+            'label' => __( 'Confirm Password', 'propertyhive' ),
+            'required' => true
+        );
+    }
     
     $fields['telephone_number'] = array(
         'type' => 'text',
@@ -389,12 +404,41 @@ function ph_get_applicant_registration_form_fields()
         'options' => $departments
     );
 
-    $fields['minimum_price'] = array(
-        'type' => 'number',
-        'label' => __( 'Minimum Price', 'propertyhive' ),
-        'style' => 'max-width:150px;',
-        'before' => '<div class="control control-minimum_price sales-only">',
-        'required' => false
+    $offices = array();
+    $value = '';
+
+    $args = array(
+        'post_type' => 'office',
+        'nopaging' => true,
+        'orderby' => 'title',
+        'order' => 'ASC'
+    );
+
+    $office_query = new WP_Query( $args );
+
+    if ( $office_query->have_posts() )
+    {
+        while ( $office_query->have_posts() )
+        {
+            $office_query->the_post();
+
+            $offices[get_the_ID()] = get_the_title();
+
+            if ( get_post_meta(get_the_ID(), 'primary', TRUE) == 1 )
+            {
+                $value = get_the_ID();
+            }
+        }
+    }
+    wp_reset_postdata();
+
+    $fields['office_id'] = array(
+        'type' => ( (count($offices) <= 1) ? 'hidden' : 'select' ),
+        'label' => __( 'Office', 'propertyhive' ),
+        'required' => false,
+        'show_label' => true,
+        'value' => $value,
+        'options' => $offices
     );
 
     $fields['maximum_price'] = array(
@@ -540,6 +584,7 @@ function ph_form_field( $key, $field )
         case "email":
         case "date":
         case "number":
+        case "password":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';

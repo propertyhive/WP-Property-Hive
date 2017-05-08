@@ -646,8 +646,8 @@ Kind regards,
 		if ( ! isset( $wp_roles ) ) {
 			$wp_roles = new WP_Roles();
 		}
-
-        // Customer role
+        
+        // Property Hive Contact role
         add_role( 'property_hive_contact', __( 'Property Hive Contact', 'propertyhive' ), array(
             'read' => true,
         ) );
