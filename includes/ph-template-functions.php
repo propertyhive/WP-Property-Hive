@@ -110,6 +110,13 @@ function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
         unset( $classes[ $key ] );
     }
 
+    // Add 'property' class, removing it first incase it exists
+    // Needed as results loaded with AJAX don't get the property class by default
+    if ( ( $key = array_search( 'property', $classes ) ) !== false ) {
+        unset( $classes[ $key ] );
+    }
+    $classes[] = 'property';
+
     return $classes;
 }
 
