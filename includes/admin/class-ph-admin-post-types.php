@@ -445,8 +445,6 @@ class PH_Admin_Post_Types {
 
         $options[] = $option;
 
-        $options = apply_filters( 'propertyhive_contact_filter_options', $options );
-
         // Third Parties
         $option = '<option value="thirdparty"';
         if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
