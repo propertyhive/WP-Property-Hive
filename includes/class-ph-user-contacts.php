@@ -27,6 +27,24 @@ class PH_User_Contacts {
 		//add_action( 'pre_user_query', array( __CLASS__, 'pre_user_query' ) );
 
 		//add_filter( 'editable_roles', array( __CLASS__, 'remove_ph_contact_role_from_dropdown' ) );
+
+		add_action( 'init', array( __CLASS__, 'listen_for_logout' ) );
+	}
+
+	/**
+	 * Listen for logout parameter
+	 * @return void
+	 */
+	public static function listen_for_logout( $user_id ) {
+
+		if ( isset($_GET['logout']) && $_GET['logout'] == 1 )
+		{
+			wp_logout();
+
+			// For now redirect to homepage with filter
+			wp_redirect( apply_filters( 'property_logout_redirect_url', home_url( '/' ) ) );
+			exit;
+		}
 	}
 
 	/**

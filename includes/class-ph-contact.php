@@ -25,9 +25,30 @@ class PH_Contact {
      * @param string $id (default: '')
      * @return void
      */
-    public function __construct( $id = '' ) {
-        if ( $id > 0 ) {
-            $this->get_contact( $id );
+    public function __construct( $id = '', $user_id = '' ) {
+
+        if ( $user_id > 0 )
+        {
+            // We've been passed a user ID. Need to get contact ID based on user_id
+            $contact_query = new WP_Query( array( 'post_type' => 'contact', 'meta_key' =>  '_user_id', 'meta_value' => $user_id, 'fields' => 'ids', 'posts_per_page' => 1 ) );
+
+            if ( $contact_query->have_posts() )
+            {
+                while ( $contact_query->have_posts() )
+                {
+                    $contact_query->the_post();
+
+                    $this->get_contact( get_the_ID() );
+                }
+            }
+
+            wp_reset_postdata();
+        }
+        else
+        {
+            if ( $id > 0 ) {
+                $this->get_contact( $id );
+            }
         }
     }
 

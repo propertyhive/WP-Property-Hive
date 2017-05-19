@@ -123,7 +123,8 @@ class PH_Admin {
         $user_roles = $current_user->roles;
         $user_role = array_shift($user_roles);
 
-        if ($user_role === 'property_hive_contact')
+        // Check role, but also AJAX as request to admin-ajax.php will still need to be made
+        if ( !defined( 'DOING_AJAX' ) && $user_role === 'property_hive_contact' )
         {
             exit( wp_redirect( home_url( '/' ) ) );
         }

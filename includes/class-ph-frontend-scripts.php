@@ -112,8 +112,8 @@ class PH_Frontend_Scripts {
 			) ) );
 		}
 
-		if ( wp_script_is( 'propertyhive_applicant_registration' ) ) {
-			wp_localize_script( 'propertyhive_applicant_registration', 'propertyhive_applicant_registration_params', apply_filters( 'propertyhive_applicant_registration_params', array(
+		if ( wp_script_is( 'propertyhive_account' ) ) {
+			wp_localize_script( 'propertyhive_account', 'propertyhive_account_params', apply_filters( 'propertyhive_account_params', array(
 				'ajax_url'        => PH()->ajax_url(),
 				'my_account_url'  => get_permalink( ph_get_page_id('my_account') ),
 			) ) );

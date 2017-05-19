@@ -338,9 +338,19 @@ function ph_get_property_enquiry_form_fields()
  *
  * @return array
  */
-function ph_get_applicant_registration_form_fields()
+function ph_get_user_details_form_fields()
 {
     global $post;
+
+    if ( is_user_logged_in() )
+    {
+        $current_user = wp_get_current_user();
+
+        if ( $current_user instanceof WP_User )
+        {
+            $contact = new PH_Contact( '', $current_user->ID );
+        }
+    }
     
     $fields = array();
     
@@ -349,12 +359,30 @@ function ph_get_applicant_registration_form_fields()
         'label' => __( 'Full Name', 'propertyhive' ),
         'required' => true
     );
+    if ( is_user_logged_in() && $current_user instanceof WP_User )
+    {
+        $fields['name']['value'] = $current_user->display_name;
+    }
     
     $fields['email_address'] = array(
         'type' => 'email',
         'label' => __( 'Email Address', 'propertyhive' ),
         'required' => true
     );
+    if ( is_user_logged_in() && $current_user instanceof WP_User )
+    {
+        $fields['email_address']['value'] = $current_user->user_email;
+    }
+
+    $fields['telephone_number'] = array(
+        'type' => 'text',
+        'label' => __( 'Telephone Number', 'propertyhive' ),
+        'required' => false
+    );
+    if ( is_user_logged_in() && $current_user instanceof WP_User )
+    {
+        $fields['telephone_number']['value'] = $contact->telephone_number;
+    }
 
     if ( get_option( 'propertyhive_applicant_users', '' ) == 'yes' )
     {
@@ -371,11 +399,43 @@ function ph_get_applicant_registration_form_fields()
         );
     }
     
-    $fields['telephone_number'] = array(
-        'type' => 'text',
-        'label' => __( 'Telephone Number', 'propertyhive' ),
-        'required' => false
-    );
+    return $fields;
+}
+
+/**
+ * Get default fields to be shown on applicant registration forms
+ *
+ * @return array
+ */
+function ph_get_applicant_requirements_form_fields()
+{
+    global $post;
+
+    if ( is_user_logged_in() )
+    {
+        $current_user = wp_get_current_user();
+        $applicant_profile = false;
+
+        if ( $current_user instanceof WP_User )
+        {
+            $contact = new PH_Contact( '', $current_user->ID );
+
+            if ( is_array($contact->contact_types) && in_array('applicant', $contact->contact_types) )
+            {
+                if ( 
+                    $contact->applicant_profiles != '' && 
+                    $contact->applicant_profiles > 0 && 
+                    $contact->applicant_profile_0 != '' && 
+                    is_array($contact->applicant_profile_0) 
+                )
+                {
+                    $applicant_profile = $contact->applicant_profile_0;
+                }
+            }
+        }
+    }
+    
+    $fields = array();
     
     $departments = array();
     $value = '';
@@ -403,6 +463,10 @@ function ph_get_applicant_registration_form_fields()
         'value' => $value,
         'options' => $departments
     );
+    if ( is_user_logged_in() && isset($applicant_profile['department']) )
+    {
+        $fields['department']['value'] = $applicant_profile['department'];
+    }
 
     $offices = array();
     $value = '';
@@ -448,14 +512,10 @@ function ph_get_applicant_registration_form_fields()
         'before' => '<div class="control control-minimum_price sales-only">',
         'required' => false
     );
-
-    $fields['minimum_rent'] = array(
-        'type' => 'number',
-        'label' => __( 'Minimum Rent', 'propertyhive' ) . ' (PCM)',
-        'style' => 'max-width:150px;',
-        'before' => '<div class="control control-minimum_price lettings-only">',
-        'required' => false
-    );
+    if ( is_user_logged_in() && isset($applicant_profile['max_price']) )
+    {
+        $fields['maximum_price']['value'] = $applicant_profile['max_price'];
+    }
 
     $fields['maximum_rent'] = array(
         'type' => 'number',
@@ -464,6 +524,10 @@ function ph_get_applicant_registration_form_fields()
         'before' => '<div class="control control-minimum_price lettings-only">',
         'required' => false
     );
+    if ( is_user_logged_in() && isset($applicant_profile['max_rent']) )
+    {
+        $fields['maximum_rent']['value'] = $applicant_profile['max_rent'];
+    }
 
     $fields['minimum_bedrooms'] = array(
         'type' => 'number',
@@ -471,6 +535,10 @@ function ph_get_applicant_registration_form_fields()
         'style' => 'max-width:80px;',
         'required' => false
     );
+    if ( is_user_logged_in() && isset($applicant_profile['min_beds']) )
+    {
+        $fields['minimum_bedrooms']['value'] = $applicant_profile['min_beds'];
+    }
 
     $args = array(
         'hide_empty' => false,
@@ -483,7 +551,7 @@ function ph_get_applicant_registration_form_fields()
     $selected_value = '';
     if ( !empty( $terms ) && !is_wp_error( $terms ) )
     {
-        $options = array( '' => '' );
+        $options = array( '' => __( 'All Property Types', 'properthive' ) );
 
         foreach ($terms as $term)
         {
@@ -513,6 +581,11 @@ function ph_get_applicant_registration_form_fields()
             'required' => false,
             'options' => $options,
         );
+
+        if ( is_user_logged_in() && isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+        {
+            $fields['property_type']['value'] = $applicant_profile['property_types'][0];
+        }
     }
 
     $args = array(
@@ -526,7 +599,7 @@ function ph_get_applicant_registration_form_fields()
     $selected_value = '';
     if ( !empty( $terms ) && !is_wp_error( $terms ) )
     {
-        $options = array( '' => '' );
+        $options = array( '' => __( 'All Locations', 'properthive' ) );
 
         foreach ($terms as $term)
         {
@@ -556,6 +629,11 @@ function ph_get_applicant_registration_form_fields()
             'required' => false,
             'options' => $options,
         );
+
+        if ( is_user_logged_in() && isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+        {
+            $fields['location']['value'] = $applicant_profile['locations'][0];
+        }
     }
     
     $fields['additional_requirements'] = array(
@@ -563,6 +641,10 @@ function ph_get_applicant_registration_form_fields()
         'label' => __( 'Additional Requirements', 'propertyhive' ),
         'required' => false
     );
+    if ( is_user_logged_in() && isset($applicant_profile['notes']) )
+    {
+        $fields['additional_requirements']['value'] = $applicant_profile['notes'];
+    }
 
     return $fields;
 }

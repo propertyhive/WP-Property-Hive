@@ -30,3 +30,9 @@
 .propertyhive-pagination ul { list-style-type:none; margin:0; padding:0; }
 .propertyhive-pagination ul li { display:inline-block; }
 .propertyhive-pagination ul li a {  }
+
+.propertyhive-my-account {  }
+.propertyhive-my-account::before { content:' '; display:table; }
+.propertyhive-my-account::after { clear:both; content:' '; display:table; }
+.propertyhive-my-account .my-account-navigation { float:left; width:30%; }
+.propertyhive-my-account .my-account-sections { float:right; width:68%; }

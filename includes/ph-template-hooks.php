@@ -137,8 +137,18 @@ add_action( 'propertyhive_after_single_property_summary', 'propertyhive_template
  */
 add_action( 'propertyhive_property_actions_list_start', 'propertyhive_make_enquiry_button', 10 );
 
+/**
+ * My Account
+ *
+ * @see propertyhive_my_account_navigation()
+ * @see propertyhive_my_account_sections()
+ */
+add_action( 'propertyhive_my_account_content', 'propertyhive_my_account_navigation', 10 );
+add_action( 'propertyhive_my_account_content', 'propertyhive_my_account_sections', 20 );
 
-
+add_action( 'propertyhive_my_account_section_dashboard', 'propertyhive_my_account_dashboard', 10 );
+add_action( 'propertyhive_my_account_section_details', 'propertyhive_my_account_details', 10 );
+add_action( 'propertyhive_my_account_section_requirements', 'propertyhive_my_account_requirements', 10 );
 
 /**
  * Footer

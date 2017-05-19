@@ -279,7 +279,6 @@ class PH_Settings_General extends PH_Settings_Page {
 
             array(
                 'title' => __( 'My Account Page', 'propertyhive' ),
-                //'desc'      => '<br/>' . sprintf( __( 'The base page can also be used in your <a href="%s">product permalinks</a>.', 'propertyhive' ), admin_url( 'options-permalink.php' ) ),
                 'id'        => 'propertyhive_my_account_page_id',
                 'type'      => 'single_select_page',
                 'default'   => '',
