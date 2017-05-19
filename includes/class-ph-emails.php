@@ -67,6 +67,59 @@ class PH_Emails {
 
 		add_action( 'propertyhive_process_email_log', array( $this, 'ph_process_email_log' ) );
 		add_action( 'propertyhive_auto_email_match', array( $this, 'ph_auto_email_match' ) );
+
+		// Send applicant registration email 
+		add_action( 'propertyhive_applicant_registered', array( $this, 'send_applicant_registration_alert' ), 10, 2 );
+	}
+
+	public function send_applicant_registration_alert( $contact_post_id, $user_id )
+	{
+		if ( 
+			get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && 
+			isset($_POST['office_id']) && // in the future we should have office stored against contact and use that
+			$_POST['office_id'] != '' &&
+			isset($_POST['department']) && // Should really take department from contacts requirements
+			$_POST['department'] != ''
+		)
+		{
+			$to = get_post_meta( $_POST['office_id'], '_office_email_address_' . str_replace("residential-", "", $_POST['department']), TRUE );
+
+			if ( $to == '' )
+			{
+				$to = get_option( 'admin_email', '' );
+			}
+
+			$subject = sprintf( __( 'A new applicant, %s, has registered through your website', 'propertyhive' ), get_the_title($contact_post_id) );
+
+			$message = __( "A new applicant has registered through your website. Please find details of the applicant below:", 'propertyhive' ) . "\n\n";
+            
+            $message = apply_filters( 'propertyhive_applicant_registration_email_pre_body', $message, $contact_post_id );
+
+            $form_controls = ph_get_user_details_form_fields();
+    
+	    	$form_controls = apply_filters( 'propertyhive_user_details_form_fields', $form_controls );
+
+	    	$form_controls_2 = ph_get_applicant_requirements_form_fields();
+	    
+	    	$form_controls_2 = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls_2 );
+
+	    	$form_controls = array_merge( $form_controls, $form_controls_2 );
+
+            unset($form_controls['office_id']);
+            
+            foreach ($form_controls as $key => $control)
+            {
+            	if ( isset($control['type']) && $control['type'] == 'password' )
+            	{
+            		continue;
+            	}
+
+                $label = ( isset($control['label']) ) ? $control['label'] : $key;
+                $message .= $label . ": " . $_POST[$key] . "\n";
+            }
+
+			wp_mail($to, $subject, $message);
+		}
 	}
 
 	/**

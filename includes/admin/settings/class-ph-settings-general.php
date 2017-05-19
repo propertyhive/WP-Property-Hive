@@ -274,7 +274,14 @@ class PH_Settings_General extends PH_Settings_Page {
                 'title'   => __( 'Allow Applicants To Login and Manage Account', 'propertyhive' ),
                 'id'      => 'propertyhive_applicant_users',
                 'type'    => 'checkbox',
-                'desc'  => __( 'Applicable when you allow users to register on a form using the [applicant_registration_form] shortcode.<br><br>Selecting this will allow applicants to create a password when registering, then login to manage their details and requirements. They will be created as a WordPress user with \'Property Hive Contact\' role.<br><br>If unticked applicants will still be able to register, it will just be emailed through to the office and no user account created.', 'propertyhive' )
+                'desc'  => __( 'Applicable when you allow users to register on a form using the [applicant_registration_form] shortcode.<br><br>Selecting this will allow applicants to create a password when registering, then login to manage their details and requirements. They will be created as a WordPress user with \'Property Hive Contact\' role.<br><br>If unticked applicants will still be able to register and they\'ll go into Property Hive as an applicant, they just won\'t be able to login at a later date.', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Send Email When Applicant Registers', 'propertyhive' ),
+                'id'      => 'propertyhive_new_registration_alert',
+                'type'    => 'checkbox',
+                'desc'  => __( 'Choose whether an email should be sent alerting you to the fact someone has registered. The email will be sent to the chosen office. Offices can be managed click selecting the \'Offices\' tab above.', 'propertyhive' )
             ),
 
             array(

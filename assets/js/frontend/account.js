@@ -16,7 +16,7 @@ jQuery(document).ready(function($)
         {
             is_submitting = true;
             
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_login' });
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_login', 'security': propertyhive_account_params.login_nonce });
             
             var form_obj = $(this);
 
@@ -62,7 +62,7 @@ jQuery(document).ready(function($)
         {
             is_submitting = true;
             
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_applicant_registration' });
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_applicant_registration', 'security': propertyhive_account_params.register_nonce });
             
             var form_obj = $(this);
 
@@ -119,7 +119,7 @@ jQuery(document).ready(function($)
         {
             is_submitting = true;
             
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_details' });
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_details', 'security': propertyhive_account_params.details_nonce });
             
             var form_obj = $(this);
 
@@ -160,7 +160,7 @@ jQuery(document).ready(function($)
         {
             is_submitting = true;
             
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_requirements' });
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_requirements', 'security': propertyhive_account_params.requirements_nonce });
             
             var form_obj = $(this);
 

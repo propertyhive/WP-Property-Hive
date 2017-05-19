@@ -103,8 +103,20 @@ class PH_AJAX {
     public function login()
     {
         $return = array(
-            'success' => false
+            'success' => false,
+            'errors' => array(),
         );
+
+        if ( check_ajax_referer( 'ph_login', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
 
         $creds = array(
             'user_login' => $_POST['email_address'],
@@ -115,7 +127,7 @@ class PH_AJAX {
 
         if ( is_wp_error( $user ) ) 
         {
-            // Could probably make use of $user->get_error_message()
+            //$return['errors'][] = $user->get_error_message();
         }
         else
         {
@@ -159,7 +171,21 @@ class PH_AJAX {
         // Validate contact
         global $post;
         
-        $return = array();
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        if ( check_ajax_referer( 'ph_register', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
         
         // Validate
         $errors = array();
@@ -306,7 +332,7 @@ class PH_AJAX {
                 'user_email' => sanitize_email($_POST['email_address']),
                 'user_pass'  => $_POST['password'],
                 'role' => 'property_hive_contact',
-                'show_admin_bar_front' => false,
+                'show_admin_bar_front' => 'false',
             );
 
             $user_id = wp_insert_user( $userdata );
@@ -347,7 +373,23 @@ class PH_AJAX {
 
         add_filter( 'send_email_change_email', '__return_false' );
 
-        $return = array();
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        // Got an issue with nonce being declined on second submission.
+        // Need to sort before putting this back in
+        /*if ( check_ajax_referer( 'ph_details', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }*/
         
         // Validate
         $errors = array();
@@ -481,7 +523,23 @@ class PH_AJAX {
         // Validate contact
         global $post;
         
-        $return = array();
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        // Got an issue with nonce being declined on second submission.
+        // Need to sort before putting this back in
+        /*if ( check_ajax_referer( 'ph_requirements', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }*/
         
         // Validate
         $errors = array();
