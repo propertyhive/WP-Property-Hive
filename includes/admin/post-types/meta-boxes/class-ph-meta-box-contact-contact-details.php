@@ -62,6 +62,8 @@ class PH_Meta_Box_Contact_Contact_Details {
         echo '</div>';
         
         echo '</div>';
+        /*
+        
 ?>
 <script language="javascript" type="text/javascript">
 
@@ -102,7 +104,7 @@ class PH_Meta_Box_Contact_Contact_Details {
 
 </script>
 <?php
-        
+        */
     }
 
     /**

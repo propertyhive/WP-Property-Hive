@@ -21,7 +21,7 @@ class PH_User_Contacts {
 	public static function init() {
 		//add_action( 'user_register', array( __CLASS__, 'user_register' ), 10, 1 );
 		//add_action( 'profile_update', array( __CLASS__, 'profile_update' ), 10, 2 );
-		add_action( 'save_post', array( __CLASS__, 'save_post' ), 10, 3 );
+		//add_action( 'save_post', array( __CLASS__, 'save_post' ), 10, 3 );
 
 		// Hide users with role 'property_hive_contact' by excluding them from user queries
 		//add_action( 'pre_user_query', array( __CLASS__, 'pre_user_query' ) );
