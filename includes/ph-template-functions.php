@@ -110,6 +110,13 @@ function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
         unset( $classes[ $key ] );
     }
 
+    // Add 'property' class, removing it first incase it exists
+    // Needed as results loaded with AJAX don't get the property class by default
+    if ( ( $key = array_search( 'property', $classes ) ) !== false ) {
+        unset( $classes[ $key ] );
+    }
+    $classes[] = 'property';
+
     return $classes;
 }
 
@@ -624,5 +631,158 @@ if ( ! function_exists( 'propertyhive_make_enquiry_button' ) ) {
      */
     function propertyhive_make_enquiry_button() {
         ph_get_template( 'global/make-enquiry.php' );
+    }
+}
+
+function propertyhive_my_account_pages()
+{
+    $user_id = get_current_user_id();
+
+    $contact = new PH_Contact( '', $user_id );
+
+    $pages = array(
+        'dashboard' => array(
+            'name' => __( 'Dashboard', 'propertyhive' )
+        ),
+        'details' => array(
+            'name' => __( 'My Details', 'propertyhive' )
+        ),
+    ); 
+
+    // Add 'requirements' tab if applicant
+
+    if ( !empty($contact->contact_types) )
+    {   
+        $contact_types = $contact->contact_types;
+        if ( !is_array($contact_types) )
+        {
+            $contact_types = array($contact_types);
+        }
+        if ( in_array('applicant', $contact_types) )
+        {
+            $applicant_profiles = $contact->applicant_profiles;
+
+            if ( $applicant_profiles && $applicant_profiles > 0 )
+            {
+                for ( $i = 0; $i < $applicant_profiles; ++$i )
+                {
+                    $pages['requirements'] = array(
+                        'name' => __( 'Requirements', 'propertyhive' ),
+                    );
+
+                    break;  // At the moment we'll only allow them to manage the first set of requirements
+                }
+            }
+        }
+    }
+
+    // In future we'll add things like 'My properties', viewings if landlord/vendor, documents etc
+
+    $pages['logout'] = array(
+        'name' => __( 'Logout', 'propertyhive' ),
+        'href' => home_url() . '?logout=1' // Logout URL
+    );
+
+    $pages = apply_filters( 'propertyhive_my_account_pages', $pages );
+
+    return $pages;
+}
+
+if ( ! function_exists( 'propertyhive_my_account_navigation' ) ) {
+
+    /**
+     * Output the navigation/tabs within a users 'My Account' page
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_navigation() {
+
+        $pages = propertyhive_my_account_pages();
+
+        ph_get_template( 'account/navigation.php', array( 'pages' => $pages ) );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_my_account_sections' ) ) {
+
+    /**
+     * Output the main sections within a users 'My Account' page that relate to the navigation tabs/links
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_sections() {
+
+        $pages = propertyhive_my_account_pages();
+
+        ph_get_template( 'account/sections.php', array( 'pages' => $pages ) );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_my_account_dashboard' ) ) {
+
+    /**
+     * Output the dashboard section within a users account
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_dashboard() {
+
+        ph_get_template( 'account/dashboard.php' );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_my_account_details' ) ) {
+
+    /**
+     * Output the details section within a users account
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_details() {
+
+        $form_controls = ph_get_user_details_form_fields();
+    
+        $form_controls = apply_filters( 'propertyhive_user_details_form_fields', $form_controls );
+
+        // Make sure password fields aren't require
+        foreach ( $form_controls as $i => $form_control )
+        {
+            if ( $form_control['type'] == 'password' )
+            {
+                $form_control['required'] = false;
+
+                $form_controls[$i] = $form_control;
+            }
+        }
+
+        ph_get_template( 'account/details.php', array( 'form_controls' => $form_controls ) );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_my_account_requirements' ) ) {
+
+    /**
+     * Output the requirements section within a users account
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_requirements() {
+
+        $form_controls = ph_get_applicant_requirements_form_fields();
+    
+        $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls );
+
+        // Remove office as this is only required on initial sign up (at the moment anyway)
+        if ( isset($form_controls['office_id']) )
+        {
+            unset($form_controls['office_id']);
+        }
+
+        ph_get_template( 'account/requirements.php', array( 'form_controls' => $form_controls ) );
     }
 }

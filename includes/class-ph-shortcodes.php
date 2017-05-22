@@ -26,6 +26,9 @@ class PH_Shortcodes {
 			'property_search_form'         => __CLASS__ . '::property_search_form',
 			'property_map'                 => __CLASS__ . '::property_map',
 			'property_street_view'         => __CLASS__ . '::property_street_view',
+			'applicant_registration_form'  => __CLASS__ . '::applicant_registration_form',
+			'propertyhive_my_account'  	   => __CLASS__ . '::my_account',
+			'propertyhive_login_form'  	   => __CLASS__ . '::login_form',
 		);
 
 		foreach ( $shortcodes as $shortcode => $function ) {
@@ -558,5 +561,114 @@ class PH_Shortcodes {
 		echo get_property_street_view( $atts );
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Output applicant registration form
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function applicant_registration_form( $atts ) {
+
+		$atts = shortcode_atts( array(
+
+		), $atts );
+
+		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
+        wp_enqueue_script( 'propertyhive_account', $assets_path . 'js/frontend/account.js', array( 'jquery' ), PH_VERSION, true );
+
+		ob_start();
+
+		if ( is_user_logged_in() )
+		{
+			ph_get_template( 'account/already-logged-in.php' );
+			return ob_get_clean();
+		}
+
+		$form_controls = ph_get_user_details_form_fields();
+    
+    	$form_controls = apply_filters( 'propertyhive_user_details_form_fields', $form_controls );
+
+    	$form_controls_2 = ph_get_applicant_requirements_form_fields();
+    
+    	$form_controls_2 = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls_2 );
+
+    	ph_get_template( 'account/applicant-registration-form.php', array( 'form_controls' => array_merge( $form_controls, $form_controls_2 ) ) );
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Output 'Login' page
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function login_form( $atts )
+	{
+		$atts = shortcode_atts( array(
+
+		), $atts );
+
+		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
+        wp_enqueue_script( 'propertyhive_account', $assets_path . 'js/frontend/account.js', array( 'jquery' ), PH_VERSION, true );
+
+		ob_start();
+
+		if ( is_user_logged_in() )
+		{
+			ph_get_template( 'account/already-logged-in.php' );
+			return ob_get_clean();
+		}
+
+		// Check 'propertyhive_applicant_users' setting is enabled
+		if ( get_option( 'propertyhive_applicant_users', '' ) != 'yes' )
+   		{
+   			ph_get_template( 'account/invalid-access.php' );
+			return ob_get_clean();
+		}
+
+		ph_get_template( 'account/login-form.php' );
+
+		return ob_get_clean();
+
+	}
+
+	/**
+	 * Output 'My Account' page
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function my_account( $atts )
+	{
+		$atts = shortcode_atts( array(
+
+		), $atts );
+
+		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
+        wp_enqueue_script( 'propertyhive_account', $assets_path . 'js/frontend/account.js', array( 'jquery' ), PH_VERSION, true );
+
+		ob_start();
+
+		// Check user is logged in
+		if ( !is_user_logged_in() )
+		{
+			ph_get_template( 'account/invalid-access.php' );
+			return ob_get_clean();
+		}
+
+		// Check 'propertyhive_applicant_users' setting is enabled
+		if ( get_option( 'propertyhive_applicant_users', '' ) != 'yes' )
+   		{
+   			ph_get_template( 'account/invalid-access.php' );
+			return ob_get_clean();
+		}
+
+		ph_get_template( 'account/my-account.php' );
+
+		return ob_get_clean();
+
 	}
 }

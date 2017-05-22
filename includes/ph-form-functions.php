@@ -334,6 +334,322 @@ function ph_get_property_enquiry_form_fields()
 }
 
 /**
+ * Get default fields to be shown on applicant registration forms
+ *
+ * @return array
+ */
+function ph_get_user_details_form_fields()
+{
+    global $post;
+
+    if ( is_user_logged_in() )
+    {
+        $current_user = wp_get_current_user();
+
+        if ( $current_user instanceof WP_User )
+        {
+            $contact = new PH_Contact( '', $current_user->ID );
+        }
+    }
+    
+    $fields = array();
+    
+    $fields['name'] = array(
+        'type' => 'text',
+        'label' => __( 'Full Name', 'propertyhive' ),
+        'required' => true
+    );
+    if ( is_user_logged_in() && $current_user instanceof WP_User )
+    {
+        $fields['name']['value'] = $current_user->display_name;
+    }
+    
+    $fields['email_address'] = array(
+        'type' => 'email',
+        'label' => __( 'Email Address', 'propertyhive' ),
+        'required' => true
+    );
+    if ( is_user_logged_in() && $current_user instanceof WP_User )
+    {
+        $fields['email_address']['value'] = $current_user->user_email;
+    }
+
+    $fields['telephone_number'] = array(
+        'type' => 'text',
+        'label' => __( 'Telephone Number', 'propertyhive' ),
+        'required' => false
+    );
+    if ( is_user_logged_in() && $current_user instanceof WP_User )
+    {
+        $fields['telephone_number']['value'] = $contact->telephone_number;
+    }
+
+    if ( get_option( 'propertyhive_applicant_users', '' ) == 'yes' )
+    {
+        $fields['password'] = array(
+            'type' => 'password',
+            'label' => __( 'Password', 'propertyhive' ),
+            'required' => true
+        );
+
+        $fields['password2'] = array(
+            'type' => 'password',
+            'label' => __( 'Confirm Password', 'propertyhive' ),
+            'required' => true
+        );
+    }
+    
+    return $fields;
+}
+
+/**
+ * Get default fields to be shown on applicant registration forms
+ *
+ * @return array
+ */
+function ph_get_applicant_requirements_form_fields()
+{
+    global $post;
+
+    if ( is_user_logged_in() )
+    {
+        $current_user = wp_get_current_user();
+        $applicant_profile = false;
+
+        if ( $current_user instanceof WP_User )
+        {
+            $contact = new PH_Contact( '', $current_user->ID );
+
+            if ( is_array($contact->contact_types) && in_array('applicant', $contact->contact_types) )
+            {
+                if ( 
+                    $contact->applicant_profiles != '' && 
+                    $contact->applicant_profiles > 0 && 
+                    $contact->applicant_profile_0 != '' && 
+                    is_array($contact->applicant_profile_0) 
+                )
+                {
+                    $applicant_profile = $contact->applicant_profile_0;
+                }
+            }
+        }
+    }
+    
+    $fields = array();
+    
+    $departments = array();
+    $value = '';
+    if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+    {
+        $departments['residential-sales'] = __( 'Buy', 'propertyhive' );
+        if ($value == '' && (get_option( 'propertyhive_primary_department' ) == 'residential-sales' || get_option( 'propertyhive_primary_department' ) === FALSE) )
+        {
+            $value = 'residential-sales';
+        }
+    }
+    if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
+    {
+        $departments['residential-lettings'] = __( 'Rent', 'propertyhive' );
+        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'residential-lettings')
+        {
+            $value = 'residential-lettings';
+        }
+    }
+    $fields['department'] = array(
+        'type' => 'radio',
+        'label' => __( 'Looking To', 'propertyhive' ),
+        'required' => true,
+        'show_label' => true,
+        'value' => $value,
+        'options' => $departments
+    );
+    if ( is_user_logged_in() && isset($applicant_profile['department']) )
+    {
+        $fields['department']['value'] = $applicant_profile['department'];
+    }
+
+    $offices = array();
+    $value = '';
+
+    $args = array(
+        'post_type' => 'office',
+        'nopaging' => true,
+        'orderby' => 'title',
+        'order' => 'ASC'
+    );
+
+    $office_query = new WP_Query( $args );
+
+    if ( $office_query->have_posts() )
+    {
+        while ( $office_query->have_posts() )
+        {
+            $office_query->the_post();
+
+            $offices[get_the_ID()] = get_the_title();
+
+            if ( get_post_meta(get_the_ID(), 'primary', TRUE) == 1 )
+            {
+                $value = get_the_ID();
+            }
+        }
+    }
+    wp_reset_postdata();
+
+    $fields['office_id'] = array(
+        'type' => ( (count($offices) <= 1) ? 'hidden' : 'select' ),
+        'label' => __( 'Office', 'propertyhive' ),
+        'required' => false,
+        'show_label' => true,
+        'value' => $value,
+        'options' => $offices
+    );
+
+    $fields['maximum_price'] = array(
+        'type' => 'number',
+        'label' => __( 'Maximum Price', 'propertyhive' ),
+        'style' => 'max-width:150px;',
+        'before' => '<div class="control control-minimum_price sales-only">',
+        'required' => false
+    );
+    if ( is_user_logged_in() && isset($applicant_profile['max_price']) )
+    {
+        $fields['maximum_price']['value'] = $applicant_profile['max_price'];
+    }
+
+    $fields['maximum_rent'] = array(
+        'type' => 'number',
+        'label' => __( 'Maximum Rent', 'propertyhive' ) . ' (PCM)',
+        'style' => 'max-width:150px;',
+        'before' => '<div class="control control-minimum_price lettings-only">',
+        'required' => false
+    );
+    if ( is_user_logged_in() && isset($applicant_profile['max_rent']) )
+    {
+        $fields['maximum_rent']['value'] = $applicant_profile['max_rent'];
+    }
+
+    $fields['minimum_bedrooms'] = array(
+        'type' => 'number',
+        'label' => __( 'Minimum Bedrooms', 'propertyhive' ),
+        'style' => 'max-width:80px;',
+        'required' => false
+    );
+    if ( is_user_logged_in() && isset($applicant_profile['min_beds']) )
+    {
+        $fields['minimum_bedrooms']['value'] = $applicant_profile['min_beds'];
+    }
+
+    $args = array(
+        'hide_empty' => false,
+        'parent' => 0
+    );
+    $terms = get_terms( 'property_type', $args );
+
+    $options = array();
+
+    $selected_value = '';
+    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+    {
+        $options = array( '' => __( 'All Property Types', 'properthive' ) );
+
+        foreach ($terms as $term)
+        {
+            $options[$term->term_id] = $term->name;
+            
+            $args = array(
+                'hide_empty' => false,
+                'parent' => $term->term_id
+            );
+            $subterms = get_terms( 'property_type', $args );
+            
+            if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+            {
+                foreach ($subterms as $term)
+                {
+                    $options[$term->term_id] = '- ' . $term->name;
+                }
+            }
+        }
+    }
+
+    if ( !empty($options) )
+    {
+        $fields['property_type'] = array(
+            'type' => 'select',
+            'label' => __( 'Property Type', 'propertyhive' ),
+            'required' => false,
+            'options' => $options,
+        );
+
+        if ( is_user_logged_in() && isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+        {
+            $fields['property_type']['value'] = $applicant_profile['property_types'][0];
+        }
+    }
+
+    $args = array(
+        'hide_empty' => false,
+        'parent' => 0
+    );
+    $terms = get_terms( 'location', $args );
+
+    $options = array();
+
+    $selected_value = '';
+    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+    {
+        $options = array( '' => __( 'All Locations', 'properthive' ) );
+
+        foreach ($terms as $term)
+        {
+            $options[$term->term_id] = $term->name;
+            
+            $args = array(
+                'hide_empty' => false,
+                'parent' => $term->term_id
+            );
+            $subterms = get_terms( 'location', $args );
+            
+            if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+            {
+                foreach ($subterms as $term)
+                {
+                    $options[$term->term_id] = '- ' . $term->name;
+                }
+            }
+        }
+    }
+
+    if ( !empty($options) )
+    {
+        $fields['location'] = array(
+            'type' => 'select',
+            'label' => __( 'Location', 'propertyhive' ),
+            'required' => false,
+            'options' => $options,
+        );
+
+        if ( is_user_logged_in() && isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+        {
+            $fields['location']['value'] = $applicant_profile['locations'][0];
+        }
+    }
+    
+    $fields['additional_requirements'] = array(
+        'type' => 'textarea',
+        'label' => __( 'Additional Requirements', 'propertyhive' ),
+        'required' => false
+    );
+    if ( is_user_logged_in() && isset($applicant_profile['notes']) )
+    {
+        $fields['additional_requirements']['value'] = $applicant_profile['notes'];
+    }
+
+    return $fields;
+}
+
+/**
  * Output individual field
  *
  * @return void
@@ -346,9 +662,11 @@ function ph_form_field( $key, $field )
     
     switch ($field['type'])
     {
-        case "text": 
-        case "email": 
-        case "date": 
+        case "text":
+        case "email":
+        case "date":
+        case "number":
+        case "password":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
@@ -356,7 +674,8 @@ function ph_form_field( $key, $field )
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
             $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : ( ( $field['type'] == 'date' ) ? 'dd/mm/yyyy' : '' );
-            $field['required'] = isset( $field['required'] ) ? $field['label'] : false;
+            $field['required'] = isset( $field['required'] ) ? $field['required'] : false;
+            $field['style'] = isset( $field['style'] ) ? $field['style'] : '';
             
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
@@ -394,6 +713,7 @@ function ph_form_field( $key, $field )
                     value="' . esc_attr(  $field['value'] ) . '"
                     placeholder="' . esc_attr(  $field['placeholder'] ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
+                    style="' . esc_attr( $field['style'] ) . '"
                     ' . ( ($field['required']) ? 'required' : '' ) . '
             >';
             
@@ -409,7 +729,7 @@ function ph_form_field( $key, $field )
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
             $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
-            $field['required'] = isset( $field['required'] ) ? $field['label'] : false;
+            $field['required'] = isset( $field['required'] ) ? $field['required'] : false;
             
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
@@ -484,6 +804,7 @@ function ph_form_field( $key, $field )
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            $field['required'] = isset( $field['required'] ) ? $field['required'] : false;
             $field['options'] = ( isset( $field['options'] ) && is_array( $field['options'] ) ) ? $field['options'] : array();
             
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
@@ -496,7 +817,12 @@ function ph_form_field( $key, $field )
             
             if ($field['show_label'])
             {
-                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
+                if ($field['required'])
+                {
+                    $output .= '<span class="required"> *</span>';
+                }
+                $output .= '</label>';
             }
             
             $output .= '<select 
@@ -651,6 +977,18 @@ function ph_form_field( $key, $field )
             
             $output .= '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . $field['value'] . '">';
             break;
+        }
+        case "html": 
+        {
+            $field['html'] = isset( $field['html'] ) ? $field['html'] : '';
+            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
+            $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
+
+            $output .= $field['before'];
+            $output .= $field['html'];
+            $output .= $field['after'];
+            
+            break;   
         }
         default:
         {

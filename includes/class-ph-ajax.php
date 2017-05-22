@@ -73,6 +73,12 @@ class PH_AJAX {
             'offer_declined' => false,
             'get_property_sales_meta_box' => false,
             'get_contact_sales_meta_box' => false,
+
+            'validate_save_contact' => false,
+            'applicant_registration' => true,
+            'login' => true,
+            'save_account_details' => true,
+            'save_account_requirements' => true,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -90,6 +96,555 @@ class PH_AJAX {
 	private function json_headers() {
 		header( 'Content-Type: application/json; charset=utf-8' );
 	}
+
+    /**
+     * Login user
+     */
+    public function login()
+    {
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        if ( check_ajax_referer( 'ph_login', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        $creds = array(
+            'user_login' => $_POST['email_address'],
+            'user_password' => $_POST['password'],
+        );
+
+        $user = wp_signon( apply_filters( 'propertyhive_login_credentials', $creds ), is_ssl() );
+
+        if ( is_wp_error( $user ) ) 
+        {
+            //$return['errors'][] = $user->get_error_message();
+        }
+        else
+        {
+            // Check has associated contact CPT and is published
+            $args = array(
+                'post_type' => 'contact',
+                'fields' => 'ids',
+                'posts_per_page' => 1,
+                'post_status' => array( 'publish' ),
+                'meta_query' => array(
+                    array(
+                        'key' => '_user_id',
+                        'value' => $user->ID
+                    )
+                )
+            );
+
+            $contact_query = new WP_Query( $args );
+
+            if ( $contact_query->have_posts() )
+            {
+                // Has associated published contact CPT
+                $return['success'] = true;
+            }
+            
+            wp_reset_postdata();
+        }
+
+        $this->json_headers();
+        echo json_encode( $return );
+        
+        // Quit out
+        die();
+    }
+
+    /**
+     * Register applicant
+     */
+    public function applicant_registration()
+    {
+        // Validate contact
+        global $post;
+        
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        if ( check_ajax_referer( 'ph_register', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+        
+        // Validate
+        $errors = array();
+
+        $form_controls = ph_get_user_details_form_fields();
+    
+        $form_controls = apply_filters( 'propertyhive_user_details_form_fields', $form_controls );
+
+        $form_controls_2 = ph_get_applicant_requirements_form_fields();
+    
+        $form_controls_2 = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls_2 );
+        
+        $form_controls = array_merge( $form_controls, $form_controls_2 );
+
+        foreach ( $form_controls as $key => $control )
+        {
+            if ( isset( $control ) && isset( $control['required'] ) && $control['required'] === TRUE )
+            {
+                // This field is mandatory. Lets check we received it in the post
+                if ( ! isset( $_POST[$key] ) || ( isset( $_POST[$key] ) && empty( $_POST[$key] ) ) )
+                {
+                    $errors[] = __( 'Missing required field', 'propertyhive' ) . ': ' . $key;
+                }
+            }
+            if ( isset( $control['type'] ) && $control['type'] == 'email' && isset( $_POST[$key] ) && ! empty( $_POST[$key] ) )
+            {
+                if ( ! is_email( $_POST[$key] ) )
+                {
+                    $errors[] = __( 'Invalid email address provided', 'propertyhive' );
+                }
+                else
+                {
+                    // Make sure this email address doesn't exist already
+                    $args = array(
+                        'post_type' => 'contact',
+                        'posts_per_page' => 1,
+                        'fields' => 'ids',
+                        'post_status' => array( 'publish' ),
+                        'meta_query' => array(
+                            array(
+                                'key' => '_email_address',
+                                'value' => $_POST[$key]
+                            )
+                        )
+                    );
+
+                    $contacts_query = new WP_Query( $args );
+
+                    if ( $contacts_query->have_posts() )
+                    {
+                        $errors[] = __( 'This email address is already registered', 'propertyhive' );
+                    }
+                    wp_reset_postdata();
+                }
+            }
+        }
+
+        // Check password and password2 match
+        if ( isset( $_POST['password'] ) && isset( $_POST['password2'] ) && $_POST['password'] != $_POST['password2'] )
+        {
+            $errors[] = __( 'The passwords entered do not match', 'propertyhive' );
+        }
+        
+        if ( !empty($errors) )
+        {
+            // Failed validation
+            
+            $return['success'] = false;
+            $return['reason'] = 'validation';
+            $return['errors'] = $errors;
+        }
+        else
+        {
+            // create CPT
+            $contact_post = array(
+                'post_title'    => $_POST['name'],
+                'post_content'  => '',
+                'post_type'     => 'contact',
+                'post_status'   => 'publish',
+                'comment_status'=> 'closed',
+                'ping_status'   => 'closed',
+            );
+            
+            // Insert the post into the database
+            $contact_post_id = wp_insert_post( $contact_post );
+
+            // Add post meta (contact details, requirements etc)
+            add_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
+            add_post_meta( $contact_post_id, '_telephone_number', ( ( isset($_POST['telephone_number']) ) ? $_POST['telephone_number'] : '' ) );
+
+            add_post_meta( $contact_post_id, '_contact_types', array('applicant') );
+
+            add_post_meta( $contact_post_id, '_applicant_profiles', 1 );
+
+            $applicant_profile = array();
+            $applicant_profile['department'] = $_POST['department'];
+
+            if ( $_POST['department'] == 'residential-sales' )
+            {
+                $price = preg_replace("/[^0-9]/", '', $_POST['maximum_price']);
+
+                $applicant_profile['max_price'] = $price;
+
+                // Not used yet but could be if introducing currencies in the future.
+                $applicant_profile['max_price_actual'] = $price;
+            }
+            elseif ( $_POST['department'] == 'residential-lettings' )
+            {
+                $price = preg_replace("/[^0-9]/", '', $_POST['maximum_rent']);
+
+                $applicant_profile['max_rent'] = $price;
+                $applicant_profile['rent_frequency'] = 'pcm';
+                $price_actual = $price; // Stored in pcm
+                $applicant_profile['max_price_actual'] = $price_actual;
+            }
+
+            if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
+            {
+                $beds = preg_replace("/[^0-9]/", '', $_POST['minimum_bedrooms']);
+                $applicant_profile['min_beds'] = $beds;
+
+                if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
+                {
+                    $applicant_profile['property_types'] = array($_POST['property_type']);
+                }
+            }
+
+            if ( isset($_POST['location']) && !empty($_POST['location']) )
+            {
+                $applicant_profile['locations'] = array($_POST['location']);
+            }
+
+            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? $_POST['additional_requirements'] : '' );
+
+            $applicant_profile['send_matching_properties'] = 'yes';
+            //$applicant_profile['auto_match_disabled'] = ''; // don't know what to do about this yet. Should probably look at global setting and reflect that
+
+            update_post_meta( $contact_post_id, '_applicant_profile_0', $applicant_profile );
+            
+            // Create user
+            $userdata = array(
+                'display_name' => $_POST['name'],
+                'user_login' => sanitize_email($_POST['email_address']),
+                'user_email' => sanitize_email($_POST['email_address']),
+                'user_pass'  => $_POST['password'],
+                'role' => 'property_hive_contact',
+                'show_admin_bar_front' => 'false',
+            );
+
+            $user_id = wp_insert_user( $userdata );
+
+            //On success
+            if ( ! is_wp_error( $user_id ) )
+            {
+                // Assign user ID to CPT
+                add_post_meta( $contact_post_id, '_user_id', $user_id );
+
+                $return['success'] = true;
+
+                wp_set_auth_cookie( $user_id, true );
+
+                do_action( 'propertyhive_applicant_registered', $contact_post_id, $user_id );
+            }
+            else
+            {
+                $return['success'] = false;
+                $return['reason'] = 'validation';
+                $return['errors'] = array('Failed to create user. You might experience issues with logging in');
+            }
+        }
+
+        $this->json_headers();
+        echo json_encode( $return );
+        
+        // Quit out
+        die();
+    }
+
+    /**
+     * Save account details
+     */
+    public function save_account_details()
+    {
+        global $wpdb, $current_user;
+
+        add_filter( 'send_email_change_email', '__return_false' );
+
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        // Got an issue with nonce being declined on second submission.
+        // Need to sort before putting this back in
+        /*if ( check_ajax_referer( 'ph_details', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }*/
+        
+        // Validate
+        $errors = array();
+
+        $user_id = (int) get_current_user_id();
+        $current_user = get_user_by( 'id', $user_id );
+        if ( $user_id <= 0 ) 
+        {
+            $return['success'] = false;
+            $return['reason'] = 'notloggedin';
+            $return['errors'] = array('It doesn\'t appear that you\'re logged in');
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        $form_controls = ph_get_user_details_form_fields();
+    
+        $form_controls = apply_filters( 'propertyhive_user_details_form_fields', $form_controls );
+
+        foreach ( $form_controls as $key => $control )
+        {
+            if ( isset( $control ) && isset( $control['required'] ) && $control['required'] === TRUE )
+            {
+                // This field is mandatory. Lets check we received it in the post
+                if ( ! isset( $_POST[$key] ) || ( isset( $_POST[$key] ) && empty( $_POST[$key] ) ) && $control['type'] != 'password' )
+                {
+                    $errors[] = __( 'Missing required field', 'propertyhive' ) . ': ' . $key;
+                }
+            }
+            if ( isset( $control['type'] ) && $control['type'] == 'email' && isset( $_POST[$key] ) && ! empty( $_POST[$key] ) )
+            {
+                if ( ! is_email( $_POST[$key] ) )
+                {
+                    $errors[] = __( 'Invalid email address provided', 'propertyhive' );
+                }
+
+                // need to see if email address is being changed and, if so, check new email address doesn't exist already
+            }
+        }
+
+        // Check password and password2 match
+        if ( isset( $_POST['password'] ) && isset( $_POST['password2'] ) && !empty( $_POST['password'] ) && $_POST['password'] != $_POST['password2'] )
+        {
+            $errors[] = __( 'The passwords entered do not match', 'propertyhive' );
+        }
+
+        if ( !empty($errors) )
+        {
+            // Failed validation
+            
+            $return['success'] = false;
+            $return['reason'] = 'validation';
+            $return['errors'] = $errors;
+        }
+        else
+        {
+            $contact = new PH_Contact( '', $user_id );
+            
+            // create CPT
+            $contact_post = array(
+                'ID' => $contact->id,
+                'post_title' => $_POST['name'],
+            );
+            
+            // Update the post in the database
+            $contact_post_id = wp_update_post( $contact_post );
+
+            update_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
+            if (isset($_POST['telephone_number']))
+            {
+                update_post_meta( $contact_post_id, '_telephone_number', $_POST['telephone_number'] );
+            }
+
+            // Update user
+            $userdata = array(
+                'ID' => $user_id,
+                'display_name' => $_POST['name'],
+                'user_email' => sanitize_email($_POST['email_address']),
+            );
+
+            if ( isset($_POST['password']) && !empty($_POST['password']) )
+            {
+                $userdata['user_pass'] = $_POST['password'];
+            }
+
+            $user_id = wp_update_user( $userdata );
+
+            $user_roles = $current_user->roles;
+            $user_role = array_shift($user_roles);
+
+            if ( $user_role === 'property_hive_contact' )
+            {
+                // Have to update login via SQL as wp_update_user won't allow altering
+                // Only do it for property hive contacts though as admin or editor might be viewing this page
+                $wpdb->update($wpdb->users, array('user_login' => sanitize_email($_POST['email_address'])), array('ID' => $user_id));
+            }
+
+            //On success
+            if ( ! is_wp_error( $user_id ) )
+            {
+                $return['success'] = true;
+
+                wp_set_auth_cookie( $user_id, true );
+
+                do_action( 'propertyhive_account_details_updated', $contact_post_id, $user_id );
+            }
+            else
+            {
+                $return['success'] = false;
+                $return['reason'] = 'validation';
+                $return['errors'] = array('Failed to update user. Please try again');
+            }
+        }
+
+        $this->json_headers();
+        echo json_encode( $return );
+        
+        // Quit out
+        die();
+    }
+
+    /**
+     * Save account requirements
+     */
+    public function save_account_requirements()
+    {
+        // Validate contact
+        global $post;
+        
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        // Got an issue with nonce being declined on second submission.
+        // Need to sort before putting this back in
+        /*if ( check_ajax_referer( 'ph_requirements', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }*/
+        
+        // Validate
+        $errors = array();
+
+        $user_id = (int) get_current_user_id();
+        $current_user = get_user_by( 'id', $user_id );
+        if ( $user_id <= 0 ) 
+        {
+            $return['success'] = false;
+            $return['reason'] = 'notloggedin';
+            $return['errors'] = array('It doesn\'t appear that you\'re logged in');
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        $form_controls = ph_get_applicant_requirements_form_fields();
+    
+        $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls );
+
+        foreach ( $form_controls as $key => $control )
+        {
+            if ( isset( $control ) && isset( $control['required'] ) && $control['required'] === TRUE )
+            {
+                // This field is mandatory. Lets check we received it in the post
+                if ( ! isset( $_POST[$key] ) || ( isset( $_POST[$key] ) && empty( $_POST[$key] ) ) )
+                {
+                    $errors[] = __( 'Missing required field', 'propertyhive' ) . ': ' . $key;
+                }
+            }
+        }
+        
+        if ( !empty($errors) )
+        {
+            // Failed validation
+            
+            $return['success'] = false;
+            $return['reason'] = 'validation';
+            $return['errors'] = $errors;
+        }
+        else
+        {
+            $contact = new PH_Contact( '', $user_id );
+
+            $contact_post_id = $contact->id;
+
+            $applicant_profile = array();
+            $applicant_profile['department'] = $_POST['department'];
+
+            if ( $_POST['department'] == 'residential-sales' )
+            {
+                $price = preg_replace("/[^0-9]/", '', $_POST['maximum_price']);
+
+                $applicant_profile['max_price'] = $price;
+
+                // Not used yet but could be if introducing currencies in the future.
+                $applicant_profile['max_price_actual'] = $price;
+            }
+            elseif ( $_POST['department'] == 'residential-lettings' )
+            {
+                $price = preg_replace("/[^0-9]/", '', $_POST['maximum_rent']);
+
+                $applicant_profile['max_rent'] = $price;
+                $applicant_profile['rent_frequency'] = 'pcm';
+                $price_actual = $price; // Stored in pcm
+                $applicant_profile['max_price_actual'] = $price_actual;
+            }
+
+            if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
+            {
+                $beds = preg_replace("/[^0-9]/", '', $_POST['minimum_bedrooms']);
+                $applicant_profile['min_beds'] = $beds;
+
+                if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
+                {
+                    $applicant_profile['property_types'] = array($_POST['property_type']);
+                }
+            }
+
+            if ( isset($_POST['location']) && !empty($_POST['location']) )
+            {
+                $applicant_profile['locations'] = array($_POST['location']);
+            }
+
+            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? $_POST['additional_requirements'] : '' );
+
+            $applicant_profile['send_matching_properties'] = 'yes';
+            //$applicant_profile['auto_match_disabled'] = ''; // don't know what to do about this yet. Should probably look at global setting and reflect that
+
+            update_post_meta( $contact_post_id, '_applicant_profile_0', $applicant_profile );
+
+            $return['success'] = true;
+
+            do_action( 'propertyhive_account_requirements_updated', $contact_post_id, $user_id );
+        }
+
+        $this->json_headers();
+        echo json_encode( $return );
+        
+        // Quit out
+        die();
+    }
 
     /**
      * Load existing features
@@ -773,7 +1328,82 @@ class PH_AJAX {
         die( json_encode( array('success' => get_edit_post_link($contact_post_id, '')) ) );
     }
 
-    // Dashboard related functionas
+    public function validate_save_contact()
+    {
+        global $post;
+
+        check_ajax_referer( 'contact-save-validation', 'security' );
+
+        $this->json_headers();
+
+        parse_str($_POST['form_data']);
+        var_dump();
+        $return = array('errors' => array());
+
+        if ( isset($_email_address) && $_email_address != '' )
+        {
+            $email_addresses = explode( ",", $_email_address );
+
+            foreach ( $email_addresses as $email_address )
+            {
+                $email_address = trim( $email_address );
+
+                if ( !is_email($email_address) )
+                {
+                    $return['errors'][] = __( 'Email address is invalid', 'propertyhive' ) . ' - ' . $email_address;
+                }
+
+                // Check it doesn't exist already
+                $args = array(
+                    'post_type' => 'contact',
+                    'post_status' => 'any',
+                    'posts_per_page' => 1,
+                    'fields' => 'ids',
+                    'meta_query' => array(
+                        'relation' => 'OR',
+                        array(
+                            'key' => '_email_address',
+                            'value' => $email_address,
+                            'compare' => '='
+                        ),
+                        array(
+                            'key' => '_email_address',
+                            'value' => ',' . $email_address,
+                            'compare' => 'LIKE'
+                        )
+                        ,
+                        array(
+                            'key' => '_email_address',
+                            'value' => $email_address . ',',
+                            'compare' => 'LIKE'
+                        )
+                    )
+                );
+                if ( isset($post_ID) && $post_ID != '' )
+                {
+                    $args['post__not_in'] = array( $post_ID );
+                }
+
+                $contact_query = new WP_Query( $args );
+
+                if ( $contact_query->have_posts() )
+                {
+                    while ( $contact_query->have_posts() )
+                    {
+                        $contact_query->the_post();
+
+                        $return['errors'][] = __( 'A contact, ' . get_the_title() . ', already exists with email address', 'propertyhive' ) . ' ' . $email_address;
+                    }
+                }
+            }
+        }
+
+        echo json_encode($return);
+
+        die();
+    }
+
+    // Dashboard related functions
     public function get_news()
     {
         $this->json_headers();

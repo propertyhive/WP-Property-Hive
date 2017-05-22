@@ -24,6 +24,7 @@ class PH_Admin {
         add_action( 'current_screen', array( $this, 'disable_propertyhive_meta_box_dragging' ) );
         add_action( 'current_screen', array( $this, 'remove_propertyhive_meta_boxes_from_screen_options' ) );
         add_action( 'admin_notices', array( $this, 'review_admin_notices') );
+        add_action( 'admin_init', array( $this, 'prevent_access_to_admin' ) );
         add_action( 'admin_init', array( $this, 'view_email' ) );
         add_action( 'admin_init', array( $this, 'preview_emails' ) );
     }
@@ -112,6 +113,20 @@ class PH_Admin {
                     update_option( 'propertyhive_review_prompt_due_timestamp', 0 );
                 }
             }
+        }
+    }
+
+    public function prevent_access_to_admin()
+    {
+        global $current_user;
+
+        $user_roles = $current_user->roles;
+        $user_role = array_shift($user_roles);
+
+        // Check role, but also AJAX as request to admin-ajax.php will still need to be made
+        if ( !defined( 'DOING_AJAX' ) && $user_role === 'property_hive_contact' )
+        {
+            exit( wp_redirect( home_url( '/' ) ) );
         }
     }
 

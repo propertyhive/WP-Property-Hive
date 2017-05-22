@@ -62,6 +62,46 @@ class PH_Meta_Box_Contact_Contact_Details {
         echo '</div>';
         
         echo '</div>';
+?>
+<script language="javascript" type="text/javascript">
+
+    var form_validated = false;
+    jQuery(document).ready(function() 
+    {
+        jQuery('#post').submit(function() 
+        {
+            if ( !form_validated )
+            {
+                var form_data = jQuery( this ).serialize();
+
+                var data = {
+                    action: 'propertyhive_validate_save_contact',
+                    security: '<?php echo wp_create_nonce( 'contact-save-validation' ); ?>',
+                    form_data: form_data
+                };
+
+                jQuery.post(ajaxurl, data, function(response) 
+                {
+                    if ( response.errors && response.errors.length > 0 ) 
+                    {
+                        alert(response.errors.join("\n"));
+                        return false;
+                    }
+                    else
+                    {
+                        form_validated = true;
+                        jQuery('#post').submit();
+                        return true;
+                    }
+                }, 'json');
+
+                return false;
+            }
+        });
+    });
+
+</script>
+<?php
         
     }
 
@@ -71,9 +111,9 @@ class PH_Meta_Box_Contact_Contact_Details {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        update_post_meta( $post_id, '_telephone_number', $_POST['_telephone_number'] );
-        update_post_meta( $post_id, '_email_address', $_POST['_email_address'] );
-        update_post_meta( $post_id, '_contact_notes', $_POST['_contact_notes'] );
+        update_post_meta( $post_id, '_telephone_number', trim($_POST['_telephone_number']) );
+        update_post_meta( $post_id, '_email_address', str_replace(" ", "", $_POST['_email_address']) );
+        update_post_meta( $post_id, '_contact_notes', trim($_POST['_contact_notes']) );
         update_post_meta( $post_id, '_forbidden_contact_methods', ( (isset($_POST['_forbidden_contact_methods'])) ? $_POST['_forbidden_contact_methods'] : '' ) );
 
         do_action( 'propertyhive_save_contact_contact_details', $post_id );
