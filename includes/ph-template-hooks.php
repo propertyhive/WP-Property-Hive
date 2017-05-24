@@ -149,6 +149,7 @@ add_action( 'propertyhive_my_account_content', 'propertyhive_my_account_sections
 add_action( 'propertyhive_my_account_section_dashboard', 'propertyhive_my_account_dashboard', 10 );
 add_action( 'propertyhive_my_account_section_details', 'propertyhive_my_account_details', 10 );
 add_action( 'propertyhive_my_account_section_requirements', 'propertyhive_my_account_requirements', 10 );
+add_action( 'propertyhive_my_account_section_applicant_viewings', 'propertyhive_my_account_applicant_viewings', 10 );
 
 /**
  * Footer
