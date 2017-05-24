@@ -26,6 +26,7 @@ class PH_Shortcodes {
 			'property_search_form'         => __CLASS__ . '::property_search_form',
 			'property_map'                 => __CLASS__ . '::property_map',
 			'property_street_view'         => __CLASS__ . '::property_street_view',
+			'property_office_details'      => __CLASS__ . '::property_office_details',
 			'applicant_registration_form'  => __CLASS__ . '::applicant_registration_form',
 			'propertyhive_my_account'  	   => __CLASS__ . '::my_account',
 			'propertyhive_login_form'  	   => __CLASS__ . '::login_form',
@@ -559,6 +560,46 @@ class PH_Shortcodes {
 		ob_start();
 
 		echo get_property_street_view( $atts );
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Output property office details
+	 * Should only be used on a property page or where the $property var is set
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function property_office_details( $atts ) {
+
+		global $property;
+
+		$atts = shortcode_atts( array(
+			'address_separator' => '<br>',
+			'hyperlink_telephone_number' => true,
+			'hyperlink_email_address' => true,
+		), $atts );
+		
+		$atts['hyperlink_telephone_number'] = (($atts['hyperlink_telephone_number'] === 'true' || $atts['hyperlink_telephone_number'] === true) ? true : false);
+		$atts['hyperlink_email_address'] = (($atts['hyperlink_email_address'] === 'true' || $atts['hyperlink_email_address'] === true) ? true : false);
+
+		ob_start();
+
+		if ( $property->office_id != '' )
+		{
+			echo '<div class="property-office-details">';
+
+				echo '<div class="office-name">' . $property->office_name . '</div>';
+
+				echo '<div class="office-address">' . $property->get_office_address( $atts['address_separator'] ) . '</div>';
+
+				echo '<div class="office-telephone-number">' . ( ($atts['hyperlink_telephone_number'] === true) ? '<a href="tel:' . $property->office_telephone_number . '">' : '' ) . $property->office_telephone_number . ( ($atts['hyperlink_telephone_number'] === true) ? '</a>' : '' ) .  '</div>';
+
+				echo '<div class="office-email-address">' . ( ($atts['hyperlink_email_address'] === true) ? '<a href="mailto:' . $property->office_email_address . '">' : '' ) . $property->office_email_address . ( ($atts['hyperlink_email_address'] === true) ? '</a>' : '' ) .  '</div>';
+
+			echo '</div>';
+		}
 
 		return ob_get_clean();
 	}
