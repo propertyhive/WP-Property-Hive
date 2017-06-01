@@ -673,6 +673,32 @@ function propertyhive_my_account_pages()
                     break;  // At the moment we'll only allow them to manage the first set of requirements
                 }
             }
+
+            // Check viewing module is active and that viewings exist, either future or past
+            if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+            {
+                $args = array(
+                    'post_type'   => 'viewing', 
+                    'posts_per_page'    => 1,
+                    'post_status'   => 'publish',
+                    'fields' => 'ids',
+                    'meta_query'  => array(
+                        array(
+                            'key' => '_applicant_contact_id',
+                            'value' => $contact->id
+                        )
+                    )
+                );
+                $viewings_query = new WP_Query( $args );
+
+                if ( $viewings_query->have_posts() )
+                {
+                    $pages['applicant_viewings'] = array(
+                        'name' => __( 'Viewings', 'propertyhive' ),
+                    );
+                }
+                wp_reset_postdata();
+            }
         }
     }
 
@@ -784,5 +810,89 @@ if ( ! function_exists( 'propertyhive_my_account_requirements' ) ) {
         }
 
         ph_get_template( 'account/requirements.php', array( 'form_controls' => $form_controls ) );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_my_account_applicant_viewings' ) ) {
+
+    /**
+     * Output the applicant viewings section within a users account
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_applicant_viewings() {
+
+        $user_id = get_current_user_id();
+
+        $contact = new PH_Contact( '', $user_id );
+
+        $past_viewings = array();
+        $upcoming_viewings = array();
+
+        $args = array(
+            'post_type'   => 'viewing', 
+            'nopaging'    => 'true',
+            'post_status'   => 'publish',
+            'fields' => 'ids',
+            'orderby'   => 'meta_value',
+            'order'       => 'DESC',
+            'post_status'   => 'publish',
+            'meta_key'  => '_start_date_time',
+            'meta_query'  => array(
+                array(
+                    'key' => '_applicant_contact_id',
+                    'value' => $contact->id
+                )
+            )
+        );
+
+        // Do past viewings
+        $args2 = $args;
+        $args2['meta_query'][] = array(
+            'key' => '_start_date_time',
+            'value' => date("Y-m-d H:i:s"),
+            'compare' => '<='
+        );
+
+        $viewings_query = new WP_Query( $args2 );
+
+        if ( $viewings_query->have_posts() )
+        {
+            while ( $viewings_query->have_posts() )
+            {
+                $viewings_query->the_post();
+
+                $viewing = new PH_Viewing( get_the_ID() );
+
+                $past_viewings[] = $viewing;
+            }
+        }
+        wp_reset_postdata();
+
+        // Do upcoming viewings
+        $args2 = $args;
+        $args2['meta_query'][] = array(
+            'key' => '_start_date_time',
+            'value' => date("Y-m-d H:i:s"),
+            'compare' => '>='
+        );
+
+        $viewings_query = new WP_Query( $args2 );
+
+        if ( $viewings_query->have_posts() )
+        {
+            while ( $viewings_query->have_posts() )
+            {
+                $viewings_query->the_post();
+
+                $viewing = new PH_Viewing( get_the_ID() );
+
+                $upcoming_viewings[] = $viewing;
+            }
+        }
+        wp_reset_postdata();
+
+        ph_get_template( 'account/applicant-viewings.php', array( 'past_viewings' => $past_viewings, 'upcoming_viewings' => $upcoming_viewings ) );
     }
 }
