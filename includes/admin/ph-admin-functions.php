@@ -27,7 +27,8 @@ function ph_get_screen_ids() {
         'viewing',
         'offer',
         'sale',
-        'property-hive_page_ph-settings'
+        'dashboard_page_ph-installed',
+        'property-hive_page_ph-settings',
     ) );
 }
 

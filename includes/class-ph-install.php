@@ -48,7 +48,7 @@ class PH_Install {
 	 */
 	public function install_actions() {
 		// Install - Add pages button
-        if ( ! empty( $_GET['install_propertyhive_pages'] ) ) {
+        /*if ( ! empty( $_GET['install_propertyhive_pages'] ) ) {
 
 			self::create_pages();
 
@@ -61,7 +61,7 @@ class PH_Install {
 			exit;
 
 		// Skip button
-		} /*elseif ( ! empty( $_GET['skip_install_propertyhive_pages'] ) ) {
+		} elseif ( ! empty( $_GET['skip_install_propertyhive_pages'] ) ) {
 
 			// We no longer need to install pages
 			delete_option( '_ph_needs_pages' );
@@ -101,24 +101,21 @@ class PH_Install {
 		PH_Post_types::register_post_types();
 		PH_Post_types::register_taxonomies();
 
-		// Also register endpoints - this needs to be done prior to rewrite rule flush
-		/*PH()->query->init_query_vars();
-		PH()->query->add_endpoints();*/
-
 		$this->create_terms();
         $this->create_primary_office();
 		$this->create_cron_jobs();
-		/*$this->create_files();
-		$this->create_css_from_less();
 
 		// Clear transient cache
-		ph_delete_property_transients();
-		ph_delete_contact_transients();
-		ph_delete_enquiry_transients();*/
 
 		// Queue upgrades
 		$current_version = get_option( 'propertyhive_version', null );
 		$current_db_version = get_option( 'propertyhive_db_version', null );
+
+        // No existing version set. This must be a new fresh install
+        if ( is_null( $current_version ) && is_null( $current_db_version ) ) 
+        {
+            set_transient( '_ph_activation_redirect', 1, 30 );
+        }
         
         update_option( 'propertyhive_db_version', PH()->version );
 
@@ -132,9 +129,6 @@ class PH_Install {
 
 		// Flush rules after install
 		flush_rewrite_rules();
-
-		// Redirect to welcome screen
-		set_transient( '_ph_activation_redirect', 1, 60 * 60 );
 	}
 
 	/**
