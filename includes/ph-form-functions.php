@@ -467,6 +467,10 @@ function ph_get_applicant_requirements_form_fields()
     {
         $fields['department']['value'] = $applicant_profile['department'];
     }
+    if ( count($departments) == 1 )
+    {
+        $fields['department']['type'] = 'hidden';
+    }
 
     $offices = array();
     $value = '';
