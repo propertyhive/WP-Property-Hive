@@ -1125,7 +1125,7 @@ class PH_Property {
             $address = get_post_meta( $this->_office_id, '_office_address_' . $i, TRUE );
             if ($address != '')
             {
-                if ($return != '') { $return .= ' '; }
+                if ($return != '') { $return .= $separator; }
                 $return .= $address;
             }
         }
