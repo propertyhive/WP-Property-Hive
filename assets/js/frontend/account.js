@@ -94,8 +94,21 @@ jQuery(document).ready(function($)
                 }
                 else
                 {
+                    form_obj.find('#registrationValidation').html('Please ensure all required fields have been completed');
                     if (response.reason == 'validation')
                     {
+                        if ( response.errors.length > 0 )
+                        {
+                            var error_html = '';
+                            for ( var i in response.errors )
+                            {
+                                error_html += response.errors[i] + '<br>';
+                            }
+                            if ( error_html != '' )
+                            {
+                                form_obj.find('#registrationValidation').html(error_html);
+                            }
+                        }
                         form_obj.find('#registrationValidation').fadeIn();
                     }
                     else
