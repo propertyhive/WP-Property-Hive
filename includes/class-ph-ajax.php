@@ -238,6 +238,13 @@ class PH_AJAX {
                     {
                         $errors[] = __( 'This email address is already registered', 'propertyhive' );
                     }
+                    else
+                    {
+                        if ( email_exists( $_POST[$key] ) ) 
+                        {
+                            $errors[] = __( 'This email address is already registered to a user', 'propertyhive' );
+                        }
+                    }
                     wp_reset_postdata();
                 }
             }
