@@ -86,7 +86,7 @@ class PH_Meta_Box_Contact_Actions {
 				        {
 				        	// Has a user associated
 					        $actions[] = '<a 
-						                href="' . get_edit_user_link( $user_id ) . '" 
+						                href="' . get_edit_user_link( $user_id ) . '&wp_http_referer=' . urlencode(get_edit_post_link($post->ID)) . '" 
 						                class="button"
 						                style="width:100%; margin-bottom:7px; text-align:center" 
 						            >' . __('View User / Change Password', 'propertyhive') . '</a>';
