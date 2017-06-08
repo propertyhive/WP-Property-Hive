@@ -366,7 +366,8 @@ class PH_Shortcodes {
 			'per_page' 	=> '12',
 			'columns' 	=> '4',
 			'orderby' 	=> 'rand',
-			'order' 	=> 'desc'
+			'order' 	=> 'desc',
+			'meta_key' 	=> '',
 		), $atts );
 
 		$args = array(
@@ -387,6 +388,10 @@ class PH_Shortcodes {
 				)
 			)
 		);
+
+		if ( ! empty( $atts['meta_key'] ) ) {
+			$args['meta_key'] = $atts['meta_key'];
+		}
 
 		ob_start();
 
