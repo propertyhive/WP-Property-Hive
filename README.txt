@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.7.5
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,10 +90,20 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 == Changelog ==
 
+= 1.4.2 =
+* When using the shortcode [property_map], check if Map Search add on is active and use same styling if any present
+* When an error occurs during applicant registration, show actual error as opposed to generic message
+* Include properties with 'Private' status when applicable when querying properties for shortcodes
+* Added new 'bedrooms' meta query for matching of exact number of beds
+* Added more ordering capability to [featured_properties] shortcode. Can now pass in 'meta_key' attribute
+* Added ability to add user from contact edit screen in WordPress, or view user record/change password if already setup as WP user
+* Also check WP users when checking if email address exists on registration
+* Don't require postcode when clicking 'Obtain Co-ordinates' on property edit screen
+
 = 1.4.1 =
 * Added new [property_office_details] shortcode to quickly pull in office contact details.
 * Added new welcome screen when Property Hive is activated for the first time.
-* Allow applicants to view past and upcoming viewings when logged into their account. New viewings tab will only show is viewings exist and viewings module is active.
+* Allow applicants to view past and upcoming viewings when logged into their account. New viewings tab will only show if viewings exist and viewings module is active.
 * If only one active department then hide 'Looking To Buy/Rent' field on applicant registration form.
 
 = 1.4.0 =
