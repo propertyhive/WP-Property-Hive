@@ -247,7 +247,7 @@ class PH_Shortcodes {
 
 		$args = array(
 			'post_type'           => 'property',
-			'post_status'         => 'publish',
+			'post_status'         => ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
 			'ignore_sticky_posts' => 1,
 			'orderby'             => $atts['orderby'],
 			'order'               => $atts['order'],
@@ -319,7 +319,7 @@ class PH_Shortcodes {
 
 		$args = array(
 			'post_type'				=> 'property',
-			'post_status'			=> 'publish',
+			'post_status'			=> ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
 			'ignore_sticky_posts'	=> 1,
 			'posts_per_page' 		=> $atts['per_page'],
 			'orderby' 				=> $atts['orderby'],
@@ -371,7 +371,7 @@ class PH_Shortcodes {
 
 		$args = array(
 			'post_type'				=> 'property',
-			'post_status' 			=> 'publish',
+			'post_status' 			=> ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
 			'ignore_sticky_posts'	=> 1,
 			'posts_per_page' 		=> $atts['per_page'],
 			'orderby' 				=> $atts['orderby'],
@@ -447,7 +447,7 @@ class PH_Shortcodes {
 			$args = array(
 				'post_type'				=> 'property',
 				'post__not_in' 			=> array($atts['property_id']),
-				'post_status' 			=> 'publish',
+				'post_status' 			=> ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
 				'ignore_sticky_posts'	=> 1,
 				'posts_per_page' 		=> $atts['per_page'],
 				'orderby' 				=> $atts['orderby'],
