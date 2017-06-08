@@ -158,6 +158,17 @@ function get_property_map( $args = array() )
 	  		mapTypeId: google.maps.MapTypeId.ROADMAP,
 	  		scrollwheel: <?php echo ( ( isset($args['scrollwheel']) && ($args['scrollwheel'] === 'false' || $args['scrollwheel'] === FALSE) ) ? 'false' : 'true' ); ?>
 	  	}
+	  	<?php
+  			if ( class_exists( 'PH_Map_Search' ) )
+  			{
+  				$map_add_on_settings = get_option( 'propertyhive_map_search', array() );
+
+  				if ( isset($map_add_on_settings['style_js']) && trim($map_add_on_settings['style_js']) != '' )
+  				{
+  					echo 'myOptions.styles = ' . trim($map_add_on_settings['style_js']) . ';';
+  				}
+  			}
+  		?>
 		property_map = new google.maps.Map(document.getElementById("property_map_canvas"), myOptions);
 				
 		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
