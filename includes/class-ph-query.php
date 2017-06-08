@@ -594,6 +594,7 @@ class PH_Query {
         $meta_query[] = $this->minimum_rent_meta_query();
         $meta_query[] = $this->maximum_rent_meta_query();
         $meta_query[] = $this->rent_range_meta_query();
+        $meta_query[] = $this->bedrooms_meta_query();
         $meta_query[] = $this->minimum_bedrooms_meta_query();
         $meta_query[] = $this->maximum_bedrooms_meta_query();
         $meta_query[] = $this->minimum_bathrooms_meta_query();
@@ -968,6 +969,35 @@ class PH_Query {
 	                'type'    => 'NUMERIC' 
 	            );
 	        }
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle exact bedrooms
+     *
+     * @access public
+     * @return array
+     */
+    public function bedrooms_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+        	(
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-sales') ||
+        		(isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'residential-lettings')
+        	) &&
+        	isset( $_REQUEST['bedrooms'] ) && $_REQUEST['bedrooms'] != '' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_bedrooms',
+                'value'   => sanitize_text_field( $_REQUEST['bedrooms'] ),
+                'compare' => '=',
+                'type'    => 'NUMERIC' 
+            );
         }
         
         return $meta_query;
