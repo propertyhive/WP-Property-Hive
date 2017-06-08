@@ -78,6 +78,29 @@ class PH_Meta_Box_Contact_Actions {
 			            }
 			        }
 
+			        // Show user options if has a valid email
+			        if ( get_post_meta( $post->ID, '_email_address', TRUE ) != '' && is_email(get_post_meta( $post->ID, '_email_address', TRUE )) )
+			        {
+				        $user_id = get_post_meta( $post->ID, '_user_id', TRUE );
+				        if ( $user_id != '' )
+				        {
+				        	// Has a user associated
+					        $actions[] = '<a 
+						                href="' . get_edit_user_link( $user_id ) . '" 
+						                class="button"
+						                style="width:100%; margin-bottom:7px; text-align:center" 
+						            >' . __('View User / Change Password', 'propertyhive') . '</a>';
+					    }
+					    else
+					    {
+					    	$actions[] = '<a 
+						                href="#action_panel_create_login" 
+						                class="button contact-action"
+						                style="width:100%; margin-bottom:7px; text-align:center" 
+						            >' . __('Create User Login', 'propertyhive') . '</a>';
+					    }
+					}
+
 			        $actions = apply_filters( 'propertyhive_admin_contact_actions', $actions, $post->ID );
 
 			        if ( !empty($actions) )
@@ -92,6 +115,26 @@ class PH_Meta_Box_Contact_Actions {
 		        echo '</div>';
 
 	        echo '</div>';
+
+	        // Book viewing action panel
+	        echo '<div id="action_panel_create_login" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
+			             
+	    		<div class="options_group">
+
+		    		<div class="form-field">
+
+			            <label for="_password">' . __( 'Password', 'propertyhive' ) . '</label>
+			            
+		            	<input type="text" id="_password" name="_password" style="width:100%;" value="' . esc_attr( wp_generate_password( 16 ) ) . '">
+		            	
+			        </div>
+
+			        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+			        <a class="button button-primary login-action-submit" href="#">' . __( 'Create Login', 'propertyhive' ) . '</a>
+
+				</div>
+
+			</div>';
 
 	        // Book viewing action panel
 	        echo '<div id="action_panel_book_viewing" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
@@ -272,6 +315,58 @@ jQuery(document).ready(function($)
 			});
 		});
 	});
+
+	// User / Login evebts
+	$('a.login-action-submit').click(function(e)
+	{
+		e.preventDefault();
+
+		// Validation
+		if ($('#_password').val() == '')
+		{
+			$('#_password').focus();
+			$('#_password').css('transition', 'background 0.6s');
+			$('#_password').css('background', '#ff9999');
+			setTimeout(function() { $('#_password').css('background', '#FFF'); }, 1000);
+			return false;
+		}
+
+		$(this).attr('disabled', 'disabled');
+		$(this).text('Saving...');
+
+		// Validation passed. Submit form
+		var data = {
+            action:         'propertyhive_create_contact_login',
+            contact_id:     <?php echo $post->ID; ?>,
+            password: 		$('#_password').val(),
+            security:       '<?php echo wp_create_nonce( 'create-login' ); ?>',
+        };
+
+        var that = this;
+		$.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        {
+        	if (response.error)
+        	{
+        		alert(response.error);
+        	}
+        	if (response.success)
+        	{
+        		$('#success_actions').html('');
+
+        		$('#success_actions').append('<strong>User login created successfully.</strong><br>This contact can now login using their email address and password.<br><br>');
+
+        		$('#action_panel_create_login').stop().fadeOut(300, function()
+				{
+					$('#action_panel_success').stop().fadeIn(300);
+				});
+
+				$('a[href=\'#action_panel_create_login\']').hide();
+        	}
+
+        	$(that).attr('disabled', false);
+        	$(that).text('Create Login');
+        });
+	})
 
 	// Viewing events
 	$('#viewing_property_search').on('keyup keypress', function(e)

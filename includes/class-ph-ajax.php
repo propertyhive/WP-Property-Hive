@@ -36,6 +36,9 @@ class PH_AJAX {
             'get_news' => false,
             'get_viewings_awaiting_applicant_feedback' => false,
 
+            // Contact actions
+            'create_contact_login' => false,
+
             // Viewing actions
             'book_viewing_property' => false,
             'book_viewing_contact' => false,
@@ -96,6 +99,57 @@ class PH_AJAX {
 	private function json_headers() {
 		header( 'Content-Type: application/json; charset=utf-8' );
 	}
+
+    public function create_contact_login()
+    {
+        check_ajax_referer( 'create-login', 'security' );
+
+        $this->json_headers();
+
+        if (empty($_POST['contact_id']))
+        {
+            $return = array('error' => 'No contact selected');
+            echo json_encode( $return );
+            die();
+        }
+
+        if (empty($_POST['password']))
+        {
+            $return = array('error' => 'No password entered');
+            echo json_encode( $return );
+            die();
+        }
+
+        $contact = new PH_Contact((int)$_POST['contact_id']);
+
+         // Create user
+        $userdata = array(
+            'display_name' => get_the_title($_POST['contact_id']),
+            'user_login' => sanitize_email($contact->email_address),
+            'user_email' => sanitize_email($contact->email_address),
+            'user_pass'  => $_POST['password'],
+            'role' => 'property_hive_contact',
+            'show_admin_bar_front' => 'false',
+        );
+
+        $user_id = wp_insert_user( $userdata );
+
+        // On success
+        if ( ! is_wp_error( $user_id ) )
+        {
+            // Assign user ID to CPT
+            add_post_meta( $_POST['contact_id'], '_user_id', $user_id );
+
+            $return = array('success' => true);
+        }
+        else
+        {
+            $return = array('error' => 'Failed to create user login');
+        }
+
+        echo json_encode( $return );
+        die();
+    }
 
     /**
      * Login user
