@@ -187,7 +187,7 @@ class PH_Meta_Box_Property_Coordinates {
             {
                 var force = force || false;
 
-                if ((!markerSet || force) && jQuery(\'#_address_postcode\').val() != \'\' && jQuery(\'#_address_country\').val() != \'\')
+                if ((!markerSet || force) && (jQuery(\'#_address_postcode\').val() != \'\' || force) && jQuery(\'#_address_country\').val() != \'\')
                 {
                     var address = jQuery(\'#_address_postcode\').val();
                     if (jQuery(\'#_address_four\').val() != \'\')
