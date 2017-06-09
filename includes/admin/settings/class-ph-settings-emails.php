@@ -240,6 +240,8 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
             	<p>Using this screen you can see which emails have been sent, which have failed, and how many are queued to be sent.</p>
 
+            	<br>
+
             	<p><strong><?php
             		$next_due = wp_next_scheduled( 'propertyhive_process_email_log' );
 
@@ -251,7 +253,8 @@ class PH_Settings_Emails extends PH_Settings_Page {
                     {
                     	echo __( 'Next scheduled to run at', 'propertyhive' ) . ' ' . date("H:i jS F Y", $next_due);
                     }
-            	?></strong></p>
+            	?></strong> <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&custom_email_log_cron=propertyhive_process_email_log' ); ?>" class="button">Run Now</a></p>
+
             	<br>
 
             	<ul class="subsubsub">
