@@ -42,8 +42,13 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	public function get_sections() {
 		$sections = array(
 			'' => __( 'Email Options', 'propertyhive' ),
-			'log'         => __( 'Email Queue', 'propertyhive' ),
 		);
+
+		if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
+	    {
+	    	$sections['log'] = __( 'Email Queue', 'propertyhive' );
+	    }
+
 		return apply_filters( 'propertyhive_get_sections_' . $this->id, $sections );
 	}
 
@@ -53,7 +58,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	 * @return array
 	 */
 	public function get_settings() {
-		$settings = apply_filters( 'propertyhive_email_settings', array(
+		$settings = array(
 
 			array( 'title' => __( 'Email Sender Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'email_sender_options' ),
 
@@ -141,38 +146,43 @@ class PH_Settings_Emails extends PH_Settings_Page {
                 'css'         => 'min-width:300px; height:110px;',
             ),
 
-            array( 'type' => 'sectionend', 'id' => 'enquiry_auto_responder_email_options' ),
+            array( 'type' => 'sectionend', 'id' => 'enquiry_auto_responder_email_options' )
 
-			array( 'title' => __( 'Property Match Email Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_match_email_options' ),
+        );
 
-            array(
-                'title'   => __( 'Default Email Subject', 'propertyhive' ),
-                'id'      => 'propertyhive_property_match_default_email_subject',
-                'type'    => 'text',
-                'css'         => 'min-width:300px;',
-            ),
+		if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
+	    {
+			$settings[] = array( 'title' => __( 'Property Match Email Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_match_email_options' );
 
-            array(
-                'title'   => __( 'Default Email Body', 'propertyhive' ),
-                'id'      => 'propertyhive_property_match_default_email_body',
-                'type'    => 'textarea',
-                'css'         => 'min-width:300px; height:110px;',
-            ),
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_property_match_default_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
 
-            array(
-                'title'   => __( 'Automatically Send Matching Properties To Applicants', 'propertyhive' ),
-                'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent emailed properties as they\'re added.<br><br>
-                	- This will only apply to properties added from the moment this option is activated.<br>
-                	- When enabled, this can disabled on a per-applicant basis by going into their record<br>
-                	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ),
-                'id'      => 'propertyhive_auto_property_match',
-                'type'    => 'checkbox',
-                'default' => '',
-            ),
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_property_match_default_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
 
-			array( 'type' => 'sectionend', 'id' => 'applicant_match_email_options' ),
+	        $settings[] = array(
+	            'title'   => __( 'Automatically Send Matching Properties To Applicants', 'propertyhive' ),
+	            'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent emailed properties as they\'re added.<br><br>
+	            	- This will only apply to properties added from the moment this option is activated.<br>
+	            	- When enabled, this can disabled on a per-applicant basis by going into their record<br>
+	            	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ),
+	            'id'      => 'propertyhive_auto_property_match',
+	            'type'    => 'checkbox',
+	            'default' => '',
+	        );
 
-		) );
+			$settings[] = array( 'type' => 'sectionend', 'id' => 'applicant_match_email_options' );
+		}
+
+		$settings = apply_filters( 'propertyhive_email_settings', $settings );
 
 		return apply_filters( 'propertyhive_get_settings_' . $this->id, $settings );
 	}
