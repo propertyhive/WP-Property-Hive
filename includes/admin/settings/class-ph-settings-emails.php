@@ -27,8 +27,11 @@ class PH_Settings_Emails extends PH_Settings_Page {
 		$this->label = __( 'Emails', 'propertyhive' );
 
 		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
+		add_action( 'propertyhive_sections_' . $this->id, array( $this, 'output_sections' ) );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
 		add_action( 'propertyhive_settings_save_' . $this->id, array( $this, 'save' ) );
+
+		add_action( 'propertyhive_admin_field_email_queue', array( $this, 'email_queue_setting' ) );
 	}
 
 	/**
@@ -39,6 +42,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	public function get_sections() {
 		$sections = array(
 			'' => __( 'Email Options', 'propertyhive' ),
+			'log'         => __( 'Email Queue', 'propertyhive' ),
 		);
 		return apply_filters( 'propertyhive_get_sections_' . $this->id, $sections );
 	}
@@ -174,12 +178,232 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	}
 
 	/**
+	 * Get email queue settings array
+	 *
+	 * @return array
+	 */
+	public function get_email_queue_settings() {
+		    
+		return apply_filters( 'propertyhive_email_queue_settings', array(
+
+			array( 'title' => __( 'Email Queue', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'email_queue_options' ),
+
+            array(
+                'type'    => 'email_queue'
+            ),
+
+			array( 'type' => 'sectionend', 'id' => 'email_queue_options'),
+
+		) ); // End general map settings
+	}
+
+	/**
+     * Output email queue
+     *
+     * @access public
+     * @return void
+     */
+    public function email_queue_setting() 
+    {
+        global $wpdb, $post;
+
+        $additional_query = '';
+        $additional_query_string = '';
+        if ( isset($_GET['date_from']) && $_GET['date_from'] != '' )
+        {
+        	$additional_query_string .= '&date_from=' . $_GET['date_from'];
+        	if ( $_GET['date_from'] != 'all' )
+        	{
+	        	$additional_query .= " AND send_at >= '" . $_GET['date_from'] . " 00:00:00' ";
+	        }
+        }
+        else
+        {
+        	// Default to 7 days
+        	$additional_query .= " AND send_at >= '" . date("Y-m-d", strtotime('-7 days')) . " 00:00:00' ";
+        }
+        ?>
+        <tr valign="top">
+            <td style="padding:0">
+
+            	<p>Some processes, such as property matching, can result in a lot of emails being sent at once. To cater for this we queue emails and send them out in batches at regular intervals.</p>
+
+            	<p>Using this screen you can see which emails have been sent, which have failed, and how many are queued to be sent.</p>
+
+            	<p><strong><?php
+            		$next_due = wp_next_scheduled( 'propertyhive_process_email_log' );
+
+                    if ( $next_due == FALSE )
+                    {
+                        echo 'Whoops. WordPress doesn\'t have the emails automated task scheduled. A quick fix for this is to deactivate, then re-activate the plugin.';
+                    }
+                    else
+                    {
+                    	echo __( 'Next scheduled to run at', 'propertyhive' ) . ' ' . date("H:i jS F Y", $next_due);
+                    }
+            	?></strong></p>
+            	<br>
+
+            	<ul class="subsubsub">
+            		<?php
+	            		$emails = $wpdb->get_var("
+							SELECT COUNT(*)
+							FROM " . $wpdb->prefix . "ph_email_log
+							WHERE 
+								method = 'email'
+						");
+	            	?>
+					<li class="all"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log' . $additional_query_string); ?>"<?php if ( !isset($_GET['status']) || (isset($_GET['status']) && $_GET['status'] == '') ) { echo ' class="current"'; } ?>>All <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<?php
+	            		$emails = $wpdb->get_var("
+							SELECT COUNT(*)
+							FROM " . $wpdb->prefix . "ph_email_log
+							WHERE 
+								method = 'email'
+							AND
+								status = ''
+						");
+	            	?>
+					<li class="queued"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued' . $additional_query_string); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'queued' ) { echo ' class="current"'; } ?>>Queued <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<?php
+            		$emails = $wpdb->get_var("
+						SELECT COUNT(*)
+						FROM " . $wpdb->prefix . "ph_email_log
+						WHERE 
+							method = 'email'
+						AND
+							status IN ('fail1', 'fail2')
+					");
+            	?>
+					<li class="failed"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&status=failed' . $additional_query_string); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'failed' ) { echo ' class="current"'; } ?>>Failed <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<?php
+            		$emails = $wpdb->get_var("
+						SELECT COUNT(*)
+						FROM " . $wpdb->prefix . "ph_email_log
+						WHERE 
+							method = 'email'
+						AND
+							status = 'sent'
+					");
+            	?>
+					<li class="sent"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&status=sent' . $additional_query_string); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'sent' ) { echo ' class="current"'; } ?>>Sent <span class="count">(<?php echo number_format($emails); ?>)</span></a></li>
+				</ul>
+
+				<div class="tablenav top">
+					<div class="alignleft actions bulkactions">
+						<div class="alignleft actions">
+							<input type="hidden" name="page" value="ph-settings">
+							<input type="hidden" name="tab" value="email">
+							<input type="hidden" name="section" value="log">
+							<input type="hidden" name="status" value="<?php echo ( ( isset($_GET['status']) ) ? $_GET['status'] : '' ); ?>">
+							<select name="date_from" id="dropdown_date_from">
+								<option value="<?php echo date("Y-m-d", strtotime("-7 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-7 days")) ) { echo ' selected'; } ?>>Last 7 Days</option>
+								<option value="<?php echo date("Y-m-d", strtotime("-14 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-14 days")) ) { echo ' selected'; } ?>>Last 14 Days</option>
+								<option value="<?php echo date("Y-m-d", strtotime("-30 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-30 days")) ) { echo ' selected'; } ?>>Last 30 Days</option>
+								<option value="all"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == 'all' ) { echo ' selected'; } ?>>All Time</option>
+							</select>
+							<input type="submit" name="filter_action" id="post-query-submit" class="button" value="Filter">
+
+							<script>
+								jQuery(document).ready(function()
+								{
+									jQuery('#_wpnonce').remove();
+									jQuery('input[name=\'_wp_http_referer\']').remove();
+									jQuery('#mainform').attr('method', 'get');
+									jQuery('#mainform').attr('action', '<?php echo admin_url('admin.php'); ?>');
+								});
+							</script>
+						</div>
+					</div>
+				</div>
+
+                <table class="ph_email_queue widefat" cellspacing="0">
+                    <thead>
+                        <tr>
+                        	<th class="date-time"><?php _e( 'Date/Time', 'propertyhive' ); ?></th>
+                        	<th class="recipient"><?php _e( 'Recipient', 'propertyhive' ); ?></th>
+                            <th class="subject"><?php _e( 'Subject', 'propertyhive' ); ?></th>
+                            <th class="status"><?php _e( 'Status', 'propertyhive' ); ?></th>
+                            <th class="actions">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                   	<?php
+                   		$query = "
+							SELECT
+								email_id,
+								contact_id,
+								to_email_address,
+								subject,
+								status,
+								send_at
+							FROM " . $wpdb->prefix . "ph_email_log
+							WHERE 
+								method = 'email' ";
+						if ( isset($_GET['status']) )
+						{
+							switch ( $_GET['status'] )
+							{
+								case "queued": { $query .= " AND status = '' "; break; }
+								case "failed": { $query .= " AND status IN ('fail1', 'fail2') "; break; }
+								case "sent": { $query .= " AND status = 'sent' "; break; }
+							}
+						}
+
+						$query .= " ORDER BY send_at DESC
+							LIMIT 250
+						";
+                   		$emails = $wpdb->get_results( $query );
+
+						foreach ( $emails as $email ) 
+						{
+					?>
+					<tr>
+                    	<td class="date-time"><?php echo date("jS M Y H:i", strtotime($email->send_at)); ?></td>
+                    	<td class="recipient"><?php echo '<a href="' . get_edit_post_link($email->contact_id) . '">' . get_the_title($email->contact_id) . '</a><br>' . $email->to_email_address; ?></td>
+                        <td class="subject"><?php echo $email->subject; ?></td>
+                        <td class="status"><?php
+                        	switch ($email->status)
+                        	{
+                        		case "fail1": { echo 'First attempt failed. Will retry'; break; }
+                        		case "fail2": { echo 'Failed after 2 attempts'; break; }
+                        		case "sent": { echo 'Sent'; break; }
+                        		default: { echo 'Queued'; }
+                        	}
+                        ?></td>
+                        <td class="actions">
+                        	<a href="<?php echo wp_nonce_url( admin_url('?view_propertyhive_email=' . $email->email_id . '&email_id=' . $email->email_id ), 'view-email' ) ?>" target="_blank" class="button">View Email</a>
+                        </td>
+                    </tr>
+					<?php
+						}
+                   	?>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <?php
+    }
+
+	/**
 	 * Output the settings.
 	 */
 	public function output() {
-		global $current_section;
+		global $current_section, $hide_save_button;
 
-		$settings = $this->get_settings();
+		if ( $current_section ) 
+        {
+        	switch ($current_section)
+            {
+            	case "log": { $settings = $this->get_email_queue_settings(); $hide_save_button = true; break; }
+                default: { die("Unknown setting section"); }
+            }
+        }
+        else
+        {
+        	$settings = $this->get_settings(); 
+        }
+
 		PH_Admin_Settings::output_fields( $settings );
 	}
 
