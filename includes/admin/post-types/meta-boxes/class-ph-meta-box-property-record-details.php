@@ -76,6 +76,8 @@ class PH_Meta_Box_Property_Record_Details {
             
             <select id="_office_id" name="_office_id" class="select short">';
         
+        $original_post = $post;
+
         $args = array(
             'post_type' => 'office',
             'nopaging' => true,
@@ -100,6 +102,8 @@ class PH_Meta_Box_Property_Record_Details {
         }
         
         $office_query->reset_postdata();
+        
+        $post = $original_post;
         
         echo '</select>
             
