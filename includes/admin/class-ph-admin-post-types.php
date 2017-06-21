@@ -293,7 +293,8 @@ class PH_Admin_Post_Types {
             'id' => 'dropdown_property_negotiator_id',
             'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
             'selected' => $selected,
-            'echo' => false
+            'echo' => false,
+            'role__not_in' => array('property_hive_contact') 
         );
         $output = wp_dropdown_users($args);
 
