@@ -150,43 +150,11 @@ function ph_get_search_form_fields()
             'options' => array( '' => __( 'No preference', 'propertyhive' ), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)
         );
         
-        // Property Type
-        $options = array( '' => __( 'No preference', 'propertyhive' ) );
-        $args = array(
-            'hide_empty' => false,
-            'parent' => 0
-        );
-        $terms = get_terms( 'property_type', $args );
-        
-        $selected_value = '';
-        if ( !empty( $terms ) && !is_wp_error( $terms ) )
-        {
-            foreach ($terms as $term)
-            {
-                $options[$term->term_id] = $term->name;
-                
-                $args = array(
-                    'hide_empty' => false,
-                    'parent' => $term->term_id
-                );
-                $subterms = get_terms( 'property_type', $args );
-                
-                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
-                {
-                    foreach ($subterms as $term)
-                    {
-                        $options[$term->term_id] = '- ' . $term->name;
-                    }
-                }
-            }
-        }
-        
         $fields['property_type'] = array(
-            'type' => 'select',
+            'type' => 'property_type',
             'show_label' => true, 
             'before' => '<div class="control control-property_type residential-only">',
             'label' => __( 'Type', 'propertyhive' ),
-            'options' => $options
         );
     }
 

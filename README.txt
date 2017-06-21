@@ -95,6 +95,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Corrected issue with property edit screen whereby office query would overwrite main $post variable. Noted when trying to use All In One SEO Pack plugin
 * Updated get_formatted_deposit() method to cater for no deposit entered to prevent division by zero warning
 * Added new actions to get_property_map() and get_property_street_view() functions so map and marker options can be adjusted
+* Changed 'Property Type' control in search form to be of type 'property_type' instead of 'select' meaning it uses the standard taxonomy functionality
 
 = 1.4.3 =
 * Added new 'Email Queue' section to email settings area of Property Hive giving a frontend view of the queue
