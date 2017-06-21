@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.8
-Stable tag: 1.4.3
+Stable tag: 1.4.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.4 =
+* Excluded registered applicants (users with role 'property_hive_contact') from 'negotiator' user dropdowns
+* Corrected issue with property edit screen whereby office query would overwrite main $post variable. Noted when trying to use All In One SEO Pack plugin
+* Updated get_formatted_deposit() method to cater for no deposit entered to prevent division by zero warning
+* Added new actions to get_property_map() and get_property_street_view() functions so map and marker options can be adjusted
 
 = 1.4.3 =
 * Added new 'Email Queue' section to email settings area of Property Hive giving a frontend view of the queue
