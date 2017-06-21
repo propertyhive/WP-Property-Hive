@@ -666,6 +666,11 @@ class PH_Property {
      */
     public function get_formatted_deposit( ) 
     {
+        if ( $this->_deposit == '' )
+        {
+            return '';
+        }
+
         $ph_countries = new PH_Countries();
 
         $currency = $ph_countries->get_currency( $this->_currency );
