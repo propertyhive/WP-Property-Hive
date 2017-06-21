@@ -152,7 +152,7 @@ function get_property_map( $args = array() )
 	function initialize_property_map() {
 				
 		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
-		var myOptions = {
+		var map_options = {
 	  		zoom: <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?>,
 			center: myLatlng,
 	  		mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -165,19 +165,24 @@ function get_property_map( $args = array() )
 
   				if ( isset($map_add_on_settings['style_js']) && trim($map_add_on_settings['style_js']) != '' )
   				{
-  					echo 'myOptions.styles = ' . trim($map_add_on_settings['style_js']) . ';';
+  					echo 'map_options.styles = ' . trim($map_add_on_settings['style_js']) . ';';
   				}
   			}
+
+  			do_action( 'propertyhive_property_map_options' );
   		?>
-		property_map = new google.maps.Map(document.getElementById("property_map_canvas"), myOptions);
+		property_map = new google.maps.Map(document.getElementById("property_map_canvas"), map_options);
 				
 		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
 			
-		var markerOptions = {
+		var marker_options = {
 			map: property_map,
 			position: myLatlng		
 		};
-		property_marker = new google.maps.Marker(markerOptions);
+
+		<?php do_action( 'propertyhive_property_map_marker_options' ); ?>
+
+		property_marker = new google.maps.Marker(marker_options);
 	}
 	
 	if(window.addEventListener) {
@@ -211,10 +216,13 @@ function get_property_street_view( $args = array() )
 	function initialize_property_street_view() {
 				
 		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
-		var myOptions = {
+		var map_options = {
 			center: myLatlng
 	  	}
-		property_street_view = new google.maps.Map(document.getElementById("property_street_view_canvas"), myOptions);
+
+	  	<?php do_action( 'propertyhive_property_street_view_map_options' ); ?>
+
+		property_street_view = new google.maps.Map(document.getElementById("property_street_view_canvas"), map_options);
 				
 		var streetViewOptions = {
 	    	position: myLatlng,
@@ -224,6 +232,9 @@ function get_property_street_view( $args = array() )
 				zoom: 0
 			}
 		};
+
+		<?php do_action( 'propertyhive_property_street_view_options' ); ?>
+
 		var streetView = new google.maps.StreetViewPanorama(document.getElementById("property_street_view_canvas"), streetViewOptions);
 		streetView.setVisible(true);
 	}
