@@ -116,6 +116,7 @@ class PH_Shortcodes {
 			'marketing_flag'	=> '', // Should be marketing_flag_id. Might deprecate this in the future
 			'property_type_id'	=> '',
 			'location_id'		=> '',
+			'office_id'			=> '',
 			'posts_per_page'	=> 10
 		), $atts );
 
@@ -214,6 +215,17 @@ class PH_Shortcodes {
 	      	$meta_query[] = $sub_meta_query;
 		}
 
+		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
+		{
+			$office_ids = explode(",", $atts['office_id']);
+
+			$meta_query[] = array(
+				'key' => '_office_id',
+				'value' => $office_ids,
+				'compare' => 'IN'
+			);
+		}
+
 		$tax_query = array();
 
 		if ( isset($atts['marketing_flag']) && $atts['marketing_flag'] != '' )
@@ -302,6 +314,7 @@ class PH_Shortcodes {
 			'per_page' 		=> '12',
 			'columns' 		=> '4',
 			'department' 	=> '',
+			'office_id'		=> '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc'
 		), $atts );
@@ -314,6 +327,17 @@ class PH_Shortcodes {
 				'key' => '_department',
 				'value' => $atts['department'],
 				'compare' => '='
+			);
+		}
+
+		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
+		{
+			$office_ids = explode(",", $atts['office_id']);
+
+			$meta_query[] = array(
+				'key' => '_office_id',
+				'value' => $office_ids,
+				'compare' => 'IN'
 			);
 		}
 
@@ -365,6 +389,8 @@ class PH_Shortcodes {
 		$atts = shortcode_atts( array(
 			'per_page' 	=> '12',
 			'columns' 	=> '4',
+			'department' => '',
+			'office_id'	=> '',
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
@@ -377,17 +403,40 @@ class PH_Shortcodes {
 			'posts_per_page' 		=> $atts['per_page'],
 			'orderby' 				=> $atts['orderby'],
 			'order' 				=> $atts['order'],
-			'meta_query'			=> array(
-				array(
-					'key' 		=> '_on_market',
-					'value' 	=> 'yes',
-				),
-				array(
-					'key' 		=> '_featured',
-					'value' 	=> 'yes'
-				)
+		);
+
+		$meta_query = array(
+			array(
+				'key' 		=> '_on_market',
+				'value' 	=> 'yes',
+			),
+			array(
+				'key' 		=> '_featured',
+				'value' 	=> 'yes'
 			)
 		);
+
+		if ( isset($atts['department']) && $atts['department'] != '' )
+		{
+			$meta_query[] = array(
+				'key' => '_department',
+				'value' => $atts['department'],
+				'compare' => '='
+			);
+		}
+
+		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
+		{
+			$office_ids = explode(",", $atts['office_id']);
+
+			$meta_query[] = array(
+				'key' => '_office_id',
+				'value' => $office_ids,
+				'compare' => 'IN'
+			);
+		}
+
+		$args['meta_query'] = $meta_query;
 
 		if ( ! empty( $atts['meta_key'] ) ) {
 			$args['meta_key'] = $atts['meta_key'];
