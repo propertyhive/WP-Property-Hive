@@ -72,6 +72,8 @@ class PH_Rest_Api {
 			'key' => '_on_market',
 			'value' => 'yes'
 		);
+
+		apply_filters( 'propertyhive_rest_api_query_args', $args );
 		
 		return $args;
 	}
@@ -97,6 +99,7 @@ class PH_Rest_Api {
 			'property_type',
 			'parking',
 			'outside_space',
+			'on_market',
 			'featured',
 			'availability',
 			'marketing_flags',
