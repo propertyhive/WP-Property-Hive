@@ -92,19 +92,22 @@ function ph_track_property_view() {
 	global $post;
 
 	// Track in cookie
-	if ( empty( $_COOKIE['propertyhive_recently_viewed'] ) )
-		$viewed_properties = array();
-	else
-		$viewed_properties = (array) explode( '|', $_COOKIE['propertyhive_recently_viewed'] );
+	if ( apply_filters( 'propertyhive_store_in_recently_viewed_cookie', true ) )
+	{
+		if ( empty( $_COOKIE['propertyhive_recently_viewed'] ) )
+			$viewed_properties = array();
+		else
+			$viewed_properties = (array) explode( '|', $_COOKIE['propertyhive_recently_viewed'] );
 
-	if ( ! in_array( $post->ID, $viewed_properties ) )
-		$viewed_properties[] = $post->ID;
+		if ( ! in_array( $post->ID, $viewed_properties ) )
+			$viewed_properties[] = $post->ID;
 
-	if ( sizeof( $viewed_properties ) > 15 )
-		array_shift( $viewed_properties );
+		if ( sizeof( $viewed_properties ) > 15 )
+			array_shift( $viewed_properties );
 
-	// Store for session only
-	ph_setcookie( 'propertyhive_recently_viewed', implode( '|', $viewed_properties ) );
+		// Store for session only
+		ph_setcookie( 'propertyhive_recently_viewed', implode( '|', $viewed_properties ) );
+	}
 
 	// Track in database
 	if ( !is_user_logged_in() || ( is_user_logged_in() && !current_user_can('manage_propertyhive') ) )
