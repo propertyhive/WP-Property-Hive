@@ -700,6 +700,75 @@ function propertyhive_my_account_pages()
                 wp_reset_postdata();
             }
         }
+        if ( in_array('owner', $contact_types) )
+        {
+            // Get properties belonging to this owner
+            $args = array(
+                'post_type'   => 'property', 
+                'posts_per_page'    => 1,
+                'post_status'   => 'publish',
+                'fields' => 'ids',
+                'meta_query'  => array(
+                    array(
+                        'key' => '_owner_contact_id',
+                        'value' => ':' . $contact->id . ';',
+                        'compare' => 'LIKE'
+                    )
+                )
+            );
+
+            $properties_query = new WP_Query( $args );
+
+            $property_ids = array();
+
+            if ( $properties_query->have_posts() )
+            {
+                while ( $properties_query->have_posts() )
+                {
+                    $properties_query->the_post();
+
+                    $property_ids[] = get_the_id();
+                }
+
+                $pages['owner_properties'] = array(
+                    'name' => __( 'Properties', 'propertyhive' ),
+                );
+            }
+            wp_reset_postdata();
+
+            // Check viewing module is active and that viewings exist, either future or past
+            if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+            {
+                $past_viewings = array();
+                $upcoming_viewings = array();
+
+                if ( !empty($property_ids) )
+                {
+                    $args = array(
+                        'post_type'   => 'viewing', 
+                        'posts_per_page'    => 1,
+                        'post_status'   => 'publish',
+                        'fields' => 'ids',
+                        'meta_query'  => array(
+                            array(
+                                'key' => '_property_id',
+                                'value' => $property_ids,
+                                'compare' => 'IN'
+                            )
+                        )
+                    );
+                    $viewings_query = new WP_Query( $args );
+
+                    if ( $viewings_query->have_posts() )
+                    {
+                        $pages['owner_viewings'] = array(
+                            'name' => __( 'Viewings', 'propertyhive' ),
+                        );
+                    }
+                    wp_reset_postdata();
+                }
+            }
+        }
     }
 
     // In future we'll add things like 'My properties', viewings if landlord/vendor, documents etc
@@ -894,5 +963,170 @@ if ( ! function_exists( 'propertyhive_my_account_applicant_viewings' ) ) {
         wp_reset_postdata();
 
         ph_get_template( 'account/applicant-viewings.php', array( 'past_viewings' => $past_viewings, 'upcoming_viewings' => $upcoming_viewings ) );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_my_account_owner_properties' ) ) {
+
+    /**
+     * Output the owner properties section within a users account
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_owner_properties() {
+
+        $user_id = get_current_user_id();
+
+        $contact = new PH_Contact( '', $user_id );
+
+        // Get properties belonging to this owner
+        $args = array(
+            'post_type'   => 'property', 
+            'nopaging'    => true,
+            'post_status'   => 'publish',
+            'fields' => 'ids',
+            'meta_query'  => array(
+                array(
+                    'key' => '_owner_contact_id',
+                    'value' => ':' . $contact->id . ';',
+                    'compare' => 'LIKE'
+                )
+            )
+        );
+
+        $properties_query = new WP_Query( $args );
+
+        $properties = array();
+
+        if ( $properties_query->have_posts() )
+        {
+            while ( $properties_query->have_posts() )
+            {
+                $properties_query->the_post();
+
+                $properties[] = new PH_Property( get_the_id() );
+            }
+        }
+        wp_reset_postdata();
+        ph_get_template( 'account/owner-properties.php', array( 'properties' => $properties ) );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_my_account_owner_viewings' ) ) {
+
+    /**
+     * Output the owner viewings section within a users account
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_owner_viewings() {
+
+        $user_id = get_current_user_id();
+
+        $contact = new PH_Contact( '', $user_id );
+
+        // Get properties belonging to this owner
+        $args = array(
+            'post_type'   => 'property', 
+            'nopaging'    => true,
+            'post_status'   => 'publish',
+            'fields' => 'ids',
+            'meta_query'  => array(
+                array(
+                    'key' => '_owner_contact_id',
+                    'value' => ':' . $contact->id . ';',
+                    'compare' => 'LIKE'
+                )
+            )
+        );
+
+        $properties_query = new WP_Query( $args );
+
+        $property_ids = array();
+
+        if ( $properties_query->have_posts() )
+        {
+            while ( $properties_query->have_posts() )
+            {
+                $properties_query->the_post();
+
+                $property_ids[] = get_the_id();
+            }
+        }
+        wp_reset_postdata();
+
+        $past_viewings = array();
+        $upcoming_viewings = array();
+
+        if ( !empty($property_ids) )
+        {
+            $args = array(
+                'post_type'   => 'viewing', 
+                'nopaging'    => true,
+                'post_status'   => 'publish',
+                'fields' => 'ids',
+                'orderby'   => 'meta_value',
+                'order'       => 'DESC',
+                'post_status'   => 'publish',
+                'meta_key'  => '_start_date_time',
+                'meta_query'  => array(
+                    array(
+                        'key' => '_property_id',
+                        'value' => $property_ids,
+                        'compare' => 'IN'
+                    )
+                )
+            );
+
+            // Do past viewings
+            $args2 = $args;
+            $args2['meta_query'][] = array(
+                'key' => '_start_date_time',
+                'value' => date("Y-m-d H:i:s"),
+                'compare' => '<='
+            );
+
+            $viewings_query = new WP_Query( $args2 );
+
+            if ( $viewings_query->have_posts() )
+            {
+                while ( $viewings_query->have_posts() )
+                {
+                    $viewings_query->the_post();
+
+                    $viewing = new PH_Viewing( get_the_ID() );
+
+                    $past_viewings[] = $viewing;
+                }
+            }
+            wp_reset_postdata();
+
+            // Do upcoming viewings
+            $args2 = $args;
+            $args2['meta_query'][] = array(
+                'key' => '_start_date_time',
+                'value' => date("Y-m-d H:i:s"),
+                'compare' => '>='
+            );
+
+            $viewings_query = new WP_Query( $args2 );
+
+            if ( $viewings_query->have_posts() )
+            {
+                while ( $viewings_query->have_posts() )
+                {
+                    $viewings_query->the_post();
+
+                    $viewing = new PH_Viewing( get_the_ID() );
+
+                    $upcoming_viewings[] = $viewing;
+                }
+            }
+            wp_reset_postdata();
+        }
+
+        ph_get_template( 'account/owner-viewings.php', array( 'past_viewings' => $past_viewings, 'upcoming_viewings' => $upcoming_viewings ) );
     }
 }

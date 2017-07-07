@@ -968,12 +968,9 @@ class PH_Admin_Meta_Boxes {
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'contact' )
         {
-            // If an applicant show the 'actions' and therefore 'book viewing' functionality
-            $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
-            {
-                add_meta_box( 'propertyhive-contact-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Contact_Actions::output', 'contact', 'side' );
-            }
+
+            add_meta_box( 'propertyhive-contact-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Contact_Actions::output', 'contact', 'side' );
+            
             add_meta_box( 'propertyhive-contact-notes', __( 'Contact History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Contact_Notes::output', 'contact', 'side' );
         } 
 
