@@ -1253,7 +1253,10 @@ class PH_AJAX {
             {
                 $headers[] = 'From: <' . sanitize_email( $from_email_address ) . '>';
             }
-            $headers[] = 'Reply-To: ' . sanitize_email( $_POST['email_address'] );
+            if ( isset($_POST['email_address']) && sanitize_email( $_POST['email_address'] ) != '' )
+            {
+                $headers[] = 'Reply-To: ' . sanitize_email( $_POST['email_address'] );
+            }
 
             $to = apply_filters( 'propertyhive_property_enquiry_to', $to, $_POST['property_id'] );
             $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, $_POST['property_id'] );
