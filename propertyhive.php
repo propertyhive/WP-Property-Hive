@@ -385,14 +385,14 @@ if ( ! class_exists( 'PropertyHive' ) )
             $locale = apply_filters( 'plugin_locale', get_locale(), 'propertyhive' );
     
             // Admin Locale
-            /*if ( is_admin() ) {
+            if ( is_admin() ) {
                 load_textdomain( 'propertyhive', WP_LANG_DIR . "/propertyhive/propertyhive-admin-$locale.mo" );
                 load_textdomain( 'propertyhive', dirname( __FILE__ ) . "/i18n/languages/propertyhive-admin-$locale.mo" );
             }
             
             // Global + Frontend Locale
             load_textdomain( 'propertyhive', WP_LANG_DIR . "/propertyhive/propertyhive-$locale.mo" );
-            load_plugin_textdomain( 'propertyhive', false, plugin_basename( dirname( __FILE__ ) ) . "/i18n/languages" );*/
+            load_plugin_textdomain( 'propertyhive', false, plugin_basename( dirname( __FILE__ ) ) . "/i18n/languages" );
         }
     
         /**
