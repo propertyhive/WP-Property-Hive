@@ -18,123 +18,61 @@ class PH_Meta_Box_Contact_Actions {
 	 */
 	public static function output( $post ) {
         global $wpdb, $thepostid;
+
+        $actions = array();
         
         $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
         if ( is_array($contact_types) && in_array('applicant', $contact_types) )
         {
-	        echo '<div class="propertyhive_meta_box" id="propertyhive_contact_actions_meta_box">';
-	        
-		        echo '<div class="options_group" style="padding-top:8px;">';
+        	if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+        	{
+	        	$actions[] = '<a 
+		                href="#action_panel_book_viewing" 
+		                class="button contact-action"
+		                style="width:100%; margin-bottom:7px; text-align:center" 
+		            >' . __('Book Viewing', 'propertyhive') . '</a>';
+	        }
 
-		        	$actions = array();
+	        if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
+        	{
+		        $show_offers = false;
+	            $show_sales = false;
 
-		        	if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
-	            	{
-			        	$actions[] = '<a 
-				                href="#action_panel_book_viewing" 
-				                class="button contact-action"
-				                style="width:100%; margin-bottom:7px; text-align:center" 
-				            >' . __('Book Viewing', 'propertyhive') . '</a>';
-			        }
+	            $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
+	            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
+	            {
+	                $show_viewings = true;
 
-			        if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
-	            	{
-				        $show_offers = false;
-			            $show_sales = false;
+	                $num_applicant_profiles = get_post_meta( $post->ID, '_applicant_profiles', TRUE );
+	                if ( $num_applicant_profiles == '' )
+	                {
+	                    $num_applicant_profiles = 0;
+	                }
 
-			            $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-			            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
-			            {
-			                $show_viewings = true;
+	                if ( $num_applicant_profiles > 0 ) 
+	                {
+	                    for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+	                    {
+	                        $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
 
-			                $num_applicant_profiles = get_post_meta( $post->ID, '_applicant_profiles', TRUE );
-			                if ( $num_applicant_profiles == '' )
-			                {
-			                    $num_applicant_profiles = 0;
-			                }
+	                        if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
+	                        {
+	                            $show_offers = true;
+	                            $show_sales = true;
+	                        }
+	                    }
+	                }
+	            }
 
-			                if ( $num_applicant_profiles > 0 ) 
-			                {
-			                    for ( $i = 0; $i < $num_applicant_profiles; ++$i )
-			                    {
-			                        $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
-
-			                        if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
-			                        {
-			                            $show_offers = true;
-			                            $show_sales = true;
-			                        }
-			                    }
-			                }
-			            }
-
-			            if ( $show_offers )
-			            {
-			            	$actions[] = '<a 
-				                href="#action_panel_record_offer" 
-				                class="button contact-action"
-				                style="width:100%; margin-bottom:7px; text-align:center" 
-				            >' . __('Record Offer', 'propertyhive') . '</a>';
-			            }
-			        }
-
-			        // Show user options if has a valid email
-			        if ( get_post_meta( $post->ID, '_email_address', TRUE ) != '' && is_email(get_post_meta( $post->ID, '_email_address', TRUE )) )
-			        {
-				        $user_id = get_post_meta( $post->ID, '_user_id', TRUE );
-				        if ( $user_id != '' )
-				        {
-				        	// Has a user associated
-					        $actions[] = '<a 
-						                href="' . get_edit_user_link( $user_id ) . '&wp_http_referer=' . urlencode(get_edit_post_link($post->ID)) . '" 
-						                class="button"
-						                style="width:100%; margin-bottom:7px; text-align:center" 
-						            >' . __('View User / Change Password', 'propertyhive') . '</a>';
-					    }
-					    else
-					    {
-					    	$actions[] = '<a 
-						                href="#action_panel_create_login" 
-						                class="button contact-action"
-						                style="width:100%; margin-bottom:7px; text-align:center" 
-						            >' . __('Create User Login', 'propertyhive') . '</a>';
-					    }
-					}
-
-			        $actions = apply_filters( 'propertyhive_admin_contact_actions', $actions, $post->ID );
-
-			        if ( !empty($actions) )
-			        {
-			        	echo implode("", $actions);
-			        }
-			        else
-			        {
-			        	echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
-			        }
-
-		        echo '</div>';
-
-	        echo '</div>';
-
-	        // Book viewing action panel
-	        echo '<div id="action_panel_create_login" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
-			             
-	    		<div class="options_group">
-
-		    		<div class="form-field">
-
-			            <label for="_password">' . __( 'Password', 'propertyhive' ) . '</label>
-			            
-		            	<input type="text" id="_password" name="_password" style="width:100%;" value="' . esc_attr( wp_generate_password( 16 ) ) . '">
-		            	
-			        </div>
-
-			        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-			        <a class="button button-primary login-action-submit" href="#">' . __( 'Create Login', 'propertyhive' ) . '</a>
-
-				</div>
-
-			</div>';
+	            if ( $show_offers )
+	            {
+	            	$actions[] = '<a 
+		                href="#action_panel_record_offer" 
+		                class="button contact-action"
+		                style="width:100%; margin-bottom:7px; text-align:center" 
+		            >' . __('Record Offer', 'propertyhive') . '</a>';
+	            }
+	        }
 
 	        // Book viewing action panel
 	        echo '<div id="action_panel_book_viewing" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
@@ -261,20 +199,82 @@ class PH_Meta_Box_Contact_Actions {
 				</div>
 
 			</div>';
-
-			// Success action panel
-	        echo '<div id="action_panel_success" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
-			             
-	    		<div class="options_group" style="padding-top:8px;">
-
-	    			<div id="success_actions"></div>
-
-	    			<a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
-
-	    		</div>
-
-	    	</div>';
 	    }
+
+	    // Show user options if has a valid email
+        if ( get_post_meta( $post->ID, '_email_address', TRUE ) != '' && is_email(get_post_meta( $post->ID, '_email_address', TRUE )) )
+        {
+	        $user_id = get_post_meta( $post->ID, '_user_id', TRUE );
+	        if ( $user_id != '' )
+	        {
+	        	// Has a user associated
+		        $actions[] = '<a 
+			                href="' . get_edit_user_link( $user_id ) . '&wp_http_referer=' . urlencode(get_edit_post_link($post->ID)) . '" 
+			                class="button"
+			                style="width:100%; margin-bottom:7px; text-align:center" 
+			            >' . __('View User / Change Password', 'propertyhive') . '</a>';
+		    }
+		    else
+		    {
+		    	$actions[] = '<a 
+			                href="#action_panel_create_login" 
+			                class="button contact-action"
+			                style="width:100%; margin-bottom:7px; text-align:center" 
+			            >' . __('Create User Login', 'propertyhive') . '</a>';
+		    }
+		}
+
+		// Create user action panel
+        echo '<div id="action_panel_create_login" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
+		             
+    		<div class="options_group">
+
+	    		<div class="form-field">
+
+		            <label for="_password">' . __( 'Password', 'propertyhive' ) . '</label>
+		            
+	            	<input type="text" id="_password" name="_password" style="width:100%;" value="' . esc_attr( wp_generate_password( 16 ) ) . '">
+	            	
+		        </div>
+
+		        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+		        <a class="button button-primary login-action-submit" href="#">' . __( 'Create Login', 'propertyhive' ) . '</a>
+
+			</div>
+
+		</div>';
+
+		// Success action panel
+        echo '<div id="action_panel_success" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
+		             
+    		<div class="options_group" style="padding-top:8px;">
+
+    			<div id="success_actions"></div>
+
+    			<a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+
+    		</div>
+
+    	</div>';
+
+	    echo '<div class="propertyhive_meta_box" id="propertyhive_contact_actions_meta_box">';
+	        
+		    echo '<div class="options_group" style="padding-top:8px;">';
+
+		    	$actions = apply_filters( 'propertyhive_admin_contact_actions', $actions, $post->ID );
+
+		        if ( !empty($actions) )
+		        {
+		        	echo implode("", $actions);
+		        }
+		        else
+		        {
+		        	echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+		        }
+
+			echo '</div>';
+
+	    echo '</div>';
 
 ?>
 <script>
