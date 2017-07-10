@@ -93,6 +93,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 = 1.4.6 =
 * Added ability for vendors and landlords to have user acounts so they can login and view their properties and past/upcoming viewings
 * Added new filter 'propertyhive_store_in_recently_viewed_cookie' to turn off use of 'propertyhive_recently_viewed' cookie
+* Allow loading of language files. Should go in "WP_LANG_DIR/propertyhive/propertyhive-admin-$locale.mo" and "WP_LANG_DIR/propertyhive/propertyhive-$locale.mo"
 * Only set 'Reply-To' header on enquiries when a valid email address exists
 
 = 1.4.5 =
