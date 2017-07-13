@@ -705,13 +705,19 @@ function propertyhive_my_account_pages()
             // Get properties belonging to this owner
             $args = array(
                 'post_type'   => 'property', 
-                'posts_per_page'    => 1,
+                'nopaging'    => true,
                 'post_status'   => 'publish',
                 'fields' => 'ids',
                 'meta_query'  => array(
+                    'relation' => 'OR',
                     array(
                         'key' => '_owner_contact_id',
                         'value' => ':' . $contact->id . ';',
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_owner_contact_id',
+                        'value' => ':"' . $contact->id . '";',
                         'compare' => 'LIKE'
                     )
                 )
@@ -987,9 +993,15 @@ if ( ! function_exists( 'propertyhive_my_account_owner_properties' ) ) {
             'post_status'   => 'publish',
             'fields' => 'ids',
             'meta_query'  => array(
+                'relation' => 'OR',
                 array(
                     'key' => '_owner_contact_id',
                     'value' => ':' . $contact->id . ';',
+                    'compare' => 'LIKE'
+                ),
+                array(
+                    'key' => '_owner_contact_id',
+                    'value' => ':"' . $contact->id . '";',
                     'compare' => 'LIKE'
                 )
             )
@@ -1034,9 +1046,15 @@ if ( ! function_exists( 'propertyhive_my_account_owner_viewings' ) ) {
             'post_status'   => 'publish',
             'fields' => 'ids',
             'meta_query'  => array(
+                'relation' => 'OR',
                 array(
                     'key' => '_owner_contact_id',
                     'value' => ':' . $contact->id . ';',
+                    'compare' => 'LIKE'
+                ),
+                array(
+                    'key' => '_owner_contact_id',
+                    'value' => ':"' . $contact->id . '";',
                     'compare' => 'LIKE'
                 )
             )
