@@ -733,6 +733,40 @@ function ph_form_field( $key, $field )
             
             break;   
         }
+        case "checkbox": 
+        {
+            $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
+            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
+            $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
+            $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
+            $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            
+            $field['value'] = isset( $field['value'] ) ? $field['value'] : 'yes';
+            $field['checked'] = isset( $field['checked'] ) ? $field['checked'] : false;
+            if ( isset( $_GET[$key] ) && $_GET[$key] == $field['value'] )
+            {
+                $field['checked'] = true;
+            }
+            
+            $output .= $field['before'];
+            
+            $output .= '<label><input 
+                type="' . esc_attr( $field['type'] ) . '" 
+                name="' . esc_attr( $key ) . '" 
+                value="' . esc_attr( $field['value'] ) . '"
+                class="' . esc_attr( $field['class'] ) . '" 
+                ' . checked( $field['checked'], true, false ) . '
+            >';
+            if ($field['show_label'])
+            {
+                $output .= ' ' . $field['label'];
+            }
+            $output .= '</label>';
+            
+            $output .= $field['after'];
+            
+            break;
+        }
         case "radio": 
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
