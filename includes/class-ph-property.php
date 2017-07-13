@@ -408,7 +408,7 @@ class PH_Property {
                         {
                             $price = $this->_price_actual * $currency['exchange_rate'];
                         }
-                        return ( ( $price != '' ) ? $prefix . number_format($price , 0) . $suffix : '-' );
+                        return ( ( $price != '' ) ? $prefix . number_format($price, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix : '-' );
                         break;
                     }
                     case "residential-lettings":
@@ -424,7 +424,7 @@ class PH_Property {
                                 case "pa": { $price = ($price * 12); break; }
                             }
                         }
-                        return ( ( $price != '' ) ? $prefix . number_format($price, 0) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                        return ( ( $price != '' ) ? $prefix . number_format($price, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                         break;
                     }
                 }
@@ -469,11 +469,11 @@ class PH_Property {
                     $explode_price = explode(".", $this->_price_from);
                     if ( count($explode_price) == 2 )
                     {
-                        $price .= $prefix . number_format($explode_price[0], 0) . '.' . $explode_price[1] . $suffix;
+                        $price .= $prefix . number_format($explode_price[0], 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . get_option('propertyhive_price_decimal_separator', '.') . $explode_price[1] . $suffix;
                     }
                     else
                     {
-                        $price .= $prefix . number_format($this->_price_from, 0) . $suffix;
+                        $price .= $prefix . number_format($this->_price_from, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix;
                     }
                 }
                 if ( $this->_price_to != '' && $this->_price_to != $this->_price_from )
@@ -485,11 +485,11 @@ class PH_Property {
                     $explode_price = explode(".", $this->_price_to);
                     if ( count($explode_price) == 2 )
                     {
-                        $price .= $prefix . number_format($explode_price[0], 0) . '.' . $explode_price[1] . $suffix;
+                        $price .= $prefix . number_format($explode_price[0], 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . get_option('propertyhive_price_decimal_separator', '.') . $explode_price[1] . $suffix;
                     }
                     else
                     {
-                        $price .= $prefix . number_format($this->_price_to, 0) . $suffix;
+                        $price .= $prefix . number_format($this->_price_to, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix;
                     }
                 }
                 if ( $price != '' )
@@ -538,11 +538,11 @@ class PH_Property {
                     $explode_rent = explode(".", $this->_rent_from);
                     if ( count($explode_rent) == 2 )
                     {
-                        $rent .= $prefix . number_format($explode_rent[0], 0) . '.' . $explode_rent[1] . $suffix;
+                        $rent .= $prefix . number_format($explode_rent[0], 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . get_option('propertyhive_price_decimal_separator', '.') . $explode_rent[1] . $suffix;
                     }
                     else
                     {
-                        $rent .= $prefix . number_format($this->_rent_from, 0) . $suffix;
+                        $rent .= $prefix . number_format($this->_rent_from, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix;
                     }
                 }
                 if ( $this->_rent_to != '' && $this->_rent_to != $this->_rent_from )
@@ -554,11 +554,11 @@ class PH_Property {
                     $explode_rent = explode(".", $this->_rent_to);
                     if ( count($explode_rent) == 2 )
                     {
-                        $rent .= $prefix . number_format($explode_rent[0], 0) . '.' . $explode_rent[1] . $suffix;
+                        $rent .= $prefix . number_format($explode_rent[0], 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . get_option('propertyhive_price_decimal_separator', '.') . $explode_rent[1] . $suffix;
                     }
                     else
                     {
-                        $rent .= $prefix . number_format($this->_rent_to, 0) . $suffix;
+                        $rent .= $prefix . number_format($this->_rent_to, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix;
                     }
                 }
                 if ( $rent != '' )

@@ -204,6 +204,22 @@ class PH_Settings_General extends PH_Settings_Page {
                 'desc'	=> __( 'Hold ctrl/cmd whilst clicking to select multiple', 'propertyhive' )
             ),
 
+            array(
+                'title'   => __( 'Price Thousand Separator', 'propertyhive' ),
+                'id'      => 'propertyhive_price_thousand_separator',
+                'type'    => 'text',
+                'default' => ',',
+                'css'       => 'width:50px;',
+            ),
+
+            array(
+                'title'   => __( 'Price Decimal Separator', 'propertyhive' ),
+                'id'      => 'propertyhive_price_decimal_separator',
+                'type'    => 'text',
+                'default' => '.',
+                'css'       => 'width:50px;',
+            ),
+
 			array( 'type' => 'sectionend', 'id' => 'international_options'),
 
 		) ); // End general international settings
@@ -374,6 +390,9 @@ class PH_Settings_General extends PH_Settings_Page {
 						update_option( 'propertyhive_default_country', $_POST['propertyhive_default_country'] );
 						update_option( 'propertyhive_countries', $_POST['propertyhive_countries'] );
 					}
+
+                    update_option( 'propertyhive_price_thousand_separator', $_POST['propertyhive_price_thousand_separator'] );
+                    update_option( 'propertyhive_price_decimal_separator', $_POST['propertyhive_price_decimal_separator'] );
 
 					do_action( 'propertyhive_update_currency_exchange_rates' );
 
