@@ -556,6 +556,9 @@ class PH_Install {
         add_option( 'propertyhive_active_departments_lettings', 'yes', '',  'yes' );
         add_option( 'propertyhive_primary_department', 'residential-sales', '',  'yes' );
 
+        add_option( 'propertyhive_default_country', 'GB', '', 'yes' );
+        add_option( 'propertyhive_countries', array('GB'), '', 'yes' );
+
         add_option( 'propertyhive_install_timestamp', time(), '', 'no' );
         add_option( 'propertyhive_review_prompt_due_timestamp', strtotime('+30 days'), '', 'no' );
 
