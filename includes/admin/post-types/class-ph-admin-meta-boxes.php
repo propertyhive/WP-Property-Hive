@@ -1193,7 +1193,12 @@ class PH_Admin_Meta_Boxes {
 
         // Force order of meta boxes
         $meta_box_ids = array();
-        if ( in_array(get_post_type($post->ID), array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale')) )
+        if ( 
+            in_array(
+                get_post_type($post->ID), 
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale') )
+            ) 
+        )
         {
             foreach ( $tabs as $tab_id => $tab_options)
             {
@@ -1203,6 +1208,7 @@ class PH_Admin_Meta_Boxes {
                 }
             }
         }
+
         if (!empty($meta_box_ids) )
         {
             $existing_meta_box_order = get_user_meta( get_current_user_id(), 'meta-box-order_' . get_post_type($post->ID), TRUE );
@@ -1228,7 +1234,13 @@ class PH_Admin_Meta_Boxes {
         
         global $post, $tabs;
         
-        if (!empty($tabs) && in_array($post->post_type, array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale')))
+        if (
+            !empty($tabs) && 
+            in_array(
+                $post->post_type, 
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale') )
+            )
+        )
         {
             $meta_boxes_under_tabs = array();
             
@@ -1408,7 +1420,12 @@ class PH_Admin_Meta_Boxes {
 		}
 
 		// Check the post type
-		if ( ! in_array( $post->post_type, array( 'property', 'contact', 'enquiry', 'viewing', 'offer', 'sale' ) ) ) {
+		if ( 
+            ! in_array( 
+                $post->post_type, 
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale') )
+            ) 
+        ) {
 			return;
 		}
 

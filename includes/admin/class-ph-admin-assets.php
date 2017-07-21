@@ -116,7 +116,7 @@ class PH_Admin_Assets {
             wp_enqueue_script('googlemaps');
         }
         
-        if ( in_array( $screen->id, array( 'property', 'contact', 'enquiry', 'viewing', 'offer', 'sale' ) ) )
+        if ( in_array( $screen->id, ph_get_screen_ids() ) )
         {
             wp_enqueue_media();
             wp_enqueue_script( 'propertyhive_admin_meta_boxes' );
