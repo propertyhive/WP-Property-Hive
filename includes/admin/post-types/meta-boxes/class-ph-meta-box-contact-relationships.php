@@ -105,7 +105,7 @@ class PH_Meta_Box_Contact_Relationships {
                 {
                     $owner_type = __( 'Property Owner', 'propertyhive' );
                     $department = get_post_meta($property_post->ID, '_department', TRUE);
-                    if ($department == 'lettings')
+                    if ($department == 'residential-lettings')
                     {
                         $owner_type = __( 'Property Landlord', 'propertyhive' );
                     }   
