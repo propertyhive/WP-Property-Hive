@@ -1002,7 +1002,8 @@ class PH_AJAX {
             $args = array(
                 'number' => 9999,
                 'search' => $keyword . '*',
-                'orderby' => 'display_name'
+                'orderby' => 'display_name',
+                'role__not_in' => array('property_hive_contact') 
             );
             
             $user_query = new WP_User_Query( $args );
