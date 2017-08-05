@@ -238,10 +238,20 @@ class PH_Shortcodes {
 
 		if ( isset($atts['property_type_id']) && $atts['property_type_id'] != '' )
 		{
-			$tax_query[] = array(
-                'taxonomy'  => 'property_type',
-                'terms' => array( $atts['property_type_id'] )
-            );
+			if ( isset($atts['department']) && $atts['department'] == 'commercial' )
+			{
+				$tax_query[] = array(
+		            'taxonomy'  => 'commercial_property_type',
+		            'terms' => array( $atts['property_type_id'] )
+		        );
+			}
+			else
+			{
+				$tax_query[] = array(
+		            'taxonomy'  => 'property_type',
+		            'terms' => array( $atts['property_type_id'] )
+		        );
+			}
 		}
 
 		if ( isset($atts['location_id']) && $atts['location_id'] != '' )
