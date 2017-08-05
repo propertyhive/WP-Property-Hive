@@ -4,7 +4,7 @@ jQuery(document).ready(function($)
 {
 	toggleApplicantRegistrationDepartmentFields();
     
-    $('form.applicant-registration-form [name=\'department\'], form.account-requirements-form [name=\'department\']').change(function()
+    $('body').on('change', 'form.applicant-registration-form [name=\'department\'], form.account-requirements-form [name=\'department\']', function()
     {
         toggleApplicantRegistrationDepartmentFields();
     });
