@@ -36,7 +36,8 @@ jQuery( function($){
     $('ul.ph-tabs li:visible').eq(0).find('a').click();
     
     // Notes
-    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes, #propertyhive-offer-notes, #propertyhive-sale-notes').on( 'click', 'a.add_note', function() {
+    //$('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes, #propertyhive-offer-notes, #propertyhive-sale-notes').on( 'click', 'a.add_note', function() {
+    $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.add_note', function() {
         if ( ! $('textarea#add_note').val() ) return;
  
         var data = {
@@ -57,7 +58,7 @@ jQuery( function($){
 
     });
 
-    $('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes, #propertyhive-offer-notes, #propertyhive-sale-notes').on( 'click', 'a.delete_note', function() {
+    $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.delete_note', function() {
         
         var confirm_box = confirm('Are you sure you wish to delete this note?');
         if (!confirm_box)
