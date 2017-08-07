@@ -53,20 +53,6 @@ jQuery(document).ready(function($)
 			return;
 		}
 
-		if ( this_href == '#action_panel_viewing_cancelled' )
-		{
-			var data = {
-		        action:         'propertyhive_viewing_cancelled',
-		        viewing_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'viewing-actions' ); ?>',
-		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
-		    {
-		    	redraw_viewing_actions();
-		    }, 'json');
-			return;
-		}
-
 		if ( this_href == '#action_panel_viewing_feedback_not_required' )
 		{
 			var data = {
@@ -137,6 +123,26 @@ jQuery(document).ready(function($)
 		e.preventDefault();
 
 		redraw_viewing_actions();
+	});
+
+	$('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.cancelled-reason-action-submit', function(e)
+	{
+		e.preventDefault();
+
+		$(this).attr('disabled', 'disabled');
+
+		// Submit interested feedback
+		var data = {
+	        action:         'propertyhive_viewing_cancelled',
+	        viewing_id:    	<?php echo $post->ID; ?>,
+	        cancelled_reason: $('#_cancelled_reason').val(),
+	        security:       '<?php echo wp_create_nonce( 'viewing-actions' ); ?>',
+	    };
+
+	    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+	    {
+	    	redraw_viewing_actions();
+	    }, 'json');
 	});
 
 	$('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.interested-feedback-action-submit', function(e)

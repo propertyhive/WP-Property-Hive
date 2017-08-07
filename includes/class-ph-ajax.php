@@ -1877,6 +1877,21 @@ class PH_AJAX {
         
         echo '</p>';
 
+        if ( $viewing->status == 'cancelled' )
+        {
+            $args = array( 
+                'id' => '_cancelled_reason', 
+                'label' => __( 'Reason Cancelled', 'propertyhive' ), 
+                'desc_tip' => false, 
+                'class' => '',
+                'value' => $viewing->cancelled_reason,
+                'custom_attributes' => array(
+                    'style' => 'width:95%; max-width:500px;'
+                )
+            );
+            propertyhive_wp_textarea_input( $args );
+        }
+
         if ( $viewing->status == 'carried_out' )
         {
             echo '<p class="form-field">
@@ -1957,6 +1972,7 @@ class PH_AJAX {
 
         <div class="options_group" style="padding-top:8px;">';
 
+        $show_cancelled_meta_boxes = false;
         $show_feedback_meta_boxes = false;
 
         $actions = array();
@@ -1970,9 +1986,11 @@ class PH_AJAX {
                 >' . __('Viewing Carried Out', 'propertyhive') . '</a>';
             $actions[] = '<a 
                     href="#action_panel_viewing_cancelled" 
-                    class="button viewing-action"
+                    class="button viewing-action viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Viewing Cancelled', 'propertyhive') . '</a>';
+
+            $show_cancelled_meta_boxes = true;
         }
 
         if ( $status == 'carried_out' )
@@ -2104,6 +2122,28 @@ class PH_AJAX {
 
         </div>';
 
+        if ( $show_cancelled_meta_boxes )
+        {
+            echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_cancelled" style="display:none;">
+
+                <div class="options_group" style="padding-top:8px;">
+
+                    <div class="form-field">
+
+                        <label for="_viewing_cancelled_reason">' . __( 'Reason Cancelled', 'propertyhive' ) . '</label>
+                        
+                        <textarea id="_cancelled_reason" name="_cancelled_reason" style="width:100%;">' . get_post_meta( $post_id, '_cancelled_reason', TRUE ) . '</textarea>
+
+                    </div>
+
+                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+                    <a class="button button-primary cancelled-reason-action-submit" href="#">' . __( 'Save', 'propertyhive' ) . '</a>
+
+                </div>
+
+            </div>';
+        }
+
         if ( $show_feedback_meta_boxes )
         {
             echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_interested" style="display:none;">
@@ -2195,6 +2235,7 @@ class PH_AJAX {
         if ( $status == 'pending' )
         {
             update_post_meta( $post_id, '_status', 'cancelled' );
+            update_post_meta( $post_id, '_cancelled_reason', sanitize_text_field( $_POST['cancelled_reason'] ) );
 
             $current_user = wp_get_current_user();
 
@@ -2231,7 +2272,7 @@ class PH_AJAX {
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_feedback_status', 'interested' );
-            update_post_meta( $post_id, '_feedback', $_POST['feedback'] );
+            update_post_meta( $post_id, '_feedback', sanitize_text_field( $_POST['feedback'] ) );
 
             $current_user = wp_get_current_user();
 
@@ -2268,7 +2309,7 @@ class PH_AJAX {
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_feedback_status', 'not_interested' );
-            update_post_meta( $post_id, '_feedback', $_POST['feedback'] );
+            update_post_meta( $post_id, '_feedback', sanitize_text_field( $_POST['feedback'] ) );
 
             $current_user = wp_get_current_user();
 
