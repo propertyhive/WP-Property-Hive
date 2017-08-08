@@ -777,15 +777,13 @@ function propertyhive_my_account_pages()
         }
     }
 
-    // In future we'll add things like 'My properties', viewings if landlord/vendor, documents etc
+    $pages = apply_filters( 'propertyhive_my_account_pages', $pages );
 
     $pages['logout'] = array(
         'name' => __( 'Logout', 'propertyhive' ),
         'href' => home_url() . '?logout=1' // Logout URL
     );
-
-    $pages = apply_filters( 'propertyhive_my_account_pages', $pages );
-
+    
     return $pages;
 }
 
