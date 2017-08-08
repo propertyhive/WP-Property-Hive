@@ -124,8 +124,19 @@ class PH_Emails {
             		continue;
             	}
 
+            	$value = $_POST[$key];
+            	if ( taxonomy_exists($key) )
+            	{
+            		$term = get_term( $_POST[$key], $key );
+
+            		if ( isset($term->name) )
+            		{
+            			$value = $term->name;
+            		}
+            	}
+
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
-                $message .= $label . ": " . $_POST[$key] . "\n";
+                $message .= $label . ": " . $value . "\n";
             }
 
 			wp_mail($to, $subject, $message);
