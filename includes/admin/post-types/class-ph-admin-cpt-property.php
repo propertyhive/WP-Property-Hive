@@ -338,16 +338,16 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
             	if (isset($the_property->_on_market) && $the_property->_on_market == 'yes')
             	{
-            		echo 'On The Market';
+            		echo __( 'On The Market', 'propertyhive' );
             	}
             	else
             	{
-            		echo 'Not On The Market';
+            		echo __( 'Not On The Market', 'propertyhive' );
             	}
             	
             	if (isset($the_property->_featured) && $the_property->_featured == 'yes')
             	{
-            		echo '<br>Featured';
+            		echo '<br>' . __( 'Featured', 'propertyhive' );
             	}
                 
 				break;
