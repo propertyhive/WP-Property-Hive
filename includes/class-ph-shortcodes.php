@@ -113,7 +113,9 @@ class PH_Shortcodes {
 			'department'		=> '', // residential-sales / residential-lettings / commercial
 			'bedrooms'			=> '',
 			'address_keyword'	=> '',
-			'marketing_flag'	=> '', // Should be marketing_flag_id. Might deprecate this in the future
+			'availability_id'	=> '',
+			'marketing_flag'	=> '', // Deprecated. Use marketing_flag_id instead
+			'marketing_flag_id'	=> '', // Should be marketing_flag_id. Might deprecate this in the future
 			'property_type_id'	=> '',
 			'location_id'		=> '',
 			'office_id'			=> '',
@@ -228,11 +230,24 @@ class PH_Shortcodes {
 
 		$tax_query = array();
 
+		if ( isset($atts['availability_id']) && $atts['availability_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'availability',
+                'terms' => array( $atts['availability_id'] )
+            );
+		}
+
+		// Fallback for deprecated marketing_flag
 		if ( isset($atts['marketing_flag']) && $atts['marketing_flag'] != '' )
+		{
+			$atts['marketing_flag_id'] = $atts['marketing_flag'];
+		}
+		if ( isset($atts['marketing_flag_id']) && $atts['marketing_flag_id'] != '' )
 		{
 			$tax_query[] = array(
                 'taxonomy'  => 'marketing_flag',
-                'terms' => array( $atts['marketing_flag'] )
+                'terms' => array( $atts['marketing_flag_id'] )
             );
 		}
 
@@ -262,7 +277,15 @@ class PH_Shortcodes {
             );
 		}
 
-		if ( isset($atts['department']) && $atts['department'] == 'commercial' )
+		// Change default meta key when department is specified as commercial, or if commercial is the only active department
+		if ( 
+			( isset($atts['department']) && $atts['department'] == 'commercial' ) ||
+			(
+				get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
+				get_option( 'propertyhive_active_departments_lettings' ) != 'yes' &&
+				get_option( 'propertyhive_active_departments_commercial' ) == 'yes'
+			)
+		)
 		{
 			$atts['meta_key'] = '_floor_area_from_sqft';
 		}
