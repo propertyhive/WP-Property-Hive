@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.8.1
-Stable tag: 1.4.10
+Stable tag: 1.4.11
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,13 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.11 =
+* Corrected the [properties] shortcode not working when only the commercial department is active
+* Added a new 'availability_id' attribute to the [properties] shortcode
+* Changed the 'marketing_flag' attribute to be called 'marketing_flag_id' in the [properties] shortcode to match other attribute naming and to be clearer. Also added a fallback so old sites won't be effected by this
+* Corrected the 2 letter ISO code for Austria in the list of countries from AU to AT
+* Added Australia to the list of supported countries
 
 = 1.4.10 =
 * Ensure term name for type and location is included within registration email, as opposed to IDs
