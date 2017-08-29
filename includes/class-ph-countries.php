@@ -115,7 +115,7 @@ class PH_Countries {
 				'currency_symbol' => '$',
 				'currency_prefix' => true
 			),
-			'AU' => array(
+			'AT' => array(
 				'name' => 'Austria',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
