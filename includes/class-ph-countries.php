@@ -187,6 +187,18 @@ class PH_Countries {
 				'currency_symbol' => '&yen;',
 				'currency_prefix' => true
 			),
+			'MU' => array(
+				'name' => 'Mauritius',
+				'currency_code' => 'MUR',
+				'currency_symbol' => 'Rs',
+				'currency_prefix' => false
+			),
+			'NO' => array(
+				'name' => 'Norway',
+				'currency_code' => 'NOK',
+				'currency_symbol' => 'kr',
+				'currency_prefix' => false
+			),
 			'PT' => array(
 				'name' => 'Portugal',
 				'currency_code' => 'EUR',
