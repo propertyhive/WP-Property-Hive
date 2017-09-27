@@ -120,7 +120,7 @@ class PH_Shortcodes {
 			'location_id'		=> '',
 			'office_id'			=> '',
 			'posts_per_page'	=> 10
-		), $atts );
+		), $atts, 'properties' );
 
 		$meta_query = array(
 			array(
@@ -350,7 +350,7 @@ class PH_Shortcodes {
 			'office_id'		=> '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc'
-		), $atts );
+		), $atts, 'recent_properties' );
 
 		$meta_query = PH()->query->get_meta_query();
 
@@ -427,7 +427,7 @@ class PH_Shortcodes {
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
-		), $atts );
+		), $atts, 'featured_properties' );
 
 		$args = array(
 			'post_type'				=> 'property',
@@ -515,7 +515,7 @@ class PH_Shortcodes {
 			'order'						=> 'asc',
 			'price_percentage_bounds'	=> 10,
 			'property_id'				=> '',
-		), $atts );
+		), $atts, 'similar_properties' );
 
 		if ($atts['property_id'] != '')
 		{
@@ -620,7 +620,7 @@ class PH_Shortcodes {
 			'height'        => '400',
 			'zoom'          => '14',
 			'scrollwheel'   => 'true'
-		), $atts );
+		), $atts, 'property_map' );
 
 		ob_start();
 
@@ -642,7 +642,7 @@ class PH_Shortcodes {
 
 		$atts = shortcode_atts( array(
 			'height'        => '400',
-		), $atts );
+		), $atts, 'property_street_view' );
 
 		ob_start();
 
@@ -666,7 +666,7 @@ class PH_Shortcodes {
 			'address_separator' => '<br>',
 			'hyperlink_telephone_number' => true,
 			'hyperlink_email_address' => true,
-		), $atts );
+		), $atts, 'property_office_details' );
 
 		$atts['hyperlink_telephone_number'] = (($atts['hyperlink_telephone_number'] === 'true' || $atts['hyperlink_telephone_number'] === true) ? true : false);
 		$atts['hyperlink_email_address'] = (($atts['hyperlink_email_address'] === 'true' || $atts['hyperlink_email_address'] === true) ? true : false);
@@ -713,7 +713,7 @@ class PH_Shortcodes {
 
 		$atts = shortcode_atts( array(
 
-		), $atts );
+		), $atts, 'applicant_registration_form' );
 
 		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
         wp_enqueue_script( 'propertyhive_account', $assets_path . 'js/frontend/account.js', array( 'jquery' ), PH_VERSION, true );
@@ -749,7 +749,7 @@ class PH_Shortcodes {
 	{
 		$atts = shortcode_atts( array(
 
-		), $atts );
+		), $atts, 'login_form' );
 
 		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
         wp_enqueue_script( 'propertyhive_account', $assets_path . 'js/frontend/account.js', array( 'jquery' ), PH_VERSION, true );
@@ -785,7 +785,7 @@ class PH_Shortcodes {
 	{
 		$atts = shortcode_atts( array(
 
-		), $atts );
+		), $atts, 'my_account' );
 
 		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
         wp_enqueue_script( 'propertyhive_account', $assets_path . 'js/frontend/account.js', array( 'jquery' ), PH_VERSION, true );
