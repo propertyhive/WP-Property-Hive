@@ -219,12 +219,10 @@ class PH_Shortcodes {
 
 		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
 		{
-			$office_ids = explode(",", $atts['office_id']);
-
 			$meta_query[] = array(
 				'key' => '_office_id',
-				'value' => $office_ids,
-				'compare' => 'IN'
+				'value' => explode(",", $atts['office_id']),
+				'compare' => 'IN',
 			);
 		}
 
@@ -234,7 +232,8 @@ class PH_Shortcodes {
 		{
 			$tax_query[] = array(
                 'taxonomy'  => 'availability',
-                'terms' => array( $atts['availability_id'] )
+                'terms' => explode(",", $atts['availability_id']),
+                'compare' => 'IN',
             );
 		}
 
@@ -247,7 +246,8 @@ class PH_Shortcodes {
 		{
 			$tax_query[] = array(
                 'taxonomy'  => 'marketing_flag',
-                'terms' => array( $atts['marketing_flag_id'] )
+                'terms' => explode(",", $atts['marketing_flag_id']),
+                'compare' => 'IN',
             );
 		}
 
@@ -257,14 +257,16 @@ class PH_Shortcodes {
 			{
 				$tax_query[] = array(
 		            'taxonomy'  => 'commercial_property_type',
-		            'terms' => array( $atts['property_type_id'] )
+		            'terms' => explode(",", $atts['property_type_id']),
+		            'compare' => 'IN',
 		        );
 			}
 			else
 			{
 				$tax_query[] = array(
 		            'taxonomy'  => 'property_type',
-		            'terms' => array( $atts['property_type_id'] )
+		            'terms' => explode(",", $atts['property_type_id']),
+		            'compare' => 'IN',
 		        );
 			}
 		}
@@ -273,7 +275,8 @@ class PH_Shortcodes {
 		{
 			$tax_query[] = array(
                 'taxonomy'  => 'location',
-                'terms' => array( $atts['location_id'] )
+                'terms' => explode(",", $atts['location_id']),
+                'compare' => 'IN',
             );
 		}
 
@@ -365,11 +368,9 @@ class PH_Shortcodes {
 
 		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
 		{
-			$office_ids = explode(",", $atts['office_id']);
-
 			$meta_query[] = array(
 				'key' => '_office_id',
-				'value' => $office_ids,
+				'value' => explode(",", $atts['office_id']),
 				'compare' => 'IN'
 			);
 		}
@@ -460,11 +461,9 @@ class PH_Shortcodes {
 
 		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
 		{
-			$office_ids = explode(",", $atts['office_id']);
-
 			$meta_query[] = array(
 				'key' => '_office_id',
-				'value' => $office_ids,
+				'value' => explode(",", $atts['office_id']),
 				'compare' => 'IN'
 			);
 		}
