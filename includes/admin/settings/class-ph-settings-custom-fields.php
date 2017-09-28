@@ -290,6 +290,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Availability', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -309,6 +310,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=availability&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -371,6 +373,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <?php do_action( 'propertyhive_custom_field_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php _e( 'Property Type', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -398,6 +401,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"><?php }else{ echo '&nbsp;'; } ?></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <?php do_action( 'propertyhive_custom_field_property_type_table_before_row_column', $term->term_id ); ?>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
@@ -415,6 +419,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                         ?>
                                         <tr>
                                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                                            <td class="id"><?php echo $term->term_id; ?></td>
                                             <?php do_action( 'propertyhive_custom_field_property_type_table_before_row_column', $term->term_id, $parent_term_id ); ?>
                                             <td class="type subtype">&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                             <td class="settings">
@@ -479,6 +484,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php _e( 'Property Type', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -506,6 +512,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"><?php }else{ echo '&nbsp;'; } ?></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_row_column', $term->term_id ); ?>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
@@ -523,6 +530,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                         ?>
                                         <tr>
                                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                                            <td class="id"><?php echo $term->term_id; ?></td>
                                             <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_row_column', $term->term_id, $parent_term_id ); ?>
                                             <td class="type subtype">&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                             <td class="settings">
@@ -587,6 +595,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Location', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -611,6 +620,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"><?php }else{ echo '&nbsp;'; } ?></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=location&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -632,6 +642,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                         ?>
                                         <tr>
                                             <td class="cb"><?php if ( empty( $subsubterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"><?php }else{ echo '&nbsp;'; } ?></td>
+                                            <td class="id"><?php echo $term->term_id; ?></td>
                                             <td class="type subtype">&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                             <td class="settings">
                                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=location&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -648,6 +659,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                                 ?>
                                                 <tr>
                                                     <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                                                    <td class="id"><?php echo $term->term_id; ?></td>
                                                     <td class="type subtype">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <?php echo $term->name; ?></td>
                                                     <td class="settings">
                                                         <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=location&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -716,6 +728,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Parking', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -735,6 +748,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=parking&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -797,6 +811,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Outside Space', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -816,6 +831,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=outside-space&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -878,6 +894,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Price Qualifier', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -897,6 +914,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=price-qualifier&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -959,6 +977,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Sale By', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -978,6 +997,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=sale-by&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1040,6 +1060,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Tenure', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1059,6 +1080,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=tenure&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1121,6 +1143,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Tenure', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1140,6 +1163,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=commercial-tenure&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1202,6 +1226,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Furnished', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1221,6 +1246,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=furnished&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1283,6 +1309,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Marketing Flag', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1302,6 +1329,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=marketing-flag&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
@@ -1364,6 +1392,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Property Feature', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -1383,6 +1412,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+                            <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=property-feature&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
