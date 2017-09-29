@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 4.8.1
-Stable tag: 1.4.11
+Tested up to: 4.8.2
+Stable tag: 1.4.12
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,14 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.12 =
+* Added support for comma-delimited list of IDs to be passed to shortcodes
+* Added term ID as column to custom field tables. Useful for when adding shortcodes and needing to know which IDs to pass in
+* Updated Flexslider JS library to customised version which includes a destroy method
+* Added shortcode name to 'shortcode_atts' function so developers can add custom attributes to existing shortcodes
+* Added Mauritius and Norway to list of countries
+* Declared compatibility for WordPress 4.8.2
 
 = 1.4.11 =
 * Corrected the [properties] shortcode not working when only the commercial department is active
