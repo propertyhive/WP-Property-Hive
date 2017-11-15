@@ -30,6 +30,7 @@ class PH_Shortcodes {
 			'applicant_registration_form'  => __CLASS__ . '::applicant_registration_form',
 			'propertyhive_my_account'  	   => __CLASS__ . '::my_account',
 			'propertyhive_login_form'  	   => __CLASS__ . '::login_form',
+		    'featured_property_carousel'   => __CLASS__ . '::featured_property_carousel',
 		);
 
 		foreach ( $shortcodes as $shortcode => $function ) {
@@ -499,6 +500,92 @@ class PH_Shortcodes {
 		return '<div class="propertyhive propertyhive-featured-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
 	}
 
+	/**
+	 * Output featured property carousel
+	 *
+	 * @access public
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function featured_property_carousel( $atts ) {
+	    global $propertyhive_loop;
+	    
+	    $atts = shortcode_atts( array(
+	        'per_page' 	=> '12',
+	        'department' => '',
+	        'office_id'	=> '',
+	        'orderby' 	=> 'rand',
+	        'order' 	=> 'desc',
+	        'meta_key' 	=> '',
+	    ), $atts, 'featured_property_carousel' );
+	    
+	    $args = array(
+	        'post_type'				=> 'property',
+	        'post_status' 			=> ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
+	        'ignore_sticky_posts'	=> 1,
+	        'posts_per_page' 		=> $atts['per_page'],
+	        'orderby' 				=> $atts['orderby'],
+	        'order' 				=> $atts['order'],
+	    );
+	    
+	    $meta_query = array(
+	        array(
+	            'key' 		=> '_on_market',
+	            'value' 	=> 'yes',
+	        ),
+	        array(
+	            'key' 		=> '_featured',
+	            'value' 	=> 'yes'
+	        )
+	    );
+	    
+	    if ( isset($atts['department']) && $atts['department'] != '' )
+	    {
+	        $meta_query[] = array(
+	            'key' => '_department',
+	            'value' => $atts['department'],
+	            'compare' => '='
+	        );
+	    }
+	    
+	    if ( isset($atts['office_id']) && $atts['office_id'] != '' )
+	    {
+	        $meta_query[] = array(
+	            'key' => '_office_id',
+	            'value' => explode(",", $atts['office_id']),
+	            'compare' => 'IN'
+	        );
+	    }
+	    
+	    $args['meta_query'] = $meta_query;
+	    
+	    if ( ! empty( $atts['meta_key'] ) ) {
+	        $args['meta_key'] = $atts['meta_key'];
+	    }
+	    
+	    ob_start();
+	    
+	    $properties = new WP_Query( apply_filters( 'propertyhive_shortcode_featured_property_carousel_query', $args, $atts ) );
+	    	    
+		if ( $properties->have_posts() ) : ?>
+
+			<ul class="properties clear slides">
+
+				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
+
+					<?php ph_get_template_part( 'content', 'property-featured-carousel' ); ?>
+
+				<?php endwhile; // end of the loop. ?>
+
+			</ul>
+
+		<?php endif;
+
+		wp_reset_postdata();
+
+		return '<div class="propertyhive propertyhive-featured-property-carousel-shortcode flexslider">' . ob_get_clean() . '</div>';
+	}
+	
 	/**
 	 * Output similar properties
 	 *

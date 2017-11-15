@@ -81,6 +81,18 @@ add_action( 'propertyhive_after_featured_loop_item_title', 'propertyhive_templat
 add_action( 'propertyhive_after_featured_loop_item_title', 'propertyhive_template_loop_actions', 30 );
 
 /**
+ * Featured Property Carousel Loop Items
+ *
+ * @see propertyhive_show_product_images()
+ * @see propertyhive_template_loop_price()
+ * @see propertyhive_template_loop_actions()
+ */
+add_action( 'propertyhive_before_featured_carouself_loop_item_title', 'propertyhive_template_loop_property_thumbnail', 10 );
+
+add_action( 'propertyhive_after_featured_carouself_loop_item_title', 'propertyhive_template_loop_price', 10 );
+add_action( 'propertyhive_after_featured_carouself_loop_item_title', 'propertyhive_template_loop_actions', 30 );
+
+/**
  * Recent Property Loop Items
  *
  * @see propertyhive_template_loop_property_thumbnail()

@@ -69,18 +69,24 @@ class PH_Frontend_Scripts {
 		// Register any scripts for later use, or used as dependencies
 		wp_register_script( 'jquery-cookie', $assets_path . 'js/jquery-cookie/jquery.cookie' . $suffix . '.js', array( 'jquery' ), '1.3.1', true );
 
+		$carouselInUse = has_shortcode( $post->post_content, 'featured_property_carousel' );
 		if ( is_property() ) {
 			wp_enqueue_script( 'prettyPhoto', $assets_path . 'js/prettyPhoto/jquery.prettyPhoto' . $suffix . '.js', array( 'jquery' ), '3.1.5', true );
 			wp_enqueue_script( 'prettyPhoto-init', $assets_path . 'js/prettyPhoto/jquery.prettyPhoto.init' . $suffix . '.js', array( 'jquery','prettyPhoto' ), PH_VERSION, true );
 			wp_enqueue_style( 'propertyhive_prettyPhoto_css', $assets_path . 'css/prettyPhoto.css' );
-		    
-		    wp_enqueue_script( 'flexslider', $assets_path . 'js/flexslider/jquery.flexslider' . $suffix . '.js', array( 'jquery' ), '2.2.2', true );
-            wp_enqueue_script( 'flexslider-init', $assets_path . 'js/flexslider/jquery.flexslider.init' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
-            wp_enqueue_style( 'flexslider_css', $assets_path . 'css/flexslider.css' );
-		    
+
+			wp_enqueue_script( 'flexslider-init', $assets_path . 'js/flexslider/jquery.flexslider.init.property' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
+			
             wp_enqueue_script( 'propertyhive_actions', $frontend_script_path . 'actions' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
             
 		    wp_enqueue_script( 'ph-single-property' );
+        }
+        if ( is_property() || $carouselInUse ) {
+            wp_enqueue_script( 'flexslider', $assets_path . 'js/flexslider/jquery.flexslider' . $suffix . '.js', array( 'jquery' ), '2.2.2', true );
+            wp_enqueue_style( 'flexslider_css', $assets_path . 'css/flexslider.css' );
+        }
+        if ( $carouselInUse ) {
+            wp_enqueue_script( 'flexslider-init-shortcode', $assets_path . 'js/flexslider/jquery.flexslider.init.shortcode' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
         }
  
 		// Global frontend scripts
