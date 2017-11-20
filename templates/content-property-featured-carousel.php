@@ -31,17 +31,17 @@ if ( $property->featured == 'yes' )
 ?>
 <li <?php post_class( $classes ); ?>>
 
-	<?php do_action( 'propertyhive_before_featured_carouself_loop_item' ); ?>
+	<?php do_action( 'propertyhive_before_featured_carousel_loop_item' ); ?>
 
     <div class="thumbnail">
     	<a href="<?php the_permalink(); ?>">
     		<?php
     			/**
-    			 * propertyhive_before_search_results_loop_item_title hook
+    			 * propertyhive_before_featured_carousel_loop_item_title hook
     			 *
     			 * @hooked propertyhive_template_loop_property_thumbnail - 10
     			 */
-    			do_action( 'propertyhive_before_featured_carouself_loop_item_title' );
+    			do_action( 'propertyhive_before_featured_carousel_loop_item_title' );
     		?>
         </a>
     </div>
@@ -52,17 +52,17 @@ if ( $property->featured == 'yes' )
         
     	<?php
     		/**
-    		 * propertyhive_after_search_results_loop_item_title hook
+    		 * propertyhive_after_featured_carousel_loop_item_title hook
     		 *
     		 * @hooked propertyhive_template_loop_price - 10
              * @hooked propertyhive_template_loop_summary - 20
              * @hooked propertyhive_template_loop_actions - 30
     		 */
-    		do_action( 'propertyhive_after_featured_carouself_loop_item_title' );
+    		do_action( 'propertyhive_after_featured_carousel_loop_item_title' );
     	?>
 	
     </div>
     
-	<?php do_action( 'propertyhive_after_featured_carouself_loop_item' ); ?>
+	<?php do_action( 'propertyhive_after_featured_carousel_loop_item' ); ?>
 
 </li>

@@ -36,3 +36,5 @@
 .propertyhive-my-account::after { clear:both; content:' '; display:table; }
 .propertyhive-my-account .my-account-navigation { float:left; width:30%; }
 .propertyhive-my-account .my-account-sections { float:right; width:68%; }
+
+.propertyhive-featured-property-carousel-shortcode.flexslider { border: none; }

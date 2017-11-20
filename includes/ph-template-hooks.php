@@ -83,14 +83,14 @@ add_action( 'propertyhive_after_featured_loop_item_title', 'propertyhive_templat
 /**
  * Featured Property Carousel Loop Items
  *
- * @see propertyhive_show_product_images()
+ * @see propertyhive_template_loop_property_thumbnail()
+ * @see propertyhive_template_loop_summary()
  * @see propertyhive_template_loop_price()
- * @see propertyhive_template_loop_actions()
  */
-add_action( 'propertyhive_before_featured_carouself_loop_item_title', 'propertyhive_template_loop_property_thumbnail', 10 );
+add_action( 'propertyhive_before_featured_carousel_loop_item_title', 'propertyhive_template_loop_property_thumbnail', 10 );
 
-add_action( 'propertyhive_after_featured_carouself_loop_item_title', 'propertyhive_template_loop_price', 10 );
-add_action( 'propertyhive_after_featured_carouself_loop_item_title', 'propertyhive_template_loop_actions', 30 );
+add_action( 'propertyhive_after_featured_carousel_loop_item_title', 'propertyhive_template_loop_summary', 30 );
+add_action( 'propertyhive_after_featured_carousel_loop_item_title', 'propertyhive_template_loop_price', 50 );
 
 /**
  * Recent Property Loop Items
