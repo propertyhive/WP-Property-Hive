@@ -38,3 +38,5 @@
 .propertyhive-my-account .my-account-sections { float:right; width:68%; }
 
 .propertyhive-featured-property-carousel-shortcode.flexslider { border: none; }
+
+.propertyhive ul.properties li.featured-carousel { border-bottom: none; clear: none }

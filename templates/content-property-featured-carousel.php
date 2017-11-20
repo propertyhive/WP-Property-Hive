@@ -26,9 +26,11 @@ if ( ! $property )
 
 // Extra post classes
 $classes = array('clear');
-if ( $property->featured == 'yes' )
+if ( $property->featured == 'yes' ) // only ever would be wouldn't it?
     $classes[] = 'featured';
+$classes[] = 'featured-carousel';
 ?>
+
 <li <?php post_class( $classes ); ?>>
 
 	<?php do_action( 'propertyhive_before_featured_carousel_loop_item' ); ?>
