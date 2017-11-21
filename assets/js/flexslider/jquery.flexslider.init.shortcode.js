@@ -1,7 +1,7 @@
 (function($) {
 
     $(window).load(function() {
-    	$('.flexslider').flexslider({
+    	$('.propertyhive-featured-property-carousel-shortcode').flexslider({
             itemMargin: 5,
         });
     });
