@@ -209,3 +209,18 @@ function get_commercial_price_units( )
     
     return $price_options;
 }
+
+/**
+ * Execute functions hooked on a specific action hook, if it exists,
+ * otherwise execute a default hook instead.
+ *
+ * @param string $tag        The name of the action to be executed (if it exists).
+ * @param string $defaultTag The name of the default action to be executed instead.
+ */
+function ph_do_action_default( $tag, $defaultTag ) {
+	if ( has_action( $tag ) ) {
+		do_action( $tag );
+	} else {
+		do_action( $defaultTag );
+	}
+}

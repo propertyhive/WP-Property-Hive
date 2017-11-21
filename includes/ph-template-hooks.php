@@ -69,30 +69,6 @@ add_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_t
 add_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_actions', 30 );
 
 /**
- * Featured Property Loop Items
- *
- * @see propertyhive_template_loop_property_thumbnail()
- * @see propertyhive_template_loop_price()
- * @see propertyhive_template_loop_actions()
- */
-add_action( 'propertyhive_before_featured_loop_item_title', 'propertyhive_template_loop_property_thumbnail', 10 );
-
-add_action( 'propertyhive_after_featured_loop_item_title', 'propertyhive_template_loop_price', 10 );
-add_action( 'propertyhive_after_featured_loop_item_title', 'propertyhive_template_loop_actions', 30 );
-
-/**
- * Recent Property Loop Items
- *
- * @see propertyhive_template_loop_property_thumbnail()
- * @see propertyhive_template_loop_price()
- * @see propertyhive_template_loop_actions()
- */
-add_action( 'propertyhive_before_recent_loop_item_title', 'propertyhive_template_loop_property_thumbnail', 10, 2 );
-
-add_action( 'propertyhive_after_recent_loop_item_title', 'propertyhive_template_loop_price', 10 );
-add_action( 'propertyhive_after_recent_loop_item_title', 'propertyhive_template_loop_actions', 20 );
-
-/**
  * Before Single Property Summary Div
  *
  * @see propertyhive_show_product_images()

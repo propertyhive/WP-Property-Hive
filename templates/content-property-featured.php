@@ -39,7 +39,7 @@ if ( $property->featured == 'yes' )
 ?>
 <li <?php post_class( $classes ); ?>>
 
-	<?php do_action( 'propertyhive_before_search_results_loop_item' ); ?>
+	<?php ph_do_action_default( 'propertyhive_before_featured_loop_item', 'propertyhive_before_search_results_loop_item' ); ?>
 
     <div class="thumbnail">
     	<a href="<?php the_permalink(); ?>">
@@ -49,7 +49,7 @@ if ( $property->featured == 'yes' )
     			 *
     			 * @hooked propertyhive_template_loop_property_thumbnail - 10
     			 */
-    			do_action( 'propertyhive_before_search_results_loop_item_title' );
+		        ph_do_action_default( 'propertyhive_before_featured_loop_item_title', 'propertyhive_before_search_results_loop_item_title' );
     		?>
         </a>
     </div>
@@ -66,11 +66,11 @@ if ( $property->featured == 'yes' )
              * @hooked propertyhive_template_loop_summary - 20
              * @hooked propertyhive_template_loop_actions - 30
     		 */
-    		do_action( 'propertyhive_after_search_results_loop_item_title' );
+	        ph_do_action_default( 'propertyhive_after_featured_loop_item_title', 'propertyhive_after_search_results_loop_item_title' );
     	?>
 	
     </div>
     
-	<?php do_action( 'propertyhive_after_search_results_loop_item' ); ?>
+	<?php ph_do_action_default( 'propertyhive_after_featured_loop_item', 'propertyhive_after_search_results_loop_item' ); ?>
 
 </li>
