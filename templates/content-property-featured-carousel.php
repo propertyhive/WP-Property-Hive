@@ -56,10 +56,10 @@ $classes[] = 'featured-carousel';
     		/**
     		 * propertyhive_after_featured_carousel_loop_item_title hook
     		 *
-    		 * @hooked propertyhive_template_loop_price - 10
-             * @hooked propertyhive_template_loop_summary - 20
-             * @hooked propertyhive_template_loop_actions - 30
-    		 */
+             * @hooked propertyhive_template_loop_summary - 30
+             * @hooked propertyhive_template_loop_price - 50
+
+		     */
     		do_action( 'propertyhive_after_featured_carousel_loop_item_title' );
     	?>
 	
