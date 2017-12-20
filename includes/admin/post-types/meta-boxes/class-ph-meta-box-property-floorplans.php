@@ -110,9 +110,77 @@ class PH_Meta_Box_Property_Floorplans {
                       return false;
                   });
                   
-                  jQuery(\'body\').on(\'click\', \'#property_floorplans_grid .attachment-edit a\', function()
+                  jQuery(\'body\').on(\'click\', \'#property_floorplans_grid .attachment-edit a\', function( event )
                   {
+                      event.preventDefault();
+
+                      var container = jQuery(this).parent().parent().parent();
+                      var floorplan_id = container.attr(\'id\');
+                      floorplan_id = floorplan_id.replace(\'floorplan_\', \'\');
                       
+                      // Create the media frame.
+                    file_frame2 = wp.media.frames.file_frame = wp.media({
+                      title: jQuery( this ).data( \'uploader_title\' ),
+                      button: {
+                        text: \'Update Image\',
+                      },
+                      multiple: false
+                    });
+
+                    // open
+                    file_frame2.on(\'open\',function() {
+                      
+                      var selection = file_frame2.state().get(\'selection\');
+                      var ids = floorplan_id;
+                      if (ids) {
+                          idsArray = ids.split(',');
+                          idsArray.forEach(function(id) {
+                              attachment = wp.media.attachment(id);
+                              attachment.fetch();
+                              selection.add( attachment ? [ attachment ] : [] );
+                          });
+                      }
+                          
+                    });
+
+                    // When an image is selected, run a callback.
+                    file_frame2.on( \'select\', function() {
+                        var selection = file_frame2.state().get(\'selection\');
+     
+                        selection.map( function( attachment ) {
+
+                            attachment = attachment.toJSON();
+
+                            if (attachment.id != floorplan_id)
+                            {
+                              // Replace floorplan
+                              var attachment_ids = jQuery(\'#floorplan_attachment_ids\').val();
+                              attachment_ids = attachment_ids.split(\',\');
+                              
+                              for (var i in attachment_ids)
+                              {
+                                  if (attachment_ids[i] == floorplan_id)
+                                  {
+                                      attachment_ids[i] = attachment.id;
+                                  }
+                              }
+                              jQuery(\'#floorplan_attachment_ids\').val(attachment_ids);
+                              
+                              // Add floorplan to media grid
+                              var mediaHTML = \'\';
+                              mediaHTML += \'<li id="floorplan_\' + attachment.id + \'">\';
+                              mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>\';
+                              mediaHTML += \'<img src="\' + attachment.url + \'" alt=""></li>\';
+                              
+                              jQuery(\'#property_floorplans_grid ul li#floorplan_\' + floorplan_id).after(mediaHTML);
+                              jQuery(\'#property_floorplans_grid ul li#floorplan_\' + floorplan_id).remove();
+
+                            }
+                        });
+                    });
+
+                    // Finally, open the modal
+                    file_frame2.open();
                   });
                   
                   jQuery(\'.ph_upload_floorplan_button\').live(\'click\', function( event ){

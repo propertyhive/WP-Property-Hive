@@ -80,7 +80,7 @@ class PH_Meta_Box_Property_Photos {
                   });
                   jQuery( \'#property_photos_grid ul\' ).disableSelection();
                   
-                  jQuery(\'body\').on(\'click\', \'#property_photos_grid .attachment-delete a\', function()
+                  jQuery(\'body\').on(\'click\', \'#property_photos_grid .attachment-delete a\', function(event)
                   {
                       var container = jQuery(this).parent().parent().parent();
                       var photo_id = container.attr(\'id\');
@@ -111,7 +111,7 @@ class PH_Meta_Box_Property_Photos {
                       return false;
                   });
                   
-                  jQuery(\'body\').on(\'click\', \'#property_photos_grid .attachment-edit a\', function()
+                  jQuery(\'body\').on(\'click\', \'#property_photos_grid .attachment-edit a\', function(event)
                   {
                       event.preventDefault();
 
