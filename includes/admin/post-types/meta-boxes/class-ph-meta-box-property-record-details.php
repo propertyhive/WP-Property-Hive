@@ -41,7 +41,7 @@ class PH_Meta_Box_Property_Record_Details {
         if ($negotiator_id == '')
         {
             // if neg isn't set then default to current user
-            $negotiator_id = get_current_user_id();
+            $negotiator_id = apply_filters('propertyhive_default_property_negotiator_id', get_current_user_id());
         }
         
         echo '<p class="form-field negotiator_field">
