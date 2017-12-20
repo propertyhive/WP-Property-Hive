@@ -1350,8 +1350,8 @@ class PH_Query {
                 }
             }
         }
-        
-        return array_filter( $tax_query );
+
+        return array_filter( apply_filters( 'propertyhive_property_query_tax_query', $tax_query, $this ) );
     }
     
 	/**
