@@ -358,7 +358,7 @@ if ( ! function_exists( 'propertyhive_catalog_ordering' ) ) {
      * @return void
      */
     function propertyhive_catalog_ordering() {
-        $orderby = isset( $_GET['orderby'] ) ? ph_clean( $_GET['orderby'] ) : apply_filters( 'propertyhive_default_catalog_orderby', get_option( 'propertyhive_default_catalog_orderby' ) );
+        $orderby = isset( $_GET['orderby'] ) ? ph_clean( $_GET['orderby'] ) : apply_filters( 'propertyhive_default_search_results_orderby', get_option( 'propertyhive_default_search_results_orderby' ) );
 
         ph_get_template( 'search/orderby.php', array( 'orderby' => $orderby ) );
     }
