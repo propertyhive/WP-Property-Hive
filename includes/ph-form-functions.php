@@ -916,8 +916,6 @@ function ph_form_field( $key, $field )
         }
         case "country": 
         {
-            $key = 'country';
-            
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
