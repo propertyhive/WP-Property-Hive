@@ -26,6 +26,8 @@ class PH_Install {
 
 		add_action( 'admin_init', array( $this, 'install_actions' ) );
 		add_action( 'admin_init', array( $this, 'check_version' ), 5 );
+
+        add_filter( 'cron_schedules', array( $this, 'custom_cron_recurrence' ) );
 		//add_action( 'in_plugin_update_message-propertyhive/propertyhive.php', array( $this, 'in_plugin_update_message' ) );
 	}
 
@@ -178,7 +180,7 @@ class PH_Install {
 		// Schedule for midnight as it's likely traffic will be quieter at that time
 		wp_schedule_event( strtotime( '00:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_update_currency_exchange_rates' );
         
-        wp_schedule_event( time(), 'hourly', 'propertyhive_process_email_log' );
+        wp_schedule_event( time(), 'every_fifteen_minutes', 'propertyhive_process_email_log' );
 
         $auto_property_match_enabled = get_option( 'propertyhive_auto_property_match', '' );
 
@@ -191,6 +193,16 @@ class PH_Install {
         // 1am so it doesn't run at exactly the same time as the exchange rate cron
         wp_schedule_event( strtotime( '01:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_check_licenses' );
 	}
+
+    public function custom_cron_recurrence( $schedules ) 
+    {
+        $schedules['every_fifteen_minutes'] = array(
+            'interval'  => 900,
+            'display'   => __( 'Every 15 Minutes', 'textdomain' )
+        );
+         
+        return $schedules;
+    }
 
 	/**
 	 * Create pages that the plugin relies on
