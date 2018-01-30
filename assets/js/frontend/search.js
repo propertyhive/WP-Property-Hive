@@ -44,13 +44,23 @@ function toggleDepartmentFields()
                 // first visible component (that isnt sales/lettings-only) and 
                 // use that display
                 var display = 'block';
+                var found = false;
                 jQuery(this).find('.control').each(function()
                 {
                     if (!jQuery(this).hasClass('.sales-only') && !jQuery(this).hasClass('.lettings-only') && !jQuery(this).hasClass('.residential-only') && !jQuery(this).hasClass('.commercial-only') && jQuery(this).css('display') != 'none')
                     {
                         display = jQuery(this).css('display');
+                        found = true;
                     }
                 });
+
+                if (found == false)
+                {
+                    if (jQuery(this).css('display') == 'table')
+                    {
+                        display = 'table-cell';
+                    }
+                }
 
                 if (selectedDepartment == 'residential-sales')
                 {
