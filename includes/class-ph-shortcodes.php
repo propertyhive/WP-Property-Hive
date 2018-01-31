@@ -513,12 +513,14 @@ class PH_Shortcodes {
 			'orderby'					=> 'rand',
 			'order'						=> 'asc',
 			'price_percentage_bounds'	=> 10,
+			'bedroom_bounds'			=> 0,
 			'property_id'				=> '',
 		), $atts, 'similar_properties' );
 
 		if ($atts['property_id'] != '')
 		{
 			$department = get_post_meta( $atts['property_id'], '_department', true );
+			
 			$price = get_post_meta( $atts['property_id'], '_price_actual', true );
 			$lower_price = $price;
 			$higher_price = $price;
@@ -528,7 +530,15 @@ class PH_Shortcodes {
 				$lower_price = $price - ($price * $atts['price_percentage_bounds'] / 100);
 				$higher_price = $price + ($price * $atts['price_percentage_bounds'] / 100);
 			}
+			
 			$bedrooms = get_post_meta( $atts['property_id'], '_bedrooms', true );
+			$lower_bedrooms = $bedrooms;
+			$higher_bedrooms = $bedrooms;
+			if ( isset($atts['bedroom_bounds']) && $atts['bedroom_bounds'] != '' && is_numeric($atts['bedroom_bounds']) && $atts['bedroom_bounds'] > 0 )
+			{
+				$lower_bedrooms = $bedrooms - $atts['bedroom_bounds'];
+				$higher_bedrooms = $bedrooms + $atts['bedroom_bounds'];
+			}
 
 			$args = array(
 				'post_type'				=> 'property',
@@ -552,25 +562,39 @@ class PH_Shortcodes {
 				'value' 	=> 'yes',
 			);
 
-			$meta_query[] = array(
-				'key' 		=> '_bedrooms',
-				'value' 	=> $bedrooms,
-				'type'      => 'NUMERIC'
-			);
+			if ( isset($atts['bedroom_bounds']) && is_numeric($atts['bedroom_bounds']) )
+			{
+				$meta_query[] = array(
+					'key' 		=> '_bedrooms',
+					'value' 	=> $lower_bedrooms,
+					'compare'   => '>=',
+					'type'      => 'NUMERIC'
+				);
 
-			$meta_query[] = array(
-				'key' 		=> '_price_actual',
-				'value' 	=> $lower_price,
-				'compare'   => '>=',
-				'type'      => 'NUMERIC'
-			);
+				$meta_query[] = array(
+					'key' 		=> '_bedrooms',
+					'value' 	=> $higher_bedrooms,
+					'compare'   => '<=',
+					'type'      => 'NUMERIC'
+				);
+			}
 
-			$meta_query[] = array(
-				'key' 		=> '_price_actual',
-				'value' 	=> $higher_price,
-				'compare'   => '<=',
-				'type'      => 'NUMERIC'
-			);
+			if ( isset($atts['price_percentage_bounds']) && is_numeric($atts['price_percentage_bounds']) )
+			{
+				$meta_query[] = array(
+					'key' 		=> '_price_actual',
+					'value' 	=> $lower_price,
+					'compare'   => '>=',
+					'type'      => 'NUMERIC'
+				);
+
+				$meta_query[] = array(
+					'key' 		=> '_price_actual',
+					'value' 	=> $higher_price,
+					'compare'   => '<=',
+					'type'      => 'NUMERIC'
+				);
+			}
 
 			$args['meta_query'] = $meta_query;
 
