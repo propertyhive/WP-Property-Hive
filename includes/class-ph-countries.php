@@ -440,29 +440,38 @@ class PH_Countries {
 
 			foreach ( $countries as $key => $value )
 			{	
-				if (!isset($exchange_rates[$value['currency_code']]) && in_array($key, $selected_countries))
+				if (!isset($exchange_rates[$value['currency_code']]) && in_array($key, $selected_countries) && $value['currency_code'] != 'GBP')
 				{
 					// we haven't got this exchange rate
 					$from   = 'GBP'; 
 					$to     = $value['currency_code'];
-					$url = 'http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s='. $from . $to .'=X';
-
-					$filehandler = @fopen( $url, 'r' );
 
 					$exchangeRate = '';
+					
+					$url = 'https://finance.google.com/finance/converter?a=1&from=' . $from . '&to=' . $to;
 
-					if ( $filehandler ) 
+					$response = wp_remote_get( $url );
+
+					if ( is_array( $response ) )
 					{
-						$data = fgets($filehandler, 4096);
-					    fclose($filehandler);
+						$body = wp_remote_retrieve_body( $response );
 
-					    $InfoData = explode(',',$data); 
+						preg_match("/<span class=bld>(.*)<\/span>/", $body, $converted);
 
-						if ( isset($InfoData[1]) )
+						if ( isset($converted[1]) && $converted[1] != '' )
 						{
-							$exchangeRate = $InfoData[1];
-							$exchange_rates[$to] = $exchangeRate;
+							$converted = preg_replace("/[^0-9.]/", "", $converted[1]);
+
+							if ( $converted != '' )
+							{
+								$exchangeRate = $converted;
+								$exchange_rates[$to] = $exchangeRate;
+							}
 						}
+					}
+					else
+					{
+
 					}
 
 					if ( $exchangeRate == '' && isset($previous_exchange_rates[$to]) )
@@ -472,12 +481,21 @@ class PH_Countries {
 					}
 				}
 			}
+			$exchange_rates['GBP'] = "1.0000";
 			update_option( 'propertyhive_currency_exchange_rates', $exchange_rates );
+			update_option( 'propertyhive_currency_exchange_rates_updated', date("Y-m-d") );
 
-			// Loop through all properties and update _actual_price meta value to be price in GBP
+			// Loop through all on market properties and update _actual_price meta value to be price in GBP
 			$args = array(
 				'post_type' => 'property',
-				'nopaging' => true
+				'post_status' => 'publish',
+				'meta_query' => array(
+					array(
+						'key' => '_on_market',
+						'value' => 'yes',
+					)
+				),
+				'nopaging' => true,
 			);
 			$property_query =  new WP_Query($args);
 
