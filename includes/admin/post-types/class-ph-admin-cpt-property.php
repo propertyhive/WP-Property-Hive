@@ -722,9 +722,19 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 			update_post_meta( $post_id, '_on_market', ph_clean( $on_market ) );
 		}
 
-		if ( ! empty( $_REQUEST['_availability'] ) ) 
+		if ( ! empty( $_REQUEST['_availability'] ) && is_numeric( $_REQUEST['_availability'] ) ) 
 		{
 			wp_set_post_terms( $post_id, ph_clean( $_REQUEST['_availability'] ), 'availability' );
+		}
+
+		if ( ! empty( $_REQUEST['_negotiator_id'] ) && is_numeric( $_REQUEST['_negotiator_id'] ) && $_REQUEST['_negotiator_id'] != '-1' ) 
+		{
+			update_post_meta( $post_id, '_negotiator_id', ph_clean( $_REQUEST['_negotiator_id'] ) );
+		}
+
+		if ( ! empty( $_REQUEST['_office_id'] ) && is_numeric( $_REQUEST['_office_id'] ) ) 
+		{
+			update_post_meta( $post_id, '_office_id', ph_clean( $_REQUEST['_office_id'] ) );
 		}
 
 		do_action( 'propertyhive_property_bulk_edit_save', $property );
