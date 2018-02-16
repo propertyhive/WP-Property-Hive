@@ -96,5 +96,29 @@ function initialise_datepicker() {
         dateFormat: "yy-mm-dd",
         numberOfMonths: 1,
         showButtonPanel: true
+    }).on("change", function(e) {
+        var curDate = jQuery(this).val();
+        var valid  = true;
+        
+        if ( curDate != '' )
+        {
+            var splitDate = curDate.split("-")
+            if ( splitDate.length != 3 )
+            {
+                valid = false;
+            }
+            else
+            {
+                if ( splitDate[0].length != 4 || splitDate[1].length != 2 || splitDate[2].length != 2 )
+                {
+                    valid = false;
+                }
+            }
+
+            if (!valid) 
+            {
+                alert("Invalid date entered. Please select a date from the calendar and ensure date is in the format YYYY-MM-DD");
+            }
+        }
     });
 }
