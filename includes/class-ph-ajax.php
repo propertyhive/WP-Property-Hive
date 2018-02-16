@@ -1390,6 +1390,8 @@ class PH_AJAX {
         if ( $telephone !== FALSE ) { update_post_meta( $contact_post_id, '_telephone_number', $telephone ); }
         if ( $email !== FALSE ) { update_post_meta( $contact_post_id, '_email_address', $email ); }
 
+        do_action('propertyhive_create_contact_from_enquiry', $enquiry_post_id, $contact_post_id);
+
         die( json_encode( array('success' => get_edit_post_link($contact_post_id, '')) ) );
     }
 
