@@ -9,5 +9,6 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+global $post, $property;
 ?>
 <h1 class="property_title entry-title"><?php the_title(); ?></h1>
