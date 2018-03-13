@@ -605,6 +605,8 @@ class PH_Query {
         $meta_query[] = $this->minimum_floor_area_meta_query();
         $meta_query[] = $this->maximum_floor_area_meta_query();
         $meta_query[] = $this->floor_area_range_meta_query();
+        $meta_query[] = $this->commercial_for_sale_meta_query();
+        $meta_query[] = $this->commercial_to_rent_meta_query();
         $meta_query[] = $this->office_meta_query();
         
 		return array_filter( apply_filters( 'propertyhive_property_query_meta_query', $meta_query, $this ) );
@@ -1299,6 +1301,56 @@ class PH_Query {
 	                'type'    => 'NUMERIC' 
 	            );
 	        }
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle commercial for sale
+     *
+     * @access public
+     * @return array
+     */
+    public function commercial_for_sale_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            isset( $_REQUEST['commercial_for_sale'] ) && $_REQUEST['commercial_for_sale'] == '1' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_for_sale',
+                'value'   => 'yes',
+                'compare' => '=',
+            );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle commercial to rent
+     *
+     * @access public
+     * @return array
+     */
+    public function commercial_to_rent_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            isset( $_REQUEST['commercial_to_rent'] ) && $_REQUEST['commercial_to_rent'] == '1' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_to_rent',
+                'value'   => 'yes',
+                'compare' => '=',
+            );
         }
         
         return $meta_query;
