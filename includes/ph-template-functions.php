@@ -378,7 +378,21 @@ if ( ! function_exists( 'propertyhive_pagination' ) ) {
     }
 }
 
-/** Single Product ********************************************************/
+/** Single Property ********************************************************/
+
+if ( ! function_exists( 'propertyhive_template_not_on_market' ) ) {
+
+    /**
+     * Output a warning/message if property is not on the market
+     *
+     * @access public
+     * @subpackage  Property
+     * @return void
+     */
+    function propertyhive_template_not_on_market() {
+        ph_get_template( 'single-property/not-on-market.php' );
+    }
+}
 
 if ( ! function_exists( 'propertyhive_show_property_images' ) ) {
 

@@ -98,6 +98,7 @@ add_action( 'propertyhive_after_recent_loop_item_title', 'propertyhive_template_
  * @see propertyhive_show_product_images()
  * @see propertyhive_show_product_thumbnails()
  */
+add_action( 'propertyhive_before_single_property_summary', 'propertyhive_template_not_on_market', 5 );
 add_action( 'propertyhive_before_single_property_summary', 'propertyhive_show_property_images', 10 );
 add_action( 'propertyhive_product_thumbnails', 'propertyhive_show_property_thumbnails', 20 );
 
