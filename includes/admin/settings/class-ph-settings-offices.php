@@ -484,7 +484,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                         <td class="settings">
                                             <a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=edit&id=' . $post->ID ) . '">' . __( 'Edit', 'propertyhive' ) . '</a>
                                             ';
-                                    if ( $num_offices > 1 )
+                                    if ( $num_offices > 1 && get_post_meta($post->ID, 'primary', TRUE) != '1' )
                                     {
                                         echo '<a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=delete&id=' . $post->ID ) . '">' . __( 'Delete', 'propertyhive' ) . '</a>';    
                                     }
