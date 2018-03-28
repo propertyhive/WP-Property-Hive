@@ -332,7 +332,7 @@ class PH_Countries {
                     case "pppw":
                     {
                         $bedrooms = get_post_meta( $postID, '_bedrooms', true );
-                        if ( $bedrooms !== FALSE && $bedrooms != 0 && $bedrooms != '' )
+                        if ( ( $bedrooms !== FALSE && $bedrooms != 0 && $bedrooms != '' ) && apply_filters( 'propertyhive_pppw_to_consider_bedrooms', true ) == true )
                         {
                             $price = (($rent * 52) / 12) * $bedrooms;
                         }
