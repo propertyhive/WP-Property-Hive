@@ -640,6 +640,7 @@ class PH_Shortcodes {
 		global $property;
 
 		$atts = shortcode_atts( array(
+			'id'        	=> '',
 			'height'        => '400',
 			'zoom'          => '14',
 			'scrollwheel'   => 'true'

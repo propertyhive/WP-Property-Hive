@@ -144,15 +144,17 @@ function get_property_map( $args = array() )
 	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 	    wp_enqueue_script('googlemaps');
 
-	    echo '<div id="property_map_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
+	    $id_suffix = ( ( isset($args['id']) && $args['id'] != '' ) ? '_' . $args['id'] : '' );
+
+	    echo '<div id="property_map_canvas' . $id_suffix . '" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
 ?>
 <script>
 
 	// We declare vars globally so developers can access them
-	var property_map; // Global declaration of the map
-	var property_marker; // Global declaration of the marker
+	var property_map<?php echo $id_suffix; ?>; // Global declaration of the map
+	var property_marker<?php echo $id_suffix; ?>; // Global declaration of the marker
 			
-	function initialize_property_map() {
+	function initialize_property_map<?php echo $id_suffix; ?>() {
 				
 		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
 		var map_options = {
@@ -174,24 +176,24 @@ function get_property_map( $args = array() )
 
   			do_action( 'propertyhive_property_map_options' );
   		?>
-		property_map = new google.maps.Map(document.getElementById("property_map_canvas"), map_options);
+		property_map<?php echo $id_suffix; ?> = new google.maps.Map(document.getElementById("property_map_canvas<?php echo $id_suffix; ?>"), map_options);
 				
 		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
 			
 		var marker_options = {
-			map: property_map,
+			map: property_map<?php echo $id_suffix; ?>,
 			position: myLatlng		
 		};
 
 		<?php do_action( 'propertyhive_property_map_marker_options' ); ?>
 
-		property_marker = new google.maps.Marker(marker_options);
+		property_marker<?php echo $id_suffix; ?> = new google.maps.Marker(marker_options);
 	}
 	
 	if(window.addEventListener) {
-		window.addEventListener('load', initialize_property_map);
+		window.addEventListener('load', initialize_property_map<?php echo $id_suffix; ?>);
 	}else{
-		window.attachEvent('onload', initialize_property_map);
+		window.attachEvent('onload', initialize_property_map<?php echo $id_suffix; ?>);
 	}
 
 </script>
