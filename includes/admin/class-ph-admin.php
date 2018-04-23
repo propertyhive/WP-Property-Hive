@@ -243,6 +243,28 @@ class PH_Admin {
                     update_option( 'propertyhive_review_prompt_due_timestamp', 0 );
                 }
             }
+
+            if ( 
+                get_option('propertyhive_search_results_page_id', '') == '' && 
+                (
+                    !isset($_GET['page'])
+                    ||
+                    (
+                        isset($_GET['page']) && $_GET['page'] != 'ph-installed' && $_GET['page'] != 'ph-settings'
+                    )
+                )
+            )
+            {
+                echo "<div class=\"notice notice-info\">
+                        <p>
+                            " . __( 'We noticed that you haven\'t assigned a page to be your \'Search Results\' page yet. We recommend that you do this in order to display properties on your site.', 'propertyhive' ) . "
+                        </p>
+                        <p>
+                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=general') . "\" class=\"button-primary\">Go To Property Hive Settings</a>
+                        </p>
+                        
+                    </div>";
+            }
         }
     }
 
