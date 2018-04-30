@@ -254,6 +254,21 @@ class PH_AJAX {
         
         $form_controls = array_merge( $form_controls, $form_controls_2 );
 
+        // need to improve this as duplicated in ph-shortcodes.php
+        if ( get_option( 'propertyhive_applicant_registration_form_disclaimer', '' ) != '' )
+        {
+            $disclaimer = get_option( 'propertyhive_applicant_registration_form_disclaimer', '' );
+
+            $form_controls['disclaimer'] = array(
+                'type' => 'checkbox',
+                'label' => $disclaimer,
+                'label_style' => 'width:100%;',
+                'required' => true
+            );
+        }
+
+        $form_controls = apply_filters( 'propertyhive_applicant_registration_form_fields', $form_controls );
+
         foreach ( $form_controls as $key => $control )
         {
             if ( isset( $control ) && isset( $control['required'] ) && $control['required'] === TRUE )
@@ -1276,33 +1291,36 @@ class PH_AJAX {
             {
                 $return['success'] = true;
                 
-                // Now insert into enquiries section of WordPress
-                $title = __( 'Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] );
-                if ( isset($_POST['name']) && ! empty($_POST['name']) )
+                if ( get_option( 'propertyhive_store_property_enquiries', 'yes' ) == 'yes' )
                 {
-                    $title .= __( ' from ', 'propertyhive' ) . sanitize_text_field($_POST['name']);
-                }
-                
-                $enquiry_post = array(
-                  'post_title'    => $title,
-                  'post_content'  => '',
-                  'post_type'  => 'enquiry',
-                  'post_status'   => 'publish',
-                  'comment_status'    => 'closed',
-                  'ping_status'    => 'closed',
-                );
-                
-                // Insert the post into the database
-                $enquiry_post_id = wp_insert_post( $enquiry_post );
-                
-                add_post_meta( $enquiry_post_id, '_status', 'open' );
-                add_post_meta( $enquiry_post_id, '_source', 'website' );
-                add_post_meta( $enquiry_post_id, '_negotiator_id', '' );
-                add_post_meta( $enquiry_post_id, '_office_id', $office_id );
-                
-                foreach ($_POST as $key => $value)
-                {
-                    add_post_meta( $enquiry_post_id, $key, $value );
+                    // Now insert into enquiries section of WordPress
+                    $title = __( 'Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] );
+                    if ( isset($_POST['name']) && ! empty($_POST['name']) )
+                    {
+                        $title .= __( ' from ', 'propertyhive' ) . sanitize_text_field($_POST['name']);
+                    }
+                    
+                    $enquiry_post = array(
+                      'post_title'    => $title,
+                      'post_content'  => '',
+                      'post_type'  => 'enquiry',
+                      'post_status'   => 'publish',
+                      'comment_status'    => 'closed',
+                      'ping_status'    => 'closed',
+                    );
+                    
+                    // Insert the post into the database
+                    $enquiry_post_id = wp_insert_post( $enquiry_post );
+                    
+                    add_post_meta( $enquiry_post_id, '_status', 'open' );
+                    add_post_meta( $enquiry_post_id, '_source', 'website' );
+                    add_post_meta( $enquiry_post_id, '_negotiator_id', '' );
+                    add_post_meta( $enquiry_post_id, '_office_id', $office_id );
+                    
+                    foreach ($_POST as $key => $value)
+                    {
+                        add_post_meta( $enquiry_post_id, $key, $value );
+                    }
                 }
 
                 // Send auto-responder

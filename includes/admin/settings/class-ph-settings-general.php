@@ -39,11 +39,12 @@ class PH_Settings_General extends PH_Settings_Page {
      */
     public function get_sections() {
         $sections = array(
-            ''         => __( 'General', 'propertyhive' ),
-            'modules'         => __( 'Modules', 'propertyhive' ),
-            'international'         => __( 'International', 'propertyhive' ),
-            'map'         => __( 'Map', 'propertyhive' ),
-            'misc'         => __( 'Miscellaneous', 'propertyhive' ),
+            ''              => __( 'General', 'propertyhive' ),
+            'modules'       => __( 'Modules', 'propertyhive' ),
+            'international' => __( 'International', 'propertyhive' ),
+            'map'           => __( 'Map', 'propertyhive' ),
+            'gdpr'          => __( 'GDPR', 'propertyhive' ),
+            'misc'          => __( 'Miscellaneous', 'propertyhive' ),
         );
 
         return $sections;
@@ -248,6 +249,44 @@ class PH_Settings_General extends PH_Settings_Page {
 		) ); // End general map settings
 	}
 
+    /**
+     * Get GDPR settings array
+     *
+     * @return array
+     */
+    public function get_general_gdpr_setting() {
+            
+        return apply_filters( 'propertyhive_general_gdpr_settings', array(
+
+            array( 'title' => __( 'GDPR Settings', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'gdpr_options' ),
+
+            array(
+                'title'   => __( 'Store Property Enquiries', 'propertyhive' ),
+                'id'      => 'propertyhive_store_property_enquiries',
+                'type'    => 'checkbox',
+                'default' => 'yes',
+                'desc'  => __( 'If using the default property enquiry form that comes with Property Hive, select this option if enquiries should be saved in the \'Enquiries\' section of Property Hive. Note that regardless of whether this is ticked or not, the enquiry will still be sent via email. This option simply determines whether we save it to the database or not.', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Property Enquiry Form Disclaimer', 'propertyhive' ),
+                'id'      => 'propertyhive_property_enquiry_form_disclaimer',
+                'type'    => 'wysiwyg',
+                'desc'  => __( 'Add disclaimer text, including a link to a privacy policy, that will appear on the property enquiry form.', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Applicant Registration Form Disclaimer', 'propertyhive' ),
+                'id'      => 'propertyhive_applicant_registration_form_disclaimer',
+                'type'    => 'wysiwyg',
+                'desc'  => __( 'Add disclaimer text, including a link to a privacy policy, that will appear on the applicant registration form.', 'propertyhive' )
+            ),
+
+            array( 'type' => 'sectionend', 'id' => 'gdpr_options'),
+
+        ) ); // End general GDPR settings
+    }
+
 	/**
 	 * Get misc settings array
 	 *
@@ -255,7 +294,7 @@ class PH_Settings_General extends PH_Settings_Page {
 	 */
 	public function get_general_misc_setting() {
 		    
-		return apply_filters( 'propertyhive_general_map_settings', array(
+		return apply_filters( 'propertyhive_general_misc_settings', array(
 
 			array( 'title' => __( 'Property Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'property_options' ),
 
@@ -327,6 +366,7 @@ class PH_Settings_General extends PH_Settings_Page {
             	case "modules": { $settings = $this->get_general_modules_setting(); break; }
                 case "international": { $settings = $this->get_general_international_setting(); break; }
                 case "map": { $settings = $this->get_general_map_setting(); break; }
+                case "gdpr": { $settings = $this->get_general_gdpr_setting(); break; }
                 case "misc": { $settings = $this->get_general_misc_setting(); break; }
                 default: { die("Unknown setting section"); }
             }
@@ -405,6 +445,13 @@ class PH_Settings_General extends PH_Settings_Page {
 					PH_Admin_Settings::save_fields( $settings );
 					break;
 				}
+                case 'gdpr':
+                {
+                    $settings = $this->get_general_gdpr_setting();
+
+                    PH_Admin_Settings::save_fields( $settings );
+                    break;
+                }
 				case 'misc':
 				{
 					$settings = $this->get_general_misc_setting();

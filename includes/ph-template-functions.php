@@ -793,6 +793,10 @@ function propertyhive_my_account_pages()
 
     $pages = apply_filters( 'propertyhive_my_account_pages', $pages );
 
+    /*$pages['delete'] = array(
+        'name' => __( 'Delete Account', 'propertyhive' )
+    );*/
+
     $pages['logout'] = array(
         'name' => __( 'Logout', 'propertyhive' ),
         'href' => home_url() . '?logout=1' // Logout URL
@@ -1158,5 +1162,19 @@ if ( ! function_exists( 'propertyhive_my_account_owner_viewings' ) ) {
         }
 
         ph_get_template( 'account/owner-viewings.php', array( 'past_viewings' => $past_viewings, 'upcoming_viewings' => $upcoming_viewings ) );
+    }
+}
+
+if ( ! function_exists( 'propertyhive_my_account_delete' ) ) {
+
+    /**
+     * Output the delete section within a users account
+     *
+     * @access public
+     * @return void
+     */
+    function propertyhive_my_account_delete() {
+
+        ph_get_template( 'account/delete.php' );
     }
 }
