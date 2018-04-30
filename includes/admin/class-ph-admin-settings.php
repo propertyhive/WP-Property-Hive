@@ -355,6 +355,31 @@ class PH_Admin_Settings {
 	                </tr><?php
 	            break;
 
+	            // WYSIWYG
+	            case 'wysiwyg':
+
+	            	$option_value 	= self::get_option( $value['id'], $value['default'] );
+
+	            	?><tr valign="top">
+						<th scope="row" class="titledesc">
+							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
+							<?php echo $tip; ?>
+						</th>
+	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    	
+	                    	<?php wp_editor( $option_value, esc_attr( $value['id'] ), array( 'media_buttons' => false, 'textarea_rows' => 3, 'teeny' => true ) ); ?>
+
+	                    	<?php echo '<br>' . $description; ?>
+
+	                        <?php /*<textarea
+	                        	name="<?php echo esc_attr( $value['id'] ); ?>"
+	                        	id="<?php echo esc_attr( $value['id'] ); ?>"
+	                        	<?php echo implode( ' ', $custom_attributes ); ?>
+	                        	><?php echo esc_textarea( $option_value );  ?></textarea>*/ ?>
+	                    </td>
+	                </tr><?php
+	            break;
+
 	            // Select boxes
 	            case 'select' :
 	            case 'multiselect' :
@@ -643,6 +668,7 @@ class PH_Admin_Settings {
 		    	break;
 
 		    	case "textarea" :
+		    	case "wysiwyg" :
 
 			    	if ( isset( $_POST[$value['id']] ) ) {
 			    		$option_value = wp_kses_post( trim( stripslashes( $_POST[ $value['id'] ] ) ) );
