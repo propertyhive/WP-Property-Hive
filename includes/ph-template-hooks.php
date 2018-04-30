@@ -153,6 +153,7 @@ add_action( 'propertyhive_my_account_section_requirements', 'propertyhive_my_acc
 add_action( 'propertyhive_my_account_section_applicant_viewings', 'propertyhive_my_account_applicant_viewings', 10 );
 add_action( 'propertyhive_my_account_section_owner_properties', 'propertyhive_my_account_owner_properties', 10 );
 add_action( 'propertyhive_my_account_section_owner_viewings', 'propertyhive_my_account_owner_viewings', 10 );
+add_action( 'propertyhive_my_account_section_delete', 'propertyhive_my_account_delete', 10 );
 
 /**
  * Footer
