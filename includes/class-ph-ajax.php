@@ -254,6 +254,21 @@ class PH_AJAX {
         
         $form_controls = array_merge( $form_controls, $form_controls_2 );
 
+        // need to improve this as duplicated in ph-shortcodes.php
+        if ( get_option( 'propertyhive_applicant_registration_form_disclaimer', '' ) != '' )
+        {
+            $disclaimer = get_option( 'propertyhive_applicant_registration_form_disclaimer', '' );
+
+            $form_controls['disclaimer'] = array(
+                'type' => 'checkbox',
+                'label' => $disclaimer,
+                'label_style' => 'width:100%;',
+                'required' => true
+            );
+        }
+
+        $form_controls = apply_filters( 'propertyhive_applicant_registration_form_fields', $form_controls );
+
         foreach ( $form_controls as $key => $control )
         {
             if ( isset( $control ) && isset( $control['required'] ) && $control['required'] === TRUE )
