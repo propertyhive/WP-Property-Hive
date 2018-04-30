@@ -25,6 +25,7 @@ class PH_Yoast_API {
 		add_filter( 'wpseo_sitemap_exclude_taxonomy', array( __CLASS__, 'sitemap_exclude_taxonomy' ), 10, 2 );
 		add_filter( 'wpseo_metabox_prio', array( __CLASS__, 'yoast_meta_box_to_bottom') );
 		add_filter( 'manage_edit-property_columns', array( __CLASS__, 'yoast_remove_columns') );
+		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'sitemap_exclude_off_market') );
 	}
 
 	public static function sitemap_exclude_taxonomy( $value, $taxonomy ) {
@@ -57,6 +58,20 @@ class PH_Yoast_API {
 		unset( $columns['wpseo-metadesc'] );
 		unset( $columns['wpseo-focuskw'] );
 		return $columns;
+	}
+
+	public static function sitemap_exclude_off_market() {
+        return get_posts(array(
+            'fields'            => 'ids',
+            'posts_per_page'    => -1,
+            'post_type'         => 'property',
+            'meta_query'        => array(
+                array(
+                    'key'   => '_on_market',
+                    'value' => '',
+                )
+            )
+       ));
 	}
 
 }
