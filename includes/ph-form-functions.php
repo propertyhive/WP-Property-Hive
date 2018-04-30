@@ -297,6 +297,18 @@ function ph_get_property_enquiry_form_fields()
         'label' => __( 'Message', 'propertyhive' ),
         'required' => true
     );
+
+    if ( get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) != '' )
+    {
+        $disclaimer = get_option( 'propertyhive_property_enquiry_form_disclaimer', '' );
+
+        $fields['disclaimer'] = array(
+            'type' => 'checkbox',
+            'label' => $disclaimer,
+            'label_style' => 'width:100%;',
+            'required' => true
+        );
+    }
     
     return $fields;
 }
