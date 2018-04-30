@@ -752,7 +752,7 @@ function ph_form_field( $key, $field )
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
-            
+            $field['label_style'] = isset( $field['label_style'] ) ? $field['label_style'] : '';
             $field['value'] = isset( $field['value'] ) ? $field['value'] : 'yes';
             $field['checked'] = isset( $field['checked'] ) ? $field['checked'] : false;
             if ( isset( $_GET[$key] ) && $_GET[$key] == $field['value'] )
@@ -762,7 +762,7 @@ function ph_form_field( $key, $field )
             
             $output .= $field['before'];
             
-            $output .= '<label><input 
+            $output .= '<label style="' . esc_attr( $field['label_style'] ) . '"><input 
                 type="' . esc_attr( $field['type'] ) . '" 
                 name="' . esc_attr( $key ) . '" 
                 value="' . esc_attr( $field['value'] ) . '"
