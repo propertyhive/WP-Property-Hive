@@ -294,7 +294,7 @@ class PH_Settings_General extends PH_Settings_Page {
 	 */
 	public function get_general_misc_setting() {
 		    
-		return apply_filters( 'propertyhive_general_map_settings', array(
+		return apply_filters( 'propertyhive_general_misc_settings', array(
 
 			array( 'title' => __( 'Property Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'property_options' ),
 
