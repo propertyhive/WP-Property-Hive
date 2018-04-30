@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 4.9.4
-Stable tag: 1.4.17
+Tested up to: 4.9.5
+Stable tag: 1.4.18
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,14 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.18 =
+* Added support for GDPR in new settings area, including option to specify if properties enquiries are stored or not, as well as ability to add disclaimer text to forms
+* Add notice to admin screens now if no page has been selected as the 'Search Results' page
+* Exclude off market properties from Yoast XML sitemap
+* Use marker icon from Map Search add on on property map shortcode if add on being used and icon has been uploaded
+* Cater for multiple [property_map] shortcodes being used on the same page by allowing a unique ID to be passed into it, for example [property_map id="map_X"]
+* Declared compatibility for WordPress 4.9.5
 
 = 1.4.17 =
 * New template hook 'propertyhive_template_not_on_market' to display a message when off market property is being viewed
