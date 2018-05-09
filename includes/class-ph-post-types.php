@@ -287,6 +287,22 @@ class PH_Post_types {
         register_post_type( "office",
             apply_filters( 'propertyhive_register_post_type_office',
                 array(
+                    'labels' => array(
+                            'name'                  => __( 'Offices', 'propertyhive' ),
+                            'singular_name'         => __( 'Office', 'propertyhive' ),
+                            'menu_name'             => _x( 'Offices', 'Admin menu name', 'propertyhive' ),
+                            'add_new'               => __( 'Add Office', 'propertyhive' ),
+                            'add_new_item'          => __( 'Add New Office', 'propertyhive' ),
+                            'edit'                  => __( 'Edit', 'propertyhive' ),
+                            'edit_item'             => __( 'Edit Office', 'propertyhive' ),
+                            'new_item'              => __( 'New Office', 'propertyhive' ),
+                            'view'                  => __( 'View Office', 'propertyhive' ),
+                            'view_item'             => __( 'View Office', 'propertyhive' ),
+                            'search_items'          => __( 'Search Offices', 'propertyhive' ),
+                            'not_found'             => __( 'No offices found', 'propertyhive' ),
+                            'not_found_in_trash'    => __( 'No offices found in trash', 'propertyhive' ),
+                            'parent'                => __( 'Parent Office', 'propertyhive' )
+                        ),
                     'public'                => true,
                     'show_ui'               => false,
                     'capability_type'       => 'post',
