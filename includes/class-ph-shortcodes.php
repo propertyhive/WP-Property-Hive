@@ -119,6 +119,8 @@ class PH_Shortcodes {
 			'property_type_id'	=> '',
 			'location_id'		=> '',
 			'office_id'			=> '',
+			'commercial_for_sale' => '',
+			'commercial_to_rent' => '',
 			'posts_per_page'	=> 10
 		), $atts, 'properties' );
 
@@ -224,6 +226,24 @@ class PH_Shortcodes {
 				'value' => explode(",", $atts['office_id']),
 				'compare' => 'IN',
 			);
+		}
+
+		if ( isset($atts['commercial_for_sale']) && $atts['commercial_for_sale'] != '' )
+		{
+			$meta_query[] = array(
+                'key'     => '_for_sale',
+                'value'   => 'yes',
+                'compare' => '=',
+            );
+		}
+
+		if ( isset($atts['commercial_to_rent']) && $atts['commercial_to_rent'] != '' )
+		{
+			$meta_query[] = array(
+                'key'     => '_to_rent',
+                'value'   => 'yes',
+                'compare' => '=',
+            );
 		}
 
 		$tax_query = array();
