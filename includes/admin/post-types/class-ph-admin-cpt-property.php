@@ -349,6 +349,12 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
             	{
             		echo '<br>' . __( 'Featured', 'propertyhive' );
             	}
+
+            	$marketing_flags = $the_property->marketing_flag;
+            	if ( $marketing_flags != '' )
+            	{
+            		echo '<br>' . implode( "<br>", explode( ",", $marketing_flags ) );
+            	}
                 
 				break;
             case 'owner' :
