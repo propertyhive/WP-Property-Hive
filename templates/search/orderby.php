@@ -16,12 +16,28 @@ if ( $wp_query->found_posts < 2 )
 ?>
 <form class="propertyhive-ordering" method="get">
 	<?php
-		$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
-			'price-desc' => __( 'Default sorting', 'propertyhive' ),
-			'date'       => __( 'Sort by date added', 'propertyhive' ),
-			'price-asc'      => __( 'Sort by price: low to high', 'propertyhive' ),
-			'price-desc' => __( 'Sort by price: high to low', 'propertyhive' )
-		) );
+
+		if (
+			( isset($_REQUEST['department']) && $_REQUEST['department'] != 'commercial' ) ||
+			( !isset($_REQUEST['department']) && get_option( 'propertyhive_primary_department' ) != 'commercial' )
+		)
+		{
+			$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
+				'price-desc' => __( 'Default sorting', 'propertyhive' ),
+				'date'       => __( 'Sort by date added', 'propertyhive' ),
+				'price-asc'      => __( 'Sort by price: low to high', 'propertyhive' ),
+				'price-desc' => __( 'Sort by price: high to low', 'propertyhive' )
+			) );
+		}
+		else
+		{
+			$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
+				'floor_area-desc' => __( 'Default sorting', 'propertyhive' ),
+				'date'       => __( 'Sort by date added', 'propertyhive' ),
+				'floor_area-asc'      => __( 'Sort by floor area: low to high', 'propertyhive' ),
+				'floor_area-desc' => __( 'Sort by floor area: high to low', 'propertyhive' )
+			) );
+		}
 
         if ( !empty($results_orderby) )
         {
