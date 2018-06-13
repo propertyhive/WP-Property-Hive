@@ -119,6 +119,7 @@ class PH_Shortcodes {
 			'property_type_id'	=> '',
 			'location_id'		=> '',
 			'office_id'			=> '',
+			'negotiator_id'		=> '',
 			'commercial_for_sale' => '',
 			'commercial_to_rent' => '',
 			'posts_per_page'	=> 10
@@ -224,6 +225,15 @@ class PH_Shortcodes {
 			$meta_query[] = array(
 				'key' => '_office_id',
 				'value' => explode(",", $atts['office_id']),
+				'compare' => 'IN',
+			);
+		}
+
+		if ( isset($atts['negotiator_id']) && $atts['negotiator_id'] != '' )
+		{
+			$meta_query[] = array(
+				'key' => '_negotiator_id',
+				'value' => explode(",", $atts['negotiator_id']),
 				'compare' => 'IN',
 			);
 		}
