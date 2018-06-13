@@ -184,6 +184,7 @@ class PH_Admin_Post_Types {
         $output = '';
         
         $output .= $this->property_department_filter();
+        $output .= $this->property_marketing_filter();
         $output .= $this->property_availability_filter();
         $output .= $this->property_location_filter();
         $output .= $this->property_office_filter();
@@ -379,7 +380,7 @@ class PH_Admin_Post_Types {
     public function property_availability_filter() {
         global $wp_query, $post;
         
-        // Department filtering
+        // Availability filtering
         $output  = '<select name="_availability_id" id="dropdown_property_availability_id">';
 
         $options = array( );
@@ -412,6 +413,53 @@ class PH_Admin_Post_Types {
             }
         }
         
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show a property marketing filter box
+     */
+    public function property_marketing_filter() {
+        global $wp_query, $post;
+        
+        // Availability filtering
+        $output  = '<select name="_marketing" id="dropdown_property_marketing">';
+
+        $output .= '<option value="">' . __( 'All Marketing Statuses', 'propertyhive' ) . '</option>';
+
+        $options = array(
+            'on_market' => __( 'On Market Only', 'propertyhive' ),
+            'featured' => __( 'Featured Only', 'propertyhive' ),
+        );
+
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'marketing_flag', $args );
+        
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            {
+                $options['marketing_flag_' . $term->term_id] = __( 'Has Marketing Flag', 'propertyhive') . ' - ' . $term->name;
+            }
+        }
+
+        $options = apply_filters( 'propertyhive_property_filter_marketing_options', $options );
+
+        foreach ( $options as $key => $value )
+        {
+            $output .= '<option value="' . $key . '"';
+            if ( isset( $_GET['_marketing'] ) && ! empty( $_GET['_marketing'] ) )
+            {
+                $output .= selected( $key, $_GET['_marketing'], false );
+            }
+            $output .= '>' . $value . '</option>';
+        }
+
         $output .= '</select>';
 
         return $output;
@@ -587,6 +635,25 @@ class PH_Admin_Post_Types {
                     'terms' => ( (is_array($_GET['_availability_id'])) ? $_GET['_availability_id'] : array( $_GET['_availability_id'] ) )
                 );
             }
+            if ( ! empty( $_GET['_marketing'] ) && $_GET['_marketing'] == 'on_market' ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_on_market',
+                    'value' => 'yes',
+                );
+            }
+            if ( ! empty( $_GET['_marketing'] ) && $_GET['_marketing'] == 'featured' ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_featured',
+                    'value' => 'yes',
+                );
+            }
+            if ( ! empty( $_GET['_marketing'] ) && substr($_GET['_marketing'], 0, 15) == 'marketing_flag_' ) {
+                $marketing_flag_id = sanitize_text_field( str_replace("marketing_flag_", "", $_GET['_marketing']) );
+                $vars['tax_query'][] = array(
+                    'taxonomy'  => 'marketing_flag',
+                    'terms' => ( (is_array($marketing_flag_id)) ? $marketing_flag_id : array( $marketing_flag_id ) )
+                );
+            }
         }
         elseif ( 'contact' === $typenow ) 
         {
@@ -614,6 +681,8 @@ class PH_Admin_Post_Types {
                 $vars['meta_value'] = sanitize_text_field( $_GET['_source'] );
             }
         }
+
+        $vars = apply_filters( 'propertyhive_property_filter_query', $vars, $typenow );
 
         return $vars;
     }
