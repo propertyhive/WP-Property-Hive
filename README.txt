@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 4.9.5
-Stable tag: 1.4.18
+Tested up to: 4.9.6
+Stable tag: 1.4.19
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,17 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.19 =
+* New 'Marketing Status' filter on admin property screen allowing filtering by 'On Market Only', 'Featured Only', by marketing flag, and by which portals the properties are active on (i.e. Show only properties active on Rightmove)
+* Display chosen marketing flags on main admin property list
+* Fixed the 'Order By' options shown in orderby.php template when searching for commercial properties on frontend
+* Added support for 'negotiator_id' attribute in [properties] shortcode
+* Added support for querying 'negotiator_id' should it be passed in the query string to main results page
+* Added support for 'commercial_for_sale' and 'commercial_for_rent' attributes in [properties] shortcode
+* Add labels to all registered taxonomies should a third party plugin use them
+* Add labels to 'office' post type should a third party plugin use it
+* Declared compatibility for WordPress 4.9.6
 
 = 1.4.18 =
 * Added support for GDPR in new settings area, including option to specify if properties enquiries are stored or not, as well as ability to add disclaimer text to forms
