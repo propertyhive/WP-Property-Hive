@@ -41,6 +41,7 @@ class PH_Post_types {
         register_taxonomy( 'availability',
             'property',
             array(
+                'label'                 => __( 'Availabilities', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -53,6 +54,7 @@ class PH_Post_types {
 		register_taxonomy( 'property_type',
 	        'property',
 	        array(
+                'label'                 => __( 'Property Types', 'propertyhive' ),
 	            'hierarchical' 			=> true,
 	            'show_ui' 				=> false,
 	            'show_in_nav_menus' 	=> false,
@@ -65,6 +67,7 @@ class PH_Post_types {
         register_taxonomy( 'commercial_property_type',
             'property',
             array(
+                'label'                 => __( 'Commercial Property Types', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -77,6 +80,7 @@ class PH_Post_types {
         register_taxonomy( 'location',
             'property',
             array(
+                'label'                 => __( 'Locations', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -89,6 +93,7 @@ class PH_Post_types {
         register_taxonomy( 'parking',
             'property',
             array(
+                'label'                 => __( 'Parking', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -101,6 +106,7 @@ class PH_Post_types {
         register_taxonomy( 'outside_space',
             'property',
             array(
+                'label'                 => __( 'Outside Spaces', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -113,6 +119,7 @@ class PH_Post_types {
         register_taxonomy( 'price_qualifier',
             'property',
             array(
+                'label'                 => __( 'Price Qualifiers', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -125,6 +132,7 @@ class PH_Post_types {
         register_taxonomy( 'tenure',
             'property',
             array(
+                'label'                 => __( 'Tenures', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -137,6 +145,7 @@ class PH_Post_types {
         register_taxonomy( 'commercial_tenure',
             'property',
             array(
+                'label'                 => __( 'Commercial Tenures', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -149,6 +158,7 @@ class PH_Post_types {
         register_taxonomy( 'sale_by',
             'property',
             array(
+                'label'                 => __( 'Sale By', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -161,6 +171,7 @@ class PH_Post_types {
         register_taxonomy( 'furnished',
             'property',
             array(
+                'label'                 => __( 'Furnished', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -173,6 +184,7 @@ class PH_Post_types {
         register_taxonomy( 'marketing_flag',
             'property',
             array(
+                'label'                 => __( 'Marketing Flags', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
@@ -185,6 +197,7 @@ class PH_Post_types {
         register_taxonomy( 'property_feature',
             'property',
             array(
+                'label'                 => __( 'Property Features', 'propertyhive' ),
                 'hierarchical'          => true,
                 'show_ui'               => false,
                 'show_in_nav_menus'     => false,
