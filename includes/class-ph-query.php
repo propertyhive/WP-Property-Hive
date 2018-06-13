@@ -607,6 +607,7 @@ class PH_Query {
         $meta_query[] = $this->floor_area_range_meta_query();
         $meta_query[] = $this->commercial_for_sale_meta_query();
         $meta_query[] = $this->commercial_to_rent_meta_query();
+        $meta_query[] = $this->negotiator_meta_query();
         $meta_query[] = $this->office_meta_query();
         
 		return array_filter( apply_filters( 'propertyhive_property_query_meta_query', $meta_query, $this ) );
@@ -1355,6 +1356,28 @@ class PH_Query {
         
         return $meta_query;
     }
+
+    /**
+	 * Returns a meta query to handle property negotiator
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function negotiator_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( isset( $_REQUEST['negotiator_id'] ) && $_REQUEST['negotiator_id'] != '' )
+        {
+    		$meta_query = array(
+    		    'key'     => '_negotiator_id',
+    		    'value'   => $_REQUEST['negotiator_id'],
+    		    'compare' => '='
+    		);
+		}
+
+		return $meta_query;
+	}
 
     /**
 	 * Returns a meta query to handle property office
