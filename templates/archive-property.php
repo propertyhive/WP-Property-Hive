@@ -40,7 +40,7 @@ get_header( 'propertyhive' ); global $wpdb; ?>
 
         <?php 
             // Output results. Filter allows us to not display the results whilst maintaining the main query. True by default
-            // Used primarily by the Map Search add on - http://wp-property-hive.com/addons/map-search/
+            // Used primarily by the Map Search add on - https://wp-property-hive.com/addons/map-search/
             if ( apply_filters( 'propertyhive_show_results', true ) ) : 
         ?>
         

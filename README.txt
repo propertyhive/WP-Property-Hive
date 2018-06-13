@@ -31,11 +31,11 @@ Want to add Draw-A-Search functionality to your website? There's an add-on for t
 
 Our add-ons are priced individually from just £14.99 meaning you only pay for what you use.
 
-You can [view all of our add-ons](http://wp-property-hive.com/add-ons/ "Property Hive Add-Ons") on our website.
+You can [view all of our add-ons](https://wp-property-hive.com/add-ons/ "Property Hive Add-Ons") on our website.
 
 **Works with any new or existing theme**
 
-Property Hive isn't a theme. It's a platform allowing you to integrate property search into any website, new or existing. For more details on supported themes [click here](http://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/) or get started with our very own free open-source theme [Honeycomb](https://wp-property-hive.com/property-hive-website-themes/honeycomb//).
+Property Hive isn't a theme. It's a platform allowing you to integrate property search into any website, new or existing. For more details on supported themes [click here](https://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/) or get started with our very own free open-source theme [Honeycomb](https://wp-property-hive.com/property-hive-website-themes/honeycomb//).
 
 **Integrates with the major software providers and property portals**
 
@@ -243,7 +243,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Added abiltiy to send auto-responder to users making enquiries. Includes message and three similar properties. Configurable under 'Property Hive > Settings > Emails'
 
 = 1.3.12 =
-* Updated a couple of default form labels to make them shorter. Done in conjunction with our new free and open-source [Honeycomb theme](http://wp-property-hive.com/honeycomb/ "Honeycomb theme")
+* Updated a couple of default form labels to make them shorter. Done in conjunction with our new free and open-source [Honeycomb theme](https://wp-property-hive.com/honeycomb/ "Honeycomb theme")
 * Added number formatting to property result count so totals over 1,000 are formatted with commas
 * Declared compatibility for WordPress 4.7.3
 
@@ -457,10 +457,10 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 = 1.0.25 =
 * Updated single property gallery to use wp_get_attachment_image() to enable RWD images (thanks to CHEWX - https://github.com/CHEWX)
 * Move shortcode and form functions/classes to be accessible from anywhere. Was causing some themes to break as the admin area tried to render shortcodes
-* Fix to the single property actions filter in how it passed arguments. Required for the new Printable Brochures add on - http://wp-property-hive.com/addons/printable-brochures/
+* Fix to the single property actions filter in how it passed arguments. Required for the new Printable Brochures add on - https://wp-property-hive.com/addons/printable-brochures/
 
 = 1.0.24 =
-* Updates to support compatibility with the new Map Search add on - http://wp-property-hive.com/addons/map-search
+* Updates to support compatibility with the new Map Search add on - https://wp-property-hive.com/addons/map-search
 * New filter added to archive-property.php template allowing main results to be turned off
 * Added $property as a global variable in the content-single-property.php template to make theming easier
 * Updated orderby.php template to not show the dropdown if there are no options

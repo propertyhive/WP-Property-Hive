@@ -150,7 +150,7 @@ class PH_Settings_Add_Ons extends PH_Settings_Page {
             {
                 echo '<p>'. __('Unable to retrieve list of add-ons. Please visit the Property Hive add ons page to view a full list of add ons available.', 'propertyhive') . '</p>';
                 
-                echo '<br><p><a href="http://wp-property-hive.com/add-ons/" class="button button-primary">'. __('Browse All Add Ons', 'propertyhive') . '</a></p>';
+                echo '<br><p><a href="https://wp-property-hive.com/add-ons/" class="button button-primary">'. __('Browse All Add Ons', 'propertyhive') . '</a></p>';
             }
         ?>
         
