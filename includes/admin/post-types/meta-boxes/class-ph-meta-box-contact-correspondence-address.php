@@ -129,6 +129,8 @@ class PH_Meta_Box_Contact_Correspondence_Address {
         update_post_meta( $post_id, '_address_four', $_POST['_address_four'] );
         update_post_meta( $post_id, '_address_postcode', $_POST['_address_postcode'] );
         update_post_meta( $post_id, '_address_country', $_POST['_address_country'] );
+
+        do_action( 'propertyhive_save_contact_correspondence_address', $post_id );
     }
 
 }
