@@ -196,7 +196,7 @@ class PH_Property {
         
         $return = false;
         
-        if (isset($photos) && is_array($photos) && !empty($photos))
+        if (isset($photos) && is_array($photos) && !empty($photos) && isset($photos[0]))
         {
             $image_attributes = wp_get_attachment_image_src( $photos[0], $size );
             if( $image_attributes ) 
