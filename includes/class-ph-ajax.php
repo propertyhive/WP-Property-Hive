@@ -1241,12 +1241,19 @@ class PH_AJAX {
             
             unset($form_controls['action']);
             unset($_POST['action']);
-            unset($form_controls['property_id']); // Unset so the fields dosn't get shown in the enquiry details
+            unset($form_controls['property_id']); // Unset so the field doesn't get shown in the enquiry details
             
+            $form_controls = apply_filters( 'propertyhive_property_enquiry_body_form_fields', $form_controls );
+
             foreach ($form_controls as $key => $control)
             {
+                if ( isset($control['type']) && $control['type'] == 'html' ) { continue; }
+
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
-                $message .= $label . ": " . $_POST[$key] . "\n";
+                $label = ( isset($control['email_label']) ) ? $control['email_label'] : $label;
+                $value = ( isset($_POST[$key]) ) ? $_POST[$key] : '';
+
+                $message .= strip_tags($label) . ": " . strip_tags($value) . "\n";
             }
             
             $from_email_address = get_option('propertyhive_email_from_address', '');
