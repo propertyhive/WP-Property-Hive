@@ -5,7 +5,7 @@
  * Description: Estate Agency Property Software Plugin for WordPress
  * Version: 1.4.18
  * Author: PropertyHive
- * Author URI: http://wp-property-hive.com
+ * Author URI: https://wp-property-hive.com
  * Requires at least: 3.8
  * Tested up to: 4.9.5
  * 
@@ -137,8 +137,8 @@ if ( ! class_exists( 'PropertyHive' ) )
         {
             return array_merge( array(
                 '<a href="' . admin_url( 'admin.php?page=ph-settings' ) . '">' . __( 'Settings', 'propertyhive' ) . '</a>',
-                '<a href="' . esc_url( apply_filters( 'propertyhive_url', 'http://wp-property-hive.com/', 'propertyhive' ) ) . '" target="_blank">' . __( 'Website', 'propertyhive' ) . '</a>',
-                '<a href="' . esc_url( apply_filters( 'propertyhive_addons_url', 'http://wp-property-hive.com/add-ons' ) ) . '" target="_blank">' . __( 'Add Ons', 'propertyhive' ) . '</a>',
+                '<a href="' . esc_url( apply_filters( 'propertyhive_url', 'https://wp-property-hive.com/', 'propertyhive' ) ) . '" target="_blank">' . __( 'Website', 'propertyhive' ) . '</a>',
+                '<a href="' . esc_url( apply_filters( 'propertyhive_addons_url', 'https://wp-property-hive.com/add-ons' ) ) . '" target="_blank">' . __( 'Add Ons', 'propertyhive' ) . '</a>',
             ), $links );
         }
     
