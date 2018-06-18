@@ -116,4 +116,59 @@ jQuery( function($){
             $('a.batch-delete').attr('disabled', 'disabled');
         }
     });
+
+    jQuery('select[name=\'propertyhive_countries[]\']').change(function()
+    {
+        fill_search_form_currency_options();
+    });
+
+    fill_search_form_currency_options();
 });
+
+function fill_search_form_currency_options()
+{
+    var selected_countries = jQuery('select[name=\'propertyhive_countries[]\']').val();
+    var selected_currency = jQuery('#propertyhive_search_form_currency').val();
+
+    var new_currency_options = new Array();
+
+    for ( var i in selected_countries)
+    {
+        var country = countries[selected_countries[i]];
+
+        new_currency_options.push( country.currency_code );
+    }
+
+    jQuery('#propertyhive_search_form_currency').find('option').remove();
+    if ( new_currency_options.length > 0 )
+    {
+        new_currency_options = jQuery.unique( new_currency_options );
+
+        /*new_currency_options.sort(function(a, b) {
+            var a1 = a.new_currency_options, b1 = b.new_currency_options;
+            if(a1 == b1) return 0;
+            return a1 > b1 ? 1 : -1;
+        });*/
+
+        for ( var i in new_currency_options)
+        {
+            jQuery('#propertyhive_search_form_currency').append('<option value="' + new_currency_options[i] + '">' + new_currency_options[i] + '</option>');
+        }
+        jQuery('#propertyhive_search_form_currency').val(selected_currency);
+
+        if ( new_currency_options.length > 1 )
+        {
+            jQuery('#propertyhive_search_form_currency').parent().parent().show();
+        }
+        else
+        {
+            jQuery('#propertyhive_search_form_currency').parent().parent().hide();
+        }
+
+        if ( jQuery("#propertyhive_search_form_currency :selected").length == 0 )
+        {
+            jQuery("#propertyhive_search_form_currency").val( jQuery("#propertyhive_search_form_currency option:first").val() );
+
+        }
+    }
+}
