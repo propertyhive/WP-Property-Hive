@@ -186,7 +186,7 @@ class PH_Settings_General extends PH_Settings_Page {
 	 */
 	public function get_general_international_setting() {
 
-		return apply_filters( 'propertyhive_general_international_settings', array(
+		$settings = array(
 
 			array( 'title' => __( 'International Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'international_options' ),
 
@@ -219,11 +219,46 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'    => 'text',
                 'default' => '.',
                 'css'       => 'width:50px;',
-            ),
+            )
+        );
 
-			array( 'type' => 'sectionend', 'id' => 'international_options'),
+        $ph_countries = new PH_Countries();
+        $ph_countries = $ph_countries->countries;
 
-		) ); // End general international settings
+        $currencies = array();
+        $countries = array();
+        if ( !empty($ph_countries) )
+        {
+            foreach ( $ph_countries as $country_code => $country )
+            {
+                $currencies[$country['currency_code']] = $country['currency_code'];
+                $countries[$country_code] = $country;
+            }
+        }
+        $currencies = array_unique($currencies);
+        ksort($currencies);
+
+        $settings[] =  array(
+            'title'   => __( 'Currency Used In Search Forms', 'propertyhive' ),
+            'id'      => 'propertyhive_search_form_currency',
+            'type'    => 'select',
+            'options' => $currencies,
+            'default' => 'GBP',
+            'desc'    => __( 'Please note that this doesn\'t change the currency symbol shown in price dropdowns within search forms. The easiest way to achieve that is to use our free <a href="https://wp-property-hive.com/addons/template-assistant/" target="_blank">Template Assistant add on</a>.', 'propertyhive' ),
+        );
+
+		$settings[] = array( 'type' => 'sectionend', 'id' => 'international_options');
+
+        $settings[] = array(
+            'type' => 'html',
+            'html' => '<script>
+
+                var countries = '. json_encode( $countries ) . ';
+
+            </script>'
+        );
+
+        return apply_filters( 'propertyhive_general_international_settings', $settings );
 	}
 
 	/**
@@ -433,6 +468,8 @@ class PH_Settings_General extends PH_Settings_Page {
 
                     update_option( 'propertyhive_price_thousand_separator', $_POST['propertyhive_price_thousand_separator'] );
                     update_option( 'propertyhive_price_decimal_separator', $_POST['propertyhive_price_decimal_separator'] );
+
+                    update_option( 'propertyhive_search_form_currency', $_POST['propertyhive_search_form_currency'] );
 
 					do_action( 'propertyhive_update_currency_exchange_rates' );
 
