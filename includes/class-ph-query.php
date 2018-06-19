@@ -556,11 +556,19 @@ class PH_Query {
 
 		$date_query = array();
 
+		if ( isset( $_REQUEST['added_from'] ) && $_REQUEST['added_from'] != '' )
+        {
+            $date_query = array(
+                'column'  => 'post_date_gmt',
+                'after'   => sanitize_text_field( $_REQUEST['added_from'] ) 
+            );
+        }
+
 		if ( isset( $_REQUEST['added_from_hours'] ) && $_REQUEST['added_from_hours'] != '' )
         {
             $date_query = array(
                 'column'  => 'post_date_gmt',
-                'after'   => sanitize_text_field( $_REQUEST['added_from_hours'] . ' hours ago' )
+                'after'   => sanitize_text_field( $_REQUEST['added_from_hours'] ) . ' hours ago'
             );
         }
 
