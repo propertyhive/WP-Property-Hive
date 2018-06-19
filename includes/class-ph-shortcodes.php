@@ -111,6 +111,8 @@ class PH_Shortcodes {
 			'meta_key' 			=> '_price_actual',
 			'ids'     			=> '',
 			'department'		=> '', // residential-sales / residential-lettings / commercial
+			'minimum_price'		=> '',
+			'maximum_price'		=> '',
 			'bedrooms'			=> '',
 			'address_keyword'	=> '',
 			'availability_id'	=> '',
@@ -149,6 +151,48 @@ class PH_Shortcodes {
 				'compare' => '='
 			);
 		}
+
+		if ( isset($atts['department']) && $atts['department'] == 'residential-sales' && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
+        {
+        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+
+        	$minimum_price = $atts['minimum_price'];
+        	if ( $search_form_currency != 'GBP' )
+        	{
+        		// Convert $atts['minimum_price'] to GBP
+        		$ph_countries = new PH_Countries();
+
+        		$minimum_price = $ph_countries->convert_price_to_gbp( $minimum_price, $search_form_currency );
+        	}
+
+            $meta_query[] = array(
+                'key'     => '_price_actual',
+                'value'   => sanitize_text_field( floor( $minimum_price ) ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+
+        if ( isset($atts['department']) && $atts['department'] == 'residential-sales' && isset($atts['maximum_price']) && $atts['maximum_price'] != '' )
+        {
+        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+
+        	$maximum_price = $atts['maximum_price'];
+        	if ( $search_form_currency != 'GBP' )
+        	{
+        		// Convert $atts['maximum_price'] to GBP
+        		$ph_countries = new PH_Countries();
+
+        		$maximum_price = $ph_countries->convert_price_to_gbp( $maximum_price, $search_form_currency );
+        	}
+
+            $meta_query[] = array(
+                'key'     => '_price_actual',
+                'value'   => sanitize_text_field( ceil( $maximum_price ) ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
+            );
+        }
 
 		if ( isset($atts['address_keyword']) && $atts['address_keyword'] != '' )
 		{
