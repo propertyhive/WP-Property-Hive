@@ -510,19 +510,17 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
         $floorplan_ids = $property->get_floorplan_attachment_ids();
         if ( !empty( $floorplan_ids ) )
         {
-            $floorplans_urls = array();
             foreach ($floorplan_ids as $floorplan_id)
             {
-                $floorplans_urls[] = wp_get_attachment_url( $floorplan_id );
-            }
-            $actions[] = array(
-                'href' => '',
-                'label' => __( 'Floorplans', 'propertyhive' ),
-                'class' => 'action-floorplans',
-                'attributes' => array(
-                    'data-floorplan-urls' => implode("|", $floorplans_urls)
-                )
-            );
+                $actions[] = array(
+                    'href' => wp_get_attachment_url( $floorplan_id ),
+                    'label' => __( 'Floorplan', 'propertyhive' ),
+                    'class' => 'action-floorplans',
+                    'attributes' => array(
+                        'data-fancybox' => 'floorplans'
+                    )
+                );
+        }
         }
 
         $brochure_ids = $property->get_brochure_attachment_ids();
@@ -546,13 +544,16 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
         {
             foreach ($epc_ids as $epc_id)
             {
+                $attributes = array('target' => '_blank');
+                if ( wp_attachment_is_image($epc_id) )
+                {
+                    $attributes = array('data-fancybox' => 'epcs');
+                }
                 $actions[] = array(
                     'href' => wp_get_attachment_url( $epc_id ),
                     'label' => __( 'View EPC', 'propertyhive' ),
                     'class' => 'action-epc',
-                    'attributes' => array(
-                        'target' => '_blank'
-                    )
+                    'attributes' => $attributes
                 );
             }
         }
