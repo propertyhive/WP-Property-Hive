@@ -233,17 +233,15 @@ class PH_Admin {
             {
                 if ( $propertyhive_review_prompt_due_timestamp < time() )
                 {
-                    echo "<div class=\"notice notice-info is-dismissible\" id=\"ph_leave_review_admin_notice\">
+                    echo "<div class=\"notice notice-info\" id=\"ph_notice_leave_review\">
                         <p>
                             " . __( '<strong>Finding Property Hive useful?</strong> Please take a minute to <a href="https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post" target="_blank">leave us a ★★★★★ review</a>', 'propertyhive' ) . "
                         </p>
                         <p>
                             <a href=\"https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post\" target=\"_blank\" class=\"button-primary\">Leave a Review</a>
-                            <a href=\"\" class=\"button\">No Thanks</a>
+                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_leave_review\">No Thanks</a>
                         </p>
                     </div>";
-
-                    update_option( 'propertyhive_review_prompt_due_timestamp', 0 );
                 }
             }
 

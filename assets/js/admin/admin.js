@@ -21,6 +21,19 @@ jQuery( function ( $ ) {
 	// Tooltips
 	$( document.body ).trigger( 'init_tooltips' );
 
+	$( '#ph_dismiss_notice_leave_review' ).click(function(e)
+	{
+		e.preventDefault();
+		
+		var data = {
+			'action': 'propertyhive_dismiss_notice_leave_review'
+		};
+
+		$.post( ajaxurl, data, function(response) {
+			$( '#ph_notice_leave_review' ).fadeOut();
+		});
+	});
+
 	$( '#ph_dismiss_notice_missing_search_results' ).click(function(e)
 	{
 		e.preventDefault();
