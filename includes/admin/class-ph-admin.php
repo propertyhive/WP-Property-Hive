@@ -190,6 +190,9 @@ class PH_Admin {
             case 'dashboard' :
                 include( 'class-ph-admin-dashboard.php' );
             break;
+            case 'plugins' :
+                include( 'class-ph-admin-plugin-updates.php' );
+            break;
         }
     }
 
