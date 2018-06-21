@@ -272,6 +272,13 @@ class PH_Admin {
             if ( 
                 get_option('propertyhive_google_maps_api_key', '') == '' && 
                 !isset($_POST['propertyhive_google_maps_api_key']) &&
+                (
+                    !isset($_GET['page'])
+                    ||
+                    (
+                        isset($_GET['page']) && $_GET['page'] != 'ph-installed'
+                    )
+                ) &&
                 get_option( 'missing_google_maps_api_key_notice_dismissed', '' ) != 'yes'
             )
             {
