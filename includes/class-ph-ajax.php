@@ -83,6 +83,7 @@ class PH_AJAX {
             'save_account_details' => true,
             'save_account_requirements' => true,
 
+            'dismiss_notice_leave_review' => false,
             'dismiss_notice_missing_search_results' => false,
             'dismiss_notice_missing_google_maps_api_key' => false,
 		);
@@ -95,6 +96,14 @@ class PH_AJAX {
 			}
 		}
 	}
+
+    public function dismiss_notice_leave_review()
+    {
+        update_option( 'propertyhive_review_prompt_due_timestamp', 0 );
+        
+        // Quit out
+        die();
+    }
 
     public function dismiss_notice_missing_search_results()
     {
