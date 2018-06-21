@@ -93,6 +93,8 @@ class PH_Admin_Assets {
         //wp_register_script( 'flot-pie', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.pie' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
         //wp_register_script( 'flot-stack', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.stack' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
 
+        wp_enqueue_script( 'propertyhive_admin' );
+
         // PropertyHive admin pages
         if ( in_array( $screen->id, array( 'dashboard' ) ) )
         {
@@ -106,7 +108,6 @@ class PH_Admin_Assets {
 
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
         {
-            wp_enqueue_script( 'propertyhive_admin' );
             wp_enqueue_script( 'ajax-chosen' );
             wp_enqueue_script( 'chosen' );
             wp_enqueue_script( 'jquery-ui-sortable' );
