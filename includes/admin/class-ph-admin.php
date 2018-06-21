@@ -264,6 +264,20 @@ class PH_Admin {
                         </p>
                         <p>
                             <a href=\"". admin_url('admin.php?page=ph-settings&tab=general') . "\" class=\"button-primary\">Go To Property Hive Settings</a>
+
+            if ( 
+                get_option('propertyhive_google_maps_api_key', '') == '' && 
+                !isset($_POST['propertyhive_google_maps_api_key']) &&
+                get_option( 'missing_google_maps_api_key_notice_dismissed', '' ) != 'yes'
+            )
+            {
+                echo "<div class=\"notice notice-info\" id=\"ph_notice_missing_google_maps_api_key\">
+                        <p>
+                            " . __( 'We noticed that you haven\'t entered a Google Maps API key yet. If wishing to display a map on your website it\'s recommended that you <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">create one</a> and <a href="'. admin_url('admin.php?page=ph-settings&tab=general&section=map') . '">enter it</a>.', 'propertyhive' ) . "
+                        </p>
+                        <p>
+                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=general&section=map') . "\" class=\"button-primary\">Enter Google Maps API Key</a>
+                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_missing_google_maps_api_key\">Dismiss</a>
                         </p>
                         
                     </div>";
