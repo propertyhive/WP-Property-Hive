@@ -82,6 +82,9 @@ class PH_AJAX {
             'login' => true,
             'save_account_details' => true,
             'save_account_requirements' => true,
+
+            'dismiss_notice_missing_search_results' => false,
+            'dismiss_notice_missing_google_maps_api_key' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -92,6 +95,22 @@ class PH_AJAX {
 			}
 		}
 	}
+
+    public function dismiss_notice_missing_search_results()
+    {
+        update_option( 'missing_search_results_notice_dismissed', 'yes' );
+        
+        // Quit out
+        die();
+    }
+
+    public function dismiss_notice_missing_google_maps_api_key()
+    {
+        update_option( 'missing_google_maps_api_key_notice_dismissed', 'yes' );
+        
+        // Quit out
+        die();
+    }
 
 	/**
 	 * Output headers for JSON requests

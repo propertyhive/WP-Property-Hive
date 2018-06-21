@@ -255,15 +255,21 @@ class PH_Admin {
                     (
                         isset($_GET['page']) && $_GET['page'] != 'ph-installed' && $_GET['page'] != 'ph-settings'
                     )
-                )
+                ) &&
+                get_option( 'missing_search_results_notice_dismissed', '' ) != 'yes'
             )
             {
-                echo "<div class=\"notice notice-info\">
+                echo "<div class=\"notice notice-info\" id=\"ph_notice_missing_search_results\">
                         <p>
                             " . __( 'We noticed that you haven\'t assigned a page to be your \'Search Results\' page yet. We recommend that you do this in order to display properties on your site.', 'propertyhive' ) . "
                         </p>
                         <p>
                             <a href=\"". admin_url('admin.php?page=ph-settings&tab=general') . "\" class=\"button-primary\">Go To Property Hive Settings</a>
+                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_missing_search_results\">Dismiss</a>
+                        </p>
+                        
+                    </div>";
+            }
 
             if ( 
                 get_option('propertyhive_google_maps_api_key', '') == '' && 
