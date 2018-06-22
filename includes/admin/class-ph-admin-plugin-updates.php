@@ -73,24 +73,25 @@ class PH_Plugin_Updates {
 	 */
 	private function parse_update_notice( $content, $new_version ) {
 		
-		$notice_regexp     = '~==\s*Upgrade Notice\s*==\s*=\s*(.*)\s*=(.*)(=\s*' . preg_quote( $new_version ) . '\s*=|$)~Uis';
 		$upgrade_notice    = '';
 
-		$matches = null;
-		if ( preg_match( $notice_regexp, $content, $matches ) ) {
-			
-			$notices = (array) preg_split( '~[\r\n]+~', trim( $matches[2] ) );
+		$notices = explode("== Upgrade Notice ==", $content, 2);
 
-			if ( version_compare( trim( $matches[1] ), PH_VERSION, '>' ) ) {
+		if ( count($notices) < 2 ) { return ''; }
 
-				foreach ( $notices as $index => $line ) {
-					$upgrade_notice .= '<br><strong>- ';
-					$upgrade_notice .= preg_replace( '~\[([^\]]*)\]\(([^\)]*)\)~', '<a href="${2}">${1}</a>', $line );
-					$upgrade_notice .= '</strong>';
-				}
+		$notices = (array) preg_split( '~[\r\n]+~', trim( $notices[1] ) );
 
-				//$upgrade_notice .= '</p>';
+		for ( $i = 0; $i < count($notices); ++$i )
+		{
+			$version = trim(str_replace("=", "", $notices[$i]));
+			if ( version_compare( $version, PH_VERSION, '>' ) ) 
+			{
+				$upgrade_notice .= '<br><strong>- ';
+				$upgrade_notice .= preg_replace( '~\[([^\]]*)\]\(([^\)]*)\)~', '<a href="${2}">${1}</a>', $notices[$i+1] );
+				$upgrade_notice .= '</strong>';
 			}
+
+			++$i;
 		}
 
 		return wp_kses_post( $upgrade_notice );
