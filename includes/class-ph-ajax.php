@@ -1364,6 +1364,8 @@ class PH_AJAX {
                     // Auto-responder enabled
                     PH()->email->send_enquiry_auto_responder( $_POST );
                 }
+
+                do_action('propertyhive_property_enquiry_sent', $_POST, $to);
             }
         }
         
