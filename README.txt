@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.9.6
-Stable tag: 1.4.19
+Stable tag: 1.4.20
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.20 =
+* Added new warning when Google Maps API key is missing to assist with common support issue and [upcoming changes](https://wp-property-hive.com/is-your-property-website-ready-for-upcoming-google-maps-api-changes/) to Google pricing on July 16th 2018
+* Added ability to dismiss all warnings/notices regarding missing search results page or Google Maps API Key
+* Added new minimum_price and maximum_price attributes to [properties] shortcode
+* Added new setting under 'Settings > General > International' to specify the currency that prices searches are based on. Specifically for international agents who previously had to convert prices to GBP for them to work.
+* Added foundations to plugins page to display important upgrade notices when future releases require special attention or might break something. 
+* Added support for the new 'added_from' parameter when performing searches. Should be a strtotime() friendly format
+* Added a new action when property enquiries are successfully sent. Put in place to cater for new Jupix Enquiries add on coming very soon.
 
 = 1.4.19 =
 * New 'Marketing Status' filter on admin property screen allowing filtering by 'On Market Only', 'Featured Only', by marketing flag, and by which portals the properties are active on (i.e. Show only properties active on Rightmove)
