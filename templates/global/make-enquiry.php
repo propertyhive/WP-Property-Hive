@@ -14,7 +14,7 @@ global $post;
 
 <li class="action-make-enquiry">
     
-    <a href="#makeEnquiry<?php echo $post->ID; ?>" data-rel="prettyPhoto"><?php _e( 'Make Enquiry', 'propertyhive' ); ?></a>
+    <a data-fancybox data-src="#makeEnquiry<?php echo $post->ID; ?>" href="javascript:;"><?php _e( 'Make Enquiry', 'propertyhive' ); ?></a>
 
     <!-- LIGHTBOX FORM -->
     <div id="makeEnquiry<?php echo $post->ID; ?>" style="display:none;">
