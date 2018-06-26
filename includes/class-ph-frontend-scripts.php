@@ -31,18 +31,6 @@ class PH_Frontend_Scripts {
 	 */
 	public static function get_styles() {
 		return apply_filters( 'propertyhive_enqueue_styles', array(
-			/*'propertyhive-layout' => array(
-				'src'     => str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/propertyhive-layout.css',
-				'deps'    => '',
-				'version' => PH_VERSION,
-				'media'   => 'all'
-			),
-			'propertyhive-smallscreen' => array(
-				'src'     => str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/propertyhive-smallscreen.css',
-				'deps'    => 'propertyhive-layout',
-				'version' => PH_VERSION,
-				'media'   => 'only screen and (max-width: ' . apply_filters( 'propertyhive_style_smallscreen_breakpoint', $breakpoint = '768px' ) . ')'
-			),*/
 			'propertyhive-general' => array(
 				'src'     => str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/propertyhive.css',
 				'deps'    => '',
@@ -70,9 +58,9 @@ class PH_Frontend_Scripts {
 		wp_register_script( 'jquery-cookie', $assets_path . 'js/jquery-cookie/jquery.cookie' . $suffix . '.js', array( 'jquery' ), '1.3.1', true );
 
 		if ( is_property() ) {
-			wp_enqueue_script( 'prettyPhoto', $assets_path . 'js/prettyPhoto/jquery.prettyPhoto' . $suffix . '.js', array( 'jquery' ), '3.1.5', true );
-			wp_enqueue_script( 'prettyPhoto-init', $assets_path . 'js/prettyPhoto/jquery.prettyPhoto.init' . $suffix . '.js', array( 'jquery','prettyPhoto' ), PH_VERSION, true );
-			wp_enqueue_style( 'propertyhive_prettyPhoto_css', $assets_path . 'css/prettyPhoto.css' );
+			wp_enqueue_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.1.5', true );
+			//wp_enqueue_script( 'propertyhive_fancybox-init', $assets_path . 'js/fancybox/jquery.fancybox.init' . $suffix . '.js', array( 'jquery','propertyhive_fancybox' ), PH_VERSION, true );
+			wp_enqueue_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css' );
 		    
 		    wp_enqueue_script( 'flexslider', $assets_path . 'js/flexslider/jquery.flexslider' . $suffix . '.js', array( 'jquery' ), '2.2.2', true );
             wp_enqueue_script( 'flexslider-init', $assets_path . 'js/flexslider/jquery.flexslider.init' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
