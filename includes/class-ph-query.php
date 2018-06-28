@@ -1508,7 +1508,7 @@ class PH_Query {
         {
             foreach ( $_REQUEST as $key => $value )
             {
-                if ( taxonomy_exists($key) && isset( $_REQUEST[$key] ) && !empty($_REQUEST[$key]) )
+                if ( taxonomy_exists($key) && isset( $_REQUEST[$key] ) && !empty($_REQUEST[$key]) && $this->taxonomy_allowed_for_department( $key ) )
                 {
                     $tax_query[] = array(
                         'taxonomy'  => $key,
@@ -1519,6 +1519,49 @@ class PH_Query {
         }
 
         return array_filter( apply_filters( 'propertyhive_property_query_tax_query', $tax_query, $this ) );
+    }
+
+    private function taxonomy_allowed_for_department( $taxonomy )
+    {
+    	if ( isset( $_REQUEST['department'] ) && $_REQUEST['department'] != '' )
+        {
+        	$department = $_REQUEST['department'];
+        }
+        else
+        {
+            $department = get_option( 'propertyhive_primary_department', 'residential-sales' );
+        }
+
+        switch ( $department )
+        {
+        	case 'residential-sales':
+        	{
+	        	if ( in_array( $taxonomy, array('commercial_property_type', 'commercial_tenure', 'furnished') ) )
+	        	{
+	        		return false;
+	        	}
+	        	break;
+	        }
+	        case 'residential-lettings':
+        	{
+	        	if ( in_array( $taxonomy, array('commercial_property_type', 'commercial_tenure', 'tenure', 'sale_by', 'price_qualifier') ) )
+	        	{
+	        		return false;
+	        	}
+	        	break;
+	        }
+	        case 'commercial':
+        	{
+	        	if ( in_array( $taxonomy, array('property_type', 'tenure', 'parking', 'outside_space', 'furnished') ) )
+	        	{
+	        		return false;
+	        	}
+	        	break;
+	        }
+        }
+
+
+        return true;
     }
     
 	/**
