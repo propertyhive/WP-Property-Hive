@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.9.6
-Stable tag: 1.4.20
+Stable tag: 1.4.21
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.21 =
+* Migrated from PrettyPhoto lightbox plugin to Fancybox 3
+* Give each floorplan it's own action button as opposed to putting them into the same lightbox. This makes it clearer that more than one floorplan exists
+* If an EPC is an image now open it in a lightbox. As EPC's can also be PDF's previously we would just open them all in a new tab.
+* Don't do tax_query on taxonomies that don't belong to queried department. For example, no properties would previously be returned if searching for commercial properties but residential 'property_type' parameter was found in query string.
 
 = 1.4.20 =
 * Added new warning when Google Maps API key is missing to assist with common support issue and [upcoming changes](https://wp-property-hive.com/is-your-property-website-ready-for-upcoming-google-maps-api-changes/) to Google pricing on July 16th 2018
@@ -578,3 +584,8 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 1.0.0 =
 * First beta release of the software
+
+== Upgrade Notice ==
+
+= 1.4.21 =
+We've swapped out the lightbox plugin from PrettyPhoto to Fancybox 3. Please ensure that you take a full site backup and test the site after updating, specifically anything related to lightboxes (photo gallery, make enquiry).
