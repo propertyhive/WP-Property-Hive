@@ -32,6 +32,14 @@ function ph_get_search_form( $id = 'default' ) {
 
         $form_controls['department'] = $original_department;
     }
+
+    // append hidden order and view fields so these are maintained should a new search be performed
+    if ( !isset($form_controls['view']) && isset($_REQUEST['view']) && $_REQUEST['view'] != '' ) {
+        $form_controls['view'] = array('type' => 'hidden', 'value' => sanitize_text_field( $_REQUEST['view'] ));
+    }
+    if ( !isset($form_controls['orderby']) && isset($_REQUEST['orderby']) && $_REQUEST['orderby'] != '' ) {
+        $form_controls['orderby'] = array('type' => 'hidden', 'value' => sanitize_text_field( $_REQUEST['orderby'] ));
+    }
     
     ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $id ) );
 
