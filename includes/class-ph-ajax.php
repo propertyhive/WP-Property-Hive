@@ -378,7 +378,7 @@ class PH_AJAX {
 
             // Add post meta (contact details, requirements etc)
             add_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
-            add_post_meta( $contact_post_id, '_telephone_number', ( ( isset($_POST['telephone_number']) ) ? $_POST['telephone_number'] : '' ) );
+            add_post_meta( $contact_post_id, '_telephone_number', ( ( isset($_POST['telephone_number']) ) ? sanitize_text_field($_POST['telephone_number']) : '' ) );
 
             add_post_meta( $contact_post_id, '_contact_types', array('applicant') );
 
@@ -389,7 +389,7 @@ class PH_AJAX {
 
             if ( $_POST['department'] == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9]/", '', $_POST['maximum_price']);
+                $price = preg_replace("/[^0-9]/", '', sanitize_text_field($_POST['maximum_price']));
 
                 $applicant_profile['max_price'] = $price;
 
@@ -398,7 +398,7 @@ class PH_AJAX {
             }
             elseif ( $_POST['department'] == 'residential-lettings' )
             {
-                $price = preg_replace("/[^0-9]/", '', $_POST['maximum_rent']);
+                $price = preg_replace("/[^0-9]/", '', sanitize_text_field($_POST['maximum_rent']));
 
                 $applicant_profile['max_rent'] = $price;
                 $applicant_profile['rent_frequency'] = 'pcm';
@@ -408,21 +408,21 @@ class PH_AJAX {
 
             if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
             {
-                $beds = preg_replace("/[^0-9]/", '', $_POST['minimum_bedrooms']);
+                $beds = preg_replace("/[^0-9]/", '', sanitize_text_field($_POST['minimum_bedrooms']));
                 $applicant_profile['min_beds'] = $beds;
 
                 if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
                 {
-                    $applicant_profile['property_types'] = array($_POST['property_type']);
+                    $applicant_profile['property_types'] = array(sanitize_text_field($_POST['property_type']));
                 }
             }
 
             if ( isset($_POST['location']) && !empty($_POST['location']) )
             {
-                $applicant_profile['locations'] = array($_POST['location']);
+                $applicant_profile['locations'] = array(sanitize_text_field($_POST['location']));
             }
 
-            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? $_POST['additional_requirements'] : '' );
+            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? sanitize_text_field($_POST['additional_requirements']) : '' );
 
             $applicant_profile['send_matching_properties'] = 'yes';
             //$applicant_profile['auto_match_disabled'] = ''; // don't know what to do about this yet. Should probably look at global setting and reflect that
