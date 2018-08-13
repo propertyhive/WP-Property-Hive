@@ -157,7 +157,15 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 echo $the_enquiry->status;
                 break;
             case 'source' :
-                echo $the_enquiry->source;
+
+                $sources = array(
+                    'office' => __( 'Office', 'propertyhive' ),
+                    'website' => __( 'Website', 'propertyhive' )
+                );
+
+                $sources = apply_filters( 'propertyhive_enquiry_sources', $sources );
+
+                echo ( ( isset($sources[$the_enquiry->source]) ) ? $sources[$the_enquiry->source] : $the_enquiry->source );
                 break;
             case 'negotiator' :
                 if ($the_enquiry->_negotiator_id == '' || $the_enquiry->_negotiator_id == 0)

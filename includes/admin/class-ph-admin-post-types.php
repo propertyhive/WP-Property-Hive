@@ -568,24 +568,28 @@ class PH_Admin_Post_Types {
      */
     public function enquiry_source_filter() {
         global $wp_query;
+
+        $sources = array(
+            'office' => __( 'Office', 'propertyhive' ),
+            'website' => __( 'Website', 'propertyhive' )
+        );
+
+        $sources = apply_filters( 'propertyhive_enquiry_sources', $sources );
         
         // Status filtering
         $output  = '<select name="_source" id="dropdown_enquiry_source">';
             
             $output .= '<option value="">' . __( 'Show all sources', 'propertyhive' ) . '</option>';
             
-            $output .= '<option value="office"';
-            if ( isset( $_GET['_source'] ) && ! empty( $_GET['_source'] ) )
+            foreach ( $sources as $key => $value )
             {
-                $output .= selected( 'office', $_GET['_source'], false );
+                $output .= '<option value="' . $key . '"';
+                if ( isset( $_GET['_source'] ) && ! empty( $_GET['_source'] ) )
+                {
+                    $output .= selected( $key, $_GET['_source'], false );
+                }
+                $output .= '>' . __( $value, 'propertyhive' ) . '</option>';
             }
-            $output .= '>' . __( 'Office', 'propertyhive' ) . '</option>';
-            $output .= '<option value="website"';
-            if ( isset( $_GET['_source'] ) && ! empty( $_GET['_source'] ) )
-            {
-                $output .= selected( 'website', $_GET['_source'], false );
-            }
-            $output .= '>' . __( 'Website', 'propertyhive' ) . '</option>';
             
         $output .= '</select>';
 

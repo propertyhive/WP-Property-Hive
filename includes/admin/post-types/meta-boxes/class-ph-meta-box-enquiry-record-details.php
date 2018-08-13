@@ -103,15 +103,19 @@ class PH_Meta_Box_Enquiry_Record_Details {
         echo '</select>
             
         </p>';
+
+        $sources = array(
+            'office' => __( 'Office', 'propertyhive' ),
+            'website' => __( 'Website', 'propertyhive' )
+        );
+
+        $sources = apply_filters( 'propertyhive_enquiry_sources', $sources );
             
         $args = array( 
             'id' => '_source', 
             'label' => __( 'Source', 'propertyhive' ), 
             'desc_tip' => false,
-            'options' => array(
-                'office' => __( 'Office', 'propertyhive' ),
-                'website' => __( 'Website', 'propertyhive' )
-            )
+            'options' => $sources
         );
         propertyhive_wp_select( $args );
 
