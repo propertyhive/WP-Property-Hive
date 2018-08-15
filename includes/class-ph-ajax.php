@@ -231,8 +231,15 @@ class PH_AJAX {
 
             if ( $contact_query->have_posts() )
             {
-                // Has associated published contact CPT
-                $return['success'] = true;
+                while ( $contact_query->have_posts() )
+                {
+                    $contact_query->the_post();
+
+                    // Has associated published contact CPT
+                    $return['success'] = true;
+
+                    do_action('propertyhive_user_logged_in', get_the_ID(), $user->ID);
+                }
             }
             
             wp_reset_postdata();
