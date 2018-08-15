@@ -1,10 +1,10 @@
 === PropertyHive ===
 Contributors: PropertyHive,BIOSTALL
-Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, reapit, reaxml, letmc, acquaint
+Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 4.9.6
-Stable tag: 1.4.21
+Tested up to: 4.9.8
+Stable tag: 1.4.22
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.22 =
+* Allow for multiple property types to be chosen for residential properties. If you export properties to a third party sich as Rightmove the first in the list will be used
+* Ensure order and current view are maintained when a new search is ran. Previously the view and order would reset back to the defaults
+* Added a new 'imported_id' property to the PH_Property object. Useful when importing properties from a third party and wanting to get the ID of the property from the third party software. Can be called like $property->imported_id;
+* Added new field type of 'recaptcha' meaning a Google reCAPTCHA can be added to enquiry forms
+* Sanitize user input on applicant registration
+* New action 'propertyhive_user_logged_in' called when applicant/vendor/landlord logs in
+* Declared compatibility for WordPress 4.9.8
 
 = 1.4.21 =
 * Migrated from PrettyPhoto lightbox plugin to Fancybox 3
