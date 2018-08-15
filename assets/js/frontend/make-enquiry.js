@@ -45,6 +45,11 @@ jQuery( function($){
                 }
                 
                 is_submitting = false;
+
+                if ( typeof grecaptcha != 'undefined' )
+                {
+                    grecaptcha.reset();
+                }
                 
             });
         }
