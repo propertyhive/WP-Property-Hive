@@ -95,19 +95,81 @@ class PH_Meta_Box_Property_Residential_Details {
                 $selected_value = $term_list[0];
             }
         }
-        
-        $args = array( 
-            'id' => 'property_type_id', 
-            'label' => __( 'Property Type', 'propertyhive' ), 
-            'desc_tip' => false,
-            'options' => $options
-        );
-        if ($selected_value != '')
-        {
-            $args['value'] = $selected_value;
-        }
-        propertyhive_wp_select( $args );
+
 ?>
+        <p class="form-field property_type_id_field"><label for="property_type_id"><?php _e( 'Property Type', 'propertyhive' ); ?></label>
+        <select id="property_type_id" name="property_type_id[]" multiple="multiple" data-placeholder="<?php _e( 'Select property type(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
+            <?php
+                $options = array( '' => '' );
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => 0
+                );
+                $terms = get_terms( 'property_type', $args );
+                
+                $selected_values = array();
+                $term_list = wp_get_post_terms($post->ID, 'property_type', array("fields" => "ids"));
+                if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+                {
+                    foreach ( $term_list as $term_id )
+                    {
+                        $selected_values[] = $term_id;
+                    }
+                }
+                
+                if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                {
+                    foreach ( $terms as $term )
+                    {
+                        echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                        if ( in_array( $term->term_id, $selected_values ) )
+                        {
+                            echo ' selected';
+                        }
+                        echo '>' . esc_html( $term->name ) . '</option>';
+
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => $term->term_id
+                        );
+                        $subterms = get_terms( 'property_type', $args );
+                        
+                        if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                        {
+                            foreach ($subterms as $term)
+                            {
+                                echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                                if ( in_array( $term->term_id, $selected_values ) )
+                                {
+                                    echo ' selected';
+                                }
+                                echo '>- ' . esc_html( $term->name ) . '</option>';
+                                
+                                $args = array(
+                                    'hide_empty' => false,
+                                    'parent' => $term->term_id
+                                );
+                                $subsubterms = get_terms( 'property_type', $args );
+                                
+                                if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                                {
+                                    foreach ($subsubterms as $term)
+                                    {
+                                        echo '<option value="' . esc_attr( $term->term_id ) . '"';
+                                        if ( in_array( $term->term_id, $selected_values ) )
+                                        {
+                                            echo ' selected';
+                                        }
+                                        echo '>- - ' . esc_html( $term->name ) . '</option>';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ?>
+        </select>
+
         <p class="form-field parking_ids_field"><label for="parking_ids"><?php _e( 'Parking', 'propertyhive' ); ?></label>
         <select id="parking_ids" name="parking_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select parking', 'propertyhive' ); ?>" class="multiselect attribute_values">
             <?php
@@ -144,7 +206,7 @@ class PH_Meta_Box_Property_Residential_Details {
         </select>
 
         <p class="form-field outside_space_ids_field"><label for="outside_space_ids"><?php _e( 'Outside Space', 'propertyhive' ); ?></label>
-        <select id="outside_space_ids" name="outside_space_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select outside space', 'propertyhive' ); ?>" class="multiselect attribute_values">
+        <select id="outside_space_ids" name="outside_space_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select outside space(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
             <?php
                 $options = array( '' => '' );
                 $args = array(
@@ -205,9 +267,17 @@ class PH_Meta_Box_Property_Residential_Details {
         $rooms = preg_replace("/[^0-9]/", '', $_POST['_reception_rooms']);
         update_post_meta( $post_id, '_reception_rooms', $rooms );
         
-        if ( !empty($_POST['property_type_id']) )
+        $property_types = array();
+        if ( isset( $_POST['property_type_id'] ) && !empty( $_POST['property_type_id'] ) )
         {
-            wp_set_post_terms( $post_id, $_POST['property_type_id'], 'property_type' );
+            foreach ( $_POST['property_type_id'] as $property_type_id )
+            {
+                $property_types[] = $property_type_id;
+            }
+        }
+        if ( !empty($property_types) )
+        {
+            wp_set_post_terms( $post_id, $property_types, 'property_type' );
         }
         else
         {
