@@ -122,6 +122,10 @@ class PH_Property {
         {
             return $this->get_marketing_flag();
         }
+        if ( 'imported_id' == $key ) 
+        {
+            return $this->get_imported_id();
+        }
         if ( 'office_name' == $key ) 
         {
             return $this->get_office_name();
@@ -965,6 +969,37 @@ class PH_Property {
             return implode(", ", $term_list);
         }
         
+        return '';
+    }
+
+    /**
+     * Get the ID of property from third party system
+     *
+     * @access public
+     * @return string
+     */
+    public function get_imported_id()
+    {
+        global $wpdb;
+
+        $row = $wpdb->get_row(
+            "
+            SELECT meta_value 
+            FROM {$wpdb->prefix}postmeta 
+            WHERE 
+                meta_key LIKE '_imported_ref_%'
+            AND
+                post_id = '" . $this->id . "'
+            LIMIT 1
+            ",
+            ARRAY_A
+        );
+
+        if ( null !== $row ) 
+        {
+            return $row['meta_value'];
+        }
+
         return '';
     }
 

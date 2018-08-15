@@ -1014,6 +1014,14 @@ function ph_form_field( $key, $field )
             
             break;   
         }
+        case "recaptcha": 
+        {
+            $field['site_key'] = isset( $field['site_key'] ) ? $field['site_key'] : '';
+            
+            $output .= '<script src="https://www.google.com/recaptcha/api.js"></script>
+            <div class="g-recaptcha" data-sitekey="' . $field['site_key'] . '"></div>';
+            break;
+        }
         default:
         {
             if ( taxonomy_exists($field['type']) )
