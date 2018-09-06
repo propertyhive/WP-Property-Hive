@@ -178,7 +178,7 @@
                             {
                                 if ( !empty($previously_sent) )
                                 {
-                                    $post_tip = 'Sent previously on ' . date("jS F Y", strtotime($previously_sent[count($previously_sent) - 1]['date']));
+                                    $post_tip = 'Sent previously via ' . $previously_sent[count($previously_sent) - 1]['method'] . ' on ' . date("jS F Y", strtotime($previously_sent[count($previously_sent) - 1]['date']));
                                 }
                                 else
                                 {
