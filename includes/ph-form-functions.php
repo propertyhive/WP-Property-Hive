@@ -672,7 +672,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = $_GET[$key];
+                $field['value'] = stripslashes($_GET[$key]);
             }
             else
             {
@@ -996,7 +996,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = $_GET[$key];
+                $field['value'] = stripslashes($_GET[$key]);
             }
             
             $output .= '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . $field['value'] . '">';
