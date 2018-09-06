@@ -158,18 +158,21 @@ class PH_Query {
 		}
         
 		// When orderby is set, WordPress shows posts. Get around that here.
-		/*if ( $q->is_home() && 'page' == get_option('show_on_front') && get_option('page_on_front') == ph_get_page_id('search_results') ) {
+		if ( ($q->is_home() || $q->get( 'page_id' ) == get_option('page_on_front')) && 'page' == get_option('show_on_front') && get_option('page_on_front') == ph_get_page_id('search_results') ) 
+		{
 			$_query = wp_parse_args( $q->query );
-			if ( empty( $_query ) || ! array_diff( array_keys( $_query ), array( 'preview', 'page', 'paged', 'cpage', 'orderby' ) ) ) {
+			if ( empty( $_query ) || ! array_diff( array_keys( $_query ), array( 'preview', 'page', 'paged', 'cpage', 'orderby' ) ) ) 
+			{
+				
 				$q->is_page = true;
 				$q->is_home = false;
-				$q->set( 'page_id', get_option('page_on_front') );
+				$q->set( 'page_id', (int) get_option('page_on_front') );
 				$q->set( 'post_type', 'property' );
 			}
-		}*/
+		}
 
 		// Special check for sites with the property search results on front page
-		/*if ( $q->is_page() && 'page' == get_option( 'show_on_front' ) && $q->get('page_id') == ph_get_page_id('search_results') ) {
+		if ( $q->is_page() && 'page' == get_option( 'show_on_front' ) && $q->get('page_id') == ph_get_page_id('search_results') ) {
 
 			// This is a front-page property listings
 			$q->set( 'post_type', 'property' );
@@ -177,7 +180,7 @@ class PH_Query {
 			if ( isset( $q->query['paged'] ) )
 				$q->set( 'paged', $q->query['paged'] );
 
-			// Define a variable so we know this is the front page shop later on
+			// Define a variable so we know this is the front page search results later on
 			define( 'SEARCH_RESULTS_IS_ON_FRONT', true );
 
 			// Get the actual WP page to avoid errors and let us use is_front_page()
@@ -204,13 +207,13 @@ class PH_Query {
 				add_filter( 'wpseo_metakey', array( $this, 'wpseo_metakey' ) );
 			}
 
-		} else {*/
+		} else {
             
 			// Only apply to property categories, the property post archive, the search results page, and property attribute taxonomies
 		    if 	( ! $q->is_post_type_archive( 'property' ) && ! $q->is_tax( get_object_taxonomies( 'property' ) ) )
 		   		return;
             
-		//}
+		}
         
 		$this->property_query( $q );
 
