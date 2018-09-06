@@ -188,9 +188,11 @@
 
                             echo '> Email Property To Applicant<span style="font-weight:400;">' . ( ($post_tip != '') ? ' - ' . $post_tip : '' ) . '</span></label>
 
-                            	<br>
+                            	<br>';
 
-                            	<label><input type="checkbox" name="not_interested_property_id[]" value="' . $property->id . '"> Property Not Suitable</label>
+                            do_action( 'propertyhive_applicant_match_send_methods', $contact_id, $property->id );
+
+                            echo '<label><input type="checkbox" name="not_interested_property_id[]" value="' . $property->id . '"> Property Not Suitable</label>
 
                             </div>';
 
