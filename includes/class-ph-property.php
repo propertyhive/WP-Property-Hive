@@ -319,7 +319,7 @@ class PH_Property {
         }
         else
         {
-            if (!is_admin() && $this->_poa == 'yes')
+            if ( ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) && $this->_poa == 'yes')
             {
                 return __( 'POA', 'propertyhive' );
             }
