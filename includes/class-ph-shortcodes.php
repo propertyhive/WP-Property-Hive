@@ -124,7 +124,8 @@ class PH_Shortcodes {
 			'negotiator_id'		=> '',
 			'commercial_for_sale' => '',
 			'commercial_to_rent' => '',
-			'posts_per_page'	=> 10
+			'posts_per_page'	=> 10,
+			'no_results_output' => '',
 		), $atts, 'properties' );
 
 		$meta_query = array(
@@ -403,6 +404,10 @@ class PH_Shortcodes {
 
 			<?php propertyhive_property_loop_end(); ?>
 
+		<?php else: ?>
+
+            <?php echo $atts['no_results_output']; ?>
+
 		<?php endif;
 
 		wp_reset_postdata();
@@ -426,7 +431,8 @@ class PH_Shortcodes {
 			'department' 	=> '',
 			'office_id'		=> '',
 			'orderby' 		=> 'date',
-			'order' 		=> 'desc'
+			'order' 		=> 'desc',
+			'no_results_output' => '',
 		), $atts, 'recent_properties' );
 
 		$meta_query = PH()->query->get_meta_query();
@@ -477,6 +483,10 @@ class PH_Shortcodes {
 
 			<?php propertyhive_property_loop_end(); ?>
 
+		<?php else: ?>
+
+            <?php echo $atts['no_results_output']; ?>
+
 		<?php endif;
 
 		wp_reset_postdata();
@@ -502,6 +512,7 @@ class PH_Shortcodes {
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
+			'no_results_output' => '',
 		), $atts, 'featured_properties' );
 
 		$args = array(
@@ -566,6 +577,10 @@ class PH_Shortcodes {
 
 			<?php propertyhive_property_loop_end(); ?>
 
+		<?php else: ?>
+
+            <?php echo $atts['no_results_output']; ?>
+
 		<?php endif;
 
 		wp_reset_postdata();
@@ -589,6 +604,7 @@ class PH_Shortcodes {
 			'price_percentage_bounds'	=> 10,
 			'bedroom_bounds'			=> 0,
 			'property_id'				=> '',
+			'no_results_output' => '',
 		), $atts, 'similar_properties' );
 
 		if ($atts['property_id'] != '')
@@ -689,6 +705,10 @@ class PH_Shortcodes {
 					<?php endwhile; // end of the loop. ?>
 
 				<?php propertyhive_property_loop_end(); ?>
+
+			<?php else: ?>
+
+            	<?php echo $atts['no_results_output']; ?>
 
 			<?php endif;
 
