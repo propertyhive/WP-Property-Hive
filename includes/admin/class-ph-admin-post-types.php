@@ -169,6 +169,9 @@ class PH_Admin_Post_Types {
             case 'enquiry' :
                 $this->enquiry_filters();
                 break;
+            case 'viewing' :
+                $this->viewing_filters();
+                break;
             default :
                 break;
         }
@@ -595,6 +598,79 @@ class PH_Admin_Post_Types {
 
         return $output;
     }
+
+    /**
+     * Show a viewing filter box
+     */
+    public function viewing_filters() {
+        global $wp_query;
+        
+        // Department filtering
+        $output = '';
+        
+        $output .= $this->viewing_status_filter();
+
+        echo apply_filters( 'propertyhive_viewing_filters', $output );
+    }
+
+    /**
+     * Show a viewing status filter box
+     */
+    public function viewing_status_filter() {
+        global $wp_query;
+        
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_viewing_status">';
+            
+            $output .= '<option value="open">All Statuses</option>';
+
+            $output .= '<option value="pending"';
+            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
+            {
+                $output .= selected( 'pending', $_GET['_status'], false );
+            }
+            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+            $output .= '<option value="confirmed"';
+            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
+            {
+                $output .= selected( 'confirmed', $_GET['_status'], false );
+            }
+            $output .= '>- ' . __( 'Confirmed', 'propertyhive' ) . '</option>';
+            $output .= '<option value="unconfirmed"';
+            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
+            {
+                $output .= selected( 'unconfirmed', $_GET['_status'], false );
+            }
+            $output .= '>- ' . __( 'Awaiting Confirmation', 'propertyhive' ) . '</option>';
+            $output .= '<option value="carried_out"';
+            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
+            {
+                $output .= selected( 'carried_out', $_GET['_status'], false );
+            }
+            $output .= '>' . __( 'Carried Out', 'propertyhive' ) . '</option>';
+            $output .= '<option value="feedback_passed_on"';
+            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
+            {
+                $output .= selected( 'feedback_passed_on', $_GET['_status'], false );
+            }
+            $output .= '>- ' . __( 'Feedback Passed On', 'propertyhive' ) . '</option>';
+            $output .= '<option value="feedback_not_passed_on"';
+            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
+            {
+                $output .= selected( 'feedback_not_passed_on', $_GET['_status'], false );
+            }
+            $output .= '>- ' . __( 'Feedback Not Passed On', 'propertyhive' ) . '</option>';
+            $output .= '<option value="cancelled"';
+            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
+            {
+                $output .= selected( 'cancelled', $_GET['_status'], false );
+            }
+            $output .= '>' . __( 'Cancelled', 'propertyhive' ) . '</option>';
+            
+        $output .= '</select>';
+
+        return $output;
+    }
     
     /**
      * Filters and sorting handler
@@ -662,23 +738,99 @@ class PH_Admin_Post_Types {
         elseif ( 'contact' === $typenow ) 
         {
             if ( ! empty( $_GET['_contact_type'] ) ) {
-                //$vars['meta_key '] = '_contact_types';
-                //$vars['meta_value'] = sanitize_text_field( $_GET['_contact_type'] );
-                //$vars['meta_compare '] = 'LIKE';
-                $vars['meta_query'] = array(
-                    array(
-                        'key' => '_contact_types',
-                        'value' => sanitize_text_field( $_GET['_contact_type'] ),
-                        'compare' => 'LIKE'
-                    )
+                $vars['meta_query'][] = array(
+                    'key' => '_contact_types',
+                    'value' => sanitize_text_field( $_GET['_contact_type'] ),
+                    'compare' => 'LIKE'
                 );
             }
         }
         elseif ( 'enquiry' === $typenow ) 
         {
             if ( ! empty( $_GET['_status'] ) ) {
-                $vars['meta_key'] = '_status';
-                $vars['meta_value'] = sanitize_text_field( $_GET['_status'] );
+                $vars['meta_query'][] = array(
+                    'key' => '_status',
+                    'value' => sanitize_text_field( $_GET['_status'] ),
+                );
+            }
+            if ( ! empty( $_GET['_source'] ) ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_source',
+                    'value' => sanitize_text_field( $_GET['_source'] ),
+                );
+            }
+        }
+        elseif ( 'viewing' === $typenow ) 
+        {
+            if ( ! empty( $_GET['_status'] ) ) {
+                switch ( $_GET['_status'] )
+                {
+                    case "confirmed":
+                    {
+                        $vars['meta_query'][] = array(
+                            'key' => '_status',
+                            'value' => 'pending',
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_all_confirmed',
+                            'value' => 'yes',
+                        );
+                        break;
+                    }
+                    case "unconfirmed":
+                    {
+                        $vars['meta_query'][] = array(
+                            'key' => '_status',
+                            'value' => 'pending',
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_all_confirmed',
+                            'value' => '',
+                        );
+                        break;
+                    }
+                    case "feedback_passed_on":
+                    {
+                        $vars['meta_query'][] = array(
+                            'key' => '_status',
+                            'value' => 'carried_out',
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_feedback_status',
+                            'value' => array('interested', 'not_interested'),
+                            'compare' => 'IN'
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_feedback_passed_on',
+                            'value' => 'yes',
+                        );
+                        break;
+                    }
+                    case "feedback_not_passed_on":
+                    {
+                         $vars['meta_query'][] = array(
+                            'key' => '_status',
+                            'value' => 'carried_out',
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_feedback_status',
+                            'value' => array('interested', 'not_interested'),
+                            'compare' => 'IN'
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_feedback_passed_on',
+                            'value' => '',
+                        );
+                        break;
+                    }
+                    default:
+                    {
+                        $vars['meta_query'][] = array(
+                            'key' => '_status',
+                            'value' => sanitize_text_field( $_GET['_status'] ),
+                        );
+                    }
+                }
             }
             if ( ! empty( $_GET['_source'] ) ) {
                 $vars['meta_key'] = '_source';
