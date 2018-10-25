@@ -2633,7 +2633,16 @@ class PH_AJAX {
 
                     echo '<tr>';
                         echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("H:i jS F Y", strtotime(get_post_meta(get_the_ID(), '_start_date_time', TRUE))) . '</a></td>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a></td>';
+                        echo '<td style="text-align:left;">';
+                        if ( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE) != '' )
+                        {
+                            echo  '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a>';
+                        }
+                        else
+                        {
+                            echo '-';
+                        }
+                        echo '</td>';
                         echo '<td style="text-align:left;">';
 
                         $negotiator_ids = get_post_meta(get_the_ID(), '_negotiator_id');
@@ -2667,6 +2676,19 @@ class PH_AJAX {
 
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
                         echo ucwords(str_replace("_", " ", $status));
+                        if ( $status == 'pending' )
+                        {
+                            echo '<br>';
+                            // confirmation status
+                            if ( get_post_meta(get_the_ID(), '_all_confirmed', TRUE) == 'yes' )
+                            {
+                                echo __( 'All Parties Confirmed', 'propertyhive' );
+                            }
+                            else
+                            {
+                                echo __( 'Awaiting Confirmation', 'propertyhive' );
+                            }
+                        }
                         if ( $status == 'carried_out' )
                         {
                             echo '<br>';
@@ -2756,7 +2778,17 @@ class PH_AJAX {
 
                     echo '<tr>';
                         echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '') . '">' . date("H:i jS F Y", strtotime(get_post_meta(get_the_ID(), '_start_date_time', TRUE))) . '</a></td>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a></td>';
+                        echo '<td style="text-align:left;">';
+                        if ( get_post_meta(get_the_ID(), '_property_id', TRUE) != '' )
+                        {
+                            echo '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a>';
+                        }
+                        else
+                        {
+                            echo '-';
+                        }
+                        echo '</td>';
+
                         echo '<td style="text-align:left;">';
 
                         $negotiator_ids = get_post_meta(get_the_ID(), '_negotiator_id');
@@ -2790,6 +2822,19 @@ class PH_AJAX {
 
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
                         echo ucwords(str_replace("_", " ", $status));
+                        if ( $status == 'pending' )
+                        {
+                            echo '<br>';
+                            // confirmation status
+                            if ( get_post_meta(get_the_ID(), '_all_confirmed', TRUE) == 'yes' )
+                            {
+                                echo __( 'All Parties Confirmed', 'propertyhive' );
+                            }
+                            else
+                            {
+                                echo __( 'Awaiting Confirmation', 'propertyhive' );
+                            }
+                        }
                         if ( $status == 'carried_out' )
                         {
                             echo '<br>';
