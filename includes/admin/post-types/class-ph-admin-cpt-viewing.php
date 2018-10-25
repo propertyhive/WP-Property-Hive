@@ -183,6 +183,19 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
             case 'status' :
                 
                 echo ucwords(str_replace("_", " ", $the_viewing->status));
+                if ( $the_viewing->status == 'pending' )
+                {
+                	echo '<br>';
+                	// confirmation status
+                	if ( $the_viewing->all_confirmed == 'yes' )
+                	{
+                		echo __( 'All Parties Confirmed', 'propertyhive' );
+                	}
+                	else
+                	{
+                		echo __( 'Awaiting Confirmation', 'propertyhive' );
+                	}
+                }
                 if ( $the_viewing->status == 'carried_out' )
                 {
                     echo '<br>';

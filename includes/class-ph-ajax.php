@@ -985,10 +985,23 @@ class PH_AJAX {
                     $property_query->the_post();
 
                     $property = new PH_Property(get_the_ID());
+
+                    $owner_id = $property->_owner_contact_id;
+                    $owner_name = '';
+                    if ( ( is_array($owner_id) && !empty($owner_id) ) || ( !is_array($owner_id) && $owner_id != '' ) )
+                    {
+                        if ( is_array($owner_id) )
+                        {
+                            $owner_id = reset($owner_id);
+                        }
+                        $owner_name = get_the_title($owner_id);
+                    }
                     
                     $return[] = array(
                         'ID' => get_the_ID(),
                         'post_title' => $property->get_formatted_full_address(),
+                        'owner_id' => $owner_id,
+                        'owner_name' => $owner_name
                     );
                 }
             }
