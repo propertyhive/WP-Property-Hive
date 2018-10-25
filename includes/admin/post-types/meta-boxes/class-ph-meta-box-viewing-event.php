@@ -140,6 +140,19 @@ class PH_Meta_Box_Viewing_Event {
             'class' => ''
         ) );
 
+        if ( get_post_meta( $post->ID, '_status', true ) == 'pending' )
+        {
+            propertyhive_wp_checkboxes( array(
+                'id' => '_confirmed', 
+                'wrapper_class' => 'confirmations',
+                'label' => __( 'Confirmed', 'propertyhive' ), 
+                'options' => array(
+                    
+                ),
+                'desc_tip' => false,
+            ) );
+        }
+
         do_action('propertyhive_viewing_event_fields');
 	    
         echo '</div>';
@@ -150,6 +163,101 @@ class PH_Meta_Box_Viewing_Event {
         {
             echo '<input type="hidden" name="_original_viewing_id" value="' . $_GET['viewing_id'] . '">';
         }
+
+        echo '<input type="hidden" name="_num_requiring_confirmation" id="_num_requiring_confirmation" value="">';
+
+        $previously_selected = array();
+        $confirmed = get_post_meta( $post->ID, '_confirmed', true );
+        if ( is_array($confirmed) && !empty($confirmed) )
+        {
+            $previously_selected = $confirmed;
+        }
+
+        echo '<script>
+
+            var previously_selected = ' . json_encode($previously_selected) . ';
+
+            jQuery(document).ready(function()
+            {
+                generate_confirmation_options(true);
+
+                jQuery(\'#_negotiator_ids\').change(function()
+                {
+                    generate_confirmation_options(false);
+                });
+
+                jQuery(\'#_applicant_contact_ids\').change(function()
+                {
+                    generate_confirmation_options(false);
+                });
+
+                jQuery(\'#_property_id\').change(function()
+                {
+                    generate_confirmation_options(false);
+                });
+            });
+
+            function generate_confirmation_options(first_load)
+            {
+                var num_requiring_confirmation = 0;
+
+                // get previously selected options so we can re-select them after updating options
+                if (!first_load)
+                {
+                    previously_selected = [];
+                    if ( jQuery("input[name=\'_confirmed[]\']:checked").length > 0 )
+                    {
+                        jQuery("input[name=\'_confirmed[]\']:checked").each(function()
+                        {
+                            previously_selected.push(jQuery(this).val());
+                        })
+                    }
+                }
+
+                var options = [];
+
+                // get applicant
+                jQuery(\'a[data-viewing-applicant-id]\').each(function()
+                {
+                    options.push( { id: \'applicant-\' + jQuery(this).attr(\'data-viewing-applicant-id\'), name: \'Applicant (\' + jQuery(this).attr(\'data-viewing-applicant-name\') + \')\' } );
+                });
+
+                // get owner
+                jQuery(\'a[data-viewing-owner-id]\').each(function()
+                {
+                    options.push( { id: \'owner-\' + jQuery(this).attr(\'data-viewing-owner-id\'), name: \'Owner (\' + jQuery(this).attr(\'data-viewing-owner-name\') + \')\' } );
+                });
+
+                // get negs
+                jQuery(\'#_negotiator_ids option:selected\').each(function(){ options.push( { id: \'negotiator-\' + jQuery(this).val(), name: \'Negotiator (\' + jQuery(this).text() + \')\' } ); });
+                
+                // set options
+                jQuery(\'.confirmations .ph-radios\').html(\'\');
+                if ( options.length > 0 )
+                {
+                    for ( var i in options )
+                    {
+                        jQuery(\'.confirmations .ph-radios\').append(\'<li><label><input type="checkbox" class="checkbox" name="_confirmed[]" value="\' + options[i].id + \'"> \' + options[i].name + \'</label></li>\');
+                        num_requiring_confirmation = num_requiring_confirmation + 1;
+                    }
+                }
+                else
+                {
+                    jQuery(\'.confirmations .ph-radios\').html(\'<li>Please select a negotiator, applicant or property</li>\');
+                }
+
+                // reselect previously selected
+                
+                for ( var i in previously_selected )
+                {
+                    //console.log(previously_selected[i]);
+                    jQuery("input[name=\'_confirmed[]\'][value=\'" + previously_selected[i] + "\']").prop(\'checked\', true);
+                }
+
+                jQuery(\'#_num_requiring_confirmation\').val(num_requiring_confirmation);
+            }
+
+        </script>';
     }
 
     /**
@@ -181,6 +289,18 @@ class PH_Meta_Box_Viewing_Event {
         }
 
         update_post_meta( $post_id, '_booking_notes', $_POST['_booking_notes'] );
+
+        $all_confirmed = '';
+        if ( isset($_POST['_confirmed']) )
+        {
+            update_post_meta( $post_id, '_confirmed', $_POST['_confirmed'] );
+
+            if ( count($_POST['_confirmed']) == $_POST['_num_requiring_confirmation'] )
+            {
+                $all_confirmed = 'yes';
+            }
+        }
+        update_post_meta( $post_id, '_all_confirmed', $all_confirmed );
         
         do_action( 'propertyhive_save_viewing_event', $post_id );   
     }

@@ -33,7 +33,7 @@ class PH_Meta_Box_Viewing_Applicant {
             
                 <label>' . __('Name', 'propertyhive') . '</label>
                 
-                <a href="' . get_edit_post_link($applicant_contact_id, '') . '">' . get_the_title($applicant_contact_id) . '</a>
+                <a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . $applicant_contact_id . '" data-viewing-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>
                 
             </p>';
 
@@ -140,7 +140,7 @@ jQuery(document).ready(function($)
         e.preventDefault();
 
         viewing_selected_applicants = []; // reset to only allow one applicant for now
-        viewing_selected_applicants[$(this).attr('href')] = ({ post_title: $(this).text() });
+        viewing_selected_applicants.push( { id: $(this).attr('href'), post_title: $(this).text() } );
 
         $('#viewing_search_applicant_results').html('');
         $('#viewing_search_applicant_results').hide();
@@ -156,7 +156,13 @@ jQuery(document).ready(function($)
 
         var applicant_id = $(this).attr('href');
 
-        delete(viewing_selected_applicants[applicant_id]);
+        for (var key in viewing_selected_applicants) 
+        {
+            if (viewing_selected_applicants[key].id == applicant_id ) 
+            {
+                viewing_selected_applicants.splice(key, 1);
+            }
+        }
 
         viewing_update_selected_applicants();
     });
@@ -164,16 +170,16 @@ jQuery(document).ready(function($)
 
 function viewing_update_selected_applicants()
 {
-    jQuery('#_applicant_contact_ids').val();
+    jQuery('#_applicant_contact_ids').val('');
 
-    if ( Object.keys(viewing_selected_applicants).length > 0 )
+    if ( viewing_selected_applicants.length > 0 )
     {
         jQuery('#viewing_selected_applicants').html('<ul></ul>');
         for ( var i in viewing_selected_applicants )
         {
-            jQuery('#viewing_selected_applicants ul').append('<li><a href="' + i + '" class="viewing-remove-applicant" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_applicants[i].post_title + '</li>');
+            jQuery('#viewing_selected_applicants ul').append('<li><a href="' + viewing_selected_applicants[i].id + '" class="viewing-remove-applicant" data-viewing-applicant-id="' + viewing_selected_applicants[i].id + '" data-viewing-applicant-name="' + viewing_selected_applicants[i].post_title + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_applicants[i].post_title + '</li>');
 
-            jQuery('#_applicant_contact_ids').val(i);
+            jQuery('#_applicant_contact_ids').val(viewing_selected_applicants[i].id);
         }
         jQuery('#viewing_selected_applicants').show();
     }
@@ -182,6 +188,8 @@ function viewing_update_selected_applicants()
         jQuery('#viewing_selected_applicants').html('');
         jQuery('#viewing_selected_applicants').hide();
     }
+
+    jQuery('#_applicant_contact_ids').trigger('change');
 }
 
 </script>
