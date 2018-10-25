@@ -171,13 +171,26 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 			 break;
             case 'property' :
                 
-                $property = new PH_Property((int)$the_viewing->property_id);
-                echo $property->get_formatted_full_address();
-                
+                if ( $the_viewing->property_id != '' ) 
+                {
+	                $property = new PH_Property((int)$the_viewing->property_id);
+	                echo $property->get_formatted_full_address();
+                }
+                else
+                {
+                	echo '-';
+                }
                 break;
             case 'applicant' :
                 
-                echo get_the_title($the_viewing->applicant_contact_id);
+                if ( $the_viewing->applicant_contact_id != '' ) 
+                {
+                	echo get_the_title($the_viewing->applicant_contact_id);
+                }
+                else
+                {
+                	echo '-';
+                }
                 
                 break;
             case 'status' :
