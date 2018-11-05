@@ -53,10 +53,10 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
 
 		// Sort link
-		/*add_filter( 'views_edit-property', array( $this, 'default_sorting_link' ) );
+		add_filter( 'views_edit-property', array( $this, 'remove_mine' ) );
 
 		// Prouct filtering
-		add_action( 'restrict_manage_posts', array( $this, 'property_filters' ) );
+		/*add_action( 'restrict_manage_posts', array( $this, 'property_filters' ) );
 		add_filter( 'parse_query', array( $this, 'property_filters_query' ) );*/
 
 		// Enhanced search
@@ -531,27 +531,22 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	}
 
 	/**
-	 * Product sorting link
-	 *
-	 * Based on Simple Page Ordering by 10up (http://wordpress.org/extend/plugins/simple-page-ordering/)
+	 * Remove 'Mine' view option
 	 *
 	 * @param array $views
 	 * @return array
 	 */
-	public function default_sorting_link( $views ) {
+	public function remove_mine( $views ) {
 		global $post_type, $wp_query;
 
 		if ( ! current_user_can('edit_others_pages') ) {
 			return $views;
 		}
 
-		$class            = ( isset( $wp_query->query['orderby'] ) && $wp_query->query['orderby'] == 'menu_order title' ) ? 'current' : '';
-		$query_string     = remove_query_arg(array( 'orderby', 'order' ));
-		$query_string     = add_query_arg( 'orderby', urlencode('menu_order title'), $query_string );
-		$query_string     = add_query_arg( 'order', urlencode('ASC'), $query_string );
-		$views['byorder'] = '<a href="'. $query_string . '" class="' . esc_attr( $class ) . '">' . __( 'Sort Properties', 'propertyhive' ) . '</a>';
+		if( isset( $views['mine'] ) )
+	        unset( $views['mine'] );
 
-		return $views;
+	    return $views;
 	}
 
 	/**
