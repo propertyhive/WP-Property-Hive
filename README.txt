@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 4.9.8
-Stable tag: 1.4.22
+Stable tag: 1.4.23
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,18 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.23 =
+* Added viewing confirmations. When adding/editing a viewing you can select which parties have confirmed
+* Added new filters to Viewings screen you can then also filter by status
+* Remove 'Mine' view option from property list
+* Allow for homepage to be used as search results page
+* Fixed POA display when properties loaded via AJAX (i.e. infinite scroll)
+* Added ability to output message/HTML in shortcodes if no results
+* Added new action to matching screen to allow other sending methods to be added in future (i.e. SMS property matching)
+* Display the send method (e.g. email) when showing if property previously sent when matching
+* Stripslashes when setting input value from $_GET
+* Added CSS allowing for adding of flags by Template Assistant add on (a new feature coming soon)
 
 = 1.4.22 =
 * Allow for multiple property types to be chosen for residential properties. If you export properties to a third party sich as Rightmove the first in the list will be used
