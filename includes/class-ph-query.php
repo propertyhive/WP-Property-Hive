@@ -766,7 +766,7 @@ class PH_Query {
 				);
 	      		$meta_query[] = array(
 				    'key'     => '_address_postcode',
-				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ) . '[ ]',
+				    'value'   => '^' . sanitize_text_field( $_REQUEST['address_keyword'] ) . '[ ]',
 				    'compare' => 'RLIKE'
 				);
 	      	}
