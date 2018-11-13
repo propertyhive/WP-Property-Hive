@@ -65,7 +65,7 @@ class PH_Admin_Meta_Boxes {
         if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
         {
             add_action( 'propertyhive_process_enquiry_meta', 'PH_Meta_Box_Enquiry_Record_Details::save', 10, 2 );
-            //add_action( 'propertyhive_process_enquiry_meta', 'PH_Meta_Box_Enquiry_Details::save', 15, 2 );
+            add_action( 'propertyhive_process_enquiry_meta', 'PH_Meta_Box_Enquiry_Details::save', 15, 2 );
         }
 
         // Save Viewing Meta Boxes
