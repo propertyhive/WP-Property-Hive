@@ -48,7 +48,7 @@ class PH_Admin_Dashboard {
 	}
 
 	/*
-	 * Property Hive News Widget
+	 * Property Hive Viewings Awaiting Applicant Feedback Widget
 	 */
 	public function viewings_awaiting_applicant_feedback_widget()
 	{
