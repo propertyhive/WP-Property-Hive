@@ -477,12 +477,6 @@ class PH_Install {
             ),
             'marketing_flag' => array(
                 array(
-                    'name' => 'Recently Sold'
-                ),
-                array(
-                    'name' => 'Recently Let'
-                ),
-                array(
                     'name' => 'New Instruction'
                 ),
                 array(
