@@ -813,14 +813,40 @@ class PH_Admin_Meta_Boxes {
         }
 
         // CONTACT
-        add_meta_box( 'propertyhive-contact-correspondence-address', __( 'Correspondence Address', 'propertyhive' ), 'PH_Meta_Box_Contact_Correspondence_Address::output', 'contact', 'normal', 'high' );
-        add_meta_box( 'propertyhive-contact-contact-details', __( 'Contact Details', 'propertyhive' ), 'PH_Meta_Box_Contact_Contact_Details::output', 'contact', 'normal', 'high' );
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-contact-correspondence-address',
+            'title' => __( 'Correspondence Address', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Contact_Correspondence_Address::output',
+            'screen' => 'contact',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-contact-contact-details',
+            'title' => __( 'Contact Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Contact_Contact_Details::output',
+            'screen' => 'contact',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_contact_details_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+        
         $tabs['tab_contact_details'] = array(
             'name' => __( 'Contact Details', 'propertyhive' ),
-            'metabox_ids' => array('propertyhive-contact-correspondence-address', 'propertyhive-contact-contact-details'),
+            'metabox_ids' => $ids,
             'post_type' => 'contact'
         );
-        
+
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'contact' )
         {
             add_meta_box( 'propertyhive-contact-relationships', __( 'Relationships', 'propertyhive' ), 'PH_Meta_Box_Contact_Relationships::output', 'contact', 'normal', 'high' );
