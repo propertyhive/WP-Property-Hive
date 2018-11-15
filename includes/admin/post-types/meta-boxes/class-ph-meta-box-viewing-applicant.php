@@ -55,23 +55,74 @@ class PH_Meta_Box_Viewing_Applicant {
         }
         else
         {
-            echo '<p class="form-field">
-            
-                <label for="viewing_applicant_search">' . __('Search Applicants', 'propertyhive') . '</label>
+            echo '<div id="viewing_applicant_search_existing">';
+
+                echo '<p class="form-field">
                 
-                <span style="position:relative;">
+                    <label for="viewing_applicant_search">' . __('Search Applicants', 'propertyhive') . '</label>
+                    
+                    <span style="position:relative;">
 
-                    <input type="text" name="viewing_applicant_search" id="viewing_applicant_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
+                        <input type="text" name="viewing_applicant_search" id="viewing_applicant_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
 
-                    <div id="viewing_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
+                        <div id="viewing_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
-                    <div id="viewing_selected_applicants" style="display:none;"></div>
+                        <div id="viewing_selected_applicants" style="display:none;"></div>
 
-                </span>
+                    </span>
+                    
+                </p>
+
+                <p class="form-field">
                 
-            </p>';
+                    <label for="">&nbsp;</label>
+                    
+                    <a href="" class="create-viewing-applicant button">Create New Applicant</a>
+                    
+                </p>';
 
-            echo '<input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="">';
+                echo '<input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="">';
+
+            echo '</div>';
+
+            echo '<div id="viewing_applicant_create_new" style="display:none">';
+
+                $args = array( 
+                    'id' => '_applicant_name', 
+                    'label' => __( 'Name', 'propertyhive' ), 
+                    'desc_tip' => false, 
+                    'type' => 'text'
+                );
+                propertyhive_wp_text_input( $args );
+
+                $args = array( 
+                    'id' => '_applicant_telephone_number', 
+                    'label' => __( 'Telephone Number', 'propertyhive' ), 
+                    'desc_tip' => false, 
+                    'type' => 'text'
+                );
+                propertyhive_wp_text_input( $args );
+
+                $args = array( 
+                    'id' => '_applicant_email_address', 
+                    'label' => __( 'Email Address', 'propertyhive' ), 
+                    'desc_tip' => false,
+                    'description' => 'Upon booking a new applicant record will be created with these details.',
+                    'type' => 'email'
+                );
+                propertyhive_wp_text_input( $args );
+
+                echo '<p class="form-field">
+                
+                    <label for="">&nbsp;</label>
+                    
+                    <a href="" class="create-viewing-applicant-cancel">Cancel and Search Existing Applicants</a>
+                    
+                </p>';
+
+            echo '</div>';
+
+            echo '<input type="hidden" name="_viewing_applicant_create_new" id="_viewing_applicant_create_new" value="">';
 ?>
 <script>
 
@@ -83,6 +134,27 @@ viewing_selected_applicants[<?php echo $_GET['applicant_contact_id']; ?>] = ({ p
 jQuery(document).ready(function($)
 {
     viewing_update_selected_applicants();
+
+    $('a.create-viewing-applicant').click(function(e)
+    {
+        e.preventDefault();
+
+        $('#_viewing_applicant_create_new').val('1');
+
+        $('#viewing_applicant_search_existing').hide();
+        $('#viewing_applicant_create_new').fadeIn();
+    });
+
+    $('a.create-viewing-applicant-cancel').click(function(e)
+    {
+        e.preventDefault();
+
+        $('#_viewing_applicant_create_new').val('');
+
+        $('#viewing_applicant_create_new').hide();
+        $('#viewing_applicant_search_existing').fadeIn();
+        
+    });
 
     $('#viewing_applicant_search').on('keyup keypress', function(e)
     {
@@ -210,9 +282,61 @@ function viewing_update_selected_applicants()
     public static function save( $post_id, $post ) {
         global $wpdb;
 
-        if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
+        if ( isset($_POST['_viewing_applicant_create_new']) && !empty($_POST['_viewing_applicant_create_new']) )
         {
-            update_post_meta( $post_id, '_applicant_contact_id', $_POST['_applicant_contact_ids'] );
+            // we're created a new applicant on submission
+            if (!empty($_POST['_applicant_name']))
+            {
+                // Need to create contact/applicant
+                $contact_post = array(
+                    'post_title'    => wp_strip_all_tags($_POST['_applicant_name']),
+                    'post_content'  => '',
+                    'post_type'     => 'contact',
+                    'post_status'   => 'publish',
+                    'comment_status'    => 'closed',
+                    'ping_status'    => 'closed',
+                );
+                        
+                // Insert the post into the database
+                $contact_post_id = wp_insert_post( $contact_post );
+
+                if ( is_wp_error($contact_post_id) || $contact_post_id == 0 )
+                {
+                    // Failed. Don't really know at the moment how to handle this
+
+                    $return = array('error' => 'Failed to create contact post. Please try again');
+                    //echo json_encode( $return );
+                    //die();
+                }
+                else
+                {
+                    // Successfully added contact post
+                    update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
+                    update_post_meta( $contact_post_id, '_telephone_number', trim($_POST['_applicant_telephone_number']) );
+                    update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", $_POST['_applicant_email_address']) );
+
+                    update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
+
+                    // get department of selected property
+                    $department = 'residential-sales'; // should be primary department. TODO
+                    if ( isset($_POST['_property_id']) && $_POST['_property_id'] != '' )
+                    {
+                        $property = new PH_Property( (int)$_POST['_property_id'] );
+                        $department = $property->department;
+                    }
+                    update_post_meta( $contact_post_id, '_applicant_profile_0', array( 'department' => $department, 'send_matching_properties' => '' ) );
+
+                    update_post_meta( $post_id, '_applicant_contact_id', $contact_post_id );
+                }
+                
+            }
+        }
+        else
+        {
+            if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
+            {
+                update_post_meta( $post_id, '_applicant_contact_id', $_POST['_applicant_contact_ids'] );
+            }
         }
     }
 
