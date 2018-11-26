@@ -63,5 +63,5 @@ function activateTipTip() {
 		'delay': 200
 	};
 
-	$( '.help_tip' ).tipTip( tiptip_args );
+	jQuery( '.help_tip' ).tipTip( tiptip_args );
 }
