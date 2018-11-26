@@ -1353,6 +1353,7 @@ class PH_Admin_Meta_Boxes {
                                         jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) 
                                         {
                                             jQuery(\'#\' + ajax_action[0].replace(\'get_\', \'propertyhive_\')).html(response);
+                                            activateTipTip();
                                         }, \'html\');
                                     //}
                                 }
