@@ -1203,7 +1203,7 @@ class PH_Admin_Meta_Boxes {
             $ids[] = $meta_box['id'];
         }
         
-        $tabs['tab_offer_summary'] = array(
+        $tabs['tab_sale_summary'] = array(
             'name' => __( 'Summary', 'propertyhive' ),
             'metabox_ids' => $ids,
             'post_type' => 'sale'
