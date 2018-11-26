@@ -141,7 +141,7 @@ class PH_Admin_Assets {
             }
         }
         
-        if ( in_array( $screen->id, array( 'property-hive_page_ph-settings' ) ) )
+        if ( strpos($screen->id, 'page_ph-settings') !== FALSE )
         {
             wp_enqueue_script( 'propertyhive_admin_settings' );
         
@@ -158,7 +158,7 @@ class PH_Admin_Assets {
         }
         
         // Reports Pages
-        if ( in_array( $screen->id, array( 'property-hive_page_ph-reports' ) ) )
+        if ( strpos($screen->id, 'page_ph-reports') !== FALSE )
         {
            //wp_register_script( 'ph-reports', PH()->plugin_url() . '/assets/js/admin/reports' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker' ), PH_VERSION );
 
