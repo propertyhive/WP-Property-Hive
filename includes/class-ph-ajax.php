@@ -2214,7 +2214,7 @@ class PH_AJAX {
                 >' . __('Revert To Pending', 'propertyhive') . '</a>';
         }
 
-        $actions = apply_filters( 'propertyhive_admin_viewing_actions', $actions, $post->ID );
+        $actions = apply_filters( 'propertyhive_admin_viewing_actions', $actions, $post_id );
 
         if ( !empty($actions) )
         {
@@ -3247,7 +3247,7 @@ class PH_AJAX {
                 >' . __('Revert To Pending', 'propertyhive') . '</a>';
         }
 
-        $actions = apply_filters( 'propertyhive_admin_offer_actions', $actions, $post->ID );
+        $actions = apply_filters( 'propertyhive_admin_offer_actions', $actions, $post_id );
 
         if ( !empty($actions) )
         {
@@ -3656,7 +3656,7 @@ class PH_AJAX {
                 >' . __('Sale Fallen Through', 'propertyhive') . '</a>';
         }
 
-        $actions = apply_filters( 'propertyhive_admin_sale_actions', $actions, $post->ID );
+        $actions = apply_filters( 'propertyhive_admin_sale_actions', $actions, $post_id );
 
         if ( !empty($actions) )
         {
