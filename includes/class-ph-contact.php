@@ -114,4 +114,54 @@ class PH_Contact {
         $this->post_title          = $result->post_title;
         $this->post_status         = $result->post_status;
     }
+
+    /**
+     * Get the full formatted address
+     *
+     * @access public
+     * @return string
+     */
+    public function get_formatted_full_address( $separator = ', ' ) {
+        // Standard post data
+        
+        $return = '';
+        
+        $address_name_number = $this->_address_name_number;
+        if ($address_name_number != '')
+        {
+            $return .= $address_name_number;
+        }
+        $address_street = $this->_address_street;
+        if ($address_street != '')
+        {
+            if ($return != '') { $return .= ' '; }
+            $return .= $address_street;
+        }
+        $address_two = $this->_address_two;
+        if ($address_two != '')
+        {
+            if ($return != '') { $return .= $separator; }
+            $return .= $address_two;
+        }
+        $address_three = $this->_address_three;
+        if ($address_three != '')
+        {
+            if ($return != '') { $return .= $separator; }
+            $return .= $address_three;
+        }
+        $address_four = $this->_address_four;
+        if ($address_four != '')
+        {
+            if ($return != '') { $return .= $separator; }
+            $return .= $address_four;
+        }
+        $address_postcode = $this->_address_postcode;
+        if ($address_postcode != '')
+        {
+            if ($return != '') { $return .= $separator; }
+            $return .= $address_postcode;
+        }
+        
+        return $return;
+    }
 }
