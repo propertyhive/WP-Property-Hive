@@ -900,6 +900,7 @@ class PH_Query {
         	if ( isset($explode_price_range[0]) && $explode_price_range[0] != '' )
         	{
         		$minimum_price = $explode_price_range[0];
+
 	        	if ( $search_form_currency != 'GBP' )
 	        	{
 	        		// Convert $explode_price_range[0] to GBP
@@ -908,7 +909,7 @@ class PH_Query {
 	        		$minimum_price = $ph_countries->convert_price_to_gbp( $minimum_price, $search_form_currency );
 	        	}
 
-	            $meta_query = array(
+	            $meta_query[] = array(
 	                'key'     => '_price_actual',
 	                'value'   => sanitize_text_field( floor( $minimum_price ) ),
 	                'compare' => '>=',
@@ -926,7 +927,7 @@ class PH_Query {
 	        		$maximum_price = $ph_countries->convert_price_to_gbp( $maximum_price, $search_form_currency );
 	        	}
 
-	            $meta_query = array(
+	            $meta_query[] = array(
 	                'key'     => '_price_actual',
 	                'value'   => sanitize_text_field( ceil( $maximum_price ) ),
 	                'compare' => '<=',
@@ -1042,7 +1043,7 @@ class PH_Query {
 	        		$minimum_rent = $ph_countries->convert_price_to_gbp( $minimum_rent, $search_form_currency );
 	        	}
 
-	            $meta_query = array(
+	            $meta_query[] = array(
 	                'key'     => '_price_actual',
 	                'value'   => sanitize_text_field( floor( $minimum_rent ) ),
 	                'compare' => '>=',
@@ -1060,7 +1061,7 @@ class PH_Query {
 	        		$maximum_rent = $ph_countries->convert_price_to_gbp( $maximum_rent, $search_form_currency );
 	        	}
 
-	            $meta_query = array(
+	            $meta_query[] = array(
 	                'key'     => '_price_actual',
 	                'value'   => sanitize_text_field( ceil( $maximum_rent ) ),
 	                'compare' => '<=',
