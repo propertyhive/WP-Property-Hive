@@ -39,7 +39,7 @@ function ph_get_search_form( $id = 'default' ) {
         if ( !isset($form_controls[$key]) )
         {
             // we've received a field that isn't a standard form control so let's store it in a hidden field so it's not lost
-            $form_controls[$key] = array('type' => 'hidden', 'value' => sanitize_text_field( $value ));
+            $form_controls[$key] = array('type' => 'hidden', 'value' => stripslashes( sanitize_text_field( $value) ));
         }
     }
     
