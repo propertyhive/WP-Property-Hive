@@ -71,12 +71,12 @@ class PH_Emails {
 		// Send applicant registration email 
 		add_action( 'propertyhive_applicant_registered', array( $this, 'send_applicant_registration_alert' ), 10, 2 );
 
-		add_action( 'admin_init', array( $this, 'run_custom_email_log_cron' ), 10, 1 );
+		add_action( 'admin_init', array( $this, 'run_custom_email_cron' ), 10, 1 );
 	}
 
-	public function run_custom_email_log_cron()
+	public function run_custom_email_cron()
 	{
-		if( isset($_GET['custom_email_log_cron']) )
+		if (isset($_GET['custom_email_log_cron']) && in_array($_GET['custom_email_log_cron'], array('propertyhive_process_email_log', 'propertyhive_auto_email_match')) )
         {
             do_action($_GET['custom_email_log_cron']);
         }
