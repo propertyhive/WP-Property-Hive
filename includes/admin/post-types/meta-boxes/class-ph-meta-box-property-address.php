@@ -44,7 +44,7 @@ class PH_Meta_Box_Property_Address {
         $parent_post = false;
         if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
         {
-            $post_parent_id = $_GET['post_parent'];
+            $post_parent_id = (int)$_GET['post_parent'];
             $parent_post = $post_parent_id;
         }
         propertyhive_wp_hidden_input( array( 
@@ -501,18 +501,18 @@ class PH_Meta_Box_Property_Address {
     public static function save( $post_id, $post ) {
         global $wpdb;
 
-        update_post_meta( $post_id, '_reference_number', $_POST['_reference_number'] );
-        update_post_meta( $post_id, '_address_name_number', $_POST['_address_name_number'] );
-        update_post_meta( $post_id, '_address_street', $_POST['_address_street'] );
-        update_post_meta( $post_id, '_address_two', $_POST['_address_two'] );
-        update_post_meta( $post_id, '_address_three', $_POST['_address_three'] );
-        update_post_meta( $post_id, '_address_four', $_POST['_address_four'] );
-        update_post_meta( $post_id, '_address_postcode', $_POST['_address_postcode'] );
-        update_post_meta( $post_id, '_address_country', $_POST['_address_country'] );
+        update_post_meta( $post_id, '_reference_number', ph_clean($_POST['_reference_number']) );
+        update_post_meta( $post_id, '_address_name_number', ph_clean($_POST['_address_name_number']) );
+        update_post_meta( $post_id, '_address_street', ph_clean($_POST['_address_street']) );
+        update_post_meta( $post_id, '_address_two', ph_clean($_POST['_address_two']) );
+        update_post_meta( $post_id, '_address_three', ph_clean($_POST['_address_three']) );
+        update_post_meta( $post_id, '_address_four', ph_clean($_POST['_address_four']) );
+        update_post_meta( $post_id, '_address_postcode', ph_clean($_POST['_address_postcode']) );
+        update_post_meta( $post_id, '_address_country', ph_clean($_POST['_address_country']) );
 
         if ( !empty($_POST['location_id']) )
         {
-            wp_set_post_terms( $post_id, $_POST['location_id'], 'location' );
+            wp_set_post_terms( $post_id, ph_clean($_POST['location_id']), 'location' );
         }
         else
         {

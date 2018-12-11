@@ -181,7 +181,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             
             if (isset($_REQUEST['id'])) // we're either adding or editing
             {
-                $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+                $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
                 
                 switch ($current_section)
                 {
@@ -1455,7 +1455,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_availability_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
         
         $taxonomy = 'availability';
         $term_name = '';
@@ -1498,7 +1498,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_property_type_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
         
         $taxonomy = 'property_type';
         $term_name = '';
@@ -1569,7 +1569,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_commercial_property_type_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
         
         $taxonomy = 'commercial_property_type';
         $term_name = '';
@@ -1640,7 +1640,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_location_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
         
         $taxonomy = 'location';
         $term_name = '';
@@ -1725,7 +1725,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_parking_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
         
         $taxonomy = 'parking';
         $term_name = '';
@@ -1768,7 +1768,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_outside_space_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
         
         $taxonomy = 'outside_space';
         $term_name = '';
@@ -2355,7 +2355,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         {
             if (isset($_REQUEST['id'])) // we're either adding or editing
             {
-                $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+                $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
                 
                 switch ($current_section)
                 {
@@ -2373,10 +2373,10 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             // TODO: Check term doesn't exist already
                             
                             wp_insert_term(
-                                $_POST[$_POST['taxonomy'] . '_name'], // the term 
-                                $_POST['taxonomy'], // the taxonomy
+                                ph_clean($_POST[ph_clean($_POST['taxonomy']) . '_name']), // the term 
+                                ph_clean($_POST['taxonomy']), // the taxonomy
                                 array(
-                                    'parent' => $_POST['parent_' . $_POST['taxonomy'] . '_id']
+                                    'parent' => $_POST['parent_' . ph_clean($_POST['taxonomy']) . '_id']
                                 )
                             );
                             
@@ -2385,9 +2385,9 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         else
                         {
                             // Editing term
-                            wp_update_term($current_id, $_POST['taxonomy'], array(
-                                'name' => $_POST[$_POST['taxonomy'].'_name'],
-                                 'parent' => $_POST['parent_' . $_POST['taxonomy'] . '_id']
+                            wp_update_term($current_id, ph_clean($_POST['taxonomy']), array(
+                                'name' => ph_clean($_POST[ph_clean($_POST['taxonomy']).'_name']),
+                                 'parent' => ph_clean($_POST['parent_' . $_POST['taxonomy'] . '_id'])
                             ));
                             
                             // TODO: Check for errors returned from wp_update_term()
@@ -2415,7 +2415,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             // TODO: Check term doesn't exist already
                             
                             wp_insert_term(
-                                $_POST[$_POST['taxonomy'] . '_name'], // the term 
+                                ph_clean($_POST[ph_clean($_POST['taxonomy']) . '_name']), // the term 
                                 $_POST['taxonomy'] // the taxonomy
                             );
                             
@@ -2424,8 +2424,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         else
                         {
                             // Editing term
-                            wp_update_term($current_id, $_POST['taxonomy'], array(
-                                'name' => $_POST[$_POST['taxonomy'] . '_name']
+                            wp_update_term($current_id, ph_clean($_POST['taxonomy']), array(
+                                'name' => ph_clean($_POST[ph_clean($_POST['taxonomy']) . '_name'])
                             ));
                             
                             // TODO: Check for errors returned from wp_update_term()
@@ -2472,14 +2472,14 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     {
                                         $property_query->the_post();
                                         
-                                        wp_remove_object_terms( $post->ID, $current_id, $_POST['taxonomy'] );
+                                        wp_remove_object_terms( $post->ID, $current_id, ph_clean($_POST['taxonomy']) );
                                         
                                         // Re-assign to another term
                                         if ( isset($_POST['reassign_to_' . $current_id]) && ! empty( $_POST['reassign_to_' . $current_id] ) && $_POST['reassign_to_' . $current_id] != 'none' )
                                         {
                                             $new_id = $_POST['reassign_to_' . $current_id];
                                             
-                                            wp_set_post_terms( $post->ID, $new_id, $_POST['taxonomy'], TRUE );
+                                            wp_set_post_terms( $post->ID, $new_id, ph_clean($_POST['taxonomy']), TRUE );
                                             
                                             // TODO: Check for WP_ERROR
                                         }
@@ -2522,20 +2522,20 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                                 {
                                                     $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
 
-                                                    if ( isset($applicant_profile[$_POST['taxonomy'].'s']) && is_array($applicant_profile[$_POST['taxonomy'].'s']) && !empty($applicant_profile[$_POST['taxonomy'].'s']) )
+                                                    if ( isset($applicant_profile[ph_clean($_POST['taxonomy']).'s']) && is_array($applicant_profile[ph_clean($_POST['taxonomy']).'s']) && !empty($applicant_profile[ph_clean($_POST['taxonomy']).'s']) )
                                                     {
-                                                        if (in_array($current_id, $applicant_profile[$_POST['taxonomy'].'s']))
+                                                        if (in_array($current_id, $applicant_profile[ph_clean($_POST['taxonomy']).'s']))
                                                         {
                                                             // This profile has this term set
-                                                            unset($applicant_profile[$_POST['taxonomy'].'s'][$current_id]);
+                                                            unset($applicant_profile[ph_clean($_POST['taxonomy']).'s'][$current_id]);
 
-                                                            if ( isset($_POST['reassign_to_' . $current_id]) && ! empty( $_POST['reassign_to_' . $current_id] ) && $_POST['reassign_to_' . $current_id] != 'none' )
+                                                            if ( isset($_POST['reassign_to_' . $current_id]) && ! empty( $_POST['reassign_to_' . $current_id] ) && ph_clean($_POST['reassign_to_' . $current_id]) != 'none' )
                                                             {
-                                                                $applicant_profile[$_POST['taxonomy'].'s'][] = $_POST['reassign_to_' . $current_id];
-                                                                $applicant_profile[$_POST['taxonomy'].'s'] = array_unique($applicant_profile[$_POST['taxonomy'].'s']);
+                                                                $applicant_profile[ph_clean($_POST['taxonomy']).'s'][] = $_POST['reassign_to_' . $current_id];
+                                                                $applicant_profile[ph_clean($_POST['taxonomy']).'s'] = array_unique($applicant_profile[ph_clean($_POST['taxonomy']).'s']);
                                                             }
 
-                                                            $applicant_profile[$_POST['taxonomy'].'s'] = array_values($applicant_profile[$_POST['taxonomy'].'s']);
+                                                            $applicant_profile[ph_clean($_POST['taxonomy']).'s'] = array_values($applicant_profile[ph_clean($_POST['taxonomy']).'s']);
 
                                                             update_post_meta( get_the_ID(), '_applicant_profile_' . $i, $applicant_profile );
                                                         }
@@ -2548,7 +2548,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
                                 wp_reset_postdata();
 
-                                wp_delete_term( $current_id, $_POST['taxonomy'] );
+                                wp_delete_term( $current_id, ph_clean($_POST['taxonomy']) );
                             }
                         }
 

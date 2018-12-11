@@ -30,8 +30,6 @@ class PH_Admin_Post_Types {
         add_action( 'restrict_manage_posts', array( $this, 'restrict_manage_posts' ) );
         add_filter( 'request', array( $this, 'request_query' ) );
 
-        add_filter( 'posts_where', array( $this, 'search_property_reference' ) );
-
 		// Status transitions
 		add_action( 'delete_post', array( $this, 'delete_post' ) );
 		add_action( 'wp_trash_post', array( $this, 'trash_post' ) );
@@ -201,6 +199,8 @@ class PH_Admin_Post_Types {
      */
     public function property_department_filter() {
         global $wp_query;
+
+        $selected_department = isset( $_GET['_department'] ) && in_array( $_GET['_department'], array( 'residential-sales', 'residential-lettings', 'commercial' ) ) ? $_GET['_department'] : '';
         
         // Department filtering
         $output  = '<select name="_department" id="dropdown_property_department">';
@@ -210,28 +210,19 @@ class PH_Admin_Post_Types {
             if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
             {
                 $output .= '<option value="residential-sales"';
-                if ( isset( $_GET['_department'] ) && ! empty( $_GET['_department'] ) )
-                {
-                    $output .= selected( 'residential-sales', $_GET['_department'], false );
-                }
+                $output .= selected( 'residential-sales', $selected_department, false );
                 $output .= '>' . __( 'Residential Sales', 'propertyhive' ) . '</option>';
             }
             if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
             {
                 $output .= '<option value="residential-lettings"';
-                if ( isset( $_GET['_department'] ) && ! empty( $_GET['_department'] ) )
-                {
-                    $output .= selected( 'residential-lettings', $_GET['_department'], false );
-                }
+                $output .= selected( 'residential-lettings', $selected_department, false );
                 $output .= '>' . __( 'Residential Lettings', 'propertyhive' ) . '</option>';
             }
             if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
             {
                 $output .= '<option value="commercial"';
-                if ( isset( $_GET['_department'] ) && ! empty( $_GET['_department'] ) )
-                {
-                    $output .= selected( 'commercial', $_GET['_department'], false );
-                }
+                $output .= selected( 'commercial', $selected_department, false );
                 $output .= '>' . __( 'Commercial', 'propertyhive' ) . '</option>';
             }
         $output .= '</select>';
@@ -267,7 +258,7 @@ class PH_Admin_Post_Types {
                 $output .= '<option value="' . $post->ID . '"';
                 if ( isset( $_GET['_office_id'] ) && ! empty( $_GET['_office_id'] ) )
                 {
-                    $output .= selected( $post->ID, $_GET['_office_id'], false );
+                    $output .= selected( $post->ID, (int)$_GET['_office_id'], false );
                 }
                 $output .= '>' . get_the_title() . '</option>';
             }
@@ -289,7 +280,7 @@ class PH_Admin_Post_Types {
         $selected = '';
         if ( isset( $_GET['_negotiator_id'] ) && ! empty( $_GET['_negotiator_id'] ) )
         {
-            $selected = $_GET['_negotiator_id'];
+            $selected = (int)$_GET['_negotiator_id'];
         }
         
         $args = array(
@@ -366,7 +357,7 @@ class PH_Admin_Post_Types {
                 $output .= '<option value="' . $value . '"';
                 if ( isset( $_GET['_location_id'] ) && ! empty( $_GET['_location_id'] ) )
                 {
-                    $output .= selected( $value, $_GET['_location_id'], false );
+                    $output .= selected( $value, (int)$_GET['_location_id'], false );
                 }
                 $output .= '>' . $label . '</option>';
             }
@@ -410,7 +401,7 @@ class PH_Admin_Post_Types {
                 $output .= '<option value="' . $value . '"';
                 if ( isset( $_GET['_availability_id'] ) && ! empty( $_GET['_availability_id'] ) )
                 {
-                    $output .= selected( $value, $_GET['_availability_id'], false );
+                    $output .= selected( $value, (int)$_GET['_availability_id'], false );
                 }
                 $output .= '>' . $label . '</option>';
             }
@@ -458,7 +449,7 @@ class PH_Admin_Post_Types {
             $output .= '<option value="' . $key . '"';
             if ( isset( $_GET['_marketing'] ) && ! empty( $_GET['_marketing'] ) )
             {
-                $output .= selected( $key, $_GET['_marketing'], false );
+                $output .= selected( $key, sanitize_text_field($_GET['_marketing']), false );
             }
             $output .= '>' . $value . '</option>';
         }
@@ -473,36 +464,29 @@ class PH_Admin_Post_Types {
      */
     public function contact_filters() {
         global $wp_query;
+
+        $selected_contact_type = isset( $_GET['_contact_type'] ) && in_array( $_GET['_contact_type'], array( 'owner', 'applicant', 'thirdparty' ) ) ? $_GET['_contact_type'] : '';
         
         // Type filtering        
         $options = array();
 
         // Owners
         $option = '<option value="owner"';
-        if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
-        {
-            $option .= selected( 'owner', $_GET['_contact_type'], false );
-        }
+        $option .= selected( 'owner', $selected_contact_type, false );
         $option .= '>' . __( 'Owners and Landlords', 'propertyhive' ) . '</option>';
 
         $options[] = $option;
 
         // Applicants
         $option = '<option value="applicant"';
-        if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
-        {
-            $option .= selected( 'applicant', $_GET['_contact_type'], false );
-        }
+        $option .= selected( 'applicant', $selected_contact_type, false );
         $option .= '>' . __( 'Applicants', 'propertyhive' ) . '</option>';
 
         $options[] = $option;
 
         // Third Parties
         $option = '<option value="thirdparty"';
-        if ( isset( $_GET['_contact_type'] ) && ! empty( $_GET['_contact_type'] ) )
-        {
-            $option .= selected( 'thirdparty', $_GET['_contact_type'], false );
-        }
+        $option .= selected( 'thirdparty', $selected_contact_type, false );
         $option .= '>' . __( 'Third Party Contacts', 'propertyhive' ) . '</option>';
 
         $options[] = $option;
@@ -544,21 +528,18 @@ class PH_Admin_Post_Types {
      */
     public function enquiry_status_filter() {
         global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'open', 'closed' ) ) ? $_GET['_status'] : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_enquiry_status">';
             
             $output .= '<option value="open"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'open', $_GET['_status'], false );
-            }
+            $option .= selected( 'open', $selected_status, false );
             $output .= '>' . __( 'Open', 'propertyhive' ) . '</option>';
+
             $output .= '<option value="closed"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'closed', $_GET['_status'], false );
-            }
+            $option .= selected( 'closed', $selected_status, false );
             $output .= '>' . __( 'Closed', 'propertyhive' ) . '</option>';
             
         $output .= '</select>';
@@ -589,7 +570,7 @@ class PH_Admin_Post_Types {
                 $output .= '<option value="' . $key . '"';
                 if ( isset( $_GET['_source'] ) && ! empty( $_GET['_source'] ) )
                 {
-                    $output .= selected( $key, $_GET['_source'], false );
+                    $output .= selected( $key, sanitize_text_field($_GET['_source']), false );
                 }
                 $output .= '>' . __( $value, 'propertyhive' ) . '</option>';
             }
@@ -618,6 +599,8 @@ class PH_Admin_Post_Types {
      */
     public function viewing_status_filter() {
         global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'open', 'pending', 'confirmed', 'unconfirmed', 'carried_out', 'feedback_passed_on', 'feedback_not_passed_on', 'cancelled' ) ) ? $_GET['_status'] : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_viewing_status">';
@@ -625,46 +608,31 @@ class PH_Admin_Post_Types {
             $output .= '<option value="open">All Statuses</option>';
 
             $output .= '<option value="pending"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'pending', $_GET['_status'], false );
-            }
+            $output .= selected( 'pending', $selected_status, false );
             $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+
             $output .= '<option value="confirmed"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'confirmed', $_GET['_status'], false );
-            }
+            $output .= selected( 'confirmed', $selected_status, false );
             $output .= '>- ' . __( 'Confirmed', 'propertyhive' ) . '</option>';
+
             $output .= '<option value="unconfirmed"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'unconfirmed', $_GET['_status'], false );
-            }
+            $output .= selected( 'unconfirmed', $selected_status, false );
             $output .= '>- ' . __( 'Awaiting Confirmation', 'propertyhive' ) . '</option>';
+
             $output .= '<option value="carried_out"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'carried_out', $_GET['_status'], false );
-            }
+            $output .= selected( 'carried_out', $selected_status, false );
             $output .= '>' . __( 'Carried Out', 'propertyhive' ) . '</option>';
+
             $output .= '<option value="feedback_passed_on"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'feedback_passed_on', $_GET['_status'], false );
-            }
+            $output .= selected( 'feedback_passed_on', $selected_status, false );
             $output .= '>- ' . __( 'Feedback Passed On', 'propertyhive' ) . '</option>';
+
             $output .= '<option value="feedback_not_passed_on"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'feedback_not_passed_on', $_GET['_status'], false );
-            }
+            $output .= selected( 'feedback_not_passed_on', $selected_status, false );
             $output .= '>- ' . __( 'Feedback Not Passed On', 'propertyhive' ) . '</option>';
+
             $output .= '<option value="cancelled"';
-            if ( isset( $_GET['_status'] ) && ! empty( $_GET['_status'] ) )
-            {
-                $output .= selected( 'cancelled', $_GET['_status'], false );
-            }
+            $output .= selected( 'cancelled', $selected_status, false );
             $output .= '>' . __( 'Cancelled', 'propertyhive' ) . '</option>';
             
         $output .= '</select>';
@@ -694,25 +662,25 @@ class PH_Admin_Post_Types {
             if ( ! empty( $_GET['_office_id'] ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_office_id',
-                    'value' => sanitize_text_field( $_GET['_office_id'] ),
+                    'value' => (int)$_GET['_office_id'],
                 );
             }
             if ( ! empty( $_GET['_negotiator_id'] ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_negotiator_id',
-                    'value' => sanitize_text_field( $_GET['_negotiator_id'] ),
+                    'value' => (int)$_GET['_negotiator_id'],
                 );
             }
             if ( ! empty( $_GET['_location_id'] ) ) {
                 $vars['tax_query'][] = array(
                     'taxonomy'  => 'location',
-                    'terms' => ( (is_array($_GET['_location_id'])) ? $_GET['_location_id'] : array( $_GET['_location_id'] ) )
+                    'terms' => ( (is_array($_GET['_location_id'])) ? (int)$_GET['_location_id'] : array( (int)$_GET['_location_id'] ) )
                 );
             }
             if ( ! empty( $_GET['_availability_id'] ) ) {
                 $vars['tax_query'][] = array(
                     'taxonomy'  => 'availability',
-                    'terms' => ( (is_array($_GET['_availability_id'])) ? $_GET['_availability_id'] : array( $_GET['_availability_id'] ) )
+                    'terms' => ( (is_array($_GET['_availability_id'])) ? (int)$_GET['_availability_id'] : array( (int)$_GET['_availability_id'] ) )
                 );
             }
             if ( ! empty( $_GET['_marketing'] ) && $_GET['_marketing'] == 'on_market' ) {
@@ -763,7 +731,7 @@ class PH_Admin_Post_Types {
         elseif ( 'viewing' === $typenow ) 
         {
             if ( ! empty( $_GET['_status'] ) ) {
-                switch ( $_GET['_status'] )
+                switch ( sanitize_text_field( $_GET['_status'] ) )
                 {
                     case "confirmed":
                     {
@@ -841,24 +809,6 @@ class PH_Admin_Post_Types {
         $vars = apply_filters( 'propertyhive_property_filter_query', $vars, $typenow );
 
         return $vars;
-    }
-    
-    /**
-     * search_property_reference function.
-     *
-     * @access public
-     * @param string $where (default: '')
-     * @return string (modified where clause)
-     */
-    public function search_property_reference( $where = '' ) {
-        global $typenow;
-        
-        if ( $typenow == 'property' && isset( $_GET['s'] ) && ! empty( $_GET['s'] ) )
-        {
-            //$where .= 'hel';
-        }
-        
-        return $where;
     }
 
 	/**

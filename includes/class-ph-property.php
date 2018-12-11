@@ -335,7 +335,7 @@ class PH_Property {
                     {
                         if ( $_GET['currency'] != '' )
                         {
-                            $requested_currency = $ph_countries->get_currency( $_GET['currency'] );
+                            $requested_currency = $ph_countries->get_currency( sanitize_text_field($_GET['currency']) );
                             if ( $requested_currency !== FALSE )
                             {
                                 $currency = $requested_currency;
@@ -343,7 +343,7 @@ class PH_Property {
                                 $exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
                                 if ( isset($exchange_rates[$_GET['currency']]) )
                                 {
-                                    $currency['exchange_rate'] = $exchange_rates[$_GET['currency']];
+                                    $currency['exchange_rate'] = $exchange_rates[sanitize_text_field($_GET['currency'])];
                                 }
                             }
                         }

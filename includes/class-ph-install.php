@@ -49,44 +49,8 @@ class PH_Install {
 	 * Install actions such as installing pages when a button is clicked.
 	 */
 	public function install_actions() {
-		// Install - Add pages button
-        /*if ( ! empty( $_GET['install_propertyhive_pages'] ) ) {
 
-			self::create_pages();
 
-			// We no longer need to install pages
-			delete_option( '_ph_needs_pages' );
-			delete_transient( '_ph_activation_redirect' );
-
-			// What's new redirect
-			wp_redirect( admin_url( 'index.php?page=ph-about&ph-installed=true' ) );
-			exit;
-
-		// Skip button
-		} elseif ( ! empty( $_GET['skip_install_propertyhive_pages'] ) ) {
-
-			// We no longer need to install pages
-			delete_option( '_ph_needs_pages' );
-			delete_transient( '_ph_activation_redirect' );
-
-			// What's new redirect
-			wp_redirect( admin_url( 'index.php?page=ph-about' ) );
-			exit;
-
-		// Update button
-		} elseif ( ! empty( $_GET['do_update_propertyhive'] ) ) {
-
-			$this->update();
-
-			// Update complete
-			delete_option( '_ph_needs_pages' );
-			delete_option( '_ph_needs_update' );
-			delete_transient( '_ph_activation_redirect' );
-
-			// What's new redirect
-			wp_redirect( admin_url( 'index.php?page=ph-about&ph-updated=true' ) );
-			exit;
-		}*/
 	}
 
 	/**

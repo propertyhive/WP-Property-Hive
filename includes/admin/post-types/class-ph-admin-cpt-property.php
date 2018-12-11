@@ -105,10 +105,10 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		if ( ! empty( $_GET['post_type'] ) && 'property' == $_GET['post_type'] ) {
 			return true;
 		}
-		if ( ! empty( $_GET['post'] ) && 'property' == get_post_type( $_GET['post'] ) ) {
+		if ( ! empty( $_GET['post'] ) && 'property' == get_post_type( (int)$_GET['post'] ) ) {
 			return true;
 		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'property' == get_post_type( $_REQUEST['post_id'] ) ) {
+		if ( ! empty( $_REQUEST['post_id'] ) && 'property' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
 			return true;
 		}
 		return false;
@@ -571,29 +571,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		global $typenow, $wp_query;
 
 		if ( 'property' == $typenow ) {
-
-			/*if ( isset( $query->query_vars['product_type'] ) ) {
-				// Subtypes
-				if ( 'downloadable' == $query->query_vars['product_type'] ) {
-					$query->query_vars['product_type']  = '';
-					$query->query_vars['meta_value']    = 'yes';
-					$query->query_vars['meta_key']      = '_downloadable';
-				} elseif ( 'virtual' == $query->query_vars['product_type'] ) {
-					$query->query_vars['product_type']  = '';
-					$query->query_vars['meta_value']    = 'yes';
-					$query->query_vars['meta_key']      = '_virtual';
-				}
-			}
-
-			// Categories
-			if ( isset( $_GET['product_cat'] ) && '0' == $_GET['product_cat'] ) {
-				$query->query_vars['tax_query'][] = array(
-					'taxonomy' => 'product_cat',
-					'field'    => 'id',
-					'terms'    => get_terms( 'product_cat', array( 'fields' => 'ids' ) ),
-					'operator' => 'NOT IN'
-				);
-			}*/
+			
 		}
 	}
 
@@ -718,24 +696,24 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		// Save fields
 		if ( ! empty( $_REQUEST['_on_market'] ) ) 
 		{
-			$on_market = $_REQUEST['_on_market'];
+			$on_market = ph_clean( $_REQUEST['_on_market'] );
 			if ( $_REQUEST['_on_market'] != 'yes' ) { $on_market = ''; } // can only be 'yes' or blank
 			update_post_meta( $post_id, '_on_market', ph_clean( $on_market ) );
 		}
 
 		if ( ! empty( $_REQUEST['_availability'] ) && is_numeric( $_REQUEST['_availability'] ) ) 
 		{
-			wp_set_post_terms( $post_id, ph_clean( $_REQUEST['_availability'] ), 'availability' );
+			wp_set_post_terms( $post_id, (int)$_REQUEST['_availability'], 'availability' );
 		}
 
 		if ( ! empty( $_REQUEST['_negotiator_id'] ) && is_numeric( $_REQUEST['_negotiator_id'] ) && $_REQUEST['_negotiator_id'] != '-1' ) 
 		{
-			update_post_meta( $post_id, '_negotiator_id', ph_clean( $_REQUEST['_negotiator_id'] ) );
+			update_post_meta( $post_id, '_negotiator_id', (int)$_REQUEST['_negotiator_id'] );
 		}
 
 		if ( ! empty( $_REQUEST['_office_id'] ) && is_numeric( $_REQUEST['_office_id'] ) ) 
 		{
-			update_post_meta( $post_id, '_office_id', ph_clean( $_REQUEST['_office_id'] ) );
+			update_post_meta( $post_id, '_office_id', (int)$_REQUEST['_office_id'] );
 		}
 
 		do_action( 'propertyhive_property_bulk_edit_save', $property );

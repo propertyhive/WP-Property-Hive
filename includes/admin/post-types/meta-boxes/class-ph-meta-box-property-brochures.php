@@ -262,7 +262,7 @@ class PH_Meta_Box_Property_Brochures {
         $brochures = array();
         if (trim($_POST['brochure_attachment_ids'], ',') != '')
         {
-            $brochures = explode( ",", trim($_POST['brochure_attachment_ids'], ',') );
+            $brochures = explode( ",", trim(ph_clean($_POST['brochure_attachment_ids']), ',') );
         }
         update_post_meta( $post_id, '_brochures', $brochures );
     }

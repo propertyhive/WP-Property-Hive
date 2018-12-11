@@ -122,13 +122,13 @@ class PH_Meta_Box_Contact_Correspondence_Address {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        update_post_meta( $post_id, '_address_name_number', $_POST['_address_name_number'] );
-        update_post_meta( $post_id, '_address_street', $_POST['_address_street'] );
-        update_post_meta( $post_id, '_address_two', $_POST['_address_two'] );
-        update_post_meta( $post_id, '_address_three', $_POST['_address_three'] );
-        update_post_meta( $post_id, '_address_four', $_POST['_address_four'] );
-        update_post_meta( $post_id, '_address_postcode', $_POST['_address_postcode'] );
-        update_post_meta( $post_id, '_address_country', $_POST['_address_country'] );
+        update_post_meta( $post_id, '_address_name_number', ph_clean($_POST['_address_name_number']) );
+        update_post_meta( $post_id, '_address_street', ph_clean($_POST['_address_street']) );
+        update_post_meta( $post_id, '_address_two', ph_clean($_POST['_address_two']) );
+        update_post_meta( $post_id, '_address_three', ph_clean($_POST['_address_three']) );
+        update_post_meta( $post_id, '_address_four', ph_clean($_POST['_address_four']) );
+        update_post_meta( $post_id, '_address_postcode', ph_clean($_POST['_address_postcode']) );
+        update_post_meta( $post_id, '_address_country', ph_clean($_POST['_address_country']) );
 
         do_action( 'propertyhive_save_contact_correspondence_address', $post_id );
     }

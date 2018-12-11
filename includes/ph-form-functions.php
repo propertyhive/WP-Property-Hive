@@ -39,7 +39,7 @@ function ph_get_search_form( $id = 'default' ) {
         if ( !isset($form_controls[$key]) )
         {
             // we've received a field that isn't a standard form control so let's store it in a hidden field so it's not lost
-            $form_controls[$key] = array('type' => 'hidden', 'value' => stripslashes( sanitize_text_field( $value) ));
+            $form_controls[$key] = array('type' => 'hidden', 'value' => stripslashes( ph_clean( $value) ));
         }
     }
     
@@ -674,7 +674,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = stripslashes($_GET[$key]);
+                $field['value'] = sanitize_text_field( wp_unslash( $_GET[$key] ) );
             }
             else
             {
@@ -728,7 +728,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = $_GET[$key];
+                $field['value'] = sanitize_textarea_field( wp_unslash( $_GET[$key] ) );
             }
             
             $output .= $field['before'];
@@ -765,7 +765,7 @@ function ph_form_field( $key, $field )
             $field['label_style'] = isset( $field['label_style'] ) ? $field['label_style'] : '';
             $field['value'] = isset( $field['value'] ) ? $field['value'] : 'yes';
             $field['checked'] = isset( $field['checked'] ) ? $field['checked'] : false;
-            if ( isset( $_GET[$key] ) && $_GET[$key] == $field['value'] )
+            if ( isset( $_GET[$key] ) && sanitize_text_field(wp_unslash($_GET[$key])) == $field['value'] )
             {
                 $field['checked'] = true;
             }
@@ -800,7 +800,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = $_GET[$key];
+                $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
             
             $output .= $field['before'];
@@ -838,7 +838,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = $_GET[$key];
+                $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
             
             $output .= $field['before'];
@@ -886,7 +886,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = $_GET[$key];
+                $field['value'] = (int)$_GET[$key];
             }
             
             $output .= $field['before'];
@@ -947,7 +947,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = $_GET[$key];
+                $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
             
             $output .= $field['before'];
@@ -998,7 +998,7 @@ function ph_form_field( $key, $field )
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
-                $field['value'] = stripslashes($_GET[$key]);
+                $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
             
             $output .= '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . $field['value'] . '">';
@@ -1038,7 +1038,7 @@ function ph_form_field( $key, $field )
                 $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
                 if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
                 {
-                    $field['value'] = $_GET[$key];
+                    $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
                 }
                 
                 $output .= $field['before'];

@@ -452,24 +452,24 @@ class PH_Settings_General extends PH_Settings_Page {
 					if (!isset($_POST['propertyhive_countries']) || (isset($_POST['propertyhive_countries']) && empty($_POST['propertyhive_countries'])))
 					{
 						// If we haven't selected which countries we operate in
-						update_option( 'propertyhive_countries', array( $_POST['propertyhive_default_country'] ) );
+						update_option( 'propertyhive_countries', array( ph_clean($_POST['propertyhive_default_country']) ) );
 					}
 					else
 					{
 						// We have default country and countries set
 						// Make sure default country is in list of countries selected
-						if ( !in_array($_POST['propertyhive_default_country'], $_POST['propertyhive_countries']) ) {
+						if ( !in_array(ph_clean($_POST['propertyhive_default_country']), ph_clean($_POST['propertyhive_countries'])) ) {
 							$_POST['propertyhive_default_country'] = $_POST['propertyhive_countries'][0];
 						}
 
-						update_option( 'propertyhive_default_country', $_POST['propertyhive_default_country'] );
-						update_option( 'propertyhive_countries', $_POST['propertyhive_countries'] );
+						update_option( 'propertyhive_default_country', ph_clean($_POST['propertyhive_default_country']) );
+						update_option( 'propertyhive_countries', ph_clean($_POST['propertyhive_countries']) );
 					}
 
-                    update_option( 'propertyhive_price_thousand_separator', $_POST['propertyhive_price_thousand_separator'] );
-                    update_option( 'propertyhive_price_decimal_separator', $_POST['propertyhive_price_decimal_separator'] );
+                    update_option( 'propertyhive_price_thousand_separator', ph_clean($_POST['propertyhive_price_thousand_separator']) );
+                    update_option( 'propertyhive_price_decimal_separator', ph_clean($_POST['propertyhive_price_decimal_separator']) );
 
-                    update_option( 'propertyhive_search_form_currency', $_POST['propertyhive_search_form_currency'] );
+                    update_option( 'propertyhive_search_form_currency', ph_clean($_POST['propertyhive_search_form_currency']) );
 
 					do_action( 'propertyhive_update_currency_exchange_rates' );
 

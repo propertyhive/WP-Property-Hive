@@ -102,19 +102,19 @@ class PH_Admin_Meta_Boxes {
         if ( isset($_GET['add_applicant_relationship']) && wp_verify_nonce($_GET['add_applicant_relationship'], '1') && isset($_GET['post']) ) 
         {
             // Need to add blank applicant
-            if ( get_post_type($_GET['post']) != 'contact' )
+            if ( get_post_type((int)$_GET['post']) != 'contact' )
                 return;
 
-            $num_applicant_profiles = get_post_meta( $_GET['post'], '_applicant_profiles', TRUE );
+            $num_applicant_profiles = get_post_meta( (int)$_GET['post'], '_applicant_profiles', TRUE );
             if ( $num_applicant_profiles == '' )
             {
                 $num_applicant_profiles = 0;
             }
 
-            update_post_meta( $_GET['post'], '_applicant_profile_' . $num_applicant_profiles, '' );
-            update_post_meta( $_GET['post'], '_applicant_profiles', $num_applicant_profiles + 1 );
+            update_post_meta( (int)$_GET['post'], '_applicant_profile_' . $num_applicant_profiles, '' );
+            update_post_meta( (int)$_GET['post'], '_applicant_profiles', $num_applicant_profiles + 1 );
 
-            $existing_contact_types = get_post_meta( $_GET['post'], '_contact_types', TRUE );
+            $existing_contact_types = get_post_meta( (int)$_GET['post'], '_contact_types', TRUE );
             if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
             {
                 $existing_contact_types = array();
@@ -126,17 +126,17 @@ class PH_Admin_Meta_Boxes {
             }
 
             // Do redirect
-            wp_redirect( admin_url( 'post.php?post=' . $_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
+            wp_redirect( admin_url( 'post.php?post=' . (int)$_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
             exit();
         }
 
         if ( isset($_GET['add_third_party_relationship']) && wp_verify_nonce($_GET['add_third_party_relationship'], '1') && isset($_GET['post']) ) 
         {
             // Need to add blank applicant
-            if ( get_post_type($_GET['post']) != 'contact' )
+            if ( get_post_type((int)$_GET['post']) != 'contact' )
                 return;
 
-            $existing_third_party_categories = get_post_meta( $_GET['post'], '_third_party_categories', TRUE );
+            $existing_third_party_categories = get_post_meta( (int)$_GET['post'], '_third_party_categories', TRUE );
             if ($existing_third_party_categories)
             {
                 $existing_third_party_categories = array();
@@ -144,7 +144,7 @@ class PH_Admin_Meta_Boxes {
             $existing_third_party_categories[] = 0;
             update_post_meta( $_GET['post'], '_third_party_categories', $existing_third_party_categories );
 
-            $existing_contact_types = get_post_meta( $_GET['post'], '_contact_types', TRUE );
+            $existing_contact_types = get_post_meta( (int)$_GET['post'], '_contact_types', TRUE );
             if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
             {
                 $existing_contact_types = array();
@@ -152,7 +152,7 @@ class PH_Admin_Meta_Boxes {
             if ( !in_array( 'thirdparty', $existing_contact_types ) )
             {
                 $existing_contact_types[] = 'thirdparty';
-                update_post_meta( $_GET['post'], '_contact_types', $existing_contact_types );
+                update_post_meta( (int)$_GET['post'], '_contact_types', $existing_contact_types );
             }
         }
     }
@@ -162,10 +162,10 @@ class PH_Admin_Meta_Boxes {
         if ( isset($_GET['delete_applicant_relationship']) && isset($_GET['post']) )
         {
             // Need to add blank applicant
-            if ( get_post_type($_GET['post']) != 'contact' )
+            if ( get_post_type((int)$_GET['post']) != 'contact' )
                 return;
 
-            $num_applicant_profiles = get_post_meta( $_GET['post'], '_applicant_profiles', TRUE );
+            $num_applicant_profiles = get_post_meta( (int)$_GET['post'], '_applicant_profiles', TRUE );
             if ( $num_applicant_profiles == '' )
             {
                 $num_applicant_profiles = 0;
@@ -178,23 +178,23 @@ class PH_Admin_Meta_Boxes {
                     $deleting_applicant_profile = $i;
 
                     // We're deleting this one
-                    delete_post_meta( $_GET['post'], '_applicant_profile_' . $i );
+                    delete_post_meta( (int)$_GET['post'], '_applicant_profile_' . $i );
 
                     // Now need to rename any that are higher than $deleting_applicant_profile
                     for ( $j = 0; $j < $num_applicant_profiles; ++$j )
                     {
                         if ( $j > $deleting_applicant_profile )
                         {
-                            $this_applicant_profile = get_post_meta( $_GET['post'], '_applicant_profile_' . $j );
-                            update_post_meta( $_GET['post'], '_applicant_profile_' . ($j - 1), $this_applicant_profile );
-                            delete_post_meta( $_GET['post'], '_applicant_profile_' . $j );
+                            $this_applicant_profile = get_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j );
+                            update_post_meta( (int)$_GET['post'], '_applicant_profile_' . ($j - 1), $this_applicant_profile );
+                            delete_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j );
                         }
                     }
 
                     // remove from _contact_types if no more profiles left
                     if ( $num_applicant_profiles == 1 )
                     {
-                        $existing_contact_types = get_post_meta( $_GET['post'], '_contact_types', TRUE );
+                        $existing_contact_types = get_post_meta( (int)$_GET['post'], '_contact_types', TRUE );
                         if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
                         {
                             $existing_contact_types = array();
@@ -203,13 +203,13 @@ class PH_Admin_Meta_Boxes {
                         {
                             unset($existing_contact_types[$key]);
                         }
-                        update_post_meta( $_GET['post'], '_contact_types', $existing_contact_types );
+                        update_post_meta( (int)$_GET['post'], '_contact_types', $existing_contact_types );
                     }
 
-                    update_post_meta( $_GET['post'], '_applicant_profiles', $num_applicant_profiles - 1 );
+                    update_post_meta( (int)$_GET['post'], '_applicant_profiles', $num_applicant_profiles - 1 );
 
                     // Do redirect
-                    wp_redirect( admin_url( 'post.php?post=' . $_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
+                    wp_redirect( admin_url( 'post.php?post=' . (int)$_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
                     exit();
                 }
             }
@@ -220,18 +220,18 @@ class PH_Admin_Meta_Boxes {
     {
         if ( isset($_GET['remove_property_owner_solicitor']) && isset($_GET['post']) )
         {
-            if ( get_post_type($_GET['post']) != 'offer' && get_post_type($_GET['post']) != 'sale' )
+            if ( get_post_type((int)$_GET['post']) != 'offer' && get_post_type((int)$_GET['post']) != 'sale' )
                 return;
 
-            update_post_meta( $_GET['post'], '_property_owner_solicitor_contact_id', '' );
+            update_post_meta( (int)$_GET['post'], '_property_owner_solicitor_contact_id', '' );
         }
 
         if ( isset($_GET['remove_applicant_solicitor']) && isset($_GET['post']) )
         {
-            if ( get_post_type($_GET['post']) != 'offer' && get_post_type($_GET['post']) != 'sale' )
+            if ( get_post_type((int)$_GET['post']) != 'offer' && get_post_type((int)$_GET['post']) != 'sale' )
                 return;
 
-            update_post_meta( $_GET['post'], '_applicant_solicitor_contact_id', '' );
+            update_post_meta( (int)$_GET['post'], '_applicant_solicitor_contact_id', '' );
         }
     }
 
@@ -239,7 +239,7 @@ class PH_Admin_Meta_Boxes {
     {
         if ( isset($_GET['create_offer']) && isset($_GET['post']) )
         {
-            if ( get_post_type($_GET['post']) != 'viewing')
+            if ( get_post_type((int)$_GET['post']) != 'viewing')
                 return;
 
             $viewing = new PH_Viewing((int)$_GET['post']);
@@ -264,8 +264,8 @@ class PH_Admin_Meta_Boxes {
             add_post_meta( $offer_post_id, '_property_owner_solicitor_contact_id', '' );
             add_post_meta( $offer_post_id, '_offer_date_time', date("Y-m-d H:i:s") );
 
-            update_post_meta( $_GET['post'], '_offer_id', $offer_post_id );
-            update_post_meta( $_GET['post'], '_status', 'offer_made' );
+            update_post_meta( (int)$_GET['post'], '_offer_id', $offer_post_id );
+            update_post_meta( (int)$_GET['post'], '_status', 'offer_made' );
 
             $current_user = wp_get_current_user();
 
@@ -276,7 +276,7 @@ class PH_Admin_Meta_Boxes {
             );
 
             $data = array(
-                'comment_post_ID'      => $_GET['post'],
+                'comment_post_ID'      => (int)$_GET['post'],
                 'comment_author'       => $current_user->display_name,
                 'comment_author_email' => 'propertyhive@noreply.com',
                 'comment_author_url'   => '',
@@ -298,7 +298,7 @@ class PH_Admin_Meta_Boxes {
     {
         if ( isset($_GET['create_sale']) && isset($_GET['post']) )
         {
-            if ( get_post_type($_GET['post']) != 'offer')
+            if ( get_post_type((int)$_GET['post']) != 'offer')
                 return;
 
             $offer = new PH_Offer((int)$_GET['post']);
@@ -323,7 +323,7 @@ class PH_Admin_Meta_Boxes {
             add_post_meta( $sale_post_id, '_property_owner_solicitor_contact_id', $offer->property_owner_solicitor_contact_id );
             add_post_meta( $sale_post_id, '_sale_date_time', date("Y-m-d H:i:s") );
 
-            update_post_meta( $_GET['post'], '_sale_id', $sale_post_id );
+            update_post_meta( (int)$_GET['post'], '_sale_id', $sale_post_id );
 
             $current_user = wp_get_current_user();
 
@@ -334,7 +334,7 @@ class PH_Admin_Meta_Boxes {
             );
 
             $data = array(
-                'comment_post_ID'      => $_GET['post'],
+                'comment_post_ID'      => (int)$_GET['post'],
                 'comment_author'       => $current_user->display_name,
                 'comment_author_email' => 'propertyhive@noreply.com',
                 'comment_author_url'   => '',
@@ -1460,7 +1460,7 @@ class PH_Admin_Meta_Boxes {
         {
             global $wpdb;
 
-            $wpdb->update( $wpdb->posts, array( 'post_parent' => $_POST['post_parent'] ), array( 'ID' => $post_id ) );
+            $wpdb->update( $wpdb->posts, array( 'post_parent' => (int)$_POST['post_parent'] ), array( 'ID' => $post_id ) );
         }
 
 		do_action( 'propertyhive_process_' . $post->post_type . '_meta', $post_id, $post );

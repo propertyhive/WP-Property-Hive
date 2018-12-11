@@ -108,7 +108,7 @@
             {
                 echo '<div style="display:inline-block; width:100%; vertical-align:top; margin-top:15px;">
                         <strong>Additional Requirement Notes:</strong><br>
-                        ' . strip_tags( $applicant_profile['notes'] ) . '
+                        ' . nl2br( strip_tags( $applicant_profile['notes'] ) ) . '
                     </div>';
             }
 
@@ -209,7 +209,7 @@
 
         	<input name="save" class="button-primary" type="submit" value="<?php echo __( 'Continue', 'propertyhive' ); ?>" />
 
-            <a href="<?php echo get_edit_post_link($_GET['contact_id']); ?>" class="button"><?php _e( 'Cancel', 'propertyhive' ); ?></a>
+            <a href="<?php echo get_edit_post_link((int)$_GET['contact_id']); ?>" class="button"><?php _e( 'Cancel', 'propertyhive' ); ?></a>
 
         	<input type="hidden" name="step" value="one" />
         	<?php wp_nonce_field( 'propertyhive-matching-properties' ); ?>

@@ -152,7 +152,7 @@ class PH_AJAX {
 
          // Create user
         $userdata = array(
-            'display_name' => get_the_title($_POST['contact_id']),
+            'display_name' => get_the_title((int)$_POST['contact_id']),
             'user_login' => sanitize_email($contact->email_address),
             'user_email' => sanitize_email($contact->email_address),
             'user_pass'  => $_POST['password'],
@@ -166,7 +166,7 @@ class PH_AJAX {
         if ( ! is_wp_error( $user_id ) )
         {
             // Assign user ID to CPT
-            add_post_meta( $_POST['contact_id'], '_user_id', $user_id );
+            add_post_meta( (int)$_POST['contact_id'], '_user_id', $user_id );
 
             $return = array('success' => true);
         }
@@ -201,8 +201,8 @@ class PH_AJAX {
         }
 
         $creds = array(
-            'user_login' => $_POST['email_address'],
-            'user_password' => $_POST['password'],
+            'user_login' => ph_clean($_POST['email_address']),
+            'user_password' => ph_clean($_POST['password']),
         );
 
         $user = wp_signon( apply_filters( 'propertyhive_login_credentials', $creds ), is_ssl() );
@@ -372,7 +372,7 @@ class PH_AJAX {
         {
             // create CPT
             $contact_post = array(
-                'post_title'    => $_POST['name'],
+                'post_title'    => ph_clean($_POST['name']),
                 'post_content'  => '',
                 'post_type'     => 'contact',
                 'post_status'   => 'publish',
@@ -385,7 +385,7 @@ class PH_AJAX {
 
             // Add post meta (contact details, requirements etc)
             add_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
-            add_post_meta( $contact_post_id, '_telephone_number', ( ( isset($_POST['telephone_number']) ) ? sanitize_text_field($_POST['telephone_number']) : '' ) );
+            add_post_meta( $contact_post_id, '_telephone_number', ( ( isset($_POST['telephone_number']) ) ? ph_clean($_POST['telephone_number']) : '' ) );
 
             add_post_meta( $contact_post_id, '_contact_types', array('applicant') );
 
@@ -396,7 +396,7 @@ class PH_AJAX {
 
             if ( $_POST['department'] == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9]/", '', sanitize_text_field($_POST['maximum_price']));
+                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
 
                 $applicant_profile['max_price'] = $price;
 
@@ -405,7 +405,7 @@ class PH_AJAX {
             }
             elseif ( $_POST['department'] == 'residential-lettings' )
             {
-                $price = preg_replace("/[^0-9]/", '', sanitize_text_field($_POST['maximum_rent']));
+                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
 
                 $applicant_profile['max_rent'] = $price;
                 $applicant_profile['rent_frequency'] = 'pcm';
@@ -415,21 +415,21 @@ class PH_AJAX {
 
             if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
             {
-                $beds = preg_replace("/[^0-9]/", '', sanitize_text_field($_POST['minimum_bedrooms']));
+                $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
                 $applicant_profile['min_beds'] = $beds;
 
                 if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
                 {
-                    $applicant_profile['property_types'] = array(sanitize_text_field($_POST['property_type']));
+                    $applicant_profile['property_types'] = array(ph_clean($_POST['property_type']));
                 }
             }
 
             if ( isset($_POST['location']) && !empty($_POST['location']) )
             {
-                $applicant_profile['locations'] = array(sanitize_text_field($_POST['location']));
+                $applicant_profile['locations'] = array(ph_clean($_POST['location']));
             }
 
-            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? sanitize_text_field($_POST['additional_requirements']) : '' );
+            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? sanitize_textarea_field($_POST['additional_requirements']) : '' );
 
             $applicant_profile['send_matching_properties'] = 'yes';
             //$applicant_profile['auto_match_disabled'] = ''; // don't know what to do about this yet. Should probably look at global setting and reflect that
@@ -438,10 +438,10 @@ class PH_AJAX {
             
             // Create user
             $userdata = array(
-                'display_name' => $_POST['name'],
+                'display_name' => ph_clean($_POST['name']),
                 'user_login' => sanitize_email($_POST['email_address']),
                 'user_email' => sanitize_email($_POST['email_address']),
-                'user_pass'  => $_POST['password'],
+                'user_pass'  => ph_clean($_POST['password']),
                 'role' => 'property_hive_contact',
                 'show_admin_bar_front' => 'false',
             );
@@ -566,7 +566,7 @@ class PH_AJAX {
             // create CPT
             $contact_post = array(
                 'ID' => $contact->id,
-                'post_title' => $_POST['name'],
+                'post_title' => ph_clean($_POST['name']),
             );
             
             // Update the post in the database
@@ -575,19 +575,19 @@ class PH_AJAX {
             update_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
             if (isset($_POST['telephone_number']))
             {
-                update_post_meta( $contact_post_id, '_telephone_number', $_POST['telephone_number'] );
+                update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['telephone_number']) );
             }
 
             // Update user
             $userdata = array(
                 'ID' => $user_id,
-                'display_name' => $_POST['name'],
+                'display_name' => ph_clean($_POST['name']),
                 'user_email' => sanitize_email($_POST['email_address']),
             );
 
             if ( isset($_POST['password']) && !empty($_POST['password']) )
             {
-                $userdata['user_pass'] = $_POST['password'];
+                $userdata['user_pass'] = ph_clean($_POST['password']);
             }
 
             $user_id = wp_update_user( $userdata );
@@ -701,11 +701,11 @@ class PH_AJAX {
             $contact_post_id = $contact->id;
 
             $applicant_profile = array();
-            $applicant_profile['department'] = $_POST['department'];
+            $applicant_profile['department'] = ph_clean($_POST['department']);
 
             if ( $_POST['department'] == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9]/", '', $_POST['maximum_price']);
+                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
 
                 $applicant_profile['max_price'] = $price;
 
@@ -714,7 +714,7 @@ class PH_AJAX {
             }
             elseif ( $_POST['department'] == 'residential-lettings' )
             {
-                $price = preg_replace("/[^0-9]/", '', $_POST['maximum_rent']);
+                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
 
                 $applicant_profile['max_rent'] = $price;
                 $applicant_profile['rent_frequency'] = 'pcm';
@@ -724,21 +724,21 @@ class PH_AJAX {
 
             if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
             {
-                $beds = preg_replace("/[^0-9]/", '', $_POST['minimum_bedrooms']);
+                $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
                 $applicant_profile['min_beds'] = $beds;
 
                 if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
                 {
-                    $applicant_profile['property_types'] = array($_POST['property_type']);
+                    $applicant_profile['property_types'] = array(ph_clean($_POST['property_type']));
                 }
             }
 
             if ( isset($_POST['location']) && !empty($_POST['location']) )
             {
-                $applicant_profile['locations'] = array($_POST['location']);
+                $applicant_profile['locations'] = array(ph_clean($_POST['location']));
             }
 
-            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? $_POST['additional_requirements'] : '' );
+            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? sanitize_textarea_field($_POST['additional_requirements']) : '' );
 
             $applicant_profile['send_matching_properties'] = 'yes';
             //$applicant_profile['auto_match_disabled'] = ''; // don't know what to do about this yet. Should probably look at global setting and reflect that
@@ -807,7 +807,7 @@ class PH_AJAX {
         
         check_ajax_referer( 'load-existing-owner-contact', 'security' );
         
-        $contact_id = $_POST['contact_id'];
+        $contact_id = (int)$_POST['contact_id'];
         
         $contact = get_post($contact_id);
         
@@ -874,7 +874,7 @@ class PH_AJAX {
         
         $return = array();
         
-        $keyword = trim( $_POST['keyword'] );
+        $keyword = ph_clean($_POST['keyword']);
         
         if ( !empty( $keyword ) && strlen( $keyword ) > 2 )
         {
@@ -890,7 +890,7 @@ class PH_AJAX {
                 $args['meta_query'] = array(
                     array(
                         'key' => '_contact_types',
-                        'value' => $_POST['contact_type'],
+                        'value' => ph_clean($_POST['contact_type']),
                         'compare' => 'LIKE',
                     )
                 );
@@ -929,7 +929,7 @@ class PH_AJAX {
     {
         global $wpdb;
         
-        $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( like_escape( trim( $_POST['keyword'] ) ) ) . '%\'';
+        $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( like_escape( ph_clean($_POST['keyword']) ) ) . '%\'';
         
         return $where;
     }
@@ -945,7 +945,7 @@ class PH_AJAX {
         
         $return = array();
         
-        $keyword = trim( $_POST['keyword'] );
+        $keyword = ph_clean($_POST['keyword']);
         
         if ( !empty( $keyword ) && strlen( $keyword ) > 2 )
         {
@@ -962,7 +962,7 @@ class PH_AJAX {
             {
                 $meta_query[] = array(
                     'key' => '_department',
-                    'value' => $_POST['department'],
+                    'value' => ph_clean($_POST['department']),
                 );
             }
             if ( !empty($meta_query) )
@@ -1028,19 +1028,19 @@ class PH_AJAX {
     public function search_properties_where( $where )
     {
         $where .= " AND (
-            (mt1.meta_key='_address_name_number' AND mt1.meta_value LIKE '" . esc_sql($_POST['keyword']). "%')
+            (mt1.meta_key='_address_name_number' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
             OR
-            (mt1.meta_key='_address_street' AND mt1.meta_value LIKE '" . esc_sql($_POST['keyword']). "%')
+            (mt1.meta_key='_address_street' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
             OR
-            (mt1.meta_key='_address_2' AND mt1.meta_value LIKE '" . esc_sql($_POST['keyword']). "%')
+            (mt1.meta_key='_address_2' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
             OR
-            (mt1.meta_key='_address_3' AND mt1.meta_value LIKE '" . esc_sql($_POST['keyword']). "%')
+            (mt1.meta_key='_address_3' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
             OR
-            (mt1.meta_key='_address_4' AND mt1.meta_value LIKE '" . esc_sql($_POST['keyword']). "%')
+            (mt1.meta_key='_address_4' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
             OR
-            (mt1.meta_key='_address_postcode' AND mt1.meta_value LIKE '" . esc_sql($_POST['keyword']). "%')
+            (mt1.meta_key='_address_postcode' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
             OR
-            (mt1.meta_key='_reference_number' AND mt1.meta_value = '" . esc_sql($_POST['keyword']). "')
+            (mt1.meta_key='_reference_number' AND mt1.meta_value = '" . esc_sql(ph_clean($_POST['keyword'])) . "')
         ) ";
         
         return $where;
@@ -1057,7 +1057,7 @@ class PH_AJAX {
         
         $return = array();
         
-        $keyword = trim( $_POST['keyword'] );
+        $keyword = ph_clean($_POST['keyword']);
         
         if ( !empty( $keyword ) && strlen( $keyword ) > 2 )
         {
@@ -1102,7 +1102,7 @@ class PH_AJAX {
     
 		check_ajax_referer( 'add-note', 'security' );
         
-		$post_id   = (int) $_POST['post_id'];
+		$post_id = (int)$_POST['post_id'];
 
 		if ( $post_id > 0 ) {
 
@@ -1158,7 +1158,7 @@ class PH_AJAX {
 
 		check_ajax_referer( 'delete-note', 'security' );
 
-		$note_id = (int) $_POST['note_id'];
+		$note_id = (int)$_POST['note_id'];
 
 		if ( $note_id > 0 ) {
 			wp_delete_comment( $note_id );
@@ -1187,7 +1187,7 @@ class PH_AJAX {
         }
         else
         {
-            $post = get_post($_POST['property_id']);
+            $post = get_post((int)$_POST['property_id']);
             
             $form_controls = ph_get_property_enquiry_form_fields();
 
@@ -1211,7 +1211,7 @@ class PH_AJAX {
             if ( $key == 'recaptcha' )
             {
                 $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                $response = isset( $_POST['g-recaptcha-response'] ) ? $_POST['g-recaptcha-response'] : '';
+                $response = isset( $_POST['g-recaptcha-response'] ) ? ph_clean($_POST['g-recaptcha-response']) : '';
 
                 $response = wp_remote_post( 
                     'https://www.google.com/recaptcha/api/siteverify',
@@ -1262,12 +1262,12 @@ class PH_AJAX {
             $to = '';
             
             // Try and get office's email address first, else fallback to admin email
-            $office_id = get_post_meta($_POST['property_id'], '_office_id', TRUE);
+            $office_id = get_post_meta((int)$_POST['property_id'], '_office_id', TRUE);
             if ( $office_id != '' )
             {
                 if ( get_post_type( $office_id ) == 'office' )
                 {
-                    $property_department = get_post_meta($_POST['property_id'], '_department', TRUE);
+                    $property_department = get_post_meta((int)$_POST['property_id'], '_department', TRUE);
                     
                     $fields_to_check = array();
                     switch ( $property_department )
@@ -1310,12 +1310,12 @@ class PH_AJAX {
                 $to = get_option( 'admin_email' );
             }
             
-            $subject = __( 'New Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] );
+            $subject = __( 'New Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( (int)$_POST['property_id'] );
             $message = __( "You have received a property enquiry via your website. Please find details of the enquiry below", 'propertyhive' ) . "\n\n";
             
-            $message = apply_filters( 'propertyhive_property_enquiry_pre_body', $message, $_POST['property_id'] );
+            $message = apply_filters( 'propertyhive_property_enquiry_pre_body', $message, (int)$_POST['property_id'] );
 
-            $message .= __( 'Property', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] ) . " (" . get_permalink( $_POST['property_id'] ) . ")\n\n";
+            $message .= __( 'Property', 'propertyhive' ) . ': ' . get_the_title( (int)$_POST['property_id'] ) . " (" . get_permalink( (int)$_POST['property_id'] ) . ")\n\n";
             
             unset($form_controls['action']);
             unset($_POST['action']);
@@ -1329,7 +1329,7 @@ class PH_AJAX {
 
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
                 $label = ( isset($control['email_label']) ) ? $control['email_label'] : $label;
-                $value = ( isset($_POST[$key]) ) ? $_POST[$key] : '';
+                $value = ( isset($_POST[$key]) ) ? sanitize_textarea_field($_POST[$key]) : '';
 
                 $message .= strip_tags($label) . ": " . strip_tags($value) . "\n";
             }
@@ -1348,7 +1348,7 @@ class PH_AJAX {
             $headers = array();
             if ( isset($_POST['name']) && ! empty($_POST['name']) )
             {
-                $headers[] = 'From: ' . sanitize_text_field( $_POST['name'] ) . ' <' . sanitize_email( $from_email_address ) . '>';
+                $headers[] = 'From: ' . ph_clean( $_POST['name'] ) . ' <' . sanitize_email( $from_email_address ) . '>';
             }
             else
             {
@@ -1359,10 +1359,10 @@ class PH_AJAX {
                 $headers[] = 'Reply-To: ' . sanitize_email( $_POST['email_address'] );
             }
 
-            $to = apply_filters( 'propertyhive_property_enquiry_to', $to, $_POST['property_id'] );
-            $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, $_POST['property_id'] );
-            $message = apply_filters( 'propertyhive_property_enquiry_body', $message, $_POST['property_id'] );
-            $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, $_POST['property_id'] );
+            $to = apply_filters( 'propertyhive_property_enquiry_to', $to, (int)$_POST['property_id'] );
+            $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, (int)$_POST['property_id'] );
+            $message = apply_filters( 'propertyhive_property_enquiry_body', $message, (int)$_POST['property_id'] );
+            $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, (int)$_POST['property_id'] );
 
             $sent = wp_mail( $to, $subject, $message, $headers );
             
@@ -1379,10 +1379,10 @@ class PH_AJAX {
                 if ( get_option( 'propertyhive_store_property_enquiries', 'yes' ) == 'yes' )
                 {
                     // Now insert into enquiries section of WordPress
-                    $title = __( 'Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( $_POST['property_id'] );
+                    $title = __( 'Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( (int)$_POST['property_id'] );
                     if ( isset($_POST['name']) && ! empty($_POST['name']) )
                     {
-                        $title .= __( ' from ', 'propertyhive' ) . sanitize_text_field($_POST['name']);
+                        $title .= __( ' from ', 'propertyhive' ) . ph_clean($_POST['name']);
                     }
                     
                     $enquiry_post = array(
@@ -1404,7 +1404,7 @@ class PH_AJAX {
                     
                     foreach ($_POST as $key => $value)
                     {
-                        add_post_meta( $enquiry_post_id, $key, $value );
+                        add_post_meta( $enquiry_post_id, $key, sanitize_textarea_field($value) );
                     }
                 }
 
@@ -1433,8 +1433,8 @@ class PH_AJAX {
     {
         global $post;
 
-        $enquiry_post_id = ( (isset($_POST['post_id'])) ? $_POST['post_id'] : '' );
-        $nonce = ( (isset($_POST['security'])) ? $_POST['security'] : '' );
+        $enquiry_post_id = ( (isset($_POST['post_id'])) ? (int)$_POST['post_id'] : '' );
+        $nonce = ( (isset($_POST['security'])) ? ph_clean($_POST['security']) : '' );
 
         if ( ! wp_verify_nonce( $nonce, 'create-content-from-enquiry-nonce-' . $enquiry_post_id ) ) 
         {
@@ -1694,7 +1694,7 @@ class PH_AJAX {
         {
             // Need to create contact/applicant
             $contact_post = array(
-                'post_title'    => wp_strip_all_tags($_POST['applicant_name']),
+                'post_title'    => ph_clean($_POST['applicant_name']),
                 'post_content'  => '',
                 'post_type'     => 'contact',
                 'post_status'   => 'publish',
@@ -1725,12 +1725,12 @@ class PH_AJAX {
             // This is an existing contact
             if ( !is_array($_POST['applicant_ids']) )
             {
-                $_POST['applicant_ids'] = array($_POST['applicant_ids']);
+                $_POST['applicant_ids'] = array(ph_clean($_POST['applicant_ids']));
             }
 
             foreach ( $_POST['applicant_ids'] as $applicant_id )
             {
-                $applicant_contact_ids[] = $applicant_id;
+                $applicant_contact_ids[] = (int)$applicant_id;
             }
         }
 
@@ -1822,9 +1822,9 @@ class PH_AJAX {
                 die();
             }
             
-            add_post_meta( $viewing_post_id, '_start_date_time', $_POST['start_date'] . ' ' . $_POST['start_time'] );
+            add_post_meta( $viewing_post_id, '_start_date_time', ph_clean($_POST['start_date']) . ' ' . ph_clean($_POST['start_time']) );
             add_post_meta( $viewing_post_id, '_duration', 30 * 60 ); // Stored in seconds. Default to 30 mins
-            add_post_meta( $viewing_post_id, '_property_id', $_POST['property_id'] );
+            add_post_meta( $viewing_post_id, '_property_id', (int)$_POST['property_id'] );
             add_post_meta( $viewing_post_id, '_applicant_contact_id', $applicant_contact_id );
             add_post_meta( $viewing_post_id, '_status', 'pending' );
             add_post_meta( $viewing_post_id, '_feedback_status', '' );
@@ -1835,7 +1835,7 @@ class PH_AJAX {
             {
                 foreach ( $_POST['negotiator_ids'] as $negotiator_id )
                 {
-                    add_post_meta( $viewing_post_id, '_negotiator_id', $negotiator_id );
+                    add_post_meta( $viewing_post_id, '_negotiator_id', (int)$negotiator_id );
                 }
             }
         }
@@ -1908,10 +1908,10 @@ class PH_AJAX {
                 die();
             }
             
-            add_post_meta( $viewing_post_id, '_start_date_time', $_POST['start_date'] . ' ' . $_POST['start_time'] );
+            add_post_meta( $viewing_post_id, '_start_date_time', ph_clean($_POST['start_date']) . ' ' . ph_clean($_POST['start_time']) );
             add_post_meta( $viewing_post_id, '_duration', 30 * 60 ); // Stored in seconds. Default to 30 mins
-            add_post_meta( $viewing_post_id, '_property_id', $property_id );
-            add_post_meta( $viewing_post_id, '_applicant_contact_id', $_POST['contact_id'] );
+            add_post_meta( $viewing_post_id, '_property_id', (int)$property_id );
+            add_post_meta( $viewing_post_id, '_applicant_contact_id', (int)$_POST['contact_id'] );
             add_post_meta( $viewing_post_id, '_status', 'pending' );
             add_post_meta( $viewing_post_id, '_feedback_status', '' );
             add_post_meta( $viewing_post_id, '_feedback', '' );
@@ -1921,7 +1921,7 @@ class PH_AJAX {
             {
                 foreach ( $_POST['negotiator_ids'] as $negotiator_id )
                 {
-                    add_post_meta( $viewing_post_id, '_negotiator_id', $negotiator_id );
+                    add_post_meta( $viewing_post_id, '_negotiator_id', (int)$negotiator_id );
                 }
             }
         }
@@ -1930,9 +1930,9 @@ class PH_AJAX {
         foreach ( $_POST['property_ids'] as $property_id )
         {
             $properties[] = array(
-                'ID' => $property_id,
-                'post_title' => get_the_title($property_id),
-                'edit_link' => get_edit_post_link( $property_id, '' ),
+                'ID' => (int)$property_id,
+                'post_title' => get_the_title((int)$property_id),
+                'edit_link' => get_edit_post_link( (int)$property_id, '' ),
             );
         }
 
@@ -2070,7 +2070,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
         $feedback_status = get_post_meta( $post_id, '_feedback_status', TRUE );
@@ -2108,19 +2108,19 @@ class PH_AJAX {
                     href="#action_panel_viewing_interested" 
                     class="button button-success viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Applicant Interested', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Applicant Interested', 'propertyhive') ) . '</a>';
 
                 $actions[] = '<a 
                     href="#action_panel_viewing_not_interested" 
                     class="button button-danger viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Applicant Not Interested', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Applicant Not Interested', 'propertyhive') ) . '</a>';
 
                 $actions[] = '<a 
                     href="#action_panel_viewing_feedback_not_required" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Feedback Not Required', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Feedback Not Required', 'propertyhive') ) . '</a>';
 
                 $show_feedback_meta_boxes = true;
             }
@@ -2131,7 +2131,7 @@ class PH_AJAX {
                     href="' . trim(admin_url(), '/') . '/post-new.php?post_type=viewing&applicant_contact_id=' . get_post_meta( $post_id, '_applicant_contact_id', TRUE ) . '&property_id=' . get_post_meta( $post_id, '_property_id', TRUE ) . '&viewing_id=' . $post_id .'" 
                     class="button button-success"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Book Second Viewing', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Book Second Viewing', 'propertyhive') ) . '</a>';
 
                 if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
                 {
@@ -2151,7 +2151,7 @@ class PH_AJAX {
                                     href="' . get_edit_post_link( $offer_id, '' ) . '" 
                                     class="button"
                                     style="width:100%; margin-bottom:7px; text-align:center" 
-                                >' . __('View Offer', 'propertyhive') . '</a>';
+                                >' . wp_kses_post( __('View Offer', 'propertyhive') ) . '</a>';
                         }
                         else
                         {
@@ -2159,7 +2159,7 @@ class PH_AJAX {
                                     href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_offer' ) . '" 
                                     class="button button-success"
                                     style="width:100%; margin-bottom:7px; text-align:center" 
-                                >' . __('Record Offer', 'propertyhive') . '</a>';
+                                >' . wp_kses_post( __('Record Offer', 'propertyhive') ) . '</a>';
                         }
                     }
                 }
@@ -2171,7 +2171,7 @@ class PH_AJAX {
                     href="#action_panel_viewing_revert_feedback_passed_on" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Feedback Passed On To Owner', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Feedback Passed On To Owner', 'propertyhive') ) . '</a>';
             }
 
             if ( $feedback_status == 'interested' || $feedback_status == 'not_interested' || $feedback_status == 'not_required' )
@@ -2180,7 +2180,7 @@ class PH_AJAX {
                     href="#action_panel_viewing_revert_feedback_pending" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Revert To Feedback Pending', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Revert To Feedback Pending', 'propertyhive') ) . '</a>';
             }
         }
 
@@ -2200,7 +2200,7 @@ class PH_AJAX {
                             href="' . get_edit_post_link( $offer_id, '' ) . '" 
                             class="button"
                             style="width:100%; margin-bottom:7px; text-align:center" 
-                        >' . __('View Offer', 'propertyhive') . '</a>';
+                        >' . wp_kses_post( __('View Offer', 'propertyhive') ) . '</a>';
                 }
             }
         }
@@ -2211,7 +2211,7 @@ class PH_AJAX {
                     href="#action_panel_viewing_revert_pending" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Revert To Pending', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Revert To Pending', 'propertyhive') ) . '</a>';
         }
 
         $actions = apply_filters( 'propertyhive_admin_viewing_actions', $actions, $post_id );
@@ -2222,7 +2222,7 @@ class PH_AJAX {
         }
         else
         {
-            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+            echo '<div style="text-align:center">' . wp_kses_post( __( 'No actions to display', 'propertyhive' ) ) . '</div>';
         }
 
         echo '</div>
@@ -2266,7 +2266,7 @@ class PH_AJAX {
                     </div>
 
                     <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-                    <a class="button button-primary interested-feedback-action-submit" href="#">' . __( 'Save Feedback', 'propertyhive' ) . '</a>
+                    <a class="button button-primary interested-feedback-action-submit" href="#">' . wp_kses_post( __( 'Save Feedback', 'propertyhive' ) ) . '</a>
 
                 </div>
 
@@ -2285,7 +2285,7 @@ class PH_AJAX {
                     </div>
 
                     <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-                    <a class="button button-primary not-interested-feedback-action-submit" href="#">' . __( 'Save Feedback', 'propertyhive' ) . '</a>
+                    <a class="button button-primary not-interested-feedback-action-submit" href="#">' . wp_kses_post( __( 'Save Feedback', 'propertyhive' ) ) . '</a>
 
                 </div>
 
@@ -2299,7 +2299,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -2335,14 +2335,14 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'pending' )
         {
             update_post_meta( $post_id, '_status', 'cancelled' );
-            update_post_meta( $post_id, '_cancelled_reason', sanitize_text_field( $_POST['cancelled_reason'] ) );
+            update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field( $_POST['cancelled_reason'] ) );
 
             $current_user = wp_get_current_user();
 
@@ -2372,14 +2372,14 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_feedback_status', 'interested' );
-            update_post_meta( $post_id, '_feedback', sanitize_text_field( $_POST['feedback'] ) );
+            update_post_meta( $post_id, '_feedback', sanitize_textarea_field( $_POST['feedback'] ) );
 
             $current_user = wp_get_current_user();
 
@@ -2409,14 +2409,14 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_feedback_status', 'not_interested' );
-            update_post_meta( $post_id, '_feedback', sanitize_text_field( $_POST['feedback'] ) );
+            update_post_meta( $post_id, '_feedback', sanitize_textarea_field( $_POST['feedback'] ) );
 
             $current_user = wp_get_current_user();
 
@@ -2446,7 +2446,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -2482,7 +2482,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -2519,7 +2519,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -2556,7 +2556,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = $_POST['viewing_id'];
+        $post_id = (int)$_POST['viewing_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -2608,7 +2608,7 @@ class PH_AJAX {
                 'meta_query'  => array(
                     array(
                         'key' => '_property_id',
-                        'value' => $_POST['post_id']
+                        'value' => (int)$_POST['post_id']
                     )
                 )
             );
@@ -2751,7 +2751,7 @@ class PH_AJAX {
                 'meta_query'  => array(
                     array(
                         'key' => '_applicant_contact_id',
-                        'value' => $_POST['post_id']
+                        'value' => (int)$_POST['post_id']
                     )
                 )
             );
@@ -2901,7 +2901,7 @@ class PH_AJAX {
         {
             // Need to create contact/applicant
             $contact_post = array(
-                'post_title'    => wp_strip_all_tags($_POST['applicant_name']),
+                'post_title'    => ph_clean($_POST['applicant_name']),
                 'post_content'  => '',
                 'post_type'     => 'contact',
                 'post_status'   => 'publish',
@@ -2937,7 +2937,7 @@ class PH_AJAX {
 
             foreach ( $_POST['applicant_ids'] as $applicant_id )
             {
-                $applicant_contact_ids[] = $applicant_id;
+                $applicant_contact_ids[] = (int)$applicant_id;
             }
         }
 
@@ -2976,8 +2976,8 @@ class PH_AJAX {
 
             $amount = preg_replace("/[^0-9]/", '', $_POST['amount']);
             
-            add_post_meta( $offer_post_id, '_offer_date_time', $_POST['offer_date'] . ' ' . $_POST['offer_time'] );
-            add_post_meta( $offer_post_id, '_property_id', $_POST['property_id'] );
+            add_post_meta( $offer_post_id, '_offer_date_time', ph_clean($_POST['offer_date']) . ' ' . ph_clean($_POST['offer_time']) );
+            add_post_meta( $offer_post_id, '_property_id', (int)$_POST['property_id'] );
             add_post_meta( $offer_post_id, '_applicant_contact_id', $applicant_contact_id );
             add_post_meta( $offer_post_id, '_amount', $amount );
             add_post_meta( $offer_post_id, '_status', 'pending' );
@@ -3051,11 +3051,11 @@ class PH_AJAX {
                 die();
             }
 
-            $amount = preg_replace("/[^0-9]/", '', $_POST['amount']);
+            $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['amount']));
             
-            add_post_meta( $offer_post_id, '_offer_date_time', $_POST['offer_date'] . ' ' . $_POST['offer_time'] );
-            add_post_meta( $offer_post_id, '_property_id', $property_id );
-            add_post_meta( $offer_post_id, '_applicant_contact_id', $_POST['contact_id'] );
+            add_post_meta( $offer_post_id, '_offer_date_time', ph_clean($_POST['offer_date']) . ' ' . ph_clean($_POST['offer_time']) );
+            add_post_meta( $offer_post_id, '_property_id', (int)$property_id );
+            add_post_meta( $offer_post_id, '_applicant_contact_id', (int)$_POST['contact_id'] );
             add_post_meta( $offer_post_id, '_amount', $amount );
             add_post_meta( $offer_post_id, '_status', 'pending' );
         }
@@ -3064,9 +3064,9 @@ class PH_AJAX {
         foreach ( $_POST['property_ids'] as $property_id )
         {
             $properties[] = array(
-                'ID' => $property_id,
-                'post_title' => get_the_title($property_id),
-                'edit_link' => get_edit_post_link( $property_id, '' ),
+                'ID' => (int)$property_id,
+                'post_title' => get_the_title((int)$property_id),
+                'edit_link' => get_edit_post_link( (int)$property_id, '' ),
             );
         }
 
@@ -3182,7 +3182,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = $_POST['offer_id'];
+        $post_id = (int)$_POST['offer_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -3198,12 +3198,12 @@ class PH_AJAX {
                     href="#action_panel_offer_accepted" 
                     class="button button-success offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Accept Offer', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Accept Offer', 'propertyhive') ) . '</a>';
             $actions[] = '<a 
                     href="#action_panel_offer_declined" 
                     class="button button-danger offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Decline Offer', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Decline Offer', 'propertyhive') ) . '</a>';
         }
 
         if ( $status == 'accepted' )
@@ -3221,7 +3221,7 @@ class PH_AJAX {
                         href="' . get_edit_post_link( $sale_id, '' ) . '" 
                         class="button"
                         style="width:100%; margin-bottom:7px; text-align:center" 
-                    >' . __('View Sale', 'propertyhive') . '</a>';
+                    >' . wp_kses_post( __('View Sale', 'propertyhive') ) . '</a>';
             }
             else
             {
@@ -3229,7 +3229,7 @@ class PH_AJAX {
                         href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' ) . '" 
                         class="button button-success"
                         style="width:100%; margin-bottom:7px; text-align:center" 
-                    >' . __('Create Sale', 'propertyhive') . '</a>';
+                    >' . wp_kses_post( __('Create Sale', 'propertyhive') ) . '</a>';
             }
         }
 
@@ -3244,7 +3244,7 @@ class PH_AJAX {
                     href="#action_panel_offer_revert_pending" 
                     class="button offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Revert To Pending', 'propertyhive') . '</a>';
+                >' . wp_kses_post( __('Revert To Pending', 'propertyhive') ) . '</a>';
         }
 
         $actions = apply_filters( 'propertyhive_admin_offer_actions', $actions, $post_id );
@@ -3269,7 +3269,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = $_POST['offer_id'];
+        $post_id = (int)$_POST['offer_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -3305,7 +3305,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = $_POST['offer_id'];
+        $post_id = (int)$_POST['offer_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -3341,7 +3341,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = $_POST['offer_id'];
+        $post_id = (int)$_POST['offer_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -3393,7 +3393,7 @@ class PH_AJAX {
                 'meta_query'  => array(
                     array(
                         'key' => '_property_id',
-                        'value' => $_POST['post_id']
+                        'value' => (int)$_POST['post_id']
                     )
                 )
             );
@@ -3469,7 +3469,7 @@ class PH_AJAX {
                 'meta_query'  => array(
                     array(
                         'key' => '_applicant_contact_id',
-                        'value' => $_POST['post_id']
+                        'value' => (int)$_POST['post_id']
                     )
                 )
             );
@@ -3613,7 +3613,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'sale-actions', 'security' );
 
-        $post_id = $_POST['sale_id'];
+        $post_id = (int)$_POST['sale_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -3678,7 +3678,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'sale-actions', 'security' );
 
-        $post_id = $_POST['sale_id'];
+        $post_id = (int)$_POST['sale_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -3714,7 +3714,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'sale-actions', 'security' );
 
-        $post_id = $_POST['sale_id'];
+        $post_id = (int)$_POST['sale_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -3750,7 +3750,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'sale-actions', 'security' );
 
-        $post_id = $_POST['sale_id'];
+        $post_id = (int)$_POST['sale_id'];
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -3802,7 +3802,7 @@ class PH_AJAX {
                 'meta_query'  => array(
                     array(
                         'key' => '_property_id',
-                        'value' => $_POST['post_id']
+                        'value' => (int)$_POST['post_id']
                     )
                 )
             );
@@ -3878,7 +3878,7 @@ class PH_AJAX {
                 'meta_query'  => array(
                     array(
                         'key' => '_applicant_contact_id',
-                        'value' => $_POST['post_id']
+                        'value' => (int)$_POST['post_id']
                     )
                 )
             );

@@ -64,9 +64,9 @@ function redraw_offer_details_meta_box()
             update_post_meta( $post_id, '_status', 'pending' );
         }
 
-        update_post_meta( $post_id, '_offer_date_time', $_POST['_offer_date'] . ' ' . $_POST['_offer_time_hours'] . ':' . $_POST['_offer_time_minutes'] . ':00' );
+        update_post_meta( $post_id, '_offer_date_time', ph_clean($_POST['_offer_date']) . ' ' . (int)$_POST['_offer_time_hours'] . ':' . (int)$_POST['_offer_time_minutes'] . ':00' );
 
-        $amount = preg_replace("/[^0-9]/", '', $_POST['_amount']);
+        $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_amount']));
         update_post_meta( $post_id, '_amount', $amount );
     }
 

@@ -167,24 +167,24 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         
         if ($department == 'residential-lettings')
         {
-            update_post_meta( $post_id, '_currency', $_POST['_rent_currency'] );
+            update_post_meta( $post_id, '_currency', ph_clean($_POST['_rent_currency']) );
 
-            $rent = preg_replace("/[^0-9.]/", '', $_POST['_rent']);
+            $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent']));
             update_post_meta( $post_id, '_rent', $rent );
-            update_post_meta( $post_id, '_rent_frequency', $_POST['_rent_frequency'] );
+            update_post_meta( $post_id, '_rent_frequency', ph_clean($_POST['_rent_frequency']) );
             
             // Store price in common currency (GBP) and frequency (PCM) used for ordering
             $ph_countries = new PH_Countries();
             $ph_countries->update_property_price_actual( $post_id );
 
-            update_post_meta( $post_id, '_poa', ( isset($_POST['_rent_poa']) ? $_POST['_rent_poa'] : '' ) );
+            update_post_meta( $post_id, '_poa', ( isset($_POST['_rent_poa']) ? ph_clean($_POST['_rent_poa']) : '' ) );
             
-            update_post_meta( $post_id, '_deposit', preg_replace("/[^0-9.]/", '', $_POST['_deposit']) );
-            update_post_meta( $post_id, '_available_date', $_POST['_available_date'] );
+            update_post_meta( $post_id, '_deposit', preg_replace("/[^0-9.]/", '', ph_clean($_POST['_deposit'])) );
+            update_post_meta( $post_id, '_available_date', ph_clean($_POST['_available_date']) );
             
             if ( !empty($_POST['furnished_id']) )
             {
-                wp_set_post_terms( $post_id, $_POST['furnished_id'], 'furnished' );
+                wp_set_post_terms( $post_id, (int)$_POST['furnished_id'], 'furnished' );
             }
             else
             {

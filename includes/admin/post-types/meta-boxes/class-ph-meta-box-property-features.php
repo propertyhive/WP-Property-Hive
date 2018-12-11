@@ -221,7 +221,7 @@ class PH_Meta_Box_Property_Features {
             {
                 foreach ( $_POST['feature_ids'] as $feature_id )
                 {
-                    $features[] = $feature_id;
+                    $features[] = (int)$feature_id;
                 }
             }
             if ( !empty($features) )
@@ -255,7 +255,7 @@ class PH_Meta_Box_Property_Features {
             
             for ($i = 0; $i < $new_num_property_features; ++$i)
             {
-                update_post_meta($post_id, '_feature_' . $i, $_POST['feature'][$i]);
+                update_post_meta($post_id, '_feature_' . $i, ph_clean($_POST['feature'][$i]));
             }
         }
     }

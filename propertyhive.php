@@ -275,7 +275,7 @@ if ( ! class_exists( 'PropertyHive' ) )
         public function unsubscribe_contact() {
             if ( isset($_GET['ph_unsubscribe']) && !empty($_GET['ph_unsubscribe']) )
             {
-                $ph_unsubscribe = base64_decode($_GET['ph_unsubscribe']);
+                $ph_unsubscribe = sanitize_text_field(base64_decode($_GET['ph_unsubscribe']));
                 if ( $ph_unsubscribe === FALSE )
                 {
                     die("Invalid token passed 1");

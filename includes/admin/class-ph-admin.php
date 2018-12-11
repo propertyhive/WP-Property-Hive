@@ -36,7 +36,7 @@ class PH_Admin {
     {
         if ( ! empty( $_GET['page'] ) ) 
         {
-            switch ( $_GET['page'] ) 
+            switch ( sanitize_title($_GET['page']) ) 
             {
                 case 'ph-installed':
                 {
@@ -44,7 +44,7 @@ class PH_Admin {
                         __( 'Welcome to Property Hive', 'propertyhive'  ),
                         __( 'Welcome to Property Hive', 'propertyhive'  ),
                         'manage_propertyhive',
-                        $_GET['page'],
+                        sanitize_title($_GET['page']),
                         array( $this, 'installed_screen' )
                     );
 
@@ -251,7 +251,7 @@ class PH_Admin {
                     !isset($_GET['page'])
                     ||
                     (
-                        isset($_GET['page']) && $_GET['page'] != 'ph-installed' && $_GET['page'] != 'ph-settings'
+                        isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed' && sanitize_title($_GET['page']) != 'ph-settings'
                     )
                 ) &&
                 get_option( 'missing_search_results_notice_dismissed', '' ) != 'yes'
@@ -276,7 +276,7 @@ class PH_Admin {
                     !isset($_GET['page'])
                     ||
                     (
-                        isset($_GET['page']) && $_GET['page'] != 'ph-installed'
+                        isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed'
                     )
                 ) &&
                 get_option( 'missing_google_maps_api_key_notice_dismissed', '' ) != 'yes'
@@ -348,7 +348,7 @@ class PH_Admin {
 
             if ( isset( $_GET['email_id'] ) )
             {
-                $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . esc_sql( $_GET['email_id'] ) . "'" );
+                $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . esc_sql( (int)$_GET['email_id'] ) . "'" );
                 if ( null !== $email_log ) 
                 {
                     echo apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $email_log->body ) ) );
@@ -378,17 +378,17 @@ class PH_Admin {
             }
 
             // get the preview email content
-            $email_property_ids = explode(",", $_POST['email_property_id']);
+            $email_property_ids = explode(",", sanitize_text_field($_POST['email_property_id']));
 
-            $body = stripslashes($_POST['body']);
+            $body = stripslashes(sanitize_textarea_field($_POST['body']));
 
-            $body = str_replace("[contact_name]", get_the_title($_GET['contact_id']), $body);
+            $body = str_replace("[contact_name]", get_the_title((int)$_GET['contact_id']), $body);
             $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
 
             if ( strpos($body, '[properties]') !== FALSE )
             {
                 ob_start();
-                
+
                 if ( !empty($email_property_ids) )
                 {
                     foreach ( $email_property_ids as $email_property_id )

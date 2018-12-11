@@ -210,7 +210,7 @@ function sale_update_selected_applicant_solicitors()
         if ( isset($_POST['_applicant_solicitor_contact_ids']) && $_POST['_applicant_solicitor_contact_ids'] != '' )
         {
             
-            update_post_meta( $post_id, '_applicant_solicitor_contact_id', $_POST['_applicant_solicitor_contact_ids'] );
+            update_post_meta( $post_id, '_applicant_solicitor_contact_id', (int)$_POST['_applicant_solicitor_contact_ids'] );
         }
     }
 

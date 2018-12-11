@@ -161,7 +161,7 @@ class PH_Meta_Box_Viewing_Event {
         
         if ( isset($_GET['viewing_id']) )
         {
-            echo '<input type="hidden" name="_original_viewing_id" value="' . $_GET['viewing_id'] . '">';
+            echo '<input type="hidden" name="_original_viewing_id" value="' . (int)$_GET['viewing_id'] . '">';
         }
 
         echo '<input type="hidden" name="_num_requiring_confirmation" id="_num_requiring_confirmation" value="">';
@@ -273,22 +273,22 @@ class PH_Meta_Box_Viewing_Event {
 
         if ( isset($_POST['_original_viewing_id']) && $_POST['_original_viewing_id'] != '' )
         {
-            add_post_meta( $post_id, '_original_viewing_id', $_POST['_original_viewing_id'], TRUE );
+            add_post_meta( $post_id, '_original_viewing_id', (int)$_POST['_original_viewing_id'], TRUE );
         }
 
-        update_post_meta( $post_id, '_start_date_time', $_POST['_start_date'] . ' ' . $_POST['_start_time_hours'] . ':' . $_POST['_start_time_minutes'] . ':00' );
-        update_post_meta( $post_id, '_duration', $_POST['_duration'] );
+        update_post_meta( $post_id, '_start_date_time', ph_clean($_POST['_start_date']) . ' ' . (int)$_POST['_start_time_hours'] . ':' . (int)$_POST['_start_time_minutes'] . ':00' );
+        update_post_meta( $post_id, '_duration', (int)$_POST['_duration'] );
 
         delete_post_meta($post_id, '_negotiator_id');
         if ( !empty($_POST['_negotiator_ids']) )
         {
             foreach ( $_POST['_negotiator_ids'] as $negotiator_id )
             {
-                add_post_meta( $post_id, '_negotiator_id', $negotiator_id );
+                add_post_meta( $post_id, '_negotiator_id', (int)$negotiator_id );
             }
         }
 
-        update_post_meta( $post_id, '_booking_notes', $_POST['_booking_notes'] );
+        update_post_meta( $post_id, '_booking_notes', sanitize_textarea_field($_POST['_booking_notes']) );
 
         $all_confirmed = '';
         if ( isset($_POST['_confirmed']) )

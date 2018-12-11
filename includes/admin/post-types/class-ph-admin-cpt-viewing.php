@@ -57,10 +57,10 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 		if ( ! empty( $_GET['post_type'] ) && 'viewing' == $_GET['post_type'] ) {
 			return true;
 		}
-		if ( ! empty( $_GET['post'] ) && 'viewing' == get_post_type( $_GET['post'] ) ) {
+		if ( ! empty( $_GET['post'] ) && 'viewing' == get_post_type( (int)$_GET['post'] ) ) {
 			return true;
 		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'viewing' == get_post_type( $_REQUEST['post_id'] ) ) {
+		if ( ! empty( $_REQUEST['post_id'] ) && 'viewing' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
 			return true;
 		}
 		return false;

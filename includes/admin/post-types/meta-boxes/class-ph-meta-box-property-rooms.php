@@ -242,9 +242,9 @@ class PH_Meta_Box_Property_Rooms {
         
         for ($i = 0; $i < $new_num_property_rooms; ++$i)
         {
-            update_post_meta($post_id, '_room_name_' . $i, $_POST['_room_name'][$i]);
-            update_post_meta($post_id, '_room_dimensions_' . $i, $_POST['_room_dimensions'][$i]);
-            update_post_meta($post_id, '_room_description_' . $i, $_POST['_room_description'][$i]);
+            update_post_meta($post_id, '_room_name_' . $i, ph_clean($_POST['_room_name'][$i]));
+            update_post_meta($post_id, '_room_dimensions_' . $i, ph_clean($_POST['_room_dimensions'][$i]));
+            update_post_meta($post_id, '_room_description_' . $i, sanitize_textarea_field($_POST['_room_description'][$i]));
         }
     }
 

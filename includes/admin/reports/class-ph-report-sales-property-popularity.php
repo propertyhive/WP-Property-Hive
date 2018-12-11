@@ -110,10 +110,10 @@ class PH_Report_Sales_Property_Popularity extends PH_Admin_Report {
 	 */
 	public function output_report() {
 
-		$duration = ( ( isset($_GET['duration']) ) ? ($_GET['duration'] - 1) : 6 );
+		$duration = ( ( isset($_GET['duration']) ) ? ((int)$_GET['duration'] - 1) : 6 );
 
-		$date_from = ( ( isset($_GET['date_from']) ) ? $_GET['date_from'] : date("Y-m-d", strtotime(($duration + 1) . " days ago")) );
-		$date_to = ( ( isset($_GET['date_to']) ) ? $_GET['date_to'] : date("Y-m-d", strtotime("yesterday")) );
+		$date_from = ( ( isset($_GET['date_from']) ) ? saniitize_text_field($_GET['date_from']) : date("Y-m-d", strtotime(($duration + 1) . " days ago")) );
+		$date_to = ( ( isset($_GET['date_to']) ) ? saniitize_text_field($_GET['date_to']) : date("Y-m-d", strtotime("yesterday")) );
 
 		$properties_view_data = $this->get_property_view_data( $date_from, $date_to );
 

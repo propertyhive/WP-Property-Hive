@@ -128,7 +128,7 @@ class PH_Meta_Box_Viewing_Applicant {
 
 var viewing_selected_applicants = [];
 <?php if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '') { ?>
-viewing_selected_applicants[<?php echo $_GET['applicant_contact_id']; ?>] = ({ post_title: '<?php echo get_the_title($_GET['applicant_contact_id']); ?>' });
+viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
 <?php } ?>
 
 jQuery(document).ready(function($)
@@ -289,7 +289,7 @@ function viewing_update_selected_applicants()
             {
                 // Need to create contact/applicant
                 $contact_post = array(
-                    'post_title'    => wp_strip_all_tags($_POST['_applicant_name']),
+                    'post_title'    => ph_clean($_POST['_applicant_name']),
                     'post_content'  => '',
                     'post_type'     => 'contact',
                     'post_status'   => 'publish',
@@ -312,8 +312,8 @@ function viewing_update_selected_applicants()
                 {
                     // Successfully added contact post
                     update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
-                    update_post_meta( $contact_post_id, '_telephone_number', trim($_POST['_applicant_telephone_number']) );
-                    update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", $_POST['_applicant_email_address']) );
+                    update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['_applicant_telephone_number']) );
+                    update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_applicant_email_address'])) );
 
                     update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
 
@@ -335,7 +335,7 @@ function viewing_update_selected_applicants()
         {
             if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
             {
-                update_post_meta( $post_id, '_applicant_contact_id', $_POST['_applicant_contact_ids'] );
+                update_post_meta( $post_id, '_applicant_contact_id', ph_clean($_POST['_applicant_contact_ids']) );
             }
         }
     }

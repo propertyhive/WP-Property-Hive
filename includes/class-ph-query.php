@@ -123,7 +123,7 @@ class PH_Query {
 		// Map query vars to their keys, or get them if endpoints are not supported
 		foreach ( $this->query_vars as $key => $var ) {
 			if ( isset( $_GET[ $var ] ) ) {
-				$wp->query_vars[ $key ] = $_GET[ $var ];
+				$wp->query_vars[ $key ] = sanitize_text_field( wp_unslash( $_GET[ $var ] ) );
 			}
 
 			elseif ( isset( $wp->query_vars[ $var ] ) ) {
@@ -714,17 +714,17 @@ class PH_Query {
       	
       	if ( isset( $_REQUEST['address_keyword'] ) && $_REQUEST['address_keyword'] != '' )
         {
-        	$_REQUEST['address_keyword'] = sanitize_text_field( trim( $_REQUEST['address_keyword'] ) );
+        	$_REQUEST['address_keyword'] = ph_clean( wp_unslash( $_REQUEST['address_keyword'] ) );
 
         	$address_keywords = array( $_REQUEST['address_keyword'] );
 
         	if ( strpos( $_REQUEST['address_keyword'], ' ' ) !== FALSE )
         	{
-        		$address_keywords[] = str_replace(" ", "-", $_REQUEST['address_keyword']);
+        		$address_keywords[] = str_replace(" ", "-", ph_clean($_REQUEST['address_keyword']));
         	}
         	if ( strpos( $_REQUEST['address_keyword'], '-' ) !== FALSE )
         	{
-        		$address_keywords[] = str_replace("-", " ", $_REQUEST['address_keyword']);
+        		$address_keywords[] = str_replace("-", " ", ph_clean($_REQUEST['address_keyword']));
         	}
 
 	      	$meta_query = array('relation' => 'OR');
@@ -761,12 +761,12 @@ class PH_Query {
 	      	{
 	      		$meta_query[] = array(
 				    'key'     => '_address_postcode',
-				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
+				    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
 				    'compare' => '='
 				);
 	      		$meta_query[] = array(
 				    'key'     => '_address_postcode',
-				    'value'   => '^' . sanitize_text_field( $_REQUEST['address_keyword'] ) . '[ ]',
+				    'value'   => '^' . ph_clean( $_REQUEST['address_keyword'] ) . '[ ]',
 				    'compare' => 'RLIKE'
 				);
 	      	}
@@ -774,7 +774,7 @@ class PH_Query {
 	      	{
 	      		$meta_query[] = array(
 				    'key'     => '_address_postcode',
-				    'value'   => sanitize_text_field( $_REQUEST['address_keyword'] ),
+				    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
 				    'compare' => 'LIKE'
 				);
 	      	}
@@ -797,7 +797,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_address_country',
-                'value'   => sanitize_text_field( $_REQUEST['country'] )
+                'value'   => ph_clean( $_REQUEST['country'] )
             );
         }
         
@@ -832,7 +832,7 @@ class PH_Query {
 
             $meta_query = array(
                 'key'     => '_price_actual',
-                'value'   => sanitize_text_field( floor( $minimum_price ) ),
+                'value'   => ph_clean( floor( $minimum_price ) ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -869,7 +869,7 @@ class PH_Query {
 
             $meta_query = array(
                 'key'     => '_price_actual',
-                'value'   => sanitize_text_field( ceil( $maximum_price ) ),
+                'value'   => ph_clean( ceil( $maximum_price ) ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -893,7 +893,7 @@ class PH_Query {
             isset( $_REQUEST['price_range'] ) && $_REQUEST['price_range'] != '' 
         )
         {
-        	$explode_price_range = explode("-", $_REQUEST['price_range']);
+        	$explode_price_range = explode("-", ph_clean($_REQUEST['price_range']));
 
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
@@ -967,7 +967,7 @@ class PH_Query {
 
             $meta_query = array(
                 'key'     => '_price_actual',
-                'value'   => sanitize_text_field( floor( $minimum_rent ) ),
+                'value'   => ph_clean( floor( $minimum_rent ) ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -1004,7 +1004,7 @@ class PH_Query {
 
             $meta_query = array(
                 'key'     => '_price_actual',
-                'value'   => sanitize_text_field( ceil( $maximum_rent ) ),
+                'value'   => ph_clean( ceil( $maximum_rent ) ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -1028,7 +1028,7 @@ class PH_Query {
             isset( $_REQUEST['rent_range'] ) && $_REQUEST['rent_range'] != '' 
         )
         {
-        	$explode_rent_range = explode("-", $_REQUEST['rent_range']);
+        	$explode_rent_range = explode("-", ph_clean($_REQUEST['rent_range']));
 
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
@@ -1093,7 +1093,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
-                'value'   => sanitize_text_field( $_REQUEST['bedrooms'] ),
+                'value'   => ph_clean( $_REQUEST['bedrooms'] ),
                 'compare' => '=',
                 'type'    => 'NUMERIC' 
             );
@@ -1122,7 +1122,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
-                'value'   => sanitize_text_field( $_REQUEST['minimum_bedrooms'] ),
+                'value'   => ph_clean( $_REQUEST['minimum_bedrooms'] ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -1151,7 +1151,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
-                'value'   => sanitize_text_field( $_REQUEST['maximum_bedrooms'] ),
+                'value'   => ph_clean( $_REQUEST['maximum_bedrooms'] ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -1180,7 +1180,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_bathrooms',
-                'value'   => sanitize_text_field( $_REQUEST['minimum_bathrooms'] ),
+                'value'   => ph_clean( $_REQUEST['minimum_bathrooms'] ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -1209,7 +1209,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_bathrooms',
-                'value'   => sanitize_text_field( $_REQUEST['maximum_bathrooms'] ),
+                'value'   => ph_clean( $_REQUEST['maximum_bathrooms'] ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -1238,7 +1238,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_reception_rooms',
-                'value'   => sanitize_text_field( $_REQUEST['minimum_reception_rooms'] ),
+                'value'   => ph_clean( $_REQUEST['minimum_reception_rooms'] ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -1267,7 +1267,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_reception_rooms',
-                'value'   => sanitize_text_field( $_REQUEST['maximum_reception_rooms'] ),
+                'value'   => ph_clean( $_REQUEST['maximum_reception_rooms'] ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -1291,7 +1291,7 @@ class PH_Query {
         	isset( $_REQUEST['available_date_from'] ) && $_REQUEST['available_date_from'] != '' 
         )
         {
-        	$available_date = $_REQUEST['available_date_from'];
+        	$available_date = ph_clean($_REQUEST['available_date_from']);
         	if ( strpos($available_date, '/') !== FALSE )
         	{
         		// it's been provided in the format dd/mm/yyyy
@@ -1303,7 +1303,7 @@ class PH_Query {
         	}
             $meta_query = array(
                 'key'     => '_available_date',
-                'value'   => sanitize_text_field( $available_date ),
+                'value'   => ph_clean( $available_date ),
                 'compare' => '<=', 
             );
         }
@@ -1328,7 +1328,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_floor_area_from_sqft',
-                'value'   => sanitize_text_field( $_REQUEST['minimum_floor_area'] ),
+                'value'   => ph_clean( $_REQUEST['minimum_floor_area'] ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -1354,7 +1354,7 @@ class PH_Query {
         {
             $meta_query = array(
                 'key'     => '_floor_area_to_sqft',
-                'value'   => sanitize_text_field( $_REQUEST['maximum_floor_area'] ),
+                'value'   => ph_clean( $_REQUEST['maximum_floor_area'] ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -1378,13 +1378,13 @@ class PH_Query {
             isset( $_REQUEST['floor_area_range'] ) && $_REQUEST['floor_area_range'] != '' 
         )
         {
-        	$explode_floor_area_range = explode("-", $_REQUEST['floor_area_range']);
+        	$explode_floor_area_range = explode("-", ph_clean($_REQUEST['floor_area_range']));
 
         	if ( isset($explode_floor_area_range[0]) && $explode_floor_area_range[0] != '' )
         	{
 	            $meta_query = array(
 	                'key'     => '_floor_area_from_sqft',
-	                'value'   => sanitize_text_field( $explode_floor_area_range[0] ),
+	                'value'   => ph_clean( $explode_floor_area_range[0] ),
 	                'compare' => '>=',
 	                'type'    => 'NUMERIC' 
 	            );
@@ -1393,7 +1393,7 @@ class PH_Query {
         	{
 	            $meta_query = array(
 	                'key'     => '_floor_area_to_sqft',
-	                'value'   => sanitize_text_field( $explode_floor_area_range[1] ),
+	                'value'   => ph_clean( $explode_floor_area_range[1] ),
 	                'compare' => '<=',
 	                'type'    => 'NUMERIC' 
 	            );
@@ -1467,7 +1467,7 @@ class PH_Query {
         {
     		$meta_query = array(
     		    'key'     => '_negotiator_id',
-    		    'value'   => $_REQUEST['negotiator_id'],
+    		    'value'   => (int)$_REQUEST['negotiator_id'],
     		    'compare' => '='
     		);
 		}
@@ -1490,7 +1490,7 @@ class PH_Query {
         {
     		$meta_query = array(
     		    'key'     => '_office_id',
-    		    'value'   => $_REQUEST['officeID'],
+    		    'value'   => (int)$_REQUEST['officeID'],
     		    'compare' => '='
     		);
 		}
@@ -1516,7 +1516,7 @@ class PH_Query {
                 {
                     $tax_query[] = array(
                         'taxonomy'  => $key,
-                        'terms' => ( (is_array($value)) ? $value : array( $value ) )
+                        'terms' => ph_clean( (is_array($value)) ? $value : array( $value ) )
                     );
                 }
             }
@@ -1529,7 +1529,7 @@ class PH_Query {
     {
     	if ( isset( $_REQUEST['department'] ) && $_REQUEST['department'] != '' )
         {
-        	$department = $_REQUEST['department'];
+        	$department = ph_clean($_REQUEST['department']);
         }
         else
         {

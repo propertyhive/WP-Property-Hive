@@ -67,7 +67,7 @@ $current_user = wp_get_current_user();
                 <input name="preview" id="preview_email" class="button" type="button" value="<?php echo __( 'Preview Email', 'propertyhive' ); ?>" />
 
             	<input type="hidden" name="step" value="two" />
-                <input type="hidden" name="email_property_id" value="<?php echo implode(",", $_POST['email_property_id']); ?>" />
+                <input type="hidden" name="email_property_id" value="<?php echo implode(",", ph_clean($_POST['email_property_id'])); ?>" />
             	<?php wp_nonce_field( 'propertyhive-matching-properties' ); ?>
 
             </p>
@@ -106,7 +106,7 @@ $current_user = wp_get_current_user();
     function showPreview()
     {
         jQuery('#mainform').attr('target', '_blank');
-        jQuery('#mainform').attr('action', '<?php echo admin_url( '?preview_propertyhive_email=true&contact_id=' . $_GET['contact_id'] . '&applicant_profile=' . $_GET['applicant_profile'] ); ?>');
+        jQuery('#mainform').attr('action', '<?php echo admin_url( '?preview_propertyhive_email=true&contact_id=' . (int)$_GET['contact_id'] . '&applicant_profile=' . (int)$_GET['applicant_profile'] ); ?>');
 
         jQuery('#mainform').submit();
         jQuery('#mainform').attr('target', '_self');

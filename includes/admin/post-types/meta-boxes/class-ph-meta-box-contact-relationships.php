@@ -711,10 +711,10 @@ class PH_Meta_Box_Contact_Relationships {
             for ( $i = 0; $i < $num_applicant_profiles; ++$i )
             {
                 $applicant_profile = array();
-                $applicant_profile['department'] = $_POST['_applicant_department_' . $i];
+                $applicant_profile['department'] = ph_clean($_POST['_applicant_department_' . $i]);
                 if ( $_POST['_applicant_department_' . $i] == 'residential-sales' )
                 {
-                    $price = preg_replace("/[^0-9]/", '', $_POST['_applicant_maximum_price_' . $i]);
+                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['_applicant_maximum_price_' . $i]));
 
                     $applicant_profile['max_price'] = $price;
 
@@ -723,10 +723,10 @@ class PH_Meta_Box_Contact_Relationships {
                 }
                 elseif ( $_POST['_applicant_department_' . $i] == 'residential-lettings' )
                 {
-                    $rent = preg_replace("/[^0-9.]/", '', $_POST['_applicant_maximum_rent_' . $i]);
+                    $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_maximum_rent_' . $i]));
 
                     $applicant_profile['max_rent'] = $rent;
-                    $applicant_profile['rent_frequency'] = $_POST['_applicant_rent_frequency_' . $i];
+                    $applicant_profile['rent_frequency'] = ph_clean($_POST['_applicant_rent_frequency_' . $i]);
 
                     $price_actual = $rent; // Used for ordering properties. Stored in pcm
                     switch ($_POST['_applicant_rent_frequency_' . $i])
@@ -741,34 +741,34 @@ class PH_Meta_Box_Contact_Relationships {
 
                 if ( $_POST['_applicant_department_' . $i] == 'residential-sales' || $_POST['_applicant_department_' . $i] == 'residential-lettings' )
                 {
-                    $beds = preg_replace("/[^0-9]/", '', $_POST['_applicant_minimum_bedrooms_' . $i]);
+                    $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['_applicant_minimum_bedrooms_' . $i]));
                     $applicant_profile['min_beds'] = $beds;
 
                     if ( isset($_POST['_applicant_property_types_' . $i]) && is_array($_POST['_applicant_property_types_' . $i]) && !empty($_POST['_applicant_property_types_' . $i]) )
                     {
-                        $applicant_profile['property_types'] = $_POST['_applicant_property_types_' . $i];
+                        $applicant_profile['property_types'] = ph_clean($_POST['_applicant_property_types_' . $i]);
                     }
                 }
 
                 if ( $_POST['_applicant_department_' . $i] == 'commercial' )
                 {
-                    $applicant_profile['available_as'] = ( isset($_POST['_applicant_available_as_' . $i]) && !empty($_POST['_applicant_available_as_' . $i]) ) ? $_POST['_applicant_available_as_' . $i] : array();
+                    $applicant_profile['available_as'] = ( isset($_POST['_applicant_available_as_' . $i]) && !empty($_POST['_applicant_available_as_' . $i]) ) ? ph_clean($_POST['_applicant_available_as_' . $i]) : array();
 
                     if ( isset($_POST['_applicant_commercial_property_types_' . $i]) && is_array($_POST['_applicant_commercial_property_types_' . $i]) && !empty($_POST['_applicant_commercial_property_types_' . $i]) )
                     {
-                        $applicant_profile['commercial_property_types'] = $_POST['_applicant_commercial_property_types_' . $i];
+                        $applicant_profile['commercial_property_types'] = ph_clean($_POST['_applicant_commercial_property_types_' . $i]);
                     }
                 }
 
                 if ( isset($_POST['_applicant_locations_' . $i]) && is_array($_POST['_applicant_locations_' . $i]) && !empty($_POST['_applicant_locations_' . $i]) )
                 {
-                    $applicant_profile['locations'] = $_POST['_applicant_locations_' . $i];
+                    $applicant_profile['locations'] = ph_clean($_POST['_applicant_locations_' . $i]);
                 }
 
-                $applicant_profile['notes'] = $_POST['_applicant_requirement_notes_' . $i];
+                $applicant_profile['notes'] = sanitize_textarea_field($_POST['_applicant_requirement_notes_' . $i]);
 
-                $applicant_profile['send_matching_properties'] = ( ( isset($_POST['_send_matching_properties_' . $i]) ) ? $_POST['_send_matching_properties_' . $i] : '' );
-                $applicant_profile['auto_match_disabled'] = ( ( isset($_POST['_auto_match_disabled_' . $i]) ) ? $_POST['_auto_match_disabled_' . $i] : '' );
+                $applicant_profile['send_matching_properties'] = ( ( isset($_POST['_send_matching_properties_' . $i]) ) ? ph_clean($_POST['_send_matching_properties_' . $i]) : '' );
+                $applicant_profile['auto_match_disabled'] = ( ( isset($_POST['_auto_match_disabled_' . $i]) ) ? ph_clean($_POST['_auto_match_disabled_' . $i]) : '' );
 
                 update_post_meta( $post_id, '_applicant_profile_' . $i, $applicant_profile );
             }
@@ -779,7 +779,7 @@ class PH_Meta_Box_Contact_Relationships {
         {
             foreach ( $_POST['_third_party_category'] as $category )
             {
-                $third_party_categories[]  = $category;
+                $third_party_categories[]  = ph_clean($category);
             }
         }
         update_post_meta( $post_id, '_third_party_categories', $third_party_categories );

@@ -106,7 +106,7 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 			{
 				$meta_query[] = array(
 					'key' => '_department',
-					'value' => $_POST['department'],
+					'value' => ph_clean($_POST['department']),
 				);
 			}
 

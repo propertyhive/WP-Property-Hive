@@ -19,7 +19,7 @@ class PH_Admin_Matching_Properties {
 
 	public function output()
 	{
-        if ( !isset($_GET['contact_id']) || (isset($_GET['contact_id']) && get_post_type($_GET['contact_id']) != 'contact') )
+        if ( !isset($_GET['contact_id']) || (isset($_GET['contact_id']) && get_post_type((int)$_GET['contact_id']) != 'contact') )
         {
             die('Invalid contact_id passed');
         }
@@ -28,11 +28,11 @@ class PH_Admin_Matching_Properties {
             die('Invalid applicant_profile passed');
         }
 
-        $contact_id = $_GET['contact_id'];
+        $contact_id = (int)$_GET['contact_id'];
 
         $email_address = get_post_meta( $contact_id, '_email_address', TRUE );
 
-		$applicant_profile_id = $_GET['applicant_profile'];
+		$applicant_profile_id = (int)$_GET['applicant_profile'];
 
 		$applicant_profile = get_post_meta( $contact_id, '_applicant_profile_' . $applicant_profile_id, TRUE );
 
@@ -73,16 +73,23 @@ class PH_Admin_Matching_Properties {
 				{
                     if ( isset($_POST['email_property_id']) && !empty($_POST['email_property_id']) )
                     {
+                        $to_email_addresses = explode(",", $_POST['to_email_address']);
+                        $new_to_email_addresses = array();
+                        foreach ( $to_email_addresses as $to_email_address)
+                        {
+                            $new_to_email_addresses[] = sanitize_email($to_email_address);
+                        }
+
     					// Email info entered. Time to send emails
                         $this->send_emails(
-                            $_GET['contact_id'], 
-                            $_GET['applicant_profile'], 
-                            explode(",", $_POST['email_property_id']),
-                            $_POST['from_name'],
-                            $_POST['from_email_address'],
-                            $_POST['subject'],
-                            $_POST['body'],
-                            $_POST['to_email_address']
+                            (int)$_GET['contact_id'], 
+                            (int)$_GET['applicant_profile'], 
+                            explode(",", ph_clean($_POST['email_property_id'])),
+                            ph_clean($_POST['from_name']),
+                            sanitize_email($_POST['from_email_address']),
+                            ph_clean($_POST['subject']),
+                            sanitize_textarea_field($_POST['body']),
+                            implode(",", $new_to_email_addresses)
                         );
 
                         echo '<script>window.location.href = "' . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=1";</script>';
@@ -97,10 +104,10 @@ class PH_Admin_Matching_Properties {
 		{
 			$applicant_profile_match_history = get_post_meta( $contact_id, '_applicant_profile_' . $applicant_profile_id . '_match_history', TRUE );
 
-			$properties = $this->get_matching_properties( $_GET['contact_id'], $_GET['applicant_profile'] );
+			$properties = $this->get_matching_properties( (int)$_GET['contact_id'], (int)$_GET['applicant_profile'] );
 
             $do_not_email = false;
-            $forbidden_contact_methods = get_post_meta( $_GET['contact_id'], '_forbidden_contact_methods', TRUE );
+            $forbidden_contact_methods = get_post_meta( (int)$_GET['contact_id'], '_forbidden_contact_methods', TRUE );
             if ( is_array($forbidden_contact_methods) && in_array('email', $forbidden_contact_methods) )
             {
                 $do_not_email = true;
@@ -112,8 +119,8 @@ class PH_Admin_Matching_Properties {
 
 	private function dismiss_properties()
 	{
-		$contact_id = $_GET['contact_id'];
-		$applicant_profile_id = $_GET['applicant_profile'];
+		$contact_id = (int)$_GET['contact_id'];
+		$applicant_profile_id = (int)$_GET['applicant_profile'];
 
 		// Get currently dismissed properties for this contact to decide if we need to add or remove it
         $dismissed_properties = get_post_meta( $contact_id, '_dismissed_properties', TRUE );
@@ -127,10 +134,10 @@ class PH_Admin_Matching_Properties {
 		{
 			foreach ( $_POST['not_interested_property_id'] as $property_id )
 			{
-				if ( in_array($property_id, $dismissed_properties) )
+				if ( in_array((int)$property_id, $dismissed_properties) )
 		        {
 		            // Already dismissed. Need to remove from array
-		            if( ($key = array_search($property_id, $dismissed_properties)) !== false ) 
+		            if( ($key = array_search((int)$property_id, $dismissed_properties)) !== false ) 
 		            {
 		                unset($dismissed_properties[$key]);
 		            }
@@ -138,7 +145,7 @@ class PH_Admin_Matching_Properties {
 		        else
 		        {
 		            // Not dismissed. Add to array
-		            $dismissed_properties[] = $property_id;
+		            $dismissed_properties[] = (int)$property_id;
 		        }
 			}
 

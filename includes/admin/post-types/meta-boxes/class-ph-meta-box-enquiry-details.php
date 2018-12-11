@@ -350,12 +350,12 @@ function viewing_update_selected_properties()
         
         if ( isset($_POST['_added_manually']) && $_POST['_added_manually'] == 'yes' )
         {
-            update_post_meta( $post_id, '_added_manually', $_POST['_added_manually'] );
-            update_post_meta( $post_id, 'name', $_POST['name'] );
-            update_post_meta( $post_id, 'email', $_POST['email'] );
-            update_post_meta( $post_id, 'telephone', $_POST['telephone'] );
-            update_post_meta( $post_id, 'body', $_POST['body'] );
-            if ( isset($_POST['property_id']) && $_POST['property_id'] != '' ) { update_post_meta( $post_id, 'property_id', $_POST['property_id'] ); }
+            update_post_meta( $post_id, '_added_manually', ph_clean($_POST['_added_manually']) );
+            update_post_meta( $post_id, 'name', ph_clean($_POST['name']) );
+            update_post_meta( $post_id, 'email', ph_clean($_POST['email']) );
+            update_post_meta( $post_id, 'telephone', ph_clean($_POST['telephone']) );
+            update_post_meta( $post_id, 'body', sanitize_textarea_field($_POST['body']) );
+            if ( isset($_POST['property_id']) && $_POST['property_id'] != '' ) { update_post_meta( $post_id, 'property_id', (int)$_POST['property_id'] ); }
         }
     }
 
