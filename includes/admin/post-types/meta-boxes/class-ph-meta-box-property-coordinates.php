@@ -24,7 +24,7 @@ class PH_Meta_Box_Property_Coordinates {
         $parent_post = false;
         if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
         {
-            $parent_post = $_GET['post_parent'];
+            $parent_post = (int)$_GET['post_parent'];
         }
         
         echo '<div class="propertyhive_meta_box">';
@@ -272,8 +272,8 @@ class PH_Meta_Box_Property_Coordinates {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        update_post_meta( $post_id, '_latitude', $_POST['_latitude'] );
-        update_post_meta( $post_id, '_longitude', $_POST['_longitude'] );
+        update_post_meta( $post_id, '_latitude', ph_clean($_POST['_latitude']) );
+        update_post_meta( $post_id, '_longitude', ph_clean($_POST['_longitude']) );
     }
 
 }

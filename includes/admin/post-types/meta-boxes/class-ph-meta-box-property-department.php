@@ -36,7 +36,7 @@ class PH_Meta_Box_Property_Department {
         $parent_post = false;
         if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
         {
-            $parent_post = $_GET['post_parent'];
+            $parent_post = (int)$_GET['post_parent'];
         }
         
         echo '<div class="propertyhive_meta_box">';
@@ -156,7 +156,7 @@ class PH_Meta_Box_Property_Department {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        update_post_meta( $post_id, '_department', $_POST['_department'] );
+        update_post_meta( $post_id, '_department', ph_clean($_POST['_department']) );
     }
 
 }

@@ -20,7 +20,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string|array
  */
 function ph_clean( $var ) {
-	return is_array( $var ) ? array_map( 'ph_clean', $var ) : sanitize_text_field( $var );
+	if ( is_array( $var ) ) {
+		return array_map( 'ph_clean', $var );
+	} else {
+		return is_scalar( $var ) ? sanitize_text_field( $var ) : $var;
+	}
 }
 
 if ( ! function_exists( 'ph_rgb_from_hex' ) ) {

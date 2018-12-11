@@ -117,7 +117,7 @@ class PH_Meta_Box_Property_Virtual_Tours {
         
         for ($i = 0; $i < $new_num_property_virtual_tours; ++$i)
         {
-            update_post_meta($post_id, '_virtual_tour_' . $i, $_POST['virtual_tour'][$i]);
+            update_post_meta($post_id, '_virtual_tour_' . $i, ph_clean($_POST['virtual_tour'][$i]));
         }
     }
 }

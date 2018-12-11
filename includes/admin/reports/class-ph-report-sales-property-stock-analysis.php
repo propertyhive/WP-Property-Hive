@@ -345,7 +345,7 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 
 		$metrics = $this->get_metrics();
 
-		$report_type = ( ( isset($_GET['report_type']) ) ? $_GET['report_type'] : 'averages' );
+		$report_type = ( ( isset($_GET['report_type']) && in_array($_GET['report_type'], array('averages', 'totals')) ) ? sanitize_text_field($_GET['report_type']) : 'averages' );
 ?>
 <style type="text/css">
 
@@ -376,8 +376,8 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 		<?php 
 			if ( $report_type == 'averages' ) 
 			{
-				$metric_one = ( ( isset($_POST['metric_one']) ) ? $_POST['metric_one'] : 'property_type' );
-				$metric_two = ( ( isset($_POST['metric_two']) ) ? $_POST['metric_two'] : 'price' );
+				$metric_one = ( ( isset($_POST['metric_one']) ) ? ph_clean($_POST['metric_one']) : 'property_type' );
+				$metric_two = ( ( isset($_POST['metric_two']) ) ? ph_clean($_POST['metric_two']) : 'price' );
 		?>
 		<form method="post" action="">
 
@@ -427,7 +427,7 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 		?>
 		<form method="post" action="">
 		<?php
-				$selected_metrics = ( ( isset($_POST['metrics']) ) ? $_POST['metrics'] : array('price') );
+				$selected_metrics = ( ( isset($_POST['metrics']) ) ? ph_clean($_POST['metrics']) : array('price') );
 
 				foreach ( $metrics as $metric => $metric_data ) 
 				{
@@ -474,7 +474,7 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 	{
 		$metrics = $this->get_metrics();
 
-		$selected_metrics = ( ( isset($_POST['metrics']) ) ? $_POST['metrics'] : array('price') );
+		$selected_metrics = ( ( isset($_POST['metrics']) ) ? ph_clean($_POST['metrics']) : array('price') );
 
 		$price_ranges = $this->get_price_ranges();
 
@@ -690,8 +690,8 @@ jQuery.fn.useTooltip = function () {
 	{
 		$metrics = $this->get_metrics();
 
-		$metric_one = ( ( isset($_POST['metric_one']) ) ? $_POST['metric_one'] : 'property_type' );
-		$metric_two = ( ( isset($_POST['metric_two']) ) ? $_POST['metric_two'] : 'price' );
+		$metric_one = ( ( isset($_POST['metric_one']) ) ? ph_clean($_POST['metric_one']) : 'property_type' );
+		$metric_two = ( ( isset($_POST['metric_two']) ) ? ph_clean($_POST['metric_two']) : 'price' );
 		//
 
 		$average_data = $this->get_average_property_data($metric_one, $metric_two);

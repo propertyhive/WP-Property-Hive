@@ -209,8 +209,7 @@ function offer_update_selected_property_owner_solicitors()
 
         if ( isset($_POST['_property_owner_solicitor_contact_ids']) && $_POST['_property_owner_solicitor_contact_ids'] != '' )
         {
-            
-            update_post_meta( $post_id, '_property_owner_solicitor_contact_id', $_POST['_property_owner_solicitor_contact_ids'] );
+            update_post_meta( $post_id, '_property_owner_solicitor_contact_id', (int)$_POST['_property_owner_solicitor_contact_ids'] );
         }
     }
 

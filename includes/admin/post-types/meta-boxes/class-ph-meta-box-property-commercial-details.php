@@ -23,7 +23,7 @@ class PH_Meta_Box_Property_Commercial_Details {
         $parent_post = false;
         if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
         {
-            $parent_post = $_GET['post_parent'];
+            $parent_post = (int)$_GET['post_parent'];
         }
         
         echo '<div class="propertyhive_meta_box">';
@@ -496,29 +496,29 @@ class PH_Meta_Box_Property_Commercial_Details {
                 {
                     update_post_meta( $post_id, '_for_sale', 'yes' );
 
-                    update_post_meta( $post_id, '_commercial_price_currency', $_POST['_commercial_price_currency'] );
+                    update_post_meta( $post_id, '_commercial_price_currency', ph_clean($_POST['_commercial_price_currency']) );
 
-                    $price = preg_replace("/[^0-9.]/", '', $_POST['_price_from']);
+                    $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price_from']));
                     if ( $price == '' )
                     {
-                        $price = preg_replace("/[^0-9.]/", '', $_POST['_price_to']);
+                        $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price_to']));
                     }
                     update_post_meta( $post_id, '_price_from', $price );
 
-                    $price = preg_replace("/[^0-9.]/", '', $_POST['_price_to']);
+                    $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price_to']));
                     if ( $price == '' )
                     {
-                        $price = preg_replace("/[^0-9.]/", '', $_POST['_price_from']);
+                        $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price_from']));
                     }
                     update_post_meta( $post_id, '_price_to', $price );
 
-                    update_post_meta( $post_id, '_price_units', $_POST['_price_units'] );
+                    update_post_meta( $post_id, '_price_units', ph_clean($_POST['_price_units']) );
 
-                    update_post_meta( $post_id, '_price_poa', ( isset($_POST['_commercial_price_poa']) ? $_POST['_commercial_price_poa'] : '' ) );
+                    update_post_meta( $post_id, '_price_poa', ( isset($_POST['_commercial_price_poa']) ? ph_clean($_POST['_commercial_price_poa']) : '' ) );
 
                     if ( !empty($_POST['commercial_price_qualifier_id']) )
                     {
-                        wp_set_post_terms( $post_id, $_POST['commercial_price_qualifier_id'], 'price_qualifier' );
+                        wp_set_post_terms( $post_id, (int)$_POST['commercial_price_qualifier_id'], 'price_qualifier' );
                     }
                     else
                     {
@@ -528,7 +528,7 @@ class PH_Meta_Box_Property_Commercial_Details {
                     
                     if ( !empty($_POST['commercial_sale_by_id']) )
                     {
-                        wp_set_post_terms( $post_id, $_POST['commercial_sale_by_id'], 'sale_by' );
+                        wp_set_post_terms( $post_id, (int)$_POST['commercial_sale_by_id'], 'sale_by' );
                     }
                     else
                     {
@@ -538,7 +538,7 @@ class PH_Meta_Box_Property_Commercial_Details {
                     
                     if ( !empty($_POST['commercial_tenure_id']) )
                     {
-                        wp_set_post_terms( $post_id, $_POST['commercial_tenure_id'], 'commercial_tenure' );
+                        wp_set_post_terms( $post_id, (int)$_POST['commercial_tenure_id'], 'commercial_tenure' );
                     }
                     else
                     {
@@ -550,25 +550,25 @@ class PH_Meta_Box_Property_Commercial_Details {
                 {
                     update_post_meta( $post_id, '_to_rent', 'yes' );
 
-                    update_post_meta( $post_id, '_commercial_rent_currency', $_POST['_commercial_rent_currency'] );
+                    update_post_meta( $post_id, '_commercial_rent_currency', ph_clean($_POST['_commercial_rent_currency']) );
 
-                    $rent = preg_replace("/[^0-9.]/", '', $_POST['_rent_from']);
+                    $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent_from']));
                     if ( $rent == '' )
                     {
-                        $rent = preg_replace("/[^0-9.]/", '', $_POST['_rent_to']);
+                        $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent_to']));
                     }
                     update_post_meta( $post_id, '_rent_from', $rent );
 
-                    $rent = preg_replace("/[^0-9.]/", '', $_POST['_rent_to']);
+                    $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent_to']));
                     if ( $rent == '' )
                     {
-                        $rent = preg_replace("/[^0-9.]/", '', $_POST['_rent_from']);
+                        $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent_from']));
                     }
                     update_post_meta( $post_id, '_rent_to', $rent );
 
-                    update_post_meta( $post_id, '_rent_units', $_POST['_rent_units'] );
+                    update_post_meta( $post_id, '_rent_units', ph_clean($_POST['_rent_units']) );
 
-                    update_post_meta( $post_id, '_rent_poa', ( isset($_POST['_commercial_rent_poa']) ? $_POST['_commercial_rent_poa'] : '' ) );
+                    update_post_meta( $post_id, '_rent_poa', ( isset($_POST['_commercial_rent_poa']) ? ph_clean($_POST['_commercial_rent_poa']) : '' ) );
                 }
             }
 
@@ -581,7 +581,7 @@ class PH_Meta_Box_Property_Commercial_Details {
             {
                 foreach ( $_POST['property_type_ids'] as $property_type_id )
                 {
-                    $property_types[] = $property_type_id;
+                    $property_types[] = (int)$property_type_id;
                 }
             }
             if ( !empty($property_types) )
@@ -593,45 +593,45 @@ class PH_Meta_Box_Property_Commercial_Details {
                 wp_delete_object_term_relationships( $post_id, 'commercial_property_type' );
             }
 
-            $size = preg_replace("/[^0-9.]/", '', $_POST['_floor_area_from']);
+            $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_floor_area_from']));
             if ( $size == '' )
             {
-                $size = preg_replace("/[^0-9.]/", '', $_POST['_floor_area_to']);
+                $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_floor_area_to']));
             }
             update_post_meta( $post_id, '_floor_area_from', $size );
 
-            update_post_meta( $post_id, '_floor_area_from_sqft', convert_size_to_sqft( $size, $_POST['_floor_area_units'] ) );
+            update_post_meta( $post_id, '_floor_area_from_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_floor_area_units']) ) );
 
-            $size = preg_replace("/[^0-9.]/", '', $_POST['_floor_area_to']);
+            $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_floor_area_to']));
             if ( $size == '' )
             {
-                $size = preg_replace("/[^0-9.]/", '', $_POST['_floor_area_from']);
+                $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_floor_area_from']));
             }
             update_post_meta( $post_id, '_floor_area_to', $size );
 
-            update_post_meta( $post_id, '_floor_area_to_sqft', convert_size_to_sqft( $size, $_POST['_floor_area_units'] ) );
+            update_post_meta( $post_id, '_floor_area_to_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_floor_area_units']) ) );
 
-            update_post_meta( $post_id, '_floor_area_units', $_POST['_floor_area_units'] );
+            update_post_meta( $post_id, '_floor_area_units', ph_clean($_POST['_floor_area_units']) );
 
-            $size = preg_replace("/[^0-9.]/", '', $_POST['_site_area_from']);
+            $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_site_area_from']));
             if ( $size == '' )
             {
-                $size = preg_replace("/[^0-9.]/", '', $_POST['_site_area_to']);
+                $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_site_area_to']));
             }
             update_post_meta( $post_id, '_site_area_from', $size );
 
-            update_post_meta( $post_id, '_site_area_from_sqft', convert_size_to_sqft( $size, $_POST['_site_area_units'] ) );
+            update_post_meta( $post_id, '_site_area_from_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_site_area_units']) ) );
 
-            $size = preg_replace("/[^0-9.]/", '', $_POST['_site_area_to']);
+            $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_site_area_to']));
             if ( $size == '' )
             {
-                $size = preg_replace("/[^0-9.]/", '', $_POST['_site_area_from']);
+                $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_site_area_from']));
             }
             update_post_meta( $post_id, '_site_area_to', $size );
 
-            update_post_meta( $post_id, '_site_area_to_sqft', convert_size_to_sqft( $size, $_POST['_site_area_units'] ) );
+            update_post_meta( $post_id, '_site_area_to_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_site_area_units']) ) );
 
-            update_post_meta( $post_id, '_site_area_units', $_POST['_site_area_units'] );
+            update_post_meta( $post_id, '_site_area_units', ph_clean($_POST['_site_area_units']) );
         }
     }
 

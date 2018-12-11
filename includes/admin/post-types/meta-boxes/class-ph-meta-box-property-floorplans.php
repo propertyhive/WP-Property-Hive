@@ -271,7 +271,7 @@ class PH_Meta_Box_Property_Floorplans {
         $floorplans = array();
         if (trim($_POST['floorplan_attachment_ids'], ',') != '')
         {
-            $floorplans = explode( ",", trim($_POST['floorplan_attachment_ids'], ',') );
+            $floorplans = explode( ",", trim(ph_clean($_POST['floorplan_attachment_ids']), ',') );
         }
         update_post_meta( $post_id, '_floorplans', $floorplans );
     }

@@ -219,8 +219,8 @@ class PH_Meta_Box_Property_Description {
         
         for ($i = 0; $i < $new_num_property_descriptions; ++$i)
         {
-            update_post_meta($post_id, '_description_name_' . $i, $_POST['_description_name'][$i]);
-            update_post_meta($post_id, '_description_' . $i, $_POST['_description'][$i]);
+            update_post_meta($post_id, '_description_name_' . $i, ph_clean($_POST['_description_name'][$i]));
+            update_post_meta($post_id, '_description_' . $i, sanitize_textarea_field($_POST['_description'][$i]));
         }
     }
 

@@ -269,7 +269,7 @@ class PH_Meta_Box_Property_Photos {
         $photos = array();
         if (trim($_POST['photo_attachment_ids'], ',') != '')
         {
-            $photos = explode( ",", trim($_POST['photo_attachment_ids'], ',') );
+            $photos = explode( ",", trim(ph_clean($_POST['photo_attachment_ids']), ',') );
         }
         update_post_meta( $post_id, '_photos', $photos );
     }

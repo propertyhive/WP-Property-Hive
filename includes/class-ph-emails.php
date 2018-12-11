@@ -92,7 +92,7 @@ class PH_Emails {
 			$_POST['department'] != ''
 		)
 		{
-			$to = get_post_meta( $_POST['office_id'], '_office_email_address_' . str_replace("residential-", "", $_POST['department']), TRUE );
+			$to = get_post_meta( (int)$_POST['office_id'], '_office_email_address_' . str_replace("residential-", "", ph_clean($_POST['department'])), TRUE );
 
 			if ( $to == '' )
 			{
@@ -124,10 +124,10 @@ class PH_Emails {
             		continue;
             	}
 
-            	$value = $_POST[$key];
+            	$value = ph_clean($_POST[$key]);
             	if ( taxonomy_exists($key) )
             	{
-            		$term = get_term( $_POST[$key], $key );
+            		$term = get_term( ph_clean($_POST[$key]), $key );
 
             		if ( isset($term->name) )
             		{

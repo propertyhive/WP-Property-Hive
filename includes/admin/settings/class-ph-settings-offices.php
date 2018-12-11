@@ -60,7 +60,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
         
         global $current_section;
         
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
 
         $args = array(
 
@@ -253,7 +253,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
         }
         else
         {
-            $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+            $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
             
             if ($current_id == '')
             {
@@ -367,7 +367,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             remove_action('propertyhive_admin_field_offices', array( $this, 'offices_setting' ));
             
-            $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+            $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
             
             $settings = $this->get_office_settings();
 
@@ -377,7 +377,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             remove_action('propertyhive_admin_field_offices', array( $this, 'offices_setting' ));
             
-            $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+            $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
             
             $settings = $this->get_office_delete();
 
@@ -522,7 +522,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             // Insert office
             $office_post = array(
-              'post_title'    => wp_strip_all_tags( $_POST['office_name'] ),
+              'post_title'    => ph_clean( $_POST['office_name'] ),
               'post_content'  => '',
               'post_status'   => 'publish',
               'post_type'     => 'office',
@@ -540,7 +540,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
         } elseif ( $current_section == 'edit' ) {
             
-            $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+            $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
        
             // TODO: Validate
             // TODO: Make sure this ID belongs to an office
@@ -549,7 +549,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             // Update office
             $office_post = array(
                 'ID'           => $current_id,
-                'post_title'   => wp_strip_all_tags( $_POST['office_name'] )
+                'post_title'   => ph_clean( $_POST['office_name'] )
             );
             
             wp_update_post( $office_post );
@@ -565,7 +565,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == '1' )
             {
-                $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+                $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
                 
                 // Get number of properties assigned to this term
                 $query_args = array(
@@ -590,7 +590,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                     }
                     else
                     {
-                        $post_type = get_post_type( $_POST['reassign_to'] );
+                        $post_type = get_post_type( (int)$_POST['reassign_to'] );
                 
                         if ( $post_type != 'office' )
                         {
@@ -602,7 +602,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                     {
                         $property_query->the_post();
                         
-                        update_post_meta( $post->ID, '_office_id', $_POST['reassign_to'] );
+                        update_post_meta( $post->ID, '_office_id', (int)$_POST['reassign_to'] );
                         
                         // TODO: Check for WP_ERROR
                     }
@@ -643,25 +643,25 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 wp_reset_postdata();
                 
                 // Set selected office as primary
-                update_post_meta(wp_strip_all_tags( $_POST['primary'] ), 'primary', '1');
+                update_post_meta( (int)$_POST['primary'], 'primary', '1');
             }
             else
             {
-                update_post_meta($office_post_id, '_office_address_1', wp_strip_all_tags( $_POST['_office_address_1'] ));
-                update_post_meta($office_post_id, '_office_address_2', wp_strip_all_tags( $_POST['_office_address_2'] ));
-                update_post_meta($office_post_id, '_office_address_3', wp_strip_all_tags( $_POST['_office_address_3'] ));
-                update_post_meta($office_post_id, '_office_address_4', wp_strip_all_tags( $_POST['_office_address_4'] ));
-                update_post_meta($office_post_id, '_office_address_postcode', wp_strip_all_tags( $_POST['_office_address_postcode'] ));
+                update_post_meta($office_post_id, '_office_address_1', ph_clean( $_POST['_office_address_1'] ));
+                update_post_meta($office_post_id, '_office_address_2', ph_clean( $_POST['_office_address_2'] ));
+                update_post_meta($office_post_id, '_office_address_3', ph_clean( $_POST['_office_address_3'] ));
+                update_post_meta($office_post_id, '_office_address_4', ph_clean( $_POST['_office_address_4'] ));
+                update_post_meta($office_post_id, '_office_address_postcode', ph_clean( $_POST['_office_address_postcode'] ));
                 
-                update_post_meta($office_post_id, '_office_telephone_number_sales', (isset($_POST['_office_telephone_number_sales'])) ? wp_strip_all_tags( $_POST['_office_telephone_number_sales'] ) : '');
-                update_post_meta($office_post_id, '_office_email_address_sales', (isset($_POST['_office_email_address_sales'])) ? wp_strip_all_tags( $_POST['_office_email_address_sales'] ) : '');
-                update_post_meta($office_post_id, '_office_telephone_number_lettings', (isset($_POST['_office_telephone_number_lettings'])) ? wp_strip_all_tags( $_POST['_office_telephone_number_lettings'] ) : '');
-                update_post_meta($office_post_id, '_office_email_address_lettings', (isset($_POST['_office_email_address_lettings'])) ? wp_strip_all_tags( $_POST['_office_email_address_lettings'] ) : '');
-                update_post_meta($office_post_id, '_office_telephone_number_commercial', (isset($_POST['_office_telephone_number_commercial'])) ? wp_strip_all_tags( $_POST['_office_telephone_number_commercial'] ) : '');
-                update_post_meta($office_post_id, '_office_email_address_commercial', (isset($_POST['_office_email_address_commercial'])) ? wp_strip_all_tags( $_POST['_office_email_address_commercial'] ) : '');
+                update_post_meta($office_post_id, '_office_telephone_number_sales', (isset($_POST['_office_telephone_number_sales'])) ? ph_clean( $_POST['_office_telephone_number_sales'] ) : '');
+                update_post_meta($office_post_id, '_office_email_address_sales', (isset($_POST['_office_email_address_sales'])) ? ph_clean( $_POST['_office_email_address_sales'] ) : '');
+                update_post_meta($office_post_id, '_office_telephone_number_lettings', (isset($_POST['_office_telephone_number_lettings'])) ? ph_clean( $_POST['_office_telephone_number_lettings'] ) : '');
+                update_post_meta($office_post_id, '_office_email_address_lettings', (isset($_POST['_office_email_address_lettings'])) ? ph_clean( $_POST['_office_email_address_lettings'] ) : '');
+                update_post_meta($office_post_id, '_office_telephone_number_commercial', (isset($_POST['_office_telephone_number_commercial'])) ? ph_clean( $_POST['_office_telephone_number_commercial'] ) : '');
+                update_post_meta($office_post_id, '_office_email_address_commercial', (isset($_POST['_office_email_address_commercial'])) ? ph_clean( $_POST['_office_email_address_commercial'] ) : '');
 
-                update_post_meta($office_post_id, '_office_latitude', wp_strip_all_tags( $_POST['_office_latitude'] ));
-                update_post_meta($office_post_id, '_office_longitude', wp_strip_all_tags( $_POST['_office_longitude'] ));
+                update_post_meta($office_post_id, '_office_latitude', ph_clean( $_POST['_office_latitude'] ));
+                update_post_meta($office_post_id, '_office_longitude', ph_clean( $_POST['_office_longitude'] ));
 
                 do_action( 'propertyhive_save_office', $office_post_id );
             }

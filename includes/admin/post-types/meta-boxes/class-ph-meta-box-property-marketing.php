@@ -124,12 +124,12 @@ class PH_Meta_Box_Property_Marketing {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        update_post_meta($post_id, '_on_market', ( isset($_POST['_on_market']) ? $_POST['_on_market'] : '' ) );
-        update_post_meta($post_id, '_featured', ( isset($_POST['_featured']) ? $_POST['_featured'] : '' ) );
+        update_post_meta($post_id, '_on_market', ( isset($_POST['_on_market']) ? ph_clean($_POST['_on_market']) : '' ) );
+        update_post_meta($post_id, '_featured', ( isset($_POST['_featured']) ? ph_clean($_POST['_featured']) : '' ) );
 
         if ( !empty($_POST['_availability']) )
         {
-            wp_set_post_terms( $post_id, $_POST['_availability'], 'availability' );
+            wp_set_post_terms( $post_id, (int)$_POST['_availability'], 'availability' );
         }
         else
         {
@@ -140,7 +140,7 @@ class PH_Meta_Box_Property_Marketing {
         wp_delete_object_term_relationships( $post_id, 'marketing_flag' );
         if ( !empty($_POST['_marketing_flags']) )
         {
-            wp_set_post_terms( $post_id, $_POST['_marketing_flags'], 'marketing_flag' );
+            wp_set_post_terms( $post_id, ph_clean($_POST['_marketing_flags']), 'marketing_flag' );
         }
 
         do_action( 'propertyhive_save_property_marketing', $post_id );

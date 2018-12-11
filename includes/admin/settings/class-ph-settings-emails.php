@@ -219,12 +219,12 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
         $additional_query = '';
         $additional_query_string = '';
-        if ( isset($_GET['date_from']) && $_GET['date_from'] != '' )
+        if ( isset($_GET['date_from']) && sanitize_text_field($_GET['date_from']) != '' )
         {
-        	$additional_query_string .= '&date_from=' . $_GET['date_from'];
-        	if ( $_GET['date_from'] != 'all' )
+        	$additional_query_string .= '&date_from=' . sanitize_text_field($_GET['date_from']);
+        	if ( sanitize_text_field($_GET['date_from']) != 'all' )
         	{
-	        	$additional_query .= " AND send_at >= '" . $_GET['date_from'] . " 00:00:00' ";
+	        	$additional_query .= " AND send_at >= '" . sanitize_text_field($_GET['date_from']) . " 00:00:00' ";
 	        }
         }
         else
@@ -362,6 +362,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 								case "sent": { $query .= " AND status = 'sent' "; break; }
 							}
 						}
+						$query .= $additional_query;
 
 						$query .= " ORDER BY send_at DESC
 							LIMIT 250

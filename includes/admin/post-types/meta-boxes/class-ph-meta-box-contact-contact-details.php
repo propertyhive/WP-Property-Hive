@@ -113,10 +113,10 @@ class PH_Meta_Box_Contact_Contact_Details {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        update_post_meta( $post_id, '_telephone_number', trim($_POST['_telephone_number']) );
-        update_post_meta( $post_id, '_email_address', str_replace(" ", "", $_POST['_email_address']) );
-        update_post_meta( $post_id, '_contact_notes', trim($_POST['_contact_notes']) );
-        update_post_meta( $post_id, '_forbidden_contact_methods', ( (isset($_POST['_forbidden_contact_methods'])) ? $_POST['_forbidden_contact_methods'] : '' ) );
+        update_post_meta( $post_id, '_telephone_number',  ph_clean($_POST['_telephone_number']) );
+        update_post_meta( $post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_email_address'])) );
+        update_post_meta( $post_id, '_contact_notes', sanitize_textarea_field($_POST['_contact_notes']) );
+        update_post_meta( $post_id, '_forbidden_contact_methods', ( (isset($_POST['_forbidden_contact_methods'])) ? ph_clean($_POST['_forbidden_contact_methods']) : '' ) );
 
         do_action( 'propertyhive_save_contact_contact_details', $post_id );
     }

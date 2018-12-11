@@ -281,7 +281,7 @@ class PH_Meta_Box_Property_Epcs {
         $epcs = array();
         if (trim($_POST['epc_attachment_ids'], ',') != '')
         {
-            $epcs = explode( ",", trim($_POST['epc_attachment_ids'], ',') );
+            $epcs = explode( ",", trim(ph_clean($_POST['epc_attachment_ids']), ',') );
         }
         update_post_meta( $post_id, '_epcs', $epcs );
     }

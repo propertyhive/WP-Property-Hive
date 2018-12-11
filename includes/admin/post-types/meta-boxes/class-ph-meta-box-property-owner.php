@@ -36,9 +36,9 @@ class PH_Meta_Box_Property_Owner {
         $owner_contact_ids = array();
         if ( isset($_GET['owner_contact_id']) && ! empty( $_GET['owner_contact_id'] ) )
         {
-            if ( get_post_type( $_GET['owner_contact_id'] ) == 'contact' )
+            if ( get_post_type( (int)$_GET['owner_contact_id'] ) == 'contact' )
             {
-                $owner_contact_ids = $_GET['owner_contact_id'];
+                $owner_contact_ids = (int)$_GET['owner_contact_id'];
             }   
         }
         else
@@ -424,7 +424,7 @@ class PH_Meta_Box_Property_Owner {
     public static function save( $post_id, $post ) {
         global $wpdb;
 
-        $contact_post_ids = explode( "|", $_POST['_owner_contact_id'] );
+        $contact_post_ids = explode( "|", ph_clean($_POST['_owner_contact_id']) );
         
         if ($_POST['_owner_contact_add_new'] == '1')
         {
@@ -443,7 +443,7 @@ class PH_Meta_Box_Property_Owner {
             {
                 // Insert contact
                 $owner_post = array(
-                    'post_title'    => $_POST['_owner_name'],
+                    'post_title'    => ph_clean($_POST['_owner_name']),
                     'post_content'  => '',
                     'post_status'   => 'publish',
                     'post_type'  => 'contact',
@@ -457,16 +457,16 @@ class PH_Meta_Box_Property_Owner {
                 {
                     $contact_post_ids[] = $contact_post_id;
                   
-                    update_post_meta( $contact_post_id, '_address_name_number', $_POST['_owner_address_name_number'] );
-                    update_post_meta( $contact_post_id, '_address_street', $_POST['_owner_address_street'] );
-                    update_post_meta( $contact_post_id, '_address_two', $_POST['_owner_address_two'] );
-                    update_post_meta( $contact_post_id, '_address_three', $_POST['_owner_address_three'] );
-                    update_post_meta( $contact_post_id, '_address_four', $_POST['_owner_address_four'] );
-                    update_post_meta( $contact_post_id, '_address_postcode', $_POST['_owner_address_postcode'] );
-                    update_post_meta( $contact_post_id, '_address_country', $_POST['_owner_address_country'] );
+                    update_post_meta( $contact_post_id, '_address_name_number', ph_clean($_POST['_owner_address_name_number']) );
+                    update_post_meta( $contact_post_id, '_address_street', ph_clean($_POST['_owner_address_street']) );
+                    update_post_meta( $contact_post_id, '_address_two', ph_clean($_POST['_owner_address_two']) );
+                    update_post_meta( $contact_post_id, '_address_three', ph_clean($_POST['_owner_address_three']) );
+                    update_post_meta( $contact_post_id, '_address_four', ph_clean($_POST['_owner_address_four']) );
+                    update_post_meta( $contact_post_id, '_address_postcode', ph_clean($_POST['_owner_address_postcode']) );
+                    update_post_meta( $contact_post_id, '_address_country', ph_clean($_POST['_owner_address_country']) );
                   
-                    update_post_meta( $contact_post_id, '_telephone_number', $_POST['_owner_telephone_number'] );
-                    update_post_meta( $contact_post_id, '_email_address', $_POST['_owner_email_address'] );
+                    update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['_owner_telephone_number']) );
+                    update_post_meta( $contact_post_id, '_email_address', ph_clean($_POST['_owner_email_address']) );
                 }
             }
         }
@@ -475,7 +475,7 @@ class PH_Meta_Box_Property_Owner {
 
         foreach ( $contact_post_ids as $contact_post_id )
         {
-            $existing_contact_types = get_post_meta( $contact_post_id, '_contact_types', TRUE );
+            $existing_contact_types = get_post_meta( (int)$contact_post_id, '_contact_types', TRUE );
             if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
             {
                 $existing_contact_types = array();
@@ -483,7 +483,7 @@ class PH_Meta_Box_Property_Owner {
             if ( !in_array( 'owner', $existing_contact_types ) )
             {
                 $existing_contact_types[] = 'owner';
-                update_post_meta( $contact_post_id, '_contact_types', $existing_contact_types );
+                update_post_meta( (int)$contact_post_id, '_contact_types', $existing_contact_types );
             }
         }
         

@@ -24,7 +24,7 @@ class PH_Meta_Box_Property_Record_Details {
         $parent_post = false;
         if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
         {
-            $parent_post = $_GET['post_parent'];
+            $parent_post = (int)$_GET['post_parent'];
         }
         
         echo '<div class="propertyhive_meta_box">';
@@ -124,8 +124,8 @@ class PH_Meta_Box_Property_Record_Details {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        update_post_meta( $post_id, '_negotiator_id', $_POST['_negotiator_id'] );
-        update_post_meta( $post_id, '_office_id', $_POST['_office_id'] );
+        update_post_meta( $post_id, '_negotiator_id', (int)$_POST['_negotiator_id'] );
+        update_post_meta( $post_id, '_office_id', (int)$_POST['_office_id'] );
 
         do_action('propertyhive_save_property_record_details', $post_id);
     }

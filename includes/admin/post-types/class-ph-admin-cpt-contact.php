@@ -117,10 +117,10 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		if ( ! empty( $_GET['post_type'] ) && 'contact' == $_GET['post_type'] ) {
 			return true;
 		}
-		if ( ! empty( $_GET['post'] ) && 'contact' == get_post_type( $_GET['post'] ) ) {
+		if ( ! empty( $_GET['post'] ) && 'contact' == get_post_type( (int)$_GET['post'] ) ) {
 			return true;
 		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'contact' == get_post_type( $_REQUEST['post_id'] ) ) {
+		if ( ! empty( $_REQUEST['post_id'] ) && 'contact' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
 			return true;
 		}
 		return false;
@@ -379,29 +379,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		global $typenow, $wp_query;
 
 		if ( 'contact' == $typenow ) {
-
-			/*if ( isset( $query->query_vars['product_type'] ) ) {
-				// Subtypes
-				if ( 'downloadable' == $query->query_vars['product_type'] ) {
-					$query->query_vars['product_type']  = '';
-					$query->query_vars['meta_value']    = 'yes';
-					$query->query_vars['meta_key']      = '_downloadable';
-				} elseif ( 'virtual' == $query->query_vars['product_type'] ) {
-					$query->query_vars['product_type']  = '';
-					$query->query_vars['meta_value']    = 'yes';
-					$query->query_vars['meta_key']      = '_virtual';
-				}
-			}
-
-			// Categories
-			if ( isset( $_GET['product_cat'] ) && '0' == $_GET['product_cat'] ) {
-				$query->query_vars['tax_query'][] = array(
-					'taxonomy' => 'product_cat',
-					'field'    => 'id',
-					'terms'    => get_terms( 'product_cat', array( 'fields' => 'ids' ) ),
-					'operator' => 'NOT IN'
-				);
-			}*/
+			
 		}
 	}
 
@@ -513,7 +491,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		/*
 		// Save fields
 		if ( isset( $_REQUEST['_availability'] ) ) {
-			update_post_meta( $post_id, '_availability', ph__clean( $_REQUEST['_availability'] ) );
+			update_post_meta( $post_id, '_availability', ph_clean( $_REQUEST['_availability'] ) );
 		}*/
 
 		do_action( 'propertyhive_product_quick_edit_save', $contact );
@@ -527,7 +505,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		/*
 		// Save fields
 		if ( ! empty( $_REQUEST['_availability'] ) ) {
-			update_post_meta( $post_id, '_availability', ph__clean( $_REQUEST['_availability'] ) );
+			update_post_meta( $post_id, '_availability', ph_clean( $_REQUEST['_availability'] ) );
 		}*/
 
 		do_action( 'propertyhive_contact_bulk_edit_save', $contact );

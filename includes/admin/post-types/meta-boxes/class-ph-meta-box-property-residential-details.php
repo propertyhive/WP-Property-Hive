@@ -258,13 +258,13 @@ class PH_Meta_Box_Property_Residential_Details {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
-        $rooms = preg_replace("/[^0-9]/", '', $_POST['_bedrooms']);
+        $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bedrooms']));
         update_post_meta( $post_id, '_bedrooms', $rooms );
 
-        $rooms = preg_replace("/[^0-9]/", '', $_POST['_bathrooms']);
+        $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bathrooms']));
         update_post_meta( $post_id, '_bathrooms', $rooms );
 
-        $rooms = preg_replace("/[^0-9]/", '', $_POST['_reception_rooms']);
+        $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_reception_rooms']));
         update_post_meta( $post_id, '_reception_rooms', $rooms );
         
         $property_types = array();
@@ -272,7 +272,7 @@ class PH_Meta_Box_Property_Residential_Details {
         {
             foreach ( $_POST['property_type_id'] as $property_type_id )
             {
-                $property_types[] = $property_type_id;
+                $property_types[] = (int)$property_type_id;
             }
         }
         if ( !empty($property_types) )
@@ -290,7 +290,7 @@ class PH_Meta_Box_Property_Residential_Details {
         {
             foreach ( $_POST['parking_ids'] as $parking_id )
             {
-                $parkings[] = $parking_id;
+                $parkings[] = (int)$parking_id;
             }
         }
         if ( !empty($parkings) )
@@ -307,7 +307,7 @@ class PH_Meta_Box_Property_Residential_Details {
         {
             foreach ( $_POST['outside_space_ids'] as $outside_space_id )
             {
-                $outside_spaces[] = $outside_space_id;
+                $outside_spaces[] = (int)$outside_space_id;
             }
         }
         if ( !empty($outside_spaces) )

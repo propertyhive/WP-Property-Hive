@@ -64,9 +64,9 @@ function redraw_sale_details_meta_box()
             update_post_meta( $post_id, '_status', 'current' );
         }
 
-        update_post_meta( $post_id, '_sale_date_time', $_POST['_sale_date'] . ' 00:00:00' );
+        update_post_meta( $post_id, '_sale_date_time', ph_clean($_POST['_sale_date']) . ' 00:00:00' );
 
-        $amount = preg_replace("/[^0-9]/", '', $_POST['_amount']);
+        $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_amount']));
         update_post_meta( $post_id, '_amount', $amount );
     }
 

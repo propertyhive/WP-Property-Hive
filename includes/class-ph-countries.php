@@ -51,7 +51,7 @@ class PH_Countries {
 			// TO DO: Make sure currency passed in is in list of countries they operate in
 			// so we can get the exchange rate
 
-			$currency = $this->get_currency( $_GET['currency'] );
+			$currency = $this->get_currency( sanitize_text_field($_GET['currency']) );
 			if ( $currency === FALSE )
 			{
 				$default_country = get_option( 'propertyhive_default_country', 'GB' );
@@ -64,7 +64,7 @@ class PH_Countries {
 			$exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
 			if ( isset($exchange_rates[$_GET['currency']]) )
 			{
-				$currency['exchange_rate'] = $exchange_rates[$_GET['currency']];
+				$currency['exchange_rate'] = $exchange_rates[sanitize_text_field($_GET['currency'])];
 			}
 			
 			ph_setcookie( 'propertyhive_currency', htmlentities(serialize($currency)), time() + (30 * DAY_IN_SECONDS), is_ssl() );

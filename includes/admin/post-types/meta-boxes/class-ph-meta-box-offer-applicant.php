@@ -77,7 +77,7 @@ class PH_Meta_Box_Offer_Applicant {
 
 var offer_selected_applicants = [];
 <?php if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '') { ?>
-offer_selected_applicants[<?php echo $_GET['applicant_contact_id']; ?>] = ({ post_title: '<?php echo get_the_title($_GET['applicant_contact_id']); ?>' });
+offer_selected_applicants[<?php echo (int)$_GET['applicant_contact_id']; ?>] = ({ post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
 <?php } ?>
 
 jQuery(document).ready(function($)
@@ -204,7 +204,7 @@ function offer_update_selected_applicants()
 
         if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
         {
-            update_post_meta( $post_id, '_applicant_contact_id', $_POST['_applicant_contact_ids'] );
+            update_post_meta( $post_id, '_applicant_contact_id', (int)$_POST['_applicant_contact_ids'] );
         }
     }
 

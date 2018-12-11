@@ -205,20 +205,20 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         
         if ($department == 'residential-sales')
         {
-            update_post_meta( $post_id, '_currency', $_POST['_price_currency'] );
+            update_post_meta( $post_id, '_currency', ph_clean($_POST['_price_currency']) );
 
-            $price = preg_replace("/[^0-9]/", '', $_POST['_price']);
+            $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['_price']));
             update_post_meta( $post_id, '_price', $price );
             
             // Store price in common currency (GBP) used for ordering
             $ph_countries = new PH_Countries();
             $ph_countries->update_property_price_actual( $post_id );
 
-            update_post_meta( $post_id, '_poa', ( isset($_POST['_sale_poa']) ? $_POST['_sale_poa'] : '' ) );
+            update_post_meta( $post_id, '_poa', ( isset($_POST['_sale_poa']) ? ph_clean($_POST['_sale_poa']) : '' ) );
             
             if ( !empty($_POST['price_qualifier_id']) )
             {
-                wp_set_post_terms( $post_id, $_POST['price_qualifier_id'], 'price_qualifier' );
+                wp_set_post_terms( $post_id, (int)$_POST['price_qualifier_id'], 'price_qualifier' );
             }
             else
             {
@@ -228,7 +228,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             
             if ( !empty($_POST['sale_by_id']) )
             {
-                wp_set_post_terms( $post_id, $_POST['sale_by_id'], 'sale_by' );
+                wp_set_post_terms( $post_id, (int)$_POST['sale_by_id'], 'sale_by' );
             }
             else
             {
@@ -238,7 +238,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             
             if ( !empty($_POST['tenure_id']) )
             {
-                wp_set_post_terms( $post_id, $_POST['tenure_id'], 'tenure' );
+                wp_set_post_terms( $post_id, (int)$_POST['tenure_id'], 'tenure' );
             }
             else
             {
