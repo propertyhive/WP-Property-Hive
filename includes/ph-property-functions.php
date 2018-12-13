@@ -42,18 +42,18 @@ function ph_get_featured_property_ids() {
 		'post_status'    => 'publish',
 		'meta_query'     => array(
 			array(
-                'key'   => 'on_market',
-                'value' => 'yes'
-            ),
+				'key'   => '_on_market',
+				'value' => 'yes'
+			),
 			array(
-				'key' 	=> 'featured',
+				'key' 	=> '_featured',
 				'value' => 'yes'
 			)
 		),
 		'fields' => 'id=>parent'
 	) );
 
-	$featured_property_ids = array_keys( $property_ids );
+	$featured_property_ids = array_keys( $featured );
 
 	set_transient( 'ph_featured_properties', $featured_property_ids, YEAR_IN_SECONDS );
 
