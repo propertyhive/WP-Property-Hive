@@ -732,55 +732,54 @@ class PH_Query {
 
 	      	$meta_query = array('relation' => 'OR');
 
+	      	$address_fields_to_query = array(
+	      		'_reference_number',
+	      		'_address_street',
+	      		'_address_two',
+	      		'_address_three',
+	      		'_address_four',
+	      		'_address_postcode'
+	      	);
+
+	      	$address_fields_to_query = apply_filters( 'propertyhive_address_fields_to_query', $address_fields_to_query );
+
 	      	foreach ( $address_keywords as $address_keyword )
 	      	{
-		      	$meta_query[] = array(
-				    'key'     => '_reference_number',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-	      		$meta_query[] = array(
-				    'key'     => '_address_street',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-      			$meta_query[] = array(
-				    'key'     => '_address_two',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-				$meta_query[] = array(
-				    'key'     => '_address_three',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-				$meta_query[] = array(
-				    'key'     => '_address_four',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
+	      		foreach ( $address_fields_to_query as $address_field )
+	      		{
+	      			if ( $address_field == '_address_postcode' ) { continue; } // ignore postcode as that is handled differently afterwards
+
+	      			$meta_query[] = array(
+					    'key'     => $address_field,
+					    'value'   => $address_keyword,
+					    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+					);
+	      		}
 			}
-	      	if ( strlen($_REQUEST['address_keyword']) <= 4 )
-	      	{
-	      		$meta_query[] = array(
-				    'key'     => '_address_postcode',
-				    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
-				    'compare' => '='
-				);
-	      		$meta_query[] = array(
-				    'key'     => '_address_postcode',
-				    'value'   => '^' . ph_clean( $_REQUEST['address_keyword'] ) . '[ ]',
-				    'compare' => 'RLIKE'
-				);
-	      	}
-	      	else
-	      	{
-	      		$meta_query[] = array(
-				    'key'     => '_address_postcode',
-				    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
-				    'compare' => 'LIKE'
-				);
-	      	}
+			if ( in_array('_address_postcode', $address_fields_to_query) )
+			{
+		      	if ( strlen($_REQUEST['address_keyword']) <= 4 )
+		      	{
+		      		$meta_query[] = array(
+					    'key'     => '_address_postcode',
+					    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
+					    'compare' => '='
+					);
+		      		$meta_query[] = array(
+					    'key'     => '_address_postcode',
+					    'value'   => '^' . ph_clean( $_REQUEST['address_keyword'] ) . '[ ]',
+					    'compare' => 'RLIKE'
+					);
+		      	}
+		      	else
+		      	{
+		      		$meta_query[] = array(
+					    'key'     => '_address_postcode',
+					    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
+					    'compare' => 'LIKE'
+					);
+		      	}
+		    }
       	}
 
 		return $meta_query;
