@@ -352,6 +352,42 @@ class PH_AJAX {
                     wp_reset_postdata();
                 }
             }
+            if ( $key == 'recaptcha' )
+            {
+                $secret = isset( $control['secret'] ) ? $control['secret'] : '';
+                $response = isset( $_POST['g-recaptcha-response'] ) ? ph_clean($_POST['g-recaptcha-response']) : '';
+
+                $response = wp_remote_post( 
+                    'https://www.google.com/recaptcha/api/siteverify',
+                    array(
+                        'method' => 'POST',
+                        'body' => array( 'secret' => $secret, 'response' => $response ),
+                    )
+                );
+                if ( is_wp_error( $response ) ) 
+                {
+                    $errors[] = $response->get_error_message();
+                }
+                else
+                {
+                    $response = json_decode($response['body'], TRUE);
+                    if ( $response === FALSE )
+                    {
+                        $errors[] = __( 'Error decoding response from reCAPTCHA check', 'propertyhive' );
+                    }
+                    else
+                    {
+                        if ( isset($response['success']) && $response['success'] == true )
+                        {
+
+                        }
+                        else
+                        {
+                            $errors[] = __( 'Failed reCAPTCHA validation', 'propertyhive' );
+                        }
+                    }
+                }
+            }
         }
 
         // Check password and password2 match
