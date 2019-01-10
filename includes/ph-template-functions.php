@@ -116,6 +116,7 @@ function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
         unset( $classes[ $key ] );
     }
     $classes[] = 'property';
+    $classes[] = 'department-' . $property->department;
 
     return $classes;
 }
