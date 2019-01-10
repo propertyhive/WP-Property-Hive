@@ -716,6 +716,9 @@ class PH_Query {
         {
         	$_REQUEST['address_keyword'] = ph_clean( wp_unslash( $_REQUEST['address_keyword'] ) );
 
+        	// Remove country code from end (i.e. ', UK')
+        	$_REQUEST['address_keyword'] = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $_REQUEST['address_keyword']);
+
         	$address_keywords = array( $_REQUEST['address_keyword'] );
 
         	if ( strpos( $_REQUEST['address_keyword'], ' ' ) !== FALSE )
