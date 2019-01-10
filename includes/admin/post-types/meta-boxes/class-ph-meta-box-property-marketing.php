@@ -126,6 +126,11 @@ class PH_Meta_Box_Property_Marketing {
         
         update_post_meta($post_id, '_on_market', ( isset($_POST['_on_market']) ? ph_clean($_POST['_on_market']) : '' ) );
         update_post_meta($post_id, '_featured', ( isset($_POST['_featured']) ? ph_clean($_POST['_featured']) : '' ) );
+		if ( isset($_POST['_featured']) )
+		{
+			// Flush the cache when submitted
+			delete_transient("ph_featured_properties");
+		}
 
         if ( !empty($_POST['_availability']) )
         {
