@@ -100,7 +100,7 @@ h2 {
 	font-size: 18px;
 	font-weight: bold;
 	line-height: 130%;
-	margin: 16px 0 8px;
+	margin: 0 0 8px;
 	text-align: <?php echo is_rtl() ? 'right' : 'left'; ?>;
 }
 
@@ -111,7 +111,7 @@ h3 {
 	font-size: 16px;
 	font-weight: bold;
 	line-height: 130%;
-	margin: 16px 0 8px;
+	margin: 0 0 8px;
 	text-align: <?php echo is_rtl() ? 'right' : 'left'; ?>;
 }
 
