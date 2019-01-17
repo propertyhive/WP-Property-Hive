@@ -616,6 +616,7 @@ class PH_Query {
         $meta_query[] = $this->minimum_floor_area_meta_query();
         $meta_query[] = $this->maximum_floor_area_meta_query();
         $meta_query[] = $this->floor_area_range_meta_query();
+        $meta_query[] = $this->commercial_for_sale_to_rent_meta_query();
         $meta_query[] = $this->commercial_for_sale_meta_query();
         $meta_query[] = $this->commercial_to_rent_meta_query();
         $meta_query[] = $this->negotiator_meta_query();
@@ -1400,6 +1401,43 @@ class PH_Query {
 	                'type'    => 'NUMERIC' 
 	            );
 	        }
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle commercial for sale or to rent
+     *
+     * @access public
+     * @return array
+     */
+    public function commercial_for_sale_to_rent_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'for_sale' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_for_sale',
+                'value'   => 'yes',
+                'compare' => '=',
+            );
+        }
+
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'to_rent' 
+        )
+        {
+            $meta_query = array(
+                'key'     => '_to_rent',
+                'value'   => 'yes',
+                'compare' => '=',
+            );
         }
         
         return $meta_query;
