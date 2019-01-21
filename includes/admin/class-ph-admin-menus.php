@@ -71,6 +71,7 @@ class PH_Admin_Menus {
     	if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
 	    {
 	        add_submenu_page( null, __( 'Applicant Matching Properties', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-properties', array($this, 'matching_properties_page'));
+	        add_submenu_page( null, __( 'Generate Applicant List', 'propertyhive'), __( 'Generate Applicant List', 'propertyhive' ), 'manage_propertyhive', 'ph-generate-applicant-list', array($this, 'generate_applicant_list_page'));
 	    }
     }
 
@@ -199,6 +200,14 @@ class PH_Admin_Menus {
 		include_once( 'class-ph-admin-matching-properties.php' );
 		$ph_admin_matching_properties = new PH_Admin_Matching_Properties();
 		$ph_admin_matching_properties->output();
+	}
+
+	/**
+	 * Init the applicant list page
+	 */
+	public function generate_applicant_list_page() {
+		include_once( 'class-ph-admin-applicant-list.php' );
+		PH_Admin_Applicant_List::output();
 	}
 
 	/**

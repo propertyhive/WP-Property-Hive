@@ -704,8 +704,8 @@ function ph_form_field( $key, $field )
                     type="' . esc_attr( $field['type'] ) . '" 
                     name="' . esc_attr( $key ) . '" 
                     id="' . esc_attr( $key ) . '" 
-                    value="' . esc_attr(  $field['value'] ) . '"
-                    placeholder="' . esc_attr(  $field['placeholder'] ) . '"
+                    value="' . esc_attr( $field['value'] ) . '"
+                    placeholder="' . esc_attr( $field['placeholder'] ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
                     style="' . esc_attr( $field['style'] ) . '"
                     ' . ( ($field['required']) ? 'required' : '' ) . '
