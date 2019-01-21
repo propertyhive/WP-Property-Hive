@@ -78,6 +78,8 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 
 		add_action( 'admin_notices', array( $this, 'ph_message_admin_notice') );
 
+		add_action( 'manage_posts_extra_tablenav', array( $this, 'generate_applicant_list_action') );
+
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
 	}
@@ -534,6 +536,20 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		}
 
 		return $pathdata;
+	}
+
+	public function generate_applicant_list_action( $which )
+	{
+		global $typenow, $wp_query;
+
+		if ( 'contact' != $typenow ) {
+			return;
+		}
+
+		if ( $which == 'top' && isset($_GET['_contact_type']) && $_GET['_contact_type'] == 'applicant' )
+		{
+			echo '<div class="alignleft actions"><a href="' . admin_url('admin.php?page=ph-generate-applicant-list') . '" id="generate_applicant_list_button" class="button">' . __( 'Generate Applicant List', 'propertyhive' ) . '</a></div>';
+		}
 	}
 }
 

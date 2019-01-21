@@ -48,8 +48,8 @@ class PH_Admin_Assets {
             wp_enqueue_style( 'jquery-ui-style', PH()->plugin_url() . '/assets/css/jquery-ui/jquery-ui.css', array(), PH_VERSION );
             wp_enqueue_style( 'wp-color-picker' );
         }
-        
-        if ( in_array( $screen->id, array( 'property', 'contact', 'viewing' ) ) )
+
+        if ( in_array( $screen->id, array( 'property', 'contact', 'viewing', 'admin_page_ph-generate-applicant-list' ) ) )
         {
             wp_enqueue_style( 'chosen', PH()->plugin_url() . '/assets/css/chosen.css', array(), PH_VERSION );
         }
