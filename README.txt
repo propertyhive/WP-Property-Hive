@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.0.3
-Stable tag: 1.4.30
+Stable tag: 1.4.31
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,13 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.31 =
+* Added ability to email applicant viewing booking confirmations. Available in the 'actions' area on a viewing record. Email content can be customised under 'Property Hive > Settings > Emails'
+* Only create default set of terms if it's the first time installing Property Hive. Previously if you deleted all the terms within a custom field and updated they'd get recreated
+* If no license key is present, show update messages on plugins page when updates are available
+* Added 'availability_id' as a new attribute for all property related shortcodes
+* Corrected batch delete functionality on custom fields not working following recent security enhancements
 
 = 1.4.30 =
 * Added new 'Generate Applicant List' functionality
