@@ -430,6 +430,7 @@ class PH_Shortcodes {
 			'columns' 		=> '4',
 			'department' 	=> '',
 			'office_id'		=> '',
+			'availability_id'	=> '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
 			'no_results_output' => '',
@@ -455,6 +456,17 @@ class PH_Shortcodes {
 			);
 		}
 
+		$tax_query = array();
+
+		if ( isset($atts['availability_id']) && $atts['availability_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'availability',
+                'terms' => explode(",", $atts['availability_id']),
+                'compare' => 'IN',
+            );
+		}
+
 		$args = array(
 			'post_type'				=> 'property',
 			'post_status'			=> ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
@@ -462,7 +474,8 @@ class PH_Shortcodes {
 			'posts_per_page' 		=> $atts['per_page'],
 			'orderby' 				=> $atts['orderby'],
 			'order' 				=> $atts['order'],
-			'meta_query' 			=> $meta_query
+			'meta_query' 			=> $meta_query,
+			'tax_query' 			=> $tax_query,
 		);
 
 		ob_start();
@@ -509,6 +522,7 @@ class PH_Shortcodes {
 			'columns' 	=> '4',
 			'department' => '',
 			'office_id'	=> '',
+			'availability_id'	=> '',
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
@@ -559,6 +573,21 @@ class PH_Shortcodes {
 			$args['meta_key'] = $atts['meta_key'];
 		}
 
+		$tax_query = array();
+
+		if ( isset($atts['availability_id']) && $atts['availability_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'availability',
+                'terms' => explode(",", $atts['availability_id']),
+                'compare' => 'IN',
+            );
+		}
+
+		if ( ! empty( $tax_query ) ) {
+			$args['tax_query'] = $tax_query;
+		}
+
 		ob_start();
 
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_featured_properties_query', $args, $atts ) );
@@ -604,6 +633,7 @@ class PH_Shortcodes {
 			'price_percentage_bounds'	=> 10,
 			'bedroom_bounds'			=> 0,
 			'property_id'				=> '',
+			'availability_id'	=> '',
 			'no_results_output' => '',
 		), $atts, 'similar_properties' );
 
@@ -687,6 +717,21 @@ class PH_Shortcodes {
 			}
 
 			$args['meta_query'] = $meta_query;
+
+			$tax_query = array();
+
+			if ( isset($atts['availability_id']) && $atts['availability_id'] != '' )
+			{
+				$tax_query[] = array(
+	                'taxonomy'  => 'availability',
+	                'terms' => explode(",", $atts['availability_id']),
+	                'compare' => 'IN',
+	            );
+			}
+
+			if ( ! empty( $tax_query ) ) {
+				$args['tax_query'] = $tax_query;
+			}
 
 			ob_start();
 
