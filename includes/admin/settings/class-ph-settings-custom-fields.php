@@ -181,7 +181,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             
             if (isset($_REQUEST['id'])) // we're either adding or editing
             {
-                $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+                $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_text_field($_REQUEST['id']);
                 
                 switch ($current_section)
                 {
@@ -2355,7 +2355,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         {
             if (isset($_REQUEST['id'])) // we're either adding or editing
             {
-                $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+                $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_text_field($_REQUEST['id']);
                 
                 switch ($current_section)
                 {
