@@ -28,6 +28,105 @@ class PH_Plugin_Updates {
 	 */
 	public function __construct() {
 		add_action( 'in_plugin_update_message-propertyhive/propertyhive.php', array( $this, 'in_plugin_update_message' ), 10, 2 );
+
+		if ( is_network_admin() || ! is_multisite() ) 
+		{
+			$license = PH()->license->get_current_license();
+
+			$valid_license = false;
+
+			if ( is_array($license) && empty($license) && get_option( 'propertyhive_license_key', '' ) != '' )
+			{
+				
+			}
+			elseif ( isset($license['active']) && $license['active'] != '1' )
+			{
+
+			}
+			else
+			{
+				if ( isset($license['expires_at']) && $license['expires_at'] != '' )
+				{
+					if ( strtotime($license['expires_at']) <= time() )
+					{
+						// Expired
+
+					}
+					elseif ( 
+						strtotime($license['expires_at']) > time() &&
+						strtotime($license['expires_at']) < (time() + 30 * 24 * 60 * 60)
+					)
+					{
+						// Expires in less than 30 days
+
+					}
+					elseif (strtotime($license['expires_at']) > time())
+					{
+						// Valid
+						$valid_license = true;
+					}
+				}
+			}
+
+			if ( !$valid_license )
+			{
+				$add_ons = @file_get_contents('http://wp-property-hive.com/add-ons-json.php');
+
+				if ($add_ons !== FALSE && $add_ons !== '')
+		        {
+		            $add_ons = json_decode($add_ons);
+		            
+		            if ($add_ons !== FALSE && !empty($add_ons))
+		            {
+		            	foreach ($add_ons as $add_on)
+		                {
+		                	$url = trim($add_on->url, '/');
+
+		                	if ( 
+		                		isset($add_on->wordpress_plugin_file) && $add_on->wordpress_plugin_file != '' && $add_on->wordpress_plugin_file != false &&
+		                		isset($add_on->wordpress_version_option_name) && $add_on->wordpress_version_option_name != '' && $add_on->wordpress_version_option_name != false 
+		                	)
+		                	{
+			                	$plugin_file = $add_on->wordpress_plugin_file;
+
+			                	if ( is_plugin_active($plugin_file) )
+			                	{
+				                	$current_version = get_option($add_on->wordpress_version_option_name, '');
+
+				                	if ( $current_version != '' )
+				                	{
+					                	// check if add on update available
+					                	$new_version = $add_on->version;
+
+					                	if( version_compare($new_version, $current_version) == 1 )
+					                	{
+						                	add_action( 'after_plugin_row_' . $plugin_file, array( $this, 'test' ), 10, 3 );
+						                }
+					                }
+					            }
+				            }
+		                }
+		            }
+		        }
+		    }
+	    }
+	}
+
+	public function test(  $plugin_file, $plugin_data, $status ) 
+	{
+		if ( is_network_admin() ) {
+			$active_class = is_plugin_active_for_network( $plugin_file ) ? ' active' : '';
+		} else {
+			$active_class = is_plugin_active( $plugin_file ) ? ' active' : '';
+		}
+
+		echo '<tr class="plugin-update-tr' . $active_class . '">
+			<td colspan="3" class="plugin-update colspanchange">
+				<div class="update-message notice inline notice-warning notice-alt">
+					<p>An update is available for this add on. It is recommended that you update to ensure you receive the latest features and bug fixes. You can access all updates to any purchased add ons for 12 months by <a href="https://wp-property-hive.com/product/12-month-license-key/" target="_blank">purchasing a license key</a>.</p>
+				</div>
+			</td>
+		</tr>';
 	}
 
 	/**
