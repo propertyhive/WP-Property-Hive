@@ -182,6 +182,27 @@ class PH_Settings_Emails extends PH_Settings_Page {
 			$settings[] = array( 'type' => 'sectionend', 'id' => 'applicant_match_email_options' );
 		}
 
+		if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+	    {
+	    	$settings[] = array( 'title' => __( 'Viewing Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'viewing_booking_confirmation_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_applicant_booking_confirmation_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_applicant_booking_confirmation_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'viewing_booking_confirmation_email_options' );
+	    }
+
 		$settings = apply_filters( 'propertyhive_email_settings', $settings );
 
 		return apply_filters( 'propertyhive_get_settings_' . $this->id, $settings );

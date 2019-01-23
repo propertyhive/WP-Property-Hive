@@ -46,6 +46,7 @@ class PH_AJAX {
             'get_viewing_actions' => false,
             'viewing_carried_out' => false,
             'viewing_cancelled' => false,
+            'viewing_email_applicant_booking_confirmation' => false,
             'viewing_interested_feedback' => false,
             'viewing_not_interested_feedback' => false,
             'viewing_feedback_not_required' => false,
@@ -2122,6 +2123,28 @@ class PH_AJAX {
 
         if ( $status == 'pending' )
         {
+            $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+            $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+            $applicant_email_address = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+
+            if ( (int)$applicant_contact_id == '' || (int)$property_id == '' || (int)$applicant_contact_id == 0 || (int)$property_id == 0 || sanitize_email($applicant_email_address) == '' )
+            {
+
+            }
+            else
+            {
+                $booking_confirmation_sent_at = get_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', TRUE );
+
+                $actions[] = '<a 
+                        href="#action_panel_viewing_email_applicant_booking_confirmation" 
+                        class="button viewing-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . ( ( $booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Resend Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
+                
+                $actions[] = '<div id="viewing_applicant_confirmation_date" style="text-align:center; font-size:12px; color:#999;' . ( ( $booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $booking_confirmation_sent_at != '' ) ? 'Previously sent on <span title="' . $booking_confirmation_sent_at . '">' . date("jS F", strtotime($booking_confirmation_sent_at)) : '' ) . '</span></div>';
+                $actions[] = '<hr>';
+            }
+
             $actions[] = '<a 
                     href="#action_panel_viewing_carried_out" 
                     class="button button-success viewing-action"
@@ -2129,7 +2152,7 @@ class PH_AJAX {
                 >' . __('Viewing Carried Out', 'propertyhive') . '</a>';
             $actions[] = '<a 
                     href="#action_panel_viewing_cancelled" 
-                    class="button viewing-action viewing-action"
+                    class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . __('Viewing Cancelled', 'propertyhive') . '</a>';
 
@@ -2399,6 +2422,57 @@ class PH_AJAX {
                 'comment_type'         => 'propertyhive_note',
             );
             $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function viewing_email_applicant_booking_confirmation()
+    {
+        check_ajax_referer( 'viewing-actions', 'security' );
+
+        $post_id = (int)$_POST['viewing_id'];
+
+        $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+        $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+
+        if ( (int)$applicant_contact_id == '' || (int)$property_id == '' || (int)$applicant_contact_id == 0 || (int)$property_id == 0 )
+        {
+            die();
+        }
+
+        $property = new PH_Property((int)$property_id);
+
+        $to = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+
+        if ( sanitize_email($to) != '' )
+        {
+            $subject = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
+            $body = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
+
+            $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
+            $subject = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $subject);
+            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+
+            $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
+            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
+            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+
+            $from = $property->office_email_address;
+            if ( sanitize_email($from) == '' )
+            {
+                $from = get_bloginfo('admin_email');
+            }
+
+            $headers = array();
+            $headers[] = 'From: ' . get_bloginfo('name') . ' <' . $from . '>';
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            wp_mail($to, $subject, $body, $headers);
+
+            update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
         }
 
         die();
