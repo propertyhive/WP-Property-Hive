@@ -554,6 +554,15 @@ Kind regards,
 
 " . get_bloginfo('name'), 'propertyhive' ), '', 'no' );
 
+        add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', 'Your Viewing On [property_address]', '', 'no' );
+        add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', "Dear [applicant_name],
+
+This is confirmation that your viewing on [property_address] has been booked for [viewing_time] on [viewing_date].
+
+Should you need to cancel or amend your booking please do not hesitate to contact us.
+
+" . get_bloginfo('name'), '', 'no' );
+
 	}
 
 	/**
