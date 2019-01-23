@@ -57,7 +57,12 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		$renew_link = '<a href=https://wp-property-hive.com/product/12-month-license-key/"" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
 		$valid_license = false;
 
-		if ( isset($license['active']) && $license['active'] != '1' )
+		if ( is_array($license) && empty($license) && get_option( 'propertyhive_license_key', '' ) != '' )
+		{
+			$output = '<span style="color:#900">' . __( 'Invalid license key entered. If you\'re seeing this message and the license key is correct please contact Property Hive support.', 'propertyhive' ) . '</span>';
+			$input_border_color = '#900';
+		}
+		elseif ( isset($license['active']) && $license['active'] != '1' )
 		{
 			$output = '<span style="color:#900">' . __( 'License inactive.', 'propertyhive' ) . '</span>';
 			$input_border_color = '#900';

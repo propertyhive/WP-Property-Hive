@@ -67,7 +67,6 @@ class PH_Install {
 		PH_Post_types::register_post_types();
 		PH_Post_types::register_taxonomies();
 
-		$this->create_terms();
         $this->create_primary_office();
 		$this->create_cron_jobs();
 
@@ -80,6 +79,7 @@ class PH_Install {
         // No existing version set. This must be a new fresh install
         if ( is_null( $current_version ) && is_null( $current_db_version ) ) 
         {
+            $this->create_terms();
             set_transient( '_ph_activation_redirect', 1, 30 );
         }
         
