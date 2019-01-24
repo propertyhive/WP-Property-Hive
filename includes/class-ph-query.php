@@ -634,6 +634,8 @@ class PH_Query {
 	 */
 	public function on_market_meta_query( ) {
         
+        $meta_query = array();
+        
         if ( !is_admin() )
         {
     		$meta_query = array(
