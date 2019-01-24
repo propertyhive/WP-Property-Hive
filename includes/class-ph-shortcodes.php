@@ -73,7 +73,8 @@ class PH_Shortcodes {
 	 */
 	public static function property_search_form( $atts ) {
 		$atts = shortcode_atts( array(
-			'id' 				=> 'shortcode'
+			'id' 					=> 'shortcode',
+			'default_department' 	=> ''
 		), $atts );
 
 		$form_controls = ph_get_search_form_fields();
@@ -88,6 +89,14 @@ class PH_Shortcodes {
 	        $original_department['type'] = 'hidden';
 
 	        $form_controls['department'] = $original_department;
+	    }
+
+	    if ( 
+	    	isset($atts['default_department']) && in_array($atts['default_department'], array('residential-sales', 'residential-lettings', 'commercial')) &&
+	    	( !isset($_REQUEST['department']) )
+	    )
+	    {
+	    	$form_controls['department']['value'] = $atts['default_department'];
 	    }
 
 		ob_start();
