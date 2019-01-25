@@ -1224,7 +1224,7 @@ class PH_AJAX {
         }
         else
         {
-            $post = get_post((int)$_POST['property_id']);
+            //$post = get_post((int)$_POST['property_id']);
             
             $form_controls = ph_get_property_enquiry_form_fields();
 
@@ -1294,17 +1294,18 @@ class PH_AJAX {
         else
         {
             // Passed validation
+            $property_ids = explode("|", ph_clean($_POST['property_id']));
             
             // Get recipient email address
             $to = '';
             
             // Try and get office's email address first, else fallback to admin email
-            $office_id = get_post_meta((int)$_POST['property_id'], '_office_id', TRUE);
+            $office_id = get_post_meta((int)$property_ids[0], '_office_id', TRUE);
             if ( $office_id != '' )
             {
                 if ( get_post_type( $office_id ) == 'office' )
                 {
-                    $property_department = get_post_meta((int)$_POST['property_id'], '_department', TRUE);
+                    $property_department = get_post_meta((int)$property_ids[0], '_department', TRUE);
                     
                     $fields_to_check = array();
                     switch ( $property_department )
@@ -1347,13 +1348,25 @@ class PH_AJAX {
                 $to = get_option( 'admin_email' );
             }
             
-            $subject = __( 'New Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( (int)$_POST['property_id'] );
+            if ( count($property_ids) == 1 )
+            {
+                $subject = __( 'New Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( (int)$property_ids[0] );
+            }
+            else
+            {
+                $subject = __( 'Multiple Property Enquiry', 'propertyhive' ) . ': ' . count($property_ids) . ' Properties';
+            }
             $message = __( "You have received a property enquiry via your website. Please find details of the enquiry below", 'propertyhive' ) . "\n\n";
             
-            $message = apply_filters( 'propertyhive_property_enquiry_pre_body', $message, (int)$_POST['property_id'] );
+            $message = apply_filters( 'propertyhive_property_enquiry_pre_body', $message, $property_ids );
 
-            $message .= __( 'Property', 'propertyhive' ) . ': ' . get_the_title( (int)$_POST['property_id'] ) . " (" . get_permalink( (int)$_POST['property_id'] ) . ")\n\n";
-            
+            $message .= __( 'Properties', 'propertyhive' ) . ":\n";
+            foreach ( $property_ids as $property_id )
+            {
+                $message .= get_the_title( (int)$property_id ) . " (" . get_permalink( (int)$property_id ) . ")\n";
+            }
+            $message .= "\n";
+
             unset($form_controls['action']);
             unset($_POST['action']);
             unset($form_controls['property_id']); // Unset so the field doesn't get shown in the enquiry details
@@ -1396,10 +1409,10 @@ class PH_AJAX {
                 $headers[] = 'Reply-To: ' . sanitize_email( $_POST['email_address'] );
             }
 
-            $to = apply_filters( 'propertyhive_property_enquiry_to', $to, (int)$_POST['property_id'] );
-            $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, (int)$_POST['property_id'] );
-            $message = apply_filters( 'propertyhive_property_enquiry_body', $message, (int)$_POST['property_id'] );
-            $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, (int)$_POST['property_id'] );
+            $to = apply_filters( 'propertyhive_property_enquiry_to', $to, $property_ids );
+            $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, $property_ids );
+            $message = apply_filters( 'propertyhive_property_enquiry_body', $message, $property_ids );
+            $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, $property_ids );
 
             $sent = wp_mail( $to, $subject, $message, $headers );
             
@@ -1416,7 +1429,14 @@ class PH_AJAX {
                 if ( get_option( 'propertyhive_store_property_enquiries', 'yes' ) == 'yes' )
                 {
                     // Now insert into enquiries section of WordPress
-                    $title = __( 'Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( (int)$_POST['property_id'] );
+                    if ( count($property_ids) == 1 )
+                    {
+                        $title = __( 'Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( (int)$property_ids[0] );
+                    }
+                    else
+                    {
+                        $title = __( 'Multiple Property Enquiry', 'propertyhive' );
+                    }
                     if ( isset($_POST['name']) && ! empty($_POST['name']) )
                     {
                         $title .= __( ' from ', 'propertyhive' ) . ph_clean($_POST['name']);
@@ -1441,7 +1461,17 @@ class PH_AJAX {
                     
                     foreach ($_POST as $key => $value)
                     {
-                        add_post_meta( $enquiry_post_id, $key, sanitize_textarea_field($value) );
+                        if ( $key == 'property_id' )
+                        {
+                            foreach ( $property_ids as $property_id )
+                            {
+                                add_post_meta( $enquiry_post_id, $key, (int)$property_id );
+                            }
+                        }
+                        else
+                        {
+                            add_post_meta( $enquiry_post_id, $key, sanitize_textarea_field($value) );
+                        }
                     }
                 }
 
