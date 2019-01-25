@@ -229,7 +229,12 @@ function viewing_update_selected_properties()
                 {
                     if ( $key == '_property_id' || $key == 'property_id' )
                     {
-                        $value = '<a href="' . get_edit_post_link( $value[0] ) . '">' . get_the_title( $value[0] ) . '</a>';
+                        $property_links = array();
+                        foreach ( $value as $sub_value)
+                        {
+                            $property_links[] = '<a href="' . get_edit_post_link( $sub_value ) . '">' . get_the_title( $sub_value ) . '</a>';
+                        }
+                        $value = implode('<br>', $property_links);
                     }
                     else
                     {

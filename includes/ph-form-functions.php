@@ -247,9 +247,9 @@ function ph_get_search_form_fields()
  * @param string $id
  * @return void
  */
-function propertyhive_enquiry_form()
+function propertyhive_enquiry_form( $property_id = '' )
 {
-    $form_controls = ph_get_property_enquiry_form_fields();
+    $form_controls = ph_get_property_enquiry_form_fields( $property_id );
     
     $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
     
@@ -261,7 +261,7 @@ function propertyhive_enquiry_form()
  *
  * @return array
  */
-function ph_get_property_enquiry_form_fields()
+function ph_get_property_enquiry_form_fields( $property_id = '' )
 {
     global $post;
     
@@ -269,7 +269,7 @@ function ph_get_property_enquiry_form_fields()
     
     $fields['property_id'] = array(
         'type' => 'hidden',
-        'value' => $post->ID
+        'value' => ( $property_id != '' ? $property_id : $post->ID )
     );
     
     $fields['name'] = array(
