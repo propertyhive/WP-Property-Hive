@@ -53,6 +53,18 @@ jQuery( function ( $ ) {
 		});
 	});
 
+	$( '#ph_dismiss_notice_invalid_expired_license_key' ).click(function(e)
+	{
+		e.preventDefault();
+
+		var data = {
+			'action': 'propertyhive_dismiss_notice_invalid_expired_license_key'
+		};
+
+		$.post( ajaxurl, data, function(response) {
+			$( '#ph_notice_invalid_expired_license_key' ).fadeOut();
+		});
+	});
 });
 
 function activateTipTip() {

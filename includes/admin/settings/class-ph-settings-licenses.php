@@ -140,6 +140,8 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	public function save() {
 		PH_Admin_Settings::save_fields( $this->get_settings() );
 
+		update_option( 'missing_invalid_expired_license_key_notice_dismissed', '' );
+
 		PH()->license->ph_check_licenses(true);
 	}
 }

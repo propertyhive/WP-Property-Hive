@@ -293,6 +293,64 @@ class PH_Admin {
                         
                     </div>";
             }
+
+            if ( 
+                get_option('propertyhive_license_key', '') != '' &&
+                get_option( 'missing_invalid_expired_license_key_notice_dismissed', '' ) != 'yes' && 
+                (
+                    !isset($_GET['page'])
+                    ||
+                    (
+                        isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed' && sanitize_title($_GET['page']) != 'ph-settings'
+                    )
+                )
+            )
+            {
+                $license = PH()->license->get_current_license();
+                $output = '';
+
+                if ( isset($license['active']) && $license['active'] != '1' )
+                {
+                    $output = __( 'You\'re Property Hive license key is inactive.', 'propertyhive' );
+                }
+                else
+                {
+                    if ( isset($license['expires_at']) && $license['expires_at'] != '' )
+                    {
+                        if ( strtotime($license['expires_at']) <= time() )
+                        {
+                            // Expired
+                            $output = __( 'You\'re Property Hive license key expired on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. It\'s recommended that you renew it to ensure you continue to receive future updates to add ons you\'ve purchased.';
+                        }
+                        elseif ( 
+                            strtotime($license['expires_at']) > time() &&
+                            strtotime($license['expires_at']) < (time() + 30 * 24 * 60 * 60)
+                        )
+                        {
+                            // Expires in less than 30 days
+                            $output = __( 'You\'re Property Hive license key expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. It\'s recommended that you renew it to ensure you continue to receive future updates to add ons you\'ve purchased.';
+                        }
+                        elseif (strtotime($license['expires_at']) > time())
+                        {
+                            // Valid
+                        }
+                    }
+                }
+
+                if ( $output != '' )
+                {
+                    echo "<div class=\"notice notice-info\" id=\"ph_notice_invalid_expired_license_key\">
+                        <p>
+                            " . $output . "
+                        </p>
+                        <p>
+                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=licensekey') . "\" class=\"button-primary\">Go To License Key Settings</a>
+                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_invalid_expired_license_key\">Dismiss</a>
+                        </p>
+                        
+                    </div>";
+                }
+            }
         }
     }
 
