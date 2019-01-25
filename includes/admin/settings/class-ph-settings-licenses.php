@@ -54,7 +54,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
 		$output = '';
 		$input_border_color = '';
-		$renew_link = '<a href=https://wp-property-hive.com/product/12-month-license-key/"" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
+		$renew_link = '<a href="https://wp-property-hive.com/product/12-month-license-key/" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
 		$valid_license = false;
 
 		if ( is_array($license) && empty($license) && get_option( 'propertyhive_license_key', '' ) != '' )
