@@ -535,11 +535,11 @@ class PH_Admin_Post_Types {
         $output  = '<select name="_status" id="dropdown_enquiry_status">';
             
             $output .= '<option value="open"';
-            $option .= selected( 'open', $selected_status, false );
+            $output .= selected( 'open', $selected_status, false );
             $output .= '>' . __( 'Open', 'propertyhive' ) . '</option>';
 
             $output .= '<option value="closed"';
-            $option .= selected( 'closed', $selected_status, false );
+            $output .= selected( 'closed', $selected_status, false );
             $output .= '>' . __( 'Closed', 'propertyhive' ) . '</option>';
             
         $output .= '</select>';
