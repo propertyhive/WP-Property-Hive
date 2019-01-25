@@ -87,6 +87,7 @@ class PH_AJAX {
             'dismiss_notice_leave_review' => false,
             'dismiss_notice_missing_search_results' => false,
             'dismiss_notice_missing_google_maps_api_key' => false,
+            'dismiss_notice_invalid_expired_license_key' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -117,6 +118,14 @@ class PH_AJAX {
     public function dismiss_notice_missing_google_maps_api_key()
     {
         update_option( 'missing_google_maps_api_key_notice_dismissed', 'yes' );
+        
+        // Quit out
+        die();
+    }
+
+    public function dismiss_notice_invalid_expired_license_key()
+    {
+        update_option( 'missing_invalid_expired_license_key_notice_dismissed', 'yes' );
         
         // Quit out
         die();
