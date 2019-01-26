@@ -1,11 +1,11 @@
 <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" style="margin-bottom:10px;">
 	<tr>
-		<td width="20%"><?php 
+		<td width="25%"><?php 
 			$image = $property->get_main_photo_src();
 			if ($image !== FALSE)
 			{
 		?>
-		<a href="<?php echo get_the_permalink( $property->id ); ?>"><img src="<?php echo $image; ?>" alt="<?php echo get_the_title( $property->id ); ?>"></a>
+		<a href="<?php echo get_the_permalink( $property->id ); ?>"><img src="<?php echo $image; ?>" style="max-width:100%" alt="<?php echo get_the_title( $property->id ); ?>"></a>
 		<?php
 			}
 		?></td>

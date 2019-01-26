@@ -385,6 +385,58 @@ class PH_Settings_General extends PH_Settings_Page {
 
             array( 'type' => 'sectionend', 'id' => 'applicant_registration_options'),
 
+            array( 'title' => __( 'Property Media Storage', 'propertyhive' ), 'type' => 'title', 'desc' => 'By default media atttached to properties will be stored in the WordPress media library. If the property media is hosted elsewhere (for example if you import properties from a third party and they allow you to link direct to the files on their server) you can choose to store media as URL\'s. It also means that the images are not downloaded onto your server, thus saving diskspace.<br><br>Note: If you change this you\'ll need to re-add all of the property media for existing properties.<br>Note: Changing this will not delete all existing media or URLs entered.<br>Note: Choosing to store the media as URLs will mean you don\'t benefit from having access to different sized images (i.e. small , medium, large etc).', 'id' => 'media_storage_options' ),
+
+            array(
+                'title'   => __( 'Images Stored As', 'propertyhive' ),
+                'id'      => 'propertyhive_images_stored_as',
+                'type'    => 'select',
+                'default' => 'files',
+                'options' => array(
+                    'files' => __( 'Media Files', 'propertyhive' ),
+                    'urls' => __( 'URLs', 'propertyhive' ),
+                ),
+                'desc'  => __( '', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Floorplans Stored As', 'propertyhive' ),
+                'id'      => 'propertyhive_floorplans_stored_as',
+                'type'    => 'select',
+                'default' => 'files',
+                'options' => array(
+                    'files' => __( 'Media Files', 'propertyhive' ),
+                    'urls' => __( 'URLs', 'propertyhive' ),
+                ),
+                'desc'  => __( '', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Brochures Stored As', 'propertyhive' ),
+                'id'      => 'propertyhive_brochures_stored_as',
+                'type'    => 'select',
+                'default' => 'files',
+                'options' => array(
+                    'files' => __( 'Media Files', 'propertyhive' ),
+                    'urls' => __( 'URLs', 'propertyhive' ),
+                ),
+                'desc'  => __( '', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'EPCs Stored As', 'propertyhive' ),
+                'id'      => 'propertyhive_epcs_stored_as',
+                'type'    => 'select',
+                'default' => 'files',
+                'options' => array(
+                    'files' => __( 'Media Files', 'propertyhive' ),
+                    'urls' => __( 'URLs', 'propertyhive' ),
+                ),
+                'desc'  => __( '', 'propertyhive' )
+            ),
+
+            array( 'type' => 'sectionend', 'id' => 'media_storage_options'),
+
 		) ); // End general misc settings
 	}
 
