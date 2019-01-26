@@ -128,7 +128,15 @@
 
 					echo '<div id="matching_applicant_' . $contact_id . '_property_' . $property->id . '" style="padding:20px 0; border-bottom:1px solid #CCC;">';
                     
-                        echo '<div style="float:left; width:18%;"><a href="' . get_edit_post_link( $property->id ) . '" target="_blank"><img src="' . $property->get_main_photo_src() . '" style="max-width:100%; margin:0 auto; display:block;" alt="' . addslashes($property->get_formatted_summary_address()) . '"></a></div>';
+                        echo '<div style="float:left; width:18%;">';
+
+                        $image_url = $property->get_main_photo_src();
+                        if ( $image_url !== FALSE )
+                        {
+                            echo '<a href="' . get_edit_post_link( $property->id ) . '" target="_blank"><img src="' . $image_url . '" style="max-width:100%; margin:0 auto; display:block;" alt="' . addslashes($property->get_formatted_summary_address()) . '"></a>';
+                        }
+
+                        echo '</div>';
                         
                         echo '<div style="float:right; width:80%;">';
                             

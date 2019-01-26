@@ -12,6 +12,30 @@ jQuery( function($){
          handle: 'label'
      });
 
+     $('.propertyhive_meta_box #property_photo_urls').sortable({
+         opacity: 0.8,
+         revert: true,
+         handle: 'label'
+     });
+
+     $('.propertyhive_meta_box #property_floorplan_urls').sortable({
+         opacity: 0.8,
+         revert: true,
+         handle: 'label'
+     });
+
+     $('.propertyhive_meta_box #property_brochure_urls').sortable({
+         opacity: 0.8,
+         revert: true,
+         handle: 'label'
+     });
+
+     $('.propertyhive_meta_box #property_epc_urls').sortable({
+         opacity: 0.8,
+         revert: true,
+         handle: 'label'
+     });
+
      $('.propertyhive_meta_box #property_virtual_tours').sortable({
          opacity: 0.8,
          revert: true,

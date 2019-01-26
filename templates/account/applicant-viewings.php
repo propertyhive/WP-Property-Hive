@@ -37,8 +37,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$link_prefix = ( ( $property->on_market == 'yes' ) ? '<a href="' . get_permalink( $viewing->property_id ) . '">' : '' );
 				$link_suffix = ( ( $property->on_market == 'yes' ) ? '</a>' : '' );
 
+				$image = $property->get_main_photo_src();
+
 				echo '<tr>
-					<td>' . ( ( $property->get_main_photo_src() != '' ) ? $link_prefix . '<img src="' . $property->get_main_photo_src() . '" width="75" alt="' . get_the_title( $viewing->property_id ) . '">' : '' ) . $link_suffix . '</td>
+					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . $image . '" width="75" alt="' . get_the_title( $viewing->property_id ) . '">' : '' ) . $link_suffix . '</td>
 					<td>' . date( "H:i jS M Y", strtotime( $viewing->start_date_time ) ) . '</td>
 					<td>' . $link_prefix . get_the_title( $viewing->property_id ) . $link_suffix . '<br>' . $property->get_formatted_price() . '</td>
 				</tr>';
@@ -71,8 +73,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$link_prefix = ( ( $property->on_market == 'yes' ) ? '<a href="' . get_permalink( $viewing->property_id ) . '">' : '' );
 				$link_suffix = ( ( $property->on_market == 'yes' ) ? '</a>' : '' );
 
+				$image = $property->get_main_photo_src();
+
 				echo '<tr>
-					<td>' . ( ( $property->get_main_photo_src() != '' ) ? $link_prefix . '<img src="' . $property->get_main_photo_src() . '" width="75" alt="' . get_the_title( $viewing->property_id ) . '">' : '' ) . $link_suffix . '</td>
+					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . $image . '" width="75" alt="' . get_the_title( $viewing->property_id ) . '">' : '' ) . $link_suffix . '</td>
 					<td>' . date( "H:i jS M Y", strtotime( $viewing->start_date_time ) ) . '</td>
 					<td>' . $link_prefix . get_the_title( $viewing->property_id ) . $link_suffix . '<br>' . $property->get_formatted_price() . '</td>
 				</tr>';
