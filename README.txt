@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.0.3
-Stable tag: 1.4.31
+Stable tag: 1.4.32
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.32 =
+* Added ability to store property media as URL's instead of having them uploaded to the media library. Useful if importing properties from a third party and wanting to link direct to the media on their servers (if they allow you), thus saving diskspace. Setting accessible from 'Property Hive > Settings > Miscellanouse'.
+* Added ability for a property enquiry to be assigned to multiple properties. Added due to upcoming Property Shortlist add on update allowing the user to make one enquiry about all shortlisted properties at the same time.
+* Added 'default_department' attribute to [property_search_form] shortcode allowing you to override the default department selected. Useful when the primary department is sales but you want to display the search form on a lettings related content page, for example.
+* Added new notice to backend if license is coming up for renewal or has expired.
 
 = 1.4.31 =
 * Added ability to email applicant viewing booking confirmations. Available in the 'actions' area on a viewing record. Email content can be customised under 'Property Hive > Settings > Emails'
