@@ -135,8 +135,8 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 						!isset($_POST['missing'])
 					)
 					{
-						$photos = $property->get_gallery_attachment_ids();
-						if ( $photos === false || ( is_array($photos) && empty($photos) ) )
+						$photo = $property->get_main_photo_src();
+						if ( $photo === false )
 						{
 							$missing[] = 'Photos';
 						}
@@ -148,10 +148,25 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 						!isset($_POST['missing'])
 					)
 					{
-						$floorplans = $property->get_floorplan_attachment_ids();
-						if ( $floorplans === false || ( is_array($floorplans) && empty($floorplans) ) )
-						{
-							$missing[] = 'Floorplans';
+						if ( get_option('propertyhive_brochures_stored_as', '') == 'urls' )
+        				{
+        					$floorplans = $property->_floorplan_urls;
+        					if (isset($floorplans) && is_array($floorplans) && !empty($floorplans) && isset($floorplans[0]) && isset($floorplans[0]['url']))
+            				{
+
+        					}
+        					else
+        					{
+        						$missing[] = 'Floorplans';
+        					}
+        				}
+        				else
+        				{
+							$floorplans = $property->get_floorplan_attachment_ids();
+							if ( $floorplans === false || ( is_array($floorplans) && empty($floorplans) ) )
+							{
+								$missing[] = 'Floorplans';
+							}
 						}
 					}
 
@@ -161,10 +176,25 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 						!isset($_POST['missing'])
 					)
 					{
-						$epcs = $property->get_epc_attachment_ids();
-						if ( $epcs === false || ( is_array($epcs) && empty($epcs) ) )
-						{
-							$missing[] = 'EPCs';
+						if ( get_option('propertyhive_epcs_stored_as', '') == 'urls' )
+        				{
+        					$epcs = $property->_epc_urls;
+        					if (isset($epcs) && is_array($epcs) && !empty($epcs) && isset($epcs[0]) && isset($epcs[0]['url']))
+            				{
+
+        					}
+        					else
+        					{
+        						$missing[] = 'EPCs';
+        					}
+        				}
+        				else
+        				{
+							$epcs = $property->get_epc_attachment_ids();
+							if ( $epcs === false || ( is_array($epcs) && empty($epcs) ) )
+							{
+								$missing[] = 'EPCs';
+							}
 						}
 					}
 
@@ -174,10 +204,25 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 						!isset($_POST['missing'])
 					)
 					{
-						$brochures = $property->get_epc_attachment_ids();
-						if ( $brochures === false || ( is_array($brochures) && empty($brochures) ) )
-						{
-							$missing[] = 'Brochures';
+						if ( get_option('propertyhive_brochures_stored_as', '') == 'urls' )
+        				{
+        					$brochures = $property->_brochure_urls;
+        					if (isset($brochures) && is_array($brochures) && !empty($brochures) && isset($brochures[0]) && isset($brochures[0]['url']))
+            				{
+
+        					}
+        					else
+        					{
+        						$missing[] = 'Brochures';
+        					}
+        				}
+        				else
+        				{
+							$brochures = $property->get_epc_attachment_ids();
+							if ( $brochures === false || ( is_array($brochures) && empty($brochures) ) )
+							{
+								$missing[] = 'Brochures';
+							}
 						}
 					}
 
