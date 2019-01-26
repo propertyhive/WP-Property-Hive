@@ -22,7 +22,7 @@ class PH_Meta_Box_Property_Virtual_Tours {
         
         echo '<div class="propertyhive_meta_box">';
         
-        echo '<div class="options_group ui-sortable">';
+        echo '<div class="options_group">';
                 
             echo '<div id="property_virtual_tours">';
             
@@ -33,8 +33,8 @@ class PH_Meta_Box_Property_Virtual_Tours {
                 {
                     echo '
                     <p class="form-field virtual_tour_field ">
-                        <label for="virtual_tours_1">Virtual Tour</label>
-                        <input type="text" class="short" name="virtual_tour[]" id="" value="' . get_post_meta($post->ID, '_virtual_tour_' . $i, TRUE) . '" placeholder=""> 
+                        <label for="virtual_tours_1">Virtual Tour URL</label>
+                        <input type="text" class="short" name="virtual_tour[]" id="" value="' . get_post_meta($post->ID, '_virtual_tour_' . $i, TRUE) . '" placeholder="http://"> 
                         <a href="" class="button remove_virtual_tour"><span class="fa fa-trash"></span></a>
                     </p>';
                 }
@@ -45,7 +45,7 @@ class PH_Meta_Box_Property_Virtual_Tours {
 
             echo '
             <p class="form-field virtual_tour_field ">
-                <label for="virtual_tours_1">Virtual Tour</label>
+                <label for="virtual_tours_1">Virtual Tour URL</label>
                 <input type="text" class="short" name="virtual_tour[]" id="" value="" placeholder="http://"> 
                 <a href="" class="button remove_virtual_tour"><span class="fa fa-trash"></span></a>
             </p>';

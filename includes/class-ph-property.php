@@ -195,19 +195,34 @@ class PH_Property {
      * @return string
      */
     public function get_main_photo_src( $size = 'thumbnail' ) {
-            
-        $photos = $this->_photos;
         
         $return = false;
-        
-        if (isset($photos) && is_array($photos) && !empty($photos) && isset($photos[0]))
+
+        if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
         {
-            $image_attributes = wp_get_attachment_image_src( $photos[0], $size );
-            if( $image_attributes ) 
+            $photos = $this->_photo_urls;
+
+            if (isset($photos) && is_array($photos) && !empty($photos) && isset($photos[0]) && isset($photos[0]['url']))
             {
-                $return = $image_attributes[0];
+                $return = $photos[0]['url'];
             }
         }
+        else
+        {
+            $photos = $this->_photos;
+        
+            
+            
+            if (isset($photos) && is_array($photos) && !empty($photos) && isset($photos[0]))
+            {
+                $image_attributes = wp_get_attachment_image_src( $photos[0], $size );
+                if( $image_attributes ) 
+                {
+                    $return = $image_attributes[0];
+                }
+            }
+        }
+        
         
         return $return;
     }

@@ -33,8 +33,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$link_prefix = ( ( $property->on_market == 'yes' ) ? '<a href="' . get_permalink( $property->id ) . '">' : '' );
 				$link_suffix = ( ( $property->on_market == 'yes' ) ? '</a>' : '' );
 
+				$image = $property->get_main_photo_src();
+
 				echo '<tr>
-					<td>' . ( ( $property->get_main_photo_src() != '' ) ? $link_prefix . '<img src="' . $property->get_main_photo_src() . '" width="75" alt="' . get_the_title( $property->id ) . '">' : '' ) . $link_suffix . '</td>
+					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . $image . '" width="75" alt="' . get_the_title( $property->id ) . '">' : '' ) . $link_suffix . '</td>
 					<td>' . $link_prefix . get_the_title( $property->id ) . $link_suffix . '</td>
 					<td>' . $property->get_formatted_price() . '</td>
 					<td>' . $property->availability . '<br>' . ( ( $property->on_market == 'yes' ) ? 'On Market' : 'Not On Market' ) . '</td>

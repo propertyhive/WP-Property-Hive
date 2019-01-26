@@ -255,7 +255,7 @@ if ( ! function_exists( 'propertyhive_get_property_thumbnail' ) ) {
     function propertyhive_get_property_thumbnail( $size = 'medium', $class = '', $placeholder_width = 0, $placeholder_height = 0  ) {
         global $post, $property;
 
-        $photo_url = $property->get_main_photo_src( $size);
+        $photo_url = $property->get_main_photo_src( $size );
 
         if ($photo_url !== FALSE)
             return '<img src="' . $photo_url . '" alt="' . get_the_title($post->ID) . '" class="' . $class . '">';
@@ -404,8 +404,44 @@ if ( ! function_exists( 'propertyhive_show_property_images' ) ) {
      * @subpackage  Property
      * @return void
      */
-    function propertyhive_show_property_images() {
-        ph_get_template( 'single-property/property-images.php' );
+    function propertyhive_show_property_images() 
+    {
+        global $property;
+
+        $images = array();
+        if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
+        {
+            $photo_urls = $property->_photo_urls;
+            if ( !is_array($photo_urls) ) { $photo_urls = array(); }
+
+            foreach ( $photo_urls as $photo )
+            {
+                $images[] = array(
+                    'title' => isset($photo['title']) ? $photo['title'] : '',
+                    'url'  => isset($photo['url']) ? $photo['url'] : '',
+                    'image' => '<img src="' . ( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . ( isset($photo['title']) ? $photo['title'] : '' ) . '">',
+                );
+            }
+        }
+        else
+        {
+            $gallery_attachments = $property->get_gallery_attachment_ids();
+
+            if ( !empty($gallery_attachments) ) 
+            {
+                foreach ($gallery_attachments as $gallery_attachment)
+                {
+                    $images[] = array(
+                        'title' => esc_attr( get_the_title( $gallery_attachment ) ),
+                        'url'  => wp_get_attachment_url( $gallery_attachment ),
+                        'image' => wp_get_attachment_image( $gallery_attachment, 'original' ),
+                        'attachment_id' => $gallery_attachment,
+                    );
+                }
+            }
+        }
+
+        ph_get_template( 'single-property/property-images.php', array( 'images' => $images ) );
     }
 }
 
@@ -419,7 +455,43 @@ if ( ! function_exists( 'propertyhive_show_property_thumbnails' ) ) {
      * @return void
      */
     function propertyhive_show_property_thumbnails() {
-        ph_get_template( 'single-property/property-thumbnails.php' );
+
+        global $property;
+
+        $images = array();
+        if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
+        {
+            $photo_urls = $property->_photo_urls;
+            if ( !is_array($photo_urls) ) { $photo_urls = array(); }
+            
+            foreach ( $photo_urls as $photo )
+            {
+                $images[] = array(
+                    'title' => isset($photo['title']) ? $photo['title'] : '',
+                    'url'  => isset($photo['url']) ? $photo['url'] : '',
+                    'image' => '<img src="' . ( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . ( isset($photo['title']) ? $photo['title'] : '' ) . '">',
+                );
+            }
+        }
+        else
+        {
+            $gallery_attachments = $property->get_gallery_attachment_ids();
+
+            if ( !empty($gallery_attachments) ) 
+            {
+                foreach ($gallery_attachments as $gallery_attachment)
+                {
+                    $images[] = array(
+                        'title' => esc_attr( get_the_title( $gallery_attachment ) ),
+                        'url'  => wp_get_attachment_url( $gallery_attachment ),
+                        'image' => wp_get_attachment_image( $gallery_attachment, apply_filters( 'single_property_small_thumbnail_size', 'thumbnail' ) ),
+                        'attachment_id' => $gallery_attachment,
+                    );
+                }
+            }
+        }
+
+        ph_get_template( 'single-property/property-thumbnails.php', array( 'images' => $images ) );
     }
 }
 
@@ -508,54 +580,117 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
 
         $actions = array();
 
-        $floorplan_ids = $property->get_floorplan_attachment_ids();
-        if ( !empty( $floorplan_ids ) )
+        if ( get_option('propertyhive_floorplans_stored_as', '') == 'urls' )
         {
-            foreach ($floorplan_ids as $floorplan_id)
+            $floorplan_urls = $property->_floorplan_urls;
+            if ( is_array($floorplan_urls) && !empty( $floorplan_urls ) )
             {
-                $actions[] = array(
-                    'href' => wp_get_attachment_url( $floorplan_id ),
-                    'label' => __( 'Floorplan', 'propertyhive' ),
-                    'class' => 'action-floorplans',
-                    'attributes' => array(
-                        'data-fancybox' => 'floorplans'
-                    )
-                );
+                foreach ($floorplan_urls as $floorplan)
+                {
+                    $actions[] = array(
+                        'href' => ( ( isset($floorplan['url']) ) ? $floorplan['url'] : '' ),
+                        'label' => __( 'Floorplan', 'propertyhive' ),
+                        'class' => 'action-floorplans',
+                        'attributes' => array(
+                            'data-fancybox' => 'floorplans'
+                        )
+                    );
+                }
+            }
         }
-        }
-
-        $brochure_ids = $property->get_brochure_attachment_ids();
-        if ( !empty( $brochure_ids ) )
+        else
         {
-            foreach ($brochure_ids as $brochure_id)
+            $floorplan_ids = $property->get_floorplan_attachment_ids();
+            if ( !empty( $floorplan_ids ) )
             {
-                $actions[] = array(
-                    'href' => wp_get_attachment_url( $brochure_id ),
-                    'label' => __( 'View Brochure', 'propertyhive' ),
-                    'class' => 'action-brochure',
-                    'attributes' => array(
-                        'target' => '_blank'
-                    )
-                );
+                foreach ($floorplan_ids as $floorplan_id)
+                {
+                    $actions[] = array(
+                        'href' => wp_get_attachment_url( $floorplan_id ),
+                        'label' => __( 'Floorplan', 'propertyhive' ),
+                        'class' => 'action-floorplans',
+                        'attributes' => array(
+                            'data-fancybox' => 'floorplans'
+                        )
+                    );
+                }
             }
         }
 
-        $epc_ids = $property->get_epc_attachment_ids();
-        if ( !empty( $epc_ids ) )
+        if ( get_option('propertyhive_brochures_stored_as', '') == 'urls' )
         {
-            foreach ($epc_ids as $epc_id)
+            $brochure_urls = $property->_brochure_urls;
+            if ( is_array($brochure_urls) && !empty( $brochure_urls ) )
             {
-                $attributes = array('target' => '_blank');
-                if ( wp_attachment_is_image($epc_id) )
+                foreach ($brochure_urls as $brochure)
                 {
-                    $attributes = array('data-fancybox' => 'epcs');
+                    $actions[] = array(
+                        'href' => ( ( isset($brochure['url']) ) ? $brochure['url'] : '' ),
+                        'label' => __( 'View Brochure', 'propertyhive' ),
+                        'class' => 'action-brochure',
+                        'attributes' => array(
+                            'target' => '_blank'
+                        )
+                    );
                 }
-                $actions[] = array(
-                    'href' => wp_get_attachment_url( $epc_id ),
-                    'label' => __( 'View EPC', 'propertyhive' ),
-                    'class' => 'action-epc',
-                    'attributes' => $attributes
-                );
+            }
+        }
+        else
+        {
+            $brochure_ids = $property->get_brochure_attachment_ids();
+            if ( !empty( $brochure_ids ) )
+            {
+                foreach ($brochure_ids as $brochure_id)
+                {
+                    $actions[] = array(
+                        'href' => wp_get_attachment_url( $brochure_id ),
+                        'label' => __( 'View Brochure', 'propertyhive' ),
+                        'class' => 'action-brochure',
+                        'attributes' => array(
+                            'target' => '_blank'
+                        )
+                    );
+                }
+            }
+        }
+
+        if ( get_option('propertyhive_epcs_stored_as', '') == 'urls' )
+        {
+            $epc_urls = $property->_epc_urls;
+            if ( is_array($epc_urls) && !empty( $epc_urls ) )
+            {
+                foreach ($epc_urls as $epc)
+                {
+                    $actions[] = array(
+                        'href' => ( ( isset($epc['url']) ) ? $epc['url'] : '' ),
+                        'label' => __( 'View EPC', 'propertyhive' ),
+                        'class' => 'action-epc',
+                        'attributes' => array(
+                            'target' => '_blank'
+                        )
+                    );
+                }
+            }
+        }
+        else
+        {
+            $epc_ids = $property->get_epc_attachment_ids();
+            if ( !empty( $epc_ids ) )
+            {
+                foreach ($epc_ids as $epc_id)
+                {
+                    $attributes = array('target' => '_blank');
+                    if ( wp_attachment_is_image($epc_id) )
+                    {
+                        $attributes = array('data-fancybox' => 'epcs');
+                    }
+                    $actions[] = array(
+                        'href' => wp_get_attachment_url( $epc_id ),
+                        'label' => __( 'View EPC', 'propertyhive' ),
+                        'class' => 'action-epc',
+                        'attributes' => $attributes
+                    );
+                }
             }
         }
 
