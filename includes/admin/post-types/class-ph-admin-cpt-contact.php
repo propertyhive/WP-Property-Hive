@@ -325,7 +325,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				$search_ids[] = $term;
 			}
 
-			// Attempt to get an ID by searching for address and reference number
+			// Attempt to get an ID by searching for phone and email address
 			$query = $wpdb->prepare( 
 				"SELECT 
 					ID 
