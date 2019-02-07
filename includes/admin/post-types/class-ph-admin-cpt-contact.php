@@ -342,9 +342,10 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 					post_type='contact'
 				GROUP BY ID
 				",
-				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
+				'%' . $wpdb->esc_like( ph_clean( preg_replace( "/[^0-9,]/", "", $term ) ) ) . '%',
 				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%'
 			);
+
 			$search_posts = $wpdb->get_results( $query );
 			$search_posts = wp_list_pluck( $search_posts, 'ID' );
 
