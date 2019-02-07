@@ -298,6 +298,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 
 	/**
 	 * Search by email and phone number
+	 * Phone numbers are stripped of any none numeric or comma charactors
 	 *
 	 * @param string $where
 	 * @return string
