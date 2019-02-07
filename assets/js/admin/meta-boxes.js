@@ -80,7 +80,7 @@ jQuery( function($){
 
         return false;
 
-    });
+});
 
     $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.delete_note', function() {
         
@@ -113,20 +113,6 @@ jQuery( function($){
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
 
-    // Enforce numeric and comma in contact phone numbers only
-    $("#_telephone_number").on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
-        var cursor = this.selectionStart,
-        regex = /[^0-9,]/gi,
-        value = $(this).val();
-        
-        if(regex.test(value))
-        {
-            $(this).val(value.replace(regex, ''));
-            cursor--;
-        }
-        
-        this.setSelectionRange(cursor, cursor);
-      });
     });
 
 function initialise_datepicker() {

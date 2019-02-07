@@ -312,7 +312,10 @@ function viewing_update_selected_applicants()
                 {
                     // Successfully added contact post
                     update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
+
                     update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['_applicant_telephone_number']) );
+                    update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean($_POST['_applicant_telephone_number'], true) );
+
                     update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_applicant_email_address'])) );
 
                     update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
