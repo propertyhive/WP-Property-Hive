@@ -466,6 +466,8 @@ class PH_Meta_Box_Property_Owner {
                     update_post_meta( $contact_post_id, '_address_country', ph_clean($_POST['_owner_address_country']) );
                   
                     update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['_owner_telephone_number']) );
+                    update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean($_POST['_owner_telephone_number'], true) );
+                    
                     update_post_meta( $contact_post_id, '_email_address', ph_clean($_POST['_owner_email_address']) );
                 }
             }
