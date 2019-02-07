@@ -337,7 +337,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				INNER JOIN {$wpdb->postmeta} AS mt1 ON {$wpdb->posts}.ID = mt1.post_id
 				WHERE 
 					(
-						(mt1.meta_key='_telephone_number' AND mt1.meta_value LIKE NULLIF(%s,'%%%'))
+						(mt1.meta_key='_telephone_number_clean' AND mt1.meta_value LIKE NULLIF(%s,'%%%'))
 						OR
 						(mt1.meta_key='_email_address' AND mt1.meta_value LIKE %s)
 					)
