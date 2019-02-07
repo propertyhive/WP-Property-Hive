@@ -33,7 +33,15 @@ global $post, $property;
            {
                $action['class'] = ( isset( $action['class'] ) ) ? $action['class'] : '';
                
-               echo '<li class="' . $action['class'] . '"><a href="' . $action['href'] . '"';
+               echo '<li class="' . $action['class'] . '"';
+               if ( isset( $action['parent_attributes'] ) && ! empty( $action['parent_attributes'] ) )
+               {
+                   foreach ( $action['parent_attributes'] as $key => $value )
+                   {
+                       echo ' ' . $key . '="' . $value . '"';
+                   }
+               }
+               echo '><a href="' . $action['href'] . '"';
                if ( isset( $action['attributes'] ) && ! empty( $action['attributes'] ) )
                {
                    foreach ( $action['attributes'] as $key => $value )
