@@ -326,16 +326,18 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				$search_ids[] = $term;
 			}
 
+            $phone_number = preg_replace( "/[^0-9,]/", "", $term );
+
 			// Attempt to get an ID by searching for phone and email address
 			$query = $wpdb->prepare( 
 				"SELECT 
-					ID 
+					ID
 				FROM 
 					{$wpdb->posts} 
 				INNER JOIN {$wpdb->postmeta} AS mt1 ON {$wpdb->posts}.ID = mt1.post_id
 				WHERE 
 					(
-						(mt1.meta_key='_telephone_number' AND mt1.meta_value LIKE %s)
+						(mt1.meta_key='_telephone_number' AND mt1.meta_value LIKE NULLIF(%s,'%%%'))
 						OR
 						(mt1.meta_key='_email_address' AND mt1.meta_value LIKE %s)
 					)
@@ -346,6 +348,8 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				'%' . $wpdb->esc_like( ph_clean( preg_replace( "/[^0-9,]/", "", $term ) ) ) . '%',
 				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%'
 			);
+
+//exit($query);
 
 			$search_posts = $wpdb->get_results( $query );
 			$search_posts = wp_list_pluck( $search_posts, 'ID' );
