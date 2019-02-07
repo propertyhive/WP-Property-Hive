@@ -349,8 +349,6 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%'
 			);
 
-//exit($query);
-
 			$search_posts = $wpdb->get_results( $query );
 			$search_posts = wp_list_pluck( $search_posts, 'ID' );
 
