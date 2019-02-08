@@ -30,6 +30,17 @@ function ph_clean( $var, $is_phone_number = false ) {
 	}
 }
 
+/**
+ * Strip none numeric or comma chars from phone numbers
+ * @param string
+ * @return string
+ */
+
+function ph_clean_telephone_number( $var ) {
+
+	return preg_replace( "/[^0-9,]/", "", $var );
+}
+
 if ( ! function_exists( 'ph_rgb_from_hex' ) ) {
 
 	/**

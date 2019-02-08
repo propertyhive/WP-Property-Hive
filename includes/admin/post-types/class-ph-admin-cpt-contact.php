@@ -345,7 +345,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 					post_type='contact'
 				GROUP BY ID
 				",
-				'%' . $wpdb->esc_like( ph_clean( preg_replace( "/[^0-9,]/", "", $term ) ) ) . '%',
+				'%' . $wpdb->esc_like( ph_clean( ph_clean_telephone_number( $term ) ) ) . '%',
 				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%'
 			);
 

@@ -1,3 +1,4 @@
+
 <?php
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -431,7 +432,9 @@ class PH_AJAX {
 
             // Add post meta (contact details, requirements etc)
             add_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
+            
             add_post_meta( $contact_post_id, '_telephone_number', ( ( isset($_POST['telephone_number']) ) ? ph_clean($_POST['telephone_number']) : '' ) );
+            add_post_meta( $contact_post_id, '_telephone_number_clean', ( ( isset($_POST['telephone_number']) ) ? ph_clean( ph_clean_telephone_number( $_POST['telephone_number']) ) : '' ) );
 
             add_post_meta( $contact_post_id, '_contact_types', array('applicant') );
 
@@ -1568,8 +1571,12 @@ class PH_AJAX {
             die( json_encode( array('error' => 'Error creating contact') ) );
         }
 
-        if ( $telephone !== FALSE ) { update_post_meta( $contact_post_id, '_telephone_number', $telephone ); }
-        if ( $email !== FALSE ) { update_post_meta( $contact_post_id, '_email_address', $email ); }
+        if ( $telephone !== FALSE ) { 
+            update_post_meta( $contact_post_id, '_telephone_number', ph_clean( $telephone ) );
+            update_post_meta( $contact_post_id, '_telephone_number', ph_clean( ph_clean_telephone_number( $telephone ) ) );
+        }
+
+        if ( $email !== FALSE ) { update_post_meta( $contact_post_id, '_email_address', ph_clean( $email ) ); }
 
         do_action('propertyhive_create_contact_from_enquiry', $enquiry_post_id, $contact_post_id);
 
