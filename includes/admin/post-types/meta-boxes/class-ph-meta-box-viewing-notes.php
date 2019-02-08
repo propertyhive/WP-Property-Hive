@@ -60,7 +60,16 @@ class PH_Meta_Box_Viewing_Notes {
                         <?php echo wpautop( wptexturize( wp_kses_post( $note_body ) ) ); ?>
                     </div>
                     <p class="meta">
-                        <abbr class="exact-date" title="<?php echo $note->comment_date_gmt; ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $note->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
+                        <abbr class="exact-date" title="<?php echo $note->comment_date_gmt; ?> GMT">
+                            <?php 
+                                $timediff = strtotime(strtotime( $note->comment_date_gmt )) - strtotime(current_time( 'timestamp', 1 ));
+                                if ($timediff > 86400) {
+                                    echo strtotime( $note->comment_date_gmt );
+                                } else {
+                                    printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $note->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?>
+                                }
+                            ?>
+                        </abbr>
                         <?php if ( $note->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $note->comment_author ); ?>
                         <?php if ($allow_delete) { ?><a href="#" class="delete_note"><?php _e( 'Delete', 'propertyhive' ); ?></a><?php } ?>
                     </p>
