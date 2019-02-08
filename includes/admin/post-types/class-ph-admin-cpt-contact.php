@@ -46,21 +46,21 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		// Admin Columns
 		add_filter( 'manage_edit-contact_columns', array( $this, 'edit_columns' ) );
 		add_action( 'manage_contact_posts_custom_column', array( $this, 'custom_columns' ), 2 );
-		/*add_filter( 'manage_edit-property_sortable_columns', array( $this, 'custom_columns_sort' ) );
-		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
+		// add_filter( 'manage_edit-property_sortable_columns', array( $this, 'custom_columns_sort' ) );
+		// add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
 
 		// Sort link
-		add_filter( 'views_edit-property', array( $this, 'default_sorting_link' ) );
+		// add_filter( 'views_edit-property', array( $this, 'default_sorting_link' ) );
 
 		// Prouct filtering
-		add_action( 'restrict_manage_posts', array( $this, 'product_filters' ) );
-		add_filter( 'parse_query', array( $this, 'property_filters_query' ) );
+		// add_action( 'restrict_manage_posts', array( $this, 'product_filters' ) );
+		// add_filter( 'parse_query', array( $this, 'property_filters_query' ) );
 
 		// Enhanced search
-		add_filter( 'posts_search', array( $this, 'product_search' ) );
+		add_filter( 'posts_search', array( $this, 'contact_search' ) );
 
 		// Maintain hierarchy of terms
-		add_filter( 'wp_terms_checklist_args', array( $this, 'disable_checked_ontop' ) );*/
+		// add_filter( 'wp_terms_checklist_args', array( $this, 'disable_checked_ontop' ) );
 
 		// Bulk / quick edit
 		add_filter( 'bulk_actions-edit-contact', array( $this, 'remove_bulk_actions') );
@@ -295,6 +295,75 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
         unset( $actions['edit'] );
         return $actions;
     }
+
+	/**
+	 * Search by email and phone number
+	 * Phone numbers are stripped of any none numeric or comma charactors
+	 *
+	 * @param string $where
+	 * @return string
+	 */
+	public function contact_search( $where ) {
+
+		global $pagenow, $wpdb, $wp;
+		
+		if ( 'edit.php' != $pagenow || ! is_search() || ! isset( $wp->query_vars['s'] ) || 'contact' != $wp->query_vars['post_type'] ) {
+			return $where;
+		}
+
+		if ( trim($wp->query_vars['s']) == '' )
+		{
+			return $where;
+		}
+
+		$search_ids = array();
+		$terms      = explode( ',', $wp->query_vars['s'] );
+
+		foreach ( $terms as $term )
+		{
+			if ( is_numeric( $term ) )
+			{
+				$search_ids[] = $term;
+			}
+
+            $phone_number = preg_replace( "/[^0-9,]/", "", $term );
+
+			// Attempt to get an ID by searching for phone and email address
+			$query = $wpdb->prepare( 
+				"SELECT 
+					ID
+				FROM 
+					{$wpdb->posts} 
+				INNER JOIN {$wpdb->postmeta} AS mt1 ON {$wpdb->posts}.ID = mt1.post_id
+				WHERE 
+					(
+						(mt1.meta_key='_telephone_number_clean' AND mt1.meta_value LIKE NULLIF(%s,'%%%'))
+						OR
+						(mt1.meta_key='_email_address' AND mt1.meta_value LIKE %s)
+					)
+				AND 
+					post_type='contact'
+				GROUP BY ID
+				",
+				'%' . $wpdb->esc_like( ph_clean( ph_clean_telephone_number( $term ) ) ) . '%',
+				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%'
+			);
+
+			$search_posts = $wpdb->get_results( $query );
+			$search_posts = wp_list_pluck( $search_posts, 'ID' );
+
+			if ( sizeof( $search_posts ) > 0 )
+			{
+				$search_ids = array_merge( $search_ids, $search_posts );
+			}
+		}
+		$search_ids = array_filter( array_unique( array_map( 'absint', $search_ids ) ) );
+		if ( sizeof( $search_ids ) > 0 ) 
+		{
+			$where = str_replace( 'AND (((', "AND ( ({$wpdb->posts}.ID IN (" . implode( ',', $search_ids ) . ")) OR ((", $where );
+		}
+		return $where;
+	}
 
 	/**
 	 * Make contact columns sortable

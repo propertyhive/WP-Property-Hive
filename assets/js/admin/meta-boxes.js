@@ -80,7 +80,7 @@ jQuery( function($){
 
         return false;
 
-    });
+});
 
     $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.delete_note', function() {
         
@@ -113,7 +113,7 @@ jQuery( function($){
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
 
-});
+    });
 
 function initialise_datepicker() {
     jQuery( ".date-picker" ).datepicker({

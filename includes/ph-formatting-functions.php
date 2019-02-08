@@ -20,11 +20,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string|array
  */
 function ph_clean( $var ) {
+
 	if ( is_array( $var ) ) {
 		return array_map( 'ph_clean', $var );
 	} else {
 		return is_scalar( $var ) ? sanitize_text_field( $var ) : $var;
 	}
+}
+
+/**
+ * Strip none numeric or comma chars from phone numbers
+ * @param string
+ * @return string
+ */
+
+function ph_clean_telephone_number( $var ) {
+
+	return preg_replace( "/[^0-9,]/", "", $var );
 }
 
 if ( ! function_exists( 'ph_rgb_from_hex' ) ) {
