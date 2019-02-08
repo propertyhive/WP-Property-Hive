@@ -19,9 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param string|array $var
  * @return string|array
  */
-function ph_clean( $var, $is_phone_number = false ) {
-
-	if ( $is_phone_number ) $var = preg_replace( "/[^0-9,]/", "", $var );
+function ph_clean( $var ) {
 
 	if ( is_array( $var ) ) {
 		return array_map( 'ph_clean', $var );
