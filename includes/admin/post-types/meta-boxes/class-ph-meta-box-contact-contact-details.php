@@ -114,7 +114,7 @@ class PH_Meta_Box_Contact_Contact_Details {
         global $wpdb;
         
         update_post_meta( $post_id, '_telephone_number',  ph_clean($_POST['_telephone_number']) );
-        update_post_meta( $post_id, '_telephone_number_clean',  ph_clean($_POST['_telephone_number']), true );
+        update_post_meta( $post_id, '_telephone_number_clean',  ph_clean( ph_clean_telephone_number( $_POST['_telephone_number'] ) ) );
 
         update_post_meta( $post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_email_address'])) );
         update_post_meta( $post_id, '_contact_notes', sanitize_textarea_field($_POST['_contact_notes']) );
