@@ -38,6 +38,9 @@ class PH_Meta_Box_Property_Notes {
 
         if ( !empty($notes) ) 
         {
+
+            $datetime_format = get_option('date_format')." \a\\t ".get_option('time_format');
+            
             foreach( $notes as $note )
             {
                 $note_classes = array( 'note' );
@@ -73,7 +76,18 @@ class PH_Meta_Box_Property_Notes {
                         <?php echo wpautop( wptexturize( wp_kses_post( $note_body ) ) ); ?>
                     </div>
                     <p class="meta">
-                        <abbr class="exact-date" title="<?php echo $note->comment_date_gmt; ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $note->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
+                        <abbr class="exact-date" title="<?php echo $note->comment_date_gmt; ?> GMT">
+                            <?php 
+                                
+                                $time_diff =  current_time( 'timestamp', 1 ) - strtotime( $note->comment_date_gmt );
+
+                                if ($time_diff > 86400) {
+                                    echo date( $datetime_format, strtotime( $note->comment_date_gmt ) );
+                                } else {
+                                    printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $note->comment_date_gmt ), current_time( 'timestamp', 1 ) ) );
+                                }
+                            ?>
+                        </abbr>
                         <?php if ( $note->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $note->comment_author ); ?>
                         <a href="#" class="delete_note"><?php _e( 'Delete', 'propertyhive' ); ?></a>
                     </p>
