@@ -79,7 +79,7 @@ class PH_Meta_Box_Property_Notes {
                             <?php 
                                 
                                 $time_diff =  current_time( 'timestamp', 1 ) - strtotime( $note->comment_date_gmt );
-                                
+
                                 if ($time_diff > 86400) {
                                     echo date($datetime_format, strtotime( $note->comment_date_gmt ) );
                                 } else {
