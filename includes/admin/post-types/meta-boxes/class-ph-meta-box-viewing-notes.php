@@ -32,6 +32,9 @@ class PH_Meta_Box_Viewing_Notes {
 
         if ( !empty($notes) ) 
         {
+
+            $datetime_format = get_option('date_format')." \a\\t ".get_option('time_format');
+
             foreach( $notes as $note )
             {
                 $note_classes = array( 'note' );
@@ -62,11 +65,13 @@ class PH_Meta_Box_Viewing_Notes {
                     <p class="meta">
                         <abbr class="exact-date" title="<?php echo $note->comment_date_gmt; ?> GMT">
                             <?php 
-                                $timediff = strtotime(strtotime( $note->comment_date_gmt )) - strtotime(current_time( 'timestamp', 1 ));
-                                if ($timediff > 86400) {
-                                    echo strtotime( $note->comment_date_gmt );
+                                
+                                $time_diff =  current_time( 'timestamp', 1 ) - strtotime( $note->comment_date_gmt );
+
+                                if ($time_diff > 86400) {
+                                    echo date( $datetime_format, strtotime( $note->comment_date_gmt ) );
                                 } else {
-                                    printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $note->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?>
+                                    printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $note->comment_date_gmt ), current_time( 'timestamp', 1 ) ) );
                                 }
                             ?>
                         </abbr>
