@@ -26,7 +26,7 @@ if ( $wp_query->found_posts < 2 )
 				'price-desc' => __( 'Default sorting', 'propertyhive' ),
 				'date'       => __( 'Sort by date added', 'propertyhive' ),
 				'price-asc'      => __( 'Sort by price: low to high', 'propertyhive' ),
-				'price-desc' => __( 'Sort by price: high to low', 'propertyhive' )
+				'price-desc' => __( 'Sort by price: high to low', 'propertyhive' ),
 			) );
 		}
 		else
@@ -35,7 +35,9 @@ if ( $wp_query->found_posts < 2 )
 				'floor_area-desc' => __( 'Default sorting', 'propertyhive' ),
 				'date'       => __( 'Sort by date added', 'propertyhive' ),
 				'floor_area-asc'      => __( 'Sort by floor area: low to high', 'propertyhive' ),
-				'floor_area-desc' => __( 'Sort by floor area: high to low', 'propertyhive' )
+				'floor_area-desc' => __( 'Sort by floor area: high to low', 'propertyhive' ),
+				'price-asc'      => __( 'Sort by price: low to high', 'propertyhive' ),
+				'price-desc' => __( 'Sort by price: high to low', 'propertyhive' ),
 			) );
 		}
 
