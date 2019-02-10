@@ -277,6 +277,30 @@ class PH_Emails {
 			return false;
 		}
 
+		// Get all of the office email addresses and store them in an array to save having to query them for every email
+		// Get all contacts that have a type of applicant
+		$args = array(
+			'post_type' => 'office',
+			'nopaging' => true
+		);
+
+		$office_email_addresses = array();
+		$office_query = new WP_Query( $args );
+
+		if ( $office_query->have_posts() )
+		{
+			while ( $office_query->have_posts() )
+			{
+				$office_query->the_post();
+
+				$office_email_addresses['residential-sales'][get_the_ID()] = get_post_meta( get_the_ID(), '_office_email_address_sales', TRUE );
+				$office_email_addresses['residential-lettings'][get_the_ID()] = get_post_meta( get_the_ID(), '_office_email_address_lettings', TRUE );
+				$office_email_addresses['commercial'][get_the_ID()] = get_post_meta( get_the_ID(), '_office_email_address_commercial', TRUE );
+			}
+		}
+
+		wp_reset_postdata();
+
 		include_once( dirname(__FILE__) . '/admin/class-ph-admin-matching-properties.php' );
 		$ph_admin_matching_properties = new PH_Admin_Matching_Properties();
 
@@ -371,23 +395,47 @@ class PH_Emails {
 						        if ( strpos($body, '[properties]') !== FALSE )
 						        {
 						            ob_start();
+
+						            $office_counts = array();
 						            if ( !empty($new_matching_properties) )
 						            {
 						                foreach ( $new_matching_properties as $email_property_id )
 						                {
 						                    $property = new PH_Property((int)$email_property_id);
+
+						                    if ( $property->office_id != '' && $property->office_id != 0 )
+						                    {
+						                    	if ( !isset($office_counts[$property->office_id]) ) { $office_counts[$property->office_id] = 0; }
+						                    	++$office_counts[$property->office_id];
+						                    }
+
 						                    ph_get_template( 'emails/applicant-match-property.php', array( 'property' => $property ) );
 						                }
 						            }
 						            $body = str_replace("[properties]", ob_get_clean(), $body);
 						        }
 
+						        // Get email address of office with most properties
+						        $highest_office_email_address = '';
+						        if ( !empty($office_counts) )
+						        {
+							        arsort($office_counts);
+							        reset($office_counts);
+									$highest_office_id = key($office_counts);
+									$highest_office_email_address = ( isset($office_email_addresses[$applicant_profile['department']][$highest_office_id]) ? $office_email_addresses[$applicant_profile['department']][$highest_office_id] : '' );
+								}
+								if ( $highest_office_email_address == '' )
+								{
+									// fallback to admin email address
+									$highest_office_email_address = get_option('admin_email');
+								}
+
 								$ph_admin_matching_properties->send_emails(
 									$contact_id,
 									$i,
 									$new_matching_properties,
 									get_bloginfo('name'),
-									get_option('admin_email'),
+									$highest_office_email_address,
 									$subject,
 									$body
 								);
