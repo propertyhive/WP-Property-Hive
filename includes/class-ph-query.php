@@ -537,7 +537,17 @@ class PH_Query {
 			case 'price' :
 				$args['orderby']  = 'meta_value_num';
 				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
-				$args['meta_key'] = '_price_actual';
+				if (
+					( isset($_REQUEST['department']) && $_REQUEST['department'] == 'commercial' ) ||
+					( !isset($_REQUEST['department']) && get_option( 'propertyhive_primary_department' ) == 'commercial' )
+				)
+				{
+					$args['meta_key'] = '_price_from_actual';
+				}
+				else
+				{
+					$args['meta_key'] = '_price_actual';
+				}
 			break;
 			case 'floor_area' :
 				$args['orderby']  = 'meta_value_num';

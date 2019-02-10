@@ -407,6 +407,11 @@ class PH_Countries {
 
 		            update_post_meta( $postID, '_rent_from_actual', $converted_price );
 
+		            if ( get_post_meta( $postID, '_for_sale', true ) != 'yes' )
+					{
+						update_post_meta( $postID, '_price_from_actual', $converted_price );
+					}
+
 		            $price = get_post_meta( $postID, '_rent_to', true );
 		            switch ($rent_units)
 		            {
