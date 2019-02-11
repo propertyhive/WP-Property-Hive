@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.0.3
-Stable tag: 1.4.32
+Stable tag: 1.4.33
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.33 =
+* Added ability to order commercial properties by price
+* Corrected 'From' email address on automated match emails. Previously it would come from the admin email address but now looks at how many properties contained within each email belong to each office and uses the email address of the office with the most properties.
+* Added ability to search contacts from within WordPress by email address or telephone number
+* For notes older than 24 hours display the actual date and time they were created instead, for example, of '2 months ago'
 
 = 1.4.32 =
 * Added ability to store property media as URL's instead of having them uploaded to the media library. Useful if importing properties from a third party and wanting to link direct to the media on their servers (if they allow you), thus saving diskspace. Setting accessible from 'Property Hive > Settings > Miscellanouse'.
