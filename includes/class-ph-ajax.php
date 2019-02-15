@@ -2583,8 +2583,6 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
-            error_log($body);
-
             $from = $property->office_email_address;
             if ( sanitize_email($from) == '' )
             {
@@ -3113,7 +3111,7 @@ class PH_AJAX {
         die();
     }
 
-    // Offer _applicant_booking_confirmation_sent_atted functions
+    // Offer related functions
     public function record_offer_property()
     {
         check_ajax_referer( 'record-offer', 'security' );
