@@ -184,7 +184,8 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
 		if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
 	    {
-	    	$settings[] = array( 'title' => __( 'Viewing Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'viewing_booking_confirmation_email_options' );
+	    	//Applicant
+	    	$settings[] = array( 'title' => __( 'Applicant Viewing Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_viewing_booking_confirmation_email_options' );
 
 	        $settings[] = array(
 	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
@@ -196,6 +197,25 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	        $settings[] = array(
 	            'title'   => __( 'Default Email Body', 'propertyhive' ),
 	            'id'      => 'propertyhive_viewing_applicant_booking_confirmation_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'viewing_booking_confirmation_email_options' );
+
+	        // Owner
+	        $settings[] = array( 'title' => __( 'Owner/Landlord Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_viewing_booking_confirmation_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_owner_booking_confirmation_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_owner_booking_confirmation_email_body',
 	            'type'    => 'textarea',
 	            'css'         => 'min-width:300px; height:110px;',
 	        );

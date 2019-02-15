@@ -67,6 +67,20 @@ jQuery(document).ready(function($)
 			return;
 		}
 
+		if ( this_href == '#action_panel_viewing_email_owner_booking_confirmation' )
+		{
+			var data = {
+		        action:         'propertyhive_viewing_email_owner_booking_confirmation',
+		        viewing_id:    	<?php echo $post->ID; ?>,
+		        security:       '<?php echo wp_create_nonce( 'viewing-actions' ); ?>',
+		    };
+			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+		    {
+		    	redraw_viewing_actions();
+		    }, 'json');
+			return;
+		}
+
 		if ( this_href == '#action_panel_viewing_feedback_not_required' )
 		{
 			var data = {
