@@ -221,6 +221,25 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	        );
 
 	        $settings[] = array( 'type' => 'sectionend', 'id' => 'viewing_booking_confirmation_email_options' );
+
+	        // Viewing Feedback
+	        $settings[] = array( 'title' => __( 'Applicant Feedback Email Requests', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_viewing_feedback_request_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_feedback_request_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_feedback_request_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'viewing_feedback_request_email_options' );
 	    }
 
 		$settings = apply_filters( 'propertyhive_email_settings', $settings );

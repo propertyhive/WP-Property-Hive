@@ -572,6 +572,13 @@ Should you need to cancel or amend your booking please do not hesitate to contac
 
 " . get_bloginfo('name'), '', 'no' );
 
+        add_option( 'propertyhive_viewing_feedback_request_email_subject', 'Feedback On Your Viewing Of [property_address]', '', 'no' );
+        add_option( 'propertyhive_viewing_feedback_request_email_body', "Dear Applicant,
+
+[feedback_url]
+
+" . get_bloginfo('name'), '', 'no' );
+
 	}
 
 	/**
