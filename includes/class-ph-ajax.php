@@ -2240,6 +2240,13 @@ class PH_AJAX {
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . wp_kses_post( __('Applicant Not Interested', 'propertyhive') ) . '</a>';
 
+                // Based on line 2176 - this should only show if the applicant as a valid email - correct?
+                $actions[] = '<a 
+                    href="#action_panel_viewing_request_feedback" 
+                    class="button viewing-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . wp_kses_post( __('Request Feedback', 'propertyhive') ) . '</a>';
+
                 $actions[] = '<a 
                     href="#action_panel_viewing_feedback_not_required" 
                     class="button viewing-action"
