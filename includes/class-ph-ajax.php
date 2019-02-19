@@ -47,6 +47,7 @@ class PH_AJAX {
             'viewing_carried_out' => false,
             'viewing_cancelled' => false,
             'viewing_email_applicant_booking_confirmation' => false,
+            'viewing_feedback_request' => false,
             'viewing_email_owner_booking_confirmation' => false,
             'viewing_interested_feedback' => false,
             'viewing_not_interested_feedback' => false,
@@ -2242,7 +2243,7 @@ class PH_AJAX {
 
                 // Based on line 2176 - this should only show if the applicant as a valid email - correct?
                 $actions[] = '<a 
-                    href="#action_panel_viewing_email_request_feedback" 
+                    href="#action_panel_viewing_feedback_request" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . wp_kses_post( __('Email Request For Feedback', 'propertyhive') ) . '</a>';
@@ -2545,6 +2546,54 @@ class PH_AJAX {
             wp_mail($to, $subject, $body, $headers);
 
             update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+        }
+
+        die();
+    }
+
+    public function viewing_feedback_request()
+    {
+
+        check_ajax_referer( 'viewing-actions', 'security' );
+
+        $post_id = (int)$_POST['viewing_id'];
+
+        $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+        $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+
+        if ( (int)$applicant_contact_id == '' || (int)$property_id == '' || (int)$applicant_contact_id == 0 || (int)$property_id == 0 )
+        {
+            die();
+        }
+
+        $property = new PH_Property((int)$property_id);
+
+        $to = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+
+        if ( sanitize_email($to) != '' )
+        {
+            $subject = get_option( 'propertyhive_viewing_feedback_request_email_subject', '' );
+            $body = get_option( 'propertyhive_viewing_feedback_request_email_body', '' );
+
+            $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
+
+            $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
+            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
+            $body = str_replace('[feedback_url]', 'google.com', $body);
+
+            $from = $property->office_email_address;
+            if ( sanitize_email($from) == '' )
+            {
+                $from = get_bloginfo('admin_email');
+            }
+
+            $headers = array();
+            $headers[] = 'From: ' . get_bloginfo('name') . ' <' . $from . '>';
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            wp_mail($to, $subject, $body, $headers);
+
+            update_post_meta( $post_id, '_applicant_viewing_feedback_request_sent_at', date("Y-m-d H:i:s") );
         }
 
         die();
