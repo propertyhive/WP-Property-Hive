@@ -563,12 +563,12 @@ Should you need to cancel or amend your booking please do not hesitate to contac
 
 " . get_bloginfo('name'), '', 'no' );
 
-        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', 'Your Viewing On [property_address]', '', 'no' );
-        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', "Dear Property [owner_or_landlord],
+        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', 'Viewing Booked On [property_address]', '', 'no' );
+        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', "Dear [owner_name],
 
-This is confirmation that your viewing on [property_address] has been booked for [viewing_time] on [viewing_date] with applicant [applicant_name].
+This is confirmation that a viewing has been booked at your property, [property_address], for [viewing_time] on [viewing_date].
 
-Should you need to cancel or amend your booking please do not hesitate to contact us.
+Should you need to cancel or amend this viewing please do not hesitate to contact us.
 
 " . get_bloginfo('name'), '', 'no' );
 

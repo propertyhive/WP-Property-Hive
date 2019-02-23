@@ -2551,7 +2551,6 @@ class PH_AJAX {
 
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
         $property_department = get_post_meta( $property_id, '_department' );
-        $owner_or_landlord = ( $property_department[0] == 'residential-lettings' ? 'Landlord' : 'Owner' );
 
         $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
         $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
@@ -2559,11 +2558,15 @@ class PH_AJAX {
         if ( $owner_contact_ids > 0 ) {
 
             $owner_emails = array();
+            $owner_names = array();
     
-            foreach ($owner_contact_ids as $owner_id) {
+            foreach ($owner_contact_ids as $owner_id) 
+            {
                 $owner_email = sanitize_email( get_post_meta($owner_id, '_email_address', TRUE) );
+                $owner_name = get_the_title($owner_id);
 
                 if( ! empty($owner_email) ) array_push($owner_emails, $owner_email);
+                if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
             }
 
             $property = new PH_Property((int)$property_id);
@@ -2574,14 +2577,12 @@ class PH_AJAX {
             $body = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
-            $subject = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $subject);
+            $subject = str_replace('[owner_name]', implode(", ", $owner_names), $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
-            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
-            $body = str_replace('[owner_or_landlord]', $owner_or_landlord, $body);
-
+            $body = str_replace('[owner_name]', implode(", ", $owner_names), $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
