@@ -47,6 +47,7 @@ class PH_AJAX {
             'viewing_carried_out' => false,
             'viewing_cancelled' => false,
             'viewing_email_applicant_booking_confirmation' => false,
+            'viewing_email_owner_booking_confirmation' => false,
             'viewing_interested_feedback' => false,
             'viewing_not_interested_feedback' => false,
             'viewing_feedback_not_required' => false,
@@ -2178,15 +2179,34 @@ class PH_AJAX {
             }
             else
             {
-                $booking_confirmation_sent_at = get_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', TRUE );
-
+                $applicant_booking_confirmation_sent_at = get_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', TRUE );
+                $owner_booking_confirmation_sent_at = get_post_meta( $post_id, '_owner_booking_confirmation_sent_at', TRUE );
+                
+                //Applicant
                 $actions[] = '<a 
                         href="#action_panel_viewing_email_applicant_booking_confirmation" 
                         class="button viewing-action"
                         style="width:100%; margin-bottom:7px; text-align:center" 
-                    >' . ( ( $booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Resend Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
-                
-                $actions[] = '<div id="viewing_applicant_confirmation_date" style="text-align:center; font-size:12px; color:#999;' . ( ( $booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $booking_confirmation_sent_at != '' ) ? 'Previously sent on <span title="' . $booking_confirmation_sent_at . '">' . date("jS F", strtotime($booking_confirmation_sent_at)) : '' ) . '</span></div>';
+                    >' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Resend Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
+
+                $actions[] = '<div id="viewing_applicant_confirmation_date" style="text-align:center; font-size:12px; color:#999;' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $applicant_booking_confirmation_sent_at != '' ) ? 'Previously sent on <span title="' . $applicant_booking_confirmation_sent_at . '">' . date("jS F", strtotime($applicant_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+
+                // Owner/Landlord
+                $property_department = get_post_meta( $property_id, '_department' );
+                $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
+                $owner_or_landlord = ( $property_department[0] == 'residential-lettings' ? 'Landlord' : 'Owner' );
+
+                if ( count($owner_contact_ids) > 0) {
+
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_owner_booking_confirmation" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email '.$owner_or_landlord.' Booking Confirmation', 'propertyhive') : __('Resend '.$owner_or_landlord.' Booking Confirmation', 'propertyhive') ) . '</a>';
+                    
+                    $actions[] = '<div id="viewing_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+                }
+
                 $actions[] = '<hr>';
             }
 
@@ -2518,6 +2538,67 @@ class PH_AJAX {
             wp_mail($to, $subject, $body, $headers);
 
             update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+        }
+
+        die();
+    }
+
+    public function viewing_email_owner_booking_confirmation()
+    {
+        check_ajax_referer( 'viewing-actions', 'security' );
+
+        $post_id = (int)$_POST['viewing_id'];
+
+        $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+        $property_department = get_post_meta( $property_id, '_department' );
+        $owner_or_landlord = ( $property_department[0] == 'residential-lettings' ? 'Landlord' : 'Owner' );
+
+        $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+        $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
+ 
+        if ( $owner_contact_ids > 0 ) {
+
+            $owner_emails = array();
+    
+            foreach ($owner_contact_ids as $owner_id) {
+                $owner_email = sanitize_email( get_post_meta($owner_id, '_email_address', TRUE) );
+
+                if( ! empty($owner_email) ) array_push($owner_emails, $owner_email);
+            }
+
+            $property = new PH_Property((int)$property_id);
+
+            $to = implode(",", $owner_emails);
+
+            $subject = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', '' );
+            $body = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
+
+            $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
+            $subject = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $subject);
+            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+
+            $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
+            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
+            $body = str_replace('[owner_or_landlord]', $owner_or_landlord, $body);
+
+            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+
+            $from = $property->office_email_address;
+            if ( sanitize_email($from) == '' )
+            {
+                $from = get_bloginfo('admin_email');
+            }
+
+            $headers = array();
+            $headers[] = 'From: ' . get_bloginfo('name') . ' <' . $from . '>';
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            wp_mail($to, $subject, $body, $headers);
+
+            update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+
         }
 
         die();
