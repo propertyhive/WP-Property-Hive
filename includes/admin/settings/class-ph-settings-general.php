@@ -146,6 +146,15 @@ class PH_Settings_General extends PH_Settings_Page {
                 'default' => '',
                 'checkboxgroup' => 'start'
             ),
+
+            array(
+                'title'   => __( 'Disabled Modules', 'propertyhive' ),
+                'desc'    => __( 'Appraisals', 'propertyhive' ),
+                'id'      => 'propertyhive_module_disabled_appraisals',
+                'type'    => 'checkbox',
+                'default' => '',
+                'checkboxgroup' => 'middle'
+            ),
             
             array(
                 'title'   => __( 'Disabled Modules', 'propertyhive' ),
