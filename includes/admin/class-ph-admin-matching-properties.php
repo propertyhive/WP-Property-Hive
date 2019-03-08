@@ -50,17 +50,89 @@ class PH_Admin_Matching_Properties {
 					// Handle dismissed properties
 					$this->dismiss_properties();
 
+                    $nothing_to_send = true;
+
 					// Handle properties to email
 					if ( isset($_POST['email_property_id']) && !empty($_POST['email_property_id']) )
 					{
+                        $nothing_to_send = false;
+
                         $subject = get_option( 'propertyhive_property_match_default_email_subject', '' );
                         $body = get_option( 'propertyhive_property_match_default_email_body', '' );
-
-						// We've got emails to send
-						include 'views/html-admin-matching-properties-email.php';
 					}
-					else
-					{
+
+                    $nothing_to_send = apply_filters( 'propertyhive_property_match_nothing_to_send', $nothing_to_send );
+
+                    if ( $nothing_to_send != true )
+                    {
+?>
+<div class="wrap propertyhive">
+
+    <div id="poststuff">
+
+        <form method="post" id="mainform" action="" enctype="multipart/form-data">
+<?php
+            if ( isset($_POST['email_property_id']) && !empty($_POST['email_property_id']) )
+            {
+                // We've got emails to send
+                include 'views/html-admin-matching-properties-email.php';
+            }
+
+            do_action( 'propertyhive_property_match_step_two', $contact_id, $applicant_profile_id );
+?>
+            <p class="submit">
+
+                <input name="save" class="button-primary" type="submit" value="<?php echo __( 'Send Email', 'propertyhive' ); ?>" />
+                <?php if ( isset($_POST['email_property_id']) && !empty($_POST['email_property_id']) ) { ?>
+                <input name="preview" id="preview_email" class="button" type="button" value="<?php echo __( 'Preview Email', 'propertyhive' ); ?>" />
+                <?php } ?>
+
+                <input type="hidden" name="step" value="two" />
+                <input type="hidden" name="email_property_id" value="<?php echo ( isset($_POST['email_property_id']) && is_array($_POST['email_property_id']) && !empty($_POST['email_property_id']) ) ? implode(",", ph_clean($_POST['email_property_id'])) : ''; ?>" />
+                <?php do_action( 'propertyhive_property_match_step_two_hidden_fields' ); ?>
+                <?php wp_nonce_field( 'propertyhive-matching-properties' ); ?>
+
+            </p>
+
+            <p>
+            <?php echo __( 'When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' );
+            ?>
+            </p>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+    jQuery(document).ready(function()
+    {
+        jQuery('#preview_email').click(function(e)
+        {
+            e.preventDefault();
+
+            showPreview();
+        });
+    });
+
+    function showPreview()
+    {
+        jQuery('#mainform').attr('target', '_blank');
+        jQuery('#mainform').attr('action', '<?php echo admin_url( '?preview_propertyhive_email=true&contact_id=' . (int)$_GET['contact_id'] . '&applicant_profile=' . (int)$_GET['applicant_profile'] ); ?>');
+
+        jQuery('#mainform').submit();
+        jQuery('#mainform').attr('target', '_self');
+        jQuery('#mainform').attr('action', '');
+    }
+
+</script>
+<?php
+                    }
+
+					if ( $nothing_to_send == true )
+                    {
                         echo '<script>window.location.href = "' . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2";</script>';
 
 						//header("Location: " . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2' ); // properties marked as not interested
@@ -92,11 +164,13 @@ class PH_Admin_Matching_Properties {
                             implode(",", $new_to_email_addresses)
                         );
 
-                        echo '<script>window.location.href = "' . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=1";</script>';
-
                         //header("Location: " . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=1' ); // email sent
                         //die();
                     }
+
+                    do_action( 'propertyhive_property_match_step_send', $contact_id, $applicant_profile_id );
+
+                    echo '<script>window.location.href = "' . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=1";</script>';
 				}
 			}
 		}

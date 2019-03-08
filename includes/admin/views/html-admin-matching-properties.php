@@ -198,7 +198,7 @@
 
                             	<br>';
 
-                            do_action( 'propertyhive_applicant_match_send_methods', $contact_id, $property->id );
+                            do_action( 'propertyhive_applicant_match_send_methods', $contact_id, $applicant_profile_id, $property->id );
 
                             echo '<label><input type="checkbox" name="not_interested_property_id[]" value="' . $property->id . '"> Property Not Suitable</label>
 
