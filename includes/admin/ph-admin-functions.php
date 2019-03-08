@@ -24,6 +24,7 @@ function ph_get_screen_ids() {
         'edit-contact',
         'contact',
         'enquiry',
+        'appraisal',
         'viewing',
         'offer',
         'sale',

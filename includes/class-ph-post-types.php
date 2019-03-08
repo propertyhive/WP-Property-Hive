@@ -52,7 +52,7 @@ class PH_Post_types {
         );
 
 		register_taxonomy( 'property_type',
-	        'property',
+	        array( 'property', 'appraisal' ),
 	        array(
                 'label'                 => __( 'Property Types', 'propertyhive' ),
 	            'hierarchical' 			=> true,
@@ -65,7 +65,7 @@ class PH_Post_types {
 	    );
 
         register_taxonomy( 'commercial_property_type',
-            'property',
+            array( 'property', 'appraisal' ),
             array(
                 'label'                 => __( 'Commercial Property Types', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -91,7 +91,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'parking',
-            'property',
+            array( 'property', 'appraisal' ),
             array(
                 'label'                 => __( 'Parking', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -104,7 +104,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'outside_space',
-            'property',
+            array( 'property', 'appraisal' ),
             array(
                 'label'                 => __( 'Outside Spaces', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -169,7 +169,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'furnished',
-            'property',
+            array( 'property', 'appraisal' ),
             array(
                 'label'                 => __( 'Furnished', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -359,6 +359,40 @@ class PH_Post_types {
                     'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
                     'query_var'             => true,
                     'supports'              => array( 'title' ),
+                    'show_in_nav_menus'     => false,
+                    'show_in_menu'          => false
+                )
+            )
+        );
+
+        register_post_type( "appraisal",
+            apply_filters( 'propertyhive_register_post_type_appraisal',
+                array(
+                    'labels' => array(
+                            'name'                  => __( 'Appraisals', 'propertyhive' ),
+                            'singular_name'         => __( 'Appraisal', 'propertyhive' ),
+                            'menu_name'             => _x( 'Appraisals', 'Admin menu name', 'propertyhive' ),
+                            'add_new'               => __( 'Add Appraisal', 'propertyhive' ),
+                            'add_new_item'          => __( 'Add New Appraisal', 'propertyhive' ),
+                            'edit'                  => __( 'Edit', 'propertyhive' ),
+                            'edit_item'             => __( 'Edit Appraisal', 'propertyhive' ),
+                            'new_item'              => __( 'New Appraisal', 'propertyhive' ),
+                            'view'                  => __( 'View Appraisal', 'propertyhive' ),
+                            'view_item'             => __( 'View Appraisal', 'propertyhive' ),
+                            'search_items'          => __( 'Search Appraisals', 'propertyhive' ),
+                            'not_found'             => __( 'No appraisals found', 'propertyhive' ),
+                            'not_found_in_trash'    => __( 'No appraisals found in trash', 'propertyhive' ),
+                            'parent'                => __( 'Parent Appraisal', 'propertyhive' )
+                        ),
+                    'public'                => false,
+                    'show_ui'               => true,
+                    'capability_type'       => 'post',
+                    'map_meta_cap'          => true,
+                    'publicly_queryable'    => false,
+                    'exclude_from_search'   => true,
+                    'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
+                    'query_var'             => true,
+                    'supports'              => false,
                     'show_in_nav_menus'     => false,
                     'show_in_menu'          => false
                 )
