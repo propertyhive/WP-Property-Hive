@@ -52,7 +52,7 @@ class PH_Post_types {
         );
 
 		register_taxonomy( 'property_type',
-	        'property',
+	        array( 'property', 'appraisal' ),
 	        array(
                 'label'                 => __( 'Property Types', 'propertyhive' ),
 	            'hierarchical' 			=> true,
@@ -65,7 +65,7 @@ class PH_Post_types {
 	    );
 
         register_taxonomy( 'commercial_property_type',
-            'property',
+            array( 'property', 'appraisal' ),
             array(
                 'label'                 => __( 'Commercial Property Types', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -91,7 +91,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'parking',
-            'property',
+            array( 'property', 'appraisal' ),
             array(
                 'label'                 => __( 'Parking', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -104,7 +104,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'outside_space',
-            'property',
+            array( 'property', 'appraisal' ),
             array(
                 'label'                 => __( 'Outside Spaces', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -169,7 +169,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'furnished',
-            'property',
+            array( 'property', 'appraisal' ),
             array(
                 'label'                 => __( 'Furnished', 'propertyhive' ),
                 'hierarchical'          => true,

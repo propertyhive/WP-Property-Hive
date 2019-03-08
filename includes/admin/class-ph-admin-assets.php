@@ -49,7 +49,7 @@ class PH_Admin_Assets {
             wp_enqueue_style( 'wp-color-picker' );
         }
 
-        if ( in_array( $screen->id, array( 'property', 'contact', 'viewing', 'admin_page_ph-generate-applicant-list' ) ) )
+        if ( in_array( $screen->id, array( 'property', 'contact', 'appraisal', 'viewing', 'admin_page_ph-generate-applicant-list' ) ) )
         {
             wp_enqueue_style( 'chosen', PH()->plugin_url() . '/assets/css/chosen.css', array(), PH_VERSION );
         }
