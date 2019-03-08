@@ -68,6 +68,12 @@ class PH_Admin_Meta_Boxes {
             add_action( 'propertyhive_process_enquiry_meta', 'PH_Meta_Box_Enquiry_Details::save', 15, 2 );
         }
 
+        // Save Appraisal Meta Boxes
+        add_action( 'propertyhive_process_appraisal_meta', 'PH_Meta_Box_Appraisal_Details::save', 10, 2 );
+        add_action( 'propertyhive_process_appraisal_meta', 'PH_Meta_Box_Appraisal_Event::save', 15, 2 );
+        add_action( 'propertyhive_process_appraisal_meta', 'PH_Meta_Box_Appraisal_Property_Owner::save', 20, 2 );
+        add_action( 'propertyhive_process_appraisal_meta', 'PH_Meta_Box_Appraisal_Property::save', 25, 2 );
+
         // Save Viewing Meta Boxes
         add_action( 'propertyhive_process_viewing_meta', 'PH_Meta_Box_Viewing_Details::save', 10, 2 );
         add_action( 'propertyhive_process_viewing_meta', 'PH_Meta_Box_Viewing_Event::save', 15, 2 );
@@ -949,7 +955,6 @@ class PH_Admin_Meta_Boxes {
             {
                 if ( $show_viewings )
                 {
-                
                     /* CONTACT VIEWINGS META BOXES */
                     add_meta_box( 'propertyhive-contact-viewings', __( 'Viewings', 'propertyhive' ), 'PH_Meta_Box_Contact_Viewings::output', 'contact', 'normal', 'high' );
                     
@@ -1012,6 +1017,69 @@ class PH_Admin_Meta_Boxes {
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'enquiry' )
         {
             add_meta_box( 'propertyhive-enquiry-notes', __( 'Enquiry Notes', 'propertyhive' ), 'PH_Meta_Box_Enquiry_Notes::output', 'enquiry', 'side' );
+        }
+
+        // APPRAISAL
+        if (!isset($tabs)) $tabs = array();
+
+        /* APPRAISAL SUMMARY META BOXES */
+        $meta_boxes = array();
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'appraisal' )
+        {
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-appraisal-details',
+                'title' => __( 'Appraisal Details', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Appraisal_Details::output',
+                'screen' => 'appraisal',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+        }
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-appraisal-event',
+            'title' => __( 'Event Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Appraisal_Event::output',
+            'screen' => 'appraisal',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-appraisal-property-owner',
+            'title' => __( 'Property Owner Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Appraisal_Property_Owner::output',
+            'screen' => 'appraisal',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[20] = array(
+            'id' => 'propertyhive-appraisal-property',
+            'title' => __( 'Property Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Appraisal_Property::output',
+            'screen' => 'appraisal',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_appraisal_summary_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+        
+        $tabs['tab_appraisal_summary'] = array(
+            'name' => __( 'Summary', 'propertyhive' ),
+            'metabox_ids' => $ids,
+            'post_type' => 'appraisal'
+        );
+
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'appraisal' )
+        {
+            add_meta_box( 'propertyhive-appraisal-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Appraisal_Actions::output', 'appraisal', 'side' );
+            add_meta_box( 'propertyhive-appraisal-notes', __( 'Appraisal History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Appraisal_Notes::output', 'appraisal', 'side' );
         }
 
         // VIEWING
@@ -1450,7 +1518,7 @@ class PH_Admin_Meta_Boxes {
 		if ( 
             ! in_array( 
                 $post->post_type, 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale') )
             ) 
         ) {
 			return;

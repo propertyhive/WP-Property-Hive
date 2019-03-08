@@ -49,6 +49,7 @@ class PH_Admin_Post_Types {
         include( 'post-types/class-ph-admin-cpt-contact.php' );
         include( 'post-types/class-ph-admin-cpt-enquiry.php' );
         include( 'post-types/class-ph-admin-cpt-office.php' );
+        include( 'post-types/class-ph-admin-cpt-appraisal.php' );
         include( 'post-types/class-ph-admin-cpt-viewing.php' );
         include( 'post-types/class-ph-admin-cpt-offer.php' );
         include( 'post-types/class-ph-admin-cpt-sale.php' );
@@ -131,7 +132,7 @@ class PH_Admin_Post_Types {
     public function remove_month_filter() {
         global $typenow;
         
-        if ($typenow == 'property' || $typenow == 'contact' || $typenow == 'viewing' || $typenow == 'offer' || $typenow == 'sale')
+        if ($typenow == 'property' || $typenow == 'contact' || $typenow == 'appraisal' || $typenow == 'viewing' || $typenow == 'offer' || $typenow == 'sale')
         {
             add_filter('months_dropdown_results', '__return_empty_array');
         }
@@ -166,6 +167,9 @@ class PH_Admin_Post_Types {
                 break;
             case 'enquiry' :
                 $this->enquiry_filters();
+                break;
+            case 'appraisal' :
+                $this->appraisal_filters();
                 break;
             case 'viewing' :
                 $this->viewing_filters();
@@ -465,7 +469,7 @@ class PH_Admin_Post_Types {
     public function contact_filters() {
         global $wp_query;
 
-        $selected_contact_type = isset( $_GET['_contact_type'] ) && in_array( $_GET['_contact_type'], array( 'owner', 'applicant', 'thirdparty' ) ) ? $_GET['_contact_type'] : '';
+        $selected_contact_type = isset( $_GET['_contact_type'] ) && in_array( $_GET['_contact_type'], array( 'owner', 'potentialowner', 'applicant', 'thirdparty' ) ) ? $_GET['_contact_type'] : '';
         
         // Type filtering        
         $options = array();
@@ -474,6 +478,13 @@ class PH_Admin_Post_Types {
         $option = '<option value="owner"';
         $option .= selected( 'owner', $selected_contact_type, false );
         $option .= '>' . __( 'Owners and Landlords', 'propertyhive' ) . '</option>';
+
+        $options[] = $option;
+
+        // Potential Owners
+        $option = '<option value="potentialowner"';
+        $option .= selected( 'potentialowner', $selected_contact_type, false );
+        $option .= '>' . __( 'Potential Owners and Landlords', 'propertyhive' ) . '</option>';
 
         $options[] = $option;
 
@@ -574,6 +585,61 @@ class PH_Admin_Post_Types {
                 }
                 $output .= '>' . __( $value, 'propertyhive' ) . '</option>';
             }
+            
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show am appraisal filter box
+     */
+    public function appraisal_filters() {
+        global $wp_query;
+        
+        $output = '';
+        
+        $output .= $this->appraisal_status_filter();
+
+        echo apply_filters( 'propertyhive_appraisal_filters', $output );
+    }
+
+    /**
+     * Show an appraisal status filter box
+     */
+    public function appraisal_status_filter() {
+        global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'carried_out', 'won', 'lost', 'instructed', 'cancelled' ) ) ? $_GET['_status'] : '';
+        
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_appraisal_status">';
+            
+            $output .= '<option value="open">All Statuses</option>';
+
+            $output .= '<option value="pending"';
+            $output .= selected( 'pending', $selected_status, false );
+            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="carried_out"';
+            $output .= selected( 'carried_out', $selected_status, false );
+            $output .= '>' . __( 'Carried Out', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="won"';
+            $output .= selected( 'won', $selected_status, false );
+            $output .= '>- ' . __( 'Won', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="lost"';
+            $output .= selected( 'lost', $selected_status, false );
+            $output .= '>- ' . __( 'Lost', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="instructed"';
+            $output .= selected( 'instructed', $selected_status, false );
+            $output .= '>- ' . __( 'Instructed', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="cancelled"';
+            $output .= selected( 'cancelled', $selected_status, false );
+            $output .= '>' . __( 'Cancelled', 'propertyhive' ) . '</option>';
             
         $output .= '</select>';
 
@@ -728,6 +794,45 @@ class PH_Admin_Post_Types {
                 );
             }
         }
+        elseif ( 'appraisal' === $typenow ) 
+        {
+            if ( ! empty( $_GET['_status'] ) ) {
+                switch ( sanitize_text_field( $_GET['_status'] ) )
+                {
+                    case "confirmed":
+                    {
+                        $vars['meta_query'][] = array(
+                            'key' => '_status',
+                            'value' => 'pending',
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_all_confirmed',
+                            'value' => 'yes',
+                        );
+                        break;
+                    }
+                    case "unconfirmed":
+                    {
+                        $vars['meta_query'][] = array(
+                            'key' => '_status',
+                            'value' => 'pending',
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_all_confirmed',
+                            'value' => '',
+                        );
+                        break;
+                    }
+                    default:
+                    {
+                        $vars['meta_query'][] = array(
+                            'key' => '_status',
+                            'value' => sanitize_text_field( $_GET['_status'] ),
+                        );
+                    }
+                }
+            }
+        }
         elseif ( 'viewing' === $typenow ) 
         {
             if ( ! empty( $_GET['_status'] ) ) {
@@ -799,10 +904,6 @@ class PH_Admin_Post_Types {
                         );
                     }
                 }
-            }
-            if ( ! empty( $_GET['_source'] ) ) {
-                $vars['meta_key'] = '_source';
-                $vars['meta_value'] = sanitize_text_field( $_GET['_source'] );
             }
         }
 
