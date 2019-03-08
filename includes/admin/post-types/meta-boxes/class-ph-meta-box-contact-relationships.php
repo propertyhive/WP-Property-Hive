@@ -27,21 +27,22 @@ class PH_Meta_Box_Contact_Relationships {
         // get properties where this is the owner
         $args = array(
             'post_type' => 'property',
+            'nopaging' => true,
             'meta_query' => array(
                 'relation' => 'OR',
                 array(
                     'key' => '_owner_contact_id',
-                    'value' => $post->ID,
+                    'value' => $thepostid,
                     'compare' => '='
                 ),
                 array(
                     'key' => '_owner_contact_id',
-                    'value' => ':"' . $post->ID . '"',
+                    'value' => ':"' . $thepostid . '"',
                     'compare' => 'LIKE'
                 ),
                 array(
                     'key' => '_owner_contact_id',
-                    'value' => ':' . $post->ID . ';',
+                    'value' => ':' . $thepostid . ';',
                     'compare' => 'LIKE'
                 )
             )
@@ -60,6 +61,41 @@ class PH_Meta_Box_Contact_Relationships {
                 ++$total_profiles;
             }
         }
+        wp_reset_postdata();
+
+        $potential_owner_profiles = array();
+        // get appraisals where this is the owner and where not instructed
+        $args = array(
+            'post_type' => 'appraisal',
+            'nopaging' => true,
+            'meta_query' => array(
+                array(
+                    'key' => '_property_owner_contact_id',
+                    'value' => $thepostid,
+                    'compare' => '='
+                ),
+                array(
+                    'key' => '_status',
+                    'value' => 'instructed',
+                    'compare' => '!='
+                )
+            )
+        );
+
+        $appraisal_query = new WP_Query($args);
+        
+        if ($appraisal_query->have_posts())
+        {
+            while ($appraisal_query->have_posts())
+            {
+                $appraisal_query->the_post();
+                
+                $potential_owner_profiles[] = $post;
+                
+                ++$total_profiles;
+            }
+        }
+
         wp_reset_postdata();
 
         $applicant_profiles = array();
@@ -110,7 +146,22 @@ class PH_Meta_Box_Contact_Relationships {
                         $owner_type = __( 'Property Landlord', 'propertyhive' );
                     }   
                     echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
-                        <a href="#tab_property_data_' . $property_post->ID . '">'.$owner_type.'</a>
+                        <a href="#tab_property_data_' . $property_post->ID . '">' . $owner_type . '</a>
+                    </li>';
+                    
+                    ++$tab;
+                }
+
+                foreach ($potential_owner_profiles as $appraisal_post)
+                {
+                    $owner_type = __( 'Potential Owner', 'propertyhive' );
+                    $department = get_post_meta($appraisal_post->ID, '_department', TRUE);
+                    if ($department == 'residential-lettings')
+                    {
+                        $owner_type = __( 'Potential Landlord', 'propertyhive' );
+                    }   
+                    echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
+                        <a href="#tab_appraisal_data_' . $appraisal_post->ID . '">' . $owner_type . ' (' . ucwords( str_replace("_", " ", get_post_meta( $appraisal_post->ID, '_status', TRUE ) ) ) . ')</a>
                     </li>';
                     
                     ++$tab;
@@ -174,7 +225,7 @@ class PH_Meta_Box_Contact_Relationships {
                         
                         echo '<p class="form-field">';
                             echo '<label>' . __('Address', 'propertyhive') . '</label>';
-                            echo $the_property->get_formatted_summary_address('<br>');
+                            echo $the_property->get_formatted_full_address('<br>');
                         echo '</p>';
                         
                         echo '<p class="form-field">';
@@ -195,6 +246,34 @@ class PH_Meta_Box_Contact_Relationships {
                         echo '<p class="form-field">';
                             echo '<label></label>';
                             echo '<a href="' . get_edit_post_link( $property_post->ID ) . '" class="button">' . __( 'View Property Record', 'propertyhive' ) . '</a>';
+                        echo '</p>';
+                        
+                        echo '
+                        </div>
+                    </div>';
+                    ++$tab;
+                }
+
+                foreach ($potential_owner_profiles as $appraisal_post)
+                {
+                    $the_appraisal = new PH_Appraisal( $appraisal_post->ID );
+                    
+                    echo '<div id="tab_appraisal_data_' . $appraisal_post->ID . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
+                        <div class="options_group" style="float:left; width:100%;">';
+                        
+                        echo '<p class="form-field">';
+                            echo '<label>' . __('Address', 'propertyhive') . '</label>';
+                            echo ( ( $the_appraisal->get_formatted_full_address('<br>') != '' ) ? $the_appraisal->get_formatted_full_address('<br>') : '-' );
+                        echo '</p>';
+                        
+                        echo '<p class="form-field">';
+                            echo '<label>' . __('Appraisal Status', 'propertyhive') . '</label>';
+                            echo ucwords(str_replace("_", " ", $the_appraisal->status));
+                        echo '</p>';
+                        
+                        echo '<p class="form-field">';
+                            echo '<label></label>';
+                            echo '<a href="' . get_edit_post_link( $appraisal_post->ID ) . '" class="button">' . __( 'View Appraisal Record', 'propertyhive' ) . '</a>';
                         echo '</p>';
                         
                         echo '

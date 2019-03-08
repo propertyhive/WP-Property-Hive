@@ -1,6 +1,6 @@
 <?php
 /**
- * Viewing Event Details
+ * Appraisal Event Details
  *
  * @author 		PropertyHive
  * @category 	Admin
@@ -9,9 +9,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * PH_Meta_Box_Viewing_Event
+ * PH_Meta_Box_Appraisal_Event
  */
-class PH_Meta_Box_Viewing_Event {
+class PH_Meta_Box_Appraisal_Event {
 
 	/**
 	 * Output the metabox
@@ -33,7 +33,7 @@ class PH_Meta_Box_Viewing_Event {
 
         echo '<p class="form-field event_start_time_field">
         
-            <label for="_start_date">' . __('Viewing Date / Time', 'propertyhive') . '</label>
+            <label for="_start_date">' . __('Appraisal Date / Time', 'propertyhive') . '</label>
             
             <input type="text" id="_start_date" name="_start_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="' . date("Y-m-d", strtotime($start_date_time)) . '">
             <select id="_start_time_hours" name="_start_time_hours" class="select short" style="width:55px">';
@@ -102,7 +102,7 @@ class PH_Meta_Box_Viewing_Event {
 
         echo '
         <p class="form-field"><label for="_negotiator_ids">' . __( 'Attending Negotiator(s)', 'propertyhive' ) . '</label>
-        <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . __( 'Unattended', 'propertyhive' ) . '" class="multiselect attribute_values">';
+        <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . __( 'Please select a negotiator', 'propertyhive' ) . '" class="multiselect attribute_values">';
         
         $negotiator_ids = get_post_meta( $post->ID, '_negotiator_id' );
         if ( empty($negotiator_ids) )
@@ -153,15 +153,15 @@ class PH_Meta_Box_Viewing_Event {
             ) );
         }
 
-        do_action('propertyhive_viewing_event_fields');
+        do_action('propertyhive_appraisal_event_fields');
 	    
         echo '</div>';
         
         echo '</div>';
         
-        if ( isset($_GET['viewing_id']) )
+        if ( isset($_GET['appraisal_id']) )
         {
-            echo '<input type="hidden" name="_original_viewing_id" value="' . (int)$_GET['viewing_id'] . '">';
+            echo '<input type="hidden" name="_original_appraisal_id" value="' . (int)$_GET['appraisal_id'] . '">';
         }
 
         echo '<input type="hidden" name="_num_requiring_confirmation" id="_num_requiring_confirmation" value="">';
@@ -182,11 +182,6 @@ class PH_Meta_Box_Viewing_Event {
                 generate_confirmation_options(true);
 
                 jQuery(\'#_negotiator_ids\').change(function()
-                {
-                    generate_confirmation_options(false);
-                });
-
-                jQuery(\'#_applicant_contact_ids\').change(function()
                 {
                     generate_confirmation_options(false);
                 });
@@ -216,16 +211,10 @@ class PH_Meta_Box_Viewing_Event {
 
                 var options = [];
 
-                // get applicant
-                jQuery(\'a[data-viewing-applicant-id]\').each(function()
-                {
-                    options.push( { id: \'applicant-\' + jQuery(this).attr(\'data-viewing-applicant-id\'), name: \'Applicant (\' + jQuery(this).attr(\'data-viewing-applicant-name\') + \')\' } );
-                });
-
                 // get owner
-                jQuery(\'a[data-viewing-owner-id]\').each(function()
+                jQuery(\'a[data-appraisal-property-owner-id]\').each(function()
                 {
-                    options.push( { id: \'owner-\' + jQuery(this).attr(\'data-viewing-owner-id\'), name: \'Owner (\' + jQuery(this).attr(\'data-viewing-owner-name\') + \')\' } );
+                    options.push( { id: \'owner-\' + jQuery(this).attr(\'data-appraisal-property-owner-id\'), name: \'Owner (\' + jQuery(this).attr(\'data-appraisal-property-owner-name\') + \')\' } );
                 });
 
                 // get negs
@@ -243,7 +232,7 @@ class PH_Meta_Box_Viewing_Event {
                 }
                 else
                 {
-                    jQuery(\'.confirmations .ph-radios\').html(\'<li>Please select a negotiator, applicant or property</li>\');
+                    jQuery(\'.confirmations .ph-radios\').html(\'<li>Please select a negotiator or enter property owner details</li>\');
                 }
 
                 // reselect previously selected
@@ -271,9 +260,9 @@ class PH_Meta_Box_Viewing_Event {
         add_post_meta( $post_id, '_feedback', '', TRUE );
         add_post_meta( $post_id, '_feedback_passed_on', '', TRUE );
 
-        if ( isset($_POST['_original_viewing_id']) && $_POST['_original_viewing_id'] != '' )
+        if ( isset($_POST['_original_appraisal_id']) && $_POST['_original_appraisal_id'] != '' )
         {
-            add_post_meta( $post_id, '_original_viewing_id', (int)$_POST['_original_viewing_id'], TRUE );
+            add_post_meta( $post_id, '_original_appraisal_id', (int)$_POST['_original_appraisal_id'], TRUE );
         }
 
         update_post_meta( $post_id, '_start_date_time', ph_clean($_POST['_start_date']) . ' ' . (int)$_POST['_start_time_hours'] . ':' . (int)$_POST['_start_time_minutes'] . ':00' );
@@ -306,7 +295,7 @@ class PH_Meta_Box_Viewing_Event {
         }
         update_post_meta( $post_id, '_all_confirmed', $all_confirmed );
         
-        do_action( 'propertyhive_save_viewing_event', $post_id );   
+        do_action( 'propertyhive_save_appraisal_event', $post_id );   
     }
 
 }

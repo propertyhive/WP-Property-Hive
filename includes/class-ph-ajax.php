@@ -39,6 +39,18 @@ class PH_AJAX {
             // Contact actions
             'create_contact_login' => false,
 
+            // Appraisal actions
+            'get_appraisal_details_meta_box' => false,
+            'get_appraisal_actions' => false,
+            'appraisal_carried_out' => false,
+            'appraisal_cancelled' => false,
+            'appraisal_won' => false,
+            'appraisal_lost_reason' => false,
+            'appraisal_instructed' => false,
+            'appraisal_revert_pending' => false,
+            'appraisal_revert_carried_out' => false,
+            'appraisal_revert_won' => false,
+
             // Viewing actions
             'book_viewing_property' => false,
             'book_viewing_contact' => false,
@@ -956,10 +968,20 @@ class PH_AJAX {
                 while ( $contact_query->have_posts() )
                 {
                     $contact_query->the_post();
+
+                    $contact = new PH_Contact( get_the_ID() );
                     
                     $return[] = array(
                         'ID' => get_the_ID(),
-                        'post_title' => get_the_title(get_the_ID())
+                        'post_title' => get_the_title(get_the_ID()),
+                        'address_name_number' => $contact->_address_name_number,
+                        'address_street' => $contact->_address_street,
+                        'address_two' => $contact->_address_two,
+                        'address_three' => $contact->_address_three,
+                        'address_four' => $contact->_address_four,
+                        'address_postcode' => $contact->_address_postcode,
+                        'address_country' => $contact->_address_country,
+                        'address_full_formatted' => $contact->get_formatted_full_address('<br>'),
                     );
                 }
             }
@@ -1749,6 +1771,856 @@ class PH_AJAX {
         wp_reset_postdata();
 
         echo json_encode($return);
+
+        die();
+    }
+
+    public function get_appraisal_details_meta_box()
+    {
+        check_ajax_referer( 'appraisal-details-meta-box', 'security' );
+
+        $appraisal = new PH_Appraisal((int)$_POST['appraisal_id']);
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+        echo '<p class="form-field">
+        
+            <label for="">' . __('Status', 'propertyhive') . '</label>
+            
+            ' . ucwords(str_replace("_", " ", $appraisal->status));
+        
+        echo '</p>';
+
+        if ( $appraisal->status == 'cancelled' )
+        {
+            $args = array( 
+                'id' => '_cancelled_reason', 
+                'label' => __( 'Reason Cancelled', 'propertyhive' ), 
+                'desc_tip' => false, 
+                'class' => '',
+                'value' => $appraisal->cancelled_reason,
+                'custom_attributes' => array(
+                    'style' => 'width:95%; max-width:500px;'
+                )
+            );
+            propertyhive_wp_textarea_input( $args );
+        }
+
+        if ( $appraisal->status == 'carried_out' || $appraisal->status == 'won' || $appraisal->status == 'instructed' )
+        {
+            if ( $appraisal->department == 'residential-sales' )
+            {
+                $args = array( 
+                    'id' => '_valued_price', 
+                    'label' => __( 'Valued Price', 'propertyhive' ) . ' (&pound;)', 
+                    'desc_tip' => false, 
+                    'class' => 'short',
+                    'value' => $appraisal->valued_price,
+                );
+                propertyhive_wp_text_input( $args );
+            }
+            elseif ( $appraisal->department == 'residential-lettings' )
+            {
+                $rent_frequency = $appraisal->valued_rent_frequency;
+
+                echo '<p class="form-field">
+        
+                    <label for="">' . __('Valued Rent', 'propertyhive') . ' (&pound;)</label>
+
+                    <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . $appraisal->valued_rent . '" placeholder="" style="width:10%; min-width:100px;">
+                
+                    <select id="_valued_rent_frequency" name="_valued_rent_frequency" class="select" style="width:auto">
+                        <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . __('Per Person Per Week', 'propertyhive') . '</option>
+                        <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
+                        <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
+                        <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
+                        <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>
+                    </select>
+
+                </p>';
+            }
+        }
+
+        if ( $appraisal->status == 'lost' )
+        {
+            $args = array( 
+                'id' => '_lost_reason', 
+                'label' => __( 'Reason Lost', 'propertyhive' ), 
+                'desc_tip' => false, 
+                'class' => '',
+                'value' => $appraisal->lost_reason,
+                'custom_attributes' => array(
+                    'style' => 'width:95%; max-width:500px;'
+                )
+            );
+            propertyhive_wp_textarea_input( $args );
+        }
+
+        do_action('propertyhive_appraisal_details_fields');
+        
+        echo '</div>';
+        
+        echo '</div>';
+
+        die();
+    }
+
+    public function get_appraisal_actions()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        $department = get_post_meta( $post_id, '_department', TRUE );
+
+        echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="propertyhive_appraisal_actions_meta_box">
+
+        <div class="options_group" style="padding-top:8px;">';
+
+        $show_cancelled_meta_boxes = false;
+        $show_carried_out_meta_boxes = false;
+        $show_instructed_meta_boxes = false;
+        $show_lost_meta_boxes = false;
+
+        $actions = array();
+
+        if ( $status == 'pending' )
+        {
+            /*$actions[] = '<a 
+                    href="" 
+                    class="button"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Print Market Appraisal Sheet', 'propertyhive') . '</a>';
+            if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
+            {
+                $actions[] = '<a 
+                        href="" 
+                        class="button"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . __('Run Potential Applicant Match', 'propertyhive') . '</a>';
+            }*/
+            $actions[] = '<a 
+                    href="#action_panel_appraisal_carried_out" 
+                    class="button button-success appraisal-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Appraisal Carried Out', 'propertyhive') . '</a>';
+            $actions[] = '<a 
+                    href="#action_panel_appraisal_cancelled" 
+                    class="button appraisal-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Appraisal Cancelled', 'propertyhive') . '</a>';
+
+            $show_cancelled_meta_boxes = true;
+            $show_carried_out_meta_boxes = true;
+        }
+
+        if ( $status == 'carried_out' )
+        {
+            $actions[] = '<a 
+                    href="#action_panel_appraisal_won" 
+                    class="button button-success appraisal-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Appraisal Won', 'propertyhive') . '</a>';
+
+            $actions[] = '<a 
+                    href="#action_panel_appraisal_lost" 
+                    class="button button-danger appraisal-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Appraisal Lost', 'propertyhive') . '</a>';
+
+            $show_lost_meta_boxes = true;
+        }
+
+        if ( $status == 'won' )
+        {
+            $actions[] = '<a 
+                    href="#action_panel_appraisal_instruct" 
+                    class="button button-success appraisal-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Instruct Property', 'propertyhive') . '</a>';
+
+            $show_instructed_meta_boxes = true;
+        }
+
+        if ( $status == 'won' || $status == 'lost' )
+        {
+            $actions[] = '<a 
+                    href="#action_panel_appraisal_revert_carried_out" 
+                    class="button appraisal-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Revert To Carried Out', 'propertyhive') . '</a>';
+        }
+
+        if ( $status == 'instructed' )
+        {
+            $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+
+            $actions[] = '<a 
+                    href="' . get_edit_post_link($property_id) . '" 
+                    class="button"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('View Instructed Property', 'propertyhive') . '</a>';
+
+            /*$actions[] = '<a 
+                    href="#action_panel_appraisal_revert_won" 
+                    class="button appraisal-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Revert To Won', 'propertyhive') . '</a>';*/
+        }
+
+        if ( $status == 'carried_out' || $status == 'cancelled' )
+        {
+            $actions[] = '<a 
+                    href="#action_panel_appraisal_revert_pending" 
+                    class="button appraisal-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Revert To Pending', 'propertyhive') . '</a>';
+        }
+
+        $actions = apply_filters( 'propertyhive_admin_appraisal_actions', $actions, $post_id );
+
+        if ( !empty($actions) )
+        {
+            echo implode("", $actions);
+        }
+        else
+        {
+            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+        }
+
+        echo '</div>
+
+        </div>';
+
+        if ( $show_cancelled_meta_boxes )
+        {
+            echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_appraisal_cancelled" style="display:none;">
+
+                <div class="options_group" style="padding-top:8px;">
+
+                    <div class="form-field">
+
+                        <label for="_appraisal_cancelled_reason">' . __( 'Reason Cancelled', 'propertyhive' ) . '</label>
+                        
+                        <textarea id="_cancelled_reason" name="_cancelled_reason" style="width:100%;">' . get_post_meta( $post_id, '_cancelled_reason', TRUE ) . '</textarea>
+
+                    </div>
+
+                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+                    <a class="button button-primary cancelled-reason-action-submit" href="#">' . __( 'Save', 'propertyhive' ) . '</a>
+
+                </div>
+
+            </div>';
+        }
+
+        if ( $show_carried_out_meta_boxes )
+        {
+            echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_appraisal_carried_out" style="display:none;">
+
+                <div class="options_group" style="padding-top:8px;">';
+
+            if ( $department == 'residential-sales' )
+            {
+                echo '<div class="form-field">
+
+                        <label for="_price">' . __( 'Valued Price (&pound;)', 'propertyhive' ) . '</label>
+                        
+                        <input type="text" id="_price" name="_price" style="width:100%;" value="' . get_post_meta( $post_id, '_valued_price', TRUE ) . '">
+
+                    </div>';
+            }
+            else
+            {
+                $rent_frequency = get_post_meta( $post_id, '_valued_rent_frequency', TRUE );
+                echo '<div class="form-field">
+
+                        <label for="_price">' . __( 'Valued Rent (&pound;)', 'propertyhive' ) . '</label>
+                        
+                        <input type="text" id="_price" name="_price" style="width:100%;" value="' . get_post_meta( $post_id, '_valued_rent', TRUE ) . '">
+
+                        <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:100%">
+                            <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . __('Per Person Per Week', 'propertyhive') . '</option>
+                            <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
+                            <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
+                            <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
+                            <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>
+                        </select>
+
+                    </div>';
+            }
+
+            echo '<a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+                    <a class="button button-primary carried-out-action-submit" href="#">' . __( 'Save', 'propertyhive' ) . '</a>
+
+                </div>
+
+            </div>';
+        }
+
+        if ( $show_instructed_meta_boxes )
+        {
+            echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_appraisal_instruct" style="display:none;">
+
+                <div class="options_group" style="padding-top:8px;">';
+
+                echo '<div style="margin-bottom:13px;">' . __( 'Upon instruction a new property record will be created within the \'Properties\' area.', 'propertyhive' ) . '</div>';
+
+            echo '<a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+                    <a class="button button-primary instructed-action-submit" href="#">' . __( 'OK', 'propertyhive' ) . '</a>
+
+                </div>
+
+            </div>';
+        }
+
+        if ( $show_lost_meta_boxes )
+        {
+            echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_appraisal_lost" style="display:none;">
+
+                <div class="options_group" style="padding-top:8px;">
+
+                    <div class="form-field">
+
+                        <label for="_lost_reason">' . __( 'Reason Lost', 'propertyhive' ) . '</label>
+                        
+                        <textarea id="_lost_reason" name="_lost_reason" style="width:100%;">' . get_post_meta( $post_id, '_lost_reason', TRUE ) . '</textarea>
+
+                    </div>
+
+                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+                    <a class="button button-primary lost-reason-action-submit" href="#">' . wp_kses_post( __( 'Save Reason Lost', 'propertyhive' ) ) . '</a>
+
+                </div>
+
+            </div>';
+        }
+
+        die();
+    }
+
+    public function appraisal_carried_out()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'pending' )
+        {
+            update_post_meta( $post_id, '_status', 'carried_out' );
+
+            if ( get_post_meta( $post_id, '_department', TRUE ) == 'residential-sales' )
+            {
+                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['price']));
+                update_post_meta( $post_id, '_valued_price', $price );
+                update_post_meta( $post_id, '_valued_price_actual', $price );
+            }
+            elseif ( get_post_meta( $post_id, '_department', TRUE ) == 'residential-lettings' )
+            {
+                $rent = preg_replace("/[^0-9]/", '', ph_clean($_POST['rent']));
+                update_post_meta( $post_id, '_valued_rent', $rent );
+
+                update_post_meta( $post_id, '_valued_rent_frequency', ph_clean($_POST['rent_frequency']) );
+
+                switch (ph_clean($_POST['rent_frequency']))
+                {
+                    case "pppw":
+                    {
+                        $bedrooms = get_post_meta( $postID, '_bedrooms', true );
+                        if ( ( $bedrooms !== FALSE && $bedrooms != 0 && $bedrooms != '' ) && apply_filters( 'propertyhive_pppw_to_consider_bedrooms', true ) == true )
+                        {
+                            $price = (($rent * 52) / 12) * $bedrooms;
+                        }
+                        else
+                        {
+                            $price = ($rent * 52) / 12;
+                        }
+                        break;
+                    }
+                    case "pw": { $price = ($rent * 52) / 12; break; }
+                    case "pcm": { $price = $rent; break; }
+                    case "pq": { $price = ($rent * 4) / 12; break; }
+                    case "pa": { $price = ($rent / 12); break; }
+                }
+                update_post_meta( $post_id, '_valued_price_actual', $price );
+            }
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to appraisal
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'appraisal_carried_out',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function appraisal_cancelled()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'pending' )
+        {
+            update_post_meta( $post_id, '_status', 'cancelled' );
+            update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field( $_POST['cancelled_reason'] ) );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to appraisal
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'appraisal_cancelled',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function appraisal_won()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'carried_out' )
+        {
+            update_post_meta( $post_id, '_status', 'won' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to appraisal
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'appraisal_won',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function appraisal_lost_reason()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'carried_out' )
+        {
+            update_post_meta( $post_id, '_status', 'lost' );
+            update_post_meta( $post_id, '_lost_reason', sanitize_textarea_field( $_POST['lost_reason'] ) );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to appraisal
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'appraisal_lost',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function appraisal_instructed()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'won' )
+        {
+            // Create property record and copy everything over
+            $display_address = array();
+            if ( get_post_meta( $post_id, '_address_street', TRUE ) != '' )
+            {
+                $display_address[] = get_post_meta( $post_id, '_address_street', TRUE );
+            }
+            if ( get_post_meta( $post_id, '_address_two', TRUE ) != '' )
+            {
+                $display_address[] = get_post_meta( $post_id, '_address_two', TRUE );
+            }
+            if ( get_post_meta( $post_id, '_address_three', TRUE ) != '' )
+            {
+                $display_address[] = get_post_meta( $post_id, '_address_three', TRUE );
+            }
+            else
+            {
+                if ( get_post_meta( $post_id, '_address_four', TRUE ) != '' )
+                {
+                    $display_address[] = get_post_meta( $post_id, '_address_four', TRUE );
+                }
+            }
+            $display_address = implode(", ", $display_address);
+
+            $property_post = array(
+                'post_title'    => ph_clean($display_address),
+                'post_content'  => '',
+                'post_type'     => 'property',
+                'post_status'   => 'publish',
+                'comment_status'    => 'closed',
+                'ping_status'    => 'closed',
+            );
+                    
+            // Insert the post into the database
+            $property_post_id = wp_insert_post( $property_post );
+
+            if ( is_wp_error($property_post_id) || $property_post_id == 0 )
+            {
+                // Failed. Don't really know at the moment how to handle this
+
+                $return = array('error' => 'Failed to create property post. Please try again');
+                //echo json_encode( $return );
+                //die();
+            }
+            else
+            {
+                // Successfully added property post
+
+                $department = get_post_meta( $post_id, '_department', TRUE );
+
+                update_post_meta( $property_post_id, '_address_name_number', get_post_meta( $post_id, '_address_name_number', TRUE ) );
+                update_post_meta( $property_post_id, '_address_street', get_post_meta( $post_id, '_address_street', TRUE ) );
+                update_post_meta( $property_post_id, '_address_two', get_post_meta( $post_id, '_address_two', TRUE ) );
+                update_post_meta( $property_post_id, '_address_three', get_post_meta( $post_id, '_address_three', TRUE ) );
+                update_post_meta( $property_post_id, '_address_four', get_post_meta( $post_id, '_address_four', TRUE ) );
+                update_post_meta( $property_post_id, '_address_postcode', get_post_meta( $post_id, '_address_postcode', TRUE ) );
+                update_post_meta( $property_post_id, '_address_country', get_post_meta( $post_id, '_address_country', TRUE ) );
+
+                if ( ini_get('allow_url_fopen') )
+                {
+                    // No lat lng. Let's get it
+                    $address_to_geocode = array();
+                    if ( get_post_meta( $post_id, '_address_name_number', TRUE ) != '' ) { $address_to_geocode[] = get_post_meta( $post_id, '_address_name_number', TRUE ); }
+                    if ( get_post_meta( $post_id, '_address_street', TRUE ) != '' ) { $address_to_geocode[] = get_post_meta( $post_id, '_address_street', TRUE ); }
+                    if ( get_post_meta( $post_id, '_address_two', TRUE ) != '' ) { $address_to_geocode[] = get_post_meta( $post_id, '_address_two', TRUE ); }
+                    if ( get_post_meta( $post_id, '_address_three', TRUE ) != '' ) { $address_to_geocode[] = get_post_meta( $post_id, '_address_three', TRUE ); }
+                    if ( get_post_meta( $post_id, '_address_four', TRUE ) != '' ) { $address_to_geocode[] = get_post_meta( $post_id, '_address_four', TRUE ); }
+                    if ( get_post_meta( $post_id, '_address_postcode', TRUE ) ) { $address_to_geocode[] = get_post_meta( $post_id, '_address_postcode', TRUE ); }
+
+                    $country = get_option( 'propertyhive_default_country', 'GB' );
+                    $request_url = "https://maps.googleapis.com/maps/api/geocode/xml?address=" . urlencode( implode( ", ", $address_to_geocode ) ) . "&sensor=false&region=gb"; // the request URL you'll send to google to get back your XML feed
+                    
+                    $api_key = get_option('propertyhive_google_maps_api_key', '');
+                    if ( $api_key != '' ) { $request_url .= "&key=" . $api_key; }
+
+                    $response = wp_remote_get($request_url);
+
+                    if ( is_array( $response ) && !is_wp_error( $response ) ) 
+                    {
+                        $header = $response['headers']; // array of http header lines
+                        $body = $response['body']; // use the content
+
+                        $xml = simplexml_load_string($body);
+
+                        if ( $xml !== FALSE )
+                        {
+                            $status = $xml->status; // Get the request status as google's api can return several responses
+
+                            if ($status == "OK") 
+                            {
+                                //request returned completed time to get lat / lng for storage
+                                $lat = (string)$xml->result->geometry->location->lat;
+                                $lng = (string)$xml->result->geometry->location->lng;
+                                
+                                if ($lat != '' && $lng != '')
+                                {
+                                    update_post_meta( $post_id, '_latitude', $lat );
+                                    update_post_meta( $post_id, '_longitude', $lng );
+                                }
+                            }
+                        }
+                    }
+                }
+
+                update_post_meta( $property_post_id, '_department', $department );
+
+                switch ( $department )
+                {
+                    case "residential-sales":
+                    {
+                        update_post_meta( $property_post_id, '_currency', 'GBP' );
+
+                        $price = preg_replace("/[^0-9]/", '', get_post_meta( $post_id, '_valued_price', TRUE ));
+                        update_post_meta( $property_post_id, '_price', $price );
+                        
+                        break;
+                    }
+                    case "residential-lettings":
+                    {
+                        update_post_meta( $property_post_id, '_currency', 'GBP' );
+
+                        $rent = preg_replace("/[^0-9.]/", '', get_post_meta( $post_id, '_valued_rent', TRUE ));
+                        update_post_meta( $property_post_id, '_rent', $rent );
+                        update_post_meta( $property_post_id, '_rent_frequency', get_post_meta( $post_id, '_valued_rent_frequency', TRUE ) );
+
+                        break;
+                    }
+                }
+
+                // Store price in common currency (GBP) used for ordering
+                $ph_countries = new PH_Countries();
+                $ph_countries->update_property_price_actual( $property_post_id );
+
+                update_post_meta( $property_post_id, '_bedrooms', get_post_meta( $post_id, '_bedrooms', TRUE ) );
+                update_post_meta( $property_post_id, '_bathrooms', get_post_meta( $post_id, '_bathrooms', TRUE ) );
+                update_post_meta( $property_post_id, '_reception_rooms', get_post_meta( $post_id, '_reception_rooms', TRUE ) );
+
+                update_post_meta( $property_post_id, '_on_market', '' );
+                update_post_meta( $property_post_id, '_featured', '' );
+
+                // Taxonomies
+                wp_set_object_terms( $property_post_id, wp_get_object_terms( $post_id, 'property_type', array("fields" => "ids") ), 'property_type' );
+                wp_set_object_terms( $property_post_id, wp_get_object_terms( $post_id, 'parking', array("fields" => "ids") ), 'parking' );
+                wp_set_object_terms( $property_post_id, wp_get_object_terms( $post_id, 'outside_space', array("fields" => "ids") ), 'outside_space' );
+
+                $owner_contact_ids = get_post_meta( $post_id, '_property_owner_contact_id', TRUE );
+                if ( !is_array($owner_contact_ids) )
+                {
+                    $owner_contact_ids = array($owner_contact_ids);
+                }
+                update_post_meta( $property_post_id, '_owner_contact_id', $owner_contact_ids );
+
+                // Make updates to appraisal
+                update_post_meta( $post_id, '_status', 'instructed' );
+                update_post_meta( $post_id, '_property_id', $property_post_id );
+
+                //Update owner(s)
+                foreach ( $owner_contact_ids as $owner_contact_id )
+                {
+                    $contact_types = get_post_meta( $owner_contact_id, '_contact_types', TRUE );
+
+                    if ( !in_array('owner', $contact_types) )
+                    {
+                        $contact_types[] = 'owner';
+                    }
+
+                    // get appraisals where this is the owner and where not instructed
+                    $args = array(
+                        'post_type' => 'appraisal',
+                        'nopaging' => true,
+                        'meta_query' => array(
+                            array(
+                                'key' => '_property_owner_contact_id',
+                                'value' => $post->ID,
+                                'compare' => '='
+                            ),
+                            array(
+                                'key' => '_status',
+                                'value' => 'instructed',
+                                'compare' => '!='
+                            )
+                        )
+                    );
+
+                    $appraisal_query = new WP_Query($args);
+                    
+                    if (!$appraisal_query->have_posts())
+                    {
+                        // no longer a potential owner. 
+                        if (($key = array_search('potentialowner', $contact_types)) !== false) 
+                        {
+                            unset($contact_types[$key]);
+                        }
+                    }
+                    wp_reset_postdata();
+
+                    update_post_meta( $owner_contact_id, '_contact_types', $contact_types );
+                }
+
+                $current_user = wp_get_current_user();
+
+                // Add note/comment to appraisal
+                $comment = array(
+                    'note_type' => 'action',
+                    'action' => 'appraisal_instructed',
+                );
+
+                $data = array(
+                    'comment_post_ID'      => $post_id,
+                    'comment_author'       => $current_user->display_name,
+                    'comment_author_email' => 'propertyhive@noreply.com',
+                    'comment_author_url'   => '',
+                    'comment_date'         => date("Y-m-d H:i:s"),
+                    'comment_content'      => serialize($comment),
+                    'comment_approved'     => 1,
+                    'comment_type'         => 'propertyhive_note',
+                );
+                $comment_id = wp_insert_comment( $data );
+            }
+        }
+
+        die();
+    }
+
+    public function appraisal_revert_pending()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'carried_out' || $status == 'cancelled' )
+        {
+            update_post_meta( $post_id, '_status', 'pending' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to appraisal
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'appraisal_revert_pending',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function appraisal_revert_carried_out()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'won' || $status == 'lost' )
+        {
+            update_post_meta( $post_id, '_status', 'carried_out' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to appraisal
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'appraisal_revert_carried_out',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function appraisal_revert_won()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'instructed' )
+        {
+            update_post_meta( $post_id, '_status', 'won' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to appraisal
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'appraisal_revert_won',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
 
         die();
     }
@@ -2551,7 +3423,6 @@ class PH_AJAX {
 
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
         $property_department = get_post_meta( $property_id, '_department' );
-        $owner_or_landlord = ( $property_department[0] == 'residential-lettings' ? 'Landlord' : 'Owner' );
 
         $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
         $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
@@ -2559,11 +3430,15 @@ class PH_AJAX {
         if ( $owner_contact_ids > 0 ) {
 
             $owner_emails = array();
+            $owner_names = array();
     
-            foreach ($owner_contact_ids as $owner_id) {
+            foreach ($owner_contact_ids as $owner_id) 
+            {
                 $owner_email = sanitize_email( get_post_meta($owner_id, '_email_address', TRUE) );
+                $owner_name = get_the_title($owner_id);
 
                 if( ! empty($owner_email) ) array_push($owner_emails, $owner_email);
+                if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
             }
 
             $property = new PH_Property((int)$property_id);
@@ -2574,14 +3449,12 @@ class PH_AJAX {
             $body = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
-            $subject = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $subject);
+            $subject = str_replace('[owner_name]', implode(", ", $owner_names), $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
-            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
-            $body = str_replace('[owner_or_landlord]', $owner_or_landlord, $body);
-
+            $body = str_replace('[owner_name]', implode(", ", $owner_names), $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 

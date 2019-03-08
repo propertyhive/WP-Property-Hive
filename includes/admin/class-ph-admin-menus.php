@@ -57,6 +57,11 @@ class PH_Admin_Menus {
         	add_submenu_page( 'propertyhive', __( 'Enquiries', 'propertyhive' ), __( 'Enquiries', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=enquiry'/*, array( $this, 'attributes_page' )*/ );
         }
         
+        if ( get_option('propertyhive_module_disabled_appraisals', '') != 'yes' )
+	    {
+        	add_submenu_page( 'propertyhive', __( 'Appraisals', 'propertyhive' ), __( 'Appraisals', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=appraisal'/*, array( $this, 'attributes_page' )*/ );
+        }
+
         if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
 	    {
         	add_submenu_page( 'propertyhive', __( 'Viewings', 'propertyhive' ), __( 'Viewings', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=viewing'/*, array( $this, 'attributes_page' )*/ );
