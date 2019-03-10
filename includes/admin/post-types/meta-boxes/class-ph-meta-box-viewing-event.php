@@ -29,6 +29,12 @@ class PH_Meta_Box_Viewing_Event {
         if ( $start_date_time == '' )
         {
             $start_date_time = date("Y-m-d H:i:s");
+
+            if ( isset($_GET['start']) && $_GET['start'] != '' )
+            {
+                // $_GET['start'] should be a unix timestamp
+                $start_date_time = date("Y-m-d H:i:s", $_GET['start']);
+            }
         }
 
         echo '<p class="form-field event_start_time_field">
@@ -78,25 +84,47 @@ class PH_Meta_Box_Viewing_Event {
             
         </p>';
 
+        $durations = array(15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180);
+        $durations = apply_filters( 'propertyhive_viewing_durations', $durations );
+
         $value = get_post_meta( $post->ID, '_duration', true );
         if ($value == '')
         {
-            $value = 30 * 60; // Default is 30 minutes
+            $value = apply_filters( 'propertyhive_viewing_default_duration_minutes', 30 ) * 60; // Default is 30 minutes, unless modified by filter
+
+            if ( isset($_GET['start']) && $_GET['start'] != '' && isset($_GET['end']) && $_GET['end'] != '' )
+            {
+                // $_GET['start'] and $_GET['end'] should be a unix timestamp
+                $duration = ($_GET['end'] - $_GET['start']) / 60;
+
+                if ( in_array($duration, $durations) )
+                {
+                    $value = $duration * 60;
+                }
+            }
         }
+
         echo '<p class="form-field">
         
             <label for="_duration">' . __('Duration', 'propertyhive') . '</label>
             
-            <select id="_duration" name="_duration" class="select short">
-                <option value="' . (15 * 60) . '"' . ( $value == (15 * 60) ? 'selected' : '' ) . '>15 minutes</option>
-                <option value="' . (30 * 60) . '"' . ( $value == (30 * 60) ? 'selected' : '' ) . '>30 minutes</option>
-                <option value="' . (45 * 60) . '"' . ( $value == (45 * 60) ? 'selected' : '' ) . '>45 minutes</option>
-                <option value="' . (60 * 60) . '"' . ( $value == (60 * 60) ? 'selected' : '' ) . '>1 hour</option>
-                <option value="' . (90 * 60) . '"' . ( $value == (90 * 60) ? 'selected' : '' ) . '>1 hour 30 minutes</option>
-                <option value="' . (120 * 60) . '"' . ( $value == (120 * 60) ? 'selected' : '' ) . '>2 hours</option>
-                <option value="' . (150 * 60) . '"' . ( $value == (150 * 60) ? 'selected' : '' ) . '>2 hour 30 minutes</option>
-                <option value="' . (180 * 60) . '"' . ( $value == (180 * 60) ? 'selected' : '' ) . '>3 hours</option>
-            </select>
+            <select id="_duration" name="_duration" class="select short">';
+
+            foreach ( $durations as $duration )
+            {
+                // convert duration to reable format (i.e. 1 hour 15 minutes)
+                $hours = floor($duration / 60);
+                $minutes = $duration % 60;
+                echo '<option value="' . ($duration * 60) . '"' . ( $value == ($duration * 60) ? 'selected' : '' ) . '>' . ( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' '. $minutes . ' minutes' : '' ) . '</option>';
+            }
+            if ( !in_array( $value / 60, $durations))
+            {
+                $hours = floor(($value / 60) / 60);
+                $minutes = ($value / 60) % 60;
+                echo '<option value="' . $value . '" selected>' . ( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' ' . $minutes . ' minutes' : '' ) . '</option>';
+            }
+
+        echo '</select>
             
         </p>';
 
