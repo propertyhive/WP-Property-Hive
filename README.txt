@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.0.3
-Stable tag: 1.4.34
+Tested up to: 5.1
+Stable tag: 1.4.35
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,14 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.35 =
+* Added New 'Appraisals' module allowing the management of upcoming appraisals. Record the status, the valud price, the potential owner/landlord, and convert to an instructed property when won
+* Added ability to send owner/landlord viewing email confirmations from a viewing's 'Actions' panel
+* Added new [office_map] shortcode to show all or one office location on map
+* Tweaked applicant match process to allow for better third party integration such as upcoming SMS add on
+* Tweaked event (i.e. viewing and appraisal) start dates and duration to support upcoming calendar add on, including new filter to customise durations
+* Declared compatibility for WordPress 5.1
 
 = 1.4.34 =
 * Corrected issue with enquiries and applicant registrations (and other AJAX related functionality) potentially not going through due to whitespace output in last release
