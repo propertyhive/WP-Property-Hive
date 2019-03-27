@@ -244,7 +244,12 @@ class PH_Meta_Box_Property_Rooms {
         {
             update_post_meta($post_id, '_room_name_' . $i, ph_clean($_POST['_room_name'][$i]));
             update_post_meta($post_id, '_room_dimensions_' . $i, ph_clean($_POST['_room_dimensions'][$i]));
-            update_post_meta($post_id, '_room_description_' . $i, sanitize_textarea_field($_POST['_room_description'][$i]));
+
+            $allowed_html = array(
+                'p' => array(),
+                'br' => array(),
+            );
+            update_post_meta($post_id, '_room_description_' . $i, wp_kses($_POST['_room_description'][$i], $allowed_html));
         }
     }
 
