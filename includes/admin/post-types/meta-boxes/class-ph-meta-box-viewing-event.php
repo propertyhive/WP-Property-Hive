@@ -133,7 +133,7 @@ class PH_Meta_Box_Viewing_Event {
         <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . __( 'Unattended', 'propertyhive' ) . '" class="multiselect attribute_values">';
         
         $negotiator_ids = get_post_meta( $post->ID, '_negotiator_id' );
-        if ( empty($negotiator_ids) )
+        if ( get_post_meta( $post->ID, '_status', true ) == '' )
         {
             $negotiator_ids = array( get_current_user_id() );
         }
