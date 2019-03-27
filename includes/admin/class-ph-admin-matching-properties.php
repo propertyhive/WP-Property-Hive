@@ -82,7 +82,7 @@ class PH_Admin_Matching_Properties {
 ?>
             <p class="submit">
 
-                <input name="save" class="button-primary" type="submit" value="<?php echo __( 'Send Email', 'propertyhive' ); ?>" />
+                <input name="save" class="button-primary" type="submit" value="<?php echo __( 'Send Matches', 'propertyhive' ); ?>" />
                 <?php if ( isset($_POST['email_property_id']) && !empty($_POST['email_property_id']) ) { ?>
                 <input name="preview" id="preview_email" class="button" type="button" value="<?php echo __( 'Preview Email', 'propertyhive' ); ?>" />
                 <?php } ?>
