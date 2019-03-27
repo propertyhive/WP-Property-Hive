@@ -220,7 +220,12 @@ class PH_Meta_Box_Property_Description {
         for ($i = 0; $i < $new_num_property_descriptions; ++$i)
         {
             update_post_meta($post_id, '_description_name_' . $i, ph_clean($_POST['_description_name'][$i]));
-            update_post_meta($post_id, '_description_' . $i, sanitize_textarea_field($_POST['_description'][$i]));
+
+            $allowed_html = array(
+                'p' => array(),
+                'br' => array(),
+            );
+            update_post_meta($post_id, '_description_' . $i, wp_kses($_POST['_description'][$i], $allowed_html));
         }
     }
 
