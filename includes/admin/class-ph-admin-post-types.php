@@ -656,6 +656,7 @@ class PH_Admin_Post_Types {
         $output = '';
         
         $output .= $this->viewing_status_filter();
+        $output .= $this->viewing_attending_negotiator_filter();
 
         echo apply_filters( 'propertyhive_viewing_filters', $output );
     }
@@ -700,6 +701,45 @@ class PH_Admin_Post_Types {
             $output .= '<option value="cancelled"';
             $output .= selected( 'cancelled', $selected_status, false );
             $output .= '>' . __( 'Cancelled', 'propertyhive' ) . '</option>';
+            
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show a viewing attending negotiator filter box
+     */
+    public function viewing_attending_negotiator_filter() {
+        global $wp_query;
+
+        $selected_negotiator_id = isset( $_GET['_negotiator_id']) ? (int)$_GET['_negotiator_id'] : '';
+        
+        // Status filtering
+        $output = '<select name="_negotiator_id" id="dropdown_viewing_negotiator_id">';
+            
+            $output .= '<option value="">Attending Negotiator</option>';
+            $output .= '<option value="">All Negotiators</option>';
+
+            $args = array(
+                'number' => 9999,
+                'orderby' => 'display_name',
+                'role__not_in' => array('property_hive_contact') 
+            );
+            $user_query = new WP_User_Query( $args );
+
+            if ( ! empty( $user_query->results ) ) 
+            {
+                foreach ( $user_query->results as $user ) 
+                {
+                    $output .= '<option value="' . $user->ID . '"';
+                    if ( $user->ID == $selected_negotiator_id )
+                    {
+                        $output .= ' selected';
+                    }
+                    $output .= '>' . $user->display_name . '</option>';
+                }
+            }
             
         $output .= '</select>';
 
@@ -904,6 +944,13 @@ class PH_Admin_Post_Types {
                         );
                     }
                 }
+            }
+            if ( ! empty( $_GET['_negotiator_id'] ) ) 
+            {
+                $vars['meta_query'][] = array(
+                    'key' => '_negotiator_id',
+                    'value' => (int)$_GET['_negotiator_id'],
+                );
             }
         }
 
