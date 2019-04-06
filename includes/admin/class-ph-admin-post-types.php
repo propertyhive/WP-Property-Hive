@@ -615,7 +615,7 @@ class PH_Admin_Post_Types {
         // Status filtering
         $output  = '<select name="_status" id="dropdown_appraisal_status">';
             
-            $output .= '<option value="open">All Statuses</option>';
+            $output .= '<option value="">All Statuses</option>';
 
             $output .= '<option value="pending"';
             $output .= selected( 'pending', $selected_status, false );
