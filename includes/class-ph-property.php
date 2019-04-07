@@ -764,9 +764,7 @@ class PH_Property {
                 {
                     $return .= '<br>';
                 }
-                $return .= nl2br($this->{'_room_description_' . $i}) . '
-                </p>
-                ';
+                $return .= nl2br($this->{'_room_description_' . $i}) . '</p>';
             }
         }
         
@@ -798,9 +796,7 @@ class PH_Property {
                 {
                     $return .= '<br>';
                 }
-                $return .= nl2br($this->{'_description_' . $i}) . '
-                </p>
-                ';
+                $return .= nl2br($this->{'_description_' . $i}) . '</p>';
             }
         }
         
