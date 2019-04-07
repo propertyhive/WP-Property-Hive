@@ -101,6 +101,7 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
         $columns['owner'] = __( 'Owner / Landlord', 'propertyhive' );
         $columns['price'] = __( 'Valued Price', 'propertyhive' );
         $columns['status'] = __( 'Status', 'propertyhive' );
+        $columns['negotiators'] = __( 'Attending Negotiators', 'propertyhive' );
 
 		return array_merge( $columns, $existing_columns );
 	}
@@ -235,6 +236,23 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
                 }
 
                 break;
+            case 'negotiators' :
+            	$negotiator_ids = get_post_meta( $post->ID, '_negotiator_id' );
+            	if ( is_array($negotiator_ids) && !empty($negotiator_ids) )
+            	{
+            		$negotiators = array();
+            		foreach ( $negotiator_ids as $negotiator_id )
+            		{
+            			$user_info = get_userdata($negotiator_id);
+            			$negotiators[] = $user_info->display_name;
+            		}
+            		echo implode(", ", $negotiators);
+            	}
+            	else
+            	{
+            		echo '<em>- ' . __( 'None Set', 'propertyhive' ) . ' -</em>';
+            	}
+            	break;
 			default :
 				break;
 		}
