@@ -605,9 +605,25 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
             {
                 foreach ($floorplan_ids as $floorplan_id)
                 {
+                    $label = 'Floorplan';
+
+                    if ( get_the_title($floorplan_id) != '' )
+                    {
+                        $label = get_the_title($floorplan_id);
+                    }
+                    else
+                    {
+                        $attachment_data = wp_prepare_attachment_for_js( $floorplan_id );
+                        if ( isset( $attachment_data['caption'] ) && $attachment_data['caption'] != '' )
+                        {
+                            $label = $attachment_data['caption'];
+                        }
+                    }
+                    
+
                     $actions[] = array(
                         'href' => wp_get_attachment_url( $floorplan_id ),
-                        'label' => __( 'Floorplan', 'propertyhive' ),
+                        'label' => __( $label, 'propertyhive' ),
                         'class' => 'action-floorplans',
                         'attributes' => array(
                             'data-fancybox' => 'floorplans'
