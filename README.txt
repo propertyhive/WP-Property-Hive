@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.1
-Stable tag: 1.4.35
+Tested up to: 5.1.1
+Stable tag: 1.4.36
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,8 +90,18 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 == Changelog ==
 
+= 1.4.36 =
+* Added ability for commercial applicants to register through frontend if commercial department active
+* Removed whitespace from formatted full description which was causing problems with Zoopla Real-Time feed and formatting in Rightmove RTDF add on
+* Use floorplan title and/or caption as button label if present
+* Corrected status default filter in viewings and appraisals lists
+* Added new filter to viewings and appraisals lists to filter by attending negotiator
+* Added new column to viewings and appraisals list showing attending negotiator
+* Removed unecessary call to get_properties_in_view in PH_Query which set a transient which wasn't used
+* Allow for p and br HTML tags in rooms/descriptions
+
 = 1.4.35 =
-* Added New 'Appraisals' module allowing the management of upcoming appraisals. Record the status, the valud price, the potential owner/landlord, and convert to an instructed property when won
+* Added New 'Appraisals' module allowing the management of upcoming appraisals. Record the status, the valued price, the potential owner/landlord, and convert to an instructed property when won
 * Added ability to send owner/landlord viewing email confirmations from a viewing's 'Actions' panel
 * Added new [office_map] shortcode to show all or one office location on map
 * Tweaked applicant match process to allow for better third party integration such as upcoming SMS add on
