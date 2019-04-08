@@ -226,7 +226,7 @@ class PH_Query {
 		add_filter( 'posts_where', array( $this, 'exclude_protected_properties' ) );
 
 		// We're on a property search page so queue the propertyhive_get_properties_in_view function
-		add_action( 'wp', array( $this, 'get_properties_in_view' ), 2);
+		//add_action( 'wp', array( $this, 'get_properties_in_view' ), 2);
 
 		// And remove the pre_get_posts hook
 		$this->remove_property_query();
