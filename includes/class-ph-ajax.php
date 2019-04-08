@@ -485,6 +485,25 @@ class PH_AJAX {
                 }
             }
 
+            if ( $_POST['department'] == 'commercial' )
+            {
+                $available_as = array();
+                if ( isset($_POST['available_as_sale']) && $_POST['available_as_sale'] == 'yes' )
+                {
+                    $available_as[] = 'sale';
+                }
+                if ( isset($_POST['available_as_rent']) && $_POST['available_as_rent'] == 'yes' )
+                {
+                    $available_as[] = 'rent';
+                }
+                $applicant_profile['available_as'] = $available_as;
+
+                if ( isset($_POST['commercial_property_type']) && !empty($_POST['commercial_property_type']) )
+                {
+                    $applicant_profile['commercial_property_types'] = array(ph_clean($_POST['commercial_property_type']));
+                }
+            }
+
             if ( isset($_POST['location']) && !empty($_POST['location']) )
             {
                 $applicant_profile['locations'] = array(ph_clean($_POST['location']));
@@ -791,6 +810,25 @@ class PH_AJAX {
                 if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
                 {
                     $applicant_profile['property_types'] = array(ph_clean($_POST['property_type']));
+                }
+            }
+
+            if ( $_POST['department'] == 'commercial' )
+            {
+                $available_as = array();
+                if ( isset($_POST['available_as_sale']) && $_POST['available_as_sale'] == 'yes' )
+                {
+                    $available_as[] = 'sale';
+                }
+                if ( isset($_POST['available_as_rent']) && $_POST['available_as_rent'] == 'yes' )
+                {
+                    $available_as[] = 'rent';
+                }
+                $applicant_profile['available_as'] = $available_as;
+
+                if ( isset($_POST['commercial_property_type']) && !empty($_POST['commercial_property_type']) )
+                {
+                    $applicant_profile['commercial_property_types'] = array(ph_clean($_POST['commercial_property_type']));
                 }
             }
 

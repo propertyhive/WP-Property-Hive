@@ -426,41 +426,6 @@ function ph_get_applicant_requirements_form_fields()
     }
     
     $fields = array();
-    
-    $departments = array();
-    $value = '';
-    if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
-    {
-        $departments['residential-sales'] = __( 'Buy', 'propertyhive' );
-        if ($value == '' && (get_option( 'propertyhive_primary_department' ) == 'residential-sales' || get_option( 'propertyhive_primary_department' ) === FALSE) )
-        {
-            $value = 'residential-sales';
-        }
-    }
-    if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-    {
-        $departments['residential-lettings'] = __( 'Rent', 'propertyhive' );
-        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'residential-lettings')
-        {
-            $value = 'residential-lettings';
-        }
-    }
-    $fields['department'] = array(
-        'type' => 'radio',
-        'label' => __( 'Looking To', 'propertyhive' ),
-        'required' => true,
-        'show_label' => true,
-        'value' => $value,
-        'options' => $departments
-    );
-    if ( is_user_logged_in() && isset($applicant_profile['department']) )
-    {
-        $fields['department']['value'] = $applicant_profile['department'];
-    }
-    if ( count($departments) == 1 )
-    {
-        $fields['department']['type'] = 'hidden';
-    }
 
     $offices = array();
     $value = '';
@@ -498,87 +463,209 @@ function ph_get_applicant_requirements_form_fields()
         'value' => $value,
         'options' => $offices
     );
-
-    $fields['maximum_price'] = array(
-        'type' => 'number',
-        'label' => __( 'Maximum Price', 'propertyhive' ),
-        'style' => 'max-width:150px;',
-        'before' => '<div class="control control-minimum_price sales-only">',
-        'required' => false
-    );
-    if ( is_user_logged_in() && isset($applicant_profile['max_price']) )
+    
+    $departments = array();
+    $value = '';
+    if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
     {
-        $fields['maximum_price']['value'] = $applicant_profile['max_price'];
-    }
-
-    $fields['maximum_rent'] = array(
-        'type' => 'number',
-        'label' => __( 'Maximum Rent', 'propertyhive' ) . ' (PCM)',
-        'style' => 'max-width:150px;',
-        'before' => '<div class="control control-minimum_price lettings-only">',
-        'required' => false
-    );
-    if ( is_user_logged_in() && isset($applicant_profile['max_rent']) )
-    {
-        $fields['maximum_rent']['value'] = $applicant_profile['max_rent'];
-    }
-
-    $fields['minimum_bedrooms'] = array(
-        'type' => 'number',
-        'label' => __( 'Minimum Bedrooms', 'propertyhive' ),
-        'style' => 'max-width:80px;',
-        'required' => false
-    );
-    if ( is_user_logged_in() && isset($applicant_profile['min_beds']) )
-    {
-        $fields['minimum_bedrooms']['value'] = $applicant_profile['min_beds'];
-    }
-
-    $args = array(
-        'hide_empty' => false,
-        'parent' => 0
-    );
-    $terms = get_terms( 'property_type', $args );
-
-    $options = array();
-
-    $selected_value = '';
-    if ( !empty( $terms ) && !is_wp_error( $terms ) )
-    {
-        $options = array( '' => __( 'All Property Types', 'properthive' ) );
-
-        foreach ($terms as $term)
+        $departments['residential-sales'] = __( 'Properties To Buy', 'propertyhive' );
+        if ($value == '' && (get_option( 'propertyhive_primary_department' ) == 'residential-sales' || get_option( 'propertyhive_primary_department' ) === FALSE) )
         {
-            $options[$term->term_id] = $term->name;
-            
-            $args = array(
-                'hide_empty' => false,
-                'parent' => $term->term_id
-            );
-            $subterms = get_terms( 'property_type', $args );
-            
-            if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+            $value = 'residential-sales';
+        }
+    }
+    if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
+    {
+        $departments['residential-lettings'] = __( 'Properties For Rent', 'propertyhive' );
+        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'residential-lettings')
+        {
+            $value = 'residential-lettings';
+        }
+    }
+    if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+    {
+        $departments['commercial'] = __( 'Commercial Properties', 'propertyhive' );
+        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'commercial')
+        {
+            $value = 'commercial';
+        }
+    }
+    $fields['department'] = array(
+        'type' => 'radio',
+        'label' => __( 'Looking For', 'propertyhive' ),
+        'required' => true,
+        'show_label' => true,
+        'value' => $value,
+        'options' => $departments
+    );
+    if ( is_user_logged_in() && isset($applicant_profile['department']) )
+    {
+        $fields['department']['value'] = $applicant_profile['department'];
+    }
+    if ( count($departments) == 1 )
+    {
+        $fields['department']['type'] = 'hidden';
+    }
+
+    if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' || get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
+    {
+        $fields['maximum_price'] = array(
+            'type' => 'number',
+            'label' => __( 'Maximum Price', 'propertyhive' ),
+            'style' => 'max-width:150px;',
+            'before' => '<div class="control control-minimum_price sales-only">',
+            'required' => false
+        );
+        if ( is_user_logged_in() && isset($applicant_profile['max_price']) )
+        {
+            $fields['maximum_price']['value'] = $applicant_profile['max_price'];
+        }
+
+        $fields['maximum_rent'] = array(
+            'type' => 'number',
+            'label' => __( 'Maximum Rent', 'propertyhive' ) . ' (PCM)',
+            'style' => 'max-width:150px;',
+            'before' => '<div class="control control-minimum_price lettings-only">',
+            'required' => false
+        );
+        if ( is_user_logged_in() && isset($applicant_profile['max_rent']) )
+        {
+            $fields['maximum_rent']['value'] = $applicant_profile['max_rent'];
+        }
+
+        $fields['minimum_bedrooms'] = array(
+            'type' => 'number',
+            'label' => __( 'Minimum Bedrooms', 'propertyhive' ),
+            'style' => 'max-width:80px;',
+            'before' => '<div class="control control-minimum_bedrooms residential-only">',
+            'required' => false
+        );
+        if ( is_user_logged_in() && isset($applicant_profile['min_beds']) )
+        {
+            $fields['minimum_bedrooms']['value'] = $applicant_profile['min_beds'];
+        }
+
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'property_type', $args );
+
+        $options = array();
+
+        $selected_value = '';
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            $options = array( '' => __( 'All Property Types', 'properthive' ) );
+
+            foreach ($terms as $term)
             {
-                foreach ($subterms as $term)
+                $options[$term->term_id] = $term->name;
+                
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $term->term_id
+                );
+                $subterms = get_terms( 'property_type', $args );
+                
+                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
-                    $options[$term->term_id] = '- ' . $term->name;
+                    foreach ($subterms as $term)
+                    {
+                        $options[$term->term_id] = '- ' . $term->name;
+                    }
                 }
+            }
+        }
+
+        if ( !empty($options) )
+        {
+            $fields['property_type'] = array(
+                'type' => 'select',
+                'label' => __( 'Property Type', 'propertyhive' ),
+                'before' => '<div class="control control-property_type residential-only">',
+                'required' => false,
+                'options' => $options,
+            );
+
+            if ( is_user_logged_in() && isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+            {
+                $fields['property_type']['value'] = $applicant_profile['property_types'][0];
             }
         }
     }
 
-    if ( !empty($options) )
+    if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
     {
-        $fields['property_type'] = array(
-            'type' => 'select',
-            'label' => __( 'Property Type', 'propertyhive' ),
+        $fields['available_as_sale'] = array(
+            'type' => 'checkbox',
+            'label' => __( 'For Sale', 'propertyhive' ),
+            'before' => '<div class="control control-available_as_sale commercial-only">',
             'required' => false,
-            'options' => $options,
         );
-
-        if ( is_user_logged_in() && isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
+        if ( is_user_logged_in() && isset($applicant_profile['available_as']) && in_array('sale', $applicant_profile['available_as']) )
         {
-            $fields['property_type']['value'] = $applicant_profile['property_types'][0];
+            $fields['available_as_sale']['checked'] = true;
+        }
+
+        $fields['available_as_rent'] = array(
+            'type' => 'checkbox',
+            'label' => __( 'To Rent', 'propertyhive' ),
+            'before' => '<div class="control control-available_as_rent commercial-only">',
+            'required' => false,
+        );
+        if ( is_user_logged_in() && isset($applicant_profile['available_as']) && in_array('rent', $applicant_profile['available_as']) )
+        {
+            $fields['available_as_rent']['checked'] = true;
+        }
+
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'commercial_property_type', $args );
+
+        $options = array();
+
+        $selected_value = '';
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            $options = array( '' => __( 'All Property Types', 'properthive' ) );
+
+            foreach ($terms as $term)
+            {
+                $options[$term->term_id] = $term->name;
+                
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $term->term_id
+                );
+                $subterms = get_terms( 'commercial_property_type', $args );
+                
+                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                {
+                    foreach ($subterms as $term)
+                    {
+                        $options[$term->term_id] = '- ' . $term->name;
+                    }
+                }
+            }
+        }
+
+        if ( !empty($options) )
+        {
+            $fields['commercial_property_type'] = array(
+                'type' => 'select',
+                'label' => __( 'Property Type', 'propertyhive' ),
+                'before' => '<div class="control control-commercial_property_type commercial-only">',
+                'required' => false,
+                'options' => $options,
+            );
+
+            if ( is_user_logged_in() && isset($applicant_profile['commercial_property_types']) && is_array($applicant_profile['commercial_property_types']) && !empty($applicant_profile['commercial_property_types']) )
+            {
+                $fields['commercial_property_type']['value'] = $applicant_profile['commercial_property_types'][0];
+            }
         }
     }
 
