@@ -764,7 +764,7 @@ class PH_Property {
                 {
                     $return .= '<br>';
                 }
-                $return .= nl2br($this->{'_room_description_' . $i}) . '</p>';
+                $return .= str_replace("\r\n", "", nl2br($this->{'_room_description_' . $i})) . '</p>';
             }
         }
         
