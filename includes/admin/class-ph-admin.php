@@ -320,7 +320,7 @@ class PH_Admin {
                         if ( strtotime($license['expires_at']) <= time() )
                         {
                             // Expired
-                            $output = __( 'You\'re Property Hive license key expired on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. It\'s recommended that you renew it to ensure you continue to receive future updates to add ons you\'ve purchased.';
+                            $output = __( 'Your Property Hive license key expired on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. It\'s recommended that you renew it to ensure you continue to receive future updates to add ons you\'ve purchased.';
                         }
                         elseif ( 
                             strtotime($license['expires_at']) > time() &&
@@ -328,7 +328,7 @@ class PH_Admin {
                         )
                         {
                             // Expires in less than 30 days
-                            $output = __( 'You\'re Property Hive license key expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. It\'s recommended that you renew it to ensure you continue to receive future updates to add ons you\'ve purchased.';
+                            $output = __( 'Your Property Hive license key expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. It\'s recommended that you renew it to ensure you continue to receive future updates to add ons you\'ve purchased.';
                         }
                         elseif (strtotime($license['expires_at']) > time())
                         {
