@@ -128,7 +128,7 @@ class PH_Admin_Meta_Boxes {
             if ( !in_array( 'applicant', $existing_contact_types ) )
             {
                 $existing_contact_types[] = 'applicant';
-                update_post_meta( $_GET['post'], '_contact_types', $existing_contact_types );
+                update_post_meta( (int)$_GET['post'], '_contact_types', $existing_contact_types );
             }
 
             // Do redirect
