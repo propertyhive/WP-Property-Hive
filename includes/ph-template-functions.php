@@ -607,17 +607,10 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
                 {
                     $label = 'Floorplan';
 
-                    if ( get_the_title($floorplan_id) != '' )
+                    $attachment_data = wp_prepare_attachment_for_js( $floorplan_id );
+                    if ( isset( $attachment_data['caption'] ) && $attachment_data['caption'] != '' )
                     {
-                        $label = get_the_title($floorplan_id);
-                    }
-                    else
-                    {
-                        $attachment_data = wp_prepare_attachment_for_js( $floorplan_id );
-                        if ( isset( $attachment_data['caption'] ) && $attachment_data['caption'] != '' )
-                        {
-                            $label = $attachment_data['caption'];
-                        }
+                        $label = $attachment_data['caption'];
                     }
                     
 
