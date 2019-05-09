@@ -453,10 +453,7 @@ class PH_Emails {
 	 * Init email classes.
 	 */
 	public function init() {
-		// include css inliner
-		if ( ! class_exists( 'Emogrifier' ) && class_exists( 'DOMDocument' ) ) {
-			include_once( dirname( __FILE__ ) . '/libraries/class-emogrifier.php' );
-		}
+		
 	}
 
 	/**
@@ -471,6 +468,12 @@ class PH_Emails {
 			ob_start();
 			ph_get_template( 'emails/email-styles.php' );
 			$css = apply_filters( 'propertyhive_email_styles', ob_get_clean() );
+
+			// include css inliner
+			if ( ! class_exists( 'Emogrifier' ) && class_exists( 'DOMDocument' ) ) {
+				include_once( dirname( __FILE__ ) . '/libraries/class-emogrifier.php' );
+			}
+			
 			// apply CSS styles inline for picky email clients
 			try {
 				$emogrifier = new Emogrifier( $content, $css );
