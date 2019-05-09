@@ -1031,7 +1031,7 @@ class PH_Property {
             {
                 foreach ( $term_list as $term_name )
                 {
-                    $features[] = $term_name;
+                    $features[] = trim($term_name);
                 }
             }
         }
@@ -1042,9 +1042,9 @@ class PH_Property {
             
             for ($i = 0; $i < $num_property_features; ++$i)
             {   
-                if ( $this->{'_feature_' . $i} != '' )
+                if ( trim($this->{'_feature_' . $i}) != '' )
                 {
-                    $features[] = $this->{'_feature_' . $i};
+                    $features[] = trim($this->{'_feature_' . $i});
                 }
             }
         }
