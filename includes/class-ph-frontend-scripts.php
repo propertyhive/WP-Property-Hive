@@ -61,21 +61,19 @@ class PH_Frontend_Scripts {
 			wp_enqueue_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.1.5', true );
 			//wp_enqueue_script( 'propertyhive_fancybox-init', $assets_path . 'js/fancybox/jquery.fancybox.init' . $suffix . '.js', array( 'jquery','propertyhive_fancybox' ), PH_VERSION, true );
 			wp_enqueue_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css' );
-		    
+
 		    wp_enqueue_script( 'flexslider', $assets_path . 'js/flexslider/jquery.flexslider' . $suffix . '.js', array( 'jquery' ), '2.2.2', true );
             wp_enqueue_script( 'flexslider-init', $assets_path . 'js/flexslider/jquery.flexslider.init' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
             wp_enqueue_style( 'flexslider_css', $assets_path . 'css/flexslider.css' );
-		    
-            wp_enqueue_script( 'propertyhive_actions', $frontend_script_path . 'actions' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
-            
+
 		    wp_enqueue_script( 'ph-single-property' );
         }
- 
+
 		// Global frontend scripts
 		wp_enqueue_script( 'propertyhive_search', $frontend_script_path . 'search' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
 		wp_enqueue_script( 'propertyhive_make_enquiry', $frontend_script_path . 'make-enquiry' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
         //wp_enqueue_script( 'propertyhive', $frontend_script_path . 'propertyhive' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
-		
+
 		// CSS Styles
 		$enqueue_styles = self::get_styles();
 
