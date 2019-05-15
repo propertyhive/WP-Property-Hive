@@ -547,7 +547,119 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
      * @return void
      */
     function propertyhive_template_single_meta() {
-        ph_get_template( 'single-property/meta.php' );
+
+        global $post, $property;
+
+        $meta = array();
+
+        if ( $property->reference_number != '' )
+        {
+            $meta['reference-number'] = array(
+                'label' => __('Ref', 'propertyhive'),
+                'value' => $property->reference_number
+            );
+        }
+
+        if ( $property->property_type != '' )
+        {
+            $meta['property-type'] = array(
+                'label' =>  __('Type', 'propertyhive'),
+                'value' => $property->property_type
+            );
+        }
+
+        if ( $property->availability != '' )
+        {
+            $meta['availability'] = array(
+                'label' => __('Availability', 'propertyhive'),
+                'value' => $property->availability
+            );
+        }
+
+        if ( $property->department != 'commercial' ) 
+        {
+            if ( $property->bedrooms > 0 )
+            {
+                $meta['bedrooms'] = array(
+                    'label' => __('Bedrooms', 'propertyhive'),
+                    'value' => $property->bedrooms
+                );
+            }
+
+            if ( $property->bathrooms > 0 )
+            {
+                $meta['bathrooms'] = array(
+                    'label' => __('Bathrooms', 'propertyhive'),
+                    'value' => $property->bathrooms
+                );
+            }
+
+            if ( $property->reception_rooms > 0 )
+            {
+                $meta['reception-rooms'] = array(
+                    'label' => __('Reception Rooms', 'propertyhive'),
+                    'value' => $property->reception_rooms
+                );
+            }
+
+            if ( $property->parking != '' )
+            {
+                $meta['parking'] = array(
+                    'label' => __('Parking', 'propertyhive'),
+                    'value' => $property->parking
+                );
+            }
+
+            if ( $property->outside_space != '' )
+            {
+                $meta['outside-space'] = array(
+                    'label' => __('Outside Space', 'propertyhive'),
+                    'value' => $property->outside_space
+                );
+            }
+        }
+
+        if ( $property->department == 'residential-sales' ) 
+        {
+            if ( $property->tenure != '' )
+            {
+                $meta['tenure'] = array(
+                    'label' => __('Tenure', 'propertyhive'),
+                    'value' => $property->tenure
+                );
+            }
+        }
+
+        if ( $property->department == 'residential-lettings' ) 
+        {
+            if ( $property->furnished != '' )
+            {
+                $meta['furnished'] = array(
+                    'label' => __('Furnished', 'propertyhive'),
+                    'value' => $property->furnished
+                );
+            }
+
+            if ( $property->deposit > 0 )
+            {
+                $meta['deposit'] = array(
+                    'label' => __('Deposit', 'propertyhive'),
+                    'value' => $property->get_formatted_deposit()
+                );
+            }
+
+            if ( $property->available_date != '' )
+            {
+                $meta['available-date'] = array(
+                    'label' => __('Available', 'propertyhive'),
+                    'value' => $property->get_available_date()
+                );
+            }
+        }
+
+        $meta = apply_filters( 'propertyhive_single_property_meta', $meta );
+
+        ph_get_template( 'single-property/meta.php', array( 'meta' => $meta ) );
     }
 }
 
