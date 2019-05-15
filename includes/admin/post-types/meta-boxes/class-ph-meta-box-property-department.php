@@ -157,6 +157,8 @@ class PH_Meta_Box_Property_Department {
         global $wpdb;
         
         update_post_meta( $post_id, '_department', ph_clean($_POST['_department']) );
+
+        do_action( 'propertyhive_save_property_department', $post_id );
     }
 
 }
