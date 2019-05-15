@@ -424,7 +424,7 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_shortcode', '<div class="propertyhive propertyhive-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		return apply_filters( 'propertyhive_properties_shortcode_output', '<div class="propertyhive propertyhive-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
@@ -518,7 +518,7 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_shortcode', '<div class="propertyhive propertyhive-recent-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		return apply_filters( 'propertyhive_recent_properties_shortcode_output', '<div class="propertyhive propertyhive-recent-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 
 	}
 
@@ -631,7 +631,7 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_shortcode', '<div class="propertyhive propertyhive-featured-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		return apply_filters( 'propertyhive_featured_properties_shortcode_output', '<div class="propertyhive propertyhive-featured-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
@@ -783,7 +783,7 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_shortcode', '<div class="propertyhive propertyhive-similar-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		return apply_filters( 'propertyhive_similar_properties_shortcode_output', '<div class="propertyhive propertyhive-similar-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
