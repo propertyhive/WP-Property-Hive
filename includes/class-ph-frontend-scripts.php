@@ -57,10 +57,18 @@ class PH_Frontend_Scripts {
 		// Register any scripts for later use, or used as dependencies
 		wp_register_script( 'jquery-cookie', $assets_path . 'js/jquery-cookie/jquery.cookie' . $suffix . '.js', array( 'jquery' ), '1.3.1', true );
 
+		wp_register_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.3.5', true );
+		wp_register_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css', array(), '3.3.5' );
+
+		if ( get_option('propertyhive_lettings_fees_display_search_results', '') == 'yes' )
+		{
+			wp_enqueue_script( 'propertyhive_fancybox' );
+			wp_enqueue_style( 'propertyhive_fancybox_css' );
+		}
+
 		if ( is_property() ) {
-			wp_enqueue_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.1.5', true );
-			//wp_enqueue_script( 'propertyhive_fancybox-init', $assets_path . 'js/fancybox/jquery.fancybox.init' . $suffix . '.js', array( 'jquery','propertyhive_fancybox' ), PH_VERSION, true );
-			wp_enqueue_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css' );
+			wp_enqueue_script( 'propertyhive_fancybox' );
+			wp_enqueue_style( 'propertyhive_fancybox_css' );
 
 		    wp_enqueue_script( 'flexslider', $assets_path . 'js/flexslider/jquery.flexslider' . $suffix . '.js', array( 'jquery' ), '2.2.2', true );
             wp_enqueue_script( 'flexslider-init', $assets_path . 'js/flexslider/jquery.flexslider.init' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
