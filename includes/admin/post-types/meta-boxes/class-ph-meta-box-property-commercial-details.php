@@ -632,6 +632,8 @@ class PH_Meta_Box_Property_Commercial_Details {
             update_post_meta( $post_id, '_site_area_to_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_site_area_units']) ) );
 
             update_post_meta( $post_id, '_site_area_units', ph_clean($_POST['_site_area_units']) );
+
+            do_action( 'propertyhive_save_property_commercial_details', $post_id );
         }
     }
 
