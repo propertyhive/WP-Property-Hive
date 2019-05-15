@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.1.1
-Stable tag: 1.4.37
+Tested up to: 5.2
+Stable tag: 1.4.38
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,10 +90,21 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 == Changelog ==
 
+= 1.4.38 =
+* Added new general setting to display lettings fees link next to price in templates
+* Adjusted how single-property/meta.php is contructed by doing logic outside of the template. This means meta data can be changed through use of a new 'propertyhive_single_property_meta' filter instead of having to override template
+* Media uploaded manually to the property record under the 'Media' tab is now actually attached to the property post. Previously it would show as 'unattached' in the media library
+* Added new save actions to commercial details and department meta boxes so custom fields added to these meta boxes via the Template Assistant add on are saved accordingly
+* Features are now trimmed (i.e. whitespace is removed) before they're returned from the get_features() method. Properties sent to Zoopla using the real-time format would get rejected if additional whitespace existed in features.
+* Removed request to empty actions.js file
+* Performed same removal \r\n from full descriptions on commercial properties to follow suit with recent change to residential descriptions
+* Move how and where Emogrifier is loaded so it's only loaded when needed
+* Declared compatibility for WordPress 5.2
+
 = 1.4.37 =
 * Amended change made in latest release relating to floorplan button labels. Now we'll just use the caption if one exists. Using the title effected too many sites and often wasn't a valid title and instead contained a filename or similar.
 * Fixed typo in license notice
-* Remove \r\n from full descriptions after running nl2br on formatted descriptions. When sending properties to third parties they would somethings also run nl2br() causing duplicated line breaks
+* Removed \r\n from full descriptions after running nl2br on formatted descriptions. When sending properties to third parties they would somethings also run nl2br() causing duplicated line breaks
 
 = 1.4.36 =
 * Added ability for commercial applicants to register through frontend if commercial department active
