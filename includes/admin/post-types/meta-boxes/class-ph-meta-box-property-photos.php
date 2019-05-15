@@ -117,7 +117,8 @@ class PH_Meta_Box_Property_Photos {
                 echo '<a href="" class="button button-primary ph_upload_photo_button">' . __('Add Photos', 'propertyhive') . '</a>';
     
                 do_action('propertyhive_property_photos_fields');
-    	       
+    	          
+                echo '<input type="hidden" name="previous_photo_attachment_ids" id="previous_photo_attachment_ids" value="' . $input_value . '">';
                 echo '<input type="hidden" name="photo_attachment_ids" id="photo_attachment_ids" value="' . $input_value . '">';
 
                 echo '<script>
@@ -353,8 +354,42 @@ class PH_Meta_Box_Property_Photos {
             if (trim($_POST['photo_attachment_ids'], ',') != '')
             {
                 $photos = explode( ",", trim(ph_clean($_POST['photo_attachment_ids']), ',') );
+
+                foreach ($photos as $attachment_id)
+                {
+                    $attachment = array(
+                        'ID' => $attachment_id,
+                        'post_parent' => $post_id,
+                    );
+
+                    wp_update_post($attachment);
+
+                    clean_attachment_cache($attachment_id);
+                }
             }
             update_post_meta( $post_id, '_photos', $photos );
+
+            // Remove post attachment for photos no longer in list
+            if (trim($_POST['previous_photo_attachment_ids'], ',') != '')
+            {
+                $previous_photos = explode( ",", trim(ph_clean($_POST['previous_photo_attachment_ids']), ',') );
+
+                foreach ( $previous_photos as $attachment_id )
+                {
+                    if ( !in_array($attachment_id, $photos) )
+                    {
+                        // No longer in list, let's unattach it
+                        $attachment = array(
+                            'ID' => $attachment_id,
+                            'post_parent' => 0,
+                        );
+
+                        wp_update_post($attachment);
+
+                        clean_attachment_cache($attachment_id);
+                    }
+                }
+            }
         }
     }
 

@@ -156,7 +156,8 @@ class PH_Meta_Box_Property_Epcs {
                 echo '<a href="" class="button button-primary ph_upload_epc_button">' . __('Add EPCs', 'propertyhive') . '</a>';
     
                 do_action('propertyhive_property_epcs_fields');
-    	       
+    	        
+                echo '<input type="hidden" name="previous_epc_attachment_ids" id="previous_epc_attachment_ids" value="' . $input_value . '">';
                 echo '<input type="hidden" name="epc_attachment_ids" id="epc_attachment_ids" value="' . $input_value . '">';
 
                 echo '<script>
@@ -366,8 +367,42 @@ class PH_Meta_Box_Property_Epcs {
             if (trim($_POST['epc_attachment_ids'], ',') != '')
             {
                 $epcs = explode( ",", trim(ph_clean($_POST['epc_attachment_ids']), ',') );
+
+                foreach ($epcs as $attachment_id)
+                {
+                    $attachment = array(
+                        'ID' => $attachment_id,
+                        'post_parent' => $post_id,
+                    );
+
+                    wp_update_post($attachment);
+
+                    clean_attachment_cache($attachment_id);
+                }
             }
             update_post_meta( $post_id, '_epcs', $epcs );
+
+            // Remove post attachment for EPCS no longer in list
+            if (trim($_POST['previous_epc_attachment_ids'], ',') != '')
+            {
+                $previous_epcs = explode( ",", trim(ph_clean($_POST['previous_epc_attachment_ids']), ',') );
+
+                foreach ( $previous_epcs as $attachment_id )
+                {
+                    if ( !in_array($attachment_id, $photos) )
+                    {
+                        // No longer in list, let's unattach it
+                        $attachment = array(
+                            'ID' => $attachment_id,
+                            'post_parent' => 0,
+                        );
+
+                        wp_update_post($attachment);
+
+                        clean_attachment_cache($attachment_id);
+                    }
+                }
+            }
         }
     }
 

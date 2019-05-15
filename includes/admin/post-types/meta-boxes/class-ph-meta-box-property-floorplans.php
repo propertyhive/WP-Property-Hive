@@ -118,7 +118,8 @@ class PH_Meta_Box_Property_Floorplans {
                 echo '<a href="" class="button button-primary ph_upload_floorplan_button">' . __('Add Floorplans', 'propertyhive') . '</a>';
     
                 do_action('propertyhive_property_floorplans_fields');
-    	       
+    	           
+                echo '<input type="hidden" name="previous_floorplan_attachment_ids" id="previous_floorplan_attachment_ids" value="' . $input_value . '">';
                 echo '<input type="hidden" name="floorplan_attachment_ids" id="floorplan_attachment_ids" value="' . $input_value . '">';
 
                 echo '<script>
@@ -357,8 +358,42 @@ class PH_Meta_Box_Property_Floorplans {
           if (trim($_POST['floorplan_attachment_ids'], ',') != '')
           {
               $floorplans = explode( ",", trim(ph_clean($_POST['floorplan_attachment_ids']), ',') );
+
+              foreach ($floorplans as $attachment_id)
+              {
+                  $attachment = array(
+                      'ID' => $attachment_id,
+                      'post_parent' => $post_id,
+                  );
+
+                  wp_update_post($attachment);
+
+                  clean_attachment_cache($attachment_id);
+              }
           }
           update_post_meta( $post_id, '_floorplans', $floorplans );
+
+          // Remove post attachment for floorplans no longer in list
+          if (trim($_POST['previous_floorplan_attachment_ids'], ',') != '')
+          {
+              $previous_floorplans = explode( ",", trim(ph_clean($_POST['previous_floorplan_attachment_ids']), ',') );
+
+              foreach ( $previous_floorplans as $attachment_id )
+              {
+                  if ( !in_array($attachment_id, $photos) )
+                  {
+                      // No longer in list, let's unattach it
+                      $attachment = array(
+                          'ID' => $attachment_id,
+                          'post_parent' => 0,
+                      );
+
+                      wp_update_post($attachment);
+
+                      clean_attachment_cache($attachment_id);
+                  }
+              }
+          }
         }
     }
 }
