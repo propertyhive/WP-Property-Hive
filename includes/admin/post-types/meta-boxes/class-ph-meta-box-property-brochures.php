@@ -146,7 +146,8 @@ class PH_Meta_Box_Property_Brochures {
                 echo '<a href="" class="button button-primary ph_upload_brochure_button">' . __('Add Brochures', 'propertyhive') . '</a>';
     
                 do_action('propertyhive_property_brochures_fields');
-    	       
+    	        
+                echo '<input type="hidden" name="previous_brochure_attachment_ids" id="previous_brochure_attachment_ids" value="' . $input_value . '">';
                 echo '<input type="hidden" name="brochure_attachment_ids" id="brochure_attachment_ids" value="' . $input_value . '">';
 
                 echo '<script>
@@ -347,8 +348,42 @@ class PH_Meta_Box_Property_Brochures {
             if (trim($_POST['brochure_attachment_ids'], ',') != '')
             {
                 $brochures = explode( ",", trim(ph_clean($_POST['brochure_attachment_ids']), ',') );
+
+                foreach ($brochures as $attachment_id)
+                {
+                    $attachment = array(
+                        'ID' => $attachment_id,
+                        'post_parent' => $post_id,
+                    );
+
+                    wp_update_post($attachment);
+
+                    clean_attachment_cache($attachment_id);
+                }
             }
             update_post_meta( $post_id, '_brochures', $brochures );
+
+            // Remove post attachment for brochures no longer in list
+            if (trim($_POST['previous_brochure_attachment_ids'], ',') != '')
+            {
+                $previous_brochures = explode( ",", trim(ph_clean($_POST['previous_brochure_attachment_ids']), ',') );
+
+                foreach ( $previous_brochures as $attachment_id )
+                {
+                    if ( !in_array($attachment_id, $photos) )
+                    {
+                        // No longer in list, let's unattach it
+                        $attachment = array(
+                            'ID' => $attachment_id,
+                            'post_parent' => 0,
+                        );
+
+                        wp_update_post($attachment);
+
+                        clean_attachment_cache($attachment_id);
+                    }
+                }
+            }
         }
     }
 
