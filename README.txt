@@ -93,6 +93,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 = 1.4.37 =
 * Amended change made in latest release relating to floorplan button labels. Now we'll just use the caption if one exists. Using the title effected too many sites and often wasn't a valid title and instead contained a filename or similar.
 * Fixed typo in license notice
+* Remove \r\n from full descriptions after running nl2br on formatted descriptions. When sending properties to third parties they would somethings also run nl2br() causing duplicated line breaks
 
 = 1.4.36 =
 * Added ability for commercial applicants to register through frontend if commercial department active
