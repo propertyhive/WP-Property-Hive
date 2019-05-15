@@ -116,6 +116,22 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'    => 'textarea',
                 'css'	  => 'height:150px; width:100%; max-width:400px'
             ),
+
+            array(
+                'title'   => __( 'Display Link To Lettings Fees Next To Price', 'propertyhive' ),
+                'desc'    => __( 'In Search Results', 'propertyhive' ),
+                'id'      => 'propertyhive_lettings_fees_display_search_results',
+                'type'    => 'checkbox',
+                'checkboxgroup' => 'start',
+            ),
+
+            array(
+                'title'   => __( 'Display Link To Lettings Fees Next To Price', 'propertyhive' ),
+                'desc'    => __( 'On Property Details Page', 'propertyhive' ),
+                'id'      => 'propertyhive_lettings_fees_display_single_property',
+                'type'    => 'checkbox',
+                'checkboxgroup' => 'end',
+            ),
             
 			array( 'type' => 'sectionend', 'id' => 'general_options'),
 
