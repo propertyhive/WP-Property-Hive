@@ -92,7 +92,7 @@ class PH_Shortcodes {
 	        $form_controls['department'] = $original_department;
 	    }
 
-	    if ( 
+	    if (
 	    	isset($atts['default_department']) && in_array($atts['default_department'], array('residential-sales', 'residential-lettings', 'commercial')) &&
 	    	( !isset($_REQUEST['department']) )
 	    )
@@ -180,7 +180,7 @@ class PH_Shortcodes {
                 'key'     => '_price_actual',
                 'value'   => sanitize_text_field( floor( $minimum_price ) ),
                 'compare' => '>=',
-                'type'    => 'NUMERIC' 
+                'type'    => 'NUMERIC'
             );
         }
 
@@ -201,7 +201,7 @@ class PH_Shortcodes {
                 'key'     => '_price_actual',
                 'value'   => sanitize_text_field( ceil( $maximum_price ) ),
                 'compare' => '<=',
-                'type'    => 'NUMERIC' 
+                'type'    => 'NUMERIC'
             );
         }
 
@@ -366,7 +366,7 @@ class PH_Shortcodes {
 		}
 
 		// Change default meta key when department is specified as commercial, or if commercial is the only active department
-		if ( 
+		if (
 			( isset($atts['department']) && $atts['department'] == 'commercial' ) ||
 			(
 				get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
@@ -422,7 +422,9 @@ class PH_Shortcodes {
 
 		wp_reset_postdata();
 
-		return '<div class="propertyhive propertyhive-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+		$shortcode_output = ob_get_clean();
+
+		return apply_filters( 'propertyhive_properties_shortcode_output', '<div class="propertyhive propertyhive-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
@@ -514,7 +516,10 @@ class PH_Shortcodes {
 
 		wp_reset_postdata();
 
-		return '<div class="propertyhive propertyhive-recent-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+		$shortcode_output = ob_get_clean();
+
+		return apply_filters( 'propertyhive_recent_properties_shortcode_output', '<div class="propertyhive propertyhive-recent-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+
 	}
 
 	/**
@@ -624,7 +629,9 @@ class PH_Shortcodes {
 
 		wp_reset_postdata();
 
-		return '<div class="propertyhive propertyhive-featured-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+		$shortcode_output = ob_get_clean();
+
+		return apply_filters( 'propertyhive_featured_properties_shortcode_output', '<div class="propertyhive propertyhive-featured-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
@@ -650,7 +657,7 @@ class PH_Shortcodes {
 		if ($atts['property_id'] != '')
 		{
 			$department = get_post_meta( $atts['property_id'], '_department', true );
-			
+
 			$price = get_post_meta( $atts['property_id'], '_price_actual', true );
 			$lower_price = $price;
 			$higher_price = $price;
@@ -660,7 +667,7 @@ class PH_Shortcodes {
 				$lower_price = $price - ($price * $atts['price_percentage_bounds'] / 100);
 				$higher_price = $price + ($price * $atts['price_percentage_bounds'] / 100);
 			}
-			
+
 			$bedrooms = get_post_meta( $atts['property_id'], '_bedrooms', true );
 			$lower_bedrooms = $bedrooms;
 			$higher_bedrooms = $bedrooms;
@@ -774,7 +781,9 @@ class PH_Shortcodes {
 			echo 'No property_id passed into similar_properties shortcode';
 		}
 
-		return '<div class="propertyhive propertyhive-similar-properties-shortcode columns-' . $atts['columns'] . '">' . ob_get_clean() . '</div>';
+		$shortcode_output = ob_get_clean();
+
+		return apply_filters( 'propertyhive_similar_properties_shortcode_output', '<div class="propertyhive propertyhive-similar-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
@@ -931,11 +940,11 @@ class PH_Shortcodes {
 
 	// We declare vars globally so developers can access them
 	var office_map; // Global declaration of the map
-	var office_marker; 
+	var office_marker;
 	var ph_office_map_lat_lngs = new Array();
-			
+
 	function initialize_office_map() {
-		
+
 		<?php
 			$args = array(
 				'post_type' => 'office',
@@ -998,7 +1007,7 @@ class PH_Shortcodes {
   			do_action( 'propertyhive_office_map_options' );
   		?>
 		office_map = new google.maps.Map(document.getElementById("office_map_canvas"), map_options);
-		
+
 		<?php
 			$args = array(
 				'post_type' => 'office',
@@ -1025,7 +1034,7 @@ class PH_Shortcodes {
 					{
 		?>
 		var myLatlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng; ?>);
-			
+
 		var marker_options = {
 			map: office_map,
 			position: myLatlng,
@@ -1062,19 +1071,19 @@ class PH_Shortcodes {
 		?>
 	}
 
-	function ph_fit_office_map_to_bounds() 
+	function ph_fit_office_map_to_bounds()
 	{
         var bounds = new google.maps.LatLngBounds();
-        if ( ph_office_map_lat_lngs.length > 0 ) 
+        if ( ph_office_map_lat_lngs.length > 0 )
         {
-            for ( var i = 0; i < ph_office_map_lat_lngs.length; i++ ) 
+            for ( var i = 0; i < ph_office_map_lat_lngs.length; i++ )
             {
                 bounds.extend(ph_office_map_lat_lngs[i]);
             }
             office_map.fitBounds(bounds);
         }
 	}
-	
+
 	if(window.addEventListener) {
 		window.addEventListener('load', initialize_office_map);
 	}else{
@@ -1110,11 +1119,11 @@ class PH_Shortcodes {
 		}
 
 		$form_controls = ph_get_user_details_form_fields();
-    
+
     	$form_controls = apply_filters( 'propertyhive_user_details_form_fields', $form_controls );
 
     	$form_controls_2 = ph_get_applicant_requirements_form_fields();
-    
+
     	$form_controls_2 = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls_2 );
 
     	$form_controls = array_merge( $form_controls, $form_controls_2 );
