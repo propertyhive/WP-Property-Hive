@@ -115,6 +115,8 @@ class PH_Emails {
 
 	    	$form_controls = array_merge( $form_controls, $form_controls_2 );
 
+	    	$form_controls = apply_filters( 'propertyhive_applicant_registration_form_fields', $form_controls );
+
             unset($form_controls['office_id']);
             
             foreach ($form_controls as $key => $control)
