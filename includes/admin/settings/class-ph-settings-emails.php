@@ -270,8 +270,8 @@ class PH_Settings_Emails extends PH_Settings_Page {
         }
         else
         {
-        	// Default to 7 days
-        	$additional_query .= " AND send_at >= '" . date("Y-m-d", strtotime('-7 days')) . " 00:00:00' ";
+        	// Default to 30 days
+        	$additional_query .= " AND send_at >= '" . date("Y-m-d", strtotime('-30 days')) . " 00:00:00' ";
         }
         ?>
         <tr valign="top">
@@ -303,8 +303,6 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	            		$emails = $wpdb->get_var("
 							SELECT COUNT(*)
 							FROM " . $wpdb->prefix . "ph_email_log
-							WHERE 
-								method = 'email'
 						");
 	            	?>
 					<li class="all"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log' . $additional_query_string); ?>"<?php if ( !isset($_GET['status']) || (isset($_GET['status']) && $_GET['status'] == '') ) { echo ' class="current"'; } ?>>All <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
@@ -313,8 +311,6 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							SELECT COUNT(*)
 							FROM " . $wpdb->prefix . "ph_email_log
 							WHERE 
-								method = 'email'
-							AND
 								status = ''
 						");
 	            	?>
@@ -324,8 +320,6 @@ class PH_Settings_Emails extends PH_Settings_Page {
 						SELECT COUNT(*)
 						FROM " . $wpdb->prefix . "ph_email_log
 						WHERE 
-							method = 'email'
-						AND
 							status IN ('fail1', 'fail2')
 					");
             	?>
@@ -335,8 +329,6 @@ class PH_Settings_Emails extends PH_Settings_Page {
 						SELECT COUNT(*)
 						FROM " . $wpdb->prefix . "ph_email_log
 						WHERE 
-							method = 'email'
-						AND
 							status = 'sent'
 					");
             	?>
@@ -353,7 +345,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							<select name="date_from" id="dropdown_date_from">
 								<option value="<?php echo date("Y-m-d", strtotime("-7 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-7 days")) ) { echo ' selected'; } ?>>Last 7 Days</option>
 								<option value="<?php echo date("Y-m-d", strtotime("-14 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-14 days")) ) { echo ' selected'; } ?>>Last 14 Days</option>
-								<option value="<?php echo date("Y-m-d", strtotime("-30 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-30 days")) ) { echo ' selected'; } ?>>Last 30 Days</option>
+								<option value="<?php echo date("Y-m-d", strtotime("-30 days")); ?>"<?php if ( !isset($_GET['date_from']) || ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-30 days")) ) ) { echo ' selected'; } ?>>Last 30 Days</option>
 								<option value="all"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == 'all' ) { echo ' selected'; } ?>>All Time</option>
 							</select>
 							<input type="submit" name="filter_action" id="post-query-submit" class="button" value="Filter">
@@ -393,7 +385,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 								send_at
 							FROM " . $wpdb->prefix . "ph_email_log
 							WHERE 
-								method = 'email' ";
+								1=1 ";
 						if ( isset($_GET['status']) )
 						{
 							switch ( $_GET['status'] )
@@ -410,26 +402,37 @@ class PH_Settings_Emails extends PH_Settings_Page {
 						";
                    		$emails = $wpdb->get_results( $query );
 
-						foreach ( $emails as $email ) 
+                   		if ( is_array($emails) && !empty($emails) )
+                   		{
+							foreach ( $emails as $email ) 
+							{
+						?>
+						<tr>
+	                    	<td class="date-time"><?php echo date("jS M Y H:i", strtotime($email->send_at)); ?></td>
+	                    	<td class="recipient"><?php echo '<a href="' . get_edit_post_link($email->contact_id) . '">' . get_the_title($email->contact_id) . '</a><br>' . $email->to_email_address; ?></td>
+	                        <td class="subject"><?php echo $email->subject; ?></td>
+	                        <td class="status"><?php
+	                        	switch ($email->status)
+	                        	{
+	                        		case "fail1": { echo 'First attempt failed. Will retry'; break; }
+	                        		case "fail2": { echo 'Failed after 2 attempts'; break; }
+	                        		case "sent": { echo 'Sent'; break; }
+	                        		default: { echo 'Queued'; }
+	                        	}
+	                        ?></td>
+	                        <td class="actions">
+	                        	<a href="<?php echo wp_nonce_url( admin_url('?view_propertyhive_email=' . $email->email_id . '&email_id=' . $email->email_id ), 'view-email' ) ?>" target="_blank" class="button">View Email</a>
+	                        </td>
+	                    </tr>
+						<?php
+							}
+						}
+						else
 						{
 					?>
 					<tr>
-                    	<td class="date-time"><?php echo date("jS M Y H:i", strtotime($email->send_at)); ?></td>
-                    	<td class="recipient"><?php echo '<a href="' . get_edit_post_link($email->contact_id) . '">' . get_the_title($email->contact_id) . '</a><br>' . $email->to_email_address; ?></td>
-                        <td class="subject"><?php echo $email->subject; ?></td>
-                        <td class="status"><?php
-                        	switch ($email->status)
-                        	{
-                        		case "fail1": { echo 'First attempt failed. Will retry'; break; }
-                        		case "fail2": { echo 'Failed after 2 attempts'; break; }
-                        		case "sent": { echo 'Sent'; break; }
-                        		default: { echo 'Queued'; }
-                        	}
-                        ?></td>
-                        <td class="actions">
-                        	<a href="<?php echo wp_nonce_url( admin_url('?view_propertyhive_email=' . $email->email_id . '&email_id=' . $email->email_id ), 'view-email' ) ?>" target="_blank" class="button">View Email</a>
-                        </td>
-                    </tr>
+						<td colspan="5">No emails found</td>
+					</tr>
 					<?php
 						}
                    	?>
