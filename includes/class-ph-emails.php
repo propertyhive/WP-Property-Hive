@@ -135,6 +135,11 @@ class PH_Emails {
             		}
             	}
 
+            	if ( ph_clean($value) == '' )
+            	{
+            		continue;
+            	}
+
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
                 $message .= $label . ": " . $value . "\n";
             }
