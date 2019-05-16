@@ -36,11 +36,14 @@ function ph_get_search_form( $id = 'default' ) {
     // append hidden order and view fields so these are maintained should a new search be performed
     foreach ( $_REQUEST as $key => $value )
     {
-        if ( !isset($form_controls[$key]) )
-        {
-            // we've received a field that isn't a standard form control so let's store it in a hidden field so it's not lost
-            $form_controls[$key] = array('type' => 'hidden', 'value' => stripslashes( ph_clean( $value) ));
-        }
+        if ( isset($form_controls[$key]) )
+            continue;
+
+        if ( $key == 'officeID' && isset($form_controls['office']) )
+            continue;
+
+        // we've received a field that isn't a standard form control so let's store it in a hidden field so it's not lost
+        $form_controls[$key] = array('type' => 'hidden', 'value' => stripslashes( ph_clean( $value) ));
     }
     
     ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $id ) );
