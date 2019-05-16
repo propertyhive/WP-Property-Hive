@@ -165,7 +165,7 @@
                             echo ' ' . $property->get_availability() . '
                             </div>';
 
-                            echo '<div style="margin-bottom:7px;">' . strip_tags(get_the_excerpt()) . '</div>';
+                            echo '<div style="margin-bottom:7px;">' . strip_tags(get_the_excerpt($property->id)) . '</div>';
 
                             echo '<div style="background:#F8F8F8; padding:12px 11px; line-height:1.7em; border:1px solid #DDD; font-weight:700">
 
