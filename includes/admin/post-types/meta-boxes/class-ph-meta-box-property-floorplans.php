@@ -380,7 +380,7 @@ class PH_Meta_Box_Property_Floorplans {
 
               foreach ( $previous_floorplans as $attachment_id )
               {
-                  if ( !in_array($attachment_id, $photos) )
+                  if ( !in_array($attachment_id, $floorplans) )
                   {
                       // No longer in list, let's unattach it
                       $attachment = array(

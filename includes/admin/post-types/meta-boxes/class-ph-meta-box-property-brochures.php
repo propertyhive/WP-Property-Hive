@@ -370,7 +370,7 @@ class PH_Meta_Box_Property_Brochures {
 
                 foreach ( $previous_brochures as $attachment_id )
                 {
-                    if ( !in_array($attachment_id, $photos) )
+                    if ( !in_array($attachment_id, $brochures) )
                     {
                         // No longer in list, let's unattach it
                         $attachment = array(
