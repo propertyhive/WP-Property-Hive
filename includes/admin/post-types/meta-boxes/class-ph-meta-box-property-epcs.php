@@ -389,7 +389,7 @@ class PH_Meta_Box_Property_Epcs {
 
                 foreach ( $previous_epcs as $attachment_id )
                 {
-                    if ( !in_array($attachment_id, $photos) )
+                    if ( !in_array($attachment_id, $epcs) )
                     {
                         // No longer in list, let's unattach it
                         $attachment = array(
