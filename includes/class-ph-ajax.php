@@ -1652,7 +1652,7 @@ class PH_AJAX {
         $this->json_headers();
 
         parse_str($_POST['form_data']);
-        var_dump();
+        
         $return = array('errors' => array());
 
         if ( isset($_email_address) && $_email_address != '' )
