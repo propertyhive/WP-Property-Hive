@@ -3097,14 +3097,14 @@ class PH_AJAX {
                         href="#action_panel_viewing_email_applicant_booking_confirmation" 
                         class="button viewing-action"
                         style="width:100%; margin-bottom:7px; text-align:center" 
-                    >' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Resend Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
+                    >' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Re-Email Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
 
-                $actions[] = '<div id="viewing_applicant_confirmation_date" style="text-align:center; font-size:12px; color:#999;' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $applicant_booking_confirmation_sent_at != '' ) ? 'Previously sent on <span title="' . $applicant_booking_confirmation_sent_at . '">' . date("jS F", strtotime($applicant_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+                $actions[] = '<div id="viewing_applicant_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $applicant_booking_confirmation_sent_at != '' ) ? 'Previously sent to applicant on <span title="' . $applicant_booking_confirmation_sent_at . '">' . date("jS F", strtotime($applicant_booking_confirmation_sent_at)) : '' ) . '</span></div>';
 
                 // Owner/Landlord
-                $property_department = get_post_meta( $property_id, '_department' );
+                $property_department = get_post_meta( $property_id, '_department', TRUE );
                 $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
-                $owner_or_landlord = ( $property_department[0] == 'residential-lettings' ? 'Landlord' : 'Owner' );
+                $owner_or_landlord = ( $property_department == 'residential-lettings' ? 'Landlord' : 'Owner' );
 
                 if ( count($owner_contact_ids) > 0) {
 
@@ -3112,9 +3112,9 @@ class PH_AJAX {
                             href="#action_panel_viewing_email_owner_booking_confirmation" 
                             class="button viewing-action"
                             style="width:100%; margin-bottom:7px; text-align:center" 
-                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email '.$owner_or_landlord.' Booking Confirmation', 'propertyhive') : __('Resend '.$owner_or_landlord.' Booking Confirmation', 'propertyhive') ) . '</a>';
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
                     
-                    $actions[] = '<div id="viewing_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+                    $actions[] = '<div id="viewing_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
                 }
 
                 $actions[] = '<hr>';
