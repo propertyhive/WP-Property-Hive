@@ -20,7 +20,7 @@
 function ph_get_search_form( $id = 'default' ) {
 
     $form_controls = ph_get_search_form_fields();
-    
+
     $form_controls = apply_filters( 'propertyhive_search_form_fields_' . $id, $form_controls );
 
     // We 100% need department so make sure it exists. If it doesn't, set a hidden field
@@ -45,7 +45,7 @@ function ph_get_search_form( $id = 'default' ) {
         // we've received a field that isn't a standard form control so let's store it in a hidden field so it's not lost
         $form_controls[$key] = array('type' => 'hidden', 'value' => stripslashes( ph_clean( $value) ));
     }
-    
+
     ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $id ) );
 
 }
@@ -58,7 +58,7 @@ function ph_get_search_form( $id = 'default' ) {
 function ph_get_search_form_fields()
 {
     $fields = array();
-    
+
     $departments = array();
     $value = '';
     if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
@@ -85,13 +85,13 @@ function ph_get_search_form_fields()
             $value = 'commercial';
         }
     }
-    
+
     $fields['department'] = array(
         'type' => 'radio',
         'options' => $departments,
         'value' => $value
     );
-    
+
     if ( array_key_exists('residential-sales', $departments) || array_key_exists('residential-lettings', $departments) )
     {
         if ( array_key_exists('residential-sales', $departments) )
@@ -107,24 +107,24 @@ function ph_get_search_form_fields()
                 '750000' => '&pound;750,000',
                 '1000000' => '&pound;1,000,000'
             );
-            
+
             $fields['minimum_price'] = array(
                 'type' => 'select',
-                'show_label' => true, 
+                'show_label' => true,
                 'label' => __( 'Min Price', 'propertyhive' ),
                 'before' => '<div class="control control-minimum_price sales-only">',
                 'options' => $prices
             );
-            
+
             $fields['maximum_price'] = array(
                 'type' => 'select',
-                'show_label' => true, 
+                'show_label' => true,
                 'label' => __( 'Max Price', 'propertyhive' ),
                 'before' => '<div class="control control-maximum_price sales-only">',
                 'options' => $prices
             );
         }
-        
+
         if ( array_key_exists('residential-lettings', $departments) )
         {
             $prices = array(
@@ -137,18 +137,18 @@ function ph_get_search_form_fields()
                 '1500' => '&pound;1500 PCM',
                 '2000' => '&pound;2000 PCM'
             );
-            
+
             $fields['minimum_rent'] = array(
                 'type' => 'select',
-                'show_label' => true, 
+                'show_label' => true,
                 'label' => __( 'Min Rent', 'propertyhive' ),
                 'before' => '<div class="control control-minimum_rent lettings-only">',
                 'options' => $prices
             );
-            
+
             $fields['maximum_rent'] = array(
                 'type' => 'select',
-                'show_label' => true, 
+                'show_label' => true,
                 'label' => __( 'Max Rent', 'propertyhive' ),
                 'before' => '<div class="control control-maximum_rent lettings-only">',
                 'options' => $prices
@@ -157,15 +157,15 @@ function ph_get_search_form_fields()
 
         $fields['minimum_bedrooms'] = array(
             'type' => 'select',
-            'show_label' => true, 
+            'show_label' => true,
             'label' => __( 'Min Beds', 'propertyhive' ),
             'before' => '<div class="control control-minimum_bedrooms residential-only">',
             'options' => array( '' => __( 'No preference', 'propertyhive' ), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5)
         );
-        
+
         $fields['property_type'] = array(
             'type' => 'property_type',
-            'show_label' => true, 
+            'show_label' => true,
             'before' => '<div class="control control-property_type residential-only">',
             'label' => __( 'Type', 'propertyhive' ),
         );
@@ -184,18 +184,18 @@ function ph_get_search_form_fields()
             '25000' => '25,000 sq ft',
             '50000' => '50,000 sq ft'
         );
-        
+
         $fields['minimum_floor_area'] = array(
             'type' => 'select',
-            'show_label' => true, 
+            'show_label' => true,
             'label' => __( 'Min Floor Area', 'propertyhive' ),
             'before' => '<div class="control control-minimum_floor_area commercial-only">',
             'options' => $sizes
         );
-        
+
         $fields['maximum_floor_area'] = array(
             'type' => 'select',
-            'show_label' => true, 
+            'show_label' => true,
             'label' => __( 'Max Floor Area', 'propertyhive' ),
             'before' => '<div class="control control-maximum_floor_area commercial-only">',
             'options' => $sizes
@@ -208,20 +208,20 @@ function ph_get_search_form_fields()
             'parent' => 0
         );
         $terms = get_terms( 'commercial_property_type', $args );
-        
+
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
             foreach ($terms as $term)
             {
                 $options[$term->term_id] = $term->name;
-                
+
                 $args = array(
                     'hide_empty' => false,
                     'parent' => $term->term_id
                 );
                 $subterms = get_terms( 'commercial_property_type', $args );
-                
+
                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
                     foreach ($subterms as $term)
@@ -231,16 +231,16 @@ function ph_get_search_form_fields()
                 }
             }
         }
-        
+
         $fields['commercial_property_type'] = array(
             'type' => 'select',
-            'show_label' => true, 
+            'show_label' => true,
             'before' => '<div class="control control-commercial_property_type commercial-only">',
             'label' => __( 'Type', 'propertyhive' ),
             'options' => $options
         );
     }
-    
+
     return $fields;
 }
 
@@ -253,9 +253,9 @@ function ph_get_search_form_fields()
 function propertyhive_enquiry_form( $property_id = '' )
 {
     $form_controls = ph_get_property_enquiry_form_fields( $property_id );
-    
+
     $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
-    
+
     ph_get_template( 'global/make-enquiry-form.php',array( 'form_controls' => $form_controls ) );
 }
 
@@ -267,14 +267,14 @@ function propertyhive_enquiry_form( $property_id = '' )
 function ph_get_property_enquiry_form_fields( $property_id = '' )
 {
     global $post;
-    
+
     $fields = array();
-    
+
     $fields['property_id'] = array(
         'type' => 'hidden',
         'value' => ( $property_id != '' ? $property_id : $post->ID )
     );
-    
+
     $fields['name'] = array(
         'type' => 'text',
         'label' => __( 'Full Name', 'propertyhive' ),
@@ -286,7 +286,7 @@ function ph_get_property_enquiry_form_fields( $property_id = '' )
 
         $fields['name']['value'] = $current_user->display_name;
     }
-    
+
     $fields['email_address'] = array(
         'type' => 'email',
         'label' => __( 'Email Address', 'propertyhive' ),
@@ -298,13 +298,13 @@ function ph_get_property_enquiry_form_fields( $property_id = '' )
 
         $fields['email_address']['value'] = $current_user->user_email;
     }
-    
+
     $fields['telephone_number'] = array(
         'type' => 'text',
         'label' => __( 'Number', 'propertyhive' ),
         'required' => true
     );
-    
+
     $fields['message'] = array(
         'type' => 'textarea',
         'label' => __( 'Message', 'propertyhive' ),
@@ -322,7 +322,7 @@ function ph_get_property_enquiry_form_fields( $property_id = '' )
             'required' => true
         );
     }
-    
+
     return $fields;
 }
 
@@ -344,9 +344,9 @@ function ph_get_user_details_form_fields()
             $contact = new PH_Contact( '', $current_user->ID );
         }
     }
-    
+
     $fields = array();
-    
+
     $fields['name'] = array(
         'type' => 'text',
         'label' => __( 'Full Name', 'propertyhive' ),
@@ -356,7 +356,7 @@ function ph_get_user_details_form_fields()
     {
         $fields['name']['value'] = $current_user->display_name;
     }
-    
+
     $fields['email_address'] = array(
         'type' => 'email',
         'label' => __( 'Email Address', 'propertyhive' ),
@@ -391,7 +391,7 @@ function ph_get_user_details_form_fields()
             'required' => true
         );
     }
-    
+
     return $fields;
 }
 
@@ -415,11 +415,11 @@ function ph_get_applicant_requirements_form_fields()
 
             if ( is_array($contact->contact_types) && in_array('applicant', $contact->contact_types) )
             {
-                if ( 
-                    $contact->applicant_profiles != '' && 
-                    $contact->applicant_profiles > 0 && 
-                    $contact->applicant_profile_0 != '' && 
-                    is_array($contact->applicant_profile_0) 
+                if (
+                    $contact->applicant_profiles != '' &&
+                    $contact->applicant_profiles > 0 &&
+                    $contact->applicant_profile_0 != '' &&
+                    is_array($contact->applicant_profile_0)
                 )
                 {
                     $applicant_profile = $contact->applicant_profile_0;
@@ -427,7 +427,7 @@ function ph_get_applicant_requirements_form_fields()
             }
         }
     }
-    
+
     $fields = array();
 
     $offices = array();
@@ -466,7 +466,7 @@ function ph_get_applicant_requirements_form_fields()
         'value' => $value,
         'options' => $offices
     );
-    
+
     $departments = array();
     $value = '';
     if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
@@ -564,13 +564,13 @@ function ph_get_applicant_requirements_form_fields()
             foreach ($terms as $term)
             {
                 $options[$term->term_id] = $term->name;
-                
+
                 $args = array(
                     'hide_empty' => false,
                     'parent' => $term->term_id
                 );
                 $subterms = get_terms( 'property_type', $args );
-                
+
                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
                     foreach ($subterms as $term)
@@ -638,13 +638,13 @@ function ph_get_applicant_requirements_form_fields()
             foreach ($terms as $term)
             {
                 $options[$term->term_id] = $term->name;
-                
+
                 $args = array(
                     'hide_empty' => false,
                     'parent' => $term->term_id
                 );
                 $subterms = get_terms( 'commercial_property_type', $args );
-                
+
                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
                     foreach ($subterms as $term)
@@ -688,13 +688,13 @@ function ph_get_applicant_requirements_form_fields()
         foreach ($terms as $term)
         {
             $options[$term->term_id] = $term->name;
-            
+
             $args = array(
                 'hide_empty' => false,
                 'parent' => $term->term_id
             );
             $subterms = get_terms( 'location', $args );
-            
+
             if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
             {
                 foreach ($subterms as $term)
@@ -719,7 +719,7 @@ function ph_get_applicant_requirements_form_fields()
             $fields['location']['value'] = $applicant_profile['locations'][0];
         }
     }
-    
+
     $fields['additional_requirements'] = array(
         'type' => 'textarea',
         'label' => __( 'Additional Requirements', 'propertyhive' ),
@@ -743,7 +743,7 @@ function ph_form_field( $key, $field )
     global $post;
 
     $output = '';
-    
+
     switch ($field['type'])
     {
         case "text":
@@ -760,7 +760,7 @@ function ph_form_field( $key, $field )
             $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : ( ( $field['type'] == 'date' ) ? 'dd/mm/yyyy' : '' );
             $field['required'] = isset( $field['required'] ) ? $field['required'] : false;
             $field['style'] = isset( $field['style'] ) ? $field['style'] : '';
-            
+
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
@@ -777,9 +777,9 @@ function ph_form_field( $key, $field )
                     }
                 }
             }
-            
+
             $output .= $field['before'];
-            
+
             if ($field['show_label'])
             {
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
@@ -789,23 +789,23 @@ function ph_form_field( $key, $field )
                 }
                 $output .= '</label>';
             }
-            
-            $output .= '<input 
-                    type="' . esc_attr( $field['type'] ) . '" 
-                    name="' . esc_attr( $key ) . '" 
-                    id="' . esc_attr( $key ) . '" 
+
+            $output .= '<input
+                    type="' . esc_attr( $field['type'] ) . '"
+                    name="' . esc_attr( $key ) . '"
+                    id="' . esc_attr( $key ) . '"
                     value="' . esc_attr( $field['value'] ) . '"
                     placeholder="' . esc_attr( $field['placeholder'] ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
                     style="' . esc_attr( $field['style'] ) . '"
                     ' . ( ($field['required']) ? 'required' : '' ) . '
             >';
-            
+
             $output .= $field['after'];
-            
-            break;   
+
+            break;
         }
-        case "textarea": 
+        case "textarea":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
@@ -814,15 +814,15 @@ function ph_form_field( $key, $field )
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
             $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
             $field['required'] = isset( $field['required'] ) ? $field['required'] : false;
-            
+
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
                 $field['value'] = sanitize_textarea_field( wp_unslash( $_GET[$key] ) );
             }
-            
+
             $output .= $field['before'];
-            
+
             if ($field['show_label'])
             {
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
@@ -832,20 +832,20 @@ function ph_form_field( $key, $field )
                 }
                 $output .= '</label>';
             }
-            
-            $output .= '<textarea 
-                    name="' . esc_attr( $key ) . '" 
-                    id="' . esc_attr( $key ) . '" 
+
+            $output .= '<textarea
+                    name="' . esc_attr( $key ) . '"
+                    id="' . esc_attr( $key ) . '"
                     placeholder="' . esc_attr(  $field['placeholder'] ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
                     ' . ( ($field['required']) ? 'required' : '' ) . '
             >' . esc_attr(  $field['value'] ) . '</textarea>';
-            
+
             $output .= $field['after'];
-            
-            break;   
+
+            break;
         }
-        case "checkbox": 
+        case "checkbox":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
@@ -859,63 +859,63 @@ function ph_form_field( $key, $field )
             {
                 $field['checked'] = true;
             }
-            
+
             $output .= $field['before'];
-            
-            $output .= '<label style="' . esc_attr( $field['label_style'] ) . '"><input 
-                type="' . esc_attr( $field['type'] ) . '" 
-                name="' . esc_attr( $key ) . '" 
+
+            $output .= '<label style="' . esc_attr( $field['label_style'] ) . '"><input
+                type="' . esc_attr( $field['type'] ) . '"
+                name="' . esc_attr( $key ) . '"
                 value="' . esc_attr( $field['value'] ) . '"
-                class="' . esc_attr( $field['class'] ) . '" 
+                class="' . esc_attr( $field['class'] ) . '"
                 ' . checked( $field['checked'], true, false ) . '
             >';
             if ($field['show_label'])
             {
-                $output .= ' ' . $field['label'];
+                $output .= ' <span>' . $field['label'] . '</span>';
             }
             $output .= '</label>';
-            
+
             $output .= $field['after'];
-            
+
             break;
         }
-        case "radio": 
+        case "radio":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : false;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
-            
+
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
                 $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
-            
+
             $output .= $field['before'];
-            
+
             if ($field['show_label'])
             {
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
-            
-            foreach ( $field['options'] as $option_key => $value ) 
+
+            foreach ( $field['options'] as $option_key => $value )
             {
-                $output .= '<label><input 
-                    type="' . esc_attr( $field['type'] ) . '" 
-                    name="' . esc_attr( $key ) . '" 
+                $output .= '<label><input
+                    type="' . esc_attr( $field['type'] ) . '"
+                    name="' . esc_attr( $key ) . '"
                     value="' . esc_attr( $option_key ) . '"
-                    class="' . esc_attr( $field['class'] ) . '" 
+                    class="' . esc_attr( $field['class'] ) . '"
                     ' . checked( esc_attr( $field['value'] ), esc_attr( $option_key ), false ) . '
                 > ' . esc_html( $value ) . '</label>';
             }
-            
+
             $output .= $field['after'];
-            
+
             break;
         }
-        case "select": 
+        case "select":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
@@ -924,15 +924,15 @@ function ph_form_field( $key, $field )
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
             $field['required'] = isset( $field['required'] ) ? $field['required'] : false;
             $field['options'] = ( isset( $field['options'] ) && is_array( $field['options'] ) ) ? $field['options'] : array();
-            
+
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
                 $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
-            
+
             $output .= $field['before'];
-            
+
             if ($field['show_label'])
             {
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
@@ -942,58 +942,58 @@ function ph_form_field( $key, $field )
                 }
                 $output .= '</label>';
             }
-            
-            $output .= '<select 
-                name="' . esc_attr( $key ) . '" 
-                id="' . esc_attr( $key ) . '" 
+
+            $output .= '<select
+                name="' . esc_attr( $key ) . '"
+                id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . '"
              >';
-            
-            foreach ( $field['options'] as $option_key => $value ) 
+
+            foreach ( $field['options'] as $option_key => $value )
             {
-                $output .= '<option 
-                    value="' . esc_attr( $option_key ) . '" 
+                $output .= '<option
+                    value="' . esc_attr( $option_key ) . '"
                     ' . selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false ) . '
                 >' . esc_html( $value ) . '</option>';
             }
-            
+
             $output .= '</select>';
-            
+
             $output .= $field['after'];
-            
+
             break;
         }
-        case "office": 
+        case "office":
         {
             $key = 'officeID';
-            
+
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
-            
+
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
                 $field['value'] = (int)$_GET[$key];
             }
-            
+
             $output .= $field['before'];
-            
+
             if ($field['show_label'])
             {
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
-            
-            $output .= '<select 
-                name="' . esc_attr( $key ) . '" 
-                id="' . esc_attr( $key ) . '" 
+
+            $output .= '<select
+                name="' . esc_attr( $key ) . '"
+                id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . '"
              >';
 
-             $output .= '<option 
-                        value="" 
+             $output .= '<option
+                        value=""
                         ' . selected( esc_attr( $field['value'] ), esc_attr( '' ), false ) . '
                     >' . esc_html( __( 'No preference', 'propertyhive' ) ) . '</option>';
 
@@ -1004,57 +1004,57 @@ function ph_form_field( $key, $field )
                 'order' => 'ASC'
             );
             $office_query = new WP_Query($args);
-            
+
             if ($office_query->have_posts())
             {
                 while ($office_query->have_posts())
                 {
                     $office_query->the_post();
-            
-                    $output .= '<option 
-                        value="' . esc_attr( $post->ID ) . '" 
+
+                    $output .= '<option
+                        value="' . esc_attr( $post->ID ) . '"
                         ' . selected( esc_attr( $field['value'] ), esc_attr( $post->ID ), false ) . '
                     >' . esc_html( get_the_title() ) . '</option>';
-                
+
                 }
             }
             wp_reset_postdata();
-            
+
             $output .= '</select>';
-            
+
             $output .= $field['after'];
-            
+
             break;
         }
-        case "country": 
+        case "country":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
-            
+
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
                 $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
-            
+
             $output .= $field['before'];
-            
+
             if ($field['show_label'])
             {
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
-            
-            $output .= '<select 
-                name="' . esc_attr( $key ) . '" 
-                id="' . esc_attr( $key ) . '" 
+
+            $output .= '<select
+                name="' . esc_attr( $key ) . '"
+                id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . '"
              >';
 
-             $output .= '<option 
-                        value="" 
+             $output .= '<option
+                        value=""
                         ' . selected( esc_attr( $field['value'] ), esc_attr( '' ), false ) . '
                     >' . esc_html( __( 'No preference', 'propertyhive' ) ) . '</option>';
 
@@ -1069,32 +1069,32 @@ function ph_form_field( $key, $field )
 
                     if ( $ph_country !== FALSE )
                     {
-                        $output .= '<option 
-                        value="' . esc_attr( $country ) . '" 
+                        $output .= '<option
+                        value="' . esc_attr( $country ) . '"
                         ' . selected( esc_attr( $field['value'] ), esc_attr( $country ), false ) . '
                         >' . esc_html( $ph_country['name'] ) . '</option>';
                     }
                 }
             }
-            
+
             $output .= '</select>';
-            
+
             $output .= $field['after'];
-            
+
             break;
         }
-        case "hidden": 
+        case "hidden":
         {
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
                 $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
-            
+
             $output .= '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . $field['value'] . '">';
             break;
         }
-        case "html": 
+        case "html":
         {
             $field['html'] = isset( $field['html'] ) ? $field['html'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
@@ -1103,13 +1103,13 @@ function ph_form_field( $key, $field )
             $output .= $field['before'];
             $output .= $field['html'];
             $output .= $field['after'];
-            
-            break;   
+
+            break;
         }
-        case "recaptcha": 
+        case "recaptcha":
         {
             $field['site_key'] = isset( $field['site_key'] ) ? $field['site_key'] : '';
-            
+
             $output .= '<script src="https://www.google.com/recaptcha/api.js"></script>
             <div class="g-recaptcha" data-sitekey="' . $field['site_key'] . '"></div>';
             break;
@@ -1124,23 +1124,23 @@ function ph_form_field( $key, $field )
                 $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
                 $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
                 $field['blank_option'] = isset( $field['blank_option'] ) ? $field['blank_option'] : __( 'No preference', 'propertyhive' );
-                
+
                 $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
                 if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
                 {
                     $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
                 }
-                
+
                 $output .= $field['before'];
-                
+
                 if ($field['show_label'])
                 {
                     $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
                 }
-                
-                $output .= '<select 
-                    name="' . esc_attr( $key ) . '" 
-                    id="' . esc_attr( $key ) . '" 
+
+                $output .= '<select
+                    name="' . esc_attr( $key ) . '"
+                    id="' . esc_attr( $key ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
                  >';
 
@@ -1150,32 +1150,32 @@ function ph_form_field( $key, $field )
                     'parent' => 0
                 );
                 $terms = get_terms( $field['type'], $args );
-                
+
                 $selected_value = '';
                 if ( !empty( $terms ) && !is_wp_error( $terms ) )
                 {
                     foreach ($terms as $term)
                     {
                         $options[$term->term_id] = $term->name;
-                        
+
                         $args = array(
                             'hide_empty' => false,
                             'parent' => $term->term_id
                         );
                         $subterms = get_terms( $field['type'], $args );
-                        
+
                         if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                         {
                             foreach ($subterms as $term)
                             {
                                 $options[$term->term_id] = '- ' . $term->name;
-                                
+
                                 $args = array(
                                     'hide_empty' => false,
                                     'parent' => $term->term_id
                                 );
                                 $subsubterms = get_terms( $field['type'], $args );
-                                
+
                                 if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                                 {
                                     foreach ($subsubterms as $term)
@@ -1188,20 +1188,20 @@ function ph_form_field( $key, $field )
                     }
                 }
 
-                foreach ( $options as $option_key => $value ) 
+                foreach ( $options as $option_key => $value )
                 {
-                    $output .= '<option 
-                        value="' . esc_attr( $option_key ) . '" 
+                    $output .= '<option
+                        value="' . esc_attr( $option_key ) . '"
                         ' . selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false ) . '
                     >' . esc_html( $value ) . '</option>';
                 }
 
                 $output .= '</select>';
-                
+
                 $output .= $field['after'];
             }
         }
     }
-    
+
     echo $output;
 }
