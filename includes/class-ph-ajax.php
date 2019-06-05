@@ -1815,7 +1815,11 @@ class PH_AJAX {
 
     public function get_appraisal_details_meta_box()
     {
+        global $post;
+
         check_ajax_referer( 'appraisal-details-meta-box', 'security' );
+
+        $post = get_post((int)$_POST['appraisal_id']);
 
         $appraisal = new PH_Appraisal((int)$_POST['appraisal_id']);
 
@@ -2944,7 +2948,11 @@ class PH_AJAX {
 
     public function get_viewing_details_meta_box()
     {
+        global $post;
+
         check_ajax_referer( 'viewing-details-meta-box', 'security' );
+
+        $post = get_post((int)$_POST['viewing_id']);
 
         $viewing = new PH_Viewing((int)$_POST['viewing_id']);
 
