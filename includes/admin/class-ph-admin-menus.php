@@ -120,7 +120,7 @@ class PH_Admin_Menus {
 	    
 		global $menu, $submenu, $parent_file, $submenu_file, $self, $post_type, $taxonomy;
 
-		$to_highlight_types = array( 'property', 'contact', 'enquiry', 'viewing', 'offer', 'sale' );
+		$to_highlight_types = array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale' );
 
 		if ( isset( $post_type ) ) {
 			if ( in_array( $post_type, $to_highlight_types ) ) {
