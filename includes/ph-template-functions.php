@@ -289,7 +289,31 @@ if ( ! function_exists( 'propertyhive_template_loop_price' ) ) {
      * @return void
      */
     function propertyhive_template_loop_price() {
-        ph_get_template( 'search/price.php' );
+
+        global $property;
+
+        $fees = '';
+        if ( get_option('propertyhive_lettings_fees_display_search_results', '') == 'yes' )
+        {
+            if (
+                $property->department == 'residential-lettings' && 
+                get_option('propertyhive_lettings_fees', '') != ''
+            )
+            {
+                $fees = nl2br(get_option('propertyhive_lettings_fees', ''));
+            }
+            if (
+                $property->department == 'commercial' && 
+                $property->to_rent == 'yes' && 
+                get_option('propertyhive_lettings_fees_commercial', '') != ''
+            )
+            {
+                $fees = nl2br(get_option('propertyhive_lettings_fees_commercial', ''));
+            }
+        }
+
+
+        ph_get_template( 'search/price.php', array( 'fees' => $fees ) );
     }
 }
 
@@ -533,7 +557,30 @@ if ( ! function_exists( 'propertyhive_template_single_price' ) ) {
      * @return void
      */
     function propertyhive_template_single_price() {
-        ph_get_template( 'single-property/price.php' );
+        
+        global $property;
+
+        $fees = '';
+        if ( get_option('propertyhive_lettings_fees_display_single_property', '') == 'yes' )
+        {
+            if (
+                $property->department == 'residential-lettings' && 
+                get_option('propertyhive_lettings_fees', '') != ''
+            )
+            {
+                $fees = nl2br(get_option('propertyhive_lettings_fees', ''));
+            }
+            if (
+                $property->department == 'commercial' && 
+                $property->to_rent == 'yes' && 
+                get_option('propertyhive_lettings_fees_commercial', '') != ''
+            )
+            {
+                $fees = nl2br(get_option('propertyhive_lettings_fees_commercial', ''));
+            }
+        }
+
+        ph_get_template( 'single-property/price.php', array( 'fees' => $fees ) );
     }
 }
 

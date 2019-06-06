@@ -111,10 +111,17 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
-                'title'   => __( 'Lettings Fees', 'propertyhive' ),
+                'title'   => __( 'Lettings Fees (Residential)', 'propertyhive' ),
                 'id'      => 'propertyhive_lettings_fees',
                 'type'    => 'textarea',
                 'css'	  => 'height:150px; width:100%; max-width:400px'
+            ),
+
+            array(
+                'title'   => __( 'Lettings Fees (Commercial)', 'propertyhive' ),
+                'id'      => 'propertyhive_lettings_fees_commercial',
+                'type'    => 'textarea',
+                'css'     => 'height:150px; width:100%; max-width:400px'
             ),
 
             array(
@@ -131,6 +138,42 @@ class PH_Settings_General extends PH_Settings_Page {
                 'id'      => 'propertyhive_lettings_fees_display_single_property',
                 'type'    => 'checkbox',
                 'checkboxgroup' => 'end',
+            ),
+
+            array(
+                'id'      => 'propertyhive_lettings_fees_html',
+                'type'    => 'html',
+                'html' => '<script>
+
+                    jQuery(document).ready(function()
+                    {
+                        toggle_fees();
+
+                        jQuery(\'input[name^=\\\'propertyhive_active_departments\\\']\').change(function()
+                        {
+                            toggle_fees();
+                        });
+                    });
+
+                    function toggle_fees()
+                    {
+                        jQuery(\'#row_propertyhive_lettings_fees\').hide();
+                        jQuery(\'#row_propertyhive_lettings_fees_commercial\').hide();
+                        jQuery(\'#row_propertyhive_lettings_fees_display_search_results\').hide();
+
+                        if (jQuery(\'#propertyhive_active_departments_lettings\').prop(\'checked\') == true)
+                        {
+                            jQuery(\'#row_propertyhive_lettings_fees\').show();
+                            jQuery(\'#row_propertyhive_lettings_fees_display_search_results\').show();
+                        }
+                        if (jQuery(\'#propertyhive_active_departments_commercial\').prop(\'checked\') == true)
+                        {
+                            jQuery(\'#row_propertyhive_lettings_fees_commercial\').show();
+                            jQuery(\'#row_propertyhive_lettings_fees_display_search_results\').show();
+                        }
+                    }
+
+                </script>',
             ),
             
 			array( 'type' => 'sectionend', 'id' => 'general_options'),
