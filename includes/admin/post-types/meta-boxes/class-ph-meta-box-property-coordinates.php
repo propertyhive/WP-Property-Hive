@@ -190,6 +190,11 @@ class PH_Meta_Box_Property_Coordinates {
                 if ((!markerSet || force) && (jQuery(\'#_address_postcode\').val() != \'\' || force) && jQuery(\'#_address_country\').val() != \'\')
                 {
                     var address = jQuery(\'#_address_postcode\').val();
+                    var location_filter = \'\';
+                    if ( jQuery(\'#_address_postcode\').val() != \'\' )
+                    {
+                        location_filter = jQuery(\'#_address_postcode\').val();
+                    }
                     if (jQuery(\'#_address_four\').val() != \'\')
                     {
                         address = jQuery(\'#_address_four\').val() + \', \' + address;
@@ -210,8 +215,16 @@ class PH_Meta_Box_Property_Coordinates {
                     {
                         address = address + \', \' + jQuery(\'#_address_country\').val();
                     }
+
+                    var geocoding_data = { \'address\': address };
+                    if ( location_filter != \'\' )
+                    {
+                        geocoding_data.componentRestrictions = {
+                            postalCode : jQuery(\'#_address_postcode\').val()
+                        }
+                    }
                     
-                    geocoder.geocode( { \'address\': address}, function(results, status) {
+                    geocoder.geocode( geocoding_data, function(results, status) {
 
                         if (status == google.maps.GeocoderStatus.OK) 
                         {
