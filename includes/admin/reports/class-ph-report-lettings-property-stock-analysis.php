@@ -118,7 +118,7 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 		);
 	}
 
-	private function get_property_data( $selected_metrics = array() )
+	private function get_property_data( $selected_metrics = array(), $office_id = '' )
 	{
 		global $post;
 
@@ -147,6 +147,14 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 				)
 			)
 		);
+
+		if ( $office_id != '' )
+		{
+			$args['meta_query'][] = array(
+				'key' => '_office_id',
+				'value' => $office_id
+			);
+		}
 
 		$property_query = new WP_Query( $args );
 
@@ -239,7 +247,7 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 		return $return;
 	}
 
-	private function get_average_property_data($metric_one, $metric_two)
+	private function get_average_property_data($metric_one, $metric_two, $office_id = '')
 	{
 		global $post;
 
@@ -260,6 +268,14 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 				)
 			)
 		);
+
+		if ( $office_id != '' )
+		{
+			$args['meta_query'][] = array(
+				'key' => '_office_id',
+				'value' => $office_id
+			);
+		}
 
 		$price_ranges = $this->get_price_ranges();
 
@@ -385,6 +401,7 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 			{
 				$metric_one = ( ( isset($_POST['metric_one']) ) ? ph_clean($_POST['metric_one']) : 'property_type' );
 				$metric_two = ( ( isset($_POST['metric_two']) ) ? ph_clean($_POST['metric_two']) : 'price' );
+				$office_id = ( ( isset($_POST['office_id']) ) ? (int)$_POST['office_id'] : '' );
 		?>
 		<form method="post" action="">
 
@@ -416,6 +433,34 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 			</select>
 
 			<br><br>
+
+			<label for="metric_two">Office:</label>
+			<select name="office_id" id="office_id" style="width:100%;">
+				<option value="">All Offices</option>
+				<?php 
+					$args = array(
+						'post_type' => 'office',
+						'nopaging' => true,
+					);
+
+					$office_query = new WP_Query( $args );
+
+					if ( $office_query->have_posts() )
+					{
+						while ( $office_query->have_posts() )
+						{
+							$office_query->the_post();
+					?>
+					<option value="<?php echo get_the_ID(); ?>"<?php if ( get_the_ID() == $office_id ) { echo ' selected'; } ?>><?php echo get_the_title(get_the_ID()); ?></option>
+					<?php 
+						} 
+					}
+
+					wp_reset_postdata();
+				?>
+			</select>
+
+			<br><br>
 			<input type="submit" value="Update" class="button button-primary">
 
 		</form><br>
@@ -435,6 +480,7 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 		<form method="post" action="">
 		<?php
 				$selected_metrics = ( ( isset($_POST['metrics']) ) ? ph_clean($_POST['metrics']) : array('price') );
+				$office_id = ( ( isset($_POST['office_id']) ) ? (int)$_POST['office_id'] : '' );
 
 				foreach ( $metrics as $metric => $metric_data ) 
 				{
@@ -445,6 +491,34 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 		<?php
 				}
 		?>
+			<br><br>
+
+			<label for="metric_two">Office:</label>
+			<select name="office_id" id="office_id" style="width:100%;">
+				<option value="">All Offices</option>
+				<?php 
+					$args = array(
+						'post_type' => 'office',
+						'nopaging' => true,
+					);
+
+					$office_query = new WP_Query( $args );
+
+					if ( $office_query->have_posts() )
+					{
+						while ( $office_query->have_posts() )
+						{
+							$office_query->the_post();
+					?>
+					<option value="<?php echo get_the_ID(); ?>"<?php if ( get_the_ID() == $office_id ) { echo ' selected'; } ?>><?php echo get_the_title(get_the_ID()); ?></option>
+					<?php 
+						} 
+					}
+
+					wp_reset_postdata();
+				?>
+			</select>
+
 			<br><br>
 			<input type="submit" value="Update" class="button button-primary">
 
@@ -485,7 +559,7 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 
 		$price_ranges = $this->get_price_ranges();
 
-		$totals_data = $this->get_property_data( $selected_metrics );
+		$totals_data = $this->get_property_data( $selected_metrics, $office_id );
 ?>
 <script>
 
@@ -697,9 +771,10 @@ jQuery.fn.useTooltip = function () {
 
 		$metric_one = ( ( isset($_POST['metric_one']) ) ? ph_clean($_POST['metric_one']) : 'property_type' );
 		$metric_two = ( ( isset($_POST['metric_two']) ) ? ph_clean($_POST['metric_two']) : 'price' );
+		$office_id = ( ( isset($_POST['office_id']) ) ? (int)$_POST['office_id'] : '' );
 		//
 
-		$average_data = $this->get_average_property_data($metric_one, $metric_two);
+		$average_data = $this->get_average_property_data($metric_one, $metric_two, $office_id);
 
 		$price_ranges = $this->get_price_ranges();
 ?>
