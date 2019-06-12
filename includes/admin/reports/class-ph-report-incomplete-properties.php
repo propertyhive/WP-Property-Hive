@@ -73,6 +73,34 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 			</select>
 
 			<br><br>
+
+			<label for="metric_two">Office:</label>
+			<select name="office_id" id="office_id" style="width:100%;">
+				<option value="">All Offices</option>
+				<?php 
+					$args = array(
+						'post_type' => 'office',
+						'nopaging' => true,
+					);
+
+					$office_query = new WP_Query( $args );
+
+					if ( $office_query->have_posts() )
+					{
+						while ( $office_query->have_posts() )
+						{
+							$office_query->the_post();
+					?>
+					<option value="<?php echo get_the_ID(); ?>"<?php if ( isset($_POST['office_id']) && ($_POST['office_id'] == get_the_ID()) ) { echo ' selected'; } ?>><?php echo get_the_title(get_the_ID()); ?></option>
+					<?php 
+						} 
+					}
+
+					wp_reset_postdata();
+				?>
+			</select>
+
+			<br><br>
 			<input type="submit" value="Update" class="button button-primary">
 
 		</form>
@@ -107,6 +135,14 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 				$meta_query[] = array(
 					'key' => '_department',
 					'value' => ph_clean($_POST['department']),
+				);
+			}
+
+			if ( isset($_POST['office_id']) && $_POST['office_id'] != '' )
+			{
+				$meta_query[] = array(
+					'key' => '_office_id',
+					'value' => (int)$_POST['office_id']
 				);
 			}
 
