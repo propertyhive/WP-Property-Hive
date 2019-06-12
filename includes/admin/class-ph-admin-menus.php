@@ -77,6 +77,7 @@ class PH_Admin_Menus {
 	    {
 	        add_submenu_page( null, __( 'Applicant Matching Properties', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-properties', array($this, 'matching_properties_page'));
 	        add_submenu_page( null, __( 'Generate Applicant List', 'propertyhive'), __( 'Generate Applicant List', 'propertyhive' ), 'manage_propertyhive', 'ph-generate-applicant-list', array($this, 'generate_applicant_list_page'));
+	        add_submenu_page( null, __( 'Applicant Matching Applicants', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-applicants', array($this, 'matching_applicants_page'));
 	    }
     }
 
@@ -213,6 +214,15 @@ class PH_Admin_Menus {
 	public function generate_applicant_list_page() {
 		include_once( 'class-ph-admin-applicant-list.php' );
 		PH_Admin_Applicant_List::output();
+	}
+
+	/**
+	 * Init the property matching applicants page
+	 */
+	public function matching_applicants_page() {
+		include_once( 'class-ph-admin-matching-applicants.php' );
+		$ph_admin_matching_applicants = new PH_Admin_Matching_Applicants();
+		$ph_admin_matching_applicants->output();
 	}
 
 	/**

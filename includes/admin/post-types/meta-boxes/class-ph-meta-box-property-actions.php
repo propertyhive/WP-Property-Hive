@@ -25,6 +25,15 @@ class PH_Meta_Box_Property_Actions {
 
 	        	$actions = array();
 
+	        	if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
+            	{
+		        	$actions[] = '<a 
+			                href="' . admin_url('admin.php?page=ph-matching-applicants&property_id=' . $post->ID) . '" 
+			                class="button"
+			                style="width:100%; margin-bottom:7px; text-align:center" 
+			            >' . __('View Matching Applicants', 'propertyhive') . '</a>';
+		        }
+
 	        	if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
             	{
 		        	$actions[] = '<a 
