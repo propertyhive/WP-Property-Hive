@@ -430,13 +430,20 @@ class PH_Admin {
     public function preview_emails() {
         if ( isset( $_GET['preview_propertyhive_email'] ) ) 
         {
-            if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-properties' ) ) 
+            if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-properties' ) && ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-applicants' ) ) 
             {
                 die( 'Security check' );
             }
 
             // get the preview email content
-            $email_property_ids = explode(",", sanitize_text_field($_POST['email_property_id']));
+            if ( isset($_GET['property_id']) )
+            {
+                $email_property_ids = array((int)$_GET['property_id']);
+            }
+            elseif ( isset($_POST['email_property_id']) )
+            {
+                $email_property_ids = explode(",", sanitize_text_field($_POST['email_property_id']));
+            }
 
             $body = stripslashes(sanitize_textarea_field($_POST['body']));
 
