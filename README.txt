@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.2.1
-Stable tag: 1.4.40
+Stable tag: 1.4.41
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.41 =
+* Applicant matching added to property record so you can now see all applicants with criteria matching the property in question. From there you can then email them details of the property
+* Added new office filter to reports
+* Postal code added as geocoding restriction when making geocoding request in JS on property record to give better accuracy
+* Added before/after actions in single-property/images.php template
 
 = 1.4.40 =
 * Added ability to enter separate fees for residential lettings and commercial properties to rent
