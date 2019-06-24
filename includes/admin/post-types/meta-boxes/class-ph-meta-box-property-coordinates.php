@@ -193,7 +193,8 @@ class PH_Meta_Box_Property_Coordinates {
                     var location_filter = \'\';
                     if ( jQuery(\'#_address_postcode\').val() != \'\' )
                     {
-                        location_filter = jQuery(\'#_address_postcode\').val();
+                        location_filter = jQuery(\'#_address_postcode\').val().split(" ");
+                        location_filter = location_filter[0];
                     }
                     if (jQuery(\'#_address_four\').val() != \'\')
                     {
@@ -220,7 +221,7 @@ class PH_Meta_Box_Property_Coordinates {
                     if ( location_filter != \'\' )
                     {
                         geocoding_data.componentRestrictions = {
-                            postalCode : jQuery(\'#_address_postcode\').val()
+                            postalCode : location_filter
                         }
                     }
                     
