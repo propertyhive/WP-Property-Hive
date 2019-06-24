@@ -19,6 +19,9 @@ class PH_Meta_Box_Property_Floorplans {
 	 * Output the metabox
 	 */
 	public static function output( $post ) {
+
+        $thumbnail_width = get_option( 'thumbnail_size_w', 150 );
+        $thumbnail_height = get_option( 'thumbnail_size_h', 150 );
         
         echo '<div class="propertyhive_meta_box">';
         
@@ -91,7 +94,6 @@ class PH_Meta_Box_Property_Floorplans {
             }
             else
             {
-            
                 echo '<div class="media_grid" id="property_floorplans_grid"><ul>';
                 
                 $floorplans = get_post_meta($post->ID, '_floorplans', TRUE);
@@ -104,7 +106,40 @@ class PH_Meta_Box_Property_Floorplans {
                     {
                         echo '<li id="floorplan_' . $floorplan_attachment_id . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
-                            echo wp_get_attachment_image( $floorplan_attachment_id, 'thumbnail' );
+                            if ( wp_attachment_is_image( $floorplan_attachment_id ) )
+                            {
+                                echo wp_get_attachment_image( $floorplan_attachment_id, 'thumbnail' );
+                            }
+                            else
+                            {
+                                $type = get_post_mime_type($floorplan_attachment_id);
+                                $icon = 'text.png';
+                                
+                                switch ($type)
+                                {
+                                    case "application/pdf":
+                                    case "application/x-pdf":
+                                    {
+                                        $icon = 'pdf.png';
+                                        break;
+                                    }
+                                    case "application/msword":
+                                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                                    {
+                                        $icon = 'word.png';
+                                        break;
+                                    }
+                                    case "text/csv":
+                                    case "application/vnd.ms-excel":
+                                    case "text/csv":
+                                    {
+                                        $icon = 'excel.png';
+                                        break;
+                                    }
+                                }
+
+                                echo '<a href="' . wp_get_attachment_url( $floorplan_attachment_id ) . '" target="_blank"><img src="' . PH()->plugin_url() . '/assets/images/filetypes/' . $icon . '" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></a>';
+                            }
                         echo '</li>';
                     }
                 }
