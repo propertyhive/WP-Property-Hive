@@ -625,6 +625,7 @@ class PH_Query {
         $meta_query[] = $this->available_date_from_meta_query();
         $meta_query[] = $this->minimum_floor_area_meta_query();
         $meta_query[] = $this->maximum_floor_area_meta_query();
+        $meta_query[] = $this->minimum_maximum_floor_area_meta_query();
         $meta_query[] = $this->floor_area_range_meta_query();
         $meta_query[] = $this->commercial_for_sale_to_rent_meta_query();
         $meta_query[] = $this->commercial_for_sale_meta_query();
@@ -1338,7 +1339,11 @@ class PH_Query {
         
         if ( 
             isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
-            isset( $_REQUEST['minimum_floor_area'] ) && $_REQUEST['minimum_floor_area'] != '' 
+            isset( $_REQUEST['minimum_floor_area'] ) && $_REQUEST['minimum_floor_area'] != '' &&
+            (
+            	!isset( $_REQUEST['maximum_floor_area'] ) ||
+            	( isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] == '' )
+            )
         )
         {
             $meta_query = array(
@@ -1364,7 +1369,11 @@ class PH_Query {
         
         if ( 
             isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
-            isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] != '' 
+            isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] != '' &&
+            (
+            	!isset( $_REQUEST['minimum_floor_area'] ) ||
+            	( isset( $_REQUEST['minimum_floor_area'] ) && $_REQUEST['minimum_floor_area'] == '' )
+            )
         )
         {
             $meta_query = array(
@@ -1377,6 +1386,40 @@ class PH_Query {
         
         return $meta_query;
     }
+
+    /**
+     * Returns a meta query to handle minimum AND maximum floor area
+     *
+     * @access public
+     * @return array
+     */
+    public function minimum_maximum_floor_area_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            isset( $_REQUEST['minimum_floor_area'] ) && $_REQUEST['minimum_floor_area'] != '' &&
+            isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] != ''
+        )
+        {
+            $meta_query = array(
+                'key'     => '_floor_area_from_sqft',
+                'value'   => ph_clean( $_REQUEST['maximum_floor_area'] ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
+            );
+            $meta_query = array(
+                'key'     => '_floor_area_to_sqft',
+                'value'   => ph_clean( $_REQUEST['minimum_floor_area'] ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+    
 
     /**
      * Returns a meta query to handle floor area range
