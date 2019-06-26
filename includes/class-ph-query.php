@@ -1403,13 +1403,13 @@ class PH_Query {
             isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] != ''
         )
         {
-            $meta_query = array(
+            $meta_query[] = array(
                 'key'     => '_floor_area_from_sqft',
                 'value'   => ph_clean( $_REQUEST['maximum_floor_area'] ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
-            $meta_query = array(
+            $meta_query[] = array(
                 'key'     => '_floor_area_to_sqft',
                 'value'   => ph_clean( $_REQUEST['minimum_floor_area'] ),
                 'compare' => '>=',
