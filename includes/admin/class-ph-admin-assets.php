@@ -21,8 +21,8 @@ class PH_Admin_Assets {
      * Hook in tabs.
      */
     public function __construct() {
-        add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
-        add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ), 5 );
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ), 5 );
     }
 
     /**
