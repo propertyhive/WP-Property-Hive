@@ -204,6 +204,10 @@ class PH_Meta_Box_Property_Coordinates {
                     {
                         address = jQuery(\'#_address_three\').val() + \', \' + address;
                     }
+                    if (jQuery(\'#_address_two\').val() != \'\')
+                    {
+                        address = jQuery(\'#_address_two\').val() + \', \' + address;
+                    }
                     if (jQuery(\'#_address_street\').val() != \'\')
                     {
                         address = jQuery(\'#_address_street\').val() + \', \' + address;
