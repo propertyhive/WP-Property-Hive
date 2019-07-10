@@ -223,10 +223,11 @@ class PH_Meta_Box_Property_Coordinates {
 
                     var geocoding_data = { \'address\': address };
                     if ( location_filter != \'\' )
-                    {
-                        geocoding_data.componentRestrictions = {
+                    {   
+                        // Removed as for some reason it was generating a lot of ZERO_RESULTS_FOUND errors
+                        /*geocoding_data.componentRestrictions = {
                             postalCode : location_filter
-                        }
+                        }*/
                     }
                     
                     geocoder.geocode( geocoding_data, function(results, status) {
