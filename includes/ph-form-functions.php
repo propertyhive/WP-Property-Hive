@@ -42,8 +42,19 @@ function ph_get_search_form( $id = 'default' ) {
         if ( $key == 'officeID' && isset($form_controls['office']) )
             continue;
 
+
         // we've received a field that isn't a standard form control so let's store it in a hidden field so it's not lost
-        $form_controls[$key] = array('type' => 'hidden', 'value' => stripslashes( ph_clean( $value) ));
+        if ( is_array($value) )
+        {
+            foreach ( $value as $i => $val )
+            {
+                $form_controls[$key . '-' . $i] = array('type' => 'hidden', 'name' => $key . '[]', 'value' => stripslashes( ph_clean( $val) ));
+            }
+        }
+        else
+        {
+            $form_controls[$key] = array('type' => 'hidden', 'value' => stripslashes( ph_clean( $value) ));
+        }
     }
 
     ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $id ) );
@@ -1086,12 +1097,13 @@ function ph_form_field( $key, $field )
         case "hidden":
         {
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
+            $field['name'] = isset( $field['name'] ) ? $field['name'] : $key;
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
                 $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
 
-            $output .= '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . $field['value'] . '">';
+            $output .= '<input type="hidden" name="' . esc_attr( $field['name'] ) . '" value="' . $field['value'] . '">';
             break;
         }
         case "html":
