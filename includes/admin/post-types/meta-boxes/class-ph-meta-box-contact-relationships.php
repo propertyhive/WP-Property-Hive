@@ -451,6 +451,31 @@ class PH_Meta_Box_Contact_Relationships {
                         }
                         propertyhive_wp_checkboxes( $args );
 
+                        // Floor Area
+                        propertyhive_wp_text_input( array( 
+                            'id' => '_applicant_minimum_floor_area_' . $key, 
+                            'label' => __( 'Min Floor Area', 'propertyhive' ) . ' (Sq Ft)', 
+                            'desc_tip' => false, 
+                            'type' => 'text',
+                            'class' => '',
+                            'custom_attributes' => array(
+                                'style' => 'width:100%; max-width:150px;'
+                            ),
+                            'value' => ( ( isset($applicant_profile['min_floor_area']) ) ? $applicant_profile['min_floor_area'] : '' )
+                        ) );
+
+                        propertyhive_wp_text_input( array( 
+                            'id' => '_applicant_maximum_floor_area_' . $key, 
+                            'label' => __( 'Max Floor Area', 'propertyhive' ) . ' (Sq Ft)', 
+                            'desc_tip' => false, 
+                            'type' => 'text',
+                            'class' => '',
+                            'custom_attributes' => array(
+                                'style' => 'width:100%; max-width:150px;'
+                            ),
+                            'value' => ( ( isset($applicant_profile['max_floor_area']) ) ? $applicant_profile['max_floor_area'] : '' )
+                        ) );
+
                         // Commercial Types
                     ?>
                         <p class="form-field"><label for="_applicant_commercial_property_types_<?php echo $key; ?>"><?php _e( 'Property Types', 'propertyhive' ); ?></label>
@@ -832,6 +857,16 @@ class PH_Meta_Box_Contact_Relationships {
                 if ( $_POST['_applicant_department_' . $i] == 'commercial' )
                 {
                     $applicant_profile['available_as'] = ( isset($_POST['_applicant_available_as_' . $i]) && !empty($_POST['_applicant_available_as_' . $i]) ) ? ph_clean($_POST['_applicant_available_as_' . $i]) : array();
+
+                    $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_minimum_floor_area_' . $i]));
+                    $applicant_profile['min_floor_area'] = $floor_area;
+                    $applicant_profile['min_floor_area_actual'] = $floor_area;
+
+                    $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_maximum_floor_area_' . $i]));
+                    $applicant_profile['max_floor_area'] = $floor_area;
+                    $applicant_profile['max_floor_area_actual'] = $floor_area;
+
+                    $applicant_profile['floor_area_units'] = 'sqft';
 
                     if ( isset($_POST['_applicant_commercial_property_types_' . $i]) && is_array($_POST['_applicant_commercial_property_types_' . $i]) && !empty($_POST['_applicant_commercial_property_types_' . $i]) )
                     {
