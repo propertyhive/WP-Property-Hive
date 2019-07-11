@@ -498,6 +498,14 @@ class PH_AJAX {
                 }
                 $applicant_profile['available_as'] = $available_as;
 
+                $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['minimum_floor_area']));
+                $applicant_profile['min_floor_area'] = $floor_area;
+                $applicant_profile['min_floor_area_actual'] = $floor_area;
+
+                $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_floor_area']));
+                $applicant_profile['max_floor_area'] = $floor_area;
+                $applicant_profile['max_floor_area_actual'] = $floor_area;
+
                 if ( isset($_POST['commercial_property_type']) && !empty($_POST['commercial_property_type']) )
                 {
                     $applicant_profile['commercial_property_types'] = is_array(ph_clean($_POST['commercial_property_type'])) ? ph_clean($_POST['commercial_property_type']) : array(ph_clean($_POST['commercial_property_type']));
@@ -825,6 +833,14 @@ class PH_AJAX {
                     $available_as[] = 'rent';
                 }
                 $applicant_profile['available_as'] = $available_as;
+
+                $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['minimum_floor_area']));
+                $applicant_profile['min_floor_area'] = $floor_area;
+                $applicant_profile['min_floor_area_actual'] = $floor_area;
+
+                $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_floor_area']));
+                $applicant_profile['max_floor_area'] = $floor_area;
+                $applicant_profile['max_floor_area_actual'] = $floor_area;
 
                 if ( isset($_POST['commercial_property_type']) && !empty($_POST['commercial_property_type']) )
                 {
