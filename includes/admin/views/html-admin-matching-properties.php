@@ -78,6 +78,38 @@
                     </div>';
                 }
 
+                if ( 
+                    (isset($applicant_profile['min_floor_area_actual']) && $applicant_profile['min_floor_area_actual'] != '') 
+                    || 
+                    (isset($applicant_profile['max_floor_area_actual']) && $applicant_profile['max_floor_area_actual'] != '')
+                )
+                {
+                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                        <strong>Floor Area:</strong><br>';
+                    $sizes = array('min' => '', 'max');
+                    if ( isset($applicant_profile['min_floor_area_actual']) && $applicant_profile['min_floor_area_actual'] != '' )
+                    {
+                        $sizes['min'] = $applicant_profile['min_floor_area_actual'];
+                    }
+                    if ( isset($applicant_profile['max_floor_area_actual']) && $applicant_profile['max_floor_area_actual'] != '' )
+                    {
+                        $sizes['max'] = $applicant_profile['max_floor_area_actual'];
+                    }
+                    if ( $sizes['min'] != '' && $sizes['max'] != '' )
+                    {
+                        echo number_format($sizes['min']) . ' - ' . number_format($sizes['max']) . ' Sq Ft';
+                    }
+                    if ( $sizes['min'] != '' && $sizes['max'] == '' )
+                    {
+                        echo 'From ' . number_format($sizes['min']) . ' Sq Ft';
+                    }
+                    if ( $sizes['min'] == '' && $sizes['max'] != '' )
+                    {
+                        echo 'Up To ' . number_format($sizes['max']) . ' Sq Ft';
+                    }
+                    echo '</div>';
+                }
+
                 if ( isset($applicant_profile['commercial_property_types']) && is_array($applicant_profile['commercial_property_types']) && !empty($applicant_profile['commercial_property_types']) )
                 {
                     $terms = get_terms('commercial_property_type', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['commercial_property_types']));

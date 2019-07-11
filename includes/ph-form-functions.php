@@ -633,6 +633,30 @@ function ph_get_applicant_requirements_form_fields()
             $fields['available_as_rent']['checked'] = true;
         }
 
+        $fields['minimum_floor_area'] = array(
+            'type' => 'number',
+            'label' => __( 'Min Floor Area (Sq Ft)', 'propertyhive' ),
+            'style' => 'max-width:150px;',
+            'before' => '<div class="control control-minimum_floor_area commercial-only">',
+            'required' => false
+        );
+        if ( is_user_logged_in() && isset($applicant_profile['min_floor_area']) )
+        {
+            $fields['minimum_floor_area']['value'] = $applicant_profile['min_floor_area'];
+        }
+
+        $fields['maximum_floor_area'] = array(
+            'type' => 'number',
+            'label' => __( 'Max Floor Area (Sq Ft)', 'propertyhive' ),
+            'style' => 'max-width:150px;',
+            'before' => '<div class="control control-maximum_floor_area commercial-only">',
+            'required' => false
+        );
+        if ( is_user_logged_in() && isset($applicant_profile['max_floor_area']) )
+        {
+            $fields['maximum_floor_area']['value'] = $applicant_profile['max_floor_area'];
+        }
+
         $args = array(
             'hide_empty' => false,
             'parent' => 0
