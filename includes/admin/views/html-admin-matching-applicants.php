@@ -135,6 +135,10 @@
                 </table>
                 ';
 			}
+            else
+            {
+                echo __( 'No matching applicants found', 'propertyhive' );
+            }
 		?>
 
         <p class="submit">
