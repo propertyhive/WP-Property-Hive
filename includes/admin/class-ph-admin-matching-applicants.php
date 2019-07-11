@@ -245,12 +245,22 @@ class PH_Admin_Matching_Applicants {
                 $property_types = $term_list;
             }
 
-
             $locations = array();
             $term_list = wp_get_post_terms($property_id, 'location', array("fields" => "ids"));
             if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
             {
                 $locations = $term_list;
+            }
+
+            $floor_area_from = $property->floor_area_from_sqft;
+            if ( $floor_area_from === '' )
+            {
+                $floor_area_from = 0;
+            }
+            $floor_area_to = $property->floor_area_to_sqft;
+            if ( $floor_area_to === '' )
+            {
+                $floor_area_to = 99999999999;
             }
 
             $args = array(
@@ -294,68 +304,101 @@ class PH_Admin_Matching_Applicants {
 
                             if ( $applicant_profile['send_matching_properties'] == 'yes' )
                             {
+                                $elements_checked = 0;
                                 $matching_elements = 0;
 
-                                if ( $applicant_profile['department'] == $property->department )
+                                ++$elements_checked;
+                                if ( $applicant_profile['department'] != $property->department )
+                                {
+                                    
+                                }
+                                else
                                 {
                                     ++$matching_elements;
-                                }
 
-                                if ( 
-                                    $applicant_profile['max_price_actual'] == '' ||
-                                    $property->_price_actual <= $applicant_profile['max_price_actual']
-                                )
-                                {
-                                    ++$matching_elements;
-                                }
-
-                                if ( 
-                                    $applicant_profile['min_beds'] == '' ||
-                                    $property->_bedrooms >= $applicant_profile['min_beds']
-                                )
-                                {
-                                    ++$matching_elements;
-                                }
-
-                                if ( 
-                                    !isset($applicant_profile['property_types']) ||
-                                    ( isset($applicant_profile['property_types']) && empty($applicant_profile['property_types']) )
-                                )
-                                {
-                                    ++$matching_elements;
-                                }
-                                elseif ( isset($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
-                                {
-                                    foreach ( $applicant_profile['property_types'] as $applicant_property_type )
+                                    if ( $property->department != 'commercial' )
                                     {
-                                        if ( in_array($applicant_property_type, $property_types) )
+                                        if ( 
+                                            $applicant_profile['max_price_actual'] == '' ||
+                                            $property->_price_actual <= $applicant_profile['max_price_actual']
+                                        )
                                         {
                                             ++$matching_elements;
-                                            break;
                                         }
-                                    }
-                                }
+                                        ++$elements_checked;
 
-                                if ( 
-                                    !isset($applicant_profile['locations']) ||
-                                    ( isset($applicant_profile['locations']) && empty($applicant_profile['locations']) )
-                                )
-                                {
-                                    ++$matching_elements;
-                                }
-                                elseif ( isset($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
-                                {
-                                    foreach ( $applicant_profile['locations'] as $applicant_location )
-                                    {
-                                        if ( in_array($applicant_location, $locations) )
+                                        if ( 
+                                            $applicant_profile['min_beds'] == '' ||
+                                            $property->_bedrooms >= $applicant_profile['min_beds']
+                                        )
                                         {
                                             ++$matching_elements;
-                                            break;
+                                        }
+                                        ++$elements_checked;
+                                    }
+                                    else
+                                    {
+                                        if ( $applicant_profile['min_floor_area'] === '' )
+                                        {
+                                            $applicant_profile['min_floor_area'] = 0;
+                                        }
+                                        if ( $applicant_profile['max_floor_area'] === '' )
+                                        {
+                                            $applicant_profile['max_floor_area'] = 99999999999;
+                                        }
+                                        
+                                        if ( 
+                                            $applicant_profile['min_floor_area'] <= $floor_area_to &&
+                                            $applicant_profile['max_floor_area'] >= $floor_area_from
+                                        )
+                                        {
+                                            ++$matching_elements;
+                                        }
+                                        ++$elements_checked;
+                                    }
+
+                                    if ( 
+                                        !isset($applicant_profile[$prefix . 'property_types']) ||
+                                        ( isset($applicant_profile[$prefix . 'property_types']) && empty($applicant_profile[$prefix . 'property_types']) )
+                                    )
+                                    {
+                                        ++$matching_elements;
+                                    }
+                                    elseif ( isset($applicant_profile[$prefix . 'property_types']) && !empty($applicant_profile[$prefix . 'property_types']) )
+                                    {
+                                        foreach ( $applicant_profile[$prefix . 'property_types'] as $applicant_property_type )
+                                        {
+                                            if ( in_array($applicant_property_type, $property_types) )
+                                            {
+                                                ++$matching_elements;
+                                                break;
+                                            }
                                         }
                                     }
+                                    ++$elements_checked;
+
+                                    if ( 
+                                        !isset($applicant_profile['locations']) ||
+                                        ( isset($applicant_profile['locations']) && empty($applicant_profile['locations']) )
+                                    )
+                                    {
+                                        ++$matching_elements;
+                                    }
+                                    elseif ( isset($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+                                    {
+                                        foreach ( $applicant_profile['locations'] as $applicant_location )
+                                        {
+                                            if ( in_array($applicant_location, $locations) )
+                                            {
+                                                ++$matching_elements;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    ++$elements_checked;
                                 }
 
-                                if ( $matching_elements == 5 )
+                                if ( $matching_elements == $elements_checked )
                                 {  
                                     $applicant_profile['applicant_profile_id'] = $i;
 
