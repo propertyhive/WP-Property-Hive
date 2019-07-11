@@ -337,6 +337,33 @@ class PH_Admin_Matching_Properties {
                         // Do nothing as both are ticked
                     }
                 }
+
+                if (
+                    !isset($applicant_profile['min_floor_area_actual']) || 
+                    ( isset($applicant_profile['min_floor_area_actual']) && $applicant_profile['min_floor_area_actual'] === '') 
+                )
+                {
+                    $applicant_profile['min_floor_area_actual'] = 0;
+                }
+                if (
+                    !isset($applicant_profile['max_floor_area_actual']) || 
+                    ( isset($applicant_profile['max_floor_area_actual']) && $applicant_profile['max_floor_area_actual'] === '') 
+                )
+                {
+                    $applicant_profile['max_floor_area_actual'] = 99999999999;
+                }
+                $meta_query[] = array(
+                    'key' => '_floor_area_from_sqft',
+                    'value' => $applicant_profile['max_floor_area_actual'],
+                    'compare' => '<=',
+                    'type' => 'NUMERIC'
+                );
+                $meta_query[] = array(
+                    'key' => '_floor_area_to_sqft',
+                    'value' => $applicant_profile['min_floor_area_actual'],
+                    'compare' => '>=',
+                    'type' => 'NUMERIC'
+                );
             }
             $args['meta_query'] = $meta_query;
 
