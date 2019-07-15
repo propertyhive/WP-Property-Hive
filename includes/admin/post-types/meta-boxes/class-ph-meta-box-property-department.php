@@ -42,26 +42,27 @@ class PH_Meta_Box_Property_Department {
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
+
+        $departments = ph_get_departments();
         
-        //TODO: Get the departments being used from the plugin settings and only display them options
-        
-        $departments = array();
-        if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+        $department_options = array();
+
+        foreach ( $departments as $key => $value )
         {
-            $departments['residential-sales'] = __( 'Residential Sales', 'propertyhive' );
-        }
-        if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-        {
-            $departments['residential-lettings'] = __( 'Residential Lettings', 'propertyhive' );
-        }
-        if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
-        {
-            $departments['commercial'] = __( 'Commercial', 'propertyhive' );
+            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+            {
+                $department_options[$key] = $value;
+            }
         }
         if ( $parent_post !== FALSE || ( isset($post->post_parent) && $post->post_parent != '' && $post->post_parent != 0 ) )
         {
-            unset($departments['residential-sales']);
-            unset($departments['residential-lettings']);
+            foreach ( $departments as $key => $value )
+            {
+                if ( $key != 'commercial' )
+                {
+                    unset($department_options[$key]);
+                }
+            }
         }
         else
         {
@@ -75,8 +76,13 @@ class PH_Meta_Box_Property_Department {
 
             if ( $unit_query->have_posts() )
             {
-                unset($departments['residential-sales']);
-                unset($departments['residential-lettings']);
+                foreach ( $departments as $key => $value )
+                {
+                    if ( $key != 'commercial' )
+                    {
+                        //unset($department_options[$key]);
+                    }
+                }
             }
             wp_reset_postdata();
         }
@@ -93,11 +99,11 @@ class PH_Meta_Box_Property_Department {
             'id' => '_department',
             'label' => 'Department',
             'value' => $value,
-            'options' => $departments
+            'options' => $department_options
         );
-        if (count($departments) == 1)
+        if (count($department_options) == 1)
         {
-            foreach ($departments as $key => $value)
+            foreach ($department_options as $key => $value)
             {
                 $args['value'] = $key;
             }
@@ -119,22 +125,24 @@ class PH_Meta_Box_Property_Department {
             
             function showHideDepartmentMetaBox()
             {
-                 jQuery(\'#propertyhive-property-residential-sales-details\').hide();
-                 jQuery(\'#propertyhive-property-residential-lettings-details\').hide();
-                 jQuery(\'#propertyhive-property-commercial-details\').hide();
+                jQuery(\'#propertyhive-property-residential-details\').hide();
+        ';
+        foreach ( $departments as $key => $value )
+        {
+            echo '
+                jQuery(\'#propertyhive-property-' . $key . '-details\').hide();
+            ';
+        }
 
-                 var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
+        echo '
+                var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
                  
-                 jQuery(\'#propertyhive-property-\' + selectedDepartment + \'-details\').show();
+                jQuery(\'#propertyhive-property-\' + selectedDepartment + \'-details\').show();
 
-                 if (selectedDepartment == \'commercial\')
-                 {
-                    jQuery(\'#propertyhive-property-residential-details\').hide();
-                 }
-                 else
-                 {
+                if (selectedDepartment.indexOf(\'residential\') != -1)
+                {
                     jQuery(\'#propertyhive-property-residential-details\').show();
-                 }
+                }
             }
             
         </script>';

@@ -200,13 +200,13 @@ class PH_Meta_Box_Property_Rooms {
             {
                  var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
                  
-                 if (selectedDepartment == \'commercial\')
+                 if (selectedDepartment == \'residential-sales\' || selectedDepartment == \'residential-lettings\')
                  {
-                    jQuery(\'#propertyhive-property-rooms\').hide();
+                    jQuery(\'#propertyhive-property-rooms\').show();
                  }
                  else
                  {
-                    jQuery(\'#propertyhive-property-rooms\').show();
+                    jQuery(\'#propertyhive-property-rooms\').hide();
                  }
             }
             

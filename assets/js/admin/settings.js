@@ -121,8 +121,13 @@ jQuery( function($){
     {
         fill_search_form_currency_options();
     });
-
     fill_search_form_currency_options();
+
+    jQuery('input[name^=\'propertyhive_active_departments\']').change(function()
+    {
+        toggle_department_specific_options();
+    });
+    toggle_department_specific_options();
 });
 
 function fill_search_form_currency_options()
@@ -170,5 +175,23 @@ function fill_search_form_currency_options()
             jQuery("#propertyhive_search_form_currency").val( jQuery("#propertyhive_search_form_currency option:first").val() );
 
         }
+    }
+}
+
+function toggle_department_specific_options()
+{
+    jQuery('#row_propertyhive_lettings_fees').hide();
+    jQuery('#row_propertyhive_lettings_fees_commercial').hide();
+    jQuery('#row_propertyhive_lettings_fees_display_search_results').hide();
+
+    if (jQuery('#propertyhive_active_departments_lettings').prop('checked') == true)
+    {
+        jQuery('#row_propertyhive_lettings_fees').show();
+        jQuery('#row_propertyhive_lettings_fees_display_search_results').show();
+    }
+    if (jQuery('#propertyhive_active_departments_commercial').prop('checked') == true)
+    {
+        jQuery('#row_propertyhive_lettings_fees_commercial').show();
+        jQuery('#row_propertyhive_lettings_fees_display_search_results').show();
     }
 }
