@@ -126,67 +126,30 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
         );
         
-        if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
-        {
-            $args[] = array(
-                'title' => __( 'Telephone Number (Residential Sales)', 'propertyhive' ),
-                'id'        => '_office_telephone_number_sales',
-                //'css'       => 'width:50px;',
-                'default'   => get_post_meta($current_id, '_office_telephone_number_sales', TRUE),
-                'type'      => 'text',
-                'desc_tip'  =>  false,
-            );
-            
-            $args[] = array(
-                'title' => __( 'Email Address (Residential Sales)', 'propertyhive' ),
-                'id'        => '_office_email_address_sales',
-                //'css'       => 'width:50px;',
-                'default'   => get_post_meta($current_id, '_office_email_address_sales', TRUE),
-                'type'      => 'text',
-                'desc_tip'  =>  false,
-            );
-        }
-        
-        if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-        {
-            $args[] = array(
-                'title' => __( 'Telephone Number (Residential Lettings)', 'propertyhive' ),
-                'id'        => '_office_telephone_number_lettings',
-                //'css'       => 'width:50px;',
-                'default'   => get_post_meta($current_id, '_office_telephone_number_lettings', TRUE),
-                'type'      => 'text',
-                'desc_tip'  =>  false,
-            );
-            
-            $args[] = array(
-                'title' => __( 'Email Address (Residential Lettings)', 'propertyhive' ),
-                'id'        => '_office_email_address_lettings',
-                //'css'       => 'width:50px;',
-                'default'   => get_post_meta($current_id, '_office_email_address_lettings', TRUE),
-                'type'      => 'text',
-                'desc_tip'  =>  false,
-            );
-        }
+        $departments = ph_get_departments();
 
-        if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+        foreach ( $departments as $key => $value )
         {
-            $args[] = array(
-                'title' => __( 'Telephone Number (Commercial)', 'propertyhive' ),
-                'id'        => '_office_telephone_number_commercial',
-                //'css'       => 'width:50px;',
-                'default'   => get_post_meta($current_id, '_office_telephone_number_commercial', TRUE),
-                'type'      => 'text',
-                'desc_tip'  =>  false,
-            );
-            
-            $args[] = array(
-                'title' => __( 'Email Address (Commercial)', 'propertyhive' ),
-                'id'        => '_office_email_address_commercial',
-                //'css'       => 'width:50px;',
-                'default'   => get_post_meta($current_id, '_office_email_address_commercial', TRUE),
-                'type'      => 'text',
-                'desc_tip'  =>  false,
-            );
+            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+            {
+                $args[] = array(
+                    'title' => __( 'Telephone Number (' . $value . ')', 'propertyhive' ),
+                    'id'        => '_office_telephone_number_' . str_replace("residential-", "", $key),
+                    //'css'       => 'width:50px;',
+                    'default'   => get_post_meta($current_id, '_office_telephone_number_' . str_replace("residential-", "", $key), TRUE),
+                    'type'      => 'text',
+                    'desc_tip'  =>  false,
+                );
+                
+                $args[] = array(
+                    'title' => __( 'Email Address (' . $value . ')', 'propertyhive' ),
+                    'id'        => '_office_email_address_' . str_replace("residential-", "", $key),
+                    //'css'       => 'width:50px;',
+                    'default'   => get_post_meta($current_id, '_office_email_address_' . str_replace("residential-", "", $key), TRUE),
+                    'type'      => 'text',
+                    'desc_tip'  =>  false,
+                );
+            }
         }
         
         $args[] = array( 'type' => 'sectionend', 'id' => 'office_contact_options' );
@@ -452,20 +415,16 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                     $address .= $address_part;
                                     
                                     $contact_details = '';
-                                    if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+
+                                    $departments = ph_get_departments();
+
+                                    foreach ( $departments as $key => $value )
                                     {
-                                        $contact_details .= 'T: ' . get_post_meta($post->ID, '_office_telephone_number_sales', TRUE) . '<br>';
-                                        $contact_details .= 'E: ' . get_post_meta($post->ID, '_office_email_address_sales', TRUE) . '<br>';
-                                    }
-                                    if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-                                    {
-                                        $contact_details .= 'T: ' . get_post_meta($post->ID, '_office_telephone_number_lettings', TRUE) . '<br>';
-                                        $contact_details .= 'E: ' . get_post_meta($post->ID, '_office_email_address_lettings', TRUE) . '<br>';
-                                    }
-                                    if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
-                                    {
-                                        $contact_details .= 'T: ' . get_post_meta($post->ID, '_office_telephone_number_commercial', TRUE) . '<br>';
-                                        $contact_details .= 'E: ' . get_post_meta($post->ID, '_office_email_address_commercial', TRUE) . '<br>';
+                                        if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+                                        {
+                                            $contact_details .= 'T: ' . get_post_meta($post->ID, '_office_telephone_number_' . str_replace("residential-", "", $key), TRUE) . '<br>';
+                                            $contact_details .= 'E: ' . get_post_meta($post->ID, '_office_email_address_' . str_replace("residential-", "", $key), TRUE) . '<br>';
+                                        }
                                     }
                                     
                                     echo '<tr>
@@ -653,13 +612,17 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 update_post_meta($office_post_id, '_office_address_4', ph_clean( $_POST['_office_address_4'] ));
                 update_post_meta($office_post_id, '_office_address_postcode', ph_clean( $_POST['_office_address_postcode'] ));
                 
-                update_post_meta($office_post_id, '_office_telephone_number_sales', (isset($_POST['_office_telephone_number_sales'])) ? ph_clean( $_POST['_office_telephone_number_sales'] ) : '');
-                update_post_meta($office_post_id, '_office_email_address_sales', (isset($_POST['_office_email_address_sales'])) ? ph_clean( $_POST['_office_email_address_sales'] ) : '');
-                update_post_meta($office_post_id, '_office_telephone_number_lettings', (isset($_POST['_office_telephone_number_lettings'])) ? ph_clean( $_POST['_office_telephone_number_lettings'] ) : '');
-                update_post_meta($office_post_id, '_office_email_address_lettings', (isset($_POST['_office_email_address_lettings'])) ? ph_clean( $_POST['_office_email_address_lettings'] ) : '');
-                update_post_meta($office_post_id, '_office_telephone_number_commercial', (isset($_POST['_office_telephone_number_commercial'])) ? ph_clean( $_POST['_office_telephone_number_commercial'] ) : '');
-                update_post_meta($office_post_id, '_office_email_address_commercial', (isset($_POST['_office_email_address_commercial'])) ? ph_clean( $_POST['_office_email_address_commercial'] ) : '');
+                $departments = ph_get_departments();
 
+                foreach ( $departments as $key => $value )
+                {
+                    if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+                    {
+                        update_post_meta($office_post_id, '_office_telephone_number_' . str_replace("residential-", "", $key), (isset($_POST['_office_telephone_number_' . str_replace("residential-", "", $key)])) ? ph_clean( $_POST['_office_telephone_number_' . str_replace("residential-", "", $key)] ) : '');
+                        update_post_meta($office_post_id, '_office_email_address_' . str_replace("residential-", "", $key), (isset($_POST['_office_email_address_' . str_replace("residential-", "", $key)])) ? ph_clean( $_POST['_office_email_address_' . str_replace("residential-", "", $key)] ) : '');
+                    }
+                }
+                
                 update_post_meta($office_post_id, '_office_latitude', ph_clean( $_POST['_office_latitude'] ));
                 update_post_meta($office_post_id, '_office_longitude', ph_clean( $_POST['_office_longitude'] ));
 

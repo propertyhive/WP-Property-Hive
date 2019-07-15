@@ -42,21 +42,19 @@ class PH_Admin_Applicant_List {
 				<label>Looking For</label>
 				<select name="department">
 					<?php
-						$departments = array();
-                        if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+
+                        $departments = ph_get_departments();
+
+						$department_options = array();
+                        foreach ( $departments as $key => $value )
                         {
-                            $departments['residential-sales'] = __( 'Residential Sales', 'propertyhive' );
-                        }
-                        if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-                        {
-                            $departments['residential-lettings'] = __( 'Residential Lettings', 'propertyhive' );
-                        }
-                        if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
-                        {
-                            $departments['commercial'] = __( 'Commercial', 'propertyhive' );
+                            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+                            {
+                                $department_options[$key] = $value;
+                            }
                         }
 
-                        foreach ( $departments as $key => $department )
+                        foreach ( $department_options as $key => $department )
                         {
                         	echo '<option value="' . $key . '"';
                         	if ( isset($_POST['department']) && $_POST['department'] == $key )

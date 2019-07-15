@@ -53,15 +53,20 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 			<label for="department">Department:</label>
 			<select name="department" id="department" style="width:100%;">
 				<option value="">All</option>
-				<?php if ( get_option('propertyhive_active_departments_sales', '') == 'yes' ) { ?>
-				<option value="residential-sales"<?php if ( isset($_POST['department']) && $_POST['department'] == 'residential-sales' ) { echo ' selected'; } ?>>Residential Sales</option>
-				<?php } ?>
-				<?php if ( get_option('propertyhive_active_departments_lettings', '') == 'yes' ) { ?>
-				<option value="residential-lettings"<?php if ( isset($_POST['department']) && $_POST['department'] == 'residential-lettings' ) { echo ' selected'; } ?>>Residential Lettings</option>
-				<?php } ?>
-				<?php if ( get_option('propertyhive_active_departments_commercial', '') == 'yes' ) { ?>
-				<option value="commercial"<?php if ( isset($_POST['department']) && $_POST['department'] == 'commercial' ) { echo ' selected'; } ?>>Commercial</option>
-				<?php } ?>
+
+				<?php
+					$departments = ph_get_departments();
+
+			        foreach ( $departments as $key => $value )
+			        {
+			            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+			            {
+			            	echo '<option value="' . $key . '"';
+			            	if ( isset($_POST['department']) && $_POST['department'] == $key ) { echo ' selected'; }
+			            	echo '>' . $value . '</option>';
+			           	}
+			        }
+				?>
 			</select>
 
 			<br><br>

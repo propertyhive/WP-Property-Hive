@@ -204,31 +204,25 @@ class PH_Admin_Post_Types {
     public function property_department_filter() {
         global $wp_query;
 
-        $selected_department = isset( $_GET['_department'] ) && in_array( $_GET['_department'], array( 'residential-sales', 'residential-lettings', 'commercial' ) ) ? $_GET['_department'] : '';
+        $departments = ph_get_departments();
+
+        $selected_department = isset( $_GET['_department'] ) && in_array( $_GET['_department'], array_keys($departments) ) ? $_GET['_department'] : '';
         
         // Department filtering
         $output  = '<select name="_department" id="dropdown_property_department">';
             
             $output .= '<option value="">' . __( 'All Departments', 'propertyhive' ) . '</option>';
-            
-            if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+
+            foreach ( $departments as $key => $value )
             {
-                $output .= '<option value="residential-sales"';
-                $output .= selected( 'residential-sales', $selected_department, false );
-                $output .= '>' . __( 'Residential Sales', 'propertyhive' ) . '</option>';
+                if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+                {
+                    $output .= '<option value="' . $key . '"';
+                    $output .= selected( $key, $selected_department, false );
+                    $output .= '>' . $value . '</option>';
+                }
             }
-            if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-            {
-                $output .= '<option value="residential-lettings"';
-                $output .= selected( 'residential-lettings', $selected_department, false );
-                $output .= '>' . __( 'Residential Lettings', 'propertyhive' ) . '</option>';
-            }
-            if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
-            {
-                $output .= '<option value="commercial"';
-                $output .= selected( 'commercial', $selected_department, false );
-                $output .= '>' . __( 'Commercial', 'propertyhive' ) . '</option>';
-            }
+
         $output .= '</select>';
 
         return $output;
