@@ -57,128 +57,85 @@ class PH_Settings_General extends PH_Settings_Page {
 	 * @return array
 	 */
 	public function get_settings() {
-		    
-		return apply_filters( 'propertyhive_general_settings', array(
+		  
+        $departments = ph_get_departments();
+
+		$settings = array(
 
 			array( 'title' => __( 'General Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'general_options' ),
-            
-            array(
+        
+        );
+
+        $i = 0;
+        foreach ( $departments as $key => $value )
+        {
+            $checkboxgroup = 'middle';
+            if ( $i == 0 ) { $checkboxgroup = 'start'; }
+            if ( $i == (count($departments) - 1) ) { $checkboxgroup = 'end'; }
+
+            $settings[] = array(
                 'title'   => __( 'Active Departments', 'propertyhive' ),
-                'desc'    => __( 'Residential Sales', 'propertyhive' ),
-                'id'      => 'propertyhive_active_departments_sales',
+                'desc'    => $value,
+                'id'      => 'propertyhive_active_departments_' . str_replace("residential-", "", $key),
                 'type'    => 'checkbox',
-                'default' => 'yes',
-                'checkboxgroup' => 'start'
-            ),
+                'default' => ( ( in_array($key, array('residential-sales', 'residential-lettings', 'commercial')) ) ? 'yes' : '' ),
+                'checkboxgroup' => $checkboxgroup,
+            );
+
+            ++$i;
+        }
+
+        $settings[] = array(
+            'title'   => __( 'Primary Department', 'propertyhive' ),
+            'id'      => 'propertyhive_primary_department',
+            'type'    => 'radio',
+            'default' => 'residential-sales',
+            'options' => $departments,
+        );
             
-            array(
-                'title'   => __( 'Active Departments', 'propertyhive' ),
-                'desc'    => __( 'Residential Lettings', 'propertyhive' ),
-                'id'      => 'propertyhive_active_departments_lettings',
-                'type'    => 'checkbox',
-                'default' => 'yes',
-                'checkboxgroup' => 'middle'
-            ),
+        $settings[] = array(
+            'title' => __( 'Property Search Results Page', 'propertyhive' ),
+            //'desc'      => '<br/>' . sprintf( __( 'The base page can also be used in your <a href="%s">product permalinks</a>.', 'propertyhive' ), admin_url( 'options-permalink.php' ) ),
+            'id'        => 'propertyhive_search_results_page_id',
+            'type'      => 'single_select_page',
+            'default'   => '',
+            'css'       => 'min-width:300px;',
+            'desc'  => __( 'This sets the page of your property search results', 'propertyhive' ),
+        );
 
-            array(
-                'title'   => __( 'Active Departments', 'propertyhive' ),
-                'desc'    => __( 'Commercial', 'propertyhive' ),
-                'id'      => 'propertyhive_active_departments_commercial',
-                'type'    => 'checkbox',
-                'checkboxgroup' => 'end'
-            ),
+        $settings[] = array(
+            'title'   => __( 'Lettings Fees (Residential)', 'propertyhive' ),
+            'id'      => 'propertyhive_lettings_fees',
+            'type'    => 'textarea',
+            'css'	  => 'height:150px; width:100%; max-width:400px'
+        );
 
-            array(
-                'title'   => __( 'Primary Department', 'propertyhive' ),
-                'id'      => 'propertyhive_primary_department',
-                'type'    => 'radio',
-                'default' => 'residential-sales',
-                'options' => array(
-                	'residential-sales' => __( 'Residential Sales', 'propertyhive' ),
-                	'residential-lettings' => __( 'Residential Lettings', 'propertyhive' ),
-                	'commercial' => __( 'Commercial', 'propertyhive' )
-                )
-            ),
+        $settings[] = array(
+            'title'   => __( 'Lettings Fees (Commercial)', 'propertyhive' ),
+            'id'      => 'propertyhive_lettings_fees_commercial',
+            'type'    => 'textarea',
+            'css'     => 'height:150px; width:100%; max-width:400px'
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Display Link To Lettings Fees Next To Price', 'propertyhive' ),
+            'desc'    => __( 'In Search Results', 'propertyhive' ),
+            'id'      => 'propertyhive_lettings_fees_display_search_results',
+            'type'    => 'checkbox',
+            'checkboxgroup' => 'start',
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Display Link To Lettings Fees Next To Price', 'propertyhive' ),
+            'desc'    => __( 'On Property Details Page', 'propertyhive' ),
+            'id'      => 'propertyhive_lettings_fees_display_single_property',
+            'type'    => 'checkbox',
+            'checkboxgroup' => 'end',
+        );
             
-            array(
-                'title' => __( 'Property Search Results Page', 'propertyhive' ),
-                //'desc'      => '<br/>' . sprintf( __( 'The base page can also be used in your <a href="%s">product permalinks</a>.', 'propertyhive' ), admin_url( 'options-permalink.php' ) ),
-                'id'        => 'propertyhive_search_results_page_id',
-                'type'      => 'single_select_page',
-                'default'   => '',
-                'css'       => 'min-width:300px;',
-                'desc'  => __( 'This sets the page of your property search results', 'propertyhive' ),
-            ),
+		$settings[] = array( 'type' => 'sectionend', 'id' => 'general_options');
 
-            array(
-                'title'   => __( 'Lettings Fees (Residential)', 'propertyhive' ),
-                'id'      => 'propertyhive_lettings_fees',
-                'type'    => 'textarea',
-                'css'	  => 'height:150px; width:100%; max-width:400px'
-            ),
-
-            array(
-                'title'   => __( 'Lettings Fees (Commercial)', 'propertyhive' ),
-                'id'      => 'propertyhive_lettings_fees_commercial',
-                'type'    => 'textarea',
-                'css'     => 'height:150px; width:100%; max-width:400px'
-            ),
-
-            array(
-                'title'   => __( 'Display Link To Lettings Fees Next To Price', 'propertyhive' ),
-                'desc'    => __( 'In Search Results', 'propertyhive' ),
-                'id'      => 'propertyhive_lettings_fees_display_search_results',
-                'type'    => 'checkbox',
-                'checkboxgroup' => 'start',
-            ),
-
-            array(
-                'title'   => __( 'Display Link To Lettings Fees Next To Price', 'propertyhive' ),
-                'desc'    => __( 'On Property Details Page', 'propertyhive' ),
-                'id'      => 'propertyhive_lettings_fees_display_single_property',
-                'type'    => 'checkbox',
-                'checkboxgroup' => 'end',
-            ),
-
-            array(
-                'id'      => 'propertyhive_lettings_fees_html',
-                'type'    => 'html',
-                'html' => '<script>
-
-                    jQuery(document).ready(function()
-                    {
-                        toggle_fees();
-
-                        jQuery(\'input[name^=\\\'propertyhive_active_departments\\\']\').change(function()
-                        {
-                            toggle_fees();
-                        });
-                    });
-
-                    function toggle_fees()
-                    {
-                        jQuery(\'#row_propertyhive_lettings_fees\').hide();
-                        jQuery(\'#row_propertyhive_lettings_fees_commercial\').hide();
-                        jQuery(\'#row_propertyhive_lettings_fees_display_search_results\').hide();
-
-                        if (jQuery(\'#propertyhive_active_departments_lettings\').prop(\'checked\') == true)
-                        {
-                            jQuery(\'#row_propertyhive_lettings_fees\').show();
-                            jQuery(\'#row_propertyhive_lettings_fees_display_search_results\').show();
-                        }
-                        if (jQuery(\'#propertyhive_active_departments_commercial\').prop(\'checked\') == true)
-                        {
-                            jQuery(\'#row_propertyhive_lettings_fees_commercial\').show();
-                            jQuery(\'#row_propertyhive_lettings_fees_display_search_results\').show();
-                        }
-                    }
-
-                </script>',
-            ),
-            
-			array( 'type' => 'sectionend', 'id' => 'general_options'),
-
-		) ); // End general settings
+        return apply_filters( 'propertyhive_general_settings', $settings );
 	}
 
 	/**
