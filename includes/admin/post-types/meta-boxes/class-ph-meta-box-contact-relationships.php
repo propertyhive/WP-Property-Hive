@@ -282,24 +282,22 @@ class PH_Meta_Box_Contact_Relationships {
                     ++$tab;
                 }
 
+                $departments = ph_get_departments();
+
                 foreach ($applicant_profiles as $key => $applicant_profile)
                 {
                     echo '<div id="tab_applicant_data_' . $key . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                         
                         <div class="options_group applicant-fields-' . $key . '" style="float:left; width:100%;">';
                         
-                        $departments = array();
-                        if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+                        $department_options = array();
+
+                        foreach ( $departments as $key => $value )
                         {
-                            $departments['residential-sales'] = __( 'Residential Sales', 'propertyhive' );
-                        }
-                        if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-                        {
-                            $departments['residential-lettings'] = __( 'Residential Lettings', 'propertyhive' );
-                        }
-                        if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
-                        {
-                            $departments['commercial'] = __( 'Commercial', 'propertyhive' );
+                            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+                            {
+                                $department_options[$key] = $value;
+                            }
                         }
 
                         $value = ( ( isset($applicant_profile['department']) && $applicant_profile['department'] != '' ) ? $applicant_profile['department'] : get_option( 'propertyhive_primary_department' ));
@@ -307,11 +305,11 @@ class PH_Meta_Box_Contact_Relationships {
                             'id' => '_applicant_department_' . $key,
                             'label' => 'Looking For',
                             'value' => $value,
-                            'options' => $departments
+                            'options' => $department_options
                         );
-                        if (count($departments) == 1)
+                        if (count($department_options) == 1)
                         {
-                            foreach ($departments as $department_key => $value)
+                            foreach ($department_options as $department_key => $value)
                             {
                                 $args['value'] = $department_key;
                             }

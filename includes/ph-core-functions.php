@@ -170,7 +170,18 @@ function ph_get_image_size( $image_size ) {
     return $size;
 }
 
-function get_area_units( )
+function ph_get_departments()
+{
+    $departments = array(
+        'residential-sales' => __( 'Residential Sales', 'propertyhive' ),
+        'residential-lettings' => __( 'Residential Lettings', 'propertyhive' ),
+        'commercial' => __( 'Commercial', 'propertyhive' ),
+    );
+
+    return apply_filters( 'propertyhive_departments', $departments );
+}
+
+function get_area_units()
 {
     $size_options = array(
         'sqft' => __( 'Sq Ft', 'propertyhive' ),

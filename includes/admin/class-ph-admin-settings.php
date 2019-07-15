@@ -460,6 +460,8 @@ class PH_Admin_Settings {
 	            case 'checkbox' :
 
 					$option_value    = self::get_option( $value['id'], $value['default'] );
+					$fieldset_css  = isset($value['fieldset_css']) ? ph_clean($value['fieldset_css']) : '';
+
 					$visbility_class = array();
 
 	            	if ( ! isset( $value['hide_if_checked'] ) ) {
@@ -483,11 +485,11 @@ class PH_Admin_Settings {
 		            		<tr valign="top" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 								<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?></th>
 								<td class="forminp forminp-checkbox">
-									<fieldset>
+									<fieldset style="<?php echo $fieldset_class; ?>">
 						<?php
-	            	} else {
+	            	} else { 
 	            		?>
-		            		<fieldset class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>">
+		            		<fieldset style="<?php echo $fieldset_css; ?>" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>">
 	            		<?php
 	            	}
 
