@@ -315,6 +315,12 @@ class PH_Property {
      */
     public function get_formatted_price( ) {
         
+        $return = '';
+
+        $currency = array();
+        $prefix = '';
+        $suffix = '';
+
         if ( $this->_department == 'commercial' )
         {
             $price = '';
@@ -330,19 +336,17 @@ class PH_Property {
             }
             $price .= $rent;
 
-            return $price;
+            $return = $price;
         }
         else
         {
             if ( ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) && $this->_poa == 'yes')
             {
-                return __( 'POA', 'propertyhive' );
+                $return = __( 'POA', 'propertyhive' );
             }
             else
             {
                 $ph_countries = new PH_Countries();
-
-                $currency = array();
 
                 if ( !is_admin() )
                 {
@@ -427,7 +431,7 @@ class PH_Property {
                         {
                             $price = $this->_price_actual * $currency['exchange_rate'];
                         }
-                        return ( ( $price != '' ) ? $prefix . number_format($price, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix : '-' );
+                        $return = ( ( $price != '' ) ? $prefix . number_format($price, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix : '-' );
                         break;
                     }
                     case "residential-lettings":
@@ -443,14 +447,14 @@ class PH_Property {
                                 case "pa": { $price = ($price * 12); break; }
                             }
                         }
-                        return ( ( $price != '' ) ? $prefix . number_format($price, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                        $return = ( ( $price != '' ) ? $prefix . number_format($price, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                         break;
                     }
                 }
             }
         }
         
-        return '';
+        return apply_filters( 'propertyhive_price_output', $return, $this, $currency, $prefix, $suffix );
     }
 
     /**
