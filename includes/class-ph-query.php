@@ -688,21 +688,21 @@ class PH_Query {
             	}
             	else
             	{
-	                $departments = array();
-	                if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+            		// No primary department set. Use first active one. Should never get to this scenario
+	                $department = '';
+
+	                $departments = ph_get_departments();
+
+	                foreach ( $departments as $key => $value )
 	                {
-	                    $departments[] = 'residential-sales';
+	                    if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+	                    {
+	                    	if ( $department == '' )
+	                    	{
+	                    		$department = $key;
+	                    	}
+	                    }
 	                }
-	                if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-	                {
-	                    $departments[] = 'residential-lettings';
-	                }
-	                if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
-	                {
-	                    $departments[] = 'commercial';
-	                }
-	                
-	                $department = $departments[0];
             	}
                 $meta_query = array(
                     'key'     => '_department',
