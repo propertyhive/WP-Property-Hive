@@ -327,6 +327,8 @@ class PH_AJAX {
 
         $form_controls = apply_filters( 'propertyhive_applicant_registration_form_fields', $form_controls );
 
+        $contact_post_id = false;
+
         foreach ( $form_controls as $key => $control )
         {
             if ( isset( $control ) && isset( $control['required'] ) && $control['required'] === TRUE )
@@ -363,7 +365,13 @@ class PH_AJAX {
 
                     if ( $contacts_query->have_posts() )
                     {
-                        $errors[] = __( 'This email address is already registered', 'propertyhive' );
+                        while ( $contacts_query->have_posts() )
+                        {
+                            $contacts_query->the_post();
+
+                            $contact_post_id = get_the_ID();
+                        }
+                        //$errors[] = __( 'This email address is already registered', 'propertyhive' );
                     }
                     else
                     {
@@ -429,28 +437,67 @@ class PH_AJAX {
         }
         else
         {
-            // create CPT
-            $contact_post = array(
-                'post_title'    => ph_clean($_POST['name']),
-                'post_content'  => '',
-                'post_type'     => 'contact',
-                'post_status'   => 'publish',
-                'comment_status'=> 'closed',
-                'ping_status'   => 'closed',
-            );
+            if ( $contact_post_id === FALSE )
+            {
+                // create CPT
+                $contact_post = array(
+                    'post_title'    => ph_clean($_POST['name']),
+                    'post_content'  => '',
+                    'post_type'     => 'contact',
+                    'post_status'   => 'publish',
+                    'comment_status'=> 'closed',
+                    'ping_status'   => 'closed',
+                );
+
+                // Insert the post into the database
+                $contact_post_id = wp_insert_post( $contact_post );
+            }
+            else
+            {
+                // update CPT
+                $contact_post = array(
+                    'ID'            => $contact_post_id,
+                    'post_title'    => ph_clean($_POST['name']),
+                    'post_status'   => 'publish',
+                );
+
+                // Insert the post into the database
+                wp_update_post( $contact_post );
+            }
             
-            // Insert the post into the database
-            $contact_post_id = wp_insert_post( $contact_post );
+            $forbidden_contact_methods = get_post_meta( $contact_post_id, '_forbidden_contact_methods', TRUE );
+            if ( !is_array($forbidden_contact_methods) )
+            {
+                $forbidden_contact_methods = array();
+            }
+            if ( ( $key = array_search('email', $forbidden_contact_methods) ) !== false ) {
+                unset($forbidden_contact_methods[$key]);
+            }
+            update_post_meta( $contact_post_id, '_forbidden_contact_methods', array_unique($forbidden_contact_methods) );
 
             // Add post meta (contact details, requirements etc)
-            add_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
+            update_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
             
-            add_post_meta( $contact_post_id, '_telephone_number', ( ( isset($_POST['telephone_number']) ) ? ph_clean($_POST['telephone_number']) : '' ) );
-            add_post_meta( $contact_post_id, '_telephone_number_clean', ( ( isset($_POST['telephone_number']) ) ? ph_clean( ph_clean_telephone_number( $_POST['telephone_number']) ) : '' ) );
+            $telephone_number = get_post_meta( $contact_post_id, '_telephone_number', TRUE );
+            if ( isset($_POST['telephone_number']) && $_POST['telephone_number'] != '' )
+            {
+                $telephone_number = $_POST['telephone_number'];
+            }
+            update_post_meta( $contact_post_id, '_telephone_number', ph_clean($telephone_number) );
+            update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number($telephone_number) ) );
+            
+            $contact_types = get_post_meta( $contact_post_id, '_contact_types', TRUE );
+            if ( !is_array($contact_types) )
+            {
+                $contact_types = array();
+            }
+            if ( !in_array('applicant', $contact_types) )
+            {
+                $contact_types[] = 'applicant';
+            }
+            update_post_meta( $contact_post_id, '_contact_types', array_unique($contact_types) );
 
-            add_post_meta( $contact_post_id, '_contact_types', array('applicant') );
-
-            add_post_meta( $contact_post_id, '_applicant_profiles', 1 );
+            update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
 
             $applicant_profile = array();
             $applicant_profile['department'] = $_POST['department'];
@@ -524,35 +571,44 @@ class PH_AJAX {
 
             update_post_meta( $contact_post_id, '_applicant_profile_0', $applicant_profile );
             
-            // Create user
-            $userdata = array(
-                'display_name' => ph_clean($_POST['name']),
-                'user_login' => sanitize_email($_POST['email_address']),
-                'user_email' => sanitize_email($_POST['email_address']),
-                'user_pass'  => ph_clean($_POST['password']),
-                'role' => 'property_hive_contact',
-                'show_admin_bar_front' => 'false',
-            );
-
-            $user_id = wp_insert_user( $userdata );
-
-            //On success
-            if ( ! is_wp_error( $user_id ) )
+            if ( get_option( 'propertyhive_applicant_users', '' ) == 'yes' )
             {
-                // Assign user ID to CPT
-                add_post_meta( $contact_post_id, '_user_id', $user_id );
+                // Create user
+                $userdata = array(
+                    'display_name' => ph_clean($_POST['name']),
+                    'user_login' => sanitize_email($_POST['email_address']),
+                    'user_email' => sanitize_email($_POST['email_address']),
+                    'user_pass'  => ph_clean($_POST['password']),
+                    'role' => 'property_hive_contact',
+                    'show_admin_bar_front' => 'false',
+                );
 
-                $return['success'] = true;
+                $user_id = wp_insert_user( $userdata );
 
-                wp_set_auth_cookie( $user_id, true );
+                //On success
+                if ( ! is_wp_error( $user_id ) )
+                {
+                    // Assign user ID to CPT
+                    add_post_meta( $contact_post_id, '_user_id', $user_id );
 
-                do_action( 'propertyhive_applicant_registered', $contact_post_id, $user_id );
+                    $return['success'] = true;
+
+                    wp_set_auth_cookie( $user_id, true );
+
+                    do_action( 'propertyhive_applicant_registered', $contact_post_id, $user_id );
+                }
+                else
+                {
+                    $return['success'] = false;
+                    $return['reason'] = 'validation';
+                    $return['errors'] = array('Failed to create user. You might experience issues with logging in');
+                }
             }
             else
             {
-                $return['success'] = false;
-                $return['reason'] = 'validation';
-                $return['errors'] = array('Failed to create user. You might experience issues with logging in');
+                $return['success'] = true;
+
+                do_action( 'propertyhive_applicant_registered', $contact_post_id, 0 );
             }
         }
 
