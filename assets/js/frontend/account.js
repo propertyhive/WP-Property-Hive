@@ -87,6 +87,10 @@ jQuery(document).ready(function($)
                         else
                         {
                             form_obj.find('#registrationSuccess').fadeIn();
+
+                            $('html,body').animate({
+                                scrollTop: form_obj.find('#registrationSuccess').offset().top - 200
+                            });
                             
                             form_obj.trigger("reset");
                         }
