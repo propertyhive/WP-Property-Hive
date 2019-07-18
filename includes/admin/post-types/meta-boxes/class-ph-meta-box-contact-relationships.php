@@ -292,11 +292,11 @@ class PH_Meta_Box_Contact_Relationships {
                         
                         $department_options = array();
 
-                        foreach ( $departments as $key => $value )
+                        foreach ( $departments as $department_key => $value )
                         {
-                            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+                            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $department_key) ) == 'yes' )
                             {
-                                $department_options[$key] = $value;
+                                $department_options[$department_key] = $value;
                             }
                         }
 
