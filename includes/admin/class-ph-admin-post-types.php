@@ -423,6 +423,7 @@ class PH_Admin_Post_Types {
 
         $options = array(
             'on_market' => __( 'On Market Only', 'propertyhive' ),
+            'off_market' => __( 'Not On Market Only', 'propertyhive' ),
             'featured' => __( 'Featured Only', 'propertyhive' ),
         );
 
@@ -827,6 +828,13 @@ class PH_Admin_Post_Types {
                 $vars['meta_query'][] = array(
                     'key' => '_on_market',
                     'value' => 'yes',
+                );
+            }
+            if ( ! empty( $_GET['_marketing'] ) && $_GET['_marketing'] == 'off_market' ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_on_market',
+                    'value' => 'yes',
+                    'compare' => '!=',
                 );
             }
             if ( ! empty( $_GET['_marketing'] ) && $_GET['_marketing'] == 'featured' ) {
