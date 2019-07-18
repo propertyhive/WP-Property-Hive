@@ -22,6 +22,7 @@ function ph_get_search_form( $id = 'default' ) {
     $form_controls = ph_get_search_form_fields();
 
     $form_controls = apply_filters( 'propertyhive_search_form_fields_' . $id, $form_controls );
+    $form_controls = apply_filters( 'propertyhive_search_form_fields', $form_controls );
 
     // We 100% need department so make sure it exists. If it doesn't, set a hidden field
     if ( !isset($form_controls['department']) )
