@@ -14,7 +14,7 @@
 .propertyhive {  }
 
 .property-search-form { display:table; width:100%; }
-.property-search-form .control { display:table-cell; vertical-align:middle; padding:0 10px; } 
+.property-search-form .control { display:table-cell; vertical-align:middle; padding:0 10px; position:relative; } 
 .property-search-form .control label {  }
 
 .propertyhive ul.properties { list-style-type:none; margin:0 0 1em; padding:0; clear:both }
