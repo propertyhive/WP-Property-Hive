@@ -100,7 +100,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Catered for array passed in querystring and put in search form hidden fields
 * Added address_two to geocoding request
 * Added new filter 'propertyhive_price_output' to get_formatted_price() method
-* Changde priority of admin scripts loaded to fix conflict with Salient
+* Changed priority of admin scripts loaded to fix conflict with Salient
 * Removed recent geocoding restriction as causing a few issues with address in Scotland
 * Declared compatibility for WordPress 5.2.2
 
