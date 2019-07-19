@@ -33,6 +33,9 @@
                 <tbody>
                 ';
 
+                $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
+                $percentage_higher = get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' );
+
 				foreach ( $applicants as $applicant )
 				{
 					$previously_sent = array();
@@ -55,6 +58,41 @@
                     if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
                     {
                         $requirements[] = 'Max Price: &pound;' . number_format($applicant['applicant_profile']['max_price']);
+                    }
+                    if ( $percentage_lower != '' && $percentage_higher != '' )
+                    {
+                        $match_price_range_lower = '';
+                        if ( !isset($applicant['applicant_profile']['match_price_range_lower_actual']) || ( isset($applicant['applicant_profile']['match_price_range_lower_actual']) && $applicant['applicant_profile']['match_price_range_lower_actual'] == '' ) )
+                        {
+                            if ( isset($applicant['applicant_profile']['max_price_actual']) && $applicant['applicant_profile']['max_price_actual'] != '' )
+                            {
+                                $match_price_range_lower = $applicant['applicant_profile']['max_price_actual'] - ( $applicant['applicant_profile']['max_price_actual'] * ( $percentage_lower / 100 ) );
+                            }
+                        }
+                        else
+                        {
+                            $match_price_range_lower = $applicant['applicant_profile']['match_price_range_lower_actual'];
+                        }
+
+                        $match_price_range_higher = '';
+                        if ( !isset($applicant['applicant_profile']['match_price_range_higher_actual']) || ( isset($applicant['applicant_profile']['match_price_range_higher_actual']) && $applicant['applicant_profile']['match_price_range_higher_actual'] == '' ) )
+                        {
+                            if ( isset($applicant['applicant_profile']['max_price_actual']) && $applicant['applicant_profile']['max_price_actual'] != '' )
+                            {
+                                $match_price_range_higher = $applicant['applicant_profile']['max_price_actual'] + ( $applicant['applicant_profile']['max_price_actual'] * ( $percentage_higher / 100 ) );
+                            }
+                        }
+                        else
+                        {
+                            $match_price_range_higher = $applicant['applicant_profile']['match_price_range_higher_actual'];
+                        }
+
+                        if ( 
+                            $match_price_range_lower != '' && $match_price_range_higher != ''
+                        )
+                        {
+                            $requirements[] = 'Match Price Range: &pound;' . number_format($match_price_range_lower) . ' to &pound;' . number_format($match_price_range_higher);
+                        }
                     }
                     if ( isset($applicant['applicant_profile']['min_beds']) && $applicant['applicant_profile']['min_beds'] != '' )
                     {
