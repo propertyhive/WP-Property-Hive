@@ -279,44 +279,59 @@ class PH_Admin_Matching_Properties {
                     'value' => $applicant_profile['department']
                 );
                 
-                $match_price_range_lower = '';
-                if ( !isset($applicant_profile['match_price_range_lower_actual']) || ( isset($applicant_profile['match_price_range_lower_actual']) && $applicant_profile['match_price_range_lower_actual'] == '' ) )
+                if (
+                    get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' ) != '' &&
+                    get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' ) != ''
+                )
                 {
-                    if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
+                    $match_price_range_lower = '';
+                    if ( !isset($applicant_profile['match_price_range_lower_actual']) || ( isset($applicant_profile['match_price_range_lower_actual']) && $applicant_profile['match_price_range_lower_actual'] == '' ) )
                     {
-                        if ( $percentage_lower != '' )
+                        if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
                         {
-                            $match_price_range_lower = $applicant_profile['max_price_actual'] - ( $applicant_profile['max_price_actual'] * ( $percentage_lower / 100 ) );
+                            if ( $percentage_lower != '' )
+                            {
+                                $match_price_range_lower = $applicant_profile['max_price_actual'] - ( $applicant_profile['max_price_actual'] * ( $percentage_lower / 100 ) );
+                            }
                         }
+                    }
+                    else
+                    {
+                        $match_price_range_lower = $applicant_profile['match_price_range_lower_actual'];
+                    }
+
+                    $match_price_range_higher = '';
+                    if ( !isset($applicant_profile['match_price_range_higher_actual']) || ( isset($applicant_profile['match_price_range_higher_actual']) && $applicant_profile['match_price_range_higher_actual'] == '' ) )
+                    {
+                        if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
+                        {
+                            if ( $percentage_higher != '' )
+                            {
+                                $match_price_range_higher = $applicant_profile['max_price_actual'] + ( $applicant_profile['max_price_actual'] * ( $percentage_higher / 100 ) );
+                            }
+                        }
+                    }
+                    else
+                    {
+                        $match_price_range_higher = $applicant_profile['match_price_range_higher_actual'];
+                    }
+
+                    if ( $match_price_range_lower != '' && $match_price_range_higher != '' )
+                    {
+                        $meta_query[] = array(
+                            'key' => '_price_actual',
+                            'value' => array($match_price_range_lower, $match_price_range_higher),
+                            'compare' => 'BETWEEN',
+                            'type' => 'NUMERIC'
+                        );
                     }
                 }
                 else
-                {
-                    $match_price_range_lower = $applicant_profile['match_price_range_lower_actual'];
-                }
-
-                $match_price_range_higher = '';
-                if ( !isset($applicant_profile['match_price_range_higher_actual']) || ( isset($applicant_profile['match_price_range_higher_actual']) && $applicant_profile['match_price_range_higher_actual'] == '' ) )
-                {
-                    if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
-                    {
-                        if ( $percentage_higher != '' )
-                        {
-                            $match_price_range_higher = $applicant_profile['max_price_actual'] + ( $applicant_profile['max_price_actual'] * ( $percentage_higher / 100 ) );
-                        }
-                    }
-                }
-                else
-                {
-                    $match_price_range_higher = $applicant_profile['match_price_range_higher_actual'];
-                }
-
-                if ( $match_price_range_lower != '' && $match_price_range_higher != '' )
                 {
                     $meta_query[] = array(
                         'key' => '_price_actual',
-                        'value' => array($match_price_range_lower, $match_price_range_higher),
-                        'compare' => 'BETWEEN',
+                        'value' => $applicant_profile['max_price_actual'],
+                        'compare' => '<=',
                         'type' => 'NUMERIC'
                     );
                 }
