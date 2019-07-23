@@ -438,6 +438,16 @@ class PH_Admin_Matching_Properties {
                     'operator' => 'IN',
                 );
             }
+            $property_match_statuses = get_option( 'propertyhive_property_match_statuses', '' );
+            if ( $property_match_statuses != '' && is_array($property_match_statuses) )
+            {
+                $tax_query[] = array(
+                    'taxonomy' => 'availability',
+                    'field'    => 'term_id',
+                    'terms'    => $property_match_statuses,
+                    'operator' => 'IN',
+                );
+            }
             $args['tax_query'] = $tax_query;
 
             $properties_query = new WP_Query( $args );

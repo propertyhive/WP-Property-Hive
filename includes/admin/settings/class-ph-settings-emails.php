@@ -168,6 +168,29 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	            'css'         => 'min-width:300px; height:110px;',
 	        );
 
+	        $options = array();
+	        $args = array(
+                'hide_empty' => false,
+                'parent' => 0
+            );
+            $terms = get_terms( 'availability', $args );
+            
+            if ( !empty( $terms ) && !is_wp_error( $terms ) )
+            {
+                foreach ($terms as $term)
+                { 
+                	$options[$term->term_id] = $term->name;
+                }
+            }
+	        $settings[] = array(
+	            'title'   => __( 'Only Include Properties With Statuses', 'propertyhive' ),
+	            'id'      => 'propertyhive_property_match_statuses',
+	            'type'    => 'multiselect',
+	            'css'     => 'min-width:300px; height:110px;',
+	            'options' => $options,
+	            'desc'	=> '<p>' . __( 'By default, all on market properties will come back in matches when sending properties to applicants. If you wish to only send properties with a certain status you can choose this here. For example, maybe you don\'t want Sold STC properties to be sent. Hold ctrl/cmd whilst clicking to select multiple.', 'propertyhive' ) . '</p>',
+	        );
+
 	        $settings[] = array(
 	            'title'   => __( 'Automatically Send Matching Properties To Applicants', 'propertyhive' ),
 	            'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent emailed properties as they\'re added.<br><br>
