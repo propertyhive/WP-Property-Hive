@@ -7,6 +7,9 @@
 		<div id="poststuff">
 		
 		<?php
+            $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
+            $percentage_higher = get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' );
+
 			echo '<div style="background:#F3F3F3; border:1px solid #DDD; padding:20px;">
                 
                 <h3 style="padding-top:0; margin-top:0;">Applicant Requirements</h3>';
@@ -19,6 +22,49 @@
                     <strong>Maximum Price:</strong><br>
                     &pound;' . number_format($applicant_profile['max_price']) . '
                 </div>';
+            }
+            if ( 
+                isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales'
+            )
+            {
+                if ( $percentage_lower != '' && $percentage_higher != '' )
+                {
+                    $match_price_range_lower = '';
+                    if ( !isset($applicant_profile['match_price_range_lower_actual']) || ( isset($applicant_profile['match_price_range_lower_actual']) && $applicant_profile['match_price_range_lower_actual'] == '' ) )
+                    {
+                        if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
+                        {
+                            $match_price_range_lower = $applicant_profile['max_price_actual'] - ( $applicant_profile['max_price_actual'] * ( $percentage_lower / 100 ) );
+                        }
+                    }
+                    else
+                    {
+                        $match_price_range_lower = $applicant_profile['match_price_range_lower_actual'];
+                    }
+
+                    $match_price_range_higher = '';
+                    if ( !isset($applicant_profile['match_price_range_higher_actual']) || ( isset($applicant_profile['match_price_range_higher_actual']) && $applicant_profile['match_price_range_higher_actual'] == '' ) )
+                    {
+                        if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
+                        {
+                            $match_price_range_higher = $applicant_profile['max_price_actual'] + ( $applicant_profile['max_price_actual'] * ( $percentage_higher / 100 ) );
+                        }
+                    }
+                    else
+                    {
+                        $match_price_range_higher = $applicant_profile['match_price_range_higher_actual'];
+                    }
+
+                    if ( 
+                        $match_price_range_lower != '' && $match_price_range_higher != ''
+                    )
+                    {
+                        echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                            <strong>Match Price Range:</strong><br>
+                            &pound;' . number_format($match_price_range_lower) . ' to &pound;' . number_format($match_price_range_higher) . '
+                        </div>';
+                    }
+                }
             }
             if ( 
                 isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-lettings' &&

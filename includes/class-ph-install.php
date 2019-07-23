@@ -529,6 +529,9 @@ class PH_Install {
         add_option( 'propertyhive_default_country', 'GB', '', 'yes' );
         add_option( 'propertyhive_countries', array('GB'), '', 'yes' );
 
+        add_option( 'propertyhive_applicant_match_price_range_percentage_lower', 20, '', 'no' );
+        add_option( 'propertyhive_applicant_match_price_range_percentage_higher', 5, '', 'no' );
+
         add_option( 'propertyhive_install_timestamp', time(), '', 'no' );
         add_option( 'propertyhive_review_prompt_due_timestamp', strtotime('+30 days'), '', 'no' );
 
