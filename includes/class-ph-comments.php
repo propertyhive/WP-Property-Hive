@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Comments
  *
- * Handle comments (reviews and order notes).
+ * Handle comments.
  *
  * @class    PH_Comments
  * @version  1.0.0
@@ -30,6 +30,118 @@ class PH_Comments {
 		// Delete comments count cache whenever there is a new comment or a comment status changes
 		add_action( 'wp_insert_comment', array( __CLASS__, 'delete_comments_count_cache' ) );
 		add_action( 'wp_set_comment_status', array( __CLASS__, 'delete_comments_count_cache' ) );
+
+		add_action( 'add_post_meta', array( __CLASS__, 'check_on_market_add' ), 10, 3 );
+		add_action( 'update_post_meta', array( __CLASS__, 'check_on_market_update' ), 10, 4 );
+
+		add_action( 'update_post_meta', array( __CLASS__, 'check_price_change' ), 10, 4 );
+	}
+
+	public static function check_price_change( $meta_id, $object_id, $meta_key, $meta_value )
+	{
+		if ( get_post_type($object_id) == 'property' && ( $meta_key == '_price' || $meta_key == '_rent' ) )
+		{
+			$original_value = get_post_meta( $object_id, $meta_key, TRUE );
+
+			if ( $original_value != $meta_value )
+			{
+				$current_user = wp_get_current_user();
+
+	            // Add note/comment to property
+	            $comment = array(
+	                'note_type' => 'action',
+	                'action' => 'property_price_change',
+	                'original_value' => $original_value,
+	                'new_value' => $meta_value
+	            );
+
+	            $data = array(
+	                'comment_post_ID'      => (int)$object_id,
+	                'comment_author'       => $current_user->display_name,
+	                'comment_author_email' => 'propertyhive@noreply.com',
+	                'comment_author_url'   => '',
+	                'comment_date'         => date("Y-m-d H:i:s"),
+	                'comment_content'      => serialize($comment),
+	                'comment_approved'     => 1,
+	                'comment_type'         => 'propertyhive_note',
+	            );
+	            $comment_id = wp_insert_comment( $data );
+
+	            update_post_meta( $object_id, '_price_change_date', date("Y-m-d H:i:s") );
+			}
+		}
+	}
+
+	public static function check_on_market_add( $object_id, $meta_key, $meta_value )
+	{
+		if ( get_post_type($object_id) == 'property' && $meta_key == '_on_market' )
+		{
+			if ( $meta_value == 'yes' )
+			{
+				$note_action = 'property_on_market';
+
+				$current_user = wp_get_current_user();
+
+	            // Add note/comment to property
+	            $comment = array(
+	                'note_type' => 'action',
+	                'action' => $note_action,
+	            );
+
+	            $data = array(
+	                'comment_post_ID'      => (int)$object_id,
+	                'comment_author'       => $current_user->display_name,
+	                'comment_author_email' => 'propertyhive@noreply.com',
+	                'comment_author_url'   => '',
+	                'comment_date'         => date("Y-m-d H:i:s"),
+	                'comment_content'      => serialize($comment),
+	                'comment_approved'     => 1,
+	                'comment_type'         => 'propertyhive_note',
+	            );
+	            $comment_id = wp_insert_comment( $data );
+
+	            update_post_meta( $object_id, '_on_market_change_date', date("Y-m-d H:i:s") );
+			}
+		}
+	}
+
+	public static function check_on_market_update( $meta_id, $object_id, $meta_key, $meta_value )
+	{
+		if ( get_post_type($object_id) == 'property' && $meta_key == '_on_market' )
+		{
+			$original_value = get_post_meta( $object_id, $meta_key, TRUE );
+
+			if ( $original_value != $meta_value )
+			{
+				$note_action = 'property_off_market';
+				if ($meta_value == 'yes')
+				{
+					$note_action = 'property_on_market';
+				}
+
+				$current_user = wp_get_current_user();
+
+	            // Add note/comment to property
+	            $comment = array(
+	                'note_type' => 'action',
+	                'action' => $note_action,
+	            );
+
+	            $data = array(
+	                'comment_post_ID'      => (int)$object_id,
+	                'comment_author'       => $current_user->display_name,
+	                'comment_author_email' => 'propertyhive@noreply.com',
+	                'comment_author_url'   => '',
+	                'comment_date'         => date("Y-m-d H:i:s"),
+	                'comment_content'      => serialize($comment),
+	                'comment_approved'     => 1,
+	                'comment_type'         => 'propertyhive_note',
+	            );
+	            $comment_id = wp_insert_comment( $data );
+
+	            update_post_meta( $object_id, '_on_market_change_date', date("Y-m-d H:i:s") );
+			}
+		}
 	}
 
 	/**

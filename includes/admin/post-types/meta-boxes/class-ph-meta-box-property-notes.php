@@ -64,6 +64,20 @@ class PH_Meta_Box_Property_Notes {
                         }
                         break;
                     }
+                    case "action":
+                    {
+                        $note_body = $comment_content['action'];
+
+                        switch ( $comment_content['action'] )
+                        {
+                            case "property_price_change":
+                            {
+                                $note_body .= '<br>From: ' . $comment_content['original_value'] . '<br>To: ' . $comment_content['new_value'];
+                                break;
+                            }
+                        }
+                        break;
+                    }
                     case "note":
                     {
                         $note_body = $comment_content['note'];
