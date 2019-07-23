@@ -181,6 +181,9 @@ class PH_Admin_Matching_Applicants {
 		{
 			$applicants = $this->get_matching_applicants( (int)$_GET['property_id'] );
 
+            $on_market_change_date = $property->_on_market_change_date;
+            $price_change_date = $property->_price_change_date;
+
 			include 'views/html-admin-matching-applicants.php';
 		}
 	}

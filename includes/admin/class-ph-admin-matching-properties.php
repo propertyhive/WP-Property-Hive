@@ -408,8 +408,6 @@ class PH_Admin_Matching_Properties {
 
             if ( $properties_query->have_posts() )
             {
-                //echo '<h2>' . $properties_query->found_posts . ' matching propert' . ( ( $properties_query->found_posts != 1 ) ? 'ies' : 'y') . ' found</h2>';
-
                 while ( $properties_query->have_posts() )
                 {
                     $properties_query->the_post();
