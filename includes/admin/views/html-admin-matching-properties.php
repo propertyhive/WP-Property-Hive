@@ -158,6 +158,9 @@
 						$previously_sent = $applicant_profile_match_history[$property->id];
 					}
 
+                    $on_market_change_date = $property->_on_market_change_date;
+                    $price_change_date = $property->_price_change_date;
+
 					echo '<div id="matching_applicant_' . $contact_id . '_property_' . $property->id . '" style="padding:20px 0; border-bottom:1px solid #CCC;">';
                     
                         echo '<div style="float:left; width:18%;">';
@@ -219,6 +222,22 @@
                                 if ( !empty($previously_sent) )
                                 {
                                     $post_tip = 'Sent previously via ' . $previously_sent[count($previously_sent) - 1]['method'] . ' on ' . date("jS F Y", strtotime($previously_sent[count($previously_sent) - 1]['date']));
+
+                                    if ( 
+                                        $on_market_change_date > $previously_sent[count($previously_sent) - 1]['date'] ||
+                                        $price_change_date > $previously_sent[count($previously_sent) - 1]['date']
+                                    )
+                                    {
+                                        if ( $price_change_date > $previously_sent[count($previously_sent) - 1]['date'] )
+                                        {
+                                            $post_tip .= ', however a price change occurred on ' . date("jS F Y", strtotime($price_change_date));
+                                        }
+                                        elseif ( $on_market_change_date > $previously_sent[count($previously_sent) - 1]['date'] )
+                                        {
+                                            $post_tip .= ', however a change to the on market status occurred on ' . date("jS F Y", strtotime($on_market_change_date));
+                                        }
+                                        echo ' checked';
+                                    }
                                 }
                                 else
                                 {

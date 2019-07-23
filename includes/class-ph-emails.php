@@ -382,6 +382,24 @@ class PH_Emails {
 						{
 							$already_sent_properties = get_post_meta( $contact_id, '_applicant_profile_' . $i . '_match_history', TRUE );
 
+							// Remove from this array if on market changed or price changed
+							foreach ( $already_sent_properties as $already_sent_property_id => $sends )
+							{
+								$highest_send = $sends[count($sends) - 1]['date'];
+
+								if ( $highest_send != '' )
+								{
+									$on_market_change_date = get_post_meta( $already_sent_property_id, '_on_market_change_date', TRUE );
+									$price_change_date = get_post_meta( $already_sent_property_id, '_price_change_date', TRUE );
+
+									if ( $on_market_change_date > $highest_send || $price_change_date > $highest_send )
+									{
+										// This property has changed since it was last sent. Remove from already sent list so it gets sent again
+										unset($already_sent_properties[$already_sent_property_id]);
+									}
+								}
+							}
+
 							// Check properties haven't already been sent and not marked as 'not interested'
 							$new_matching_properties = array();
 							foreach ($matching_properties as $matching_property)
