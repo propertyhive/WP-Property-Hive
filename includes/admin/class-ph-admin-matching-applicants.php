@@ -326,49 +326,63 @@ class PH_Admin_Matching_Applicants {
                                     {
                                         if ( $property->department == 'residential-sales' )
                                         {
-                                            $match_price_range_lower = '';
-                                            if ( !isset($applicant_profile['match_price_range_lower_actual']) || ( isset($applicant_profile['match_price_range_lower_actual']) && $applicant_profile['match_price_range_lower_actual'] == '' ) )
+                                            if ( $percentage_lower != '' && $percentage_higher != '' )
                                             {
-                                                if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
+                                                $match_price_range_lower = '';
+                                                if ( !isset($applicant_profile['match_price_range_lower_actual']) || ( isset($applicant_profile['match_price_range_lower_actual']) && $applicant_profile['match_price_range_lower_actual'] == '' ) )
                                                 {
-                                                    if ( $percentage_lower != '' )
+                                                    if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
                                                     {
-                                                        $match_price_range_lower = $applicant_profile['max_price_actual'] - ( $applicant_profile['max_price_actual'] * ( $percentage_lower / 100 ) );
+                                                        if ( $percentage_lower != '' )
+                                                        {
+                                                            $match_price_range_lower = $applicant_profile['max_price_actual'] - ( $applicant_profile['max_price_actual'] * ( $percentage_lower / 100 ) );
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            else
-                                            {
-                                                $match_price_range_lower = $applicant_profile['match_price_range_lower_actual'];
-                                            }
-
-                                            $match_price_range_higher = '';
-                                            if ( !isset($applicant_profile['match_price_range_higher_actual']) || ( isset($applicant_profile['match_price_range_higher_actual']) && $applicant_profile['match_price_range_higher_actual'] == '' ) )
-                                            {
-                                                if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
+                                                else
                                                 {
-                                                    if ( $percentage_higher != '' )
+                                                    $match_price_range_lower = $applicant_profile['match_price_range_lower_actual'];
+                                                }
+
+                                                $match_price_range_higher = '';
+                                                if ( !isset($applicant_profile['match_price_range_higher_actual']) || ( isset($applicant_profile['match_price_range_higher_actual']) && $applicant_profile['match_price_range_higher_actual'] == '' ) )
+                                                {
+                                                    if ( isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' )
                                                     {
-                                                        $match_price_range_higher = $applicant_profile['max_price_actual'] + ( $applicant_profile['max_price_actual'] * ( $percentage_higher / 100 ) );
+                                                        if ( $percentage_higher != '' )
+                                                        {
+                                                            $match_price_range_higher = $applicant_profile['max_price_actual'] + ( $applicant_profile['max_price_actual'] * ( $percentage_higher / 100 ) );
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            else
-                                            {
-                                                $match_price_range_higher = $applicant_profile['match_price_range_higher_actual'];
-                                            }
+                                                else
+                                                {
+                                                    $match_price_range_higher = $applicant_profile['match_price_range_higher_actual'];
+                                                }
 
-                                            if ( 
-                                                ( $match_price_range_lower == '' && $match_price_range_higher == '' ) ||
-                                                (
-                                                    $property->_price_actual >= $match_price_range_lower &&
-                                                    $property->_price_actual <= $match_price_range_higher
+                                                if ( 
+                                                    ( $match_price_range_lower == '' && $match_price_range_higher == '' ) ||
+                                                    (
+                                                        $property->_price_actual >= $match_price_range_lower &&
+                                                        $property->_price_actual <= $match_price_range_higher
+                                                    )
                                                 )
-                                            )
-                                            {
-                                                ++$matching_elements;
+                                                {
+                                                    ++$matching_elements;
+                                                }
+                                                ++$elements_checked;
                                             }
-                                            ++$elements_checked;
+                                            else
+                                            {
+                                                if ( 
+                                                    $applicant_profile['max_price_actual'] == '' ||
+                                                    $property->_price_actual <= $applicant_profile['max_price_actual']
+                                                )
+                                                {
+                                                    ++$matching_elements;
+                                                }
+                                                ++$elements_checked;
+                                            }
                                         }
                                         else
                                         {
