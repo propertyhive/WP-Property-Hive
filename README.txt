@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.2.2
-Stable tag: 1.4.43
+Stable tag: 1.4.44
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,14 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.44 =
+* Record when a price change occurs from anywhere (i.e. done manually or via a property import) and add it to the property history. 
+* Record when a property is taken off or put on the market and add it to the property history
+* If a property has already previously been sent to an applicant, then re-include it in future matches if a price change has occured or if it's come back on the market since it was last sent
+* Added a new setting to choose what property statuses should be included in matches. Useful if you don't want to send Sold STC properties to applicants, for example
+* Added a new 'Match Price Range' setting to applicant requirements allowing you to specify the min and max prices of properties that should match with applicants. More about this can be found under 'Property Hive > Settings > General > Miscellaneous'
+* Updated help text relating to entering the Google Maps API Key
 
 = 1.4.43 =
 * Added new 'Not on Market Only' filter to backend properties list
