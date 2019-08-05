@@ -356,6 +356,10 @@ class PH_Emails {
 				if ( $applicant_profiles != '' && $applicant_profiles > 0 )
 				{
 					$dismissed_properties = get_post_meta( $contact_id, '_dismissed_properties', TRUE );
+					if ( $dismissed_properties == '' )
+					{
+						$dismissed_properties = array();
+					}
 
 					for ( $i = 0; $i < $applicant_profiles; ++$i )
 					{
@@ -383,19 +387,22 @@ class PH_Emails {
 							$already_sent_properties = get_post_meta( $contact_id, '_applicant_profile_' . $i . '_match_history', TRUE );
 
 							// Remove from this array if on market changed or price changed
-							foreach ( $already_sent_properties as $already_sent_property_id => $sends )
+							if ( is_array($already_sent_properties) )
 							{
-								$highest_send = $sends[count($sends) - 1]['date'];
-
-								if ( $highest_send != '' )
+								foreach ( $already_sent_properties as $already_sent_property_id => $sends )
 								{
-									$on_market_change_date = get_post_meta( $already_sent_property_id, '_on_market_change_date', TRUE );
-									$price_change_date = get_post_meta( $already_sent_property_id, '_price_change_date', TRUE );
+									$highest_send = $sends[count($sends) - 1]['date'];
 
-									if ( $on_market_change_date > $highest_send || $price_change_date > $highest_send )
+									if ( $highest_send != '' )
 									{
-										// This property has changed since it was last sent. Remove from already sent list so it gets sent again
-										unset($already_sent_properties[$already_sent_property_id]);
+										$on_market_change_date = get_post_meta( $already_sent_property_id, '_on_market_change_date', TRUE );
+										$price_change_date = get_post_meta( $already_sent_property_id, '_price_change_date', TRUE );
+
+										if ( $on_market_change_date > $highest_send || $price_change_date > $highest_send )
+										{
+											// This property has changed since it was last sent. Remove from already sent list so it gets sent again
+											unset($already_sent_properties[$already_sent_property_id]);
+										}
 									}
 								}
 							}
