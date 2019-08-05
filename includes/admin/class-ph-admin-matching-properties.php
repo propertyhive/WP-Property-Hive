@@ -454,7 +454,7 @@ class PH_Admin_Matching_Properties {
                 );
             }
             $property_match_statuses = get_option( 'propertyhive_property_match_statuses', '' );
-            if ( $property_match_statuses != '' && is_array($property_match_statuses) )
+            if ( $property_match_statuses != '' && is_array($property_match_statuses) && !empty($property_match_statuses) )
             {
                 $tax_query[] = array(
                     'taxonomy' => 'availability',
