@@ -282,6 +282,8 @@ function viewing_update_selected_applicants()
     public static function save( $post_id, $post ) {
         global $wpdb;
 
+        $contact_post_ids = array();
+
         if ( isset($_POST['_viewing_applicant_create_new']) && !empty($_POST['_viewing_applicant_create_new']) )
         {
             // we're created a new applicant on submission
@@ -330,6 +332,8 @@ function viewing_update_selected_applicants()
                     update_post_meta( $contact_post_id, '_applicant_profile_0', array( 'department' => $department, 'send_matching_properties' => '' ) );
 
                     update_post_meta( $post_id, '_applicant_contact_id', $contact_post_id );
+
+                    $contact_post_ids[] = $contact_post_id;
                 }
                 
             }
@@ -339,6 +343,55 @@ function viewing_update_selected_applicants()
             if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
             {
                 update_post_meta( $post_id, '_applicant_contact_id', ph_clean($_POST['_applicant_contact_ids']) );
+
+                // make the contact an applicant if not already
+                $applicant_contact_ids = explode(",", $_POST['_applicant_contact_ids']);
+                foreach ( $applicant_contact_ids as $applicant_contact_id )
+                {
+                    $existing_contact_types = get_post_meta( $applicant_contact_id, '_contact_types', TRUE );
+                    if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
+                    {
+                        $existing_contact_types = array();
+                    }
+                    if ( !in_array( 'applicant', $existing_contact_types ) )
+                    {
+                        $existing_contact_types[] = 'applicant';
+                        update_post_meta( $applicant_contact_id, '_contact_types', $existing_contact_types );
+                    }
+
+                    $contact_post_ids[] = $applicant_contact_id;
+                }
+            }
+        }
+
+        if ( !empty($contact_post_ids) )
+        {
+            foreach ( $contact_post_ids as $contact_post_id )
+            {
+                // Add note/comment to contact
+                $current_user = wp_get_current_user();
+
+                $comment = array(
+                    'note_type' => 'action',
+                    'action' => 'viewing_booked',
+                    'viewing_id' => $post_id,
+                );
+                if ( isset($_POST['_property_id']) && !empty($_POST['_property_id']) )
+                {
+                    $comment['property_id'] = (int)$_POST['_property_id'];
+                }
+
+                $data = array(
+                    'comment_post_ID'      => $applicant_contact_id,
+                    'comment_author'       => $current_user->display_name,
+                    'comment_author_email' => 'propertyhive@noreply.com',
+                    'comment_author_url'   => '',
+                    'comment_date'         => date("Y-m-d H:i:s"),
+                    'comment_content'      => serialize($comment),
+                    'comment_approved'     => 1,
+                    'comment_type'         => 'propertyhive_note',
+                );
+                $comment_id = wp_insert_comment( $data );
             }
         }
     }
