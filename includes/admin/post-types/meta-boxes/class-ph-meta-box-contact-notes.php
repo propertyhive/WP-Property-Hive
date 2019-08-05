@@ -69,6 +69,27 @@ class PH_Meta_Box_Contact_Notes {
                         }
                         break;
                     }
+                    case "action":
+                    {
+                        switch ( $comment_content['action'] )
+                        {
+                            case "viewing_booked":
+                            {
+                                $note_body = '<a href="' . get_edit_post_link($comment_content['viewing_id']) . '">Viewing</a> booked';
+                                if ( isset($comment_content['property_id']) )
+                                {
+                                    $property = new PH_Property((int)$comment_content['property_id']);
+                                    $note_body .= ' on <a href="' . get_edit_post_link($comment_content['property_id']) . '">' . $property->get_formatted_full_address() . '</a>';
+                                }
+                                break;
+                            }
+                            default:
+                            {
+                                $note_body = $comment_content['action'];
+                            }
+                        }
+                        break;
+                    }
                     case "unsubscribe": 
                     {
                         $note_body = 'Contact unsubscribed themselves from emails';
