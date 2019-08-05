@@ -308,7 +308,7 @@ class PH_Admin_Matching_Applicants {
                         {
                             $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
 
-                            if ( $applicant_profile['send_matching_properties'] == 'yes' )
+                            if ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == 'yes' )
                             {
                                 $elements_checked = 0;
                                 $matching_elements = 0;
