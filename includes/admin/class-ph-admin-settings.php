@@ -485,7 +485,7 @@ class PH_Admin_Settings {
 		            		<tr valign="top" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 								<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?></th>
 								<td class="forminp forminp-checkbox">
-									<fieldset style="<?php echo $fieldset_class; ?>">
+									<fieldset style="<?php echo $fieldset_css; ?>">
 						<?php
 	            	} else { 
 	            		?>
