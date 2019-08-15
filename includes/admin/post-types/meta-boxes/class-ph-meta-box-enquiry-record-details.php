@@ -135,7 +135,7 @@ class PH_Meta_Box_Enquiry_Record_Details {
         global $wpdb;
 
         update_post_meta( $post_id, '_status', ph_clean($_POST['_status']) );
-        update_post_meta( $post_id, '_negotiator_id', (int)$_POST['_negotiator_id'] );
+        update_post_meta( $post_id, '_negotiator_id', ( ( $_POST['_negotiator_id'] != -1 ) ? (int)$_POST['_negotiator_id'] : '' ) );
         update_post_meta( $post_id, '_office_id', (int)$_POST['_office_id'] );
         update_post_meta( $post_id, '_source', ph_clean($_POST['_source']) );
 
