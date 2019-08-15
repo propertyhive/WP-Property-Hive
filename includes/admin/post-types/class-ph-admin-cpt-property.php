@@ -324,6 +324,13 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 {
                 	$price = '-';
                 }
+                else
+                {
+                	if ( $the_property->_department == 'residential-sales' && $the_property->price_qualifier != '' )
+                	{
+                		$price .= '<br>' . $the_property->price_qualifier;
+                	}
+                }
                 echo $price;
                 
 				break;
