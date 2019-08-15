@@ -268,12 +268,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 			 break;
             case 'address' :
                 
-                echo $the_contact->_address_name_number . ' ';
-                echo $the_contact->_address_street . ', ';
-                echo $the_contact->_address_two . ', ';
-                echo $the_contact->_address_three . ', ';
-                echo $the_contact->_address_four . ', ';
-                echo $the_contact->_address_postcode;
+                echo $the_contact->get_formatted_full_address();
                 
                 break;
             case 'contact_details' :

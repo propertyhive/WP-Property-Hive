@@ -28,11 +28,17 @@ class PH_Meta_Box_Contact_Correspondence_Address {
         echo '<div class="options_group">';
         
         propertyhive_wp_text_input( array( 
+            'id' => '_company_name', 
+            'label' => __( 'Company Name', 'propertyhive' ), 
+            'desc_tip' => false, 
+            'type' => 'text'
+        ) );
+
+        propertyhive_wp_text_input( array( 
             'id' => '_address_name_number', 
             'label' => __( 'Building Name / Number', 'propertyhive' ), 
             'desc_tip' => false, 
             'placeholder' => __( 'e.g. Thistle Cottage, or Flat 10', 'propertyhive' ), 
-            //'description' => __( 'Stock quantity. If this is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.', 'propertyhive' ), 
             'type' => 'text'
         ) );
         
@@ -122,6 +128,7 @@ class PH_Meta_Box_Contact_Correspondence_Address {
     public static function save( $post_id, $post ) {
         global $wpdb;
         
+        update_post_meta( $post_id, '_company_name', ph_clean($_POST['_company_name']) );
         update_post_meta( $post_id, '_address_name_number', ph_clean($_POST['_address_name_number']) );
         update_post_meta( $post_id, '_address_street', ph_clean($_POST['_address_street']) );
         update_post_meta( $post_id, '_address_two', ph_clean($_POST['_address_two']) );
