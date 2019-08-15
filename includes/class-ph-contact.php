@@ -126,9 +126,15 @@ class PH_Contact {
         
         $return = '';
         
+        $company_name = $this->_company_name;
+        if ($company_name != '')
+        {
+            $return .= $company_name;
+        }
         $address_name_number = $this->_address_name_number;
         if ($address_name_number != '')
         {
+            if ($return != '') { $return .= $separator; }
             $return .= $address_name_number;
         }
         $address_street = $this->_address_street;
