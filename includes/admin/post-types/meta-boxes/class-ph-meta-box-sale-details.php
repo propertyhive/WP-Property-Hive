@@ -68,6 +68,8 @@ function redraw_sale_details_meta_box()
 
         $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_amount']));
         update_post_meta( $post_id, '_amount', $amount );
+
+        do_action( 'propertyhive_save_sale_details', $post_id );
     }
 
 }

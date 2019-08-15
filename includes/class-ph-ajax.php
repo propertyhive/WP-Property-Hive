@@ -4325,7 +4325,11 @@ class PH_AJAX {
 
     public function get_offer_details_meta_box()
     {
+        global $post;
+
         check_ajax_referer( 'offer-details-meta-box', 'security' );
+
+        $post = get_post((int)$_POST['offer_id']);
 
         $offer = new PH_Offer((int)$_POST['offer_id']);
 
@@ -4795,7 +4799,11 @@ class PH_AJAX {
     // Sale related functions
     public function get_sale_details_meta_box()
     {
+        global $post;
+
         check_ajax_referer( 'sale-details-meta-box', 'security' );
+
+        $post = get_post((int)$_POST['sale_id']);
 
         $sale = new PH_Offer((int)$_POST['sale_id']);
 
