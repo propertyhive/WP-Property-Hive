@@ -32,7 +32,7 @@ class PH_Third_Party_Contacts {
 			'9' => __( 'Plumbers', 'propertyhive' ),
 			'10' => __( 'Removals', 'propertyhive' ),
 			'11' => __( 'Roofer', 'propertyhive' ),
-			'12' => __( 'Solictor', 'propertyhive' ),
+			'12' => __( 'Solicitor', 'propertyhive' ),
 			'13' => __( 'Surveyor', 'propertyhive' ),
 			'14' => __( 'Other', 'propertyhive' ),
 		);
