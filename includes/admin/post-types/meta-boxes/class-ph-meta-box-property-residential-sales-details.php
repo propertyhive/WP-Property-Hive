@@ -207,7 +207,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         {
             update_post_meta( $post_id, '_currency', ph_clean($_POST['_price_currency']) );
 
-            $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['_price']));
+            $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price']));
             update_post_meta( $post_id, '_price', $price );
             
             // Store price in common currency (GBP) used for ordering
