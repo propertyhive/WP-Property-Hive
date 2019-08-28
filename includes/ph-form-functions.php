@@ -856,6 +856,17 @@ function ph_form_field( $key, $field )
             {
                 $field['value'] = sanitize_textarea_field( wp_unslash( $_GET[$key] ) );
             }
+            else
+            {
+                if ( isset($post->ID) )
+                {
+                    $value = get_post_meta( $post->ID, '_' . $key, true );
+                    if ( $value != '' )
+                    {
+                        $field['value'] = $value;
+                    }
+                }
+            }
 
             $output .= $field['before'];
 
@@ -894,6 +905,17 @@ function ph_form_field( $key, $field )
             if ( isset( $_GET[$key] ) && sanitize_text_field(wp_unslash($_GET[$key])) == $field['value'] )
             {
                 $field['checked'] = true;
+            }
+            else
+            {
+                if ( isset($post->ID) )
+                {
+                    $value = get_post_meta( $post->ID, '_' . $key, true );
+                    if ( $value == 'yes' )
+                    {
+                        $field['checked'] = true;
+                    }
+                }
             }
 
             $output .= $field['before'];
@@ -965,6 +987,17 @@ function ph_form_field( $key, $field )
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
             {
                 $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
+            }
+            else
+            {
+                if ( isset($post->ID) )
+                {
+                    $value = get_post_meta( $post->ID, '_' . $key, true );
+                    if ( $value != '' )
+                    {
+                        $field['value'] = $value;
+                    }
+                }
             }
 
             $output .= $field['before'];
