@@ -57,9 +57,16 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Virtual_Tours::save', 75, 2 );
         
         // Save Contact Meta Boxes
+        if ( isset($_POST['_contact_type_new']) )
+        {
+            add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_New_Relationship::save', 1, 2 );
+        }
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Correspondence_Address::save', 10, 2 );
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Contact_Details::save', 15, 2 );
-        add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Relationships::save', 20, 2 );
+        if ( !isset($_POST['_contact_type_new']) )
+        {
+            add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Relationships::save', 20, 2 );
+        }
         
         // Save Enquiry Meta Boxes
         if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
@@ -820,6 +827,19 @@ class PH_Admin_Meta_Boxes {
 
         // CONTACT
         $meta_boxes = array();
+
+        if ( $pagenow == 'post-new.php' && get_post_type($post->ID) == 'contact' )
+        {
+            $meta_boxes[1] = array(
+                'id' => 'propertyhive-contact-new-relationship',
+                'title' => __( 'Contact Type', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Contact_New_Relationship::output',
+                'screen' => 'contact',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+        }
+
         $meta_boxes[5] = array(
             'id' => 'propertyhive-contact-correspondence-address',
             'title' => __( 'Correspondence Address', 'propertyhive' ),
