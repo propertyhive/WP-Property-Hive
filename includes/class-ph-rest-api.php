@@ -73,7 +73,7 @@ class PH_Rest_Api {
 			'value' => 'yes'
 		);
 
-		apply_filters( 'propertyhive_rest_api_query_args', $args );
+		$args = apply_filters( 'propertyhive_rest_api_query_args', $args );
 		
 		return $args;
 	}
@@ -107,6 +107,8 @@ class PH_Rest_Api {
 			'description',
 			'office',
 		);
+
+		$field_array = apply_filters( 'propertyhive_rest_api_property_fields', $field_array );
 
 		foreach ( $field_array as $field )
 		{
