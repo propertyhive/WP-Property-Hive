@@ -145,7 +145,7 @@ class PH_Rest_Api {
 		            		}
 		            		default:
 		            		{
-				            	return $property->{$field_name};
+				            	return $property->{'_' . $field_name};
 				            }
 				        }
 		            },
