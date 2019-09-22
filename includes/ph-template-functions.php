@@ -246,8 +246,8 @@ if ( ! function_exists( 'propertyhive_get_property_thumbnail' ) ) {
      * Get the property thumbnail, or the placeholder if not set.
      *
      * @access public
-     * @subpackage  Loop
-     * @param string $size (default: 'shop_catalog')
+     * @subpackage Loop
+     * @param string $size (default: 'medium')
      * @param int $placeholder_width (default: 0)
      * @param int $placeholder_height (default: 0)
      * @return string
