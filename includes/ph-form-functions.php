@@ -71,37 +71,28 @@ function ph_get_search_form_fields()
 {
     $fields = array();
 
-    $departments = array();
-    $value = '';
-    if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+    $departments = ph_get_departments();
+
+    $department_options = array();
+    $default_value = '';
+
+    foreach ( $departments as $key => $value )
     {
-        $departments['residential-sales'] = __( 'Sales', 'propertyhive' );
-        if ($value == '' && (get_option( 'propertyhive_primary_department' ) == 'residential-sales' || get_option( 'propertyhive_primary_department' ) === FALSE) )
+        if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
         {
-            $value = 'residential-sales';
-        }
-    }
-    if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-    {
-        $departments['residential-lettings'] = __( 'Lettings', 'propertyhive' );
-        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'residential-lettings')
-        {
-            $value = 'residential-lettings';
-        }
-    }
-    if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
-    {
-        $departments['commercial'] = __( 'Commercial', 'propertyhive' );
-        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'commercial')
-        {
-            $value = 'commercial';
+            $department_options[$key] = $value;
+
+            if ($default_value == '' && get_option( 'propertyhive_primary_department' ) == $key )
+            {
+                $default_value = $key;
+            }
         }
     }
 
     $fields['department'] = array(
         'type' => 'radio',
-        'options' => $departments,
-        'value' => $value
+        'options' => $department_options,
+        'value' => $default_value
     );
 
     if ( array_key_exists('residential-sales', $departments) || array_key_exists('residential-lettings', $departments) )
