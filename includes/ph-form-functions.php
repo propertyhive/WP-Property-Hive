@@ -43,6 +43,8 @@ function ph_get_search_form( $id = 'default' ) {
         if ( $key == 'officeID' && isset($form_controls['office']) )
             continue;
 
+        if ( $key == 'paged' )
+            continue;
 
         // we've received a field that isn't a standard form control so let's store it in a hidden field so it's not lost
         if ( is_array($value) )
