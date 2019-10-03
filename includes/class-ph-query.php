@@ -527,13 +527,6 @@ class PH_Query {
 		}
 
 		switch ( $orderby ) {
-			case 'rand' :
-				$args['orderby']  = 'rand';
-			break;
-			case 'date' :
-				$args['orderby']  = 'date';
-				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
-			break;
 			case 'price' :
 				$args['orderby']  = 'meta_value_num';
 				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
@@ -554,6 +547,14 @@ class PH_Query {
 				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
 				$args['meta_key'] = '_floor_area_from_sqft';
 			break;
+			default :
+			{
+				if ( $orderby != '' )
+				{
+					$args['orderby']  = $orderby;
+					$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+				}
+			}
 		}
 
 		return apply_filters( 'propertyhive_get_search_results_ordering_args', $args );
