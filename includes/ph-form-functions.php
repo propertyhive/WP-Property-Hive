@@ -797,7 +797,7 @@ function ph_form_field( $key, $field )
             }
             else
             {
-                if ( isset($post->ID) )
+                if ( !is_post_type_archive('property') && isset($post->ID) )
                 {
                     $value = get_post_meta( $post->ID, '_' . $key, true );
                     if ( $value != '' )
@@ -851,7 +851,7 @@ function ph_form_field( $key, $field )
             }
             else
             {
-                if ( isset($post->ID) )
+                if ( !is_post_type_archive('property') && isset($post->ID) )
                 {
                     $value = get_post_meta( $post->ID, '_' . $key, true );
                     if ( $value != '' )
@@ -901,7 +901,7 @@ function ph_form_field( $key, $field )
             }
             else
             {
-                if ( isset($post->ID) )
+                if ( !is_post_type_archive('property') && isset($post->ID) )
                 {
                     $value = get_post_meta( $post->ID, '_' . $key, true );
                     if ( $value == 'yes' )
@@ -983,7 +983,7 @@ function ph_form_field( $key, $field )
             }
             else
             {
-                if ( isset($post->ID) )
+                if ( !is_post_type_archive('property') && isset($post->ID) )
                 {
                     $value = get_post_meta( $post->ID, '_' . $key, true );
                     if ( $value != '' )
