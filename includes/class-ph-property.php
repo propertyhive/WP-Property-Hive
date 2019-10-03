@@ -794,11 +794,7 @@ class PH_Property {
                 $return .= '<p class="description-section">';
                 if ($this->{'_description_name_' . $i} != '')
                 {
-                    $return .= '<strong class="description-title">' . $this->{'_description_name_' . $i} . '</strong>';
-                }
-                if ($this->{'_description_' . $i} != '')
-                {
-                    $return .= '<br>';
+                    $return .= '<strong class="description-title">' . $this->{'_description_name_' . $i} . '</strong><br>';
                 }
                 $return .= str_replace("\r\n", "", nl2br($this->{'_description_' . $i})) . '</p>';
             }
