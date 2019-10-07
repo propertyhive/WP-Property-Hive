@@ -35,6 +35,7 @@ class PH_AJAX {
             // Dashboard components
             'get_news' => false,
             'get_viewings_awaiting_applicant_feedback' => false,
+            'get_my_upcoming_appointments' => false,
 
             // Contact actions
             'create_contact_login' => false,
@@ -1892,6 +1893,121 @@ class PH_AJAX {
         }
 
         wp_reset_postdata();
+
+        echo json_encode($return);
+
+        die();
+    }
+
+    public function get_my_upcoming_appointments()
+    {
+        global $post;
+
+        $this->json_headers();
+
+        $return = array();
+
+        $args = array(
+            'post_type' => 'viewing',
+            'fields' => 'ids',
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_status',
+                    'value' => 'pending'
+                ),
+                array(
+                    'key' => '_start_date_time',
+                    'value' => date("Y-m-d H:i:s"),
+                    'compare' => '>='
+                ),
+                array(
+                    'key' => '_negotiator_id',
+                    'value' => get_current_user_id(),
+                ),
+            )
+        );
+
+        $viewings_query = new WP_Query( $args );
+
+        if ( $viewings_query->have_posts() )
+        {
+            while ( $viewings_query->have_posts() )
+            {
+                $viewings_query->the_post();
+
+                $property_id = get_post_meta( get_the_ID(), '_property_id', TRUE );
+                $property = new PH_Property((int)$property_id);
+
+                $return[] = array(
+                    'ID' => get_the_ID(),
+                    'edit_link' => get_edit_post_link( get_the_ID() ),
+                    'start_date_time' => get_post_meta( get_the_ID(), '_start_date_time', TRUE ),
+                    'start_date_time_formatted_Hi_jSFY' => date("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
+                    'start_date_time_timestamp' => strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE )),
+                    'title' => 'Viewing at ' . $property->get_formatted_full_address(),
+                );
+            }
+        }
+
+        wp_reset_postdata();
+
+        $args = array(
+            'post_type' => 'appraisal',
+            'fields' => 'ids',
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_status',
+                    'value' => 'pending'
+                ),
+                array(
+                    'key' => '_start_date_time',
+                    'value' => date("Y-m-d H:i:s"),
+                    'compare' => '>='
+                ),
+                array(
+                    'key' => '_negotiator_id',
+                    'value' => get_current_user_id(),
+                ),
+            )
+        );
+
+        $appraisals_query = new WP_Query( $args );
+
+        if ( $appraisals_query->have_posts() )
+        {
+            while ( $appraisals_query->have_posts() )
+            {
+                $appraisals_query->the_post();
+
+                $appraisal = new PH_Appraisal(get_the_ID());
+
+                $return[] = array(
+                    'ID' => get_the_ID(),
+                    'edit_link' => get_edit_post_link( get_the_ID() ),
+                    'start_date_time' => get_post_meta( get_the_ID(), '_start_date_time', TRUE ),
+                    'start_date_time_formatted_Hi_jSFY' => date("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
+                    'start_date_time_timestamp' => strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE )),
+                    'title' => 'Appraisal at ' . $appraisal->get_formatted_full_address(),
+                );
+            }
+        }
+
+        wp_reset_postdata();
+
+        $return = apply_filters( 'propertyhive_dashboard_my_upcoming_appointments', $return );
+
+        if ( !empty($return) )
+        {
+            $sort = array();
+            foreach ($return as $key => $part) {
+                   $sort[$key] = strtotime($part['start_date_time']);
+            }
+            array_multisort($sort, SORT_ASC, $return);
+
+            $return = array_slice($return, 0, 10);
+        }
 
         echo json_encode($return);
 
