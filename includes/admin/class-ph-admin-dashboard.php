@@ -37,6 +37,14 @@ class PH_Admin_Dashboard {
         {
         	wp_add_dashboard_widget( 'propertyhive_dashboard_viewings_awaiting_applicant_feedback', __( 'Viewings Awaiting Applicant Feedback', 'propertyhive' ), array( $this, 'viewings_awaiting_applicant_feedback_widget' ) );
         }
+
+        if ( 
+        	get_option('propertyhive_module_disabled_appraisals', '') != 'yes' &&
+        	get_option('propertyhive_module_disabled_viewings', '') != 'yes'
+        )
+        {
+        	wp_add_dashboard_widget( 'propertyhive_dashboard_my_upcoming_appointments', __( 'My Upcoming Appointments', 'propertyhive' ), array( $this, 'my_upcoming_appointments_widget' ) );
+        }
 	}
 
 	/*
@@ -53,6 +61,14 @@ class PH_Admin_Dashboard {
 	public function viewings_awaiting_applicant_feedback_widget()
 	{
 		echo '<div id="ph_dashboard_viewings_awaiting_applicant_feedback">Loading...</div>';
+	}
+
+	/*
+	 * Property Hive My Upcoming Appointments Widget
+	 */
+	public function my_upcoming_appointments_widget()
+	{
+		echo '<div id="ph_dashboard_my_upcoming_appointments">Loading...</div>';
 	}
 }
 
