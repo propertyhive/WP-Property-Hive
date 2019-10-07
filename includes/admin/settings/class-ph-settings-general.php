@@ -293,7 +293,7 @@ class PH_Settings_General extends PH_Settings_Page {
 	 */
 	public function get_general_map_setting() {
 		    
-		return apply_filters( 'propertyhive_general_map_settings', array(
+		$settings = array(
 
 			array( 'title' => __( 'Map Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'map_options' ),
 
@@ -302,11 +302,23 @@ class PH_Settings_General extends PH_Settings_Page {
                 'id'      => 'propertyhive_google_maps_api_key',
                 'type'    => 'text',
                 'desc'	=> '<p>' . __( 'If you have a Google Maps API key you can enter it here. You can generate an API key <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">here</a>.<br>This is used when displaying the map when adding/editing properties, and if using our <a href="https://wp-property-hive.com/addons/map-search/" target="_blank">Map Search</a> or <a href="https://wp-property-hive.com/addons/radial-search/" target="_blank">Radial Search</a> add ons.<br>When creating your API key we recommend that you enable the Geocoding library. More about this can be found <a href="https://docs.wp-property-hive.com/user-guide/maps-co-ordinates-and-geocoding/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
-            ),
+            )
 
-			array( 'type' => 'sectionend', 'id' => 'map_options'),
+        );
 
-		) ); // End general map settings
+        if ( apply_filters( 'propertyhive_use_google_maps_geocoding_api_key', false) === true )
+        {
+            $settings[] = array(
+                'title'   => __( 'Google Maps Geocoding API Key', 'propertyhive' ),
+                'id'      => 'propertyhive_google_maps_geocoding_api_key',
+                'type'    => 'text',
+                'desc'  => '<p>' . __( 'If you have referer restrictions applied to the main API key entered then server side geocoding requests will be blocked. To get around this you can setup a separate API key specifically for geocoding and enter it here, with IP restrictions applied instead if required.<br>More about this can be found <a href="https://docs.wp-property-hive.com/user-guide/maps-co-ordinates-and-geocoding/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
+            );
+        }
+
+		$settings[] = array( 'type' => 'sectionend', 'id' => 'map_options');
+
+        return apply_filters( 'propertyhive_general_map_settings', $settings );
 	}
 
     /**
