@@ -47,10 +47,7 @@ class PH_Admin_Assets {
             
             wp_enqueue_style( 'jquery-ui-style', PH()->plugin_url() . '/assets/css/jquery-ui/jquery-ui.css', array(), PH_VERSION );
             wp_enqueue_style( 'wp-color-picker' );
-        }
 
-        if ( in_array( $screen->id, array( 'property', 'contact', 'appraisal', 'viewing', 'admin_page_ph-generate-applicant-list' ) ) )
-        {
             wp_enqueue_style( 'chosen', PH()->plugin_url() . '/assets/css/chosen.css', array(), PH_VERSION );
         }
 
@@ -115,10 +112,7 @@ class PH_Admin_Assets {
             $api_key = get_option('propertyhive_google_maps_api_key');
             wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
             wp_enqueue_script('googlemaps');
-        }
-        
-        if ( in_array( $screen->id, ph_get_screen_ids() ) )
-        {
+
             wp_enqueue_media();
             wp_enqueue_script( 'propertyhive_admin_meta_boxes' );
             wp_enqueue_script( 'jquery-ui-datepicker' );
