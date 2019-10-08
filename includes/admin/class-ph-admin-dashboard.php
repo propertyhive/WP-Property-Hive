@@ -39,8 +39,12 @@ class PH_Admin_Dashboard {
         }
 
         if ( 
-        	get_option('propertyhive_module_disabled_appraisals', '') != 'yes' &&
-        	get_option('propertyhive_module_disabled_viewings', '') != 'yes'
+        	(
+        		get_option('propertyhive_module_disabled_appraisals', '') != 'yes' &&
+        		get_option('propertyhive_module_disabled_viewings', '') != 'yes'
+       		)
+       		|| 
+       		apply_filters( 'propertyhive_show_my_upcoming_appointments_dashboard_widget', false ) === true
         )
         {
         	wp_add_dashboard_widget( 'propertyhive_dashboard_my_upcoming_appointments', __( 'My Upcoming Appointments', 'propertyhive' ), array( $this, 'my_upcoming_appointments_widget' ) );
