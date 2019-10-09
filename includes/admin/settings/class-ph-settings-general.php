@@ -192,6 +192,15 @@ class PH_Settings_General extends PH_Settings_Page {
 
             array(
                 'title'   => __( 'Disabled Modules', 'propertyhive' ),
+                'desc'    => __( 'Tenancies', 'propertyhive' ),
+                'id'      => 'propertyhive_module_disabled_tenancies',
+                'type'    => 'checkbox',
+                'default' => '',
+                'checkboxgroup' => 'middle'
+            ),
+
+            array(
+                'title'   => __( 'Disabled Modules', 'propertyhive' ),
                 'desc'    => __( 'Enquiries', 'propertyhive' ),
                 'id'      => 'propertyhive_module_disabled_enquiries',
                 'type'    => 'checkbox',

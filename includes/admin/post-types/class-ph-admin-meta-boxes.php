@@ -99,6 +99,9 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_sale_meta', 'PH_Meta_Box_Sale_Applicant_Solicitor::save', 15, 2 );
         add_action( 'propertyhive_process_sale_meta', 'PH_Meta_Box_Sale_Property_Owner_Solicitor::save', 20, 2 );
 
+        // Save Tenancy Meta Boxes
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Details::save', 10, 2 );
+
 		// Error handling (for showing errors from meta boxes on next page load)
 		add_action( 'admin_notices', array( $this, 'output_errors' ) );
 		add_action( 'shutdown', array( $this, 'save_errors' ) );
@@ -1437,7 +1440,7 @@ class PH_Admin_Meta_Boxes {
         );
         
 
-        $meta_boxes = apply_filters( 'propertyhive_offer_summary_meta_boxes', $meta_boxes );
+        $meta_boxes = apply_filters( 'propertyhive_sale_summary_meta_boxes', $meta_boxes );
         ksort($meta_boxes);
 
         $ids = array();
@@ -1484,6 +1487,42 @@ class PH_Admin_Meta_Boxes {
             add_meta_box( 'propertyhive-sale-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Sale_Actions::output', 'sale', 'side' );
         }
 
+        // TENANCY
+        if (!isset($tabs)) $tabs = array();
+
+        /* TENANCY SUMMARY META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-tenancy-details',
+            'title' => __( 'Tenancy Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Tenancy_Details::output',
+            'screen' => 'tenancy',
+            'context' => 'normal',
+            'priority' => 'high'
+        );        
+
+        $meta_boxes = apply_filters( 'propertyhive_tenancy_summary_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+        
+        $tabs['tab_tenancy_summary'] = array(
+            'name' => __( 'Summary', 'propertyhive' ),
+            'metabox_ids' => $ids,
+            'post_type' => 'tenancy'
+        );
+
+        /*if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'tenancy' )
+        {
+            add_meta_box( 'propertyhive-tenancy-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Tenancy_Actions::output', 'tenancy', 'side' );
+            add_meta_box( 'propertyhive-tenancy-notes', __( 'Tenancy History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Tenancy_Notes::output', 'tenancy', 'side' );
+        }*/
+
         $tabs = apply_filters( 'propertyhive_tabs', $tabs );
 
         // Force order of meta boxes
@@ -1491,7 +1530,7 @@ class PH_Admin_Meta_Boxes {
         if ( 
             in_array(
                 get_post_type($post->ID), 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale', 'tenancy') )
             ) 
         )
         {
