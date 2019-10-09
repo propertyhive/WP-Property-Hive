@@ -123,9 +123,9 @@ class PH_Rest_Api {
 		            	{
 		            		case "price":
 		            		{ 
-		            			if ( $property->poa != 'yes' )
+		            			if ( $property->_poa != 'yes' )
 		            			{
-		            				if ( $property->department == 'residential-lettings' ) { return $property->rent; }else{ return $property->price; } 
+		            				if ( $property->_department == 'residential-lettings' ) { return $property->_rent; }else{ return $property->_price; } 
 		            			}
 
 		            			return '';
