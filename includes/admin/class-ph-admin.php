@@ -465,11 +465,8 @@ class PH_Admin {
                 $body = str_replace("[properties]", ob_get_clean(), $body);
             }
 
-            // create a new email
-            $email = new PH_Emails();
-
             // wrap the content with the email template and then add styles
-            $message = apply_filters( 'propertyhive_mail_content', $email->style_inline( $email->wrap_message( $body ) ) );
+            $message = apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $body ) ) );
 
             // print the preview email
             echo $message;
