@@ -73,33 +73,18 @@ class PH_Admin_Applicant_List {
 			</p>
 
 			<p class="form-field sales-only">
-				<label>Maximum Price From</label>
-				<input type="text" name="maximum_price_from" value="<?php if ( isset($_POST['maximum_price_from']) ) { echo esc_attr( $_POST['maximum_price_from'] ); } ?>">
-			</p>
-
-			<p class="form-field sales-only">
-				<label>Maximum Price To</label>
-				<input type="text" name="maximum_price_to" value="<?php if ( isset($_POST['maximum_price_to']) ) { echo esc_attr( $_POST['maximum_price_to'] ); } ?>">
+				<label>Price</label>
+				<input type="text" name="maximum_price" value="<?php if ( isset($_POST['maximum_price']) ) { echo esc_attr( $_POST['maximum_price'] ); } ?>">
 			</p>
 
 			<p class="form-field lettings-only">
-				<label>Maximum Rent From (PCM)</label>
-				<input type="text" name="maximum_rent_from" value="<?php if ( isset($_POST['maximum_rent_from']) ) { echo esc_attr( $_POST['maximum_rent_from'] ); } ?>">
-			</p>
-
-			<p class="form-field lettings-only">
-				<label>Maximum Rent To (PCM)</label>
-				<input type="text" name="maximum_rent_to" value="<?php if ( isset($_POST['maximum_rent_to']) ) { echo esc_attr( $_POST['maximum_rent_to'] ); } ?>">
+				<label>Rent (PCM)</label>
+				<input type="text" name="maximum_rent" value="<?php if ( isset($_POST['maximum_rent']) ) { echo esc_attr( $_POST['maximum_rent'] ); } ?>">
 			</p>
 
 			<p class="form-field residential-only">
-				<label>Minimum Bedrooms From</label>
-				<input type="number" name="minimum_bedrooms_from" class="short" value="<?php if ( isset($_POST['minimum_bedrooms_from']) ) { echo esc_attr( $_POST['minimum_bedrooms_from'] ); } ?>">
-			</p>
-
-			<p class="form-field residential-only">
-				<label>Minimum Bedrooms To</label>
-				<input type="number" name="minimum_bedrooms_to" class="short" value="<?php if ( isset($_POST['minimum_bedrooms_to']) ) { echo esc_attr( $_POST['minimum_bedrooms_to'] ); } ?>">
+				<label>Bedrooms</label>
+				<input type="number" name="minimum_bedrooms" class="short" value="<?php if ( isset($_POST['minimum_bedrooms']) ) { echo esc_attr( $_POST['minimum_bedrooms'] ); } ?>">
 			</p>
 
 			<p class="form-field residential-only">
@@ -236,6 +221,85 @@ class PH_Admin_Applicant_List {
         <?php 
             if ( isset($_POST['submitted']) && $_POST['submitted'] == '1' ) 
             { 
+                $search_property_types = array();
+                if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' ) )
+                {
+                    if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
+                    {
+                        foreach ( $_POST['property_types'] as $property_type )
+                        {
+                            $search_property_types[] = (int)$property_type;
+
+                            $args = array(
+                                'hide_empty' => false,
+                                'parent' => $property_type
+                            );
+                            $terms = get_terms( 'property_type', $args );
+
+                            if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                            {
+                                foreach ($terms as $term)
+                                {
+                                    $search_property_types[] = $term->term_id;
+
+                                    $args = array(
+                                        'hide_empty' => false,
+                                        'parent' => $term->term_id
+                                    );
+                                    $subterms = get_terms( 'property_type', $args );
+                                    
+                                    if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                                    {
+                                        foreach ($subterms as $term)
+                                        {
+                                            $search_property_types[] = $term->term_id;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    $search_property_types = array_unique($search_property_types);
+                }
+
+                $search_locations = array();
+                if ( isset($_POST['locations']) && is_array($_POST['locations']) && !empty($_POST['locations']) )
+                {
+                    foreach ( $_POST['locations'] as $location )
+                    {
+                        $search_locations[] = (int)$location;
+
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => $location
+                        );
+                        $terms = get_terms( 'location', $args );
+
+                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                        {
+                            foreach ($terms as $term)
+                            {
+                                $search_locations[] = $term->term_id;
+
+                                $args = array(
+                                    'hide_empty' => false,
+                                    'parent' => $term->term_id
+                                );
+                                $subterms = get_terms( 'location', $args );
+                                
+                                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                                {
+                                    foreach ($subterms as $term)
+                                    {
+                                        $search_locations[] = $term->term_id;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                $search_locations = array_unique($search_locations);
+
                 $args = array(
                     'post_type' => 'contact',
                     'nopaging' => true,
@@ -271,6 +335,11 @@ class PH_Admin_Applicant_List {
 
                             $match = true;
 
+                            if ( !isset($profile['send_matching_properties']) || ( isset($profile['send_matching_properties']) && $profile['send_matching_properties'] != 'yes' ) )
+                            {
+                                $match = false;
+                            }
+
                             if ( isset($_POST['department']) )
                             {
                                 if ( isset($profile['department']) && $profile['department'] != ph_clean($_POST['department']) )
@@ -281,20 +350,11 @@ class PH_Admin_Applicant_List {
 
                             if ( isset($_POST['department']) && $_POST['department'] == 'residential-sales' )
                             {
-                                if ( isset($_POST['maximum_price_from']) && ph_clean($_POST['maximum_price_from']) != '' ) 
+                                if ( isset($_POST['maximum_price']) && ph_clean($_POST['maximum_price']) != '' ) 
                                 {
-                                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price_from']));
+                                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
 
                                     if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' && $profile['max_price_actual'] != 0 && $profile['max_price_actual'] < $price )
-                                    {
-                                        $match = false;
-                                    }
-                                }
-                                if ( isset($_POST['maximum_price_to']) && ph_clean($_POST['maximum_price_to']) != '' )
-                                {
-                                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price_to']));
-
-                                    if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' && $profile['max_price_actual'] != 0 && $profile['max_price_actual'] > $price )
                                     {
                                         $match = false;
                                     }
@@ -302,20 +362,11 @@ class PH_Admin_Applicant_List {
                             }
                             if ( isset($_POST['department']) && $_POST['department'] == 'residential-lettings' )
                             {
-                                if ( isset($_POST['maximum_rent_from']) && ph_clean($_POST['maximum_rent_from']) != '' ) 
+                                if ( isset($_POST['maximum_rent']) && ph_clean($_POST['maximum_rent']) != '' )
                                 {
-                                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent_from']));
+                                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
 
                                     if ( isset($profile['max_rent_actual']) && $profile['max_rent_actual'] != '' && $profile['max_rent_actual'] != 0 && $profile['max_rent_actual'] < $price )
-                                    {
-                                        $match = false;
-                                    }
-                                }
-                                if ( isset($_POST['maximum_rent_to']) && ph_clean($_POST['maximum_rent_to']) != '' )
-                                {
-                                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent_to']));
-
-                                    if ( isset($profile['max_rent_actual']) && $profile['max_rent_actual'] != '' && $profile['max_rent_actual'] != 0 && $profile['max_rent_actual'] > $price )
                                     {
                                         $match = false;
                                     }
@@ -323,18 +374,9 @@ class PH_Admin_Applicant_List {
                             }
                             if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' ) )
                             {
-                                if ( isset($_POST['minimum_bedrooms_from']) && ph_clean($_POST['minimum_bedrooms_from']) != '' ) 
+                                if ( isset($_POST['minimum_bedrooms']) && ph_clean($_POST['minimum_bedrooms']) != '' ) 
                                 {
-                                    $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms_from']));
-
-                                    if ( isset($profile['min_beds']) && $profile['min_beds'] != '' && $profile['min_beds'] != 0 && $profile['min_beds'] < $beds )
-                                    {
-                                        $match = false;
-                                    }
-                                }
-                                if ( isset($_POST['minimum_bedrooms_to']) && ph_clean($_POST['minimum_bedrooms_to']) != '' ) 
-                                {
-                                    $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms_to']));
+                                    $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
 
                                     if ( isset($profile['min_beds']) && $profile['min_beds'] != '' && $profile['min_beds'] != 0 && $profile['min_beds'] > $beds )
                                     {
@@ -346,7 +388,7 @@ class PH_Admin_Applicant_List {
                                 if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
                                 {
                                     $found_type = false;
-                                    foreach ($_POST['property_types'] as $search_property_type)
+                                    foreach ( $search_property_types as $search_property_type )
                                     {
                                         if ( isset($profile['property_types']) && is_array($profile['property_types']) && in_array($search_property_type, $profile['property_types']) )
                                         {
@@ -364,7 +406,7 @@ class PH_Admin_Applicant_List {
                             if ( isset($_POST['locations']) && is_array($_POST['locations']) && !empty($_POST['locations']) )
                             {
                                 $found_type = false;
-                                foreach ($_POST['locations'] as $search_location)
+                                foreach ( $search_locations as $search_location )
                                 {
                                     if ( isset($profile['locations']) && is_array($profile['locations']) && in_array($search_location, $profile['locations']) )
                                     {
