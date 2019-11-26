@@ -399,7 +399,10 @@ class PH_Shortcodes {
 
 		ob_start();
 
-		$properties = new WP_Query( apply_filters( 'propertyhive_properties_query', $args, $atts ) );
+		$args = apply_filters( 'propertyhive_properties_query', $args, $atts );
+		$args = apply_filters( 'propertyhive_shortcode_properties_query', $args, $atts );
+
+		$properties = new WP_Query( $args );
 
 		$propertyhive_loop['columns'] = $atts['columns'];
 
@@ -625,7 +628,7 @@ class PH_Shortcodes {
 		}
 
 		ob_start();
-
+		
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_featured_properties_query', $args, $atts ) );
 
 		$propertyhive_loop['columns'] = $atts['columns'];
