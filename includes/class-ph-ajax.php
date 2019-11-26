@@ -1521,7 +1521,7 @@ class PH_AJAX {
             $message .= __( 'Properties', 'propertyhive' ) . ":\n";
             foreach ( $property_ids as $property_id )
             {
-                $message .= get_the_title( (int)$property_id ) . " (" . get_permalink( (int)$property_id ) . ")\n";
+                $message .= apply_filters( 'propertyhive_property_enquiry_property_output', get_the_title( (int)$property_id ) . " (" . get_permalink( (int)$property_id ) . ")", (int)$property_id ) . "\n";
             }
             $message .= "\n";
 
@@ -1541,6 +1541,8 @@ class PH_AJAX {
 
                 $message .= strip_tags($label) . ": " . strip_tags($value) . "\n";
             }
+
+            $message = apply_filters( 'propertyhive_property_enquiry_post_body', $message, $property_ids );
             
             $from_email_address = get_option('propertyhive_email_from_address', '');
             if ( $from_email_address == '' )
