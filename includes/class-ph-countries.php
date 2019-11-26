@@ -187,6 +187,12 @@ class PH_Countries {
 				'currency_symbol' => '&yen;',
 				'currency_prefix' => true
 			),
+			'MT' => array(
+				'name' => 'Malta',
+				'currency_code' => 'EUR',
+				'currency_symbol' => '&euro;',
+				'currency_prefix' => true
+			),
 			'MU' => array(
 				'name' => 'Mauritius',
 				'currency_code' => 'MUR',
