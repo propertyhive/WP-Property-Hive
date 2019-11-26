@@ -443,6 +443,7 @@ class PH_Shortcodes {
 			'columns' 		=> '4',
 			'department' 	=> '',
 			'office_id'		=> '',
+			'negotiator_id'		=> '',
 			'availability_id'	=> '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
@@ -466,6 +467,15 @@ class PH_Shortcodes {
 				'key' => '_office_id',
 				'value' => explode(",", $atts['office_id']),
 				'compare' => 'IN'
+			);
+		}
+
+		if ( isset($atts['negotiator_id']) && $atts['negotiator_id'] != '' )
+		{
+			$meta_query[] = array(
+				'key' => '_negotiator_id',
+				'value' => explode(",", $atts['negotiator_id']),
+				'compare' => 'IN',
 			);
 		}
 
@@ -538,6 +548,7 @@ class PH_Shortcodes {
 			'columns' 	=> '4',
 			'department' => '',
 			'office_id'	=> '',
+			'negotiator_id'		=> '',
 			'availability_id'	=> '',
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
@@ -580,6 +591,15 @@ class PH_Shortcodes {
 				'key' => '_office_id',
 				'value' => explode(",", $atts['office_id']),
 				'compare' => 'IN'
+			);
+		}
+
+		if ( isset($atts['negotiator_id']) && $atts['negotiator_id'] != '' )
+		{
+			$meta_query[] = array(
+				'key' => '_negotiator_id',
+				'value' => explode(",", $atts['negotiator_id']),
+				'compare' => 'IN',
 			);
 		}
 
