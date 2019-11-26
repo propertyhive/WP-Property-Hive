@@ -242,17 +242,47 @@ class PH_Admin_Matching_Applicants {
         {
             $property_types = array();
             $prefix = $property->department == 'commercial' ? 'commercial_' : '';
-            $term_list = wp_get_post_terms($property_id, $prefix . 'property_type', array("fields" => "ids"));
+            $term_list = wp_get_post_terms($property_id, $prefix . 'property_type', array("fields" => "all"));
             if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
             {
-                $property_types = $term_list;
+                foreach ( $term_list as $term )
+                {
+                    $property_types[] = $term->term_id;
+
+                    if ( $term->parent != 0 )
+                    {
+                        $parent = get_term_by( 'id', $term->parent , $prefix . 'property_type' );
+                        $property_types[] = $parent->term_id;
+
+                        if ( $parent->parent != 0 )
+                        {
+                            $parent = get_term_by( 'id', $parent->parent , $prefix . 'property_type' );
+                            $property_types[] = $parent->term_id;
+                        }
+                    }
+                }
             }
 
             $locations = array();
-            $term_list = wp_get_post_terms($property_id, 'location', array("fields" => "ids"));
+            $term_list = wp_get_post_terms($property_id, 'location', array("fields" => "all"));
             if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
             {
-                $locations = $term_list;
+                foreach ( $term_list as $term )
+                {
+                    $locations[] = $term->term_id;
+
+                    if ( $term->parent != 0 )
+                    {
+                        $parent = get_term_by( 'id', $term->parent , 'location' );
+                        $locations[] = $parent->term_id;
+
+                        if ( $parent->parent != 0 )
+                        {
+                            $parent = get_term_by( 'id', $parent->parent , 'location' );
+                            $locations[] = $parent->term_id;
+                        }
+                    }
+                }
             }
 
             $floor_area_from = $property->floor_area_from_sqft;
