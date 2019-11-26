@@ -458,7 +458,7 @@ if ( ! function_exists( 'propertyhive_show_property_images' ) ) {
                     $images[] = array(
                         'title' => esc_attr( get_the_title( $gallery_attachment ) ),
                         'url'  => wp_get_attachment_url( $gallery_attachment ),
-                        'image' => wp_get_attachment_image( $gallery_attachment, 'original' ),
+                        'image' => wp_get_attachment_image( $gallery_attachment, apply_filters( 'propertyhive_single_property_image_size', 'original' ) ),
                         'attachment_id' => $gallery_attachment,
                     );
                 }
