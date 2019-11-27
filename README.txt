@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.2.3
-Stable tag: 1.4.48
+Tested up to: 5.3
+Stable tag: 1.4.49
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,18 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.49 =
+* Updated 'Generate Applicant List' to replace from/to on price and beds fields for single fields
+* Added support for negotiator_id attribute in [recent_properties] and [featured_properties] shortcodes
+* Added Malta to list of supported countries
+* Corrected issue with duplicate header and footer when previewing email
+* Corrected issue when generating applicant list where, when filtering on property type or location, it wouldn't take into account parent/child terms
+* Added new filter propertyhive_single_property_image_size so image size on details page can be changed. Default 'original'
+* Added new filters 'propertyhive_property_enquiry_property_output' and 'propertyhive_property_enquiry_post_body' to property enquiry body
+* Added new filter 'propertyhive_show_my_upcoming_appointments_dashboard_widget' to allow third party add ons to specify whether upcoming appointments widget should show
+* Reversed previous REST API change due where underscore was removed from emta keys due to it not returning taxonomies
+* Declared compatibility for WordPress 5.3
 
 = 1.4.48 =
 * Added new dashboard widget showing users next 10 upcoming appointments
