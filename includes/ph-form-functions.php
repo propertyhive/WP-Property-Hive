@@ -1187,6 +1187,7 @@ function ph_form_field( $key, $field )
                 $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
                 $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
                 $field['blank_option'] = isset( $field['blank_option'] ) ? $field['blank_option'] : __( 'No preference', 'propertyhive' );
+                $field['parent_terms_only'] = isset( $field['parent_terms_only'] ) ? $field['parent_terms_only'] : false;
 
                 $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
                 if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
@@ -1221,29 +1222,39 @@ function ph_form_field( $key, $field )
                     {
                         $options[$term->term_id] = $term->name;
 
-                        $args = array(
-                            'hide_empty' => false,
-                            'parent' => $term->term_id
-                        );
-                        $subterms = get_terms( $field['type'], $args );
-
-                        if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                        if ( 
+                            !isset($field['parent_terms_only'])
+                            ||
+                            (
+                                isset($field['parent_terms_only']) &&
+                                $field['parent_terms_only'] === false
+                            )
+                        )
                         {
-                            foreach ($subterms as $term)
+                            $args = array(
+                                'hide_empty' => false,
+                                'parent' => $term->term_id
+                            );
+                            $subterms = get_terms( $field['type'], $args );
+
+                            if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                             {
-                                $options[$term->term_id] = '- ' . $term->name;
-
-                                $args = array(
-                                    'hide_empty' => false,
-                                    'parent' => $term->term_id
-                                );
-                                $subsubterms = get_terms( $field['type'], $args );
-
-                                if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                                foreach ($subterms as $term)
                                 {
-                                    foreach ($subsubterms as $term)
+                                    $options[$term->term_id] = '- ' . $term->name;
+
+                                    $args = array(
+                                        'hide_empty' => false,
+                                        'parent' => $term->term_id
+                                    );
+                                    $subsubterms = get_terms( $field['type'], $args );
+
+                                    if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                                     {
-                                        $options[$term->term_id] = '- ' . $term->name;
+                                        foreach ($subsubterms as $term)
+                                        {
+                                            $options[$term->term_id] = '- ' . $term->name;
+                                        }
                                     }
                                 }
                             }
