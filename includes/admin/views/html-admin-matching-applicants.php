@@ -117,7 +117,7 @@
                     }
 
                     $columns = array(
-                        'name' => '<a href="' . get_edit_post_link($applicant['contact_id']) . '" target="_blank">' . get_the_title($applicant['contact_id']) . '</a>',
+                        'name' => '<strong><a href="' . get_edit_post_link($applicant['contact_id']) . '" target="_blank">' . get_the_title($applicant['contact_id']) . '</a>' . ( ( isset($applicant['applicant_profile']['grading']) && $applicant['applicant_profile']['grading'] == 'hot' ) ? '<br><span style="color:#C00;">('. __( 'Hot Applicant', 'propertyhive' ) . ')</span>' : '' ) . '</strong>',
                         'contact_details' => 'T: ' . get_post_meta( $applicant['contact_id'], '_telephone_number', TRUE ) . '<br>E: ' . $email_address,
                         'requirements' => $requirements,
                     );
