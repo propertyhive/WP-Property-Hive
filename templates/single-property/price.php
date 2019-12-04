@@ -16,7 +16,11 @@ global $post, $property;
 	<?php echo $property->get_formatted_price(); ?>
 	
 	<?php
-       	if ($property->department == 'residential-sales')
+       	if (
+            $property->department == 'residential-sales'
+            ||
+            ( $property->department == 'commercial' && $property->for_sale == 'yes' )
+        )
        	{
         	echo ' <span class="price-qualifier">' . $property->price_qualifier . '</span>';
        	}
