@@ -205,7 +205,12 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
-				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title.'</a></strong>';
+				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title.'</a>';
+				if ( isset( $_GET['_contact_type'] ) && strpos( ph_clean($_GET['_contact_type']), 'applicant' ) !== FALSE && in_array('applicant', $the_contact->_contact_types) && $the_contact->_hot_applicant == 'yes' )
+				{
+					echo ' <span style="color:#C00;">(' . __( 'Hot Applicant', 'propertyhive' ) . ')</span>';
+				}
+				echo '</strong>';
 
 				/*if ( $post->post_parent > 0 ) {
 					echo '&nbsp;&nbsp;&larr; <a href="'. get_edit_post_link( $post->post_parent ) .'">'. get_the_title( $post->post_parent ) .'</a>';

@@ -234,6 +234,7 @@ class PH_Admin_Matching_Applicants {
 	{
 		global $post;
 
+        $hot_applicants = array();
 		$applicants = array();
 
         $property = new PH_Property((int)$property_id);
@@ -502,10 +503,20 @@ class PH_Admin_Matching_Applicants {
                                     $applicant_profile['applicant_profile_id'] = $i;
 
                                     // Matched all criteria
-                                    $applicants[] = array(
-                                        'contact_id' => get_the_ID(),
-                                        'applicant_profile' => $applicant_profile,
-                                    );
+                                    if ( isset($applicant_profile['grading']) && $applicant_profile['grading'] == 'hot' )
+                                    {
+                                        $hot_applicants[] = array(
+                                            'contact_id' => get_the_ID(),
+                                            'applicant_profile' => $applicant_profile,
+                                        );
+                                    }
+                                    else
+                                    {
+                                        $applicants[] = array(
+                                            'contact_id' => get_the_ID(),
+                                            'applicant_profile' => $applicant_profile,
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -516,7 +527,7 @@ class PH_Admin_Matching_Applicants {
             wp_reset_postdata();
         }
 
-        return $applicants;
+        return array_merge($hot_applicants, $applicants);
 	}
 
     public function send_emails( $contact_id, $applicant_profile, $email_property_ids, $from_name, $from_email_address, $subject, $body, $to_email_address = '' )
