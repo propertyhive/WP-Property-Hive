@@ -103,12 +103,24 @@ class PH_Admin_Meta_Boxes {
 		add_action( 'admin_notices', array( $this, 'output_errors' ) );
 		add_action( 'shutdown', array( $this, 'save_errors' ) );
 
+        add_filter( 'redirect_post_location', array( $this, 'redirect_to_tab' ), 10, 2 );
+
         $this->check_contact_create_relationship();
         $this->check_contact_delete_relationship();
         $this->check_remove_solicitor();
         $this->check_create_offer();
         $this->check_create_sale();
 	}
+
+    public function redirect_to_tab( $url, $post_id )
+    {
+        if ( isset($_POST['propertyhive_selected_metabox_tab']) )
+        {
+            $url .= '#' . $_POST['propertyhive_selected_metabox_tab'];
+        }
+
+        return $url;
+    }
 
     public function check_contact_create_relationship()
     {
@@ -1352,7 +1364,7 @@ class PH_Admin_Meta_Boxes {
             !empty($tabs) && 
             in_array(
                 $post->post_type, 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale') )
             )
         )
         {
@@ -1377,6 +1389,9 @@ class PH_Admin_Meta_Boxes {
                 }
             }
             echo '</div><br>';
+
+            // hidden field to keep track of selected hash
+            echo '<input type="hidden" name="propertyhive_selected_metabox_tab" id="propertyhive_selected_metabox_tab" value="">';
             
             if (!empty($meta_boxes_under_tabs))
             {
@@ -1403,8 +1418,10 @@ class PH_Admin_Meta_Boxes {
                         jQuery(\'#propertyhive_metabox_tabs a:first-child\').addClass(\'button-primary\');
                         
                         // Hide meta boxes and show correct one when tab clicked
-                        jQuery(\'#propertyhive_metabox_tabs a\').click(function()
+                        jQuery(\'#propertyhive_metabox_tabs a\').click(function(e)
                         {
+                            e.preventDefault();
+
                             hide_meta_box_tabs();
                             
                             var this_href = jQuery(this).attr(\'href\').split(\'|\');
@@ -1447,13 +1464,23 @@ class PH_Admin_Meta_Boxes {
                                 }
                             }
 
+                            //window.location.hash = jQuery(this).attr(\'href\');
+                            history.pushState({}, \'\', \'#\' + jQuery(this).attr(\'href\').replace(/#/g, \'\').replace(/\|/g, \'%7C\'));
+
+                            jQuery(\'#propertyhive_selected_metabox_tab\').val(jQuery(this).attr(\'href\').replace(/#/g, \'\').replace(/\|/g, \'%7C\'));
+
                             return false;
                         });
 
                         // Set default tab if hash set
                         if (window.location.hash != \'\')
                         {
-                            jQuery("#propertyhive_metabox_tabs a[href=\'" + window.location.hash + "\']").trigger(\'click\');
+                            var hash = window.location.hash;
+                            if ( window.location.hash.indexOf(\'%7C\') )
+                            {
+                                hash = window.location.hash.replace(/%7C/g, \'|#\');
+                            }
+                            jQuery("#propertyhive_metabox_tabs a[href=\'" + hash + "\']").trigger(\'click\');
                         }
                     });
                     
