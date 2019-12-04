@@ -686,6 +686,13 @@ class PH_Meta_Box_Contact_Relationships {
                             ) );
                         }
 
+                        propertyhive_wp_checkbox( array( 
+                            'id' => '_grading_' . $key, 
+                            'label' => __( 'Hot Applicant', 'propertyhive' ), 
+                            'desc_tip' => false, 
+                            'value' => ( ( ( isset($applicant_profile['grading']) && $applicant_profile['grading'] == 'hot' ) ) ? 'yes' : '' )
+                        ) );
+
                         echo '
 
                         </div>
@@ -856,6 +863,7 @@ class PH_Meta_Box_Contact_Relationships {
             $num_applicant_profiles = 0;
         }
 
+        $hot_applicant = ''; // use this to set a global meta key on the contact so applicants can be filtered by hot
         if ( $num_applicant_profiles > 0 )
         {
             for ( $i = 0; $i < $num_applicant_profiles; ++$i )
@@ -947,9 +955,17 @@ class PH_Meta_Box_Contact_Relationships {
                 $applicant_profile['send_matching_properties'] = ( ( isset($_POST['_send_matching_properties_' . $i]) ) ? ph_clean($_POST['_send_matching_properties_' . $i]) : '' );
                 $applicant_profile['auto_match_disabled'] = ( ( isset($_POST['_auto_match_disabled_' . $i]) ) ? ph_clean($_POST['_auto_match_disabled_' . $i]) : '' );
 
+                $applicant_profile['grading'] = ph_clean($_POST['_grading_' . $i]) == 'yes' ? 'hot' : '';
+                if ( ph_clean($_POST['_grading_' . $i]) == 'yes' )
+                {
+                    $hot_applicant = 'yes';
+                }
+
                 update_post_meta( $post_id, '_applicant_profile_' . $i, $applicant_profile );
             }
         }
+
+        update_post_meta( $post_id, '_hot_applicant', $hot_applicant );
 
         $third_party_categories = array();
         if ( isset($_POST['_third_party_category']) && is_array($_POST['_third_party_category']) && !empty($_POST['_third_party_category']) )
