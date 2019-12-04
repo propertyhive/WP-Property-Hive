@@ -464,7 +464,7 @@ class PH_Admin_Post_Types {
     public function contact_filters() {
         global $wp_query;
 
-        $selected_contact_type = isset( $_GET['_contact_type'] ) && in_array( $_GET['_contact_type'], array( 'owner', 'potentialowner', 'applicant', 'thirdparty' ) ) ? $_GET['_contact_type'] : '';
+        $selected_contact_type = isset( $_GET['_contact_type'] ) && in_array( $_GET['_contact_type'], array( 'owner', 'potentialowner', 'applicant', 'hotapplicant', 'thirdparty' ) ) ? $_GET['_contact_type'] : '';
         
         // Type filtering        
         $options = array();
@@ -487,6 +487,13 @@ class PH_Admin_Post_Types {
         $option = '<option value="applicant"';
         $option .= selected( 'applicant', $selected_contact_type, false );
         $option .= '>' . __( 'Applicants', 'propertyhive' ) . '</option>';
+
+        $options[] = $option;
+
+        // Hot Applicants
+        $option = '<option value="hotapplicant"';
+        $option .= selected( 'hotapplicant', $selected_contact_type, false );
+        $option .= '>- ' . __( 'Hot Applicants', 'propertyhive' ) . '</option>';
 
         $options[] = $option;
 
@@ -853,10 +860,21 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'contact' === $typenow ) 
         {
-            if ( ! empty( $_GET['_contact_type'] ) ) {
+            if ( ! empty( $_GET['_contact_type'] ) ) 
+            {
+                $contact_type = ph_clean($_GET['_contact_type']);
+                if ( $contact_type == 'hotapplicant' )
+                {
+                    $contact_type = 'applicant';
+
+                    $vars['meta_query'][] = array(
+                        'key' => '_hot_applicant',
+                        'value' => 'yes',
+                    );
+                }
                 $vars['meta_query'][] = array(
                     'key' => '_contact_types',
-                    'value' => sanitize_text_field( $_GET['_contact_type'] ),
+                    'value' => $contact_type,
                     'compare' => 'LIKE'
                 );
             }
