@@ -76,12 +76,12 @@ class PH_Shortcodes {
 		$atts = shortcode_atts( array(
 			'id' 					=> 'shortcode',
 			'default_department' 	=> ''
-		), $atts );
+		), $atts, 'property_search_form' );
 
 		$form_controls = ph_get_search_form_fields();
 
-		$form_controls = apply_filters( 'propertyhive_search_form_fields_' . $atts['id'], $form_controls );
-		$form_controls = apply_filters( 'propertyhive_search_form_fields', $form_controls );
+		$form_controls = apply_filters( 'propertyhive_search_form_fields_' . $atts['id'], $form_controls, $atts );
+		$form_controls = apply_filters( 'propertyhive_search_form_fields', $form_controls, $atts );
 
 		// We 100% need department so make sure it exists. If it doesn't, set a hidden field
 	    if ( !isset($form_controls['department']) )
