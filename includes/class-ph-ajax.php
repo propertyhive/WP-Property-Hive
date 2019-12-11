@@ -1518,7 +1518,7 @@ class PH_AJAX {
             
             $message = apply_filters( 'propertyhive_property_enquiry_pre_body', $message, $property_ids );
 
-            $message .= __( 'Properties', 'propertyhive' ) . ":\n";
+            $message .= ( count($property_ids) > 1 ? __( 'Properties', 'propertyhive' ) : __( 'Property', 'propertyhive' ) ) . ":\n";
             foreach ( $property_ids as $property_id )
             {
                 $message .= apply_filters( 'propertyhive_property_enquiry_property_output', get_the_title( (int)$property_id ) . " (" . get_permalink( (int)$property_id ) . ")", (int)$property_id ) . "\n";
