@@ -575,6 +575,17 @@ class PH_Admin_Meta_Boxes {
             'context' => 'normal',
             'priority' => 'high'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            $meta_boxes[10] = array(
+                'id' => 'propertyhive-property-marketing-statistics',
+                'title' => __( 'Property Marketing Statistics', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Property_Marketing_Statistics::output',
+                'screen' => 'property',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+        }
 
         $meta_boxes = apply_filters( 'propertyhive_property_marketing_meta_boxes', $meta_boxes );
         ksort($meta_boxes);
@@ -589,8 +600,12 @@ class PH_Admin_Meta_Boxes {
         $tabs['tab_marketing'] = array(
             'name' => __( 'Marketing', 'propertyhive' ),
             'metabox_ids' => $ids,
-            'post_type' => 'property'
+            'post_type' => 'property',
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            $tabs['tab_marketing']['ajax_actions'] = array( 'get_property_marketing_statistics_meta_box^' . wp_create_nonce( 'get_property_marketing_statistics_meta_box' ) );
+        }
 
         /* PROPERTY DESCRIPTIONS META BOXES */
         $meta_boxes = array();
