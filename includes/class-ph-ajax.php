@@ -37,6 +37,9 @@ class PH_AJAX {
             'get_viewings_awaiting_applicant_feedback' => false,
             'get_my_upcoming_appointments' => false,
 
+            // Property actions
+            'get_property_marketing_statistics_meta_box' => false,
+
             // Contact actions
             'create_contact_login' => false,
 
@@ -1999,6 +2002,56 @@ class PH_AJAX {
         }
 
         echo json_encode($return);
+
+        die();
+    }
+
+    public function get_property_marketing_statistics_meta_box()
+    {
+        check_ajax_referer( 'get_property_marketing_statistics_meta_box', 'security' );
+
+        global $post;
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+            $view_statistics = get_post_meta( (int)$_POST['post_id'], '_view_statistics', TRUE );
+
+            //var_dump($views);
+
+            $total = 0;
+
+            $views_last_7_days = 0;
+            $views_previous_7_days = 0;
+
+            $views_last_30_days = 0;
+            $views_previous_30_days = 0;
+
+            if ( $view_statistics != '' )
+            {
+                $date_7_days_ago = date("Y-m-d", strtotime('7 days ago'));
+                $date_14_days_ago = date("Y-m-d", strtotime('14 days ago'));
+
+                $date_30_days_ago = date("Y-m-d", strtotime('30 days ago'));
+                $date_60_days_ago = date("Y-m-d", strtotime('60 days ago'));
+
+                foreach ( $view_statistics as $date => $views )
+                {
+                    if ( $date > $date_7_days_ago )
+                    {
+                        $views_last_7_days += $views;
+                    }
+
+                    $total += $views;
+                }
+            }
+
+        do_action('propertyhive_property_marketing_statistics_fields');
+        
+        echo '</div>';
+        
+        echo '</div>';
 
         die();
     }

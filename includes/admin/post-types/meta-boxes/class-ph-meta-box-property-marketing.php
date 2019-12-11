@@ -1,6 +1,6 @@
 <?php
 /**
- * Property Residential Details
+ * Property Marketing
  *
  * @author 		PropertyHive
  * @category 	Admin
