@@ -532,6 +532,7 @@ class PH_Admin_Post_Types {
         
         $output .= $this->enquiry_status_filter();
         $output .= $this->enquiry_source_filter();
+        $output .= $this->enquiry_office_filter();
 
         echo apply_filters( 'propertyhive_enquiry_filters', $output );
     }
@@ -588,6 +589,47 @@ class PH_Admin_Post_Types {
                 $output .= '>' . __( $value, 'propertyhive' ) . '</option>';
             }
             
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show an enquiry office filter box
+     */
+    public function enquiry_office_filter() {
+        global $wp_query, $post;
+        
+        // Department filtering
+        $output  = '<select name="_office_id" id="dropdown_enquiry_office_id">';
+        
+        $output .= '<option value="">' . __( 'All Offices', 'propertyhive' ) . '</option>';
+        
+        $args = array(
+            'post_type' => 'office',
+            'nopaging' => true,
+            'orderby' => 'title',
+            'order' => 'ASC'
+        );
+        $office_query = new WP_Query($args);
+        
+        if ($office_query->have_posts())
+        {
+            while ($office_query->have_posts())
+            {
+                $office_query->the_post();
+                
+                $output .= '<option value="' . $post->ID . '"';
+                if ( isset( $_GET['_office_id'] ) && ! empty( $_GET['_office_id'] ) )
+                {
+                    $output .= selected( $post->ID, (int)$_GET['_office_id'], false );
+                }
+                $output .= '>' . get_the_title() . '</option>';
+            }
+        }
+        
+        wp_reset_postdata();
+        
         $output .= '</select>';
 
         return $output;
@@ -891,6 +933,12 @@ class PH_Admin_Post_Types {
                 $vars['meta_query'][] = array(
                     'key' => '_source',
                     'value' => sanitize_text_field( $_GET['_source'] ),
+                );
+            }
+            if ( ! empty( $_GET['_office_id'] ) ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_office_id',
+                    'value' => sanitize_text_field( $_GET['_office_id'] ),
                 );
             }
         }
