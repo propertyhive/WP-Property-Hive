@@ -96,7 +96,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 
 		$columns = array();
 		$columns['cb'] = '<input type="checkbox" />';
-		$columns['sale_date_time'] = __( 'Sale Date / Time', 'propertyhive' );
+		$columns['sale_date_time'] = __( 'Sale Date', 'propertyhive' );
         $columns['property'] = __( 'Property', 'propertyhive' );
         $columns['property_owner'] = __( 'Property Owner', 'propertyhive' );
         $columns['applicant'] = __( 'Applicant', 'propertyhive' );
@@ -123,7 +123,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 				
 				$edit_link        = get_edit_post_link( $post->ID );
 				//$title            = _draft_or_post_title();
-                $title            = date("H:i jS F Y", strtotime($the_sale->sale_date_time));
+                $title            = date("jS F Y", strtotime($the_sale->sale_date_time));
                 
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
