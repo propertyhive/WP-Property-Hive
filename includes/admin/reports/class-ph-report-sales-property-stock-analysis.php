@@ -433,6 +433,8 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 				<?php 
 					$args = array(
 						'post_type' => 'office',
+						'orderby' => 'post_title',
+						'order' => 'ASC',
 						'nopaging' => true,
 					);
 
@@ -492,6 +494,8 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 				<?php 
 					$args = array(
 						'post_type' => 'office',
+						'orderby' => 'post_title',
+						'order' => 'ASC',
 						'nopaging' => true,
 					);
 
