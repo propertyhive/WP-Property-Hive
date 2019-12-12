@@ -85,6 +85,8 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 				<?php 
 					$args = array(
 						'post_type' => 'office',
+						'orderby' => 'post_title',
+						'order' => 'ASC',
 						'nopaging' => true,
 					);
 
