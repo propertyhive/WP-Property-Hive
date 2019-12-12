@@ -186,7 +186,7 @@ class PH_Emails {
 		");
 		
 		// Lock/reserve all emails in log that are status blank or 'fail1' and lock_id blank and send_at in the past
-		// Only grab 5 at a time to prevent hanging/being seen as spamming
+		// Only grab 25 at a time to prevent hanging/being seen as spamming
 		$wpdb->query("
 		    UPDATE " . $wpdb->prefix . "ph_email_log
 		    SET 
@@ -198,10 +198,10 @@ class PH_Emails {
 		    	lock_id = ''
 		    AND
 		    	send_at <= '" . date("Y-m-d H:i:s") . "'
-		    LIMIT 5
+		    LIMIT 25
 		");
 
-		// We now have up to 5 emails locked. Get this 5 and attempt to send
+		// We now have up to 25 emails locked. Get this 25 and attempt to send
 		$emails_to_send = $wpdb->get_results("
 			SELECT *
 			FROM " . $wpdb->prefix . "ph_email_log

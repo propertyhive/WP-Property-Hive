@@ -101,6 +101,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Added new option to taxonomy dropdowns to only include top-level terms
 * Updated price templates to include price qualifier for commercial sales properties
 * Renamed 'Sale Date / Time' to just 'Sale Date' in column header in sales list
+* Increased number of match emails sent every 15 minutes from 5 to 25
 * Passed shortcode attributes through to property search form filters as an extra parameter
 
 = 1.4.49 =
