@@ -833,8 +833,34 @@ class PH_Admin_Meta_Boxes {
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
         {
+            /* PROPERTY NOTES META BOXES */
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-property-history-notes',
+                'title' => __( 'Property History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Property_Notes::output',
+                'screen' => 'property',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_property_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+            
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'property'
+            );
+
             add_meta_box( 'propertyhive-property-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Property_Actions::output', 'property', 'side' );
-            add_meta_box( 'propertyhive-property-notes', __( 'Property History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Property_Notes::output', 'property', 'side' );
         }
 
         // CONTACT
@@ -1027,14 +1053,33 @@ class PH_Admin_Meta_Boxes {
                     );
                 }
             }
-        }
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-contact-history-notes',
+                'title' => __( 'Contact History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Contact_Notes::output',
+                'screen' => 'contact',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
 
-        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'contact' )
-        {
+            $meta_boxes = apply_filters( 'propertyhive_contact_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'contact'
+            );
 
             add_meta_box( 'propertyhive-contact-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Contact_Actions::output', 'contact', 'side' );
-            
-            add_meta_box( 'propertyhive-contact-notes', __( 'Contact History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Contact_Notes::output', 'contact', 'side' );
         } 
 
         // ENQUIRY
@@ -1048,7 +1093,31 @@ class PH_Admin_Meta_Boxes {
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'enquiry' )
         {
-            add_meta_box( 'propertyhive-enquiry-notes', __( 'Enquiry Notes', 'propertyhive' ), 'PH_Meta_Box_Enquiry_Notes::output', 'enquiry', 'side' );
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-enquiry-history-notes',
+                'title' => __( 'Enquiry History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Enquiry_Notes::output',
+                'screen' => 'enquiry',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_enquiry_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'enquiry'
+            );
         }
 
         // APPRAISAL
@@ -1110,8 +1179,33 @@ class PH_Admin_Meta_Boxes {
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'appraisal' )
         {
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-appraisal-history-notes',
+                'title' => __( 'Appraisal History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Appraisal_Notes::output',
+                'screen' => 'appraisal',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_appraisal_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'appraisal'
+            );
+
             add_meta_box( 'propertyhive-appraisal-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Appraisal_Actions::output', 'appraisal', 'side' );
-            add_meta_box( 'propertyhive-appraisal-notes', __( 'Appraisal History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Appraisal_Notes::output', 'appraisal', 'side' );
         }
 
         // VIEWING
@@ -1173,8 +1267,33 @@ class PH_Admin_Meta_Boxes {
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'viewing' )
         {
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-viewing-history-notes',
+                'title' => __( 'Viewing History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Viewing_Notes::output',
+                'screen' => 'viewing',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_viewing_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'viewing'
+            );
+
             add_meta_box( 'propertyhive-viewing-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Viewing_Actions::output', 'viewing', 'side' );
-            add_meta_box( 'propertyhive-viewing-notes', __( 'Viewing History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Viewing_Notes::output', 'viewing', 'side' );
         }
 
         // OFFER
@@ -1242,8 +1361,33 @@ class PH_Admin_Meta_Boxes {
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'offer' )
         {
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-offer-history-notes',
+                'title' => __( 'Offer History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Offer_Notes::output',
+                'screen' => 'offer',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_offer_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'offer'
+            );
+
             add_meta_box( 'propertyhive-offer-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Offer_Actions::output', 'offer', 'side' );
-            add_meta_box( 'propertyhive-offer-notes', __( 'Offer History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Offer_Notes::output', 'offer', 'side' );
         }
 
         // SALE
@@ -1311,8 +1455,33 @@ class PH_Admin_Meta_Boxes {
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'sale' )
         {
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-sale-history-notes',
+                'title' => __( 'Sale History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Sale_Notes::output',
+                'screen' => 'sale',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_sale_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'sale'
+            );
+
             add_meta_box( 'propertyhive-sale-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Sale_Actions::output', 'sale', 'side' );
-            add_meta_box( 'propertyhive-sale-notes', __( 'Sale History &amp; Notes', 'propertyhive' ), 'PH_Meta_Box_Sale_Notes::output', 'sale', 'side' );
         }
 
         $tabs = apply_filters( 'propertyhive_tabs', $tabs );
