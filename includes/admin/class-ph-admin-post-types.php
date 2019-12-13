@@ -174,6 +174,12 @@ class PH_Admin_Post_Types {
             case 'viewing' :
                 $this->viewing_filters();
                 break;
+            case 'offer' :
+                $this->offer_filters();
+                break;
+            case 'sale' :
+                $this->sale_filters();
+                break;
             default :
                 break;
         }
@@ -829,6 +835,96 @@ class PH_Admin_Post_Types {
 
         return $output;
     }
+
+    /**
+     * Show an offer filter box
+     */
+    public function offer_filters() {
+        global $wp_query;
+        
+        $output = '';
+        
+        $output .= $this->offer_status_filter();
+
+        echo apply_filters( 'propertyhive_offer_filters', $output );
+    }
+
+    /**
+     * Show an offer status filter box
+     */
+    public function offer_status_filter() {
+        global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'accepted', 'declined' ) ) ? $_GET['_status'] : '';
+        
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_offer_status">';
+            
+            $output .= '<option value="">All Statuses</option>';
+
+            $output .= '<option value="pending"';
+            $output .= selected( 'pending', $selected_status, false );
+            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="accepted"';
+            $output .= selected( 'accepted', $selected_status, false );
+            $output .= '>' . __( 'Accepted', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="declined"';
+            $output .= selected( 'declined', $selected_status, false );
+            $output .= '>' . __( 'Declined', 'propertyhive' ) . '</option>';
+            
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show an sale filter box
+     */
+    public function sale_filters() {
+        global $wp_query;
+        
+        $output = '';
+        
+        $output .= $this->sale_status_filter();
+
+        echo apply_filters( 'propertyhive_sale_filters', $output );
+    }
+
+    /**
+     * Show an sale status filter box
+     */
+    public function sale_status_filter() {
+        global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'current', 'exchanged', 'completed', 'fallen_through' ) ) ? $_GET['_status'] : '';
+        
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_sale_status">';
+            
+            $output .= '<option value="">All Statuses</option>';
+
+            $output .= '<option value="current"';
+            $output .= selected( 'current', $selected_status, false );
+            $output .= '>' . __( 'Current', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="exchanged"';
+            $output .= selected( 'exchanged', $selected_status, false );
+            $output .= '>' . __( 'Exchanged', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="completed"';
+            $output .= selected( 'completed', $selected_status, false );
+            $output .= '>' . __( 'Completed', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="fallen_through"';
+            $output .= selected( 'fallen_through', $selected_status, false );
+            $output .= '>' . __( 'Fallen Through', 'propertyhive' ) . '</option>';
+            
+        $output .= '</select>';
+
+        return $output;
+    }
     
     /**
      * Filters and sorting handler
@@ -1065,6 +1161,24 @@ class PH_Admin_Post_Types {
                 $vars['meta_query'][] = array(
                     'key' => '_negotiator_id',
                     'value' => (int)$_GET['_negotiator_id'],
+                );
+            }
+        }
+        elseif ( 'offer' === $typenow ) 
+        {
+            if ( ! empty( $_GET['_status'] ) ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_status',
+                    'value' => sanitize_text_field( $_GET['_status'] ),
+                );
+            }
+        }
+        elseif ( 'sale' === $typenow ) 
+        {
+            if ( ! empty( $_GET['_status'] ) ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_status',
+                    'value' => sanitize_text_field( $_GET['_status'] ),
                 );
             }
         }
