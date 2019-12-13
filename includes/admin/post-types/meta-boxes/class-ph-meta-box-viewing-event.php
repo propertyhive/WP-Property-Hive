@@ -130,7 +130,7 @@ class PH_Meta_Box_Viewing_Event {
 
         echo '
         <p class="form-field"><label for="_negotiator_ids">' . __( 'Attending Negotiator(s)', 'propertyhive' ) . '</label>
-        <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . __( 'Unattended', 'propertyhive' ) . '" class="multiselect attribute_values">';
+        <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . __( 'Unaccompanied', 'propertyhive' ) . '" class="multiselect attribute_values">';
         
         $negotiator_ids = get_post_meta( $post->ID, '_negotiator_id' );
         if ( get_post_meta( $post->ID, '_status', true ) == '' )
