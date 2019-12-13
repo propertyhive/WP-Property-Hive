@@ -161,6 +161,11 @@ class PH_Meta_Box_Appraisal_Event {
         echo '</select>
         </p>';
 
+        propertyhive_wp_hidden_input( array( 
+            'id' => '_previous_negotiator_ids', 
+            'value' => implode(",", $negotiator_ids),
+        ) );
+
         propertyhive_wp_textarea_input( array( 
             'id' => '_booking_notes', 
             'label' => __( 'Booking Notes', 'propertyhive' ), 
@@ -296,12 +301,27 @@ class PH_Meta_Box_Appraisal_Event {
         update_post_meta( $post_id, '_start_date_time', ph_clean($_POST['_start_date']) . ' ' . str_pad((int)$_POST['_start_time_hours'], 2, "0", STR_PAD_LEFT)  . ':' . str_pad((int)$_POST['_start_time_minutes'], 2, "0", STR_PAD_LEFT) . ':00' );
         update_post_meta( $post_id, '_duration', (int)$_POST['_duration'] );
 
-        delete_post_meta($post_id, '_negotiator_id');
-        if ( !empty($_POST['_negotiator_ids']) )
+        $reset_negs = true;
+        if ( 
+            isset($_POST['_previous_negotiator_ids']) && 
+            isset($_POST['_negotiator_ids']) && 
+            !empty($_POST['_negotiator_ids']) &&
+            is_array($_POST['_negotiator_ids']) &&
+            implode(",", $_POST['_negotiator_ids']) == $_POST['_previous_negotiator_ids'] 
+        )
         {
-            foreach ( $_POST['_negotiator_ids'] as $negotiator_id )
+            $reset_negs = false;
+        }
+
+        if ( $reset_negs )
+        {
+            delete_post_meta($post_id, '_negotiator_id');
+            if ( !empty($_POST['_negotiator_ids']) )
             {
-                add_post_meta( $post_id, '_negotiator_id', (int)$negotiator_id );
+                foreach ( $_POST['_negotiator_ids'] as $negotiator_id )
+                {
+                    add_post_meta( $post_id, '_negotiator_id', (int)$negotiator_id );
+                }
             }
         }
 
