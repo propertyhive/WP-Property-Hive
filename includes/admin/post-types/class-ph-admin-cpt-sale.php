@@ -173,9 +173,16 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 			 break;
             case 'property' :
                 
-                $property = new PH_Property((int)$the_sale->property_id);
-                echo $property->get_formatted_full_address();
-                
+                if ( $the_sale->property_id != '' )
+                {
+	                $property = new PH_Property((int)$the_sale->property_id);
+	                echo $property->get_formatted_full_address();
+                }
+                else
+                {
+                	echo '-';
+                }
+
                 break;
              case 'property_owner' :
                 
@@ -212,11 +219,18 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
                 break;
             case 'applicant' :
                 
-                echo get_the_title($the_sale->applicant_contact_id);
-                echo '<div class="row-actions">';
-                echo 'T: ' . get_post_meta($the_sale->applicant_contact_id, '_telephone_number', TRUE) . '<br>';
-                echo 'E: ' . get_post_meta($the_sale->applicant_contact_id, '_email_address', TRUE);
-                echo '</div>';
+                if ( $the_sale->applicant_contact_id != '' )
+                {
+	                echo get_the_title($the_sale->applicant_contact_id);
+	                echo '<div class="row-actions">';
+	                echo 'T: ' . get_post_meta($the_sale->applicant_contact_id, '_telephone_number', TRUE) . '<br>';
+	                echo 'E: ' . get_post_meta($the_sale->applicant_contact_id, '_email_address', TRUE);
+	                echo '</div>';
+	            }
+                else
+                {
+                	echo '-';
+                }
                 
                 break;
             case 'amount' :
