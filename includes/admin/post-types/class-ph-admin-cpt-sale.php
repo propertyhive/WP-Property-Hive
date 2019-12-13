@@ -36,7 +36,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 		// Admin Columns
 		add_filter( 'manage_edit-sale_columns', array( $this, 'edit_columns' ) );
 		add_action( 'manage_sale_posts_custom_column', array( $this, 'custom_columns' ), 2 );
-		add_filter( 'manage_edit-property_sortable_columns', array( $this, 'custom_columns_sort' ) );
+		add_filter( 'manage_edit-sale_sortable_columns', array( $this, 'custom_columns_sort' ) );
 		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
 
 		// Bulk / quick edit
@@ -258,6 +258,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 	public function custom_columns_sort( $columns ) {
 		$custom = array(
 			'sale_date_time' => '_sale_date_time',
+			'status' => '_status',
 		);
 		return wp_parse_args( $custom, $columns );
 	}
@@ -270,12 +271,19 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 	 * @return array
 	 */
 	public function custom_columns_orderby( $vars ) {
-		if ( is_admin() && $vars['post_type'] == 'sale' )
-		{
-			$vars = array_merge( $vars, array(
-				'meta_key' 	=> '_sale_date_time',
-				'orderby' 	=> 'meta_value'
-			) );
+		if ( isset( $vars['orderby'] ) ) {
+			if ( '_sale_date_time' == $vars['orderby'] ) {
+				$vars = array_merge( $vars, array(
+					'meta_key' 	=> '_sale_date_time',
+					'orderby' 	=> 'meta_value'
+				) );
+			}
+			elseif ( '_status' == $vars['orderby'] ) {
+				$vars = array_merge( $vars, array(
+					'meta_key' 	=> '_status',
+					'orderby' 	=> 'meta_value'
+				) );
+			}
 		}
 		return $vars;
 	}
