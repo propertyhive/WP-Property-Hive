@@ -256,6 +256,7 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
 	public function custom_columns_sort( $columns ) {
 		$custom = array(
 			'offer_date_time' => '_offer_date_time',
+			'status' => '_status',
 		);
 		return wp_parse_args( $custom, $columns );
 	}
@@ -268,13 +269,21 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
 	 * @return array
 	 */
 	public function custom_columns_orderby( $vars ) {
-		if ( is_admin() && $vars['post_type'] == 'offer' )
-		{
-			$vars = array_merge( $vars, array(
-				'meta_key' 	=> '_offer_date_time',
-				'orderby' 	=> 'meta_value',
-			) );
+		if ( isset( $vars['orderby'] ) ) {
+			if ( '_offer_date_time' == $vars['orderby'] ) {
+				$vars = array_merge( $vars, array(
+					'meta_key' 	=> '_offer_date_time',
+					'orderby' 	=> 'meta_value'
+				) );
+			}
+			elseif ( '_status' == $vars['orderby'] ) {
+				$vars = array_merge( $vars, array(
+					'meta_key' 	=> '_status',
+					'orderby' 	=> 'meta_value'
+				) );
+			}
 		}
+
 		return $vars;
 	}
 
