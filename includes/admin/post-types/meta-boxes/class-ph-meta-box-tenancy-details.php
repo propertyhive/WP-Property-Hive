@@ -19,14 +19,24 @@ class PH_Meta_Box_Tenancy_Details {
 	public static function output( $post ) {
         global $wpdb, $thepostid;
 
+        $thepostid = $post->ID;
+
         wp_nonce_field( 'propertyhive_save_data', 'propertyhive_meta_nonce' );
         
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
+
+        echo '<p class="form-field">
         
-        $length_units = get_post_meta( $post->ID, '_length_units', true );
-        $lease_type = get_post_meta( $post->ID, '_lease_type', true );
+            <label for="">' . __('Status', 'propertyhive') . '</label>
+            
+            ' . ucwords(str_replace("_", " ", get_post_meta( $thepostid, '_status', TRUE )));
+        
+        echo '</p>';
+        
+        $length_units = get_post_meta( $thepostid, '_length_units', true );
+        $lease_type = get_post_meta( $thepostid, '_lease_type', true );
 
         echo '<p class="form-field lease_term_type_field">
         
@@ -35,8 +45,8 @@ class PH_Meta_Box_Tenancy_Details {
             <input type="number" class="" name="_length" id="_length" value="' . get_post_meta( $post->ID, '_length', true ) . '" placeholder="" style="width:70px">
             
             <select id="_length_units" name="_length_units" class="select" style="width:auto">
-                <option value="week"' . ( ($length_units == 'weeks') ? ' selected' : '') . '>' . __('Weeks', 'propertyhive') . '</option>
-                <option value="month"' . ( ($length_units == 'months' || $length_units == '') ? ' selected' : '') . '>' . __('Months', 'propertyhive') . '</option>
+                <option value="week"' . ( $length_units == 'week' ? ' selected' : '') . '>' . __('Weeks', 'propertyhive') . '</option>
+                <option value="month"' . ( ($length_units == 'month' || $length_units == '') ? ' selected' : '') . '>' . __('Months', 'propertyhive') . '</option>
             </select>
 
             <select id="_lease_type" name="_lease_type" class="select" style="width:auto">
@@ -138,7 +148,7 @@ class PH_Meta_Box_Tenancy_Details {
 
         $management_fee_units = get_post_meta( $post->ID, '_management_fee_units', true );
 
-        echo '<p class="form-field rent_field ">
+        echo '<p class="form-field management-fee-details"' . ( get_post_meta( $post->ID, '_management_type', true ) != 'fully_managed' ? ' style="display:none;"' : '' ) . '>
         
             <label for="_rent">' . __('Management Fee', 'propertyhive') . '</label>';
 
@@ -158,8 +168,6 @@ class PH_Meta_Box_Tenancy_Details {
         echo '</div>';
 
         echo '<script>
-
-        
 
         jQuery(document).ready(function()
         {
@@ -189,10 +197,22 @@ class PH_Meta_Box_Tenancy_Details {
                     {
                         var end_date = new Date(jQuery(\'#_end_date\').val());
 
-                        var review_date = new Date( end_date.getTime() - ( 31 * ms_in_day ) );
+                        var review_date = new Date( end_date.getTime() - ( 90 * ms_in_day ) );
 
                         jQuery(\'#_review_date\').val( review_date.toISOString().substring(0, 10) );
                     }
+                }
+            });
+
+            jQuery(\'#_management_type\').change(function()
+            {
+                if ( jQuery(this).val() == \'fully_managed\' )
+                {
+                    jQuery(\'.form-field.management-fee-details\').show();
+                }
+                else
+                {
+                    jQuery(\'.form-field.management-fee-details\').hide();
                 }
             });
         });
@@ -224,7 +244,7 @@ class PH_Meta_Box_Tenancy_Details {
         $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_rent']));
         update_post_meta( $post_id, '_rent', $amount );
         update_post_meta( $post_id, '_rent_frequency', ph_clean($_POST['_rent_frequency']) );
-        update_post_meta( $post_id, '_currency', ph_clean($_POST['_currency']) );
+        update_post_meta( $post_id, '_currency', ph_clean($_POST['_rent_currency']) );
 
         update_post_meta( $post_id, '_management_type', ph_clean($_POST['_management_type']) );
         update_post_meta( $post_id, '_management_fee', ph_clean($_POST['_management_fee']) );
