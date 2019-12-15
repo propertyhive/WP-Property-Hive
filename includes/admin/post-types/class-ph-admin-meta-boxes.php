@@ -1626,89 +1626,89 @@ class PH_Admin_Meta_Boxes {
             'post_type' => 'tenancy'
         );
 
-        /* TENANCY SAFETY CHECKS META BOXES */
-        $meta_boxes = array();
-        $meta_boxes[5] = array(
-            'id' => 'propertyhive-tenancy-safety-checks',
-            'title' => __( 'Property Safety Checks', 'propertyhive' ),
-            'callback' => 'PH_Meta_Box_Tenancy_Safety_Checks::output',
-            'screen' => 'tenancy',
-            'context' => 'normal',
-            'priority' => 'high'
-        );
-
-        $meta_boxes = apply_filters( 'propertyhive_tenancy_safety_checks_meta_boxes', $meta_boxes );
-        ksort($meta_boxes);
-
-        $ids = array();
-        foreach ($meta_boxes as $meta_box)
-        {
-            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
-            $ids[] = $meta_box['id'];
-        }
-        
-        $tabs['tab_tenancy_safety_checks'] = array(
-            'name' => __( 'Safety Checks', 'propertyhive' ),
-            'metabox_ids' => $ids,
-            'post_type' => 'tenancy'
-        );
-
-        /* TENANCY INSPECTIONS META BOXES */
-        $meta_boxes = array();
-        $meta_boxes[5] = array(
-            'id' => 'propertyhive-tenancy-inspections',
-            'title' => __( 'Property Inspections', 'propertyhive' ),
-            'callback' => 'PH_Meta_Box_Tenancy_Inspections::output',
-            'screen' => 'tenancy',
-            'context' => 'normal',
-            'priority' => 'high'
-        );
-
-        $meta_boxes = apply_filters( 'propertyhive_tenancy_inspections_meta_boxes', $meta_boxes );
-        ksort($meta_boxes);
-
-        $ids = array();
-        foreach ($meta_boxes as $meta_box)
-        {
-            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
-            $ids[] = $meta_box['id'];
-        }
-        
-        $tabs['tab_tenancy_inspections'] = array(
-            'name' => __( 'Inspections', 'propertyhive' ),
-            'metabox_ids' => $ids,
-            'post_type' => 'tenancy'
-        );
-
-        /* TENANCY UTILITIES META BOXES */
-        $meta_boxes = array();
-        $meta_boxes[5] = array(
-            'id' => 'propertyhive-tenancy-utilities',
-            'title' => __( 'Utilities', 'propertyhive' ),
-            'callback' => 'PH_Meta_Box_Tenancy_Utilities::output',
-            'screen' => 'tenancy',
-            'context' => 'normal',
-            'priority' => 'high'
-        );
-
-        $meta_boxes = apply_filters( 'propertyhive_tenancy_utilities_meta_boxes', $meta_boxes );
-        ksort($meta_boxes);
-
-        $ids = array();
-        foreach ($meta_boxes as $meta_box)
-        {
-            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
-            $ids[] = $meta_box['id'];
-        }
-        
-        $tabs['tab_tenancy_utilities'] = array(
-            'name' => __( 'Utilities', 'propertyhive' ),
-            'metabox_ids' => $ids,
-            'post_type' => 'tenancy'
-        );
-
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'tenancy' )
         {
+            /* TENANCY SAFETY CHECKS META BOXES */
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-tenancy-safety-checks',
+                'title' => __( 'Property Safety Checks', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Tenancy_Safety_Checks::output',
+                'screen' => 'tenancy',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_tenancy_safety_checks_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_tenancy_safety_checks'] = array(
+                'name' => __( 'Safety Checks', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'tenancy'
+            );
+
+            /* TENANCY INSPECTIONS META BOXES */
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-tenancy-inspections',
+                'title' => __( 'Property Inspections', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Tenancy_Inspections::output',
+                'screen' => 'tenancy',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_tenancy_inspections_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_tenancy_inspections'] = array(
+                'name' => __( 'Inspections', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'tenancy'
+            );
+
+            /* TENANCY UTILITIES META BOXES */
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-tenancy-utilities',
+                'title' => __( 'Utilities', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Tenancy_Utilities::output',
+                'screen' => 'tenancy',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_tenancy_utilities_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+            
+            $tabs['tab_tenancy_utilities'] = array(
+                'name' => __( 'Utilities', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'tenancy'
+            );
+
             $meta_boxes = array();
             $meta_boxes[5] = array(
                 'id' => 'propertyhive-tenancy-history-notes',
