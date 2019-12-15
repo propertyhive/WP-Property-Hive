@@ -156,6 +156,48 @@ class PH_Meta_Box_Tenancy_Details {
         echo '</div>';
         
         echo '</div>';
+
+        echo '<script>
+
+        
+
+        jQuery(document).ready(function()
+        {
+            // Set end date to X weeks/months after when start date changed
+            jQuery(\'#_start_date\').change(function()
+            {
+                if ( jQuery(\'#_length\').val() != \'\' && jQuery(\'#_length_units\').val() != \'\' && jQuery(this).val() != \'\' && jQuery(\'#_end_date\').val() == \'\' )
+                {
+                    // Only do stuff if it\'s not been set already. Don\'t want to be messing if things already entered
+
+                    var ms_in_day = 86400000;
+                    var start_date = new Date(jQuery(this).val());
+
+                    if ( jQuery(\'#_length_units\').val() == \'week\' )
+                    {
+                        var end_date = new Date( start_date.getTime() + ( jQuery(\'#_length\').val() * 7 * ms_in_day ) );
+
+                        jQuery(\'#_end_date\').val( end_date.toISOString().substring(0, 10) );
+                    }
+                    if ( jQuery(\'#_length_units\').val() == \'month\' )
+                    {
+                        var end_date = add_months(start_date, jQuery(\'#_length\').val());
+                        jQuery(\'#_end_date\').val( end_date.toISOString().substring(0, 10) );
+                    }
+
+                    if ( jQuery(\'#_review_date\').val() == \'\' )
+                    {
+                        var end_date = new Date(jQuery(\'#_end_date\').val());
+
+                        var review_date = new Date( end_date.getTime() - ( 31 * ms_in_day ) );
+
+                        jQuery(\'#_review_date\').val( review_date.toISOString().substring(0, 10) );
+                    }
+                }
+            });
+        });
+
+        </script>';
         
     }
 
