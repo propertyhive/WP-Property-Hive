@@ -3408,6 +3408,36 @@ class PH_AJAX {
                         }
                     }
                 }
+
+                if ( get_option('propertyhive_module_disabled_tenancies', '') != 'yes' )
+                {
+                    if ( get_post_meta( $property_id, '_department', TRUE ) == 'residential-lettings' )
+                    {
+                        // See if a tenancy has this viewing id associated with it
+                        $tenancy_id = get_post_meta( $post_id, '_tenancy_id', TRUE );
+                        if ( $tenancy_id != '' && get_post_status($tenancy_id) != 'publish' )
+                        {
+                            $tenancy_id = '';
+                        }
+
+                        if ( $tenancy_id != '' )
+                        {
+                            $actions[] = '<a 
+                                    href="' . get_edit_post_link( $offer_id, '' ) . '" 
+                                    class="button"
+                                    style="width:100%; margin-bottom:7px; text-align:center" 
+                                >' . wp_kses_post( __('View Tenancy', 'propertyhive') ) . '</a>';
+                        }
+                        else
+                        {
+                            $actions[] = '<a 
+                                    href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_tenancy' ) . '" 
+                                    class="button button-success"
+                                    style="width:100%; margin-bottom:7px; text-align:center" 
+                                >' . wp_kses_post( __('Proceed To Tenancy Application', 'propertyhive') ) . '</a>';
+                        }
+                    }
+                }
             }
 
             if ( get_post_meta( $post_id, '_feedback_passed_on', TRUE ) != 'yes' && ( $feedback_status == 'interested' || $feedback_status == 'not_interested' ) )

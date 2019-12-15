@@ -116,6 +116,7 @@ class PH_Admin_Meta_Boxes {
         $this->check_remove_solicitor();
         $this->check_create_offer();
         $this->check_create_sale();
+        $this->check_create_tenancy();
 	}
 
     public function redirect_to_tab( $url, $post_id )
@@ -378,6 +379,70 @@ class PH_Admin_Meta_Boxes {
 
             // Do redirect
             wp_redirect( admin_url( 'post.php?post=' . $sale_post_id . '&action=edit' ) );
+            exit();
+        }
+
+    }
+
+    public function check_create_tenancy()
+    {
+        if ( isset($_GET['create_tenancy']) && isset($_GET['post']) )
+        {
+            if ( get_post_type((int)$_GET['post']) != 'viewing')
+                return;
+
+            $viewing = new PH_Viewing((int)$_GET['post']);
+
+            $tenancy_post = array(
+              'post_title'    => '',
+              'post_content'  => '',
+              'post_type'  => 'tenancy',
+              'post_status'   => 'publish',
+              'comment_status'    => 'closed',
+              'ping_status'    => 'closed',
+            );
+            
+            // Insert the post into the database
+            $tenancy_post_id = wp_insert_post( $tenancy_post );
+            
+            $property_id = $viewing->property_id;
+
+            add_post_meta( $tenancy_post_id, '_status', 'application_pending' );
+            add_post_meta( $tenancy_post_id, '_applicant_contact_id', $viewing->applicant_contact_id );
+            add_post_meta( $tenancy_post_id, '_property_id', $viewing->property_id );
+
+            add_post_meta( $tenancy_post_id, '_rent', get_post_meta( $property_id, '_rent', TRUE ) );
+            add_post_meta( $tenancy_post_id, '_rent_frequency', get_post_meta( $property_id, '_rent_frequency', TRUE ) );
+            add_post_meta( $tenancy_post_id, '_price_actual', get_post_meta( $property_id, '_price_actual', TRUE ) );
+            add_post_meta( $tenancy_post_id, '_currency', get_post_meta( $property_id, '_currency', TRUE ) );
+
+            add_post_meta( $tenancy_post_id, '_deposit', get_post_meta( $property_id, '_deposit', TRUE ) );
+
+            update_post_meta( (int)$_GET['post'], '_tenancy_id', $tenancy_post_id );
+            update_post_meta( (int)$_GET['post'], '_status', 'offer_made' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_offer_made',
+            );
+
+            $data = array(
+                'comment_post_ID'      => (int)$_GET['post'],
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+
+            // Do redirect
+            wp_redirect( admin_url( 'post.php?post=' . $tenancy_post_id . '&action=edit' ) );
             exit();
         }
 
