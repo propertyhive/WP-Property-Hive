@@ -1240,6 +1240,14 @@ class PH_Admin_Post_Types {
                     'value' => sanitize_text_field( $_GET['_status'] ),
                 );
             }
+        }elseif ( 'tenancy' === $typenow ) 
+        {
+            if ( ! empty( $_GET['_status'] ) ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_status',
+                    'value' => sanitize_text_field( $_GET['_status'] ),
+                );
+            }
         }
 
         $vars = apply_filters( 'propertyhive_property_filter_query', $vars, $typenow );
