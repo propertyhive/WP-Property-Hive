@@ -24,7 +24,7 @@ class PH_Meta_Box_Tenancy_Deposit {
         echo '<div class="options_group">';
         
         $args = array( 
-            'id' => '_deposit_amount', 
+            'id' => '_deposit', 
             'label' => __( 'Deposit Amount', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'number'
@@ -107,8 +107,15 @@ class PH_Meta_Box_Tenancy_Deposit {
     public static function save( $post_id, $post ) {
         global $wpdb;
 
-        //$amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_amount']));
-        //update_post_meta( $post_id, '_amount', $amount );
+        $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_deposit']));
+        update_post_meta( $post_id, '_deposit', $amount );
+
+        update_post_meta( $post_id, '_deposit_taken_by', ph_clean($_POST['_deposit_taken_by']) );
+        update_post_meta( $post_id, '_deposit_held_by', ph_clean($_POST['_deposit_held_by']) );
+        update_post_meta( $post_id, '_deposit_scheme', ph_clean($_POST['_deposit_scheme']) );
+        update_post_meta( $post_id, '_deposit_received_date', ph_clean($_POST['_deposit_received_date']) );
+        update_post_meta( $post_id, '_deposit_registration_date', ph_clean($_POST['_deposit_registration_date']) );
+        update_post_meta( $post_id, '_deposit_reference', ph_clean($_POST['_deposit_reference']) );
 
         do_action( 'propertyhive_save_tenancy_deposit', $post_id );
     }
