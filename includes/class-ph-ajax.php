@@ -92,6 +92,9 @@ class PH_AJAX {
             'get_property_sales_meta_box' => false,
             'get_contact_sales_meta_box' => false,
 
+            // Tenancy actions
+            'get_tenancy_actions' => false,
+
             'validate_save_contact' => false,
             'applicant_registration' => true,
             'login' => true,
@@ -5354,6 +5357,57 @@ class PH_AJAX {
         echo '</div>';
         
         echo '</div>';
+
+        die();
+    }
+
+    public function get_tenancy_actions()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="propertyhive_tenancy_actions_meta_box">
+
+        <div class="options_group" style="padding-top:8px;">';
+
+        if ( $status == 'application_pending' )
+        {
+            $actions[] = '<a 
+                    href="#action_panel_tenancy_reserved" 
+                    class="button button-success tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Reserve Tenancy', 'propertyhive') . '</a>';
+
+            $actions[] = '<a 
+                    href="#action_panel_tenancy_unsuccessful" 
+                    class="button tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Application Unsuccessful', 'propertyhive') . '</a>';
+
+            $actions[] = '<a 
+                    href="#action_panel_tenancy_withdrawn" 
+                    class="button tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Application Withdrawn', 'propertyhive') . '</a>';
+        }
+
+        $actions = apply_filters( 'propertyhive_admin_tenancy_actions', $actions, $post_id );
+
+        if ( !empty($actions) )
+        {
+            echo implode("", $actions);
+        }
+        else
+        {
+            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+        }
+
+        echo '</div>
+
+        </div>';
 
         die();
     }

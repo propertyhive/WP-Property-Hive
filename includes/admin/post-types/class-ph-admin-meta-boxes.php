@@ -1735,7 +1735,7 @@ class PH_Admin_Meta_Boxes {
                 'post_type' => 'tenancy'
             );
 
-            add_meta_box( 'propertyhive-tenancy-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Tenancy_Actions::output', 'sale', 'side' );
+            add_meta_box( 'propertyhive-tenancy-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Tenancy_Actions::output', 'tenancy', 'side' );
         }
 
         $tabs = apply_filters( 'propertyhive_tabs', $tabs );

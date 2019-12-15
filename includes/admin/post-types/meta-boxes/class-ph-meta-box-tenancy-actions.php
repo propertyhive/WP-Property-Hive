@@ -48,7 +48,7 @@ jQuery(document).ready(function($)
 		    };
 			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
 		    {
-		    	redraw_tenancy_actions();
+		    	window.location.href = window.location.href;
 		    }, 'json');
 			return;
 		}
@@ -89,8 +89,6 @@ function redraw_tenancy_actions()
     {
     	jQuery('#propertyhive_tenancy_actions_meta_box_container').html(response);
     }, 'html');
-
-    redraw_tenancy_details_meta_box();
 }
 
 </script>
