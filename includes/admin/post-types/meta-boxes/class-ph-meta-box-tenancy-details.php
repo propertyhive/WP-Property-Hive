@@ -25,29 +25,29 @@ class PH_Meta_Box_Tenancy_Details {
         
         echo '<div class="options_group">';
         
-        $tenancy_length_units = get_post_meta( $post->ID, '_tenancy_length_units', true );
-        $tenancy_lease_type = get_post_meta( $post->ID, '_tenancy_lease_type', true );
+        $length_units = get_post_meta( $post->ID, '_length_units', true );
+        $lease_type = get_post_meta( $post->ID, '_lease_type', true );
 
         echo '<p class="form-field lease_term_type_field">
         
-            <label for="_tenancy_length">' . __('Lease Term and Type', 'propertyhive') . '</label>
+            <label for="_length">' . __('Lease Term and Type', 'propertyhive') . '</label>
 
-            <input type="number" class="" name="_tenancy_length" id="_tenancy_length" value="' . get_post_meta( $post->ID, '_tenancy_length', true ) . '" placeholder="" style="width:70px">
+            <input type="number" class="" name="_length" id="_length" value="' . get_post_meta( $post->ID, '_length', true ) . '" placeholder="" style="width:70px">
             
-            <select id="_tenancy_length_units" name="_tenancy_length_units" class="select" style="width:auto">
-                <option value="week"' . ( ($tenancy_length_units == 'weeks') ? ' selected' : '') . '>' . __('Weeks', 'propertyhive') . '</option>
-                <option value="month"' . ( ($tenancy_length_units == 'months' || $tenancy_length_units == '') ? ' selected' : '') . '>' . __('Months', 'propertyhive') . '</option>
+            <select id="_length_units" name="_length_units" class="select" style="width:auto">
+                <option value="week"' . ( ($length_units == 'weeks') ? ' selected' : '') . '>' . __('Weeks', 'propertyhive') . '</option>
+                <option value="month"' . ( ($length_units == 'months' || $length_units == '') ? ' selected' : '') . '>' . __('Months', 'propertyhive') . '</option>
             </select>
 
-            <select id="_tenancy_lease_type" name="_tenancy_lease_type" class="select" style="width:auto">
-                <option value="assured_shorthold"' . ( ($tenancy_lease_type == 'assured_shorthold' || $tenancy_lease_type == '') ? ' selected' : '') . '>' . __('Assured Shorthold', 'propertyhive') . '</option>
-                <option value="assured"' . ( $tenancy_lease_type == 'assured' ? ' selected' : '') . '>' . __('Assured', 'propertyhive') . '</option>
+            <select id="_lease_type" name="_lease_type" class="select" style="width:auto">
+                <option value="assured_shorthold"' . ( ($lease_type == 'assured_shorthold' || $lease_type == '') ? ' selected' : '') . '>' . __('Assured Shorthold', 'propertyhive') . '</option>
+                <option value="assured"' . ( $lease_type == 'assured' ? ' selected' : '') . '>' . __('Assured', 'propertyhive') . '</option>
             </select>
             
         </p>';
 
         $args = array( 
-            'id' => '_tenancy_start_date', 
+            'id' => '_start_date', 
             'label' => __( 'Tenancy Start Date', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'date'
@@ -55,7 +55,7 @@ class PH_Meta_Box_Tenancy_Details {
         propertyhive_wp_text_input( $args );
 
         $args = array( 
-            'id' => '_tenancy_end_date', 
+            'id' => '_end_date', 
             'label' => __( 'Tenancy End Date', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'date'
@@ -63,7 +63,7 @@ class PH_Meta_Box_Tenancy_Details {
         propertyhive_wp_text_input( $args );
 
         $args = array( 
-            'id' => '_tenancy_review_date', 
+            'id' => '_review_date', 
             'label' => __( 'Review / Renewal Date', 'propertyhive' ), 
             'desc_tip' => false, 
             'type' => 'date'
@@ -171,8 +171,22 @@ class PH_Meta_Box_Tenancy_Details {
             update_post_meta( $post_id, '_status', 'application_pending' );
         }
 
-        //$amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_amount']));
-        //update_post_meta( $post_id, '_amount', $amount );
+        update_post_meta( $post_id, '_length', (int)$_POST['_length'] );
+        update_post_meta( $post_id, '_length_units', ph_clean($_POST['_length_units']) );
+        update_post_meta( $post_id, '_lease_type', ph_clean($_POST['_lease_type']) );
+
+        update_post_meta( $post_id, '_start_date', ph_clean($_POST['_start_date']) );
+        update_post_meta( $post_id, '_end_date', ph_clean($_POST['_end_date']) );
+        update_post_meta( $post_id, '_review_date', ph_clean($_POST['_review_date']) );
+
+        $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_rent']));
+        update_post_meta( $post_id, '_rent', $amount );
+        update_post_meta( $post_id, '_rent_frequency', ph_clean($_POST['_rent_frequency']) );
+        update_post_meta( $post_id, '_currency', ph_clean($_POST['_currency']) );
+
+        update_post_meta( $post_id, '_management_type', ph_clean($_POST['_management_type']) );
+        update_post_meta( $post_id, '_management_fee', ph_clean($_POST['_management_fee']) );
+        update_post_meta( $post_id, '_management_fee_units', ph_clean($_POST['_management_fee_units']) );
 
         do_action( 'propertyhive_save_tenancy_details', $post_id );
     }
