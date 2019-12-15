@@ -146,14 +146,6 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 						$actions['delete'] = '<a class="submitdelete" title="' . esc_attr( __( 'Delete this item permanently', 'propertyhive' ) ) . '" href="' . get_delete_post_link( $post->ID, '', true ) . '">' . __( 'Delete Permanently', 'propertyhive' ) . '</a>';
 					}
 				}
-				if ( $post_type_object->public ) {
-					if ( in_array( $post->post_status, array( 'pending', 'draft', 'future' ) ) ) {
-						if ( $can_edit_post )
-							$actions['view'] = '<a href="' . esc_url( add_query_arg( 'preview', 'true', get_permalink( $post->ID ) ) ) . '" title="' . esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;', 'propertyhive' ), $title ) ) . '" rel="permalink">' . __( 'Preview', 'propertyhive' ) . '</a>';
-					} elseif ( 'trash' != $post->post_status ) {
-						$actions['view'] = '<a href="' . get_permalink( $post->ID ) . '" title="' . esc_attr( sprintf( __( 'View &#8220;%s&#8221;', 'propertyhive' ), $title ) ) . '" rel="permalink">' . __( 'View', 'propertyhive' ) . '</a>';
-					}
-				}
 
 				$actions = apply_filters( 'post_row_actions', $actions, $post );
 
@@ -213,17 +205,18 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
                 
                 break;
             case 'dates' :
-				echo 'Dates';
+				echo 'Start Date: ' . ( $the_tenancy->_start_date != '' ? date("d/m/Y", strtotime($the_tenancy->_start_date)) : '-' ) . '<br>';
+				echo 'End Date: ' . ( $the_tenancy->_end_date != '' ? date("d/m/Y", strtotime($the_tenancy->_end_date)) : '-' );
 
 			 break;
             case 'rent' :
                 
-                echo 'Rent';
+                echo $the_tenancy->get_formatted_rent();
                 
                 break;
             case 'status' :
                 
-                echo 'Status';
+                echo ucwords(str_replace("_", " ", $the_tenancy->_status));
                 
                 break;
 			default :
