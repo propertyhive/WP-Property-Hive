@@ -104,6 +104,7 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Applicant::save', 15, 2 );
         add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Property::save', 20, 2 );
         add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Deposit::save', 25, 2 );
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Safety_Checks::save', 30, 2 );
 
 		// Error handling (for showing errors from meta boxes on next page load)
 		add_action( 'admin_notices', array( $this, 'output_errors' ) );
