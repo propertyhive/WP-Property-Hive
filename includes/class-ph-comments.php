@@ -158,7 +158,7 @@ class PH_Comments {
 		{
 			$screen = get_current_screen();
 
-			if ( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale' ) ) ) )
+			if ( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy' ) ) ) )
 			{
 				return $clauses; // Don't hide when viewing Property Hive record
 			}

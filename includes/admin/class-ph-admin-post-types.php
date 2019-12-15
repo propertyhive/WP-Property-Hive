@@ -133,7 +133,7 @@ class PH_Admin_Post_Types {
     public function remove_month_filter() {
         global $typenow;
         
-        if ($typenow == 'property' || $typenow == 'contact' || $typenow == 'appraisal' || $typenow == 'viewing' || $typenow == 'offer' || $typenow == 'sale')
+        if ( in_array($typenow, array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy')) )
         {
             add_filter('months_dropdown_results', '__return_empty_array');
         }
@@ -180,6 +180,9 @@ class PH_Admin_Post_Types {
                 break;
             case 'sale' :
                 $this->sale_filters();
+                break;
+            case 'tenancy' :
+                $this->tenancy_filters();
                 break;
             default :
                 break;
@@ -921,6 +924,61 @@ class PH_Admin_Post_Types {
             $output .= '<option value="fallen_through"';
             $output .= selected( 'fallen_through', $selected_status, false );
             $output .= '>' . __( 'Fallen Through', 'propertyhive' ) . '</option>';
+            
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show an tenancy filter box
+     */
+    public function tenancy_filters() {
+        global $wp_query;
+        
+        $output = '';
+        
+        $output .= $this->tenancy_status_filter();
+
+        echo apply_filters( 'propertyhive_tenancy_filters', $output );
+    }
+
+    /**
+     * Show an tenancy status filter box
+     */
+    public function tenancy_status_filter() {
+        global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'application_pending', 'application_withdrawn', 'application_unsuccessful', 'tenancy_preparing', 'tenancy_active', 'tenancy_finished' ) ) ? $_GET['_status'] : '';
+        
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_sale_status">';
+            
+            $output .= '<option value="">All Statuses</option>';
+
+            $output .= '<option value="application_pending"';
+            $output .= selected( 'application_pending', $selected_status, false );
+            $output .= '>' . __( 'Pending Application', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_withdrawn"';
+            $output .= selected( 'application_withdrawn', $selected_status, false );
+            $output .= '>' . __( 'Withdrawn Application', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_unsuccessful"';
+            $output .= selected( 'application_unsuccessful', $selected_status, false );
+            $output .= '>' . __( 'Unsuccessful Application', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_preparing"';
+            $output .= selected( 'tenancy_preparing', $selected_status, false );
+            $output .= '>' . __( 'Preparing Tenancy', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_active"';
+            $output .= selected( 'tenancy_active', $selected_status, false );
+            $output .= '>' . __( 'Active Tenancy', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_finished"';
+            $output .= selected( 'tenancy_finished', $selected_status, false );
+            $output .= '>' . __( 'Finished Tenancy', 'propertyhive' ) . '</option>';
             
         $output .= '</select>';
 
