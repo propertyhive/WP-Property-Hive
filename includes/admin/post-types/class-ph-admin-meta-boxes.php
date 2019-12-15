@@ -924,7 +924,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_property_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'property'
@@ -1143,7 +1143,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_contact_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'contact'
@@ -1183,7 +1183,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_enquiry_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'enquiry'
@@ -1269,7 +1269,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_appraisal_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'appraisal'
@@ -1357,7 +1357,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_viewing_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'viewing'
@@ -1451,7 +1451,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_offer_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'offer'
@@ -1544,7 +1544,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_sale_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'sale'
@@ -1729,7 +1729,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_tenancy_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'tenancy'
