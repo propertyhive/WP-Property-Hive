@@ -146,3 +146,13 @@ function initialise_datepicker() {
         }
     });
 }
+
+function add_months(date, months) {
+    var d = date.getDate();
+    date.setMonth(date.getMonth() + +months);
+    if (date.getDate() != d) 
+    {
+        date.setDate(0);
+    }
+    return date;
+}
