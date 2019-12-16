@@ -17,7 +17,7 @@ class PH_Meta_Box_Tenancy_Inspections {
 	 * Output the metabox
 	 */
 	public static function output( $post ) {
-        global $wpdb, $thepostid;
+        global $wpdb, $thepostid, $post;
         
         $original_post = $post;
 
