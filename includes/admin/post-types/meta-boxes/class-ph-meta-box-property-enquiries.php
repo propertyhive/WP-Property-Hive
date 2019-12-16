@@ -20,6 +20,8 @@ class PH_Meta_Box_Property_Enquiries {
      */
     public static function output( $post ) {
 
+        global $post;
+
         $original_post = $post;
         
         echo '<div class="propertyhive_meta_box">';
