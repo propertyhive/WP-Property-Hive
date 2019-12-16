@@ -19,6 +19,8 @@ class PH_Meta_Box_Tenancy_Inspections {
 	public static function output( $post ) {
         global $wpdb, $thepostid;
         
+        $original_post = $post;
+
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
@@ -79,7 +81,8 @@ class PH_Meta_Box_Tenancy_Inspections {
         echo '</div>';
         
         echo '</div>';
-        
+
+        $post = $original_post;
     }
 
     /**
