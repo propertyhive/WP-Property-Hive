@@ -19,6 +19,8 @@ class PH_Meta_Box_Property_Enquiries {
      * Output the metabox
      */
     public static function output( $post ) {
+
+        $original_post = $post;
         
         echo '<div class="propertyhive_meta_box">';
         
@@ -98,6 +100,8 @@ class PH_Meta_Box_Property_Enquiries {
         echo '</div>';
         
         echo '</div>';
+
+        $post = $original_post;
     }
 
     /**
