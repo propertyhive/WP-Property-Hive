@@ -21,6 +21,8 @@ class PH_Meta_Box_Tenancy_Details {
 
         $thepostid = $post->ID;
 
+        $status = get_post_meta( $thepostid, '_status', TRUE );
+
         wp_nonce_field( 'propertyhive_save_data', 'propertyhive_meta_nonce' );
         
         echo '<div class="propertyhive_meta_box">';
@@ -31,8 +33,46 @@ class PH_Meta_Box_Tenancy_Details {
         
             <label for="">' . __('Status', 'propertyhive') . '</label>
             
-            ' . ucwords(str_replace("_", " ", get_post_meta( $thepostid, '_status', TRUE )));
-        
+            ' . ucwords( str_replace( "_", " ", $status ) );
+
+        if ( $status == 'application' && get_post_meta( $thepostid, '_offer_status', true ) == 'declined' )
+        {
+            echo ' - <span style="color:#C00; font-weight:700;">(' . __( 'Offer Declined', 'propertyhive' ) . ')';
+        }
+
+        if ( $status == 'tenancy' )
+        {
+            $renewal_status = get_post_meta( $thepostid, '_renewal_status', TRUE );
+            $start_date = get_post_meta( $thepostid, '_start_date', TRUE );
+            $end_date = get_post_meta( $thepostid, '_end_date', TRUE );
+
+            if ( strtotime($start_date) > time() )
+            {
+                $days_to_start = ceil( ( strtotime($start_date) - time() ) / 60 / 60 / 24 );
+                if ( $days_to_start != 1 )
+                {
+                    echo ' - ' . __( 'Starting in', 'propertyhive' ) . ' ' . $days_to_start . ' ' .  __( 'days', 'propertyhive' );
+                }
+                else
+                {
+                    echo ' - ' . __( 'Starting tomorrow', 'propertyhive' );
+                }
+            }
+            elseif ( strtotime($start_date) <= time() && time() < strtotime($end_date) )
+            {
+                echo ' - ' . __( 'Currently running', 'propertyhive' );
+            }
+            elseif (  strtotime($end_date) < time() )
+            {
+                 echo ' - ' . __( 'Finished', 'propertyhive' );
+            }
+
+            if ( $renewal_status != '' )
+            {
+                echo ' - ' . ucwords( str_replace( "_", " ", $renewal_status ) );
+            }
+        }
+
         echo '</p>';
         
         $length_units = get_post_meta( $thepostid, '_length_units', true );
@@ -56,31 +96,34 @@ class PH_Meta_Box_Tenancy_Details {
             
         </p>';
 
-        $references_received_date_type = get_post_meta( $thepostid, '_references_received_date_type', true );
-        $references_received_date = get_post_meta( $thepostid, '_references_received_date', true );
+        $references_status = get_post_meta( $thepostid, '_references_status', true );
 
-        echo '<p class="form-field _references_received_date_field ">
-            <label for="_references_received_date">References Received</label>
-            <select name="_references_received_date_type" id="_references_received_date_type">
-                <option value="target"' . ( $references_received_date_type == 'target' ? ' selected' : '' ) . '>Target Date Of</option>
-                <option value="completed"' . ( $references_received_date_type == 'completed' ? ' selected' : '' ) . '>Completed On</option>
-                <option value="not_required"' . ( $references_received_date_type == 'not_required' ? ' selected' : '' ) . '>Not Required</option>
-            </select>
-            <span' . ( $references_received_date_type == 'not_required' ? ' style="display:none;"' : '' ) . '><input type="date" class="short" name="_references_received_date" id="_references_received_date" value="' . $references_received_date . '" placeholder=""></span>
-        </p>
-        ';
+        echo '<p class="form-field">
+        
+            <label for="">' . __('References Status', 'propertyhive') . '</label>
+            
+            ' . ( $references_status != '' ? ucwords( str_replace( "_", " ", $references_status ) ) : 'Pending' );
 
-        $agreement_signed_date_type = get_post_meta( $thepostid, '_agreement_signed_date_type', true );
+        if ( $references_status == 'requested' )
+        {
+            echo ' on ' . date("d/m/Y", strtotime( get_post_meta( $thepostid, '_references_requested_date', true ) ));
+        }
+        elseif ( $references_status == 'accepted' )
+        {
+            echo ' on ' . date("d/m/Y", strtotime( get_post_meta( $thepostid, '_references_accepted_date', true ) ));
+        }
+        elseif ( $references_status == 'declined' )
+        {
+            echo ' on ' . date("d/m/Y", strtotime( get_post_meta( $thepostid, '_references_declined_date', true ) ));
+        }
+
+        echo '</p>';
+
         $agreement_signed_date = get_post_meta( $thepostid, '_agreement_signed_date', true );
 
         echo '<p class="form-field _agreement_signed_date_field ">
             <label for="_agreement_signed_date">Agreement Signed</label>
-            <select name="_agreement_signed_date_type" id="_agreement_signed_date_type">
-                <option value="target"' . ( $agreement_signed_date_type == 'target' ? ' selected' : '' ) . '>Target Date Of</option>
-                <option value="completed"' . ( $agreement_signed_date_type == 'completed' ? ' selected' : '' ) . '>Completed On</option>
-                <option value="not_required"' . ( $references_received_date_type == 'not_required' ? ' selected' : '' ) . '>Not Required</option>
-            </select>
-            <span' . ( $agreement_signed_date_type == 'not_required' ? ' style="display:none;"' : '' ) . '><input type="date" class="short" name="_agreement_signed_date" id="_agreement_signed_date" value="' . $agreement_signed_date . '" placeholder=""></span>
+            ' . ( $agreement_signed_date != '' ? date("d/m/Y", strtotime($agreement_signed_date)) : '-' ) . '
         </p>
         ';
 
@@ -88,6 +131,7 @@ class PH_Meta_Box_Tenancy_Details {
             'id' => '_start_date', 
             'label' => __( 'Tenancy Start Date', 'propertyhive' ), 
             'desc_tip' => false, 
+            'class' => 'small',
             'type' => 'date'
         );
         propertyhive_wp_text_input( $args );
@@ -95,7 +139,8 @@ class PH_Meta_Box_Tenancy_Details {
         $args = array( 
             'id' => '_end_date', 
             'label' => __( 'Tenancy End Date', 'propertyhive' ), 
-            'desc_tip' => false, 
+            'desc_tip' => false,
+            'class' => 'small',
             'type' => 'date'
         );
         propertyhive_wp_text_input( $args );
@@ -103,7 +148,8 @@ class PH_Meta_Box_Tenancy_Details {
         $args = array( 
             'id' => '_review_date', 
             'label' => __( 'Review / Renewal Date', 'propertyhive' ), 
-            'desc_tip' => false, 
+            'desc_tip' => false,
+            'class' => 'small', 
             'type' => 'date'
         );
         propertyhive_wp_text_input( $args );
@@ -188,6 +234,14 @@ class PH_Meta_Box_Tenancy_Details {
             </select>
             
         </p>';
+
+        $args = array( 
+            'id' => '_notes', 
+            'label' => __( 'Additional Notes', 'propertyhive' ), 
+            'desc_tip' => false,
+            'class' => '',
+        );
+        propertyhive_wp_textarea_input( $args );
 
         do_action('propertyhive_tenancy_details_fields');
         
@@ -282,7 +336,7 @@ class PH_Meta_Box_Tenancy_Details {
         $status = get_post_meta( $post_id, '_status', TRUE );
         if ( $status == '' )
         {
-            update_post_meta( $post_id, '_status', 'application_pending' );
+            update_post_meta( $post_id, '_status', 'application' );
         }
 
         update_post_meta( $post_id, '_length', (int)$_POST['_length'] );
@@ -306,6 +360,8 @@ class PH_Meta_Box_Tenancy_Details {
         update_post_meta( $post_id, '_management_type', ph_clean($_POST['_management_type']) );
         update_post_meta( $post_id, '_management_fee', ph_clean($_POST['_management_fee']) );
         update_post_meta( $post_id, '_management_fee_units', ph_clean($_POST['_management_fee_units']) );
+
+        update_post_meta( $post_id, '_notes', sanitize_textarea_field($_POST['_notes']) );
 
         do_action( 'propertyhive_save_tenancy_details', $post_id );
     }
