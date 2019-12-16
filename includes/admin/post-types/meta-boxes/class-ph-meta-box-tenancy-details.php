@@ -56,6 +56,34 @@ class PH_Meta_Box_Tenancy_Details {
             
         </p>';
 
+        $references_received_date_type = get_post_meta( $thepostid, '_references_received_date_type', true );
+        $references_received_date = get_post_meta( $thepostid, '_references_received_date', true );
+
+        echo '<p class="form-field _references_received_date_field ">
+            <label for="_references_received_date">References Received</label>
+            <select name="_references_received_date_type" id="_references_received_date_type">
+                <option value="target"' . ( $references_received_date_type == 'target' ? ' selected' : '' ) . '>Target Date Of</option>
+                <option value="completed"' . ( $references_received_date_type == 'completed' ? ' selected' : '' ) . '>Completed On</option>
+                <option value="not_required"' . ( $references_received_date_type == 'not_required' ? ' selected' : '' ) . '>Not Required</option>
+            </select>
+            <span' . ( $references_received_date_type == 'not_required' ? ' style="display:none;"' : '' ) . '><input type="date" class="short" name="_references_received_date" id="_references_received_date" value="' . $references_received_date . '" placeholder=""></span>
+        </p>
+        ';
+
+        $agreement_signed_date_type = get_post_meta( $thepostid, '_agreement_signed_date_type', true );
+        $agreement_signed_date = get_post_meta( $thepostid, '_agreement_signed_date', true );
+
+        echo '<p class="form-field _agreement_signed_date_field ">
+            <label for="_agreement_signed_date">Agreement Signed</label>
+            <select name="_agreement_signed_date_type" id="_agreement_signed_date_type">
+                <option value="target"' . ( $agreement_signed_date_type == 'target' ? ' selected' : '' ) . '>Target Date Of</option>
+                <option value="completed"' . ( $agreement_signed_date_type == 'completed' ? ' selected' : '' ) . '>Completed On</option>
+                <option value="not_required"' . ( $references_received_date_type == 'not_required' ? ' selected' : '' ) . '>Not Required</option>
+            </select>
+            <span' . ( $agreement_signed_date_type == 'not_required' ? ' style="display:none;"' : '' ) . '><input type="date" class="short" name="_agreement_signed_date" id="_agreement_signed_date" value="' . $agreement_signed_date . '" placeholder=""></span>
+        </p>
+        ';
+
         $args = array( 
             'id' => '_start_date', 
             'label' => __( 'Tenancy Start Date', 'propertyhive' ), 
@@ -171,6 +199,30 @@ class PH_Meta_Box_Tenancy_Details {
 
         jQuery(document).ready(function()
         {
+            jQuery(\'#_references_received_date_type\').change(function()
+            {
+                if ( jQuery(this).val() == \'not_required\' )
+                {
+                    jQuery(this).next(\'span\').hide();
+                }
+                else
+                {
+                    jQuery(this).next(\'span\').show();
+                }
+            });
+
+            jQuery(\'#_agreement_signed_date_type\').change(function()
+            {
+                if ( jQuery(this).val() == \'not_required\' )
+                {
+                    jQuery(this).next(\'span\').hide();
+                }
+                else
+                {
+                    jQuery(this).next(\'span\').show();
+                }
+            });
+
             // Set end date to X weeks/months after when start date changed
             jQuery(\'#_start_date\').change(function()
             {
@@ -236,6 +288,11 @@ class PH_Meta_Box_Tenancy_Details {
         update_post_meta( $post_id, '_length', (int)$_POST['_length'] );
         update_post_meta( $post_id, '_length_units', ph_clean($_POST['_length_units']) );
         update_post_meta( $post_id, '_lease_type', ph_clean($_POST['_lease_type']) );
+
+        update_post_meta( $post_id, '_references_received_date_type', ph_clean($_POST['_references_received_date_type']) );
+        update_post_meta( $post_id, '_references_received_date', ph_clean($_POST['_references_received_date']) );
+        update_post_meta( $post_id, '_agreement_signed_date_type', ph_clean($_POST['_agreement_signed_date_type']) );
+        update_post_meta( $post_id, '_agreement_signed_date', ph_clean($_POST['_agreement_signed_date']) );
 
         update_post_meta( $post_id, '_start_date', ph_clean($_POST['_start_date']) );
         update_post_meta( $post_id, '_end_date', ph_clean($_POST['_end_date']) );
