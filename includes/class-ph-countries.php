@@ -157,6 +157,18 @@ class PH_Countries {
 				'currency_symbol' => 'Kč',
 				'currency_prefix' => false
 			),
+			'DK' => array(
+				'name' => 'Denmark',
+				'currency_code' => 'DKK',
+				'currency_symbol' => 'kr',
+				'currency_prefix' => false
+			),
+			'FI' => array(
+				'name' => 'Finland',
+				'currency_code' => 'EUR',
+				'currency_symbol' => '&euro;',
+				'currency_prefix' => true
+			),
 			'FR' => array(
 				'name' => 'France',
 				'currency_code' => 'EUR',
@@ -228,6 +240,12 @@ class PH_Countries {
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => true
+			),
+			'SE' => array(
+				'name' => 'Sweden',
+				'currency_code' => 'SEK',
+				'currency_symbol' => 'kr',
+				'currency_prefix' => false
 			),
 			'AE' => array(
 				'name' => 'United Arab Emirates',
