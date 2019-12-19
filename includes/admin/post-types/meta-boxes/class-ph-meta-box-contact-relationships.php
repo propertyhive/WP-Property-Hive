@@ -20,6 +20,8 @@ class PH_Meta_Box_Contact_Relationships {
 	 */
 	public static function output( $post ) {
         global $post, $wpdb, $thepostid;
+
+        $original_post = $post;
         
         $total_profiles = 0;
         
@@ -846,6 +848,8 @@ class PH_Meta_Box_Contact_Relationships {
         </div>';
         
         echo '</div>';
+
+        $post = $original_post;
         
         //do_action('propertyhive_contact_relationships_fields');
         
