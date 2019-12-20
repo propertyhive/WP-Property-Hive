@@ -22,8 +22,14 @@ class PH_Meta_Box_Offer_Notes {
         global $wpdb, $propertyhive, $post;
 
         $args = array(
-            'post_id'   => $post->ID,
-            'type'      => 'propertyhive_note'
+            'type'      => 'propertyhive_note',
+            'meta_query' => array(
+                array(
+                    'key' => 'related_to',
+                    'value' => '"' . $post->ID . '"',
+                    'compare' => 'LIKE',
+                ),
+            )
         );
 
         $notes = get_comments( $args );
@@ -32,7 +38,6 @@ class PH_Meta_Box_Offer_Notes {
 
         if ( !empty($notes) ) 
         {
-
             $datetime_format = get_option('date_format')." \a\\t ".get_option('time_format');
 
             foreach( $notes as $note )
@@ -77,6 +82,15 @@ class PH_Meta_Box_Offer_Notes {
                         </abbr>
                         <?php if ( $note->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $note->comment_author ); ?>
                         <?php if ($allow_delete) { ?><a href="#" class="delete_note"><?php _e( 'Delete', 'propertyhive' ); ?></a><?php } ?>
+                        <?php
+                            if ( $post->ID != $note->comment_post_ID )
+                            {
+                        ?>
+                        <br>
+                        <?php echo __( 'Note originally entered on', 'properthive' ); ?> <a href="<?php echo get_edit_post_link($note->comment_post_ID); ?>" style="color:inherit;"><?php echo __( ucfirst(get_post_type($note->comment_post_ID)), 'propertyhive' ); ?></a>
+                        <?php
+                            }
+                        ?>
                     </p>
                 </li>
                 <?php
