@@ -24,6 +24,8 @@ class PH_Comments {
 		// Secure propertyhive notes
 		add_filter( 'comments_clauses', array( __CLASS__, 'exclude_note_comments' ), 10, 1 );
 
+		add_filter( 'comments_clauses', array( __CLASS__, 'related_to_or_post_id' ), 20, 1 );
+
 		// Count comments
 		add_filter( 'wp_count_comments', array( __CLASS__, 'wp_count_comments' ), 99, 2 );
 
@@ -35,6 +37,22 @@ class PH_Comments {
 		add_action( 'update_post_meta', array( __CLASS__, 'check_on_market_update' ), 10, 4 );
 
 		add_action( 'update_post_meta', array( __CLASS__, 'check_price_change' ), 10, 4 );
+	}
+
+	public static function related_to_or_post_id( $clauses )
+	{
+		global $wpdb, $post; 
+
+		if ( strpos($clauses['where'], 'related_to') !== FALSE )
+		{
+			$clauses['join'] = str_replace( 'INNER JOIN', 'LEFT JOIN', $clauses['join'] );
+
+			// we're searching for related_to so should check where main post is comment_post_ID
+			$clauses['where'] = str_replace( $wpdb->prefix . 'commentmeta.meta_key', '( ' . $wpdb->prefix . 'commentmeta.meta_key', $clauses['where'] );
+			$clauses['where'] .= ' OR comment_post_ID = "' . $post->ID . '" ) ';
+		}
+
+		return $clauses;
 	}
 
 	public static function insert_note( $post_id, $comment )
