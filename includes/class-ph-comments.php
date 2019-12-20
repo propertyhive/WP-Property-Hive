@@ -37,6 +37,145 @@ class PH_Comments {
 		add_action( 'update_post_meta', array( __CLASS__, 'check_price_change' ), 10, 4 );
 	}
 
+	public static function insert_note( $post_id, $comment )
+	{
+		$current_user = wp_get_current_user();
+
+		$post_type = get_post_type( $post_id );
+
+		$related_to = array( $post_id );
+
+		switch ( $post_type )
+		{
+			case "property": {
+				// get property owner
+				$owner_contact_ids = get_post_meta( $post_id, '_owner_contact_id', TRUE );
+				if ( !empty($owner_contact_ids) )
+				{
+					if ( !is_array($owner_contact_ids) )
+					{
+						$owner_contact_ids = array( $owner_contact_ids );
+					}
+					foreach ( $owner_contact_ids as $owner_contact_id )
+					{
+						$related_to[] = $owner_contact_id;
+					}
+				}
+				break;
+			}
+			case "contact": {
+				// check contact type, then add to property if owner
+				$contact_types = get_post_meta( $post_id, '_contact_types', TRUE );
+				if ( in_array('owner', $contact_types) )
+				{
+					// this contact is an owner
+					// get properties
+					$args = array(
+						'post_type' => 'property',
+						'nopaging' => true,
+						'fields' => 'ids',
+						'meta_query' => array(
+							'relation' => 'OR',
+							array(
+								'key' => '_owner_contact_id',
+								'value' => $post_id,
+								'compare' => '=',
+							),
+							array(
+								'key' => '_owner_contact_id',
+								'value' => '"' . $post_id . '"',
+								'compare' => 'LIKE',
+							),
+						)
+					);
+
+					$property_query = new WP_Query( $args );
+
+					if ( $property_query->have_posts() )
+					{
+						while ( $property_query->have_posts() )
+						{
+							$property_query->the_post();
+
+							$related_to[] = get_the_ID();
+						}
+					}
+					wp_reset_postdata();
+				}
+				break;
+			}
+			case "appraisal": {
+				// get potential owner
+				$property_owner_contact_id = get_post_meta( $post_id, '_property_owner_contact_id', TRUE );
+				if ( $property_owner_contact_id != '' )
+				{
+					$related_to[] = $property_owner_contact_id;
+				}
+				break;
+			}
+			case "viewing":
+			case "offer":
+			case "sale": {
+				// get property
+				$property_id = get_post_meta( $post_id, '_property_id', TRUE );
+				if ( $property_id != '' )
+				{
+					$related_to[] = $property_id;
+
+					// get property owner
+					$owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
+					if ( !empty($owner_contact_ids) )
+					{
+						if ( !is_array($owner_contact_ids) )
+						{
+							$owner_contact_ids = array( $owner_contact_ids );
+						}
+						foreach ( $owner_contact_ids as $owner_contact_id )
+						{
+							$related_to[] = $owner_contact_id;
+						}
+					}
+				}
+
+				// get applicant
+				$applicant_ids = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+				if ( !empty($applicant_ids) )
+				{
+					if ( !is_array($applicant_ids) )
+					{
+						$applicant_ids = array( $applicant_ids );
+					}
+					foreach ( $applicant_ids as $applicant_id )
+					{
+						$related_to[] = $applicant_id;
+					}
+				}
+				break;
+			}
+		}
+
+		$related_to = apply_filters( 'property_insert_note_related_to', $related_to, $post_id );
+
+		$related_to = array_filter( $related_to );
+
+        $data = array(
+            'comment_post_ID'      => $post_id,
+            'comment_author'       => $current_user->display_name,
+            'comment_author_email' => 'propertyhive@noreply.com',
+            'comment_author_url'   => '',
+            'comment_date'         => date("Y-m-d H:i:s"),
+            'comment_content'      => serialize($comment),
+            'comment_approved'     => 1,
+            'comment_type'         => 'propertyhive_note',
+            'comment_meta'		   => array(
+            	'related_to' => $related_to,
+            ),
+        );
+        $comment_id = wp_insert_comment( $data );
+
+        return $comment_id;
+	}
+
 	public static function check_price_change( $meta_id, $object_id, $meta_key, $meta_value )
 	{
 		if ( get_post_type($object_id) == 'property' && ( $meta_key == '_price' || $meta_key == '_rent' ) )
