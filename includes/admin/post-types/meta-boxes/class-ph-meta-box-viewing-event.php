@@ -309,7 +309,9 @@ class PH_Meta_Box_Viewing_Event {
             add_post_meta( $post_id, '_original_viewing_id', (int)$_POST['_original_viewing_id'], TRUE );
         }
 
-        update_post_meta( $post_id, '_start_date_time', ph_clean($_POST['_start_date']) . ' ' . (int)$_POST['_start_time_hours'] . ':' . (int)$_POST['_start_time_minutes'] . ':00' );
+        $hours = str_pad((int)$_POST['_start_time_hours'], 2, '0', STR_PAD_LEFT);
+        $minutes = str_pad((int)$_POST['_start_time_minutes'], 2, '0', STR_PAD_LEFT);
+        update_post_meta( $post_id, '_start_date_time', ph_clean($_POST['_start_date']) . ' ' . $hours . ':' . $minutes . ':00' );
         update_post_meta( $post_id, '_duration', (int)$_POST['_duration'] );
 
         $reset_negs = true;
