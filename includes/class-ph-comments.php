@@ -41,7 +41,7 @@ class PH_Comments {
 
 	public static function related_to_or_post_id( $clauses )
 	{
-		global $wpdb, $post; 
+		global $wpdb, $post;
 
 		if ( strpos($clauses['where'], 'related_to') !== FALSE )
 		{
@@ -51,6 +51,7 @@ class PH_Comments {
 			$clauses['where'] = str_replace( $wpdb->prefix . 'commentmeta.meta_key', '( ' . $wpdb->prefix . 'commentmeta.meta_key', $clauses['where'] );
 			$clauses['where'] .= ' OR comment_post_ID = "' . $post->ID . '" ) ';
 		}
+
 
 		return $clauses;
 	}
@@ -176,6 +177,13 @@ class PH_Comments {
 
 		$related_to = array_filter( $related_to );
 
+		// Ensure they all go in as strings to allow LIKE query to work when querying related_to
+		$new_related_to = array();
+		foreach ( $related_to as $related_to_value )
+		{
+			$new_related_to[] = (string)$related_to_value;
+		}
+
         $data = array(
             'comment_post_ID'      => $post_id,
             'comment_author'       => $current_user->display_name,
@@ -186,7 +194,7 @@ class PH_Comments {
             'comment_approved'     => 1,
             'comment_type'         => 'propertyhive_note',
             'comment_meta'		   => array(
-            	'related_to' => $related_to,
+            	'related_to' => $new_related_to,
             ),
         );
         $comment_id = wp_insert_comment( $data );
