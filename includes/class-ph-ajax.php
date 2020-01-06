@@ -1301,8 +1301,6 @@ class PH_AJAX {
 
 		if ( $post_id > 0 ) {
 
-            $current_user = wp_get_current_user();
-
             $note = wp_kses_post( trim( stripslashes( $_POST['note'] ) ) );
 
             // Add note/comment to property
@@ -1311,22 +1309,11 @@ class PH_AJAX {
                 'note' => $note
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            $comment_id = PH_Comments::insert_note( $post_id, $comment );
 
             if ($comment_id !== FALSE)
             {            
                 $comment = get_comment($comment_id);
-
 ?>
                 <li rel="<?php echo absint( $comment_id ) ; ?>" class="note">
                     <div class="note_content">
@@ -2395,25 +2382,13 @@ class PH_AJAX {
                 update_post_meta( $post_id, '_valued_price_actual', $price );
             }
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to appraisal
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'appraisal_carried_out',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -2432,25 +2407,13 @@ class PH_AJAX {
             update_post_meta( $post_id, '_status', 'cancelled' );
             update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field( $_POST['cancelled_reason'] ) );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to appraisal
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'appraisal_cancelled',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -2468,25 +2431,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'won' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to appraisal
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'appraisal_won',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -2505,25 +2456,13 @@ class PH_AJAX {
             update_post_meta( $post_id, '_status', 'lost' );
             update_post_meta( $post_id, '_lost_reason', sanitize_textarea_field( $_POST['lost_reason'] ) );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to appraisal
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'appraisal_lost',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -2737,25 +2676,13 @@ class PH_AJAX {
                     update_post_meta( $owner_contact_id, '_contact_types', $contact_types );
                 }
 
-                $current_user = wp_get_current_user();
-
                 // Add note/comment to appraisal
                 $comment = array(
                     'note_type' => 'action',
                     'action' => 'appraisal_instructed',
                 );
 
-                $data = array(
-                    'comment_post_ID'      => $post_id,
-                    'comment_author'       => $current_user->display_name,
-                    'comment_author_email' => 'propertyhive@noreply.com',
-                    'comment_author_url'   => '',
-                    'comment_date'         => date("Y-m-d H:i:s"),
-                    'comment_content'      => serialize($comment),
-                    'comment_approved'     => 1,
-                    'comment_type'         => 'propertyhive_note',
-                );
-                $comment_id = wp_insert_comment( $data );
+                PH_Comments::insert_note( $post_id, $comment );
             }
         }
 
@@ -2774,25 +2701,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'pending' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to appraisal
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'appraisal_revert_pending',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -2810,25 +2725,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'carried_out' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to appraisal
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'appraisal_revert_carried_out',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -2846,25 +2749,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'won' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to appraisal
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'appraisal_revert_won',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -3552,25 +3443,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'carried_out' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to viewing
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'viewing_carried_out',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -3589,25 +3468,13 @@ class PH_AJAX {
             update_post_meta( $post_id, '_status', 'cancelled' );
             update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field( $_POST['cancelled_reason'] ) );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to viewing
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'viewing_cancelled',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -3739,25 +3606,13 @@ class PH_AJAX {
             update_post_meta( $post_id, '_feedback_status', 'interested' );
             update_post_meta( $post_id, '_feedback', sanitize_textarea_field( $_POST['feedback'] ) );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to viewing
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'viewing_applicant_interested',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -3776,25 +3631,13 @@ class PH_AJAX {
             update_post_meta( $post_id, '_feedback_status', 'not_interested' );
             update_post_meta( $post_id, '_feedback', sanitize_textarea_field( $_POST['feedback'] ) );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to viewing
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'viewing_applicant_not_interested',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -3812,25 +3655,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_feedback_status', 'not_required' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to viewing
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'viewing_feedback_not_required',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -3849,25 +3680,13 @@ class PH_AJAX {
             update_post_meta( $post_id, '_feedback_status', '' );
             update_post_meta( $post_id, '_feedback_passed_on', '' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to viewing
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'viewing_revert_feedback_pending',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -3886,25 +3705,13 @@ class PH_AJAX {
             update_post_meta( $post_id, '_status', 'pending' );
             update_post_meta( $post_id, '_feedback_status', '' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to viewing
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'viewing_revert_pending',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -3922,25 +3729,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_feedback_passed_on', 'yes' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to viewing
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'viewing_feedback_passed_on',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -4639,25 +4434,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'accepted' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to offer
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'offer_accepted',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -4675,25 +4458,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'declined' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to offer
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'offer_declined',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -4711,25 +4482,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'pending' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to offer
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'offer_revert_pending',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -5052,25 +4811,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'exchanged' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to sale
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'sale_exchanged',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -5088,25 +4835,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'completed' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to sale
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'sale_completed',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
@@ -5124,25 +4859,13 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'fallen_through' );
 
-            $current_user = wp_get_current_user();
-
             // Add note/comment to sale
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'sale_fallen_through',
             );
 
-            $data = array(
-                'comment_post_ID'      => $post_id,
-                'comment_author'       => $current_user->display_name,
-                'comment_author_email' => 'propertyhive@noreply.com',
-                'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
-                'comment_content'      => serialize($comment),
-                'comment_approved'     => 1,
-                'comment_type'         => 'propertyhive_note',
-            );
-            $comment_id = wp_insert_comment( $data );
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         die();
