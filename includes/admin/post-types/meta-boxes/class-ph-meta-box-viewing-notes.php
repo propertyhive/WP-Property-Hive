@@ -34,6 +34,12 @@ class PH_Meta_Box_Viewing_Notes {
 
         $notes = get_comments( $args );
 
+        echo '<ul class="subsubsub notes-filter" style="float:none; padding-left:10px;">';
+            echo '<li><a href="" data-filter-class="*" class="current">' . __( 'All', 'propertyhive' ) . '</a> |&nbsp; </li>';
+            echo '<li><a href="" data-filter-class="note-type-note">' . __( 'Note', 'propertyhive' ) . '</a> |&nbsp; </li>';
+            echo '<li><a href="" data-filter-class="note-type-action">' . __( 'System Change', 'propertyhive' ) . '</a></li>';
+        echo '</ul>';
+
         echo '<ul class="record_notes" style="max-height:300px; overflow-y:auto">';
 
         if ( !empty($notes) ) 
@@ -45,6 +51,8 @@ class PH_Meta_Box_Viewing_Notes {
                 $note_classes = array( 'note' );
 
                 $comment_content = unserialize($note->comment_content);
+
+                $note_classes[] = 'note-type-' . $comment_content['note_type'];
 
                 $note_body = 'Unknown note type';
                 $allow_delete = true;
