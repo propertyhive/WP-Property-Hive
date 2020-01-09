@@ -79,8 +79,7 @@ jQuery( function($){
         });
 
         return false;
-
-});
+    });
 
     $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.delete_note', function() {
         
@@ -109,11 +108,32 @@ jQuery( function($){
 
         return false;
     });
+
+    // Notes filter
+    $('.notes-filter a').click(function(e)
+    {
+        e.preventDefault();
+
+        var note_type = $(this).attr('data-filter-class');
+
+        if ( note_type == '*' )
+        {
+            // show all notes
+            $('.record_notes li').show();
+        }
+        else
+        {
+            $('.record_notes li').hide();
+            $('.record_notes li.' + note_type).show();
+        }
+
+        $('.notes-filter a').removeClass('current');
+        $(this).addClass('current');
+    });
     
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
-
-    });
+});
 
 function initialise_datepicker() {
     jQuery( ".date-picker" ).datepicker({

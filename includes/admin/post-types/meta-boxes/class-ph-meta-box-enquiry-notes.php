@@ -46,6 +46,8 @@ class PH_Meta_Box_Enquiry_Notes {
 
                 $comment_content = unserialize($note->comment_content);
 
+                $note_classes[] = 'note-type-' . $comment_content['note_type'];
+
                 $note_body = 'Unknown note type';
                 switch ( $comment_content['note_type'] )
                 {
