@@ -302,6 +302,7 @@ class PH_Admin_Applicant_List {
 
                 $args = array(
                     'post_type' => 'contact',
+                    'fields' => 'ids',
                     'nopaging' => true,
                 );
 
