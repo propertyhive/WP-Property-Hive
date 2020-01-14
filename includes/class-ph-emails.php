@@ -370,7 +370,7 @@ class PH_Emails {
 							continue;
 						}
 
-						if ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == '' )
+						if ( !isset($applicant_profile['send_matching_properties']) || ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] != 'yes' ) )
 						{
 							continue;
 						}
