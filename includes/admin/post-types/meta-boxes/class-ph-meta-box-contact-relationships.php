@@ -379,6 +379,41 @@ class PH_Meta_Box_Contact_Relationships {
                                 <input type="text" class="" name="_applicant_match_price_range_higher_' . $key . '" id="_applicant_match_price_range_higher_' . $key . '" value="' . $match_price_range_higher . '" style="width:20%; max-width:150px;">
                                 
                             </p>';
+
+                            echo '<script>
+
+                                var previous_max_price_' . $key . ' = ' . ( ( isset($applicant_profile['max_price']) && $applicant_profile['max_price'] != '' ) ? $applicant_profile['max_price'] : '\'\'' ) . ';
+
+                                jQuery(document).ready(function()
+                                {
+                                    jQuery(\'#_applicant_maximum_price_' . $key . '\').change(function()
+                                    {
+                                        if ( previous_max_price_' . $key . ' == \'\' )
+                                        {
+                                            if ( jQuery(this).val().replace(/\D/g, \'\') != \'\' && jQuery(\'#_applicant_match_price_range_lower_' . $key . '\').val().replace(/\D/g, \'\') == \'\' )
+                                            {
+                                                var max_price = jQuery(this).val().replace(/\D/g, \'\');
+
+                                                max_price = parseInt(max_price) - parseInt( max_price * ( ' . $percentage_lower . ' / 100 ) );
+
+                                                jQuery(\'#_applicant_match_price_range_lower_' . $key . '\').val(max_price);
+                                            }
+
+                                            if ( jQuery(this).val().replace(/\D/g, \'\') != \'\' && jQuery(\'#_applicant_match_price_range_higher_' . $key . '\').val().replace(/\D/g, \'\') == \'\' )
+                                            {
+                                                var max_price = jQuery(this).val().replace(/\D/g, \'\');
+
+                                                max_price = parseInt(max_price) + parseInt( max_price * ( ' . $percentage_higher . ' / 100 ) );
+
+                                                jQuery(\'#_applicant_match_price_range_higher_' . $key . '\').val(max_price);
+                                            }
+                                        }
+
+                                        previous_max_price_' . $key . ' = jQuery(this).val();
+                                    });
+                                });
+
+                            </script>';
                         }
 
                         echo '</div>';
