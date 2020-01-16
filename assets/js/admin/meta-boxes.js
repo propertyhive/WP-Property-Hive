@@ -120,6 +120,11 @@ jQuery( function($){
         {
             // show all notes
             $('.record_notes li').show();
+
+            if ( $('.record_notes li').length > 1 )
+            {
+                $('.record_notes li#no_notes').hide();
+            }
         }
         else
         {
