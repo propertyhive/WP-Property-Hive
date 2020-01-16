@@ -788,9 +788,38 @@ class PH_Query {
 		      	}
 		      	else
 		      	{
+		      		$postcode = ph_clean( $_REQUEST['address_keyword'] );
+
+		      		if ( preg_match('#^(GIR ?0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]([0-9ABEHMNPRV-Y])?)|[0-9][A-HJKPS-UW])[0-9][ABD-HJLNP-UW-Z]{2})$#i', $postcode) )
+		      		{
+       					// UK postcode found with no space
+
+		      			if ( strlen($postcode) == 5 )
+		      			{
+		      				$first_part = substr($postcode, 0, 2);
+		      				$last_part = substr($postcode, 2, 3);
+
+		      				$postcode = $first_part . ' ' . $last_part;
+		      			}
+		      			elseif ( strlen($postcode) == 6 )
+		      			{
+		      				$first_part = substr($postcode, 0, 3);
+		      				$last_part = substr($postcode, 3, 3);
+
+		      				$postcode = $first_part . ' ' . $last_part;
+		      			}
+		      			elseif ( strlen($postcode) == 7 )
+		      			{
+		      				$first_part = substr($postcode, 0, 4);
+		      				$last_part = substr($postcode, 4, 3);
+
+		      				$postcode = $first_part . ' ' . $last_part;
+		      			}
+		      		}
+
 		      		$meta_query[] = array(
 					    'key'     => '_address_postcode',
-					    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
+					    'value'   => ph_clean( $postcode ),
 					    'compare' => 'LIKE'
 					);
 		      	}
