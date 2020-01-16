@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.3.2
-Stable tag: 1.4.52
+Stable tag: 1.4.53
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.53 =
+* Added new filter to History & Notes grids to filter on note type (i.e. All, Note, Mailout, System Change)
+* Added support for postcodes being entered in address keyword field in search forms with no space
+* Automatically fill match price range fields on applicant profile when entering max price for the first time
+* Small performance optimisation when generating applicant list
 
 = 1.4.52 =
 * Searching by keyword for viewings, offers and sales in admin area now also searches property address and applicant name
