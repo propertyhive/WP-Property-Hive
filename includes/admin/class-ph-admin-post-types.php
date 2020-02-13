@@ -1196,20 +1196,31 @@ class PH_Admin_Post_Types {
         if ( !isset($_GET['s']) || ( isset($_GET['s']) && ph_clean($_GET['s']) == '' ) )
             return $join;
 
-        if ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow ) 
+        if ( 'appraisal' === $typenow ) 
         {
             $join .= " 
-LEFT JOIN wp_postmeta AS ph_property_filter_meta ON wp_posts.ID = ph_property_filter_meta.post_id AND ph_property_filter_meta.meta_key = '_property_id'
-LEFT JOIN wp_posts AS ph_property_filter_posts ON ph_property_filter_posts.ID = ph_property_filter_meta.meta_value
-LEFT JOIN wp_postmeta AS ph_property_filter_meta_name_number ON ph_property_filter_posts.ID = ph_property_filter_meta_name_number.post_id AND ph_property_filter_meta_name_number.meta_key = '_address_name_number'
-LEFT JOIN wp_postmeta AS ph_property_filter_meta_street ON ph_property_filter_posts.ID = ph_property_filter_meta_street.post_id AND ph_property_filter_meta_street.meta_key = '_address_street' 
-LEFT JOIN wp_postmeta AS ph_property_filter_meta_2 ON ph_property_filter_posts.ID = ph_property_filter_meta_2.post_id AND ph_property_filter_meta_2.meta_key = '_address_2' 
-LEFT JOIN wp_postmeta AS ph_property_filter_meta_3 ON ph_property_filter_posts.ID = ph_property_filter_meta_3.post_id AND ph_property_filter_meta_3.meta_key = '_address_3' 
-LEFT JOIN wp_postmeta AS ph_property_filter_meta_4 ON ph_property_filter_posts.ID = ph_property_filter_meta_4.post_id AND ph_property_filter_meta_4.meta_key = '_address_4' 
-LEFT JOIN wp_postmeta AS ph_property_filter_meta_postcode ON ph_property_filter_posts.ID = ph_property_filter_meta_postcode.post_id AND ph_property_filter_meta_postcode.meta_key = '_address_postcode' 
+LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_name_number ON " . $wpdb->posts . ".ID = ph_appraisal_filter_meta_name_number.post_id AND ph_appraisal_filter_meta_name_number.meta_key = '_address_name_number'
+LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_street ON " . $wpdb->posts . ".ID = ph_appraisal_filter_meta_street.post_id AND ph_appraisal_filter_meta_street.meta_key = '_address_street'
+LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_2 ON " . $wpdb->posts . ".ID = ph_appraisal_filter_meta_2.post_id AND ph_appraisal_filter_meta_2.meta_key = '_address_two'
+LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_3 ON " . $wpdb->posts . ".ID = ph_appraisal_filter_meta_3.post_id AND ph_appraisal_filter_meta_3.meta_key = '_address_three'
+LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_4 ON " . $wpdb->posts . ".ID = ph_appraisal_filter_meta_4.post_id AND ph_appraisal_filter_meta_4.meta_key = '_address_four'
+LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_postcode ON " . $wpdb->posts . ".ID = ph_appraisal_filter_meta_postcode.post_id AND ph_appraisal_filter_meta_postcode.meta_key = '_address_postcode'
+";
+        }
+        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow ) 
+        {
+            $join .= " 
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta ON " . $wpdb->posts . ".ID = ph_property_filter_meta.post_id AND ph_property_filter_meta.meta_key = '_property_id'
+LEFT JOIN " . $wpdb->posts . " AS ph_property_filter_posts ON ph_property_filter_posts.ID = ph_property_filter_meta.meta_value
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_name_number ON ph_property_filter_posts.ID = ph_property_filter_meta_name_number.post_id AND ph_property_filter_meta_name_number.meta_key = '_address_name_number'
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_street ON ph_property_filter_posts.ID = ph_property_filter_meta_street.post_id AND ph_property_filter_meta_street.meta_key = '_address_street' 
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_2 ON ph_property_filter_posts.ID = ph_property_filter_meta_2.post_id AND ph_property_filter_meta_2.meta_key = '_address_2' 
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_3 ON ph_property_filter_posts.ID = ph_property_filter_meta_3.post_id AND ph_property_filter_meta_3.meta_key = '_address_3' 
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_4 ON ph_property_filter_posts.ID = ph_property_filter_meta_4.post_id AND ph_property_filter_meta_4.meta_key = '_address_4' 
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_postcode ON ph_property_filter_posts.ID = ph_property_filter_meta_postcode.post_id AND ph_property_filter_meta_postcode.meta_key = '_address_postcode' 
 
-LEFT JOIN wp_postmeta AS ph_applicant_filter_meta ON wp_posts.ID = ph_applicant_filter_meta.post_id AND ph_applicant_filter_meta.meta_key = '_applicant_contact_id'
-LEFT JOIN wp_posts AS ph_applicant_filter_posts ON ph_applicant_filter_posts.ID = ph_applicant_filter_meta.meta_value
+LEFT JOIN " . $wpdb->postmeta . " AS ph_applicant_filter_meta ON " . $wpdb->posts . ".ID = ph_applicant_filter_meta.post_id AND ph_applicant_filter_meta.meta_key = '_applicant_contact_id'
+LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filter_posts.ID = ph_applicant_filter_meta.meta_value
 ";
         }
 
@@ -1222,7 +1233,29 @@ LEFT JOIN wp_posts AS ph_applicant_filter_posts ON ph_applicant_filter_posts.ID 
         if ( !isset($_GET['s']) || ( isset($_GET['s']) && ph_clean($_GET['s']) == '' ) )
             return $where;
 
-        if ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow ) 
+        if ( 'appraisal' === $typenow ) 
+        {
+            $where = preg_replace(
+                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "(
+                    (" . $wpdb->posts . ".post_title LIKE $1) 
+                    OR
+                    (ph_appraisal_filter_meta_name_number.meta_value LIKE $1)
+                    OR 
+                    (ph_appraisal_filter_meta_street.meta_value LIKE $1)
+                    OR 
+                    (ph_appraisal_filter_meta_2.meta_value LIKE $1)
+                    OR 
+                    (ph_appraisal_filter_meta_3.meta_value LIKE $1)
+                    OR 
+                    (ph_appraisal_filter_meta_4.meta_value LIKE $1)
+                    OR 
+                    (ph_appraisal_filter_meta_postcode.meta_value LIKE $1)
+                )", 
+                $where 
+            );
+        }
+        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow ) 
         {
             $where = preg_replace(
                 "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
