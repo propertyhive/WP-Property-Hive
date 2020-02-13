@@ -17,7 +17,7 @@ class PH_Meta_Box_Appraisal_Event {
 	 * Output the metabox
 	 */
 	public static function output( $post ) {
-        global $wpdb, $thepostid;
+        global $wpdb, $thepostid, $pagenow;
         
         echo '<div class="propertyhive_meta_box">';
         
@@ -133,7 +133,7 @@ class PH_Meta_Box_Appraisal_Event {
         <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . __( 'Please select a negotiator', 'propertyhive' ) . '" class="multiselect attribute_values">';
         
         $negotiator_ids = get_post_meta( $post->ID, '_negotiator_id' );
-        if ( empty($negotiator_ids) )
+        if ( $pagenow == 'post-new.php' )
         {
             $negotiator_ids = array( get_current_user_id() );
         }
@@ -161,10 +161,13 @@ class PH_Meta_Box_Appraisal_Event {
         echo '</select>
         </p>';
 
-        propertyhive_wp_hidden_input( array( 
-            'id' => '_previous_negotiator_ids', 
-            'value' => implode(",", $negotiator_ids),
-        ) );
+        if ( $pagenow != 'post-new.php' )
+        {
+            propertyhive_wp_hidden_input( array( 
+                'id' => '_previous_negotiator_ids', 
+                'value' => implode(",", $negotiator_ids),
+            ) );
+        }
 
         propertyhive_wp_textarea_input( array( 
             'id' => '_booking_notes', 
