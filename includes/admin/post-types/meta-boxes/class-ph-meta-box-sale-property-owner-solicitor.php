@@ -29,29 +29,22 @@ class PH_Meta_Box_Sale_Property_Owner_Solicitor {
         {
             $contact = new PH_Contact($property_owner_solicitor_contact_id);
 
-            echo '<p class="form-field">
-            
-                <label>' . __('Name', 'propertyhive') . '</label>
-                
-                <a href="' . get_edit_post_link($property_owner_solicitor_contact_id, '') . '">' . get_the_title($property_owner_solicitor_contact_id) . '</a>
-                
-            </p>';
+            $fields = array(
+                'name' => array(
+                    'label' => __('Name', 'propertyhive'),
+                    'value' => '<a href="' . get_edit_post_link($property_owner_solicitor_contact_id, '') . '">' . get_the_title($property_owner_solicitor_contact_id) . '</a>',
+                ),
+                'telephone_number' => array(
+                    'label' => __('Telephone Number', 'propertyhive'),
+                    'value' => $contact->telephone_number,
+                ),
+                'email_address' => array(
+                    'label' => __('Email Address', 'propertyhive'),
+                    'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                ),
+            );
 
-            echo '<p class="form-field">
-            
-                <label>' . __('Telephone Number', 'propertyhive') . '</label>
-                
-                ' . $contact->telephone_number . '
-                
-            </p>';
-
-            echo '<p class="form-field">
-            
-                <label>' . __('Email Address', 'propertyhive') . '</label>
-                
-                <a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>
-                
-            </p>';
+            $fields = apply_filters( 'propertyhive_sale_property_owner_solictor_fields', $fields, $post->ID, $property_owner_solicitor_contact_id );
 
             echo '<p class="form-field">
             
