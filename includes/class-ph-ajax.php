@@ -1097,7 +1097,7 @@ class PH_AJAX {
                     
                     $return[] = array(
                         'ID' => get_the_ID(),
-                        'post_title' => get_the_title(get_the_ID()),
+                        'post_title' => get_the_title(get_the_ID()) . ( isset($_POST['contact_type']) && $_POST['contact_type'] == 'thirdparty' && $contact->company_name != '' && $contact->company_name != get_the_title(get_the_ID()) ? ' (' . $contact->company_name . ')' : '' ) ,
                         'address_name_number' => $contact->_address_name_number,
                         'address_street' => $contact->_address_street,
                         'address_two' => $contact->_address_two,
