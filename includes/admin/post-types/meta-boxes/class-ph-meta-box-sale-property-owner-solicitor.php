@@ -46,6 +46,17 @@ class PH_Meta_Box_Sale_Property_Owner_Solicitor {
 
             $fields = apply_filters( 'propertyhive_sale_property_owner_solictor_fields', $fields, $post->ID, $property_owner_solicitor_contact_id );
 
+            foreach ( $fields as $key => $field )
+            {
+                echo '<p class="form-field ' . esc_attr($key) . '">
+            
+                    <label>' . esc_html($field['label']) . '</label>
+                    
+                    ' . $field['value'] . '
+                    
+                </p>';
+            }
+
             echo '<p class="form-field">
             
                 <label></label>
