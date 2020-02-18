@@ -32,7 +32,7 @@ class PH_Meta_Box_Offer_Applicant_Solicitor {
             $fields = array(
                 'name' => array(
                     'label' => __('Name', 'propertyhive'),
-                    'value' => '<a href="' . get_edit_post_link($applicant_solicitor_contact_id, '') . '">' . get_the_title($applicant_solicitor_contact_id) . '</a>',
+                    'value' => '<a href="' . get_edit_post_link($applicant_solicitor_contact_id, '') . '">' . get_the_title($applicant_solicitor_contact_id) . ( $contact->company_name != '' && $contact->company_name != get_the_title($applicant_solicitor_contact_id) ? ' (' . $contact->company_name . ')' : '' ) . '</a>',
                 ),
                 'telephone_number' => array(
                     'label' => __('Telephone Number', 'propertyhive'),
