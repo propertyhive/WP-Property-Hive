@@ -193,6 +193,12 @@ class PH_Admin {
             case 'plugins' :
                 include( 'class-ph-admin-plugin-updates.php' );
             break;
+            case 'users':
+            case 'user':
+            case 'profile':
+            case 'user-edit':
+                include( 'class-ph-admin-profile.php' );
+                break;
         }
     }
 
