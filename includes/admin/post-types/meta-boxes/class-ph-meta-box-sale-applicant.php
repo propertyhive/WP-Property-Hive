@@ -29,29 +29,33 @@ class PH_Meta_Box_Sale_Applicant {
         {
             $contact = new PH_Contact($applicant_contact_id);
 
-            echo '<p class="form-field">
-            
-                <label>' . __('Name', 'propertyhive') . '</label>
-                
-                <a href="' . get_edit_post_link($applicant_contact_id, '') . '">' . get_the_title($applicant_contact_id) . '</a>
-                
-            </p>';
+            $fields = array(
+                'name' => array(
+                    'label' => __('Name', 'propertyhive'),
+                    'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . $applicant_contact_id . '" data-viewing-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
+                ),
+                'telephone_number' => array(
+                    'label' => __('Telephone Number', 'propertyhive'),
+                    'value' => $contact->telephone_number,
+                ),
+                'email_address' => array(
+                    'label' => __('Email Address', 'propertyhive'),
+                    'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                ),
+            );
 
-            echo '<p class="form-field">
-            
-                <label>' . __('Telephone Number', 'propertyhive') . '</label>
-                
-                ' . $contact->telephone_number . '
-                
-            </p>';
+            $fields = apply_filters( 'propertyhive_sale_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
-            echo '<p class="form-field">
+            foreach ( $fields as $key => $field )
+            {
+                echo '<p class="form-field ' . esc_attr($key) . '">
             
-                <label>' . __('Email Address', 'propertyhive') . '</label>
-                
-                <a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>
-                
-            </p>';
+                    <label>' . esc_html($field['label']) . '</label>
+                    
+                    ' . $field['value'] . '
+                    
+                </p>';
+            }
         }
         else
         {
