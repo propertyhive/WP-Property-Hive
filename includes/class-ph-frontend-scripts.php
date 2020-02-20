@@ -82,6 +82,9 @@ class PH_Frontend_Scripts {
 		wp_enqueue_script( 'propertyhive_make_enquiry', $frontend_script_path . 'make-enquiry' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
         //wp_enqueue_script( 'propertyhive', $frontend_script_path . 'propertyhive' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
 
+        wp_register_script( 'multiselect', $assets_path . 'js/multiselect/jquery.multiselect' . /*$suffix .*/ '.js', array('jquery'), '2.4.18', true );
+        wp_enqueue_style( 'multiselect', $assets_path . 'css/jquery.multiselect.css', array(), '2.4.18' );
+        
 		// CSS Styles
 		$enqueue_styles = self::get_styles();
 

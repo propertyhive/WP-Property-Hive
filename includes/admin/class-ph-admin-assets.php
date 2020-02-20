@@ -49,6 +49,8 @@ class PH_Admin_Assets {
             wp_enqueue_style( 'wp-color-picker' );
 
             wp_enqueue_style( 'chosen', PH()->plugin_url() . '/assets/css/chosen.css', array(), PH_VERSION );
+
+            wp_enqueue_style( 'multiselect', PH()->plugin_url() . '/assets/css/jquery.multiselect.css', array(), '2.4.18' );
         }
 
         /*if ( in_array( $screen->id, array( 'dashboard' ) ) ) {
@@ -83,6 +85,8 @@ class PH_Admin_Assets {
         wp_register_script( 'ajax-chosen', PH()->plugin_url() . '/assets/js/chosen/ajax-chosen.jquery' . /*$suffix .*/ '.js', array('jquery', 'chosen'), PH_VERSION );
 
         wp_register_script( 'chosen', PH()->plugin_url() . '/assets/js/chosen/chosen.jquery' . /*$suffix .*/ '.js', array('jquery'), PH_VERSION );
+
+        wp_register_script( 'multiselect', PH()->plugin_url() . '/assets/js/multiselect/jquery.multiselect' . /*$suffix .*/ '.js', array('jquery'), '2.4.18' );
 
         wp_register_script( 'flot', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot' . $suffix . '.js', array( 'jquery' ), PH_VERSION );
         wp_register_script( 'flot-resize', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.resize' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
