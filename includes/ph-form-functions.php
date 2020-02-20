@@ -975,6 +975,12 @@ function ph_form_field( $key, $field )
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
             $field['required'] = isset( $field['required'] ) ? $field['required'] : false;
             $field['options'] = ( isset( $field['options'] ) && is_array( $field['options'] ) ) ? $field['options'] : array();
+            $field['multiselect'] = isset( $field['multiselect'] ) ? $field['multiselect'] : false;
+
+            if ( $field['multiselect'] )
+            {
+                wp_enqueue_script( 'multiselect' );
+            }
 
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
@@ -1005,18 +1011,46 @@ function ph_form_field( $key, $field )
                 $output .= '</label>';
             }
 
+            $blank_option = '';
+            foreach ( $field['options'] as $option_key => $value )
+            {
+                if ( $field['multiselect'] && $option_key == '' )
+                {
+                    $blank_option = $value;
+                    continue;
+                }
+            }
+
             $output .= '<select
-                name="' . esc_attr( $key ) . '"
+                name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                 id="' . esc_attr( $key ) . '"
-                class="' . esc_attr( $field['class'] ) . '"
+                class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
+                ' . ( $field['multiselect'] ? ' multiple="multiple"' : '' ) . '
+                data-blank-option="' . esc_attr($blank_option) . '"
              >';
 
             foreach ( $field['options'] as $option_key => $value )
             {
+                if ( $field['multiselect'] && $option_key == '' )
+                {
+                    // Skip because we don't want a blank option in the multiselect. Instead use $value as the placeholder
+                    continue;
+                }
+
                 $output .= '<option
-                    value="' . esc_attr( $option_key ) . '"
-                    ' . selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false ) . '
-                >' . esc_html( $value ) . '</option>';
+                    value="' . esc_attr( $option_key ) . '"';
+                if ( !$field['multiselect'] )
+                {
+                    $output .= selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false );
+                }
+                else
+                {
+                    if ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($option_key, $_REQUEST[$key]) )
+                    {
+                        $output .= ' selected';
+                    }
+                }
+                $output .= '>' . esc_html( $value ) . '</option>';
             }
 
             $output .= '</select>';
@@ -1188,6 +1222,12 @@ function ph_form_field( $key, $field )
                 $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
                 $field['blank_option'] = isset( $field['blank_option'] ) ? $field['blank_option'] : __( 'No preference', 'propertyhive' );
                 $field['parent_terms_only'] = isset( $field['parent_terms_only'] ) ? $field['parent_terms_only'] : false;
+                $field['multiselect'] = isset( $field['multiselect'] ) ? $field['multiselect'] : false;
+
+                if ( $field['multiselect'] )
+                {
+                    wp_enqueue_script( 'multiselect' );
+                }
 
                 $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
                 if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
@@ -1203,9 +1243,11 @@ function ph_form_field( $key, $field )
                 }
 
                 $output .= '<select
-                    name="' . esc_attr( $key ) . '"
+                    name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                     id="' . esc_attr( $key ) . '"
-                    class="' . esc_attr( $field['class'] ) . '"
+                    class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
+                    ' . ( $field['multiselect'] ? ' multiple="multiple"' : '' ) . '
+                    data-blank-option="' . esc_attr($field['blank_option']) . '"
                  >';
 
                 $options = array( '' => $field['blank_option'] );
@@ -1264,10 +1306,26 @@ function ph_form_field( $key, $field )
 
                 foreach ( $options as $option_key => $value )
                 {
+                    if ( $field['multiselect'] && $option_key == '' )
+                    {
+                        // Skip because we don't want a blank option in the multiselect. Instead use $value as the placeholder
+                        continue;
+                    }
+
                     $output .= '<option
-                        value="' . esc_attr( $option_key ) . '"
-                        ' . selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false ) . '
-                    >' . esc_html( $value ) . '</option>';
+                        value="' . esc_attr( $option_key ) . '"';
+                    if ( !$field['multiselect'] )
+                    {
+                        $output .= selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false );
+                    }
+                    else
+                    {
+                        if ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($option_key, $_REQUEST[$key]) )
+                        {
+                            $output .= ' selected';
+                        }
+                    }
+                    $output .= '>' . esc_html( $value ) . '</option>';
                 }
 
                 $output .= '</select>';

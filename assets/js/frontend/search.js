@@ -83,7 +83,6 @@ function toggleDepartmentFields()
 
 jQuery( function(jQuery){
 
-    
     // Orderby
     jQuery( '.propertyhive-ordering' ).on( 'change', 'select.orderby', function() {
         jQuery( this ).closest( 'form' ).submit();
@@ -96,6 +95,17 @@ jQuery( function(jQuery){
         toggleDepartmentFields();
     });
 
+    if ( jQuery('form.property-search-form select.ph-form-multiselect').length > 0 )
+    {
+        jQuery('form.property-search-form select.ph-form-multiselect').each(function()
+        {
+            jQuery(this).multiselect({
+                texts: {
+                    placeholder: jQuery(this).data('blank-option')
+                }
+            });
+        });
+    }
 });
 
 jQuery(window).resize(function() {
