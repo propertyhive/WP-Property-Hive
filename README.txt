@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.3.2
-Stable tag: 1.4.54
+Stable tag: 1.4.55
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,10 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.55 =
+* Enqueue new multiselect JS and CSS for use across various parts of Property Hive and add ons
+* Added new form control type of multi-select so multiple locations and property types in search forms can be searched at anyone time. Update also applied to Template Assistant add on to reflect this
 
 = 1.4.54 =
 * Added ability to assign negotiators to an office. Doesn't do anything yet but allows us in future to default lists and widgets to their office only which is normally all a negotiator is interested in
