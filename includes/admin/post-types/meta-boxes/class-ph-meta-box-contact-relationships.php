@@ -838,10 +838,7 @@ class PH_Meta_Box_Contact_Relationships {
                             
                             <select id="_third_party_category_' . $key . '" name="_third_party_category[]" class="select short">';
 
-                        if ( $category == '' || $category == 0 )
-                        {
-                            echo '<option value="0"></option>';
-                        }
+                        echo '<option value=""></option>';
 
                         $categories = $ph_third_party_contacts->get_categories();
                         foreach ( $categories as $id => $category_name )
@@ -1011,7 +1008,10 @@ class PH_Meta_Box_Contact_Relationships {
         {
             foreach ( $_POST['_third_party_category'] as $category )
             {
-                $third_party_categories[]  = ph_clean($category);
+                if ( ph_clean($category) != '' )
+                {
+                    $third_party_categories[] = (int)$category;
+                }
             }
         }
         update_post_meta( $post_id, '_third_party_categories', $third_party_categories );
