@@ -60,6 +60,9 @@ function ph_get_search_form( $id = 'default' ) {
         }
     }
 
+    $form_controls = apply_filters( 'propertyhive_search_form_fields_after_' . $id, $form_controls );
+    $form_controls = apply_filters( 'propertyhive_search_form_fields_after', $form_controls );
+
     ph_get_template( 'global/search-form.php', array( 'form_controls' => $form_controls, 'id' => $id ) );
 
 }

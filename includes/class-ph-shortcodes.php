@@ -93,6 +93,9 @@ class PH_Shortcodes {
 	        $form_controls['department'] = $original_department;
 	    }
 
+		$form_controls = apply_filters( 'propertyhive_search_form_fields_after_' . $atts['id'], $form_controls, $atts );
+		$form_controls = apply_filters( 'propertyhive_search_form_fields_after', $form_controls, $atts );
+
 	    if (
 	    	isset($atts['default_department']) && in_array($atts['default_department'], array('residential-sales', 'residential-lettings', 'commercial')) &&
 	    	( !isset($_REQUEST['department']) )
