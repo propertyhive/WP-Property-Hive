@@ -157,12 +157,12 @@ class PH_Admin_Meta_Boxes {
 
         if ( isset($_GET['add_third_party_relationship']) && wp_verify_nonce($_GET['add_third_party_relationship'], '1') && isset($_GET['post']) ) 
         {
-            // Need to add blank applicant
+            // Need to add blank third party relationship
             if ( get_post_type((int)$_GET['post']) != 'contact' )
                 return;
 
             $existing_third_party_categories = get_post_meta( (int)$_GET['post'], '_third_party_categories', TRUE );
-            if ($existing_third_party_categories)
+            if ( !is_array($existing_third_party_categories) )
             {
                 $existing_third_party_categories = array();
             }
