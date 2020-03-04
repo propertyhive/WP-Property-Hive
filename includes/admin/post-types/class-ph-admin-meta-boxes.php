@@ -575,6 +575,17 @@ class PH_Admin_Meta_Boxes {
             'context' => 'normal',
             'priority' => 'high'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            $meta_boxes[10] = array(
+                'id' => 'propertyhive-property-marketing-statistics',
+                'title' => __( 'Property Marketing Statistics', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Property_Marketing_Statistics::output',
+                'screen' => 'property',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+        }
 
         $meta_boxes = apply_filters( 'propertyhive_property_marketing_meta_boxes', $meta_boxes );
         ksort($meta_boxes);
@@ -589,8 +600,12 @@ class PH_Admin_Meta_Boxes {
         $tabs['tab_marketing'] = array(
             'name' => __( 'Marketing', 'propertyhive' ),
             'metabox_ids' => $ids,
-            'post_type' => 'property'
+            'post_type' => 'property',
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            $tabs['tab_marketing']['ajax_actions'] = array( 'get_property_marketing_statistics_meta_box^' . wp_create_nonce( 'get_property_marketing_statistics_meta_box' ) . '^reload_marketing_statistics' );
+        }
 
         /* PROPERTY DESCRIPTIONS META BOXES */
         $meta_boxes = array();
@@ -1548,7 +1563,7 @@ class PH_Admin_Meta_Boxes {
                     echo '<a href="#' . implode("|#", $tab['metabox_ids']) . '" id="' . $tab_id . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '"';
                     if ( isset($tab['ajax_actions']) )
                     {
-                        echo ' data-ajax-actions="' . implode("|", $tab['ajax_actions']) . '"';
+                        echo ' data-ajax-actions="' . esc_attr(implode("|", $tab['ajax_actions'])) . '"';
                     }
                     echo '>' . $tab['name'] . '</a> ';
                     
@@ -1616,8 +1631,12 @@ class PH_Admin_Meta_Boxes {
 
                                     jQuery(\'#\' + ajax_action[0].replace(\'get_\', \'propertyhive_\')).html(\'Loading...\');
 
-                                    //if () // only do action once
-                                    //{
+                                    if ( ajax_action[2] ) // callback
+                                    {
+                                        eval(ajax_action[2] + \'()\');
+                                    }
+                                    else
+                                    {
                                         var data = {
                                             action: \'propertyhive_\' + ajax_action[0],
                                             post_id: ' . $post->ID . ',
@@ -1629,7 +1648,7 @@ class PH_Admin_Meta_Boxes {
                                             jQuery(\'#\' + ajax_action[0].replace(\'get_\', \'propertyhive_\')).html(response);
                                             activateTipTip();
                                         }, \'html\');
-                                    //}
+                                    }
                                 }
                             }
 

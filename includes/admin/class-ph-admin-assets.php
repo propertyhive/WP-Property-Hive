@@ -90,7 +90,7 @@ class PH_Admin_Assets {
 
         wp_register_script( 'flot', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot' . $suffix . '.js', array( 'jquery' ), PH_VERSION );
         wp_register_script( 'flot-resize', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.resize' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
-        //wp_register_script( 'flot-time', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.time' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
+        wp_register_script( 'flot-time', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.time' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
         //wp_register_script( 'flot-pie', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.pie' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
         //wp_register_script( 'flot-stack', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.stack' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
 
@@ -156,14 +156,14 @@ class PH_Admin_Assets {
         }
         
         // Reports Pages
-        if ( strpos($screen->id, 'page_ph-reports') !== FALSE )
+        if ( strpos($screen->id, 'page_ph-reports') !== FALSE || in_array( $screen->id, array( 'property' ) ) )
         {
            //wp_register_script( 'ph-reports', PH()->plugin_url() . '/assets/js/admin/reports' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker' ), PH_VERSION );
 
             //wp_enqueue_script( 'ph-reports' );
             wp_enqueue_script( 'flot' );
             wp_enqueue_script( 'flot-resize' );
-            //wp_enqueue_script( 'flot-time' );
+            wp_enqueue_script( 'flot-time' );
             //wp_enqueue_script( 'flot-pie' );
             //wp_enqueue_script( 'flot-stack' );
         }
