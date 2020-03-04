@@ -2016,42 +2016,41 @@ class PH_AJAX {
         
         echo '<div class="options_group">';
 
+            echo '<h3>' . __( 'Views On Website', 'propertyhive' ) . '</h3>';
+
             $view_statistics = get_post_meta( (int)$_POST['post_id'], '_view_statistics', TRUE );
-
-            //var_dump($views);
-
-            $total = 0;
-
-            $views_last_7_days = 0;
-            $views_previous_7_days = 0;
-
-            $views_last_30_days = 0;
-            $views_previous_30_days = 0;
-
-            if ( $view_statistics != '' )
+            if ( !is_array($view_statistics) )
             {
-                $date_7_days_ago = date("Y-m-d", strtotime('7 days ago'));
-                $date_14_days_ago = date("Y-m-d", strtotime('14 days ago'));
+                $view_statistics = array();
+            }
 
-                $date_30_days_ago = date("Y-m-d", strtotime('30 days ago'));
-                $date_60_days_ago = date("Y-m-d", strtotime('60 days ago'));
+            $date_from = isset($_POST['statistics_date_from']) ? $_POST['statistics_date_from'] : date("Y-m-d", strtotime('7 days ago'));
+            $date_from = strtotime($date_from);
 
-                foreach ( $view_statistics as $date => $views )
+            $date_to = isset($_POST['statistics_date_to']) ? $_POST['statistics_date_to'] : date("Y-m-d");
+            $date_to = strtotime($date_to);
+
+            $view_statistics_output = array();
+
+            for ($i = $date_from; $i <= $date_to; $i += 86400) 
+            { 
+                if ( isset($view_statistics[date("Y-m-d", $i)]) )
                 {
-                    if ( $date > $date_7_days_ago )
-                    {
-                        $views_last_7_days += $views;
-                    }
-
-                    $total += $views;
+                    $view_statistics_output[] = array( $i * 1000, $view_statistics[date("Y-m-d", $i)] );
+                }
+                else
+                {
+                    $view_statistics_output[] = array( $i * 1000, 0 );
                 }
             }
 
-        do_action('propertyhive_property_marketing_statistics_fields');
+            echo '<div id="marketing_statistics_website_view_graph" style="height:400px"></div>';
         
         echo '</div>';
         
         echo '</div>';
+
+        echo '<input type="hidden" name="marketing_statistics" id="marketing_statistics" value="' . esc_attr(json_encode($view_statistics_output)) . '">';
 
         die();
     }
