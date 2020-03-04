@@ -1615,8 +1615,8 @@ class PH_Query {
         {
     		$meta_query = array(
     		    'key'     => '_office_id',
-    		    'value'   => (int)$_REQUEST['officeID'],
-    		    'compare' => '='
+    		    'value'   => ph_clean( (is_array($_REQUEST['officeID'])) ? $_REQUEST['officeID'] : array( $_REQUEST['officeID'] ) ),
+    		    'compare' => 'IN'
     		);
 		}
 
