@@ -1071,6 +1071,12 @@ function ph_form_field( $key, $field )
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            $field['multiselect'] = isset( $field['multiselect'] ) ? $field['multiselect'] : false;
+
+            if ( $field['multiselect'] )
+            {
+                wp_enqueue_script( 'multiselect' );
+            }
 
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
@@ -1086,17 +1092,22 @@ function ph_form_field( $key, $field )
             }
 
             $output .= '<select
-                name="' . esc_attr( $key ) . '"
+                name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                 id="' . esc_attr( $key ) . '"
-                class="' . esc_attr( $field['class'] ) . '"
-             >';
+                class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
+                ' . ( $field['multiselect'] ? ' multiple="multiple"' : '' ) . '
+                data-blank-option="' . esc_attr( __( 'No preference', 'propertyhive' ) ) . '"
+            >';
 
-             $output .= '<option
+            if ( !$field['multiselect'] )
+            {
+                $output .= '<option
                         value=""
                         ' . selected( esc_attr( $field['value'] ), esc_attr( '' ), false ) . '
                     >' . esc_html( __( 'No preference', 'propertyhive' ) ) . '</option>';
+            }
 
-             $args = array(
+            $args = array(
                 'post_type' => 'office',
                 'nopaging' => true,
                 'orderby' => 'title',
@@ -1111,9 +1122,19 @@ function ph_form_field( $key, $field )
                     $office_query->the_post();
 
                     $output .= '<option
-                        value="' . esc_attr( $post->ID ) . '"
-                        ' . selected( esc_attr( $field['value'] ), esc_attr( $post->ID ), false ) . '
-                    >' . esc_html( get_the_title() ) . '</option>';
+                        value="' . esc_attr( $post->ID ) . '" ';
+                    if ( !$field['multiselect'] )
+                    {
+                        $output .= selected( esc_attr( $field['value'] ), esc_attr( $post->ID ), false );
+                    }
+                    else
+                    {
+                        if ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($post->ID, $_REQUEST[$key]) )
+                        {
+                            $output .= ' selected';
+                        }
+                    }
+                    $output .= '>' . esc_html( get_the_title() ) . '</option>';
 
                 }
             }
