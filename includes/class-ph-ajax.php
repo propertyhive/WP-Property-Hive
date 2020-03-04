@@ -37,6 +37,9 @@ class PH_AJAX {
             'get_viewings_awaiting_applicant_feedback' => false,
             'get_my_upcoming_appointments' => false,
 
+            // Property actions
+            'get_property_marketing_statistics_meta_box' => false,
+
             // Contact actions
             'create_contact_login' => false,
 
@@ -1999,6 +2002,55 @@ class PH_AJAX {
         }
 
         echo json_encode($return);
+
+        die();
+    }
+
+    public function get_property_marketing_statistics_meta_box()
+    {
+        check_ajax_referer( 'get_property_marketing_statistics_meta_box', 'security' );
+
+        global $post;
+
+        echo '<div class="propertyhive_meta_box">';
+        
+        echo '<div class="options_group">';
+
+            echo '<h3>' . __( 'Views On Website', 'propertyhive' ) . '</h3>';
+
+            $view_statistics = get_post_meta( (int)$_POST['post_id'], '_view_statistics', TRUE );
+            if ( !is_array($view_statistics) )
+            {
+                $view_statistics = array();
+            }
+
+            $date_from = isset($_POST['statistics_date_from']) ? $_POST['statistics_date_from'] : date("Y-m-d", strtotime('7 days ago'));
+            $date_from = strtotime($date_from);
+
+            $date_to = isset($_POST['statistics_date_to']) ? $_POST['statistics_date_to'] : date("Y-m-d");
+            $date_to = strtotime($date_to);
+
+            $view_statistics_output = array();
+
+            for ($i = $date_from; $i <= $date_to; $i += 86400) 
+            { 
+                if ( isset($view_statistics[date("Y-m-d", $i)]) )
+                {
+                    $view_statistics_output[] = array( $i * 1000, $view_statistics[date("Y-m-d", $i)] );
+                }
+                else
+                {
+                    $view_statistics_output[] = array( $i * 1000, 0 );
+                }
+            }
+
+            echo '<div id="marketing_statistics_website_view_graph" style="height:400px"></div>';
+        
+        echo '</div>';
+        
+        echo '</div>';
+
+        echo '<input type="hidden" name="marketing_statistics" id="marketing_statistics" value="' . esc_attr(json_encode($view_statistics_output)) . '">';
 
         die();
     }
