@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.3.2
-Stable tag: 1.4.55
+Stable tag: 1.4.56
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.56 =
+* Added new 'Property Marketing Statistics' area to property edit screen under 'Marketing' tab showing number of website hits with date range search. In future this could also hold number of impressions in search results, brochure download, enquiries and more.
+* Added support for office dropdown in search forms being multiselect following last update only applying to taxonomies
+* Allowed for third party relationships to be deleted by leaving category blank and saving contact
+* Corrected issue with not being able to set a contact as having multiple third party relationships.
 
 = 1.4.55 =
 * Enqueue new multiselect JS and CSS for use across various parts of Property Hive and add ons
