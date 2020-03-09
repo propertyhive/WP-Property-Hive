@@ -399,6 +399,13 @@ function appraisal_update_selected_property_owners()
 
                     update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_property_owner_email_address'])) );
 
+                    update_post_meta( $contact_post_id, '_address_name_number', ph_clean($_POST['_property_owner_address_name_number']) );
+                    update_post_meta( $contact_post_id, '_address_street', ph_clean($_POST['_property_owner_address_street']) );
+                    update_post_meta( $contact_post_id, '_address_two', ph_clean($_POST['_property_owner_address_two']) );
+                    update_post_meta( $contact_post_id, '_address_three', ph_clean($_POST['_property_owner_address_three']) );
+                    update_post_meta( $contact_post_id, '_address_four', ph_clean($_POST['_property_owner_address_four']) );
+                    update_post_meta( $contact_post_id, '_address_postcode', ph_clean($_POST['_property_owner_address_postcode']) );
+
                     update_post_meta( $post_id, '_property_owner_contact_id', $contact_post_id );
                 }
                 
