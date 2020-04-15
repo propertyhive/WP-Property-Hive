@@ -386,7 +386,7 @@ function viewing_update_selected_applicants()
                 }
 
                 $data = array(
-                    'comment_post_ID'      => $applicant_contact_id,
+                    'comment_post_ID'      => $contact_post_id,
                     'comment_author'       => $current_user->display_name,
                     'comment_author_email' => 'propertyhive@noreply.com',
                     'comment_author_url'   => '',
