@@ -1123,11 +1123,11 @@ class PH_AJAX {
         die();
     }
     
-    public function search_contacts_where( $where, &$wp_query )
+    public function search_contacts_where( $where, $wp_query )
     {
         global $wpdb;
         
-        $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( like_escape( ph_clean($_POST['keyword']) ) ) . '%\'';
+        $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . '%\'';
         
         return $where;
     }
@@ -1225,18 +1225,19 @@ class PH_AJAX {
 
     public function search_properties_where( $where )
     {
+        global $wpdb; 
         $where .= " AND (
-            (mt1.meta_key='_address_name_number' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
+            (mt1.meta_key='_address_name_number' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
             OR
-            (mt1.meta_key='_address_street' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
+            (mt1.meta_key='_address_street' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
             OR
-            (mt1.meta_key='_address_2' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
+            (mt1.meta_key='_address_2' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
             OR
-            (mt1.meta_key='_address_3' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
+            (mt1.meta_key='_address_3' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
             OR
-            (mt1.meta_key='_address_4' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
+            (mt1.meta_key='_address_4' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
             OR
-            (mt1.meta_key='_address_postcode' AND mt1.meta_value LIKE '" . esc_sql(ph_clean($_POST['keyword'])) . "%')
+            (mt1.meta_key='_address_postcode' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
             OR
             (mt1.meta_key='_reference_number' AND mt1.meta_value = '" . esc_sql(ph_clean($_POST['keyword'])) . "')
         ) ";
