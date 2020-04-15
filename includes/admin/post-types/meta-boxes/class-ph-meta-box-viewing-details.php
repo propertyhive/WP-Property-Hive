@@ -57,7 +57,7 @@ function redraw_viewing_details_meta_box()
     public static function save( $post_id, $post ) {
         global $wpdb;
     
-        update_post_meta( $post_id, '_feedback', sanitize_textarea_field($_POST['_feedback']) );
+        if ( isset($_POST['_feedback']) ) { update_post_meta( $post_id, '_feedback', sanitize_textarea_field($_POST['_feedback']) ); }
 
         do_action( 'propertyhive_save_viewing_details', $post_id );
     }
