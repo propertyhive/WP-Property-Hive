@@ -247,6 +247,12 @@ class PH_Countries {
 				'currency_symbol' => 'kr',
 				'currency_prefix' => false
 			),
+			'TR' => array(
+				'name' => 'Turkey',
+				'currency_code' => 'TRY',
+				'currency_symbol' => '‎₺',
+				'currency_prefix' => true
+			),
 			'AE' => array(
 				'name' => 'United Arab Emirates',
 				'currency_code' => 'AED',
@@ -517,6 +523,7 @@ class PH_Countries {
 			// Loop through all on market properties and update _actual_price meta value to be price in GBP
 			$args = array(
 				'post_type' => 'property',
+				'fields' => 'ids',
 				'post_status' => 'publish',
 				'meta_query' => array(
 					array(
