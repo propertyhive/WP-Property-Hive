@@ -862,14 +862,14 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
             }
         }
 
-        $virtual_tour_urls = $property->get_virtual_tour_urls();
-        if ( !empty( $virtual_tour_urls ) )
+        $virtual_tours = $property->get_virtual_tours();
+        if ( !empty( $virtual_tours ) )
         {
-            foreach ($virtual_tour_urls as $virtual_tour_url)
+            foreach ($virtual_tours as $virtual_tour)
             {
                 $actions[] = array(
-                    'href' => $virtual_tour_url,
-                    'label' => __( 'Virtual Tour', 'propertyhive' ),
+                    'href' => $virtual_tour['url'],
+                    'label' => __( $virtual_tour['label'], 'propertyhive' ),
                     'class' => 'action-virtual-tour',
                     'attributes' => array(
                         'target' => '_blank'

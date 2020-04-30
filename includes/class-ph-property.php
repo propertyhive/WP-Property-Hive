@@ -288,7 +288,32 @@ class PH_Property {
     }
 
     /**
+     * get_virtual_tours function.
+     *
+     * @access public
+     * @return array
+     */
+    public function get_virtual_tours() 
+    {
+        $num_property_virtual_tours = get_post_meta($this->id, '_virtual_tours', TRUE);
+        if ($num_property_virtual_tours == '') { $num_property_virtual_tours = 0; }
+
+        $virtual_tours = array();
+        for ($i = 0; $i < $num_property_virtual_tours; ++$i)
+        {
+            $label = get_post_meta($this->id, '_virtual_tour_label_' . $i, TRUE);
+            $virtual_tours[] = array(
+                'url' => get_post_meta($this->id, '_virtual_tour_' . $i, TRUE),
+                'label' => ( $label != '' ? $label : __( 'Virtual Tour', 'propertyhive' ) ),
+            );
+        }
+
+        return apply_filters( 'propertyhive_property_virtual_tours', array_filter( $virtual_tours ), $this );
+    }
+
+    /**
      * get_virtual_tour_urls function.
+     * deprecated
      *
      * @access public
      * @return array
