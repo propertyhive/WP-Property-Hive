@@ -203,25 +203,32 @@ class PH_Install {
 		$taxonomies = array(
 			'availability' => array(
 				array(
-				    'name' => 'For Sale'
+				    'name' => 'For Sale',
+                    'departments' => array('residential-sales', 'commercial')
 				),
 				array(
-				    'name' => 'Under Offer'
+				    'name' => 'Under Offer',
+                    'departments' => array('residential-sales', 'commercial')
 				),
 				array(
-				    'name' => 'Sold STC'
+				    'name' => 'Sold STC',
+                    'departments' => array('residential-sales', 'commercial')
 				),
 				array(
-				    'name' => 'Sold'
+				    'name' => 'Sold',
+                    'departments' => array('residential-sales', 'commercial')
 				),
 				array(
-				    'name' => 'To Let'
+				    'name' => 'To Let',
+                    'departments' => array('residential-lettings', 'commercial')
 				),
 				array(
-				    'name' => 'Let Agreed'
+				    'name' => 'Let Agreed',
+                    'departments' => array('residential-lettings', 'commercial')
 				),
 				array(
-				    'name' => 'Let'
+				    'name' => 'Let',
+                    'departments' => array('residential-lettings', 'commercial')
 				),
 			),
 			'property_type' => array(
@@ -449,6 +456,9 @@ class PH_Install {
             ),
 		);
 
+        $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+        if ( !is_array($availability_departments) ) { $availability_departments = array(); }
+
         $previous_term_id = '';
 		foreach ( $taxonomies as $taxonomy => $terms ) 
 		{
@@ -472,6 +482,11 @@ class PH_Install {
     	                    {
     	                        $previous_term_id = $return['term_id'];
     	                    }
+
+                            if ( $taxonomy == 'availability' && is_array($term['departments']) && !empty($term['departments']) )
+                            {
+                                $availability_departments[$return['term_id']] = $term['departments'];
+                            }
                         }
                         else
                         {
@@ -482,6 +497,8 @@ class PH_Install {
 				}
 			}
 		}
+
+        update_option( 'propertyhive_availability_departments', $availability_departments );
 	}
 
     /**
