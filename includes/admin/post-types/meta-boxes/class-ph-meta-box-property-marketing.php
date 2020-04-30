@@ -168,6 +168,10 @@ function fill_availability_dropdown()
             }
             jQuery('select[name=\'_availability\']').val(selected_availability);
         }
+        if ( jQuery('select[name=\'_availability\']').val() == '' || jQuery('select[name=\'_availability\']').val() == null )
+        {
+            jQuery('select[name=\'_availability\']').val( jQuery("select[name=\'_availability\'] option:first").val() );
+        }
     }
 }
 </script>
