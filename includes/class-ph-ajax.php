@@ -2045,7 +2045,7 @@ class PH_AJAX {
                 }
             }
 
-            echo '<div id="marketing_statistics_website_view_graph" style="height:400px"></div>';
+            echo '<div id="marketing_statistics_website_view_graph" style="height:400px; width:100%;"></div>';
         
         echo '</div>';
         
