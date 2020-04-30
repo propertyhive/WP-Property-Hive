@@ -459,8 +459,9 @@ class PH_Admin_Settings {
 	            // Checkbox input
 	            case 'checkbox' :
 
-					$option_value    = self::get_option( $value['id'], $value['default'] );
-					$fieldset_css  = isset($value['fieldset_css']) ? ph_clean($value['fieldset_css']) : '';
+	            	$name  = isset($value['name']) && $value['name'] != '' ? ph_clean($value['name']) : $value['id'];
+					$option_value = isset($value['value']) ? ph_clean($value['value']) : self::get_option( $value['id'], $value['default'] );
+					$fieldset_css = isset($value['fieldset_css']) ? ph_clean($value['fieldset_css']) : '';
 
 					$visbility_class = array();
 
@@ -502,7 +503,7 @@ class PH_Admin_Settings {
 	            	?>
 						<label for="<?php echo $value['id'] ?>">
 							<input
-								name="<?php echo esc_attr( $value['id'] ); ?>"
+								name="<?php echo esc_attr( $name ); ?>"
 								id="<?php echo esc_attr( $value['id'] ); ?>"
 								type="checkbox"
 								value="1"
