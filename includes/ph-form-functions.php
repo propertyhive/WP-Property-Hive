@@ -567,7 +567,7 @@ function ph_get_applicant_requirements_form_fields()
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
-            $options = array( '' => __( 'All Property Types', 'properthive' ) );
+            $options = array( '' => __( 'All Property Types', 'propertyhive' ) );
 
             foreach ($terms as $term)
             {
@@ -665,7 +665,7 @@ function ph_get_applicant_requirements_form_fields()
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
-            $options = array( '' => __( 'All Property Types', 'properthive' ) );
+            $options = array( '' => __( 'All Property Types', 'propertyhive' ) );
 
             foreach ($terms as $term)
             {
@@ -715,7 +715,7 @@ function ph_get_applicant_requirements_form_fields()
     $selected_value = '';
     if ( !empty( $terms ) && !is_wp_error( $terms ) )
     {
-        $options = array( '' => __( 'All Locations', 'properthive' ) );
+        $options = array( '' => __( 'All Locations', 'propertyhive' ) );
 
         foreach ($terms as $term)
         {
