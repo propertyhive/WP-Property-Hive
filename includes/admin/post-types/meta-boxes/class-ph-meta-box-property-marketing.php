@@ -33,38 +33,41 @@ class PH_Meta_Box_Property_Marketing {
                 ) );
 
                 // Availability
-                $options = array();
+                $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+                if ( !is_array($availability_departments) ) { $availability_departments = array(); }
+
+                $department_options = array();
                 $args = array(
                     'hide_empty' => false,
                     'parent' => 0
                 );
                 $terms = get_terms( 'availability', $args );
 
-                $selected_value = '';
+                $selected_availability = '';
                 if ( !empty( $terms ) && !is_wp_error( $terms ) )
                 {
                     foreach ($terms as $term)
                     {
-                        $options[$term->term_id] = $term->name;
+                        $department_options[$term->term_id] = $term->name;
                     }
 
                     $term_list = wp_get_post_terms($post->ID, 'availability', array("fields" => "ids"));
                     
                     if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
                     {
-                        $selected_value = $term_list[0];
+                        $selected_availability = $term_list[0];
                     }
                 }
 
                 $args = array( 
                     'id' => '_availability', 
                     'label' => __( 'Availability', 'propertyhive' ), 
-                    'options' => $options,
+                    'options' => $department_options,
                     'desc_tip' => false,
                 );
-                if ($selected_value != '')
+                if ($selected_availability != '')
                 {
-                    $args['value'] = $selected_value;
+                    $args['value'] = $selected_availability;
                 }
                 propertyhive_wp_select( $args );
                 
@@ -115,6 +118,61 @@ class PH_Meta_Box_Property_Marketing {
             echo '</div>';
         
         echo '</div>';
+
+        if ( !empty($availability_departments) )
+        {
+?>
+<script>
+var selected_availability = '<?php echo $selected_availability; ?>';
+var availability_departments = <?php echo json_encode($availability_departments); ?>;
+var availabilities = <?php echo json_encode($department_options); ?>;
+
+jQuery(document).ready(function()
+{
+    fill_availability_dropdown();
+
+    jQuery('[name=\'_department\']').change(function()
+    {
+        fill_availability_dropdown();
+    });
+});
+
+function fill_availability_dropdown()
+{
+    var department = jQuery('[name=\'_department\']:checked').val();
+    if ( department == '' )
+    {
+        department = '<?php echo get_option( 'propertyhive_primary_department', 'residential-sales' ); ?>';
+    }
+
+    if ( Object.keys(availability_departments).length > 0 )
+    {
+        jQuery('select[name=\'_availability\']').empty();
+
+        for ( var i in availabilities )
+        {
+            var this_availability_departments = [];
+            var availability_departments_exist = true;
+            if ( typeof availability_departments[i] !== 'undefined' )
+            {
+                this_availability_departments = availability_departments[i];
+            }
+            else
+            {
+                availability_departments_exist = false;
+            }
+
+            if ( jQuery.inArray( department, this_availability_departments ) > -1 || !availability_departments_exist )
+            {
+                jQuery('select[name=\'_availability\']').append( jQuery("<option />").val(i).text(availabilities[i]) );
+            }
+            jQuery('select[name=\'_availability\']').val(selected_availability);
+        }
+    }
+}
+</script>
+<?php
+        }
            
     }
 

@@ -273,6 +273,11 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function custom_fields_availability_setting() {
         global $post;
+
+        $departments = ph_get_departments();
+
+        $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+        if ( !is_array($availability_departments) ) { $availability_departments = array(); }
     ?>
         <tr valign="top">
             <th scope="row" class="titledesc">
@@ -292,6 +297,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;">&nbsp;</th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Availability', 'propertyhive' ); ?></th>
+                            <th class="department"><?php _e( 'Applies To', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -305,13 +311,38 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
-                            foreach ($terms as $term)
+                            foreach ( $terms as $term )
                             { 
                         ?>
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="id"><?php echo $term->term_id; ?></td>
                             <td class="type"><?php echo $term->name; ?></td>
+                            <td class="department"><?php
+                                $this_availability_departments = array();
+                                if ( isset($availability_departments[$term->term_id]) )
+                                {
+                                    foreach ( $availability_departments[$term->term_id] as $availability_department )
+                                    {
+                                        if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $availability_department) ) == 'yes' )
+                                        {
+                                            $this_availability_departments[] = $departments[$availability_department];
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    foreach ( $departments as $key => $value )
+                                    {
+                                        if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+                                        {
+                                            $this_availability_departments[] = $value;
+                                        }
+                                    }
+                                }
+
+                                echo !empty($this_availability_departments) ? implode(", ", $this_availability_departments) : '-';
+                            ?></td>
                             <td class="settings">
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=availability&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
                                 <a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=availability-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
@@ -1465,6 +1496,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             $term_name = $term->name;
         }
 
+        $departments = ph_get_departments();
+
         $args = array(
 
             array( 'title' => __( ( $current_id == '' ? 'Add New Availability Option' : 'Edit Availability' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_availability_settings' ),
@@ -1476,16 +1509,39 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 'type'      => 'text',
                 'desc_tip'  =>  false,
             ),
-            
-            array(
-                'type'      => 'hidden',
-                'id'        => 'taxonomy',
-                'default'     => $taxonomy
-            ),
-            
-            array( 'type' => 'sectionend', 'id' => 'custom_field_availability_settings' )
-            
+
         );
+
+        $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+
+        $i = 0;
+        foreach ( $departments as $key => $value )
+        {
+            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+            {
+                $args[] = array(
+                    'title'     => __( 'Applies To', 'propertyhive' ),
+                    'name'      => 'department[' . $key . ']',
+                    'id'        => 'department_' . $key,
+                    //'default'   => $term_name,
+                    'value'     => ( !isset($availability_departments[$current_id]) || in_array($key, $availability_departments[$current_id]) ? 'yes' : '' ),
+                    'type'      => 'checkbox',
+                    'desc_tip'  =>  false,
+                    'desc'      =>  $value,
+                    'checkboxgroup' => ( $i == 0 ? 'start' : ( $i == count($departments)-1 ? 'end' : '' ) ),
+                );
+
+                ++$i;
+            }
+        }
+
+        $args[] = array(
+            'type'      => 'hidden',
+            'id'        => 'taxonomy',
+            'default'     => $taxonomy
+        );
+            
+        $args[] = array( 'type' => 'sectionend', 'id' => 'custom_field_availability_settings' );
         
         return apply_filters( 'propertyhive_custom_field_availability_settings', $args );
     }
@@ -2414,12 +2470,17 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             
                             // TODO: Check term doesn't exist already
                             
-                            wp_insert_term(
+                            $term = wp_insert_term(
                                 ph_clean($_POST[ph_clean($_POST['taxonomy']) . '_name']), // the term 
                                 $_POST['taxonomy'] // the taxonomy
                             );
                             
                             // TODO: Check for errors returned from wp_insert_term()
+
+                            if ( ! is_wp_error( $term ) )
+                            {
+                                $current_id = isset( $term['term_id'] ) ? $term['term_id'] : 0;
+                            }
                         }
                         else
                         {
@@ -2430,6 +2491,26 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             
                             // TODO: Check for errors returned from wp_update_term()
                         }
+
+                        if ( $current_section == 'availability' )
+                        {
+                            $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+                            if ( !is_array($availability_departments) ) { $availability_departments = array(); }
+
+                            $departments = ph_get_departments();
+
+                            $availability_departments[$current_id] = array();
+                            foreach ( $departments as $key => $value )
+                            {
+                                if ( isset($_POST['department'][$key]) && $_POST['department'][$key] == '1' )
+                                {
+                                    $availability_departments[$current_id][] = $key;
+                                }
+                            }
+
+                            update_option( 'propertyhive_availability_departments', $availability_departments );
+                        }
+
                         break;
                     }
                     case "availability-delete":
@@ -2487,6 +2568,18 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                 }
                                 
                                 wp_reset_postdata();
+
+                                if ( $current_section == 'availability-delete' )
+                                {
+                                    // Remove from propertyhive_availability_departments option
+                                    $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+
+                                    if ( isset($availability_departments[$current_id]) )
+                                    {
+                                        unset($availability_departments[$current_id]);
+                                        update_option( 'propertyhive_availability_departments', $availability_departments );
+                                    }
+                                }
 
                                 if ( $_POST['taxonomy'] == 'property_type' || $_POST['taxonomy'] == 'commercial_property_type' || $_POST['taxonomy'] == 'location' )
                                 {
