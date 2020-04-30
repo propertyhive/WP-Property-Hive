@@ -31,12 +31,25 @@ class PH_Meta_Box_Property_Virtual_Tours {
                 
                 for ($i = 0; $i < $num_property_virtual_tours; ++$i)
                 {
+                    $label = get_post_meta($post->ID, '_virtual_tour_label_' . $i, TRUE);
+
                     echo '
-                    <p class="form-field virtual_tour_field ">
-                        <label for="virtual_tours_1">Virtual Tour URL</label>
-                        <input type="text" class="short" name="virtual_tour[]" id="" value="' . get_post_meta($post->ID, '_virtual_tour_' . $i, TRUE) . '" placeholder="http://"> 
-                        <a href="" class="button remove_virtual_tour"><span class="fa fa-trash"></span></a>
-                    </p>';
+                    <div>
+
+                        <p class="form-field virtual_tour_field ">
+                            <label for="">' . __( 'Virtual Tour URL', 'propertyhive' ) . '</label>
+                            <input type="text" class="short" name="virtual_tour[]" id="" value="' . get_post_meta($post->ID, '_virtual_tour_' . $i, TRUE) . '" placeholder="https://"> 
+                            <a href="" class="button remove_virtual_tour"><span class="fa fa-trash"></span></a>
+                        </p>
+
+                        <p class="form-field virtual_tour_field ">
+                            <label for="">' . __( 'Virtual Tour Label', 'propertyhive' ) . '</label>
+                            <input type="text" class="short" name="virtual_tour_label[]" id="" value="' . ( $label != '' ? $label : __( 'Virtual Tour', 'propertyhive' ) ) . '" placeholder="' . __( 'e.g. Virtual Tour', 'propertyhive' ) . '"> 
+                        </p>
+
+                        <hr>
+
+                    </div>';
                 }
             
             echo '</div>';
@@ -44,18 +57,29 @@ class PH_Meta_Box_Property_Virtual_Tours {
             echo '<div id="property_virtual_tour_template" style="display:none">';
 
             echo '
-            <p class="form-field virtual_tour_field ">
-                <label for="virtual_tours_1">Virtual Tour URL</label>
-                <input type="text" class="short" name="virtual_tour[]" id="" value="" placeholder="http://"> 
-                <a href="" class="button remove_virtual_tour"><span class="fa fa-trash"></span></a>
-            </p>';
+            <div>
+
+                <p class="form-field virtual_tour_field ">
+                    <label for="">' . __( 'Virtual Tour URL', 'propertyhive' ) . '</label>
+                    <input type="text" class="short" name="virtual_tour[]" id="" value="" placeholder="https://"> 
+                    <a href="" class="button remove_virtual_tour"><span class="fa fa-trash"></span></a>
+                </p>
+
+                <p class="form-field virtual_tour_field ">
+                    <label for="">' . __( 'Virtual Tour Label', 'propertyhive' ) . '</label>
+                    <input type="text" class="short" name="virtual_tour_label[]" id="" value="' . __( 'Virtual Tour', 'propertyhive' ) . '" placeholder="' . __( 'e.g. Virtual Tour', 'propertyhive' ) . '"> 
+                </p>
+
+                <hr>
+
+            </div>';
             
             echo '</div>';
         
             echo '            
             <p class="form-field">
                 <label for="">&nbsp;</label>
-                <a href="" class="button button-primary add_property_virtual_tour"><span class="fa fa-plus"></span> Add Virtual Tour</a>
+                <a href="" class="button button-primary add_property_virtual_tour"><span class="fa fa-plus"></span> ' . __( 'Add Virtual Tour', 'propertyhive' ) . '</a>
             </p>';
         
             do_action('propertyhive_property_virtual_tours_fields');
@@ -77,9 +101,9 @@ class PH_Meta_Box_Property_Virtual_Tours {
                     return false;
                 });
                 
-                jQuery(\'.remove_virtual_tour\').click(function()
+                jQuery(\'#property_virtual_tours\').on(\'click\', \'.remove_virtual_tour\', function()
                 {
-                    jQuery(this).parent().fadeOut(\'slow\', function()
+                    jQuery(this).parent().parent().fadeOut(\'slow\', function()
                     {
                         jQuery(this).remove();
                     });
@@ -110,6 +134,7 @@ class PH_Meta_Box_Property_Virtual_Tours {
             for ($i = ($new_num_property_virtual_tours - 1); $i < $existing_num_property_virtual_tours; ++$i)
             {
                 delete_post_meta($post_id, '_virtual_tour_' . $i);
+                delete_post_meta($post_id, '_virtual_tour_label_' . $i);
             }
         }
         
@@ -118,6 +143,7 @@ class PH_Meta_Box_Property_Virtual_Tours {
         for ($i = 0; $i < $new_num_property_virtual_tours; ++$i)
         {
             update_post_meta($post_id, '_virtual_tour_' . $i, ph_clean($_POST['virtual_tour'][$i]));
+            update_post_meta($post_id, '_virtual_tour_label_' . $i, ph_clean($_POST['virtual_tour_label'][$i]));
         }
     }
 }
