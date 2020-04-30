@@ -623,7 +623,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Declared compatibility for WordPress 4.7
 
 = 1.2.5 =
-* Introducing license keys. Can be [purchased here](https://wp-property-hive.com/product/12-month-license-key/) for priority support and updates to purchased add ons.
+* Introducing license keys. Can be [purchased here](https://wp-property-hive.com/product/12-month-license-key-subscription/) for priority support and updates to purchased add ons.
 
 = 1.2.4 =
 * Added new tab to property record which shows enquiries made about that property

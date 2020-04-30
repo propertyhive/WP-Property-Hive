@@ -106,7 +106,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
 					<p>Licenses are valid for 12 months from the date of purchase and exist on a per-site-basis. Should a license key not exist, your website will still function as it does now. However support will be limited and potentially slower than usual and you won’t receive updates to any purchased add ons.</p>
 
-					' . ( (!$valid_license) ? '<br><p><a href="https://wp-property-hive.com/product/12-month-license-key/" class="button button-primary" target="_blank">Purchase License Key</a></p>' : '' ), 'propertyhive' ),
+					' . ( (!$valid_license) ? '<br><p><a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" class="button button-primary" target="_blank">Purchase License Key</a></p>' : '' ), 'propertyhive' ),
 			),
 
 			array(
