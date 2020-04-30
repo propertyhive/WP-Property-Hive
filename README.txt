@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.4
-Stable tag: 1.4.57
+Tested up to: 5.4.1
+Stable tag: 1.4.58
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,17 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.58 =
+* Added ability to add labels to virtual tours. Will update the button shown on details page accordingly
+* Added ability to specify which availabilities apply to which departments. Only the relevant availabilities will then be shown when editing a property
+* Ensured contact type is set accordingly based on which list you come from when adding new contact
+* Ensured full address is shown in enquiry body to agent instead of display address
+* Fixed typo in text domain: properthive
+* Fixed typo in enquiry form success message: succesfully
+* Fixed typo in settings: atttached
+* Updated license key links to new subscription product URL
+* Declared compatibility for WordPress 5.4.1
 
 = 1.4.57 =
 * Corrected issue with property owner address not saving when adding appraisal
