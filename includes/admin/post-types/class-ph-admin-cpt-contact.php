@@ -80,8 +80,23 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 
 		add_action( 'manage_posts_extra_tablenav', array( $this, 'generate_applicant_list_action') );
 
+		add_filter( 'admin_url', array( $this, 'append_contact_type_to_add_new_url' ), 10, 2 );
+
+
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
+	}
+
+	public function append_contact_type_to_add_new_url( $url, $path ) 
+	{
+	    if ( $path === 'post-new.php?post_type=contact' ) 
+	    {
+	    	if ( isset($_GET['_contact_type']) )
+	    	{
+		        $url .= '&contact_type=' . ph_clean($_GET['_contact_type']);
+		    }
+	    }
+	    return $url;
 	}
 
 	public function ph_message_admin_notice()

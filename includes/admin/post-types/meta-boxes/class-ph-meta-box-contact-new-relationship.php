@@ -33,7 +33,7 @@ class PH_Meta_Box_Contact_New_Relationship {
                 'applicant' => 'Applicant',
                 'thirdparty' => 'Third Party'
             ),
-            'value' => 'applicant'
+            'value' => isset($_GET['contact_type']) && in_array($_GET['contact_type'], array('applicant', 'thirdparty')) ? $_GET['contact_type'] : 'applicant'
         ) );
         
 
