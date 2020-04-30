@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 <form name="ph_property_enquiry" class="property-enquiry-form" action="" method="post">
     
     <div id="enquirySuccess" style="display:none;" class="alert alert-success alert-box success">
-        <?php _e( 'Thank you. Your enquiry has been sent succesfully.', 'propertyhive' ); ?>
+        <?php _e( 'Thank you. Your enquiry has been sent successfully.', 'propertyhive' ); ?>
     </div>
     <div id="enquiryError" style="display:none;" class="alert alert-danger alert-box">
         <?php _e( 'An error occurred whilst trying to send your enquiry. Please try again.', 'propertyhive' ); ?>
