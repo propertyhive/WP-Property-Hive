@@ -123,7 +123,7 @@ class PH_Plugin_Updates {
 		echo '<tr class="plugin-update-tr' . $active_class . '">
 			<td colspan="3" class="plugin-update colspanchange">
 				<div class="update-message notice inline notice-warning notice-alt">
-					<p>An update is available for this add on. It is recommended that you update to ensure you receive the latest features and bug fixes. You can access all updates to any purchased add ons for 12 months by <a href="https://wp-property-hive.com/product/12-month-license-key/" target="_blank">purchasing a license key</a>.</p>
+					<p>An update is available for this add on. It is recommended that you update to ensure you receive the latest features and bug fixes. You can access all updates to any purchased add ons for 12 months by <a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" target="_blank">purchasing a license key</a>.</p>
 				</div>
 			</td>
 		</tr>';

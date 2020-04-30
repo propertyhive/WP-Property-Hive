@@ -113,7 +113,7 @@ class PH_Admin {
                 We have documentation <a href="https://wp-property-hive.com/documentation/" target="_blank">available on our website</a> covering setup advice, help with theming, and more.</p>
 
                 <p><strong style="font-size:14px;">Priority One-To-One Support</strong><br>
-                If you require help quickly, or wish to discuss a bespoke requirement, then <a href="https://wp-property-hive.com/product/12-month-license-key/" target="_blank">priority support</a> might be best for you. With a license key priced at just £49.99 per year you'll not only get priority support but also updates to any add ons you've purchased.</p>
+                If you require help quickly, or wish to discuss a bespoke requirement, then <a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" target="_blank">priority support</a> might be best for you. With a license key priced at just £49.99 per year you'll not only get priority support but also updates to any add ons you've purchased.</p>
 
                 <p><strong style="font-size:14px;">Our Support Policy</strong><br>
                 Our <a href="https://wp-property-hive.com/support-policy/" target="_blank">Support Policy is available to view here</a> and outlines how you can get in touch, how we will (and won't) help, and how to report bugs.</p>
