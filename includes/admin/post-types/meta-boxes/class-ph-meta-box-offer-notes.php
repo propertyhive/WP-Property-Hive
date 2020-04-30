@@ -95,7 +95,7 @@ class PH_Meta_Box_Offer_Notes {
                             {
                         ?>
                         <br>
-                        <?php echo __( 'Note originally entered on', 'properthive' ); ?> <a href="<?php echo get_edit_post_link($note->comment_post_ID); ?>" style="color:inherit;"><?php echo __( ucfirst(get_post_type($note->comment_post_ID)), 'propertyhive' ); ?></a>
+                        <?php echo __( 'Note originally entered on', 'propertyhive' ); ?> <a href="<?php echo get_edit_post_link($note->comment_post_ID); ?>" style="color:inherit;"><?php echo __( ucfirst(get_post_type($note->comment_post_ID)), 'propertyhive' ); ?></a>
                         <?php
                             }
                         ?>
