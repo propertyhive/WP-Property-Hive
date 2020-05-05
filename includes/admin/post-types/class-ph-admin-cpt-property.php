@@ -92,7 +92,8 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		$screen = get_current_screen();
         if ($screen->id == 'property' && $post->post_type == 'property' && $post->post_parent != 0 && $post->post_parent != '')
         {
-            $message = __( "This property is a commercial unit belonging to", 'propertyhive' ) . ' <a href="' . get_edit_post_link( $post->post_parent ) . '">' . get_the_title($post->post_parent) . '</a>';
+        	$property = new PH_Property((int)$post->post_parent);
+            $message = __( "This property is a unit belonging to", 'propertyhive' ) . ' <a href="' . get_edit_post_link( $post->post_parent ) . '">' . $property->get_formatted_full_address() . '</a>';
             echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
         }
     }
