@@ -56,18 +56,27 @@ class PH_Meta_Box_Property_Department {
         }
         if ( $parent_post !== FALSE || ( isset($post->post_parent) && $post->post_parent != '' && $post->post_parent != 0 ) )
         {
-            foreach ( $departments as $key => $value )
+            $parent_department = get_post_meta( $post->post_parent, '_department', TRUE );
+            if ($parent_post !== FALSE)
             {
-                if ( $key != 'commercial' )
+                $parent_department = get_post_meta( $parent_post, '_department', TRUE );
+            }
+
+            if ( $parent_department == 'commercial' )
+            {
+                foreach ( $departments as $key => $value )
                 {
-                    unset($department_options[$key]);
+                    if ( $key != 'commercial' )
+                    {
+                        unset($department_options[$key]);
+                    }
                 }
             }
         }
         else
         {
             // Make sure property doesn't have any children
-            $args = array(
+            /*$args = array(
                 'post_parent'       => $post->ID,
                 'post_type'         => 'property', 
                 'posts_per_page'    => 1,
@@ -84,7 +93,7 @@ class PH_Meta_Box_Property_Department {
                     }
                 }
             }
-            wp_reset_postdata();
+            wp_reset_postdata();*/
         }
         $value = get_post_meta( $post->ID, '_department', TRUE );
         if ( $parent_post !== FALSE )
