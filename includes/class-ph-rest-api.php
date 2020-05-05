@@ -63,15 +63,23 @@ class PH_Rest_Api {
 
 	public function modify_rest_property_query($args, $request)
 	{
-		if ( !isset( $args['meta_query'] ) )
+		/*if ( !isset( $args['meta_query'] ) )
 		{
 			$args['meta_query'] = array();
-		}
+		}*/
 
-		$args['meta_query'][] = array(
-			'key' => '_on_market',
-			'value' => 'yes'
-		);
+		$PH_Query = new PH_Query();
+
+		// Meta query
+		$args['meta_query'] = $PH_Query->get_meta_query();
+        
+        // Tax query
+        $args['tax_query'] = $PH_Query->get_tax_query();
+
+        // Date query
+		$args['date_query'] = $PH_Query->get_date_query();
+
+		$args['nopaging'] = true;
 
 		$args = apply_filters( 'propertyhive_rest_api_query_args', $args );
 		
