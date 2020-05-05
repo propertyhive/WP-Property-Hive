@@ -114,6 +114,7 @@ class PH_Rest_Api {
 			'features',
 			'description',
 			'office',
+			'virtual_tours',
 		);
 
 		$field_array = apply_filters( 'propertyhive_rest_api_property_fields', $field_array );
@@ -150,6 +151,11 @@ class PH_Rest_Api {
 		            				'email_address' => $property->office_email_address,
 		            			); 
 		            			break; 
+		            		}
+		            		case "virtual_tours":
+		            		{
+		            			return $property->get_virtual_tours();
+		            			break;
 		            		}
 		            		default:
 		            		{
