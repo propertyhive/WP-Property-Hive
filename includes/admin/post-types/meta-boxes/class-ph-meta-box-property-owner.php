@@ -282,7 +282,6 @@ class PH_Meta_Box_Property_Owner {
                 'label' => __( 'Full Name', 'propertyhive' ), 
                 'desc_tip' => false, 
                 'placeholder' => __( 'e.g. Mr & Mrs Jones, Ms Jane Smith', 'propertyhive' ), 
-                //'description' => __( 'Stock quantity. If this is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.', 'propertyhive' ), 
                 'type' => 'text'
             ) );
             
@@ -293,7 +292,6 @@ class PH_Meta_Box_Property_Owner {
                 'label' => __( 'Building Name / Number', 'propertyhive' ), 
                 'desc_tip' => false, 
                 'placeholder' => __( 'e.g. Thistle Cottage, or Flat 10', 'propertyhive' ), 
-                //'description' => __( 'Stock quantity. If this is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.', 'propertyhive' ), 
                 'type' => 'text'
             ) );
             
