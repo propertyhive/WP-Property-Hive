@@ -13,15 +13,18 @@
 			echo '<div style="background:#F3F3F3; border:1px solid #DDD; padding:20px;">
                 
                 <h3 style="padding-top:0; margin-top:0;">Applicant Requirements</h3>';
+
+            $requirements = array();
+
             if ( 
                 isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' &&
                 isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0
             )
             {
-                echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                    <strong>Maximum Price:</strong><br>
-                    &pound;' . number_format($applicant_profile['max_price']) . '
-                </div>';
+                $requirements[] = array(
+                    'label' => __( 'Maximum Price', 'propertyhive' ),
+                    'value' => '&pound;' . number_format($applicant_profile['max_price']),
+                );
             }
             if ( 
                 isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales'
@@ -59,10 +62,10 @@
                         $match_price_range_lower != '' && $match_price_range_higher != ''
                     )
                     {
-                        echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                            <strong>Match Price Range:</strong><br>
-                            &pound;' . number_format($match_price_range_lower) . ' to &pound;' . number_format($match_price_range_higher) . '
-                        </div>';
+                        $requirements[] = array(
+                            'label' => __( 'Match Price Range', 'propertyhive' ),
+                            'value' => '&pound;' . number_format($match_price_range_lower) . ' to &pound;' . number_format($match_price_range_higher),
+                        );
                     }
                 }
             }
@@ -71,10 +74,10 @@
                 isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0
             )
             {
-                echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                    <strong>Maximum Rent:</strong><br>
-                    &pound;' . number_format($applicant_profile['max_rent']) . ' ' . $applicant_profile['rent_frequency'] . '
-                </div>';
+                $requirements[] = array(
+                    'label' => __( 'Maximum Rent', 'propertyhive' ),
+                    'value' => '&pound;' . number_format($applicant_profile['max_rent']) . ' ' . $applicant_profile['rent_frequency'],
+                );
             }
             if ( 
                 isset($applicant_profile['department']) && 
@@ -83,10 +86,10 @@
             {
                 if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
                 {
-                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                        <strong>Minimum Beds:</strong><br>
-                        ' . $applicant_profile['min_beds'] . '
-                    </div>';
+                    $requirements[] = array(
+                        'label' => __( 'Minimum Beds', 'propertyhive' ),
+                        'value' => $applicant_profile['min_beds'],
+                    );
                 }
                 if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
                 {
@@ -94,10 +97,11 @@
                     if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
                     {
                         $sliced_terms = array_slice( $terms, 0, 2 );
-                        echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                            <strong>Property Types:</strong><br>
-                            ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ) . '
-                        </div>';
+
+                        $requirements[] = array(
+                            'label' => __( 'Property Types', 'propertyhive' ),
+                            'value' => implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ),
+                        );
                     }
                 }
             }
@@ -118,10 +122,10 @@
                         $available_as[] = 'To Rent';
                     }
 
-                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                        <strong>Available As:</strong><br>
-                        ' . implode(", ", $available_as) .'
-                    </div>';
+                    $requirements[] = array(
+                        'label' => __( 'Available As', 'propertyhive' ),
+                        'value' => implode(", ", $available_as),
+                    );
                 }
 
                 if ( 
@@ -130,9 +134,8 @@
                     (isset($applicant_profile['max_floor_area_actual']) && $applicant_profile['max_floor_area_actual'] != '')
                 )
                 {
-                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                        <strong>Floor Area:</strong><br>';
-                    $sizes = array('min' => '', 'max');
+                    $sizes = array('min' => '', 'max' => '');
+                    $value = '';
                     if ( isset($applicant_profile['min_floor_area_actual']) && $applicant_profile['min_floor_area_actual'] != '' )
                     {
                         $sizes['min'] = $applicant_profile['min_floor_area_actual'];
@@ -143,17 +146,24 @@
                     }
                     if ( $sizes['min'] != '' && $sizes['max'] != '' )
                     {
-                        echo number_format($sizes['min']) . ' - ' . number_format($sizes['max']) . ' Sq Ft';
+                        $value = number_format($sizes['min']) . ' - ' . number_format($sizes['max']) . ' Sq Ft';
                     }
                     if ( $sizes['min'] != '' && $sizes['max'] == '' )
                     {
-                        echo 'From ' . number_format($sizes['min']) . ' Sq Ft';
+                        $value = 'From ' . number_format($sizes['min']) . ' Sq Ft';
                     }
                     if ( $sizes['min'] == '' && $sizes['max'] != '' )
                     {
-                        echo 'Up To ' . number_format($sizes['max']) . ' Sq Ft';
+                        $value = 'Up To ' . number_format($sizes['max']) . ' Sq Ft';
                     }
-                    echo '</div>';
+
+                    if ( $value != '' )
+                    {
+                        $requirements[] = array(
+                            'label' => __( 'Floor Area', 'propertyhive' ),
+                            'value' => $value,
+                        );
+                    }
                 }
 
                 if ( isset($applicant_profile['commercial_property_types']) && is_array($applicant_profile['commercial_property_types']) && !empty($applicant_profile['commercial_property_types']) )
@@ -162,10 +172,11 @@
                     if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
                     {
                         $sliced_terms = array_slice( $terms, 0, 2 );
-                        echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                            <strong>Property Types:</strong><br>
-                            ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ) . '
-                        </div>';
+
+                        $requirements[] = array(
+                            'label' => __( 'Property Types', 'propertyhive' ),
+                            'value' => implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ),
+                        );
                     }
                 }
             }
@@ -175,9 +186,28 @@
                 if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
                 {
                     $sliced_terms = array_slice( $terms, 0, 2 );
-                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+
+                    $requirements[] = array(
+                        'label' => __( 'Locations', 'propertyhive' ),
+                        'value' => implode(", ", $sliced_terms) . ( (count($terms) > 2) ? ' <span title="' . addslashes( implode(", ", $terms) ) .'">+ ' . (count($terms) - 2) . ' more</span>' : '' ),
+                    );
+
+                    /*echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
                         <strong>Locations:</strong><br>
                         ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? ' <span title="' . addslashes( implode(", ", $terms) ) .'">+ ' . (count($terms) - 2) . ' more</span>' : '' ) . '
+                    </div>';*/
+                }
+            }
+
+            $requirements = apply_filters( 'propertyhive_applicant_requirements_display', $requirements, $contact_id, $applicant_profile );
+
+            if ( !empty($requirements) )
+            {
+                foreach ( $requirements as $requirement )
+                {
+                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
+                        <strong>' . $requirement['label'] . ':</strong><br>
+                        ' . $requirement['value'] . '
                     </div>';
                 }
             }

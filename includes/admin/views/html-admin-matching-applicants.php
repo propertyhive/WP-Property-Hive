@@ -57,7 +57,10 @@
                     $requirements = array();
                     if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
                     {
-                        $requirements[] = 'Max Price: &pound;' . number_format($applicant['applicant_profile']['max_price']);
+                        $requirements[] = array(
+                            'label' => __( 'Maximum Price', 'propertyhive' ),
+                            'value' => '&pound;' . number_format($applicant['applicant_profile']['max_price']),
+                        );
                     }
                     if ( $percentage_lower != '' && $percentage_higher != '' )
                     {
@@ -91,12 +94,18 @@
                             $match_price_range_lower != '' && $match_price_range_higher != ''
                         )
                         {
-                            $requirements[] = 'Match Price Range: &pound;' . number_format($match_price_range_lower) . ' to &pound;' . number_format($match_price_range_higher);
+                            $requirements[] = array(
+                                'label' => __( 'Maximum Price Range', 'propertyhive' ),
+                                'value' => '&pound;' . number_format($match_price_range_lower) . ' to &pound;' . number_format($match_price_range_higher),
+                            );
                         }
                     }
                     if ( isset($applicant['applicant_profile']['min_beds']) && $applicant['applicant_profile']['min_beds'] != '' )
                     {
-                        $requirements[] = 'Min Beds: ' . $applicant['applicant_profile']['min_beds'];
+                        $requirements[] = array(
+                            'label' => __( 'Minimum Beds', 'propertyhive' ),
+                            'value' => $applicant['applicant_profile']['min_beds'],
+                        );
                     }
                     if ( isset($applicant['applicant_profile']['property_types']) && is_array($applicant['applicant_profile']['property_types']) && !empty($applicant['applicant_profile']['property_types']) )
                     {
@@ -106,20 +115,34 @@
                     {
                         //$requirements[] = 'Max Price: ' . $applicant['applicant_profile']['max_price'];
                     }
+
+                    $requirements = apply_filters( 'propertyhive_applicant_requirements_display', $requirements, $applicant['contact_id'], $applicant['applicant_profile'] );
+                    
                     if ( isset($applicant['applicant_profile']['notes']) && $applicant['applicant_profile']['notes'] != '' )
                     {
-                        $requirements[] = 'Notes: ' . nl2br($applicant['applicant_profile']['notes']);
+                        $requirements[] = array(
+                            'label' => __( 'Notes', 'propertyhive' ),
+                            'value' => nl2br( strip_tags($applicant['applicant_profile']['notes']) ),
+                        );
                     }
-                    $requirements = implode("<br>", $requirements);
-                    if ( $requirements == '' )
+
+                    $requirements_output = '';
+                    if ( empty($requirements) )
                     {
-                        $requirements = '-';
+                        $requirements_output = '-';
+                    }
+                    else
+                    {
+                        foreach ( $requirements as $requirement )
+                        {
+                            $requirements_output .= $requirement['label'] . ': ' . $requirement['value'] . '<br>';
+                        }
                     }
 
                     $columns = array(
                         'name' => '<strong><a href="' . get_edit_post_link($applicant['contact_id']) . '" target="_blank">' . get_the_title($applicant['contact_id']) . '</a>' . ( ( isset($applicant['applicant_profile']['grading']) && $applicant['applicant_profile']['grading'] == 'hot' ) ? '<br><span style="color:#C00;">('. __( 'Hot Applicant', 'propertyhive' ) . ')</span>' : '' ) . '</strong>',
                         'contact_details' => 'T: ' . get_post_meta( $applicant['contact_id'], '_telephone_number', TRUE ) . '<br>E: ' . $email_address,
-                        'requirements' => $requirements,
+                        'requirements' => $requirements_output,
                     );
 
                     $columns = apply_filters( 'propertyhive_matching_applicants_row_data', $columns, $applicant, $property->id );
