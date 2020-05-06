@@ -993,8 +993,8 @@ class PH_Meta_Box_Contact_Relationships {
                 $applicant_profile['send_matching_properties'] = ( ( isset($_POST['_send_matching_properties_' . $i]) ) ? ph_clean($_POST['_send_matching_properties_' . $i]) : '' );
                 $applicant_profile['auto_match_disabled'] = ( ( isset($_POST['_auto_match_disabled_' . $i]) ) ? ph_clean($_POST['_auto_match_disabled_' . $i]) : '' );
 
-                $applicant_profile['grading'] = ph_clean($_POST['_grading_' . $i]) == 'yes' ? 'hot' : '';
-                if ( ph_clean($_POST['_grading_' . $i]) == 'yes' )
+                $applicant_profile['grading'] = ( isset($_POST['_grading_' . $i]) && ph_clean($_POST['_grading_' . $i]) == 'yes' ) ? 'hot' : '';
+                if ( isset($_POST['_grading_' . $i]) && ph_clean($_POST['_grading_' . $i]) == 'yes' )
                 {
                     $hot_applicant = 'yes';
                 }
