@@ -694,6 +694,8 @@ class PH_Meta_Box_Contact_Relationships {
                         </select></p>
                     <?php
 
+                        do_action('propertyhive_contact_applicant_requirements_details_fields', $thepostid, $key);
+
                         // Additional Requirement Notes
                         propertyhive_wp_textarea_input( array( 
                             'id' => '_applicant_requirement_notes_' . $key, 
@@ -998,6 +1000,8 @@ class PH_Meta_Box_Contact_Relationships {
                 }
 
                 update_post_meta( $post_id, '_applicant_profile_' . $i, $applicant_profile );
+
+                do_action( 'propertyhive_save_contact_applicant_requirements', $post_id, $i );
             }
         }
 
@@ -1015,6 +1019,8 @@ class PH_Meta_Box_Contact_Relationships {
             }
         }
         update_post_meta( $post_id, '_third_party_categories', $third_party_categories );
+
+        do_action( 'propertyhive_save_contact_relationships', $post_id );
     }
 
 }

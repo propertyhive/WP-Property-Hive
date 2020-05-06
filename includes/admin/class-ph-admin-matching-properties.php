@@ -465,6 +465,8 @@ class PH_Admin_Matching_Properties {
             }
             $args['tax_query'] = $tax_query;
 
+            $args = apply_filters( 'propertyhive_matching_properties_args', $args, $contact_id, $applicant_profile );
+
             $properties_query = new WP_Query( $args );
 
             if ( $properties_query->have_posts() )
