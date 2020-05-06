@@ -79,8 +79,6 @@ class PH_Rest_Api {
         // Date query
 		$args['date_query'] = $PH_Query->get_date_query();
 
-		$args['nopaging'] = true;
-
 		$args = apply_filters( 'propertyhive_rest_api_query_args', $args );
 		
 		return $args;
