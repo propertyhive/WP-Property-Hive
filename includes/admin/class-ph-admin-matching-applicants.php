@@ -498,7 +498,9 @@ class PH_Admin_Matching_Applicants {
                                     ++$elements_checked;
                                 }
 
-                                if ( $matching_elements == $elements_checked )
+                                $additional_checks = apply_filters( 'propertyhive_matching_applicants_check', true, $property, get_the_ID(), $applicant_profile );
+
+                                if ( $additional_checks === true && $matching_elements == $elements_checked )
                                 {  
                                     $applicant_profile['applicant_profile_id'] = $i;
 
