@@ -320,7 +320,7 @@ class PH_Post_types {
                     'show_ui'               => false,
                     'capability_type'       => 'post',
                     'map_meta_cap'          => true,
-                    'publicly_queryable'    => true,
+                    'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
                     'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
                     'query_var'             => true,
