@@ -867,13 +867,17 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
         {
             foreach ($virtual_tours as $virtual_tour)
             {
+                $attributes = array('target' => '_blank');
+                if ( strpos($virtual_tour['url'], 'yout') !== FALSE || strpos($virtual_tour['url'], 'vimeo') !== FALSE )
+                {
+                    $attributes['data-fancybox'] = '';
+                }
+
                 $actions[] = array(
                     'href' => $virtual_tour['url'],
                     'label' => __( $virtual_tour['label'], 'propertyhive' ),
                     'class' => 'action-virtual-tour',
-                    'attributes' => array(
-                        'target' => '_blank'
-                    )
+                    'attributes' => $attributes,
                 );
             }
         }
