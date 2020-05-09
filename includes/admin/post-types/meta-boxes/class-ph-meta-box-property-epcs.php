@@ -154,8 +154,6 @@ class PH_Meta_Box_Property_Epcs {
                 echo '</ul></div>';
                 
                 echo '<a href="" class="button button-primary ph_upload_epc_button">' . __('Add EPCs', 'propertyhive') . '</a>';
-    
-                do_action('propertyhive_property_epcs_fields');
     	        
                 echo '<input type="hidden" name="previous_epc_attachment_ids" id="previous_epc_attachment_ids" value="' . $input_value . '">';
                 echo '<input type="hidden" name="epc_attachment_ids" id="epc_attachment_ids" value="' . $input_value . '">';
@@ -332,9 +330,11 @@ class PH_Meta_Box_Property_Epcs {
                             jQuery(\'#property_epcs_grid ul\').append(mediaHTML);
                         }
                     }
-              </script>';
+                </script>';
 
-          }
+            }
+
+            do_action('propertyhive_property_epcs_fields');
                
           echo '</div>';
         
