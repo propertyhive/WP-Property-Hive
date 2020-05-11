@@ -325,7 +325,7 @@ class PH_Meta_Box_Property_Epcs {
                             
                             mediaHTML += \'<li id="epc_\' + attachment.id + \'">\';
                             mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>\';
-                            mediaHTML += \'<img src="\' + image + \'" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></li>\';
+                            mediaHTML += \'<a href="\' + image + \'" target="_blank"><img src="\' + image + \'" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></a></li>\';
                             
                             jQuery(\'#property_epcs_grid ul\').append(mediaHTML);
                         }
