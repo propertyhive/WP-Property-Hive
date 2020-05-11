@@ -76,6 +76,41 @@ function toggleDepartmentFields()
                 {
                     jQuery(this).find('.commercial-only').css('display', display);
                 }
+
+                if ( jQuery(this).find('[name=\'availability\']').length > 0 && typeof availability_departments !== "undefined" )
+                {
+                    if ( Object.keys(availability_departments).length > 0 )
+                    {
+                        jQuery(this).find('[name=\'availability\']').empty();
+
+                        for ( var i in availabilities_order )
+                        {
+                            var availability_id = availabilities_order[i];
+                            var availability_text = availabilities[availabilities_order[i]];
+
+                            var this_availability_departments = [];
+                            var availability_departments_exist = true;
+                            if ( typeof availability_departments[availability_id] !== 'undefined' )
+                            {
+                                this_availability_departments = availability_departments[availability_id];
+                            }
+                            else
+                            {
+                                availability_departments_exist = false;
+                            }
+
+                            if ( jQuery.inArray( selectedDepartment, this_availability_departments ) > -1 || !availability_departments_exist )
+                            {
+                                jQuery(this).find('[name=\'availability\']').append( jQuery("<option />").val(availability_id).text(availability_text) );
+                            }
+                            jQuery(this).find('[name=\'availability\']').val(selected_availability);
+                        }
+                        if ( jQuery(this).find('[name=\'availability\']').val() == '' || jQuery(this).find('[name=\'availability\']').val() == null )
+                        {
+                            jQuery(this).find('[name=\'availability\']').val( jQuery(this).find('[name=\'availability\'] option:first').val() );
+                        }
+                    }
+                }
             }
         });
     }

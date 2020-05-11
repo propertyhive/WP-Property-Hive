@@ -1355,6 +1355,24 @@ function ph_form_field( $key, $field )
                 $output .= '</select>';
 
                 $output .= $field['after'];
+
+                if ( $field['type'] == 'availability' )
+                {
+                    $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+                    if ( !is_array($availability_departments) ) { $availability_departments = array(); }
+
+                    if ( !empty($availability_departments) )
+                    {
+?>
+<script>
+var selected_availability = '<?php echo ( isset($_REQUEST[$key]) && $_REQUEST[$key] != '' ? (int)$_REQUEST[$key] : '' ); ?>';
+var availability_departments = <?php echo json_encode($availability_departments); ?>;
+var availabilities = <?php echo json_encode($options); ?>;
+var availabilities_order = <?php echo json_encode(array_keys($options)); ?>;
+</script>
+<?php
+                    }
+                }
             }
         }
     }
