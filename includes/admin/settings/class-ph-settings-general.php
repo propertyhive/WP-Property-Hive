@@ -95,7 +95,6 @@ class PH_Settings_General extends PH_Settings_Page {
             
         $settings[] = array(
             'title' => __( 'Property Search Results Page', 'propertyhive' ),
-            //'desc'      => '<br/>' . sprintf( __( 'The base page can also be used in your <a href="%s">product permalinks</a>.', 'propertyhive' ), admin_url( 'options-permalink.php' ) ),
             'id'        => 'propertyhive_search_results_page_id',
             'type'      => 'single_select_page',
             'default'   => '',
@@ -380,6 +379,19 @@ class PH_Settings_General extends PH_Settings_Page {
                     'LIKE' => __( 'Perform Loose Search', 'propertyhive' ),
                 ),
                 'desc_tip'  => __( 'Applicable if you allow users to search by entering a location. If \'Match Keyword Exactly\' is selected a search for \'Walton\' would not return properties in \'Walton On Thames\', but would prevent properties in \'Lincolnshire\' appearing when searching for \'Lincoln\'. \'Perform Loose Search\' would do the opposite.', 'propertyhive' )
+            ),
+
+            array(
+                'title' => __( 'Commercial Display In Search Results', 'propertyhive' ),
+                'id'        => 'propertyhive_commercial_display',
+                'type'      => 'select',
+                'default'   => '',
+                'css'       => 'min-width:300px;',
+                'options'   => array(
+                    '' => __( 'Display top level properties and units', 'propertyhive' ),
+                    'top_level_only' => __( 'Display top level properties only', 'propertyhive' ),
+                    'top_level_only_but_units_when_filtered' => __( 'Display top level properties only but units as well if matching filters', 'propertyhive' ),
+                ),
             ),
 
             array(

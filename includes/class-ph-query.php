@@ -61,10 +61,53 @@ class PH_Query {
 			add_filter( 'the_posts', array( $this, 'the_posts' ), 11, 2 );
 			add_action( 'wp', array( $this, 'remove_property_query' ) );
 			add_action( 'wp', array( $this, 'remove_ordering_args' ) );
+        	add_filter( 'posts_where', array( $this, 'commercial_display_where' ), 10, 2 );
 		}
 
 		$this->init_query_vars();
 	}
+
+    public function commercial_display_where( $where, $query ) 
+    {
+        if ( $query->get('post_type') == 'property' )
+        {
+        	global $wpdb;
+
+        	$commercial_display = get_option( 'propertyhive_commercial_display', '' );
+
+        	switch ( $commercial_display )
+        	{
+        		case "top_level_only":
+        		{
+        			$where .= " AND $wpdb->posts.post_parent=0 ";
+        			break;
+        		}
+        		case "top_level_only_but_units_when_filtered":
+        		{
+        			$unit_filter_parameters = apply_filters( 'propertyhive_unit_filter_parameters', array( 'minimum_floor_area', 'maximum_floor_area' ) );
+        			$unit_filter_parameter_found = false;
+        			foreach ( $unit_filter_parameters as $parameter )
+        			{
+        				if ( isset($_REQUEST[$parameter]) && ph_clean($_REQUEST[$parameter]) != '' )
+        				{
+        					$unit_filter_parameter_found = true;
+        				}
+        			}
+        			if ( !$unit_filter_parameter_found )
+        			{
+        				$where .= " AND $wpdb->posts.post_parent=0 ";
+        			}
+        			break;
+        		}
+        		default:
+        		{
+        			// do nothing
+        		}
+        	}
+        }
+
+        return $where;
+    }
 
 	/**
 	 * Init query vars by loading options.
