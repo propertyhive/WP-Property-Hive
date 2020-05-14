@@ -73,8 +73,6 @@ class PH_Frontend_Scripts {
 		    wp_enqueue_script( 'flexslider', $assets_path . 'js/flexslider/jquery.flexslider' . $suffix . '.js', array( 'jquery' ), '2.2.2', true );
             wp_enqueue_script( 'flexslider-init', $assets_path . 'js/flexslider/jquery.flexslider.init' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
             wp_enqueue_style( 'flexslider_css', $assets_path . 'css/flexslider.css' );
-
-		    wp_enqueue_script( 'ph-single-property' );
         }
 
 		// Global frontend scripts
