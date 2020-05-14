@@ -1,21 +1,21 @@
 <?php
 /**
- * Elementor Property Type Widget.
+ * Elementor Property Price Widget.
  *
  * @since 1.0.0
  */
-class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
+class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
 
 	public function get_name() {
-		return 'property-type';
+		return 'property-price';
 	}
 
 	public function get_title() {
-		return __( 'Property Type', 'propertyhive' );
+		return __( 'Price', 'propertyhive' );
 	}
 
 	public function get_icon() {
-		return 'fa fa-home';
+		return 'fa fa-pound-sign';
 	}
 
 	public function get_categories() {
@@ -23,7 +23,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'property hive', 'propertyhive', 'property', 'property type', 'type' ];
+		return [ 'property hive', 'propertyhive', 'property', 'price' ];
 	}
 
 	protected function _register_controls() {
@@ -31,7 +31,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'style_section',
 			[
-				'label' => __( 'Property Type', 'propertyhive' ),
+				'label' => __( 'Price', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
 			]
 		);
@@ -39,15 +39,15 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			[
-				'name' => 'typography',
+				'name' => 'price_typography',
 				'label' => __( 'Typography', 'propertyhive' ),
 				'scheme' => \Elementor\Scheme_Typography::TYPOGRAPHY_1,
-				'selector' => '{{WRAPPER}} .elementor-widget-property-type',
+				'selector' => '{{WRAPPER}} .price',
 			]
 		);
 
 		$this->add_control(
-			'color',
+			'price_color',
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
@@ -56,7 +56,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 					'value' => \Elementor\Scheme_Color::COLOR_1,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementor-widget-property-type' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .price' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -75,10 +75,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
-        if ( $property->property_type != '' )
-		{
-	        echo '<div class="elementor-widget-property-type">' . $property->property_type . '</div>';
-	    }
+		propertyhive_template_single_price();
 
 	}
 
