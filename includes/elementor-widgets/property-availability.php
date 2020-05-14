@@ -1,21 +1,21 @@
 <?php
 /**
- * Elementor Property Type Widget.
+ * Elementor Property Availability Widget.
  *
  * @since 1.0.0
  */
-class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
+class Elementor_Property_Availability_Widget extends \Elementor\Widget_Base {
 
 	public function get_name() {
-		return 'property-type';
+		return 'property-availability';
 	}
 
 	public function get_title() {
-		return __( 'Property Type', 'propertyhive' );
+		return __( 'Availability', 'propertyhive' );
 	}
 
 	public function get_icon() {
-		return 'fa fa-home';
+		return 'fa fa-tag';
 	}
 
 	public function get_categories() {
@@ -23,7 +23,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'property hive', 'propertyhive', 'property', 'property type', 'type' ];
+		return [ 'property hive', 'propertyhive', 'property', 'availability', 'status' ];
 	}
 
 	protected function _register_controls() {
@@ -31,7 +31,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'style_section',
 			[
-				'label' => __( 'Property Type', 'propertyhive' ),
+				'label' => __( 'Availability', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
 			]
 		);
@@ -42,7 +42,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
 				'scheme' => \Elementor\Scheme_Typography::TYPOGRAPHY_1,
-				'selector' => '{{WRAPPER}} .elementor-widget-property-type',
+				'selector' => '{{WRAPPER}} .elementor-widget-availability',
 			]
 		);
 
@@ -56,7 +56,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 					'value' => \Elementor\Scheme_Color::COLOR_1,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementor-widget-property-type' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementor-widget-availability' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -75,9 +75,9 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
-        if ( $property->property_type != '' )
+		if ( $property->availability != '' )
 		{
-	        echo '<div class="elementor-widget-property-type">' . $property->property_type . '</div>';
+	        echo '<div class="elementor-widget-availability">' . $property->availability . '</div>';
 	    }
 
 	}

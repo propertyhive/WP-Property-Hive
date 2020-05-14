@@ -6,113 +6,88 @@
  */
 class Elementor_Property_Meta_Widget extends \Elementor\Widget_Base {
 
-	/**
-	 * Get widget name.
-	 *
-	 * Retrieve widget name.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string Widget name.
-	 */
 	public function get_name() {
 		return 'property-meta';
 	}
 
-	/**
-	 * Get widget title.
-	 *
-	 * Retrieve widget title.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string Widget title.
-	 */
 	public function get_title() {
-		return __( 'Property Meta', 'plugin-name' );
+		return __( 'Property Meta', 'propertyhive' );
 	}
 
-	/**
-	 * Get widget icon.
-	 *
-	 * Retrieve widget icon.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return string Widget icon.
-	 */
 	public function get_icon() {
-		return 'fa fa-code';
+		return 'fa fa-list';
 	}
 
-	/**
-	 * Get widget categories.
-	 *
-	 * Retrieve the list of categories the widget belongs to.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return array Widget categories.
-	 */
 	public function get_categories() {
 		return [ 'property-hive' ];
 	}
 
-	/**
-	 * Register widget controls.
-	 *
-	 * Adds different input fields to allow the user to change and customize the widget settings.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 */
+	public function get_keywords() {
+		return [ 'property hive', 'propertyhive', 'property', 'meta' ];
+	}
+
 	protected function _register_controls() {
 
 		$this->start_controls_section(
-			'content_section',
+			'style_section',
 			[
-				'label' => __( 'Content', 'plugin-name' ),
-				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+				'label' => __( 'Property Meta', 'propertyhive' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'typography',
+				'label' => __( 'Typography', 'propertyhive' ),
+				'scheme' => \Elementor\Scheme_Typography::TYPOGRAPHY_1,
+				'selector' => '{{WRAPPER}} .property_meta li',
 			]
 		);
 
 		$this->add_control(
-			'url',
+			'list_color',
 			[
-				'label' => __( 'URL to embed', 'plugin-name' ),
-				'type' => \Elementor\Controls_Manager::TEXT,
-				'input_type' => 'url',
-				'placeholder' => __( 'https://your-link.com', 'plugin-name' ),
+				'label' => __( 'Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'scheme' => [
+					'type' => \Elementor\Scheme_Color::get_type(),
+					'value' => \Elementor\Scheme_Color::COLOR_1,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .property_meta li' => 'color: {{VALUE}}',
+				],
 			]
 		);
+
+		/*$this->add_control(
+			'icon',
+			[
+				'label' => __( 'List Icon', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::ICONS,
+				'default' => [
+					'value' => 'fas fa-check',
+					'library' => 'solid',
+				],
+			]
+		);*/
 
 		$this->end_controls_section();
 
 	}
 
-	/**
-	 * Render widget output on the frontend.
-	 *
-	 * Written in PHP and used to generate the final HTML.
-	 *
-	 * @since 1.0.0
-	 * @access protected
-	 */
 	protected function render() {
+
+		global $property;
 
 		$settings = $this->get_settings_for_display();
 
-		$html = 'PRICE FORMATTED';
+		if ( !isset($property->id) ) {
+			return;
+		}
 
-		echo '<div class="price-formatted-elementor-widget">';
-
-		echo ( $html ) ? $html : $settings['url'];
-
-		echo '</div>';
+		propertyhive_template_single_meta();
 
 	}
 
