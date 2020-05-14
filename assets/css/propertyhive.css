@@ -37,3 +37,11 @@
 .propertyhive-my-account::after { clear:both; content:' '; display:table; }
 .propertyhive-my-account .my-account-navigation { float:left; width:30%; }
 .propertyhive-my-account .my-account-sections { float:right; width:68%; }
+
+.property-enquiry-form {  }
+.property-enquiry-form .control { margin-bottom:5px; }
+.property-enquiry-form .control label { display:block; }
+.property-enquiry-form .control input[type='text'],
+.property-enquiry-form .control input[type='email'],
+.property-enquiry-form .control select,
+.property-enquiry-form .control textarea { display:block; width:100%; }
