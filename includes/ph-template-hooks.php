@@ -95,8 +95,9 @@ add_action( 'propertyhive_after_recent_loop_item_title', 'propertyhive_template_
 /**
  * Before Single Property Summary Div
  *
- * @see propertyhive_show_product_images()
- * @see propertyhive_show_product_thumbnails()
+ * @see propertyhive_template_not_on_market()
+ * @see propertyhive_show_property_images()
+ * @see propertyhive_show_property_thumbnails()
  */
 add_action( 'propertyhive_before_single_property_summary', 'propertyhive_template_not_on_market', 5 );
 add_action( 'propertyhive_before_single_property_summary', 'propertyhive_show_property_images', 10 );
@@ -109,7 +110,6 @@ add_action( 'propertyhive_product_thumbnails', 'propertyhive_show_property_thumb
  * @see propertyhive_template_single_floor_area()
  * @see propertyhive_template_single_price()
  * @see propertyhive_template_single_meta()
- * @see propertyhive_template_single_actions()
  * @see propertyhive_template_single_sharing()
  */
 add_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_title', 5 );
@@ -121,7 +121,7 @@ add_action( 'propertyhive_single_property_summary', 'propertyhive_template_singl
 /**
  * After Single Property Summary Div
  *
- * @see propertyhive_template_loop_actions()
+ * @see propertyhive_template_single_actions()
  * @see propertyhive_template_single_features()
  * @see propertyhive_template_single_summary()
  * @see propertyhive_template_single_description()
