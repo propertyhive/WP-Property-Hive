@@ -20,7 +20,7 @@ if ( trim(strip_tags($description)) != '' )
     
     <h4><?php _e( 'Full Details', 'propertyhive' ); ?></h4>
     
-    <?php echo $description; ?>
+    <div class="description-contents"><?php echo $description; ?></div>
 
 </div>
 <?php

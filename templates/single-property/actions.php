@@ -33,7 +33,8 @@ global $post, $property;
            {
                $action['class'] = ( isset( $action['class'] ) ) ? $action['class'] : '';
                
-               echo '<li class="' . $action['class'] . '"';
+               echo '
+               <li class="' . $action['class'] . '"';
                if ( isset( $action['parent_attributes'] ) && ! empty( $action['parent_attributes'] ) )
                {
                    foreach ( $action['parent_attributes'] as $key => $value )
@@ -49,7 +50,8 @@ global $post, $property;
                        echo ' ' . $key . '="' . $value . '"';
                    }
                }
-               echo '>' . $action['label'] . '</a></li>';
+               echo '>' . $action['label'] . '</a></li>
+               ';
            }
     	?>
     	
