@@ -19,7 +19,7 @@ class PH_Meta_Box_Property_Address {
 	 * Output the metabox
 	 */
 	public static function output( $post, $args = array() ) {
-        global $wpdb, $thepostid;
+        global $wpdb, $thepostid, $pagenow;
 
         $thepostid = $post->ID;
 
@@ -58,11 +58,34 @@ class PH_Meta_Box_Property_Address {
             'desc_tip' => false, 
             'type' => 'text'
         );
+        $next_auto_increment = FALSE;
         if ( $parent_post !== FALSE )
         {
             $args['value'] = get_post_meta( $parent_post, '_reference_number', TRUE );
         }
+        elseif ( $pagenow == 'post-new.php' )
+        {
+            if ( get_option( 'propertyhive_auto_incremental_reference_numbers' ) == 'yes' )
+            {
+                $next = get_option( 'propertyhive_auto_incremental_next', '' );
+                if ( $next == '' || (int)$next == 0 )
+                {
+                    $next = 1;
+                }
+                $args['value'] = $next;
+
+                $next_auto_increment = $next + 1;
+            }
+        }
         propertyhive_wp_text_input( $args );
+
+        if ( $next_auto_increment !== FALSE )
+        {
+            propertyhive_wp_hidden_input( array( 
+                'id' => 'next_auto_increment', 
+                'value' => $next_auto_increment
+            ) );
+        }
         
         $args = array( 
             'id' => '_address_name_number', 
@@ -525,6 +548,11 @@ class PH_Meta_Box_Property_Address {
         if ( $status == '' )
         {
             update_post_meta( $post_id, '_status', 'instructed' );
+        }
+
+        if ( isset($_POST['next_auto_increment']) )
+        {
+            update_option( 'propertyhive_auto_incremental_next', ph_clean($_POST['next_auto_increment']) );
         }
 
         do_action( 'propertyhive_save_property_address', $post_id );
