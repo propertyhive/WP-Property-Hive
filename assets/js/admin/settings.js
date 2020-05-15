@@ -128,7 +128,25 @@ jQuery( function($){
         toggle_department_specific_options();
     });
     toggle_department_specific_options();
+
+    $('[name=\'propertyhive_auto_incremental_reference_numbers\']').change(function()
+    {
+        ph_toggle_auto_incremental_reference_number_options();
+    });
+    ph_toggle_auto_incremental_reference_number_options();
 });
+
+function ph_toggle_auto_incremental_reference_number_options()
+{
+    if ( jQuery('[name=\'propertyhive_auto_incremental_reference_numbers\']').is(":checked") )
+    {
+        jQuery('#row_propertyhive_auto_incremental_next').show();
+    }
+    else
+    {
+        jQuery('#row_propertyhive_auto_incremental_next').hide();
+    }
+}
 
 function fill_search_form_currency_options()
 {
