@@ -402,7 +402,20 @@ class PH_Settings_General extends PH_Settings_Page {
                 	'' => __( 'Allow Features To Be Freetyped', 'propertyhive' ),
                 	'checkbox' => __( 'Select From A Predefined List (Editable from \'Custom Fields\')', 'propertyhive' ),
                 ),
-                'desc'	=> __( '', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Enable Auto-Incremental Reference Numbers', 'propertyhive' ),
+                'id'      => 'propertyhive_auto_incremental_reference_numbers',
+                'type'    => 'checkbox',
+                'desc'  => __( 'Will prefill the property reference with an auto-incremental number when adding a new property', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Next Incremental Reference Number', 'propertyhive' ),
+                'id'      => 'propertyhive_auto_incremental_next',
+                'type'    => 'number',
+                'default' => 1,
             ),
 
 			array( 'type' => 'sectionend', 'id' => 'property_options'),
