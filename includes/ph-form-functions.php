@@ -46,6 +46,13 @@ function ph_get_search_form( $id = 'default' ) {
         if ( $key == 'paged' )
             continue;
 
+        if ( 
+            ( $key == 'minimum_price' || $key == 'maximum_price' ) && array_key_exists('price_slider', $form_controls) || 
+            ( $key == 'minimum_rent' || $key == 'maximum_rent' ) && array_key_exists('rent_slider', $form_controls) || 
+            ( $key == 'minimum_bedrooms' || $key == 'maximum_bedrooms' ) && array_key_exists('bedrooms_slider', $form_controls)
+        )
+            continue;
+
         // we've received a field that isn't a standard form control so let's store it in a hidden field so it's not lost
         if ( is_array($value) )
         {
@@ -1200,6 +1207,108 @@ function ph_form_field( $key, $field )
             $output .= '</select>';
 
             $output .= $field['after'];
+
+            break;
+        }
+        case "slider":
+        {   
+            wp_enqueue_script('jquery');
+            wp_enqueue_script('jquery-ui-core');
+            wp_enqueue_script('jquery-ui-slider');
+            wp_enqueue_style( 'jquery-ui-style', PH()->plugin_url() . '/assets/css/jquery-ui/jquery-ui.css', array(), PH_VERSION );
+
+            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
+            $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
+            $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
+            $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            $field['min'] = isset( $field['min'] ) ? $field['min'] : '';
+            $field['max'] = isset( $field['max'] ) ? $field['max'] : '';
+            $field['step'] = isset( $field['step'] ) ? $field['step'] : '1';
+
+            $output .= $field['before'];
+
+            if ($field['show_label'])
+            {
+                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
+                $output .= ' - <span id="search-form-slider-value-' . $key . '" class="search-form-slider-value"></span>';
+                $output .= '</label>';
+            }
+
+            $output .= '<div id="search-form-slider-' . $key . '" class="search-form-slider" style="min-width:150px;"></div>';
+            switch ( $key )
+            {
+                case "price_slider":
+                {
+                    $output .= '<input type="hidden" name="minimum_price" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_price']) ? ph_clean($_GET['minimum_price']) : '' ) . '">';
+                    $output .= '<input type="hidden" name="maximum_price" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_price']) ? ph_clean($_GET['maximum_price']) : '' ) . '">';
+                    break;
+                }
+                case "rent_slider":
+                {
+                    $output .= '<input type="hidden" name="minimum_rent" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_rent']) ? ph_clean($_GET['minimum_rent']) : '' ) . '">';
+                    $output .= '<input type="hidden" name="maximum_rent" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_rent']) ? ph_clean($_GET['maximum_rent']) : '' ) . '">';
+                    break;
+                }
+                case "bedrooms_slider":
+                {
+                    $output .= '<input type="hidden" name="minimum_bedrooms" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_bedrooms']) ? ph_clean($_GET['minimum_bedrooms']) : '' ) . '">';
+                    $output .= '<input type="hidden" name="maximum_bedrooms" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_bedrooms']) ? ph_clean($_GET['maximum_bedrooms']) : '' ) . '">';
+                    break;
+                }
+            }
+
+            $output .= $field['after'];
+
+            $value = '';
+            $prefix = '';
+            switch ( $key )
+            {
+                case "price_slider":
+                {   
+                    if ( $field['min'] != '' && $field['max'] != '' )
+                    {
+                        $value = 'values: [ ' . ( isset($_GET['minimum_price']) && $_GET['minimum_price'] != '' ? ph_clean($_GET['minimum_price']) : $field['min'] ) . ', ' . ( isset($_GET['maximum_price']) && $_GET['maximum_price'] != '' ? ph_clean($_GET['maximum_price']) : $field['max'] ) . ' ],';
+                    }
+                    $prefix = '£';
+                    break;
+                }
+                case "rent_slider":
+                {   
+                    if ( $field['min'] != '' && $field['max'] != '' )
+                    {
+                        $value = 'values: [ ' . ( isset($_GET['minimum_rent']) && $_GET['minimum_rent'] != '' ? ph_clean($_GET['minimum_rent']) : $field['min'] ) . ', ' . ( isset($_GET['maximum_rent']) && $_GET['maximum_rent'] != '' ? ph_clean($_GET['maximum_rent']) : $field['max'] ) . ' ],';
+                    }
+                    $prefix = '£';
+                    break;
+                }
+                case "bedrooms_slider":
+                {   
+                    if ( $field['min'] != '' && $field['max'] != '' )
+                    {
+                        $value = 'values: [ ' . ( isset($_GET['minimum_bedrooms']) && $_GET['minimum_bedrooms'] != '' ? ph_clean($_GET['minimum_bedrooms']) : $field['min'] ) . ', ' . ( isset($_GET['maximum_bedrooms']) && $_GET['maximum_bedrooms'] != '' ? ph_clean($_GET['maximum_bedrooms']) : $field['max'] ) . ' ],';
+                    }
+                    break;
+                }
+            }
+
+            $output .= '<script>
+                jQuery(document).ready(function()
+                {
+                    jQuery( "#search-form-slider-' . $key . '" ).slider({
+                        range: ' . ( ( $field['min'] != '' && $field['max'] != '' ) ? 'true' : 'false' ) . ',
+                        step: ' . $field['step'] . ',
+                        ' . ( $field['min'] != '' ? 'min: ' . $field['min'] . ',' : '' ) . '
+                        ' . ( $field['max'] != '' ? 'max: ' . $field['max'] . ',' : '' ) . '
+                        ' . $value . '
+                        slide: function( event, ui ) {
+                            jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + ui.values[ 0 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + " - ' . $prefix . '" + ui.values[ 1 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") );
+                            jQuery( "#min_slider_value-' . $key . '" ).val( ui.values[0] );
+                            jQuery( "#max_slider_value-' . $key . '" ).val( ui.values[1] );
+                        }
+                    });
+                    jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 0 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + " - ' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 1 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") );
+                });
+            </script>';
 
             break;
         }
