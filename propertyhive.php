@@ -210,7 +210,7 @@ if ( ! class_exists( 'PropertyHive' ) )
                 $this->ajax_includes();
             }
     
-            if ( ! is_admin() || defined( 'DOING_AJAX' ) ) {
+            if ( ! is_admin() || defined( 'DOING_AJAX' ) || (isset($_GET['action']) && $_GET['action'] == 'elementor') ) {
                 $this->frontend_includes();
             }
             
@@ -250,6 +250,7 @@ if ( ! class_exists( 'PropertyHive' ) )
          * Include required frontend files.
          */
         public function frontend_includes() {
+            include_once( 'includes/ph-template-hooks.php' );
             include_once( 'includes/class-ph-template-loader.php' );        // Template Loader
             include_once( 'includes/class-ph-frontend-scripts.php' );       // Frontend Scripts
         }
@@ -258,7 +259,6 @@ if ( ! class_exists( 'PropertyHive' ) )
          * Function used to Init PropertyHive Template Functions - This makes them pluggable by plugins and themes.
          */
         public function include_template_functions() {
-            include_once( 'includes/ph-template-hooks.php' );
             include_once( 'includes/ph-template-functions.php' );
         }
     
