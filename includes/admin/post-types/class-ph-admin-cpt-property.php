@@ -176,7 +176,10 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 		$columns['status'] = __( 'Marketing Status', 'propertyhive' );
         
-        $columns['owner'] = __( 'Owner / Landlord', 'propertyhive' );
+        if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
+        {
+        	$columns['owner'] = __( 'Owner / Landlord', 'propertyhive' );
+        }
         
         $columns['negotiator_office'] = __( 'Neg / Office', 'propertyhive' );
 
