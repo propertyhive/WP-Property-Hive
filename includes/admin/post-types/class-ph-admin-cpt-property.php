@@ -244,6 +244,11 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 					echo apply_filters( 'the_excerpt', $post->post_excerpt );
 				}
 
+				if ( $the_property->bedrooms != '' || $the_property->property_type != '' )
+				{
+					echo '<br>' . ( ( ( $the_property->department == 'residential-sales' || $the_property->department == 'residential-lettings' ) && $the_property->bedrooms != '' ) ? $the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' ) . ' ' : '' ) . $the_property->property_type;
+				}
+
 				// Get actions
 				$actions = array();
 
