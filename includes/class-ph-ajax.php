@@ -1550,7 +1550,7 @@ class PH_AJAX {
             $headers = array();
             if ( isset($_POST['name']) && ! empty($_POST['name']) )
             {
-                $headers[] = 'From: ' . ph_clean( $_POST['name'] ) . ' <' . sanitize_email( $from_email_address ) . '>';
+                $headers[] = 'From: ' . html_entity_decode(ph_clean( $_POST['name'] )) . ' <' . sanitize_email( $from_email_address ) . '>';
             }
             else
             {
@@ -3574,7 +3574,7 @@ class PH_AJAX {
             }
 
             $headers = array();
-            $headers[] = 'From: ' . get_bloginfo('name') . ' <' . $from . '>';
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
             wp_mail($to, $subject, $body, $headers);
@@ -3635,7 +3635,7 @@ class PH_AJAX {
             }
 
             $headers = array();
-            $headers[] = 'From: ' . get_bloginfo('name') . ' <' . $from . '>';
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
             wp_mail($to, $subject, $body, $headers);

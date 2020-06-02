@@ -214,7 +214,7 @@ class PH_Emails {
 			$email_id = $email_to_send->email_id;
 
 			$headers = array();
-			$headers[] = 'From: ' . $email_to_send->from_name . ' <' . $email_to_send->from_email_address . '>';
+			$headers[] = 'From: ' . html_entity_decode($email_to_send->from_name) . ' <' . $email_to_send->from_email_address . '>';
 			$headers[] = 'Content-Type: text/html; charset=UTF-8';
 
         	$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $email_to_send->body, $email_to_send->contact_id ) ) );
@@ -572,7 +572,7 @@ class PH_Emails {
 			if ( $to != '' && $subject != '' && $body != '' )
 			{
 				$headers = array();
-				$headers[] = 'From: ' . get_bloginfo('name') . ' <' . get_option( 'propertyhive_email_from_address', get_option( 'admin_email' ) ) . '>';
+				$headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . get_option( 'propertyhive_email_from_address', get_option( 'admin_email' ) ) . '>';
 				$headers[] = 'Content-Type: text/html; charset=UTF-8';
 
 				$body = str_replace( "[name]", ( isset($_POST['name']) ? ph_clean($_POST['name']) : '' ), $body );
