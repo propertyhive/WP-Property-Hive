@@ -84,7 +84,13 @@ echo '<p class="form-field">
 ?>
 <script>
 
-var viewing_selected_properties = [];
+var viewing_selected_properties = [<?php 
+    if ( isset($_GET['property_id']) && ph_clean($_GET['property_id']) != '' ) 
+    { 
+        $property = new PH_Property( (int)$_GET['property_id'] );
+        echo '{ id: ' . (int)$_GET['property_id'] . ', post_title: "' . $property->get_formatted_full_address() . '" }';
+    } 
+?>];
 var viewing_search_properties_timeout;
 
 jQuery(document).ready(function($)
