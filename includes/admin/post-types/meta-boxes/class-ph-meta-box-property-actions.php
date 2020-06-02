@@ -34,6 +34,15 @@ class PH_Meta_Box_Property_Actions {
 			            >' . __('View Matching Applicants', 'propertyhive') . '</a>';
 		        }
 
+		        if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
+            	{
+            		$actions[] = '<a 
+			                href="' . admin_url('post-new.php?post_type=enquiry&property_id=' . $post->ID) . '" 
+			                class="button"
+			                style="width:100%; margin-bottom:7px; text-align:center" 
+			            >' . __('Record Enquiry', 'propertyhive') . '</a>';
+            	}
+
 	        	if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
             	{
 		        	$actions[] = '<a 
