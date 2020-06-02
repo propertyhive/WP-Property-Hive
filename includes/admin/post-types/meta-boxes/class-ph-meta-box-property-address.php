@@ -387,127 +387,133 @@ class PH_Meta_Box_Property_Address {
                 {
                     countryChange(jQuery(this).val());
                 });
-
-                if (jQuery(\'#title\').length > 0)
-                {
-                    jQuery(\'#title\').change(function()
+        ';
+        if ( apply_filters( 'propertyhive_prefill_full_address_from_title', true ) === true )
+        {
+            echo '
+                    if (jQuery(\'#title\').length > 0)
                     {
-                        // Check title contains something
-                        if (jQuery(\'#title\').val() != \'\')
+                        jQuery(\'#title\').change(function()
                         {
-                            // Check all address fields are empty so we don\'t override anything should the user have customised it already
-                            
-                            if (jQuery(\'#_address_name_number\').val() == \'\' && jQuery(\'#_address_street\').val() == \'\' && jQuery(\'#_address_two\').val() == \'\' && jQuery(\'#_address_three\').val() == \'\' && jQuery(\'#_address_four\').val() == \'\' && jQuery(\'#_address_postcode\').val() == \'\')
+                            // Check title contains something
+                            if (jQuery(\'#title\').val() != \'\')
                             {
-                                // Yep. All address fields are empty
+                                // Check all address fields are empty so we don\'t override anything should the user have customised it already
                                 
-                                // See if any of the locations can be set
-                                jQuery("#location_id > option").each(function() 
+                                if (jQuery(\'#_address_name_number\').val() == \'\' && jQuery(\'#_address_street\').val() == \'\' && jQuery(\'#_address_two\').val() == \'\' && jQuery(\'#_address_three\').val() == \'\' && jQuery(\'#_address_four\').val() == \'\' && jQuery(\'#_address_postcode\').val() == \'\')
                                 {
-                                    if (this.text != \'\')
-                                    {
-                                        var text_to_search_for = this.text.replace(\'- \', \'\');
-                                        if (jQuery(\'#title\').val().indexOf(text_to_search_for) != -1)
-                                        {
-                                            this.selected = true;
-                                        }
-                                    }
-                                });
-                                
-                                // Split address and fill related address field
-                                
-                                var address_fields = [
-                                    \'_address_name_number\',
-                                    \'_address_street\',
-                                    \'_address_two\',
-                                    \'_address_three\',
-                                    \'_address_four\',
-                                    \'_address_postcode\'
-                                ];
-                                
-                                // Split title by comma
-                                var explode_title = jQuery(\'#title\').val().split(\',\');
-                                for (var i in explode_title)
-                                {
-                                    var title_element = jQuery.trim(explode_title[i]); // Trim it to remove any white space either side
+                                    // Yep. All address fields are empty
                                     
-                                    if (title_element != \'\' && address_fields.length > 0)
+                                    // See if any of the locations can be set
+                                    jQuery("#location_id > option").each(function() 
                                     {
-                                        if ( i == 0 )
+                                        if (this.text != \'\')
                                         {
-                                            var split_title_element = title_element.split(\' \');
-                                            if (jQuery.isNumeric( title_element ) || jQuery.isNumeric( split_title_element[0] )) // check if this is a house number
+                                            var text_to_search_for = this.text.replace(\'- \', \'\');
+                                            if (jQuery(\'#title\').val().indexOf(text_to_search_for) != -1)
                                             {
-                                                jQuery(\'#\' + address_fields[0]).val(split_title_element[0]);
-                                                
-                                                title_element = title_element.replace(split_title_element[0], \'\', title_element);
-                                                title_element = jQuery.trim(title_element);
-                                                
-                                                jQuery(\'#\' + address_fields[1]).val(title_element);
-                                                address_fields.splice(0,2);
-                                            }
-                                            else
-                                            {
-                                                jQuery(\'#\' + address_fields[1]).val(title_element);
-                                                address_fields.splice(0,2);
+                                                this.selected = true;
                                             }
                                         }
-                                        else
+                                    });
+                                    
+                                    // Split address and fill related address field
+                                    
+                                    var address_fields = [
+                                        \'_address_name_number\',
+                                        \'_address_street\',
+                                        \'_address_two\',
+                                        \'_address_three\',
+                                        \'_address_four\',
+                                        \'_address_postcode\'
+                                    ];
+                                    
+                                    // Split title by comma
+                                    var explode_title = jQuery(\'#title\').val().split(\',\');
+                                    for (var i in explode_title)
+                                    {
+                                        var title_element = jQuery.trim(explode_title[i]); // Trim it to remove any white space either side
+                                        
+                                        if (title_element != \'\' && address_fields.length > 0)
                                         {
-                                            var split_title_elements = title_element.split(\' \');
-                                            
-                                            var numeric_matches = title_element.match(/\d+/g);
-                                            if (i == explode_title.length-1 &&  numeric_matches != null)
+                                            if ( i == 0 )
                                             {
-                                                // We\'re on the last bit and it contains a number
-                                                for (var j in split_title_elements)
+                                                var split_title_element = title_element.split(\' \');
+                                                if (jQuery.isNumeric( title_element ) || jQuery.isNumeric( split_title_element[0] )) // check if this is a house number
                                                 {
-                                                    var split_title_element = jQuery.trim(split_title_elements[j]);
+                                                    jQuery(\'#\' + address_fields[0]).val(split_title_element[0]);
                                                     
-                                                    var numeric_matches = split_title_element.match(/\d+/g);
+                                                    title_element = title_element.replace(split_title_element[0], \'\', title_element);
+                                                    title_element = jQuery.trim(title_element);
                                                     
-                                                    if (split_title_element.length >=2 && split_title_element.length <= 4 && numeric_matches != null)
-                                                    {
-                                                        // This bit of the address element definitely contains postcode bit
-                                                        var postcode = split_title_element;
-                                                        if (j == (split_title_elements.length - 2))
-                                                        {
-                                                            var temp_title_element = jQuery.trim(split_title_elements[split_title_elements.length-1]); // Trim it to remove any white space either side
-                                                            
-                                                            if ((temp_title_element.length >=2 || temp_title_element.length <= 4))
-                                                            {
-                                                                // We have one element left after this
-                                                                postcode += \' \' + temp_title_element;
-                                                            }
-                                                        }
-                                                        jQuery(\'#address_postcode\').val(postcode);
-                                                        
-                                                        break;
-                                                    }
-                                                    else
-                                                    {
-                                                        // General address element
-                                                        jQuery(\'#\' + address_fields[0]).val(title_element);
-                                                        address_fields.splice(0,1);
-                                                    }
+                                                    jQuery(\'#\' + address_fields[1]).val(title_element);
+                                                    address_fields.splice(0,2);
                                                 }
-                                                
+                                                else
+                                                {
+                                                    jQuery(\'#\' + address_fields[1]).val(title_element);
+                                                    address_fields.splice(0,2);
+                                                }
                                             }
                                             else
                                             {
-                                                // General address element
-                                                jQuery(\'#\' + address_fields[0]).val(title_element);
-                                                address_fields.splice(0,1);
+                                                var split_title_elements = title_element.split(\' \');
+                                                
+                                                var numeric_matches = title_element.match(/\d+/g);
+                                                if (i == explode_title.length-1 &&  numeric_matches != null)
+                                                {
+                                                    // We\'re on the last bit and it contains a number
+                                                    for (var j in split_title_elements)
+                                                    {
+                                                        var split_title_element = jQuery.trim(split_title_elements[j]);
+                                                        
+                                                        var numeric_matches = split_title_element.match(/\d+/g);
+                                                        
+                                                        if (split_title_element.length >=2 && split_title_element.length <= 4 && numeric_matches != null)
+                                                        {
+                                                            // This bit of the address element definitely contains postcode bit
+                                                            var postcode = split_title_element;
+                                                            if (j == (split_title_elements.length - 2))
+                                                            {
+                                                                var temp_title_element = jQuery.trim(split_title_elements[split_title_elements.length-1]); // Trim it to remove any white space either side
+                                                                
+                                                                if ((temp_title_element.length >=2 || temp_title_element.length <= 4))
+                                                                {
+                                                                    // We have one element left after this
+                                                                    postcode += \' \' + temp_title_element;
+                                                                }
+                                                            }
+                                                            jQuery(\'#address_postcode\').val(postcode);
+                                                            
+                                                            break;
+                                                        }
+                                                        else
+                                                        {
+                                                            // General address element
+                                                            jQuery(\'#\' + address_fields[0]).val(title_element);
+                                                            address_fields.splice(0,1);
+                                                        }
+                                                    }
+                                                    
+                                                }
+                                                else
+                                                {
+                                                    // General address element
+                                                    jQuery(\'#\' + address_fields[0]).val(title_element);
+                                                    address_fields.splice(0,1);
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                jQuery(\'#_address_postcode\').trigger(\'change\');
+                                    jQuery(\'#_address_postcode\').trigger(\'change\');
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
+                ';
+        }
+        echo '
             });
         
         </script>
