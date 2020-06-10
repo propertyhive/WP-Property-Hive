@@ -119,13 +119,13 @@ class PH_Countries {
 				'name' => 'Austria',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'BE' => array(
 				'name' => 'Belgium',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'BG' => array(
 				'name' => 'Bulgaria',
@@ -149,7 +149,7 @@ class PH_Countries {
 				'name' => 'Cyprus',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'CZ' => array(
 				'name' => 'Czech Republic',
@@ -167,31 +167,31 @@ class PH_Countries {
 				'name' => 'Finland',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'FR' => array(
 				'name' => 'France',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'DE' => array(
 				'name' => 'Germany',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'IE' => array(
 				'name' => 'Ireland',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'IT' => array(
 				'name' => 'Italy',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'JP' => array(
 				'name' => 'Japan',
@@ -203,7 +203,7 @@ class PH_Countries {
 				'name' => 'Malta',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'MU' => array(
 				'name' => 'Mauritius',
@@ -221,7 +221,7 @@ class PH_Countries {
 				'name' => 'Portugal',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'RU' => array(
 				'name' => 'Russia',
@@ -239,7 +239,7 @@ class PH_Countries {
 				'name' => 'Spain',
 				'currency_code' => 'EUR',
 				'currency_symbol' => '&euro;',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'SE' => array(
 				'name' => 'Sweden',
