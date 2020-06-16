@@ -1513,9 +1513,8 @@ class PH_AJAX {
             foreach ( $property_ids as $property_id )
             {
                 $property = new PH_Property((int)$property_id);
-                $message .= apply_filters( 'propertyhive_property_enquiry_property_output', $property->get_formatted_full_address() . " (" . get_permalink( (int)$property_id ) . ")", (int)$property_id ) . "\n";
+                $message .= apply_filters( 'propertyhive_property_enquiry_property_output', $property->get_formatted_full_address() . "\n" . $property->get_formatted_price() . "\n" . get_permalink( (int)$property_id ), (int)$property_id ) . "\n\n";
             }
-            $message .= "\n";
 
             unset($form_controls['action']);
             unset($_POST['action']);
