@@ -1261,6 +1261,36 @@ function ph_form_field( $key, $field )
 
             $value = '';
             $prefix = '';
+            $suffix = '';
+
+            if ( $key == 'price_slider' || $key == 'rent_slider' )
+            {
+                $prefix = '£';
+
+                $search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+
+                $ph_countries = new PH_Countries();
+                $countries = $ph_countries->countries;
+
+                foreach ( $countries as $country_code => $country )
+                {
+                    if ( isset($country['currency_code']) && $country['currency_code'] == $search_form_currency )
+                    {
+                        if ( $country['currency_prefix'] === true )
+                        {
+                            $prefix = $country['currency_symbol'];
+                            $suffix = '';
+                        }
+                        else
+                        {
+                            $prefix = '';
+                            $suffix = $country['currency_symbol'];
+                        }
+                        break;
+                    }
+                }
+            }
+
             switch ( $key )
             {
                 case "price_slider":
@@ -1269,7 +1299,6 @@ function ph_form_field( $key, $field )
                     {
                         $value = 'values: [ ' . ( isset($_GET['minimum_price']) && $_GET['minimum_price'] != '' ? ph_clean($_GET['minimum_price']) : $field['min'] ) . ', ' . ( isset($_GET['maximum_price']) && $_GET['maximum_price'] != '' ? ph_clean($_GET['maximum_price']) : $field['max'] ) . ' ],';
                     }
-                    $prefix = '£';
                     break;
                 }
                 case "rent_slider":
@@ -1278,7 +1307,6 @@ function ph_form_field( $key, $field )
                     {
                         $value = 'values: [ ' . ( isset($_GET['minimum_rent']) && $_GET['minimum_rent'] != '' ? ph_clean($_GET['minimum_rent']) : $field['min'] ) . ', ' . ( isset($_GET['maximum_rent']) && $_GET['maximum_rent'] != '' ? ph_clean($_GET['maximum_rent']) : $field['max'] ) . ' ],';
                     }
-                    $prefix = '£';
                     break;
                 }
                 case "bedrooms_slider":
@@ -1301,12 +1329,12 @@ function ph_form_field( $key, $field )
                         ' . ( $field['max'] != '' ? 'max: ' . $field['max'] . ',' : '' ) . '
                         ' . $value . '
                         slide: function( event, ui ) {
-                            jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + ui.values[ 0 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + " - ' . $prefix . '" + ui.values[ 1 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") );
+                            jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + ui.values[ 0 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + ui.values[ 1 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
                             jQuery( "#min_slider_value-' . $key . '" ).val( ui.values[0] );
                             jQuery( "#max_slider_value-' . $key . '" ).val( ui.values[1] );
                         }
                     });
-                    jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 0 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + " - ' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 1 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") );
+                    jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 0 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 1 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
                 });
             </script>';
 
