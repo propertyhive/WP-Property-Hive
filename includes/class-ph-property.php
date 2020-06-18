@@ -348,20 +348,31 @@ class PH_Property {
 
         if ( $this->_department == 'commercial' )
         {
-            $price = '';
-
-            // Price Details
-            $price .= $this->get_formatted_commercial_price();
-
-            // Rent Details
-            $rent = $this->get_formatted_commercial_rent();
-            if ( $price != '' && $rent != '' )
+            if ( 
+                !is_admin() &&
+                $this->_for_sale == 'yes' && $this->_price_poa == 'yes' &&
+                $this->_to_rent == 'yes' && $this->_rent_poa == 'yes'
+            )
             {
-                $price .= '<br>';
+                $return = __( 'POA', 'propertyhive' );
             }
-            $price .= $rent;
+            else
+            {
+                $price = '';
 
-            $return = $price;
+                // Price Details
+                $price .= $this->get_formatted_commercial_price();
+
+                // Rent Details
+                $rent = $this->get_formatted_commercial_rent();
+                if ( $price != '' && $rent != '' )
+                {
+                    $price .= '<br>';
+                }
+                $price .= $rent;
+
+                $return = $price;
+            }
         }
         else
         {
