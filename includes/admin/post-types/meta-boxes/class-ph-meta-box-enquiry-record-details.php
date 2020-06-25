@@ -111,7 +111,9 @@ class PH_Meta_Box_Enquiry_Record_Details {
         );
 
         $sources = apply_filters( 'propertyhive_enquiry_sources', $sources );
-            
+        
+        asort($sources);
+
         $args = array( 
             'id' => '_source', 
             'label' => __( 'Source', 'propertyhive' ), 

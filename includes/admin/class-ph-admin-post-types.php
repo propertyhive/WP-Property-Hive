@@ -581,6 +581,8 @@ class PH_Admin_Post_Types {
         );
 
         $sources = apply_filters( 'propertyhive_enquiry_sources', $sources );
+
+        asort($sources);
         
         // Status filtering
         $output  = '<select name="_source" id="dropdown_enquiry_source">';
