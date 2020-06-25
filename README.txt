@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.4.1
-Stable tag: 1.4.61
+Tested up to: 5.4.2
+Stable tag: 1.4.62
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,19 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.62 =
+* Added bedrooms and property type to admin property list
+* Hid owner column in admin property list if contacts module is disabled
+* Added 'Record Enquiry' action button to property record
+* Added price in property enquiries
+* Changed EUR currency to appear after price
+* Price slider to cater for when currency not GBP
+* Sort enquiry sources alphabetically preparing for when we can import enquiries from third party sources such as property portals
+* Don't output POA twice if commercial is POA on both sale and rent
+* Ensured children properties are deleted when parent property deleted (i.e. units of a commercial property)
+* Added html_entity_decode() on 'From' headers in emails to prevent ampersands in company name appearing as &amp;
+* Declared compatibility for WordPress 5.4.2
 
 = 1.4.61 =
 * Fix to recent Elementor module causing duplicate components to appear
