@@ -23,7 +23,10 @@ class PH_Post_types {
 	    add_action( 'init', array( __CLASS__, 'register_taxonomies' ), 5 );
 		add_action( 'init', array( __CLASS__, 'register_post_types' ), 5 );
 
+        add_action( 'wp_trash_post', array( __CLASS__, 'trash_property_children' ), 5 );
+
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_media' ), 5 );
+        add_action( 'before_delete_post', array( __CLASS__, 'delete_property_children' ), 5 );
 	}
 
 	/**
@@ -507,21 +510,51 @@ class PH_Post_types {
         do_action( 'propertyhive_after_register_post_types' );
 	}
 
-    public static function delete_property_media( $post_id ) {
+    public static function trash_property_children( $post_id )
+    {
+        if ( get_post_type($post_id) == 'property' )
+        {
+            // get all children
+            $args = array(
+                'post_type' => 'property',
+                'nopaging' => true,
+                'post_parent' => (int)$post_id,
+                'post_status' => array('publish', 'pending', 'private', 'draft', 'auto-draft', 'future'),
+            );
 
-        $property = new PH_Property( (int)$post_id );
+            $properties_query = new WP_Query($args);
 
-        $media_ids = $property->get_gallery_attachment_ids();
-        self::do_delete_media_attachments( $post_id, $media_ids );
+            if ( $properties_query->have_posts() )
+            {
+                while( $properties_query->have_posts() )
+                {
+                    $properties_query->the_post();
 
-        $media_ids = $property->get_floorplan_attachment_ids();
-        self::do_delete_media_attachments( $post_id, $media_ids );
+                    wp_trash_post( get_the_ID() );
+                }
+            }
+            wp_reset_postdata();
+        }
+    }
 
-        $media_ids = $property->get_brochure_attachment_ids();
-        self::do_delete_media_attachments( $post_id, $media_ids );
+    public static function delete_property_media( $post_id ) 
+    {
+        if ( get_post_type($post_id) == 'property' )
+        {
+            $property = new PH_Property( (int)$post_id );
 
-        $media_ids = $property->get_epc_attachment_ids();
-        self::do_delete_media_attachments( $post_id, $media_ids );
+            $media_ids = $property->get_gallery_attachment_ids();
+            self::do_delete_media_attachments( $post_id, $media_ids );
+
+            $media_ids = $property->get_floorplan_attachment_ids();
+            self::do_delete_media_attachments( $post_id, $media_ids );
+
+            $media_ids = $property->get_brochure_attachment_ids();
+            self::do_delete_media_attachments( $post_id, $media_ids );
+
+            $media_ids = $property->get_epc_attachment_ids();
+            self::do_delete_media_attachments( $post_id, $media_ids );
+        }
     }
 
     private static function do_delete_media_attachments( $post_id, $media_ids = array() )
@@ -589,6 +622,33 @@ class PH_Post_types {
                     wp_delete_attachment( $media_id, true );
                 }
             }
+        }
+    }
+
+    public static function delete_property_children( $post_id )
+    {
+        if ( get_post_type($post_id) == 'property' )
+        {
+            // get all children
+            $args = array(
+                'post_type' => 'property',
+                'nopaging' => true,
+                'post_parent' => (int)$post_id,
+                'post_status' => array('publish', 'pending', 'private', 'draft', 'auto-draft', 'future', 'trash'),
+            );
+
+            $properties_query = new WP_Query($args);
+
+            if ( $properties_query->have_posts() )
+            {
+                while( $properties_query->have_posts() )
+                {
+                    $properties_query->the_post();
+
+                    wp_delete_post( get_the_ID(), true );
+                }
+            }
+            wp_reset_postdata();
         }
     }
 }
