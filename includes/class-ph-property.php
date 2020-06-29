@@ -767,12 +767,14 @@ class PH_Property {
 
         if ( $this->_department == 'commercial' )
         {
-            return $this->get_formatted_descriptions(); // Haven't called this commercial_descriptions as we might use generic descriptions for other area going forward
+            $description = $this->get_formatted_descriptions(); // Haven't called this commercial_descriptions as we might use generic descriptions for other area going forward
         }
         else
         {
-            return $this->get_formatted_rooms();
+            $description = $this->get_formatted_rooms();
         }
+
+        return apply_filters( 'propertyhive_description_output', $description );
     }
 
     /**
@@ -807,7 +809,7 @@ class PH_Property {
                 $return .= str_replace("\r\n", "", nl2br($this->{'_room_description_' . $i})) . '</p>';
             }
         }
-        
+
         return $return;
     }
 
