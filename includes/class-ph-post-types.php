@@ -519,6 +519,7 @@ class PH_Post_types {
                 'post_type' => 'property',
                 'nopaging' => true,
                 'post_parent' => (int)$post_id,
+                'suppress_filters' => TRUE,
                 'post_status' => array('publish', 'pending', 'private', 'draft', 'auto-draft', 'future'),
             );
 
@@ -567,6 +568,7 @@ class PH_Post_types {
                 $args = array(
                     'post_type' => 'property',
                     'fields' => 'ids',
+                    'suppress_filters' => TRUE,
                     'posts_per_page' => 1,
                     'post__not_in' => array( $post_id ),
                     'meta_query' => array(
@@ -633,6 +635,7 @@ class PH_Post_types {
             $args = array(
                 'post_type' => 'property',
                 'nopaging' => true,
+                'suppress_filters' => TRUE,
                 'post_parent' => (int)$post_id,
                 'post_status' => array('publish', 'pending', 'private', 'draft', 'auto-draft', 'future', 'trash'),
             );
