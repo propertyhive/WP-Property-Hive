@@ -61,8 +61,6 @@ class PH_Meta_Box_Sale_Applicant {
         {
             echo 'No applicant found';
         }
-
-        do_action('propertyhive_sale_applicant_fields');
 	    
         echo '</div>';
         

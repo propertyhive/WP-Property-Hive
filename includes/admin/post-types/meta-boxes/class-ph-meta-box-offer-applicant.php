@@ -191,8 +191,6 @@ function offer_update_selected_applicants()
 </script>
 <?php
         }
-
-        do_action('propertyhive_offer_applicant_fields');
 	    
         echo '</div>';
         
