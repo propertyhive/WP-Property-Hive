@@ -272,8 +272,6 @@ function viewing_update_selected_applicants()
 <?php
         }
 
-        do_action('propertyhive_viewing_applicant_fields');
-	    
         echo '</div>';
         
         echo '</div>';
