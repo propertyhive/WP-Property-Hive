@@ -1,0 +1,47 @@
+.clear:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+	}
+* html .clear             { zoom: 1; } /* IE6 */
+*:first-child+html .clear { zoom: 1; } /* IE7 */
+
+#container { max-width:1140px; width:100%; margin:0 auto; }
+
+.propertyhive {  }
+
+.property-search-form { display:table; width:100%; }
+.property-search-form .control { display:table-cell; vertical-align:middle; padding:0 10px; position:relative; } 
+.property-search-form .control label {  }
+
+.propertyhive ul.properties { list-style-type:none; margin:0 0 1em; padding:0; clear:both }
+.propertyhive ul.properties li { float:left; margin:0; padding-top:1em; padding-bottom:1em; border-bottom:1px solid #CCC; /*clear:both*/ }
+.propertyhive ul.properties li.first { clear:left; }
+.propertyhive ul.properties li.first.last { width:100%; }
+.propertyhive ul.properties li .thumbnail { float:left; width:20%; }
+.propertyhive ul.properties li .thumbnail a { display:block; position:relative; height:100%; }
+.propertyhive ul.properties li .thumbnail img { max-width:100%; }
+.propertyhive ul.properties li .details { float:right; width:77%; }
+.propertyhive ul.properties li .details h3 { padding:0; margin:0 0 0.3rem; }
+
+.propertyhive-pagination {  }
+.propertyhive-pagination ul { list-style-type:none; margin:0; padding:0; }
+.propertyhive-pagination ul li { display:inline-block; }
+.propertyhive-pagination ul li a {  }
+
+.propertyhive-my-account {  }
+.propertyhive-my-account::before { content:' '; display:table; }
+.propertyhive-my-account::after { clear:both; content:' '; display:table; }
+.propertyhive-my-account .my-account-navigation { float:left; width:30%; }
+.propertyhive-my-account .my-account-sections { float:right; width:68%; }
+
+.property-enquiry-form {  }
+.property-enquiry-form .control { margin-bottom:5px; }
+.property-enquiry-form .control label { display:block; }
+.property-enquiry-form .control input[type='text'],
+.property-enquiry-form .control input[type='email'],
+.property-enquiry-form .control select,
+.property-enquiry-form .control textarea { display:block; width:100%; }

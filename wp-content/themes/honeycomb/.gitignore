@@ -1,0 +1,16 @@
+# Sass
+.sass-cache
+
+# Grunt
+/node_modules/
+/honeycomb/
+npm-debug.log
+
+# Codekit
+config.codekit
+
+# Transifex
+.transifexrc
+
+# PhpStorm
+.idea
