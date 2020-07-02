@@ -447,9 +447,12 @@ class PH_Meta_Box_Property_Address {
                                         }
                                         else
                                         {
-                                            // Split address element by spaces and remove any sections that aren\'t valid postcode sections
-                                            var last_address_parts_containing_numbers = last_address_element.split(\' \').filter(function(address_part) {
-                                                return (/[A-Za-z]{1,2}[0-9][A-Za-z0-9]?/.test(address_part) || /[0-9][A-Za-z]{2}/.test(address_part));
+                                            // Split address element by spaces
+                                            var last_address_element_split = last_address_element.split(\' \');
+
+                                            // Remove any sections that aren\'t valid postcode sections
+                                            var last_address_parts_containing_numbers = last_address_element_split.filter(function(address_part) {
+                                                return (postcodeRegex.test(address_part) || /[A-Za-z]{1,2}[0-9][A-Za-z0-9]?/.test(address_part) || /[0-9][A-Za-z]{2}/.test(address_part));
                                               });
                                             // Concatenate valid postcode elements
                                             var last_address_element_filtered = last_address_parts_containing_numbers.join(\' \');
@@ -458,6 +461,13 @@ class PH_Meta_Box_Property_Address {
                                             if (postcodeRegex.test(last_address_element_filtered))
                                             {
                                                 var postcode = last_address_element_filtered;
+
+                                                // Get non-postcode text from address element to put back into address
+                                                var last_address_parts_without_numbers = last_address_element_split.filter(function(address_part) {
+                                                    return !(postcodeRegex.test(address_part) || /[A-Za-z]{1,2}[0-9][A-Za-z0-9]?/.test(address_part) || /[0-9][A-Za-z]{2}/.test(address_part));
+                                                });
+                                                // Put other text back into address
+                                                explode_title.push(last_address_parts_without_numbers.join(\' \'));
                                             }
                                         }
 
