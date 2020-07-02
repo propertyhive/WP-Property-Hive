@@ -430,6 +430,50 @@ class PH_Meta_Box_Property_Address {
                                     
                                     // Split title by comma
                                     var explode_title = jQuery(\'#title\').val().split(\',\');
+
+                                    // If last element of address contains numbers, check if it contains a postcode
+                                    if (explode_title[explode_title.length - 1].match(/\d+/g) != null)
+                                    {
+                                        // Extract last element of address
+                                        var last_address_element = explode_title.pop().trim();
+
+                                        // Regular Expression that matches postcodes case insensitively in format NN13, NN13 7DR and NN137DR
+                                        const postcodeRegex = /^[A-Za-z]{1,2}[0-9][A-Za-z0-9]? ?([0-9][A-Za-z]{2})?$/;
+
+                                        if (postcodeRegex.test(last_address_element))
+                                        {
+                                            // Entire last element is a valid postcode
+                                            var postcode = last_address_element;
+                                        }
+                                        else
+                                        {
+                                            // Split address element by spaces and remove any sections that aren\'t valid postcode sections
+                                            var last_address_parts_containing_numbers = last_address_element.split(\' \').filter(function(address_part) {
+                                                return (/[A-Za-z]{1,2}[0-9][A-Za-z0-9]?/.test(address_part) || /[0-9][A-Za-z]{2}/.test(address_part));
+                                              });
+                                            // Concatenate valid postcode elements
+                                            var last_address_element_filtered = last_address_parts_containing_numbers.join(\' \');
+
+                                            // Re-created address element is a valid postcode
+                                            if (postcodeRegex.test(last_address_element_filtered))
+                                            {
+                                                var postcode = last_address_element_filtered;
+                                            }
+                                        }
+
+                                        // If we\'ve found a postcode, put it in the postcode field
+                                        if (typeof postcode !== \'undefined\')
+                                        {
+                                            // Set postcode field to the postcode we found
+                                            jQuery(\'#_address_postcode\').val(postcode);
+                                        }
+                                        else
+                                        {
+                                            // We couldn\'t find a postcode, so put the final address element back to be processed as normal
+                                            explode_title.push(last_address_element);
+                                        }
+                                    }
+
                                     for (var i in explode_title)
                                     {
                                         var title_element = jQuery.trim(explode_title[i]); // Trim it to remove any white space either side
