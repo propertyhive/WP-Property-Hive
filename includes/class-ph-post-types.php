@@ -506,6 +506,74 @@ class PH_Post_types {
                 )
             )
         );
+
+        register_post_type( "tenancy",
+            apply_filters( 'propertyhive_register_post_type_tenancy',
+                array(
+                    'labels' => array(
+                            'name'                  => __( 'Tenancies', 'propertyhive' ),
+                            'singular_name'         => __( 'Tenancy', 'propertyhive' ),
+                            'menu_name'             => _x( 'Tenancies', 'Admin menu name', 'propertyhive' ),
+                            'add_new'               => __( 'Add Tenancy', 'propertyhive' ),
+                            'add_new_item'          => __( 'Add New Tenancy', 'propertyhive' ),
+                            'edit'                  => __( 'Edit', 'propertyhive' ),
+                            'edit_item'             => __( 'Edit Tenancy', 'propertyhive' ),
+                            'new_item'              => __( 'New Tenancy', 'propertyhive' ),
+                            'view'                  => __( 'View Tenancy', 'propertyhive' ),
+                            'view_item'             => __( 'View Tenancy', 'propertyhive' ),
+                            'search_items'          => __( 'Search Tenancies', 'propertyhive' ),
+                            'not_found'             => __( 'No tenancies found', 'propertyhive' ),
+                            'not_found_in_trash'    => __( 'No tenancies found in trash', 'propertyhive' ),
+                            'parent'                => __( 'Parent Tenancy', 'propertyhive' )
+                        ),
+                    'public'                => false,
+                    'show_ui'               => true,
+                    'capability_type'       => 'post',
+                    'map_meta_cap'          => true,
+                    'publicly_queryable'    => false,
+                    'exclude_from_search'   => true,
+                    'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
+                    'query_var'             => true,
+                    'supports'              => false,
+                    'show_in_nav_menus'     => false,
+                    'show_in_menu'          => false
+                )
+            )
+        );
+
+        register_post_type( "inspection",
+            apply_filters( 'propertyhive_register_post_type_inspection',
+                array(
+                    'labels' => array(
+                        'name'                  => __( 'Inspections', 'propertyhive' ),
+                        'singular_name'         => __( 'Inspection', 'propertyhive' ),
+                        'menu_name'             => _x( 'Inspections', 'Admin menu name', 'propertyhive' ),
+                        'add_new'               => __( 'Add Inspection', 'propertyhive' ),
+                        'add_new_item'          => __( 'Add New Inspection', 'propertyhive' ),
+                        'edit'                  => __( 'Edit', 'propertyhive' ),
+                        'edit_item'             => __( 'Edit Inspection', 'propertyhive' ),
+                        'new_item'              => __( 'New Inspection', 'propertyhive' ),
+                        'view'                  => __( 'View Inspection', 'propertyhive' ),
+                        'view_item'             => __( 'View Inspection', 'propertyhive' ),
+                        'search_items'          => __( 'Search Inspections', 'propertyhive' ),
+                        'not_found'             => __( 'No inspections found', 'propertyhive' ),
+                        'not_found_in_trash'    => __( 'No inspections found in trash', 'propertyhive' ),
+                        'parent'                => __( 'Parent Inspection', 'propertyhive' )
+                    ),
+                    'public'                => false,
+                    'show_ui'               => true,
+                    'capability_type'       => 'post',
+                    'map_meta_cap'          => true,
+                    'publicly_queryable'    => false,
+                    'exclude_from_search'   => true,
+                    'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
+                    'query_var'             => true,
+                    'supports'              => false,
+                    'show_in_nav_menus'     => false,
+                    'show_in_menu'          => false
+                )
+            )
+        );
         
         do_action( 'propertyhive_after_register_post_types' );
 	}

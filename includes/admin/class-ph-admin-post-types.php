@@ -55,6 +55,7 @@ class PH_Admin_Post_Types {
         include( 'post-types/class-ph-admin-cpt-viewing.php' );
         include( 'post-types/class-ph-admin-cpt-offer.php' );
         include( 'post-types/class-ph-admin-cpt-sale.php' );
+        include( 'post-types/class-ph-admin-cpt-tenancy.php' );
 	}
 
 	/**
@@ -134,7 +135,7 @@ class PH_Admin_Post_Types {
     public function remove_month_filter() {
         global $typenow;
         
-        if ($typenow == 'property' || $typenow == 'contact' || $typenow == 'appraisal' || $typenow == 'viewing' || $typenow == 'offer' || $typenow == 'sale')
+        if ( in_array($typenow, array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy')) )
         {
             add_filter('months_dropdown_results', '__return_empty_array');
         }
@@ -181,6 +182,9 @@ class PH_Admin_Post_Types {
                 break;
             case 'sale' :
                 $this->sale_filters();
+                break;
+            case 'tenancy' :
+                $this->tenancy_filters();
                 break;
             default :
                 break;
@@ -929,6 +933,97 @@ class PH_Admin_Post_Types {
 
         return $output;
     }
+
+    /**
+     * Show an tenancy filter box
+     */
+    public function tenancy_filters() {
+        global $wp_query;
+        
+        $output = '';
+        
+        $output .= $this->tenancy_status_filter();
+
+        echo apply_filters( 'propertyhive_tenancy_filters', $output );
+    }
+
+    /**
+     * Show an tenancy status filter box
+     */
+    public function tenancy_status_filter() {
+        global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'application', 'application_offer_pending', 'application_offer_accepted', 'application_offer_declined', 'application_references_pending', 'application_references_accepted', 'application_references_declined', 'application_withdrawn', 'tenancy', 'tenancy_current', 'tenancy_finished', 'tenancy_terminated' ) ) ? $_GET['_status'] : '';
+        
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_sale_status">';
+            
+            $output .= '<option value="">All Statuses</option>';
+
+            $output .= '<option value="application"';
+            $output .= selected( 'application', $selected_status, false );
+            $output .= '>' . __( 'Application', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_offer_pending"';
+            $output .= selected( 'application_offer_pending', $selected_status, false );
+            $output .= '>- ' . __( 'Offer Pending', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_offer_accepted"';
+            $output .= selected( 'application_offer_accepted', $selected_status, false );
+            $output .= '>- ' . __( 'Offer Accepted', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_offer_declined"';
+            $output .= selected( 'application_offer_declined', $selected_status, false );
+            $output .= '>- ' . __( 'Offer Declined', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_references_pending"';
+            $output .= selected( 'application_references_pending', $selected_status, false );
+            $output .= '>- ' . __( 'References Pending', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_references_requested"';
+            $output .= selected( 'application_references_requested', $selected_status, false );
+            $output .= '>- ' . __( 'References Requested', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_references_accepted"';
+            $output .= selected( 'application_references_accepted', $selected_status, false );
+            $output .= '>- ' . __( 'References Accepted', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="application_references_declined"';
+            $output .= selected( 'application_references_declined', $selected_status, false );
+            $output .= '>- ' . __( 'References Declined', 'propertyhive' ) . '</option>';
+            
+            $output .= '<option value="tenancy"';
+            $output .= selected( 'tenancy', $selected_status, false );
+            $output .= '>' . __( 'Tenancy', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_current"';
+            $output .= selected( 'tenancy_current', $selected_status, false );
+            $output .= '>- ' . __( 'Current', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_current_renewing"';
+            $output .= selected( 'tenancy_current_renewing', $selected_status, false );
+            $output .= '>- - ' . __( 'Renewing', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_current_not_renewing"';
+            $output .= selected( 'tenancy_current_not_renewing', $selected_status, false );
+            $output .= '>- - ' . __( 'Not Renewing', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_current_periodic"';
+            $output .= selected( 'tenancy_current_periodic', $selected_status, false );
+            $output .= '>- - ' . __( 'Periodic', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_finished"';
+            $output .= selected( 'tenancy_finished', $selected_status, false );
+            $output .= '>- ' . __( 'Finished', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="tenancy_terminated"';
+            $output .= selected( 'tenancy_terminated', $selected_status, false );
+            $output .= '>- ' . __( 'Terminated', 'propertyhive' ) . '</option>';
+
+        $output .= '</select>';
+
+        return $output;
+    }
     
     /**
      * Filters and sorting handler
@@ -1178,6 +1273,14 @@ class PH_Admin_Post_Types {
             }
         }
         elseif ( 'sale' === $typenow ) 
+        {
+            if ( ! empty( $_GET['_status'] ) ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_status',
+                    'value' => sanitize_text_field( $_GET['_status'] ),
+                );
+            }
+        }elseif ( 'tenancy' === $typenow ) 
         {
             if ( ! empty( $_GET['_status'] ) ) {
                 $vars['meta_query'][] = array(

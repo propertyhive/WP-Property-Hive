@@ -95,6 +95,24 @@ class PH_AJAX {
             'get_property_sales_meta_box' => false,
             'get_contact_sales_meta_box' => false,
 
+            // Tenancy actions
+            'get_tenancy_actions' => false,
+            'tenancy_offer_accepted' => false,
+            'tenancy_offer_declined' => false,
+            'tenancy_revert_offer_pending' => false,
+            'tenancy_references_requested' => false,
+            'tenancy_references_accepted' => false,
+            'tenancy_references_declined' => false,
+            'tenancy_agreement_signed' => false,
+            'tenancy_application_withdrawn' => false,
+            'tenancy_revert_application_pending' => false,
+            'tenancy_mark_as_let' => false,
+            'tenancy_renewing' => false,
+            'tenancy_not_renewing' => false,
+            'tenancy_periodic' => false,
+            'tenancy_terminate' => false,
+            'tenancy_revert' => false,
+
             'validate_save_contact' => false,
             'applicant_registration' => true,
             'login' => true,
@@ -3352,6 +3370,36 @@ class PH_AJAX {
                         }
                     }
                 }
+
+                if ( get_option('propertyhive_module_disabled_tenancies', '') != 'yes' )
+                {
+                    if ( get_post_meta( $property_id, '_department', TRUE ) == 'residential-lettings' )
+                    {
+                        // See if a tenancy has this viewing id associated with it
+                        $tenancy_id = get_post_meta( $post_id, '_tenancy_id', TRUE );
+                        if ( $tenancy_id != '' && get_post_status($tenancy_id) != 'publish' )
+                        {
+                            $tenancy_id = '';
+                        }
+
+                        if ( $tenancy_id != '' )
+                        {
+                            $actions[] = '<a 
+                                    href="' . get_edit_post_link( $offer_id, '' ) . '" 
+                                    class="button"
+                                    style="width:100%; margin-bottom:7px; text-align:center" 
+                                >' . wp_kses_post( __('View Tenancy', 'propertyhive') ) . '</a>';
+                        }
+                        else
+                        {
+                            $actions[] = '<a 
+                                    href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_tenancy' ) . '" 
+                                    class="button button-success"
+                                    style="width:100%; margin-bottom:7px; text-align:center" 
+                                >' . wp_kses_post( __('Proceed To Tenancy Application', 'propertyhive') ) . '</a>';
+                        }
+                    }
+                }
             }
 
             if ( get_post_meta( $post_id, '_feedback_passed_on', TRUE ) != 'yes' && ( $feedback_status == 'interested' || $feedback_status == 'not_interested' ) )
@@ -5100,6 +5148,911 @@ class PH_AJAX {
         echo '</div>';
         
         echo '</div>';
+
+        die();
+    }
+
+    public function get_tenancy_actions()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $show_tenancy_date_meta_boxes = false;
+        $show_mark_as_let_meta_boxes = false;
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="propertyhive_tenancy_actions_meta_box">
+
+        <div class="options_group" style="padding-top:8px;">';
+
+        if ( $status == 'application' )
+        {
+            $offer_status = get_post_meta( $post_id, '_offer_status', TRUE );
+            $references_status = get_post_meta( $post_id, '_references_status', TRUE );
+            $agreement_signed_date = get_post_meta( $post_id, '_agreement_signed_date', TRUE );
+
+            if ( $offer_status == '' || $offer_status == 'pending' )
+            {
+                $actions[] = '<a 
+                    href="#action_panel_tenancy_offer_accepted" 
+                    class="button button-success tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Application Offer Accepted', 'propertyhive') . '</a>';
+
+                $actions[] = '<a 
+                    href="#action_panel_tenancy_offer_declined" 
+                    class="button button-danger tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Application Offer Declined', 'propertyhive') . '</a>';
+            }
+
+            if ( $offer_status != 'declined' )
+            {
+                if ( $references_status == '' || $references_status == 'pending' )
+                {
+                    $actions[] = '<a 
+                        href="#action_panel_tenancy_date_change" 
+                        class="button button-success tenancy-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                        data-date-change-label="References Requested Date"
+                        data-date-change-action="references_requested"
+                    >' . __('References Requested', 'propertyhive') . '</a>';
+
+                    $actions[] = '<a 
+                        href="#action_panel_tenancy_references_not_required" 
+                        class="button tenancy-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . __('References Not Required', 'propertyhive') . '</a>';
+
+                    $show_tenancy_date_meta_boxes = true;
+                }
+
+                if ( $references_status == 'requested' )
+                {
+                    $actions[] = '<a 
+                        href="#action_panel_tenancy_date_change" 
+                        class="button button-success tenancy-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                        data-date-change-label="References Accepted Date"
+                        data-date-change-action="references_accepted"
+                    >' . __('References Accepted', 'propertyhive') . '</a>';
+
+                    $actions[] = '<a 
+                        href="#action_panel_tenancy_date_change" 
+                        class="button button-danger tenancy-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                        data-date-change-label="References Declined Date"
+                        data-date-change-action="references_declined"
+                    >' . __('References Declined', 'propertyhive') . '</a>';
+
+                    $show_tenancy_date_meta_boxes = true;
+                }
+
+                if ( 
+                    $offer_status == 'accepted' &&
+                    $references_status == 'accepted' &&
+                    $agreement_signed_date == '' 
+                )
+                {
+                    $actions[] = '<a 
+                        href="#action_panel_tenancy_date_change" 
+                        class="button button-success tenancy-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                        data-date-change-label="Agreement Signed Date"
+                        data-date-change-action="agreement_signed"
+                    >' . __('Agreement Signed', 'propertyhive') . '</a>';
+
+                    $show_tenancy_date_meta_boxes = true;
+                }
+            
+                $actions[] = '<a 
+                    href="#action_panel_tenancy_application_withdrawn" 
+                    class="button tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Application Withdrawn', 'propertyhive') . '</a>';
+            }
+            else
+            {
+                $actions[] = '<a 
+                    href="#action_panel_tenancy_revert_offer_pending" 
+                    class="button tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Revert To Pending', 'propertyhive') . '</a>';
+            }
+
+            $agreement_signed_date = get_post_meta( $post_id, '_agreement_signed_date', TRUE );
+
+            if ( 
+                $status == 'application' &&
+                $offer_status == 'accepted' &&
+                ( $references_status == 'accepted' || $references_status == 'not_required' ) &&
+                $agreement_signed_date != ''
+            )
+            {
+                array_unshift($actions, '<a 
+                    href="#action_panel_tenancy_mark_as_let" 
+                    class="button button-success tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Mark As Let', 'propertyhive') . '</a>');
+
+                $show_mark_as_let_meta_boxes = true;
+            }
+
+            $actions = apply_filters( 'propertyhive_admin_tenancy_application_actions', $actions, $post_id );
+        }
+
+        if ( $status == 'application_withdrawn' )
+        {
+            $actions[] = '<a 
+                href="#action_panel_tenancy_revert_application_pending" 
+                class="button tenancy-action"
+                style="width:100%; margin-bottom:7px; text-align:center" 
+            >' . __('Revert To Active Application', 'propertyhive') . '</a>';
+        }
+
+        if ( $status == 'tenancy' )
+        {
+            $renewal_status = get_post_meta( $post_id, '_renewal_status', TRUE );
+            $start_date = get_post_meta( $post_id, '_start_date', TRUE );
+            $end_date = get_post_meta( $post_id, '_end_date', TRUE );
+
+            if ( $renewal_status == '' )
+            {
+                if ( strtotime($start_date) <= time() && time() < strtotime($end_date) )
+                {
+                    // Current tenancy
+
+                    $actions[] = '<a 
+                        href="#action_panel_tenancy_renewing" 
+                        class="button tenancy-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . __('Renewing', 'propertyhive') . '</a>';
+
+                    $actions[] = '<a 
+                        href="#action_panel_tenancy_not_renewing" 
+                        class="button tenancy-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . __('Not Renewing', 'propertyhive') . '</a>';
+
+                    $actions[] = '<a 
+                        href="#action_panel_tenancy_periodic" 
+                        class="button tenancy-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . __('Periodic', 'propertyhive') . '</a>';
+                }
+            }
+
+            if ( time() < strtotime($end_date) )
+            {
+                $actions[] = '<a 
+                    href="#action_panel_tenancy_terminate" 
+                    class="button tenancy-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . __('Terminate Tenancy', 'propertyhive') . '</a>';
+            }
+        }
+
+        if ( $status == 'tenancy_terminated' )
+        {
+            $actions[] = '<a 
+                href="#action_panel_tenancy_revert" 
+                class="button tenancy-action"
+                style="width:100%; margin-bottom:7px; text-align:center" 
+            >' . __('Revert Tenancy To Active', 'propertyhive') . '</a>';
+        }
+
+        $actions = apply_filters( 'propertyhive_admin_tenancy_actions', $actions, $post_id );
+
+        if ( !empty($actions) )
+        {
+            echo implode("", $actions);
+        }
+        else
+        {
+            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+        }
+
+        echo '</div>
+
+        </div>';
+
+        if ( $show_tenancy_date_meta_boxes )
+        {
+            echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_tenancy_date_change" style="display:none;">
+
+                <div class="options_group" style="padding-top:8px;">
+
+                    <div class="form-field">
+
+                        <label for="_tenancy_date"></label>
+                        
+                        <input type="date" id="_tenancy_date" name="_tenancy_date" value="' . date("Y-m-d") . '">
+                        <input type="hidden" id="_tenancy_date_change_action" name="_tenancy_date_change_action" value="">
+
+                    </div>
+
+                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+                    <a class="button button-primary tenancy-date-change-action-submit" href="#">' . __( 'Save', 'propertyhive' ) . '</a>
+
+                </div>
+
+            </div>';
+        }
+
+        if ( $show_mark_as_let_meta_boxes )
+        {
+            // Availability
+            $options = array();
+            $args = array(
+                'hide_empty' => false,
+                'parent' => 0
+            );
+            $terms = get_terms( 'availability', $args );
+
+            $selected_value = '';
+            if ( !empty( $terms ) && !is_wp_error( $terms ) )
+            {
+                foreach ($terms as $term)
+                {
+                    $options[$term->term_id] = $term->name;
+                }
+
+                $term_list = wp_get_post_terms( get_post_meta( $post_id, '_property_id', TRUE ) , 'availability', array("fields" => "ids"));
+                
+                if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+                {
+                    $selected_value = $term_list[0];
+                }
+            }
+
+            echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_tenancy_mark_as_let" style="display:none;">
+
+                <div class="options_group" style="padding-top:8px;">
+
+                    <div class="form-field">
+
+                        <label for="_mark_as_let_property_availability">Change Property Availability</label>
+                        
+                        <select id="_mark_as_let_property_availability" name="_mark_as_let_property_availability" style="width:100%">';
+            foreach ( $options as $key => $value )
+            {
+                echo '<option value="' . $key . '"';
+                if ( $key == $selected_value ) { echo ' selected'; }
+                echo '>' . $value . '</option>';
+            }
+            echo '
+                        </select>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label for="_mark_as_let_remove_applicants_from_mailing_list">Remove applicants from property matches</label>
+                        
+                        <input type="checkbox" id="_mark_as_let_remove_applicants_from_mailing_list" name="_mark_as_let_remove_applicants_from_mailing_list" value="yes" checked>
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label for="_mark_as_let_remove_applicants_from_mailing_list">Set applicants address to property address</label>
+                        
+                        <input type="checkbox" id="_mark_as_let_update_applicant_address" name="_mark_as_let_update_applicant_address" value="yes" checked>
+
+                    </div>
+
+                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+                    <a class="button button-primary tenancy-mark-as-let-action-submit" href="#">' . __( 'Save', 'propertyhive' ) . '</a>
+
+                </div>
+
+            </div>';
+        }
+
+        die();
+    }
+
+    public function tenancy_offer_accepted()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        $offer_status = get_post_meta( $post_id, '_offer_status', TRUE );
+
+        if ( $status == 'application' && ( $offer_status == '' || $offer_status == 'pending' ) )
+        {
+            update_post_meta( $post_id, '_offer_status', 'accepted' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'offer_accepted',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_offer_declined()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        $offer_status = get_post_meta( $post_id, '_offer_status', TRUE );
+
+        if ( $status == 'application' && ( $offer_status == '' || $offer_status == 'pending' ) )
+        {
+            update_post_meta( $post_id, '_offer_status', 'declined' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'offer_declined',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_revert_offer_pending()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        $offer_status = get_post_meta( $post_id, '_offer_status', TRUE );
+
+        if ( $status == 'application' && ( $offer_status == 'declined' ) )
+        {
+            update_post_meta( $post_id, '_offer_status', 'pending' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'offer_pending',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_references_requested()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        $references_status = get_post_meta( $post_id, '_references_status', TRUE );
+
+        if ( $status == 'application' && ( $references_status == '' || $references_status == 'pending' ) )
+        {
+            update_post_meta( $post_id, '_references_status', 'requested' );
+            update_post_meta( $post_id, '_references_requested_date', $_POST['date'] );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'references_requested',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_references_accepted()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        $references_status = get_post_meta( $post_id, '_references_status', TRUE );
+
+        if ( $status == 'application' && $references_status == 'requested' )
+        {
+            update_post_meta( $post_id, '_references_status', 'accepted' );
+            update_post_meta( $post_id, '_references_accepted_date', $_POST['date'] );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'references_accepted',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_references_declined()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        $references_status = get_post_meta( $post_id, '_references_status', TRUE );
+
+        if ( $status == 'application' && $references_status == 'requested' )
+        {
+            update_post_meta( $post_id, '_references_status', 'declined' );
+            update_post_meta( $post_id, '_references_declined_date', $_POST['date'] );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'references_declined',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_agreement_signed()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+        $agreement_signed_date = get_post_meta( $post_id, '_agreement_signed_date', TRUE );
+
+        if ( $status == 'application' && $agreement_signed_date == '' )
+        {
+            update_post_meta( $post_id, '_agreement_signed_date', $_POST['date'] );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'agreement_signed',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_application_withdrawn()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'application' )
+        {
+            update_post_meta( $post_id, '_status', 'application_withdrawn' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'application_withdrawn',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_revert_application_pending()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'application_withdrawn' )
+        {
+            update_post_meta( $post_id, '_status', 'application' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'application_pending',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_mark_as_let()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'application' )
+        {
+            update_post_meta( $post_id, '_status', 'tenancy' );
+
+            $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+
+            // Update property availability
+            if ( $property_id != '' && isset($_POST['availability_id']) )
+            {
+                wp_set_post_terms( $property_id, array( $_POST['availability_id'] ), 'availability');
+            }
+
+            // Take applicants off mailing list
+            if ( isset($_POST['remove_applicants_from_mailing_list']) && $_POST['remove_applicants_from_mailing_list'] === TRUE )
+            {
+                $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+                if ( !empty($applicant_contact_id) && !is_array($applicant_contact_id) )
+                {
+                    $applicant_contact_ids = array($applicant_contact_id);
+                }
+
+                foreach ( $applicant_contact_ids as $applicant_contact_id )
+                {
+                    $applicant_profiles = get_post_meta( $applicant_contact_id, '_applicant_profiles', TRUE );
+
+                    for ( $i = 0; $i < $applicant_profiles; ++$i )
+                    {
+                        $applicant_profile = get_post_meta( $applicant_contact_id, '_applicant_profile_' . $i, TRUE );
+                        $applicant_profile['send_matching_properties'] = '';
+                        update_post_meta( $applicant_contact_id, '_applicant_profile_' . $i, $applicant_profile );
+                    }
+                }
+            }
+
+            // Update applicants address
+            if ( $property_id != '' && isset($_POST['update_applicant_address']) && $_POST['update_applicant_address'] === TRUE )
+            {
+                $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+                if ( !empty($applicant_contact_id) && !is_array($applicant_contact_id) )
+                {
+                    $applicant_contact_ids = array($applicant_contact_id);
+                }
+
+                $property = new PH_Property( (int)$property_id );
+
+                foreach ( $applicant_contact_ids as $applicant_contact_id )
+                {
+                    update_post_meta( $applicant_contact_id, '_address_name_number', ph_clean($property->_address_name_number) );
+                    update_post_meta( $applicant_contact_id, '_address_street', ph_clean($property->_address_street) );
+                    update_post_meta( $applicant_contact_id, '_address_two', ph_clean($property->_address_two) );
+                    update_post_meta( $applicant_contact_id, '_address_three', ph_clean($property->_address_three) );
+                    update_post_meta( $applicant_contact_id, '_address_four', ph_clean($property->_address_four) );
+                    update_post_meta( $applicant_contact_id, '_address_postcode', ph_clean($property->_address_postcode) );
+                    update_post_meta( $applicant_contact_id, '_address_country', ph_clean($property->_address_country) );
+                }
+            }
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'tenancy',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_renewing()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'tenancy' )
+        {
+            update_post_meta( $post_id, '_renewal_status', 'renewing' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'tenancy_renewing',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_not_renewing()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'tenancy' )
+        {
+            update_post_meta( $post_id, '_renewal_status', 'not_renewing' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'tenancy_not_renewing',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_periodic()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'tenancy' )
+        {
+            update_post_meta( $post_id, '_renewal_status', 'periodic' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'tenancy_periodic',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_terminate()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'tenancy' )
+        {
+            update_post_meta( $post_id, '_status', 'tenancy_terminated' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'tenancy_terminated',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
+
+        die();
+    }
+
+    public function tenancy_revert()
+    {
+        check_ajax_referer( 'tenancy-actions', 'security' );
+
+        $post_id = (int)$_POST['tenancy_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'tenancy_terminated' )
+        {
+            update_post_meta( $post_id, '_status', 'tenancy' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to sale
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'tenancy_revert',
+            );
+
+            $data = array(
+                'comment_post_ID'      => $post_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+        }
 
         die();
     }
