@@ -430,6 +430,60 @@ class PH_Meta_Box_Property_Address {
                                     
                                     // Split title by comma
                                     var explode_title = jQuery(\'#title\').val().split(\',\');
+
+                                    // If last element of address contains numbers, check if it contains a postcode
+                                    if (explode_title[explode_title.length - 1].match(/\d+/g) != null)
+                                    {
+                                        // Extract last element of address
+                                        var last_address_element = explode_title.pop().trim();
+
+                                        // Regular Expression that matches postcodes case insensitively in format NN13, NN13 7DR and NN137DR
+                                        const postcodeRegex = /^[A-Za-z]{1,2}[0-9][A-Za-z0-9]? ?([0-9][A-Za-z]{2})?$/;
+
+                                        if (postcodeRegex.test(last_address_element))
+                                        {
+                                            // Entire last element is a valid postcode
+                                            var postcode = last_address_element;
+                                        }
+                                        else
+                                        {
+                                            // Split address element by spaces
+                                            var last_address_element_split = last_address_element.split(\' \');
+
+                                            // Remove any sections that aren\'t valid postcode sections
+                                            var last_address_parts_containing_numbers = last_address_element_split.filter(function(address_part) {
+                                                return (postcodeRegex.test(address_part) || /[A-Za-z]{1,2}[0-9][A-Za-z0-9]?/.test(address_part) || /[0-9][A-Za-z]{2}/.test(address_part));
+                                            });
+                                            // Concatenate valid postcode elements
+                                            var last_address_element_filtered = last_address_parts_containing_numbers.join(\' \');
+
+                                            // Re-created address element is a valid postcode
+                                            if (postcodeRegex.test(last_address_element_filtered))
+                                            {
+                                                var postcode = last_address_element_filtered;
+
+                                                // Get non-postcode text from address element to put back into address
+                                                var last_address_parts_without_numbers = last_address_element_split.filter(function(address_part) {
+                                                    return !(postcodeRegex.test(address_part) || /[A-Za-z]{1,2}[0-9][A-Za-z0-9]?/.test(address_part) || /[0-9][A-Za-z]{2}/.test(address_part));
+                                                });
+                                                // Put other text back into address
+                                                explode_title.push(last_address_parts_without_numbers.join(\' \'));
+                                            }
+                                        }
+
+                                        // If we\'ve found a postcode, put it in the postcode field
+                                        if (typeof postcode !== \'undefined\')
+                                        {
+                                            // Set postcode field to the postcode we found
+                                            jQuery(\'#_address_postcode\').val(postcode);
+                                        }
+                                        else
+                                        {
+                                            // We couldn\'t find a postcode, so put the final address element back to be processed as normal
+                                            explode_title.push(last_address_element);
+                                        }
+                                    }
+
                                     for (var i in explode_title)
                                     {
                                         var title_element = jQuery.trim(explode_title[i]); // Trim it to remove any white space either side
@@ -457,51 +511,9 @@ class PH_Meta_Box_Property_Address {
                                             }
                                             else
                                             {
-                                                var split_title_elements = title_element.split(\' \');
-                                                
-                                                var numeric_matches = title_element.match(/\d+/g);
-                                                if (i == explode_title.length-1 &&  numeric_matches != null)
-                                                {
-                                                    // We\'re on the last bit and it contains a number
-                                                    for (var j in split_title_elements)
-                                                    {
-                                                        var split_title_element = jQuery.trim(split_title_elements[j]);
-                                                        
-                                                        var numeric_matches = split_title_element.match(/\d+/g);
-                                                        
-                                                        if (split_title_element.length >=2 && split_title_element.length <= 4 && numeric_matches != null)
-                                                        {
-                                                            // This bit of the address element definitely contains postcode bit
-                                                            var postcode = split_title_element;
-                                                            if (j == (split_title_elements.length - 2))
-                                                            {
-                                                                var temp_title_element = jQuery.trim(split_title_elements[split_title_elements.length-1]); // Trim it to remove any white space either side
-                                                                
-                                                                if ((temp_title_element.length >=2 || temp_title_element.length <= 4))
-                                                                {
-                                                                    // We have one element left after this
-                                                                    postcode += \' \' + temp_title_element;
-                                                                }
-                                                            }
-                                                            jQuery(\'#address_postcode\').val(postcode);
-                                                            
-                                                            break;
-                                                        }
-                                                        else
-                                                        {
-                                                            // General address element
-                                                            jQuery(\'#\' + address_fields[0]).val(title_element);
-                                                            address_fields.splice(0,1);
-                                                        }
-                                                    }
-                                                    
-                                                }
-                                                else
-                                                {
-                                                    // General address element
-                                                    jQuery(\'#\' + address_fields[0]).val(title_element);
-                                                    address_fields.splice(0,1);
-                                                }
+                                                // General address element
+                                                jQuery(\'#\' + address_fields[0]).val(title_element);
+                                                address_fields.splice(0,1);
                                             }
                                         }
                                     }
