@@ -68,6 +68,11 @@ class PH_Meta_Box_Property_Record_Details {
         }
         if ($office_id == '')
         {
+            // Get office set on neg/user
+            $office_id = get_user_meta($negotiator_id, 'office_id', TRUE);
+        }
+        if ($office_id == '')
+        {
             // TO DO: Get primary office
         }
         
