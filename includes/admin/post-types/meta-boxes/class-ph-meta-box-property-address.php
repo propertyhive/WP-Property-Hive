@@ -501,51 +501,9 @@ class PH_Meta_Box_Property_Address {
                                             }
                                             else
                                             {
-                                                var split_title_elements = title_element.split(\' \');
-                                                
-                                                var numeric_matches = title_element.match(/\d+/g);
-                                                if (i == explode_title.length-1 &&  numeric_matches != null)
-                                                {
-                                                    // We\'re on the last bit and it contains a number
-                                                    for (var j in split_title_elements)
-                                                    {
-                                                        var split_title_element = jQuery.trim(split_title_elements[j]);
-                                                        
-                                                        var numeric_matches = split_title_element.match(/\d+/g);
-                                                        
-                                                        if (split_title_element.length >=2 && split_title_element.length <= 4 && numeric_matches != null)
-                                                        {
-                                                            // This bit of the address element definitely contains postcode bit
-                                                            var postcode = split_title_element;
-                                                            if (j == (split_title_elements.length - 2))
-                                                            {
-                                                                var temp_title_element = jQuery.trim(split_title_elements[split_title_elements.length-1]); // Trim it to remove any white space either side
-                                                                
-                                                                if ((temp_title_element.length >=2 || temp_title_element.length <= 4))
-                                                                {
-                                                                    // We have one element left after this
-                                                                    postcode += \' \' + temp_title_element;
-                                                                }
-                                                            }
-                                                            jQuery(\'#_address_postcode\').val(postcode);
-                                                            
-                                                            break;
-                                                        }
-                                                        else
-                                                        {
-                                                            // General address element
-                                                            jQuery(\'#\' + address_fields[0]).val(title_element);
-                                                            address_fields.splice(0,1);
-                                                        }
-                                                    }
-                                                    
-                                                }
-                                                else
-                                                {
-                                                    // General address element
-                                                    jQuery(\'#\' + address_fields[0]).val(title_element);
-                                                    address_fields.splice(0,1);
-                                                }
+                                                // General address element
+                                                jQuery(\'#\' + address_fields[0]).val(title_element);
+                                                address_fields.splice(0,1);
                                             }
                                         }
                                     }
