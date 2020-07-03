@@ -483,7 +483,7 @@ class PH_Meta_Box_Property_Address {
                                                                     postcode += \' \' + temp_title_element;
                                                                 }
                                                             }
-                                                            jQuery(\'#address_postcode\').val(postcode);
+                                                            jQuery(\'#_address_postcode\').val(postcode);
                                                             
                                                             break;
                                                         }
