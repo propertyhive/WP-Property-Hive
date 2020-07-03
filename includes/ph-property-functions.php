@@ -217,6 +217,48 @@ function get_property_map( $args = array() )
 	}
 }
 
+function get_property_static_map( $args = array() )
+{
+	global $property;
+
+	if ( $property->latitude != '' && $property->latitude != '0' && $property->longitude != '' && $property->longitude != '0' )
+	{
+		$api_key = get_option('propertyhive_google_maps_api_key');
+
+	    $id_suffix = ( ( isset($args['id']) && $args['id'] != '' ) ? '_' . $args['id'] : '' );
+
+	    $link = ( ( isset($args['link']) && ($args['link'] === 'false' || $args['link'] === FALSE) ) ? 'false' : 'true' );
+
+	    $map_url = 'https://maps.googleapis.com/maps/api/staticmap?' .
+	    	'center=' . $property->latitude . ',' . $property->longitude .
+	    	'&size=1024x' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) .  
+	    	'&zoom=' . ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ) . 
+	    	'&maptype=roadmap' . 
+	    	'&markers=%7C%7C' . $property->latitude . ',' . $property->longitude .
+	    	'&key=' . urlencode($api_key);
+
+	    echo '<style type="text/css">
+	    	#property_static_map' . $id_suffix . ' {
+	    		height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px;
+	    		display: block;
+			    background-image: url("' . $map_url . '");
+			    background-repeat: no-repeat;
+			    background-position: 50% 50%;
+			    line-height: 0;
+			}
+	    </style>';
+	    
+	    if ( $link === true )
+	    {
+	    	echo '<a id="property_static_map' . $id_suffix . '" href="https://maps.google.com?q=' . $property->latitude . ',' . $property->longitude . '" target="_blank" rel="nofollow"></a>';
+		}
+		else
+		{
+			echo '<div id="property_static_map' . $id_suffix . '" ></div>';
+		}
+	}
+}
+
 function get_property_street_view( $args = array() )
 {
 	global $property;

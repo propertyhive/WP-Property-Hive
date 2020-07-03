@@ -25,6 +25,7 @@ class PH_Shortcodes {
 			'similar_properties'           => __CLASS__ . '::similar_properties',
 			'property_search_form'         => __CLASS__ . '::property_search_form',
 			'property_map'                 => __CLASS__ . '::property_map',
+			'property_static_map'          => __CLASS__ . '::property_static_map',
 			'property_street_view'         => __CLASS__ . '::property_street_view',
 			'property_office_details'      => __CLASS__ . '::property_office_details',
 			'office_map'                   => __CLASS__ . '::office_map',
@@ -834,6 +835,31 @@ class PH_Shortcodes {
 		ob_start();
 
 		echo get_property_map( $atts );
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Output static (image) property map
+	 * Should only be used on a property page or where the $property var is set
+	 *
+	 * @param array $atts
+	 * @return string
+	 */
+	public static function property_static_map( $atts ) {
+
+		global $property;
+
+		$atts = shortcode_atts( array(
+			'id'        	=> '',
+			'height'        => '400',
+			'zoom'          => '14',
+			'link'        	=> 'true',
+		), $atts, 'property_static_map' );
+
+		ob_start();
+
+		echo get_property_static_map( $atts );
 
 		return ob_get_clean();
 	}
