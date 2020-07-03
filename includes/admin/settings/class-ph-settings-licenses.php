@@ -83,13 +83,13 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 				)
 				{
 					// Expires in less than 30 days
-					$output = '<span style="color:#F90">' . __( 'License expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. ' . $renew_link . '</span>';
-					$input_border_color = '#F90';
+					//$output = '<span style="color:#F90">' . __( 'License expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. ' . $renew_link . '</span>';
+					//$input_border_color = '#F90';
 				}
 				elseif (strtotime($license['expires_at']) > time())
 				{
 					// Valid
-					$output = '<span style="color:#090">' . __( 'License valid. Expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '.</span>';
+					$output = '<span style="color:#090">' . __( 'License valid', 'propertyhive') . '.</span>';
 					$input_border_color = '#090';
 					$valid_license = true;
 				}
