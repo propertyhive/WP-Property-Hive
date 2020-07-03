@@ -321,26 +321,7 @@ class PH_Admin {
                 }
                 else
                 {
-                    if ( isset($license['expires_at']) && $license['expires_at'] != '' )
-                    {
-                        if ( strtotime($license['expires_at']) <= time() )
-                        {
-                            // Expired
-                            $output = __( 'Your Property Hive license key expired on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. It\'s recommended that you renew it to ensure you continue to receive future updates to add ons you\'ve purchased.';
-                        }
-                        elseif ( 
-                            strtotime($license['expires_at']) > time() &&
-                            strtotime($license['expires_at']) < (time() + 30 * 24 * 60 * 60)
-                        )
-                        {
-                            // Expires in less than 30 days
-                            $output = __( 'Your Property Hive license key expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. It\'s recommended that you renew it to ensure you continue to receive future updates to add ons you\'ve purchased.';
-                        }
-                        elseif (strtotime($license['expires_at']) > time())
-                        {
-                            // Valid
-                        }
-                    }
+                    
                 }
 
                 if ( $output != '' )
