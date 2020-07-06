@@ -62,6 +62,7 @@ class PH_Elementor {
 		$widgets = array(
 			'Property Price',
 			'Property Images',
+			'Property Image',
 			'Property Features',
 			'Property Summary Description',
 			'Property Full Description',
