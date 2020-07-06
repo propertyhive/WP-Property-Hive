@@ -30,6 +30,81 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'prevent_access_to_admin' ) );
         add_action( 'admin_init', array( $this, 'view_email' ) );
         add_action( 'admin_init', array( $this, 'preview_emails' ) );
+        add_action( 'admin_init', array( $this, 'record_recently_viewed' ) );
+    }
+
+    public function record_recently_viewed()
+    {
+        global $pagenow;
+
+        if ( 
+            'post.php' === $pagenow &&
+            isset($_GET['post']) && 
+            in_array(
+                get_post_type((int)$_GET['post']), 
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale') )
+            ) 
+        )
+        {
+            $recently_viewed = get_user_meta( get_current_user_id(), '_propertyhive_recently_viewed', TRUE );
+
+            if ( !is_array($recently_viewed) )
+            {
+                $recently_viewed = array();
+            }
+
+            foreach ( $recently_viewed as $time => $post )
+            {
+                if ( (int)$_GET['post'] == $post['id'] )
+                {
+                    unset($recently_viewed[$time]);
+                }
+            }
+
+            $title = get_the_title((int)$_GET['post']);
+
+            switch ( get_post_type((int)$_GET['post']) )
+            {
+                case "appraisal":
+                {
+                    $appraisal = new PH_Appraisal( (int)$_GET['post'] );
+                    $title = $appraisal->get_formatted_summary_address();
+                    break;
+                }
+                case "property":
+                {
+                    $property = new PH_Property( (int)$_GET['post'] );
+                    $title = $property->get_formatted_summary_address();
+                    break;
+                }
+                case "enquiry":
+                case "viewing":
+                case "offer":
+                case "sale":
+                {
+                    $property_id = get_post_meta( (int)$_GET['post'], '_property_id', TRUE );
+                    if ( $property_id != '' )
+                    {
+                        $property = new PH_Property( (int)$property_id );
+                        $title = $property->get_formatted_summary_address();
+                    }
+                    break;
+                }
+            }
+
+            $title = ucfirst(get_post_type((int)$_GET['post'])) . ' - ' . $title;
+
+            $recently_viewed = array(time() => array(
+                'id' => (int)$_GET['post'],
+                'title' => $title,
+                'post_type' => get_post_type((int)$_GET['post']),
+                'edit_link' => get_edit_post_link((int)$_GET['post']),
+            )) + $recently_viewed;
+
+            $recently_viewed = array_slice($recently_viewed, 0, 10, TRUE);
+
+            update_user_meta( get_current_user_id(), '_propertyhive_recently_viewed', $recently_viewed );
+        }
     }
     
     public function admin_dashboard_pages()

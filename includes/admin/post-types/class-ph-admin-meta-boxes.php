@@ -1506,7 +1506,7 @@ class PH_Admin_Meta_Boxes {
         if ( 
             in_array(
                 get_post_type($post->ID), 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'viewing', 'offer', 'sale') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale') )
             ) 
         )
         {
