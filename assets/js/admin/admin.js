@@ -5,6 +5,39 @@
  */
 jQuery( function ( $ ) {
 
+	if ($('#contextual-help-link-wrap').length == 0)
+	{
+		$("#screen-meta-links").append('<div id="contextual-help-link-wrap" class="hide-if-no-js screen-meta-toggle" style="z-index:2;"><button class="show-settings" style="cursor:pointer">Recently Viewed</button></div>');
+
+		var html = '';
+
+		if ( Object.keys(propertyhive_admin.recently_viewed).length > 0 )
+		{
+			html += '<ul>';
+			for ( var i in propertyhive_admin.recently_viewed )
+			{
+				html += '<li><a href="' + propertyhive_admin.recently_viewed[i].edit_link + '">' + propertyhive_admin.recently_viewed[i].title + '</a></li>';
+			}
+			html += '</ul>';
+		}
+		else
+		{
+			html += '<div class="none">No recently viewed items to display</div>';
+		}
+
+		$("#screen-meta-links").append('<div class="ph-recently-viewed-popup">' + html + '</div>');
+
+		$('body').on('click', '#contextual-help-link-wrap .show-settings', function(e)
+		{
+			e.preventDefault();
+
+			jQuery('.ph-recently-viewed-popup').css({
+				top: $(this).position().top + $(this).outerHeight(),
+				right: $(document).width() - ($(this).parent().offset().left + $(this).parent().outerWidth())
+			}).fadeToggle('fast');
+		});
+	}
+
 	$( document.body )
 
 		.on( 'init_tooltips', function() {
