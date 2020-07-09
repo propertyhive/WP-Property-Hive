@@ -381,6 +381,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                             <th class="name"><?php _e( 'Name', 'propertyhive' ); ?></th>
                             <th class="address"><?php _e( 'Address', 'propertyhive' ); ?></th>
                             <th class="contact"><?php _e( 'Contact Details', 'propertyhive' ); ?></th>
+                            <?php do_action( 'propertyhive_office_table_header_columns' ); ?>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -439,7 +440,9 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                         </td>
                                         <td class="contact">
                                             ' . $contact_details . '
-                                        </td>
+                                        </td>';
+                                    do_action( 'propertyhive_office_table_row_columns', get_the_ID() );
+                                    echo '
                                         <td class="settings">
                                             <a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=edit&id=' . $post->ID ) . '">' . __( 'Edit', 'propertyhive' ) . '</a>
                                             ';
