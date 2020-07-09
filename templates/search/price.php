@@ -17,9 +17,8 @@ global $property;
 	
 	<?php
         if (
-            $property->department == 'residential-sales'
-            ||
-            ( $property->department == 'commercial' && $property->for_sale == 'yes' )
+            ( $property->department == 'residential-sales' || $property->department == 'commercial' ) &&
+            $property->price_qualifier != ''
         )
         {
             echo ' <span class="price-qualifier">' . $property->price_qualifier . '</span>';
