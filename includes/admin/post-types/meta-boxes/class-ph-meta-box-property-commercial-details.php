@@ -140,42 +140,6 @@ class PH_Meta_Box_Property_Commercial_Details {
             'value' => get_post_meta( $post->ID, '_price_poa', true )
         ) );
         
-        // Price Qualifier
-        $options = array( '' => '' );
-        $args = array(
-            'hide_empty' => false,
-            'parent' => 0
-        );
-        $terms = get_terms( 'price_qualifier', $args );
-        
-        $selected_value = '';
-        if ( !empty( $terms ) && !is_wp_error( $terms ) )
-        {
-            foreach ($terms as $term)
-            {
-                $options[$term->term_id] = $term->name;
-            }
-
-            $term_list = wp_get_post_terms($post->ID, 'price_qualifier', array("fields" => "ids"));
-            
-            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
-            {
-                $selected_value = $term_list[0];
-            }
-        }
-        
-        $args = array( 
-            'id' => 'commercial_price_qualifier_id', 
-            'label' => __( 'Price Qualifier', 'propertyhive' ), 
-            'desc_tip' => false,
-            'options' => $options
-        );
-        if ($selected_value != '')
-        {
-            $args['value'] = $selected_value;
-        }
-        propertyhive_wp_select( $args );
-        
         // Sale By
         $options = array( '' => '' );
         $args = array(
@@ -309,6 +273,42 @@ class PH_Meta_Box_Property_Commercial_Details {
         do_action('propertyhive_property_commercial_rent_details_fields');
 
         echo '</div>'; // end commercial-rent-fields
+
+         // Price Qualifier
+        $options = array( '' => '' );
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'price_qualifier', $args );
+        
+        $selected_value = '';
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            {
+                $options[$term->term_id] = $term->name;
+            }
+
+            $term_list = wp_get_post_terms($post->ID, 'price_qualifier', array("fields" => "ids"));
+            
+            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+            {
+                $selected_value = $term_list[0];
+            }
+        }
+        
+        $args = array( 
+            'id' => 'commercial_price_qualifier_id', 
+            'label' => __( 'Price Qualifier', 'propertyhive' ), 
+            'desc_tip' => false,
+            'options' => $options
+        );
+        if ($selected_value != '')
+        {
+            $args['value'] = $selected_value;
+        }
+        propertyhive_wp_select( $args );
 
         ?>
 
@@ -516,16 +516,6 @@ class PH_Meta_Box_Property_Commercial_Details {
 
                     update_post_meta( $post_id, '_price_poa', ( isset($_POST['_commercial_price_poa']) ? ph_clean($_POST['_commercial_price_poa']) : '' ) );
 
-                    if ( !empty($_POST['commercial_price_qualifier_id']) )
-                    {
-                        wp_set_post_terms( $post_id, (int)$_POST['commercial_price_qualifier_id'], 'price_qualifier' );
-                    }
-                    else
-                    {
-                        // Setting to blank
-                        wp_delete_object_term_relationships( $post_id, 'price_qualifier' );
-                    }
-                    
                     if ( !empty($_POST['commercial_sale_by_id']) )
                     {
                         wp_set_post_terms( $post_id, (int)$_POST['commercial_sale_by_id'], 'sale_by' );
@@ -570,6 +560,16 @@ class PH_Meta_Box_Property_Commercial_Details {
 
                     update_post_meta( $post_id, '_rent_poa', ( isset($_POST['_commercial_rent_poa']) ? ph_clean($_POST['_commercial_rent_poa']) : '' ) );
                 }
+            }
+
+            if ( !empty($_POST['commercial_price_qualifier_id']) )
+            {
+                wp_set_post_terms( $post_id, (int)$_POST['commercial_price_qualifier_id'], 'price_qualifier' );
+            }
+            else
+            {
+                // Setting to blank
+                wp_delete_object_term_relationships( $post_id, 'price_qualifier' );
             }
 
             // Store price in common currency (GBP) used for ordering
