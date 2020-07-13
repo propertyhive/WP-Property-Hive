@@ -8,7 +8,7 @@ function ph_init_slideshow()
     jQuery('#carousel').flexslider({
         animation: "slide",
         controlNav: false,
-        animationLoop: false,
+        animationLoop: true,
         slideshow: false,
         itemWidth: 150,
         itemMargin: 5,
@@ -18,7 +18,7 @@ function ph_init_slideshow()
     jQuery('#slider').flexslider({
         animation: "slide",
         controlNav: false,
-        animationLoop: false,
+        animationLoop: true,
         slideshow: false,
         sync: "#carousel",
         smoothHeight: true
