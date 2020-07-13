@@ -945,6 +945,10 @@ function ph_form_field( $key, $field )
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
+            $field['before_option'] = isset( $field['before_option'] ) ? $field['before_option'] : '<label>';
+            $field['after_option'] = isset( $field['after_option'] ) ? $field['after_option'] : '</label>';
+            $field['before_input'] = isset( $field['before_input'] ) ? $field['before_input'] : '';
+            $field['after_input'] = isset( $field['after_input'] ) ? $field['after_input'] : '';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : false;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
 
@@ -963,13 +967,20 @@ function ph_form_field( $key, $field )
 
             foreach ( $field['options'] as $option_key => $value )
             {
-                $output .= '<label><input
+                $id = esc_attr( $key ) . '_' . esc_attr( $option_key );
+                $output .= str_replace("{id}", $id, $field['before_option']);
+                $output .= str_replace("{id}", $id, $field['before_input']);
+                $output .= '<input
                     type="' . esc_attr( $field['type'] ) . '"
                     name="' . esc_attr( $key ) . '"
+                    id="' . $id . '"
                     value="' . esc_attr( $option_key ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
                     ' . checked( esc_attr( $field['value'] ), esc_attr( $option_key ), false ) . '
-                > ' . esc_html( $value ) . '</label>';
+                >';
+                $output .= str_replace("{id}", $id, $field['after_input']);
+                $output .= ' ' . esc_html( $value );
+                $output .= str_replace("{id}", $id, $field['after_option']);
             }
 
             $output .= $field['after'];
