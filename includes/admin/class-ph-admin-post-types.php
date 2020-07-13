@@ -295,7 +295,7 @@ class PH_Admin_Post_Types {
             'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
             'selected' => $selected,
             'echo' => false,
-            'role__not_in' => array('property_hive_contact') 
+            'role__not_in' => array('property_hive_contact', 'subscriber') 
         );
         $output = wp_dropdown_users($args);
 
@@ -718,7 +718,7 @@ class PH_Admin_Post_Types {
             $args = array(
                 'number' => 9999,
                 'orderby' => 'display_name',
-                'role__not_in' => array('property_hive_contact') 
+                'role__not_in' => array('property_hive_contact', 'subscriber') 
             );
             $user_query = new WP_User_Query( $args );
 
@@ -818,7 +818,7 @@ class PH_Admin_Post_Types {
             $args = array(
                 'number' => 9999,
                 'orderby' => 'display_name',
-                'role__not_in' => array('property_hive_contact') 
+                'role__not_in' => array('property_hive_contact', 'subscriber') 
             );
             $user_query = new WP_User_Query( $args );
 

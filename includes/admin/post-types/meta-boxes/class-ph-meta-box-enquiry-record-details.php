@@ -53,7 +53,7 @@ class PH_Meta_Box_Enquiry_Record_Details {
                 'id' => '_negotiator_id', 
                 'class' => 'select short',
                 'selected' => $negotiator_id,
-                'role__not_in' => array('property_hive_contact') 
+                'role__not_in' => array('property_hive_contact', 'subscriber') 
             );
             wp_dropdown_users($args);
             
