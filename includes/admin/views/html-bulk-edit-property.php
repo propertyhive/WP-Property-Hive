@@ -75,7 +75,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	                'name' => '_negotiator_id', 
 	                'id' => '_negotiator_id', 
 	                'show_option_none' => '— No Change —',
-	                'role__not_in' => array('property_hive_contact') 
+	                'role__not_in' => array('property_hive_contact', 'subscriber') 
 	            );
 	            wp_dropdown_users($args);
 				?>
