@@ -3619,11 +3619,13 @@ class PH_AJAX {
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', implode(", ", $owner_names), $subject);
+            $subject = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', implode(", ", $owner_names), $body);
+            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
