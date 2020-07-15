@@ -545,6 +545,90 @@ class PH_Admin_Settings {
 	                </tr><?php
 	            break;
 
+	            // Image
+	            case 'image' :
+
+	            	$option_value = self::get_option( $value['id'], $value['default'] );
+
+	            	?>
+	            	<tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>_uploaded" <?php if ( $option_value == '' ) { echo ' style="display:none"'; } ?>>
+						<th scope="row" class="titledesc"><?php echo esc_html( __( 'Uploaded', 'propertyhive' ) . ' ' . $value['title'] ); ?></th>
+	                    <td class="forminp image_settings">
+	                    <?php
+	                    	$image = wp_get_attachment_image_src( $option_value, 'thumbnail' );
+							if ($image !== FALSE)
+							{
+								echo '<img src="' . $image[0] . '" width="150" alt="">';
+							}
+							else
+							{
+								echo 'Image doesn\'t exist';
+							}
+	                    ?>
+	                    </td>
+	                </tr>
+	            	<tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
+						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+	                    <td class="forminp image_width_settings">
+
+	                    	<a href="" class="button button-primary ph_upload_photo_button<?php echo esc_attr( $value['id'] ); ?>">Select Image</a>
+	                    	<input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="hidden" value="<?php echo $option_value; ?>" />
+
+	                    </td>
+	                </tr><?php
+	                echo '<script>
+
+		var file_frame' . $value['id'] . ';
+
+		jQuery(document).ready(function()
+        {
+        	jQuery(\'.ph_upload_photo_button' . $value['id'] . '\').live(\'click\', function( event ){
+                 
+	            event.preventDefault();
+	         
+	            // If the media frame already exists, reopen it.
+	            if ( file_frame' . $value['id'] . ' ) {
+	              file_frame' . $value['id'] . '.open();
+	              return;
+	            }
+	         
+	            // Create the media frame.
+	            file_frame' . $value['id'] . ' = wp.media.frames.file_frame' . $value['id'] . ' = wp.media({
+	              title: jQuery( this ).data( \'uploader_title\' ),
+	              button: {
+	                text: jQuery( this ).data( \'uploader_button_text\' ),
+	              },
+	              multiple: false  // Set to true to allow multiple files to be selected
+	            });
+	         
+	            // When an image is selected, run a callback.
+	            file_frame' . $value['id'] . '.on( \'select\', function() {
+	                var selection = file_frame' . $value['id'] . '.state().get(\'selection\');
+
+	                selection.map( function( attachment ) {
+	             
+	                    attachment = attachment.toJSON();
+	             
+	                    // Do something with attachment.id and/or attachment.url here
+	                    console.log(attachment.url);
+	                    
+	                    // Add selected image to page
+	                    //add_photo_attachment_to_grid(attachment);
+
+	                    jQuery(\'#row_' . esc_attr( $value['id'] ) . '_uploaded\').show();
+	                    jQuery(\'#row_' . esc_attr( $value['id'] ) . '_uploaded td\').html(\'<img src="\' + attachment.url + \'" width="150" alt="">\');
+	                    jQuery(\'#' . esc_attr( $value['id'] ) . '\').val(attachment.id);
+	                });
+	            });
+	         
+	            // Finally, open the modal
+	            file_frame' . $value['id'] . '.open();
+	        });
+		});
+
+	</script>';
+	            break;
+
 	            // Single page selects
 	            case 'single_select_page' :
 
