@@ -747,6 +747,11 @@ class PH_Property {
      */
     public function get_available_date( ) 
     {
+        if ( $this->_available_date == '' )
+        {
+            return '';
+        }
+
         if (strtotime($this->_available_date) > time())
         {
             return date( get_option( 'date_format' ), strtotime($this->_available_date) );
