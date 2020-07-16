@@ -39,7 +39,6 @@ class PH_Settings_Get_Involved extends PH_Settings_Page {
      */
     public function get_settings()
     {
-
         global $hide_save_button;
 
         $hide_save_button = TRUE;
@@ -83,38 +82,28 @@ class PH_Settings_Get_Involved extends PH_Settings_Page {
      */
     public function getinvolved_setting()
     {
+        $assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
+
         ?>
             <style type="text/css">
 
                 .get-involved ul { list-style-type:none; margin:0; padding:0; }
                 .get-involved ul li { float:left; width:40%; padding:0 10px; margin-bottom:25px; box-sizing:border-box; }
-                .get-involved ul li:nth-child(4n+1) { clear:left; }
-                .get-involved ul li .padding { background:#FFF; padding:15px; box-sizing:border-box; border:1px solid #CCC; box-shadow:0px 0px 9px 0px rgba(0,0,0,0.2); -webkit-box-shadow:0px 0px 9px 0px rgba(0,0,0,0.2); }
+                .get-involved ul li:nth-child(2n+1) { clear:left; }
+                .get-involved ul li .padding { background:#FFF; padding:15px; box-sizing:border-box; }
+                .get-involved ul li:last-child .padding { border:1px solid #CCC; box-shadow:0px 0px 9px 0px rgba(0,0,0,0.2); -webkit-box-shadow:0px 0px 9px 0px rgba(0,0,0,0.2); }
                 .get-involved ul li .thumbnail { text-align:center; padding-top:8px; }
 
 
-                .get-involved a { text-decoration:none; color: black; }
+                .get-involved a { display:block; height:100%; text-decoration:none; color:black; border:1px solid #CCC; box-shadow:0px 0px 9px 0px rgba(0,0,0,0.2); -webkit-box-shadow:0px 0px 9px 0px rgba(0,0,0,0.2); transition:all 0.15s; -webkit-transition:all 0.15s; }
+                .get-involved a:hover { box-shadow:0px 0px 9px 0px rgba(0,0,0,0.4); -webkit-box-shadow:0px 0px 9px 0px rgba(0,0,0,0.4); }
                 .get-involved h1 { padding-top:0; font-weight:bold; }
-                .get-involved .padding .details p { font-size:1.2em; }
-                .get-involved .intro-text { width:81%; font-size:1.2em; }
+                .get-involved .padding .details p { font-size:1.1em; margin-bottom:10px; }
+                .get-involved .intro-text { width:81%; font-size:1.1em; }
                 .get-involved img { max-width:100%; }
-
-                @media (max-width:1450px) {
-                    .get-involved ul li { width:33.3333%; }
-                    .get-involved ul li:nth-child(4n+1) { clear:none; }
-                    .get-involved ul li:nth-child(3n+1) { clear:left; }
-                }
-
-                @media (max-width:1024px) {
-                    .get-involved ul li { width:50%; }
-                    .get-involved ul li:nth-child(3n+1) { clear:none; }
-                    .get-involved ul li:nth-child(2n+1) { clear:left; }
-                }
 
                 @media (max-width:550px) {
                     .get-involved ul li { width:100%; padding:0; }
-                    .get-involved ul li:nth-child(3n+1) { clear:none; }
-                    .get-involved ul li:nth-child(2n+1) { clear:left; }
                 }
 
             </style>
@@ -123,7 +112,7 @@ class PH_Settings_Get_Involved extends PH_Settings_Page {
                 <td class="get-involved">
                     <p class="intro-text">
                         Our objective since launching Property Hive back in 2015 has always been to make it easy for developers and agents alike to get involved and contribute to allow us to make an estate agency WordPress plugin that everyone can benefit from.<br><br>
-                        Below you'll find just a few ways in which you can get involved, regardless of your technical background.
+                        Below you'll find just a few ways in which you can get involved:
                     </p>
                 </td>
             </tr>
@@ -135,7 +124,7 @@ class PH_Settings_Get_Involved extends PH_Settings_Page {
                                 <div class="padding">
                                     <?php $this->draw_get_involved_details('Public Feature Roadmap', 'See what features are coming up and currently in progress. Vote on features and submit your own ideas.'); ?>
                                     <div class="thumbnail">
-                                        <img src="../wp-content/uploads/2020/07/trello.png" alt="Public Feature Roadmap">
+                                        <img src="<?php echo $assets_path; ?>images/admin/get-involved/trello.png" alt="Public Feature Roadmap">
                                     </div>
                                 </div>
                             </a>
@@ -145,7 +134,7 @@ class PH_Settings_Get_Involved extends PH_Settings_Page {
                                 <div class="padding">
                                     <?php $this->draw_get_involved_details('Open Source Codebase', 'Being open source, you can develop your own Property Hive features and push them back for everybody to benefit from.'); ?>
                                     <div class="thumbnail">
-                                        <img src="../wp-content/uploads/2020/07/github.png" alt="Open Source Codebase">
+                                        <img src="<?php echo $assets_path; ?>images/admin/get-involved/github.png" alt="Open Source Codebase">
                                     </div>
                                 </div>
                             </a>
@@ -155,21 +144,19 @@ class PH_Settings_Get_Involved extends PH_Settings_Page {
                                 <div class="padding">
                                     <?php $this->draw_get_involved_details('Build Your Own Add On', 'Get your creative juices flowing and build your own add on. We\'ve even got a skeleton add on available to get you started.'); ?>
                                     <div class="thumbnail">
-                                        <img src="../wp-content/uploads/2020/07/add-ons.png" alt="Build Your Own Add On">
+                                        <img src="<?php echo $assets_path; ?>images/admin/get-involved/addons.png" alt="Build Your Own Add On">
                                     </div>
                                 </div>
                             </a>
                         </li>
-                        <li>
+                        <?php /*<li>
                             <div class="padding">
                                 <?php $this->draw_get_involved_details('Sign Up To Our Newsletter', 'Ensure you\'re always in the know and get notified of new releases by signing up to our newsletter.'); ?>
                                 <br>
                                 <!-- Begin Mailchimp Signup Form -->
                                 <link href="//cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css">
                                 <style type="text/css">
-                                    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
-                                    /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
-                                    We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+                                    #mc_embed_signup{background:#fff; clear:left; font-size:14px; }
                                 </style>
                                 <div id="mc_embed_signup">
                                 <form action="https://wp-property-hive.us9.list-manage.com/subscribe/post?u=92cc489fc12939370f2b630b4&amp;id=58f44dd68b" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
@@ -190,7 +177,7 @@ class PH_Settings_Get_Involved extends PH_Settings_Page {
                                 <script type='text/javascript' src='//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'></script><script type='text/javascript'>(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
                                 <!--End mc_embed_signup-->
                             </div>
-                        </li>
+                        </li>*/?>
                     </ul>
                 </td>
             </tr>
