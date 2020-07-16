@@ -36,6 +36,7 @@ class PH_Admin_Settings {
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
             $settings[] = include( 'settings/class-ph-settings-licenses.php' );
             $settings[] = include( 'settings/class-ph-settings-add-ons.php' );
+            $settings[] = include( 'settings/class-ph-settings-get-involved.php' );
 
 			self::$settings = apply_filters( 'propertyhive_get_settings_pages', $settings );
 		}
