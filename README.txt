@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.4.2
-Stable tag: 1.4.63
+Stable tag: 1.4.64
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.64 =
+* Hide users with role 'subscriber' in all negotiator related lists
+* Make price qualifier on commercial not only a 'For Sale' related field
+* Available date output on frontend to read 'Now' if date passed
+* Replace [applicant_name] tag in owner viewing confirmation emails
+* Updated Flexslider jQuery slideshow plugin to 2.7.2
+* Added new 'Get Involved' tab to settings area
+* Added support for image field type in admin settings. Used by Template Assistant add on when creating additional fields of type 'Image'
 
 = 1.4.63 =
 * Added new 'Property Image' Elementor widget to show specific image in single property template
