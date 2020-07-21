@@ -82,6 +82,8 @@ class PH_Admin_Assets {
 
         wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery', 'wp-color-picker' ), PH_VERSION );
 
+        wp_register_script( 'propertyhive_admin_recently_viewed', PH()->plugin_url() . '/assets/js/admin/recently-viewed' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
+
         wp_register_script( 'ajax-chosen', PH()->plugin_url() . '/assets/js/chosen/ajax-chosen.jquery' . /*$suffix .*/ '.js', array('jquery', 'chosen'), PH_VERSION );
 
         wp_register_script( 'chosen', PH()->plugin_url() . '/assets/js/chosen/chosen.jquery' . /*$suffix .*/ '.js', array('jquery'), PH_VERSION );
@@ -105,7 +107,7 @@ class PH_Admin_Assets {
         $params = array(
             'recently_viewed' => $recently_viewed,
         );
-        wp_localize_script( 'propertyhive_admin', 'propertyhive_admin', $params );
+        wp_localize_script( 'propertyhive_admin_recently_viewed', 'propertyhive_admin_recently_viewed', $params );
 
         // PropertyHive admin pages
         if ( in_array( $screen->id, array( 'dashboard' ) ) )
@@ -130,6 +132,7 @@ class PH_Admin_Assets {
 
             wp_enqueue_media();
             wp_enqueue_script( 'propertyhive_admin_meta_boxes' );
+            wp_enqueue_script( 'propertyhive_admin_recently_viewed' );
             wp_enqueue_script( 'jquery-ui-datepicker' );
             wp_enqueue_script( 'jquery-ui-autocomplete' );
             wp_enqueue_script( 'ajax-chosen' );
