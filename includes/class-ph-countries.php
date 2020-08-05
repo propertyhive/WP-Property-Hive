@@ -223,6 +223,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'QA' => array(
+				'name' => 'Qatar',
+				'currency_code' => 'QAR',
+				'currency_symbol' => 'QR',
+				'currency_prefix' => false
+			),
 			'RU' => array(
 				'name' => 'Russia',
 				'currency_code' => 'RUB',
