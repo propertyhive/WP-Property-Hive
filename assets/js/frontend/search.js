@@ -35,6 +35,8 @@ function toggleDepartmentFields()
             jQuery(this).find('.lettings-only').hide();
             jQuery(this).find('.residential-only').hide();
             jQuery(this).find('.commercial-only').hide();
+            jQuery(this).find('.commercial-sales-only').hide();
+            jQuery(this).find('.commercial-lettings-only').hide();
             
             if (selected.length > 0)
             {
@@ -47,7 +49,7 @@ function toggleDepartmentFields()
                 var found = false;
                 jQuery(this).find('.control').each(function()
                 {
-                    if (!jQuery(this).hasClass('.sales-only') && !jQuery(this).hasClass('.lettings-only') && !jQuery(this).hasClass('.residential-only') && !jQuery(this).hasClass('.commercial-only') && jQuery(this).css('display') != 'none')
+                    if (!jQuery(this).hasClass('.sales-only') && !jQuery(this).hasClass('.lettings-only') && !jQuery(this).hasClass('.residential-only') && !jQuery(this).hasClass('.commercial-only') && !jQuery(this).hasClass('.commercial-sales-only') && !jQuery(this).hasClass('.commercial-lettings-only') && jQuery(this).css('display') != 'none')
                     {
                         display = jQuery(this).css('display');
                         found = true;
@@ -75,6 +77,24 @@ function toggleDepartmentFields()
                 else if (selectedDepartment == 'commercial')
                 {
                     jQuery(this).find('.commercial-only').css('display', display);
+                    jQuery(this).find('.commercial-sales-only').css('display', 'none');
+                    jQuery(this).find('.commercial-lettings-only').css('display', 'none');
+
+                    if ( jQuery(this).find('[name=\'commercial_for_sale_to_rent\']').length > 0 )
+                    {
+                        var commercial_for_sale_to_rent = jQuery(this).find('[name=\'commercial_for_sale_to_rent\']').val();
+
+                        if ( commercial_for_sale_to_rent == 'for_sale' )
+                        {
+                            jQuery(this).find('.commercial-sales-only').css('display', display);
+                            jQuery(this).find('.commercial-lettings-only').css('display', 'none');
+                        }
+                        if ( commercial_for_sale_to_rent == 'to_rent' )
+                        {
+                            jQuery(this).find('.commercial-sales-only').css('display', 'none');
+                            jQuery(this).find('.commercial-lettings-only').css('display', display);
+                        }
+                    }
                 }
 
                 if ( jQuery(this).find('[name=\'availability\']').length > 0 && typeof availability_departments !== "undefined" )
@@ -126,6 +146,11 @@ jQuery( function(jQuery){
     toggleDepartmentFields();
     
     jQuery('form.property-search-form [name=\'department\']').change(function()
+    {
+        toggleDepartmentFields();
+    });
+
+    jQuery('form.property-search-form [name=\'commercial_for_sale_to_rent\']').change(function()
     {
         toggleDepartmentFields();
     });
