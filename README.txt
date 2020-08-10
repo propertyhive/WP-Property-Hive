@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.4.2
-Stable tag: 1.4.64
+Tested up to: 5.5
+Stable tag: 1.4.65
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,13 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.65 =
+* Added ability to filter commercial properties by price and/or rent. Accompanying Template Assistant add on too allowing you to add these fields to search forms
+* Added ability to add classes commercial-sales-only or commercial-lettings-only to form controls to show them based on commercial for sale/to rent selection
+* Corrected new 'Recently Viewed' tab/popup showing on non-Property Hive related pages
+* Added Qatar to list of supported countries
+* Declared compatibility for WordPress 5.5
 
 = 1.4.64 =
 * Hide users with role 'subscriber' in all negotiator related lists
