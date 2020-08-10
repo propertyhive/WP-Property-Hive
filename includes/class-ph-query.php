@@ -674,6 +674,10 @@ class PH_Query {
         $meta_query[] = $this->commercial_for_sale_to_rent_meta_query();
         $meta_query[] = $this->commercial_for_sale_meta_query();
         $meta_query[] = $this->commercial_to_rent_meta_query();
+        $meta_query[] = $this->commercial_minimum_price_meta_query();
+        $meta_query[] = $this->commercial_maximum_price_meta_query();
+        $meta_query[] = $this->commercial_minimum_rent_meta_query();
+        $meta_query[] = $this->commercial_maximum_rent_meta_query();
         $meta_query[] = $this->negotiator_meta_query();
         $meta_query[] = $this->office_meta_query();
         
@@ -1615,6 +1619,174 @@ class PH_Query {
                 'key'     => '_to_rent',
                 'value'   => 'yes',
                 'compare' => '=',
+            );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle commercial minimum price
+     *
+     * @access public
+     * @return array
+     */
+    public function commercial_minimum_price_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            (
+            	( isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'for_sale' )
+            	||
+            	( isset( $_REQUEST['commercial_for_sale'] ) && $_REQUEST['commercial_for_sale'] == '1' )
+            ) && 
+            isset( $_REQUEST['commercial_minimum_price'] ) && $_REQUEST['commercial_minimum_price'] != '' 
+        )
+        {
+        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+
+        	$minimum_price = $_REQUEST['commercial_minimum_price'];
+        	if ( $search_form_currency != 'GBP' )
+        	{
+        		// Convert $_REQUEST['minimum_price'] to GBP
+        		$ph_countries = new PH_Countries();
+
+        		$minimum_price = $ph_countries->convert_price_to_gbp( $minimum_price, $search_form_currency );
+        	}
+
+            $meta_query = array(
+                'key'     => '_price_to_actual',
+                'value'   => ph_clean( floor( $minimum_price ) ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+    
+    /**
+     * Returns a meta query to handle commercial maximum price
+     *
+     * @access public
+     * @return array
+     */
+    public function commercial_maximum_price_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            (
+            	( isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'for_sale' )
+            	||
+            	( isset( $_REQUEST['commercial_for_sale'] ) && $_REQUEST['commercial_for_sale'] == '1' )
+            ) && 
+            isset( $_REQUEST['commercial_maximum_price'] ) && $_REQUEST['commercial_maximum_price'] != '' 
+        )
+        {
+        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+
+        	$maximum_price = $_REQUEST['commercial_maximum_price'];
+        	if ( $search_form_currency != 'GBP' )
+        	{
+        		// Convert $_REQUEST['maximum_price'] to GBP
+        		$ph_countries = new PH_Countries();
+
+        		$maximum_price = $ph_countries->convert_price_to_gbp( $maximum_price, $search_form_currency );
+        	}
+
+            $meta_query = array(
+                'key'     => '_price_from_actual',
+                'value'   => ph_clean( ceil( $maximum_price ) ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle commercial minimum rent
+     *
+     * @access public
+     * @return array
+     */
+    public function commercial_minimum_rent_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            (
+            	( isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'to_rent' )
+            	||
+            	( isset( $_REQUEST['commercial_to_rent'] ) && $_REQUEST['commercial_to_rent'] == '1' )
+            ) && 
+            isset( $_REQUEST['commercial_minimum_rent'] ) && $_REQUEST['commercial_minimum_rent'] != '' 
+        )
+        {
+        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+
+        	$minimum_rent = $_REQUEST['commercial_minimum_rent'];
+        	if ( $search_form_currency != 'GBP' )
+        	{
+        		// Convert $_REQUEST['minimum_rent'] to GBP
+        		$ph_countries = new PH_Countries();
+
+        		$minimum_rent = $ph_countries->convert_price_to_gbp( $minimum_rent, $search_form_currency );
+        	}
+
+            $meta_query = array(
+                'key'     => '_rent_to_actual',
+                'value'   => ph_clean( floor( $minimum_rent ) ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC' 
+            );
+        }
+        
+        return $meta_query;
+    }
+    
+    /**
+     * Returns a meta query to handle commercial maximum rent
+     *
+     * @access public
+     * @return array
+     */
+    public function commercial_maximum_rent_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( 
+            isset( $_REQUEST['department'] ) && $_REQUEST['department'] == 'commercial' && 
+            (
+            	( isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'to_rent' )
+            	||
+            	( isset( $_REQUEST['commercial_to_rent'] ) && $_REQUEST['commercial_to_rent'] == '1' )
+            ) && 
+            isset( $_REQUEST['commercial_maximum_rent'] ) && $_REQUEST['commercial_maximum_rent'] != '' 
+        )
+        {
+        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+
+        	$maximum_rent = $_REQUEST['commercial_maximum_rent'];
+        	if ( $search_form_currency != 'GBP' )
+        	{
+        		// Convert $_REQUEST['maximum_rent'] to GBP
+        		$ph_countries = new PH_Countries();
+
+        		$maximum_rent = $ph_countries->convert_price_to_gbp( $maximum_rent, $search_form_currency );
+        	}
+
+            $meta_query = array(
+                'key'     => '_rent_from_actual',
+                'value'   => ph_clean( ceil( $maximum_rent ) ),
+                'compare' => '<=',
+                'type'    => 'NUMERIC' 
             );
         }
         
