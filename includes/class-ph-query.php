@@ -590,6 +590,11 @@ class PH_Query {
 				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
 				$args['meta_key'] = '_floor_area_from_sqft';
 			break;
+			case 'date' :
+				$args['orderby']  = 'meta_value';
+				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+				$args['meta_key'] = '_on_market_change_date';
+			break;
 			default :
 			{
 				if ( $orderby != '' )
