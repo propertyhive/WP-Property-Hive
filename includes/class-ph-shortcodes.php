@@ -508,6 +508,12 @@ class PH_Shortcodes {
 			'tax_query' 			=> $tax_query,
 		);
 
+		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
+		{
+			$args['orderby'] = 'meta_value';
+			$args['meta_key'] = '_on_market_change_date';
+		}
+
 		ob_start();
 
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_recent_properties_query', $args, $atts ) );
