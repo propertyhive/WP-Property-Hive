@@ -248,7 +248,7 @@ class PH_Meta_Box_Property_Photos {
                           file_frame.open();
                         });
                         
-                        jQuery(\'.ph_upload_photo_button\').live(\'click\', function( event ){
+                        jQuery(\'body\').on(\'click\', \'.ph_upload_photo_button\', function( event ){
                        
                           event.preventDefault();
                        

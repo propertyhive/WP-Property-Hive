@@ -138,7 +138,7 @@ function propertyhive_wp_photo_upload( $field ) {
 
 		jQuery(document).ready(function()
         {
-        	jQuery(\'.ph_upload_photo_button' . $field['id'] . '\').live(\'click\', function( event ){
+        	jQuery(\'body\').on(\'click\', \'.ph_upload_photo_button' . $field['id'] . '\', function( event ){
                  
 	            event.preventDefault();
 	         

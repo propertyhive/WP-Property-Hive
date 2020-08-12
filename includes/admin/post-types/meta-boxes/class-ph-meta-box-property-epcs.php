@@ -218,7 +218,7 @@ class PH_Meta_Box_Property_Epcs {
                             
                         });
                         
-                        jQuery(\'.ph_upload_epc_button\').live(\'click\', function( event ){
+                        jQuery(\'body\').on(\'click\', \'.ph_upload_epc_button\', function( event ){
                        
                           event.preventDefault();
                        
