@@ -210,7 +210,7 @@ class PH_Meta_Box_Property_Brochures {
                             
                         });
                         
-                        jQuery(\'.ph_upload_brochure_button\').live(\'click\', function( event ){
+                        jQuery(\'body\').on(\'click\', \'.ph_upload_brochure_button\', function( event ){
                        
                           event.preventDefault();
                        

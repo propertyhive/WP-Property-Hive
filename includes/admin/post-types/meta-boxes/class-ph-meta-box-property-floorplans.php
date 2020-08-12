@@ -283,7 +283,7 @@ class PH_Meta_Box_Property_Floorplans {
                           file_frame2.open();
                         });
                         
-                        jQuery(\'.ph_upload_floorplan_button\').live(\'click\', function( event ){
+                        jQuery(\'body\').on(\'click\', \'.ph_upload_floorplan_button\', function( event ){
                        
                           event.preventDefault();
                        

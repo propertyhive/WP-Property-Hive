@@ -586,7 +586,7 @@ class PH_Admin_Settings {
 
 		jQuery(document).ready(function()
         {
-        	jQuery(\'.ph_upload_photo_button' . $value['id'] . '\').live(\'click\', function( event ){
+        	jQuery(\'body\').on(\'click\', \'.ph_upload_photo_button' . $value['id'] . '\', function( event ){
                  
 	            event.preventDefault();
 	         
