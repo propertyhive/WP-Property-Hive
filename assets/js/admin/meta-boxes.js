@@ -104,7 +104,7 @@ jQuery( function($){
             {
                 $('li#no_notes').show();
             }
-        });
+        }, 'json');
 
         return false;
     });
