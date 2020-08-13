@@ -136,10 +136,13 @@ class PH_Meta_Box_Contact_Notes {
 
         if ( !empty($note_output) )
         {
-            // order by date desc
-            $timestamp = array_column($note_output, 'timestamp');
+            // order by date desc. Older PHP versions don't support array_column so just can't order for them
+            if ( function_exists('array_column') )
+            {
+                $timestamp = array_column($note_output, 'timestamp');
 
-            array_multisort($timestamp, SORT_DESC, $note_output);
+                array_multisort($timestamp, SORT_DESC, $note_output);
+            }
 
             foreach ( $note_output as $note )
             {
