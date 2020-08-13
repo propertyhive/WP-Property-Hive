@@ -1348,10 +1348,11 @@ class PH_AJAX {
 
 		if ( $note_id > 0 ) {
 			wp_delete_comment( $note_id );
+
+            wp_send_json_success();
 		}
 
-		// Quit out
-		die();
+		wp_send_json_error();
 	}
     
     /**
@@ -2442,9 +2443,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_success();
     }
 
     public function appraisal_cancelled()
@@ -2467,9 +2470,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function appraisal_won()
@@ -2491,9 +2496,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function appraisal_lost_reason()
@@ -2516,9 +2523,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function appraisal_instructed()
@@ -2571,8 +2580,8 @@ class PH_AJAX {
                 // Failed. Don't really know at the moment how to handle this
 
                 $return = array('error' => 'Failed to create property post. Please try again');
-                //echo json_encode( $return );
-                //die();
+                echo json_encode( $return );
+                die();
             }
             else
             {
@@ -2736,10 +2745,12 @@ class PH_AJAX {
                 );
 
                 PH_Comments::insert_note( $post_id, $comment );
+
+                wp_send_json_success();
             }
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function appraisal_revert_pending()
@@ -2761,9 +2772,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function appraisal_revert_carried_out()
@@ -2785,9 +2798,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function appraisal_revert_won()
@@ -2809,9 +2824,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     // Viewing related functions
@@ -3503,9 +3520,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_cancelled()
@@ -3528,9 +3547,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_email_applicant_booking_confirmation()
@@ -3544,7 +3565,7 @@ class PH_AJAX {
 
         if ( (int)$applicant_contact_id == '' || (int)$property_id == '' || (int)$applicant_contact_id == 0 || (int)$property_id == 0 )
         {
-            die();
+            wp_send_json_error();
         }
 
         $property = new PH_Property((int)$property_id);
@@ -3579,9 +3600,11 @@ class PH_AJAX {
             wp_mail($to, $subject, $body, $headers);
 
             update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_email_owner_booking_confirmation()
@@ -3643,9 +3666,10 @@ class PH_AJAX {
 
             update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_interested_feedback()
@@ -3668,9 +3692,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_not_interested_feedback()
@@ -3693,9 +3719,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_feedback_not_required()
@@ -3717,9 +3745,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_revert_feedback_pending()
@@ -3742,9 +3772,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_revert_pending()
@@ -3767,9 +3799,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function viewing_feedback_passed_on()
@@ -3791,9 +3825,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function get_property_viewings_meta_box()
@@ -4496,9 +4532,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function offer_declined()
@@ -4520,9 +4558,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function offer_revert_pending()
@@ -4544,9 +4584,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function get_property_offers_meta_box()
@@ -4873,9 +4915,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function sale_completed()
@@ -4897,9 +4941,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function sale_fallen_through()
@@ -4921,9 +4967,11 @@ class PH_AJAX {
             );
 
             PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
         }
 
-        die();
+        wp_send_json_error();
     }
 
     public function get_property_sales_meta_box()
