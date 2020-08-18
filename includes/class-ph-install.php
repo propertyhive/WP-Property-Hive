@@ -52,6 +52,8 @@ class PH_Install {
 	    if ( ! defined( 'IFRAME_REQUEST' ) && ( get_option( 'propertyhive_version' ) != PH()->version || get_option( 'propertyhive_db_version' ) != PH()->version ) ) {
 			$this->install();
 
+            $this->update();
+
 			do_action( 'propertyhive_updated' );
 		}
 	}
@@ -145,13 +147,15 @@ class PH_Install {
 			update_option( 'propertyhive_db_version', '2.1.0' );
 		}*/
 
+		include( 'ph-update-functions.php' );
 		foreach ( self::get_db_update_callbacks() as $version => $update_callbacks ) {
 			if ( version_compare( $current_db_version, $version, '<' ) ) {
 				foreach ( $update_callbacks as $update_callback ) {
-
+					add_action('property_run_update_actions', $update_callback);
 				}
 			}
 		}
+		do_action('property_run_update_actions');
 
 		update_option( 'propertyhive_db_version', PH()->version );
 	}
