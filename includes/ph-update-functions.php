@@ -35,6 +35,7 @@ function propertyhive_update_1458_on_market_change_dates() {
             )
         ),
         'nopaging' => true,
+        'suppress_filters' => true,
     );
     $property_query =  new WP_Query($args);
 
