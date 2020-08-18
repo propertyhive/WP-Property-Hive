@@ -137,27 +137,19 @@ class PH_Install {
 		// Do updates
 		$current_db_version = get_option( 'propertyhive_db_version' );
 
-		/*if ( version_compare( $current_db_version, '1.4', '<' ) ) {
-			include( 'updates/propertyhive-update-1.4.php' );
-			update_option( 'propertyhive_db_version', '1.4' );
-		}
-
-		if ( version_compare( $current_db_version, '2.1.0', '<' ) || PH_VERSION == '2.1-bleeding' ) {
-			include( 'updates/propertyhive-update-2.1.php' );
-			update_option( 'propertyhive_db_version', '2.1.0' );
-		}*/
+        echo 'RUNNING UPDATE ';
 
 		include( 'ph-update-functions.php' );
 		foreach ( self::get_db_update_callbacks() as $version => $update_callbacks ) {
+            echo $version . ' ';
 			if ( version_compare( $current_db_version, $version, '<' ) ) {
+                echo 'VERSION COMPARE SUCCESS ';
 				foreach ( $update_callbacks as $update_callback ) {
 					add_action('property_run_update_actions', $update_callback);
 				}
 			}
 		}
 		do_action('property_run_update_actions');
-
-		update_option( 'propertyhive_db_version', PH()->version );
 	}
 
 	/**
