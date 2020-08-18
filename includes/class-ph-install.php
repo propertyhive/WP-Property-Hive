@@ -18,6 +18,17 @@ if ( ! class_exists( 'PH_Install' ) ) :
 class PH_Install {
 
 	/**
+	 * DB updates and callbacks that need to be run per version.
+	 *
+	 * @var array
+	 */
+	private static $db_updates = array(
+		'1.4.58' => array(
+			'propertyhive_update_1458_on_market_change_dates',
+		),
+	);
+
+	/**
 	 * Hook in tabs.
 	 */
 	public function __construct() {
@@ -109,6 +120,15 @@ class PH_Install {
 	}
 
 	/**
+	 * Get list of DB update callbacks.
+	 *
+	 * @return array
+	 */
+	public static function get_db_update_callbacks() {
+		return self::$db_updates;
+	}
+
+	/**
 	 * Handle updates
 	 */
 	public function update() {
@@ -124,6 +144,14 @@ class PH_Install {
 			include( 'updates/propertyhive-update-2.1.php' );
 			update_option( 'propertyhive_db_version', '2.1.0' );
 		}*/
+
+		foreach ( self::get_db_update_callbacks() as $version => $update_callbacks ) {
+			if ( version_compare( $current_db_version, $version, '<' ) ) {
+				foreach ( $update_callbacks as $update_callback ) {
+
+				}
+			}
+		}
 
 		update_option( 'propertyhive_db_version', PH()->version );
 	}
