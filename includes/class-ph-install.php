@@ -52,8 +52,6 @@ class PH_Install {
 	    if ( ! defined( 'IFRAME_REQUEST' ) && ( get_option( 'propertyhive_version' ) != PH()->version || get_option( 'propertyhive_db_version' ) != PH()->version ) ) {
 			$this->install();
 
-            $this->update();
-
 			do_action( 'propertyhive_updated' );
 		}
 	}
@@ -82,6 +80,8 @@ class PH_Install {
 
         $this->create_primary_office();
 		$this->create_cron_jobs();
+
+        $this->update();
 
 		// Clear transient cache
 
