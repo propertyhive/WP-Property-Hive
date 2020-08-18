@@ -23,8 +23,8 @@ class PH_Install {
 	 * @var array
 	 */
 	private static $db_updates = array(
-		'1.4.58' => array(
-			'propertyhive_update_1458_on_market_change_dates',
+		'1.4.68' => array(
+			'propertyhive_update_1468_on_market_change_dates',
 		),
 	);
 
@@ -137,13 +137,9 @@ class PH_Install {
 		// Do updates
 		$current_db_version = get_option( 'propertyhive_db_version' );
 
-        echo 'RUNNING UPDATE ';
-
 		include( 'ph-update-functions.php' );
 		foreach ( self::get_db_update_callbacks() as $version => $update_callbacks ) {
-            echo $version . ' ';
 			if ( version_compare( $current_db_version, $version, '<' ) ) {
-                echo 'VERSION COMPARE SUCCESS ';
 				foreach ( $update_callbacks as $update_callback ) {
 					add_action('property_run_update_actions', $update_callback);
 				}

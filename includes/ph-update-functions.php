@@ -13,11 +13,11 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Update on_market_change_dates for 1.4.58
+ * Update on_market_change_dates for 1.4.68
  *
  * @return void
  */
-function propertyhive_update_1458_on_market_change_dates() {
+function propertyhive_update_1468_on_market_change_dates() {
     global $wpdb;
 
     $args = array(
