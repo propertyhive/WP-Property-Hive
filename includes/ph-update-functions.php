@@ -45,7 +45,7 @@ function propertyhive_update_1458_on_market_change_dates() {
             $property_query->the_post();
 
             $date_post_written = get_the_date( 'Y-m-d H:i:s' );
-            add_post_meta( get_the_id(), '_on_market_change_date', $date_post_written );
+            add_post_meta( get_the_ID(), '_on_market_change_date', $date_post_written );
         }
     }
 
