@@ -400,6 +400,11 @@ class PH_Shortcodes {
 		if ( ! empty( $atts['ids'] ) ) {
 			$args['post__in'] = array_map( 'trim', explode( ',', $atts['ids'] ) );
 		}
+		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
+		{
+			$args['orderby'] = 'meta_value';
+			$args['meta_key'] = '_on_market_change_date';
+		}
 
 		ob_start();
 
@@ -637,6 +642,12 @@ class PH_Shortcodes {
 			$args['tax_query'] = $tax_query;
 		}
 
+		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
+		{
+			$args['orderby'] = 'meta_value';
+			$args['meta_key'] = '_on_market_change_date';
+		}
+
 		ob_start();
 		
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_featured_properties_query', $args, $atts ) );
@@ -782,6 +793,12 @@ class PH_Shortcodes {
 
 			if ( ! empty( $tax_query ) ) {
 				$args['tax_query'] = $tax_query;
+			}
+
+			if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
+			{
+				$args['orderby'] = 'meta_value';
+				$args['meta_key'] = '_on_market_change_date';
 			}
 
 			ob_start();
