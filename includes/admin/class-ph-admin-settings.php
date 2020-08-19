@@ -573,7 +573,7 @@ class PH_Admin_Settings {
 	                </tr>
 	            	<tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
-	                    <td class="forminp image_width_settings">
+	                    <td class="forminp image_settings">
 
 	                    	<a href="" class="button button-primary ph_upload_photo_button<?php echo esc_attr( $value['id'] ); ?>">Select Image</a>
 	                    	<input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="hidden" value="<?php echo $option_value; ?>" />
