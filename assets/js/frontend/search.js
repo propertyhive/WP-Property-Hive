@@ -137,7 +137,7 @@ function toggleDepartmentFields()
 }
 
 jQuery( function(jQuery){
-
+    
     // Orderby
     jQuery( '.propertyhive-ordering' ).on( 'change', 'select.orderby', function() {
         jQuery( this ).closest( 'form' ).submit();
@@ -145,12 +145,12 @@ jQuery( function(jQuery){
     
     toggleDepartmentFields();
     
-    jQuery('form.property-search-form [name=\'department\']').change(function()
+    jQuery('body').on('change', 'form.property-search-form [name=\'department\']', function()
     {
         toggleDepartmentFields();
     });
 
-    jQuery('form.property-search-form [name=\'commercial_for_sale_to_rent\']').change(function()
+    jQuery('body').on('change', 'form.property-search-form [name=\'commercial_for_sale_to_rent\']', function()
     {
         toggleDepartmentFields();
     });
