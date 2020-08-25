@@ -202,7 +202,7 @@ function convert_size_to_sqft( $size, $unit = 'sqft' )
     $size_sqft = $size;
     switch ( $unit )
     {
-        case "sqm": { $size_sqft = $size * 1; break; }
+        case "sqm": { $size_sqft = $size * 10.7639; break; }
         case "acre": { $size_sqft = $size * 43560; break; }
         case "hectare": { $size_sqft = $size * 107639; break; }
     }
