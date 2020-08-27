@@ -168,6 +168,19 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	            'css'         => 'min-width:300px; height:110px;',
 	        );
 
+			$settings[] = array(
+				'title'   => __( 'Default From Email Address', 'propertyhive' ),
+				'id'      => 'propertyhive_property_match_default_from',
+				'type'    => 'select',
+				'default' => '',
+				'css'     => 'min-width:300px;',
+				'options' => array(
+					'' => __( 'User Email Address', 'propertyhive' ),
+					'default_from_email' => __( 'Default "From" Email Address', 'propertyhive' ),
+				),
+				'desc'    => '<p>' . __( 'This sets the email address that manual matches will be sent from by default. This can still be edited when you go to send the match.<br>Automatic matches, if enabled, will still be sent from the email address of the office that most of the properties in the match belong to.', 'propertyhive' ) . '</p>',
+			);
+
 	        $options = array();
 	        $args = array(
                 'hide_empty' => false,
