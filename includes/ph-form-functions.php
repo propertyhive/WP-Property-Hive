@@ -248,7 +248,7 @@ function ph_get_search_form_fields()
         }
 
         $fields['commercial_property_type'] = array(
-            'type' => 'select',
+            'type' => 'commercial_property_type',
             'show_label' => true,
             'before' => '<div class="control control-commercial_property_type commercial-only">',
             'label' => __( 'Type', 'propertyhive' ),
