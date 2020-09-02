@@ -423,6 +423,8 @@ class PH_Admin_Applicant_List {
                                 }
                             }
 
+                            $match = apply_filters( 'propertyhive_applicant_list_check', $match, get_the_ID(), $profile );
+
                             if ( $match )
                             {
                                 $contact_details = array();
