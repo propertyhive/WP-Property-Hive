@@ -208,6 +208,8 @@ class PH_Admin_Applicant_List {
                 </select>
 			</p>
 
+            <?php do_action('propertyhive_applicant_list_additional_fields'); ?>
+
             <p class="form-field">
             <input type="submit" value="<?php echo __( 'Generate Applicant List', 'propertyhive' ); ?>" class="button-primary">
             </p>
@@ -420,6 +422,8 @@ class PH_Admin_Applicant_List {
                                     $match = false;
                                 }
                             }
+
+                            $match = apply_filters( 'propertyhive_applicant_list_check', $match, get_the_ID(), $profile );
 
                             if ( $match )
                             {
