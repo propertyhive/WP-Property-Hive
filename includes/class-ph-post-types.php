@@ -27,6 +27,8 @@ class PH_Post_types {
 
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_media' ), 5 );
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_children' ), 5 );
+
+        add_action( 'save_post', array( __CLASS__, 'create_concatenated_indexable_meta' ), 99, 3 );
 	}
 
 	/**
@@ -652,6 +654,94 @@ class PH_Post_types {
                 }
             }
             wp_reset_postdata();
+        }
+    }
+
+    /**
+	 * Check if we're saving, then trigger an action based on the post type
+	 *
+	 * @param  int $post_id
+	 * @param  object $post
+	 */
+    public static function create_concatenated_indexable_meta( $post_id, $post, $update )
+    {
+        // $post_id and $post are required
+        if ( empty( $post_id ) || empty( $post ) ) {
+            return;
+        }
+
+        // Dont' save meta boxes for revisions or autosaves
+        if ( defined( 'DOING_AUTOSAVE' ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
+            return;
+        }
+
+        if ( $post->post_type !== 'property' ) {
+            return;
+        }
+
+        // Set field of concatenated features
+        $features_concat_array = array();
+        if ( get_option('propertyhive_features_type') == 'checkbox' )
+        {
+            $term_list = wp_get_post_terms($post_id, 'property_feature', array("fields" => "names"));
+            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+            {
+                foreach ( $term_list as $term_name )
+                {
+                    $features_concat_array[] = trim($term_name);
+                }
+            }
+        }
+        else
+        {
+            $num_property_features = (int)get_post_meta($post_id, '_features', TRUE);
+
+            for ( $i = 0; $i < $num_property_features; ++$i )
+            {
+                $features_concat_array[] = get_post_meta($post_id, '_feature_' . $i, TRUE);
+            }
+        }
+
+        $features_concat = implode('|', array_filter($features_concat_array));
+
+        if ( $features_concat == '' )
+        {
+            delete_post_meta($post_id, '_features_concatenated');
+        }
+        else
+        {
+            $existing_concat = get_post_meta($post_id, '_features_concatenated', TRUE);
+            if( !$existing_concat || $existing_concat !== $features_concat )
+            {
+                update_post_meta($post_id, '_features_concatenated', $features_concat);
+            }
+        }
+
+        // Set field of concatenated descriptions information
+        $desc_phrasing = get_post_meta($post_id, '_department', TRUE) == 'commercial' ? 'description' : 'room';
+        $num_property_descs = (int)get_post_meta($post_id, '_'. $desc_phrasing .'s', TRUE);
+
+        $descs_concat_array = array();
+        for ( $i = 0; $i < $num_property_descs; ++$i )
+        {
+            $descs_concat_array[] = get_post_meta($post_id, '_'. $desc_phrasing .'_name_' . $i, TRUE);
+
+            $desc_field_name = $desc_phrasing == 'room' ? '_room_description_' : '_description_';
+            $descs_concat_array[] = get_post_meta($post_id, $desc_field_name . $i, TRUE);
+        }
+        $descs_concat = implode('|', array_filter($descs_concat_array));
+
+        if ( $descs_concat == '' )
+        {
+            delete_post_meta($post_id, '_descriptions_concatenated');
+        }
+        else
+        {
+            $existing_concat = get_post_meta($post_id, '_descriptions_concatenated', TRUE);
+            if( !$existing_concat || $existing_concat !== $descs_concat )
+            {
+                update_post_meta($post_id, '_descriptions_concatenated', $descs_concat);
+            }
         }
     }
 }
