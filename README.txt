@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.5
-Stable tag: 1.4.68
+Tested up to: 5.5.1
+Stable tag: 1.4.69
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,21 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.69 =
+* Added new Property Enquiry Form Elementor widget
+* Added new Property Floorplans Elementor widget
+* Added new Property EPCs Elementor widget
+* Added option to hide thumbnails in Elementor Images widget
+* Corrected 'blank option' in commercial property type search dropdown not taking effect
+* Added setting to allow users to change email address manual matches are sent from by default
+* Added support for new 'Keyword' field in search forms allowing a generic keyword to be entered, e.g. Parking. This will then search the address, features, summary description and full description
+* Added hooks to 'Generate Applicant List' page so third parties can add their own fields and filter results accordingly 
+* Corrected conversion of sqm sizes to sqft for commercial properties when storing these for filtering and ordering
+* Corrected class name for image setting row
+* Use .on() listener when listening for search form department changes to cater for search forms written to DOM dynamically (i.e. in popups)
+* Tidied up slider control code to be more generic so third parties can add their own slider controls that aren't price or bedrooms related
+* Declared compatibility for WordPress 5.5.1
 
 = 1.4.68 =
 * Added a migration script upon update to set the on_market_change_date field where one doesn't exist. This will be set to the property published date. As we use this field when ordering properties by date now we need it to be set
