@@ -31,11 +31,22 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'content_section',
 			[
-				'label' => __( 'Images', 'plugin-name' ),
+				'label' => __( 'Images', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
 			]
 		);
 
+		$this->add_control(
+			'hide_thumbnails',
+			[
+				'label' => __( 'Hide Thumbnails', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SWITCHER,
+				'label_on' => __( 'Yes', 'propertyhive' ),
+				'label_off' => __( 'No', 'propertyhive' ),
+				'return_value' => 'yes',
+				'default' => '',
+			]
+		);
 
 		$this->end_controls_section();
 
@@ -49,6 +60,11 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 
 		if ( !isset($property->id) ) {
 			return;
+		}
+
+		if ( 'yes' === $settings['hide_thumbnails'] ) 
+		{
+			remove_action( 'propertyhive_product_thumbnails', 'propertyhive_show_property_thumbnails', 20 );
 		}
 
 		propertyhive_show_property_images();
