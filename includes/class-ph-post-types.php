@@ -28,7 +28,7 @@ class PH_Post_types {
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_media' ), 5 );
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_children' ), 5 );
 
-        add_action( 'save_post', array( $this, 'create_concatenated_indexable_meta' ), 10, 2 );
+        add_action( 'save_post', array( __CLASS__, 'create_concatenated_indexable_meta' ), 99, 3 );
 	}
 
 	/**
@@ -663,7 +663,7 @@ class PH_Post_types {
 	 * @param  int $post_id
 	 * @param  object $post
 	 */
-    public static function create_concatenated_indexable_meta( $post_id, $post )
+    public static function create_concatenated_indexable_meta( $post_id, $post, $update )
     {
         // $post_id and $post are required
         if ( empty( $post_id ) || empty( $post ) ) {
@@ -675,23 +675,7 @@ class PH_Post_types {
             return;
         }
 
-        // Check the nonce
-        if ( empty( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( $_POST['propertyhive_meta_nonce'], 'propertyhive_save_data' ) ) {
-            return;
-        }
-
-        // Check the post being saved == the $post_id to prevent triggering this call for other save_post events
-        if ( empty( $_POST['post_ID'] ) || $_POST['post_ID'] != $post_id ) {
-            return;
-        }
-
-        // Check user has permission to edit
-        if ( ! current_user_can( 'edit_post', $post_id ) ) {
-            return;
-        }
-
-        // Check the post type
-        if ( $post->post_type !== 'property') {
+        if ( $post->post_type !== 'property' ) {
             return;
         }
 
@@ -719,6 +703,7 @@ class PH_Post_types {
         }
 
         $features_concat = implode('|', array_filter($features_concat_array));
+
         if ( $features_concat == '' )
         {
             delete_post_meta($post_id, '_features_concatenated');
@@ -748,14 +733,14 @@ class PH_Post_types {
 
         if ( $descs_concat == '' )
         {
-            delete_post_meta($post_id, '_'. $desc_phrasing . 's_concatenated');
+            delete_post_meta($post_id, '_descriptions_concatenated');
         }
         else
         {
-            $existing_concat = get_post_meta($post_id, '_'. $desc_phrasing . 's_concatenated', TRUE);
+            $existing_concat = get_post_meta($post_id, '_descriptions_concatenated', TRUE);
             if( !$existing_concat || $existing_concat !== $descs_concat )
             {
-                update_post_meta($post_id, '_'. $desc_phrasing . 's_concatenated', $descs_concat);
+                update_post_meta($post_id, '_descriptions_concatenated', $descs_concat);
             }
         }
     }
