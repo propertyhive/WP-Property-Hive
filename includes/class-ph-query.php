@@ -62,9 +62,27 @@ class PH_Query {
 			add_action( 'wp', array( $this, 'remove_property_query' ) );
 			add_action( 'wp', array( $this, 'remove_ordering_args' ) );
         	add_filter( 'posts_where', array( $this, 'commercial_display_where' ), 10, 2 );
+        	add_filter( 'posts_where', array( $this, 'keyword_excerpt_where' ), 10, 2 );
 		}
 
 		$this->init_query_vars();
+	}
+
+	public function keyword_excerpt_where( $where, $query )
+	{
+		if ( $query->get('post_type') == 'property' )
+        {
+        	global $wpdb;
+
+        	if ( isset($_REQUEST['keyword']) && ph_clean($_REQUEST['keyword']) != '' )
+        	{
+        		$ref_pos = strpos($where, '_reference_number');
+        		$str_to_insert = " $wpdb->posts.post_excerpt LIKE '%" . esc_sql(ph_clean($_REQUEST['keyword'])) . "%' OR ";
+        		$where = substr_replace($where, $str_to_insert, $ref_pos - 18, 0);
+        	}
+        }
+
+        return $where;
 	}
 
     public function commercial_display_where( $where, $query ) 
@@ -685,7 +703,8 @@ class PH_Query {
         $meta_query[] = $this->commercial_maximum_rent_meta_query();
         $meta_query[] = $this->negotiator_meta_query();
         $meta_query[] = $this->office_meta_query();
-        
+        $meta_query[] = $this->keyword_meta_query();
+
 		return array_filter( apply_filters( 'propertyhive_property_query_meta_query', $meta_query, $this ) );
 	}
 
@@ -1839,6 +1858,120 @@ class PH_Query {
     		    'compare' => 'IN'
     		);
 		}
+
+		return $meta_query;
+	}
+
+	/**
+	 * Returns a meta query to handle searching for a keyword in the features and descriptions
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function keyword_meta_query( ) {
+      	
+      	$meta_query = array();
+      	
+      	if ( isset( $_REQUEST['keyword'] ) && $_REQUEST['keyword'] != '' )
+        {
+        	$_REQUEST['keyword'] = ph_clean( wp_unslash( $_REQUEST['keyword'] ) );
+
+        	// Remove country code from end (i.e. ', UK')
+        	$_REQUEST['keyword'] = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $_REQUEST['keyword']);
+
+        	$keywords = array( $_REQUEST['keyword'] );
+
+        	if ( strpos( $_REQUEST['keyword'], ' ' ) !== FALSE )
+        	{
+        		$keywords[] = str_replace(" ", "-", ph_clean($_REQUEST['keyword']));
+        	}
+        	if ( strpos( $_REQUEST['keyword'], '-' ) !== FALSE )
+        	{
+        		$keywords[] = str_replace("-", " ", ph_clean($_REQUEST['keyword']));
+        	}
+
+	      	$meta_query = array( 'relation' => 'OR' );
+
+	      	$fields_to_query = array(
+	      		'_reference_number',
+	      		'_address_street',
+	      		'_address_two',
+	      		'_address_three',
+	      		'_address_four',
+	      		'_address_postcode',
+	      		'_features_concatenated',
+	      		'_descriptions_concatenated'
+	      	);
+
+	      	$fields_to_query = apply_filters( 'propertyhive_keyword_fields_to_query', $fields_to_query );
+
+	      	foreach ( $keywords as $keyword )
+	      	{
+	      		foreach ( $fields_to_query as $field )
+	      		{
+	      			if ( $field == '_address_postcode' ) { continue; } // ignore postcode as that is handled differently afterwards
+
+	      			$meta_query[] = array(
+					    'key'     => $field,
+					    'value'   => $keyword,
+					    'compare' => 'LIKE'
+					);
+	      		}
+			}
+			if ( in_array('_address_postcode', $fields_to_query) )
+			{
+		      	if ( strlen($_REQUEST['keyword']) <= 4 )
+		      	{
+		      		$meta_query[] = array(
+					    'key'     => '_address_postcode',
+					    'value'   => ph_clean( $_REQUEST['keyword'] ),
+					    'compare' => '='
+					);
+		      		$meta_query[] = array(
+					    'key'     => '_address_postcode',
+					    'value'   => '^' . ph_clean( $_REQUEST['keyword'] ) . '[ ]',
+					    'compare' => 'RLIKE'
+					);
+		      	}
+		      	else
+		      	{
+		      		$postcode = ph_clean( $_REQUEST['keyword'] );
+
+		      		if ( preg_match('#^(GIR ?0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]([0-9ABEHMNPRV-Y])?)|[0-9][A-HJKPS-UW])[0-9][ABD-HJLNP-UW-Z]{2})$#i', $postcode) )
+		      		{
+       					// UK postcode found with no space
+
+		      			if ( strlen($postcode) == 5 )
+		      			{
+		      				$first_part = substr($postcode, 0, 2);
+		      				$last_part = substr($postcode, 2, 3);
+
+		      				$postcode = $first_part . ' ' . $last_part;
+		      			}
+		      			elseif ( strlen($postcode) == 6 )
+		      			{
+		      				$first_part = substr($postcode, 0, 3);
+		      				$last_part = substr($postcode, 3, 3);
+
+		      				$postcode = $first_part . ' ' . $last_part;
+		      			}
+		      			elseif ( strlen($postcode) == 7 )
+		      			{
+		      				$first_part = substr($postcode, 0, 4);
+		      				$last_part = substr($postcode, 4, 3);
+
+		      				$postcode = $first_part . ' ' . $last_part;
+		      			}
+		      		}
+
+		      		$meta_query[] = array(
+					    'key'     => '_address_postcode',
+					    'value'   => ph_clean( $postcode ),
+					    'compare' => 'LIKE'
+					);
+		      	}
+		    }
+      	}
 
 		return $meta_query;
 	}
