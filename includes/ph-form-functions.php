@@ -1246,27 +1246,10 @@ function ph_form_field( $key, $field )
             }
 
             $output .= '<div id="search-form-slider-' . $key . '" class="search-form-slider" style="min-width:150px;"></div>';
-            switch ( $key )
-            {
-                case "price_slider":
-                {
-                    $output .= '<input type="hidden" name="minimum_price" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_price']) ? ph_clean($_GET['minimum_price']) : '' ) . '">';
-                    $output .= '<input type="hidden" name="maximum_price" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_price']) ? ph_clean($_GET['maximum_price']) : '' ) . '">';
-                    break;
-                }
-                case "rent_slider":
-                {
-                    $output .= '<input type="hidden" name="minimum_rent" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_rent']) ? ph_clean($_GET['minimum_rent']) : '' ) . '">';
-                    $output .= '<input type="hidden" name="maximum_rent" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_rent']) ? ph_clean($_GET['maximum_rent']) : '' ) . '">';
-                    break;
-                }
-                case "bedrooms_slider":
-                {
-                    $output .= '<input type="hidden" name="minimum_bedrooms" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_bedrooms']) ? ph_clean($_GET['minimum_bedrooms']) : '' ) . '">';
-                    $output .= '<input type="hidden" name="maximum_bedrooms" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_bedrooms']) ? ph_clean($_GET['maximum_bedrooms']) : '' ) . '">';
-                    break;
-                }
-            }
+
+            $field_name = str_replace("_slider", "", $key);
+            $output .= '<input type="hidden" name="minimum_' . $field_name . '" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_' . $field_name]) ? ph_clean($_GET['minimum_' . $field_name]) : '' ) . '">';
+            $output .= '<input type="hidden" name="maximum_' . $field_name . '" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_' . $field_name]) ? ph_clean($_GET['maximum_' . $field_name]) : '' ) . '">';
 
             $output .= $field['after'];
 
@@ -1302,32 +1285,9 @@ function ph_form_field( $key, $field )
                 }
             }
 
-            switch ( $key )
+            if ( $field['min'] != '' && $field['max'] != '' )
             {
-                case "price_slider":
-                {   
-                    if ( $field['min'] != '' && $field['max'] != '' )
-                    {
-                        $value = 'values: [ ' . ( isset($_GET['minimum_price']) && $_GET['minimum_price'] != '' ? ph_clean($_GET['minimum_price']) : $field['min'] ) . ', ' . ( isset($_GET['maximum_price']) && $_GET['maximum_price'] != '' ? ph_clean($_GET['maximum_price']) : $field['max'] ) . ' ],';
-                    }
-                    break;
-                }
-                case "rent_slider":
-                {   
-                    if ( $field['min'] != '' && $field['max'] != '' )
-                    {
-                        $value = 'values: [ ' . ( isset($_GET['minimum_rent']) && $_GET['minimum_rent'] != '' ? ph_clean($_GET['minimum_rent']) : $field['min'] ) . ', ' . ( isset($_GET['maximum_rent']) && $_GET['maximum_rent'] != '' ? ph_clean($_GET['maximum_rent']) : $field['max'] ) . ' ],';
-                    }
-                    break;
-                }
-                case "bedrooms_slider":
-                {   
-                    if ( $field['min'] != '' && $field['max'] != '' )
-                    {
-                        $value = 'values: [ ' . ( isset($_GET['minimum_bedrooms']) && $_GET['minimum_bedrooms'] != '' ? ph_clean($_GET['minimum_bedrooms']) : $field['min'] ) . ', ' . ( isset($_GET['maximum_bedrooms']) && $_GET['maximum_bedrooms'] != '' ? ph_clean($_GET['maximum_bedrooms']) : $field['max'] ) . ' ],';
-                    }
-                    break;
-                }
+                $value = 'values: [ ' . ( isset($_GET['minimum_' . $field_name]) && $_GET['minimum_' . $field_name] != '' ? ph_clean($_GET['minimum_' . $field_name]) : $field['min'] ) . ', ' . ( isset($_GET['maximum_' . $field_name]) && $_GET['maximum_' . $field_name] != '' ? ph_clean($_GET['maximum_' . $field_name]) : $field['max'] ) . ' ],';
             }
 
             $output .= '<script>
