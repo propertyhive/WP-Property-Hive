@@ -75,6 +75,8 @@ class PH_Elementor {
 			'Property Reception Rooms',
 			'Property Map',
 			'Property Street View',
+			'Property Floorplans',
+			'Property EPCs',
 			'Property Enquiry Form',
 		);
 
