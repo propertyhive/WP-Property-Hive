@@ -160,7 +160,7 @@ function get_property_map( $args = array() )
 
 	function initialize_property_map<?php echo $id_suffix; ?>() 
 	{
-		var property_map<?php echo $id_suffix; ?> = L.map("property_map_canvas<?php echo $id_suffix; ?>").setView([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>], <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?>);
+		property_map<?php echo $id_suffix; ?> = L.map("property_map_canvas<?php echo $id_suffix; ?>").setView([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>], <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?>);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
