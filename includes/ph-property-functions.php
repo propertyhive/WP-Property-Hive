@@ -166,7 +166,29 @@ function get_property_map( $args = array() )
 		    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 		}).addTo(property_map<?php echo $id_suffix; ?>);
 
-		L.marker([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>]).addTo(property_map<?php echo $id_suffix; ?>);
+		<?php
+			$icon_code = '';
+			if ( class_exists( 'PH_Map_Search' ) )
+  			{
+  				$map_add_on_settings = get_option( 'propertyhive_map_search', array() );
+
+				if ( isset($map_add_on_settings['icon_type']) && $map_add_on_settings['icon_type'] == 'custom_single' && isset($map_add_on_settings['custom_icon_attachment_id']) && $map_add_on_settings['custom_icon_attachment_id'] != '' )
+		        {
+		            $marker_icon_url = wp_get_attachment_url( $map_add_on_settings['custom_icon_attachment_id'] );
+		            if ( $marker_icon_url !== FALSE )
+		            {
+		?>
+		var custom_icon = L.icon({
+		    iconUrl: '<?php echo $marker_icon_url; ?>'
+		});
+		<?php
+		                $icon_code = ', { icon: custom_icon }';
+		            }
+		        }
+		    }
+		?>
+
+		L.marker([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>]<?php echo $icon_code; ?>).addTo(property_map<?php echo $id_suffix; ?>);
 	}
 
 	if (window.addEventListener) {
