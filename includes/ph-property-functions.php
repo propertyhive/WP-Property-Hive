@@ -253,7 +253,18 @@ function get_property_map( $args = array() )
 		            $marker_icon_url = wp_get_attachment_url( $map_add_on_settings['custom_icon_attachment_id'] );
 		            if ( $marker_icon_url !== FALSE )
 		            {
-		                echo 'marker_options.icon = \'' . $marker_icon_url . '\';';
+		            	echo 'var ph_map_icon = {
+						    url: \'' . $marker_icon_url . '\'';
+						if ( isset($map_add_on_settings['custom_icon_anchor_position']) && $map_add_on_settings['custom_icon_anchor_position'] == 'center' )
+						{
+							$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
+							if ( $size !== FALSE && !empty($size) )
+							{
+								echo ', anchor: new google.maps.Point(' . floor( $size[0] / 2 ) . ', ' . floor( $size[1] / 2 ) . ')';
+							}
+						}   
+						echo '};';
+		                echo 'marker_options.icon = ph_map_icon;';
 		            }
 		        }
 		    }
