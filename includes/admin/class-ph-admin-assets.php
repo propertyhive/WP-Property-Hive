@@ -126,9 +126,25 @@ class PH_Admin_Assets {
             wp_enqueue_script( 'chosen' );
             wp_enqueue_script( 'jquery-ui-sortable' );
             
-            $api_key = get_option('propertyhive_google_maps_api_key');
-            wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
-            wp_enqueue_script('googlemaps');
+            if ( get_option('propertyhive_maps_provider') == 'osm' )
+            {
+                wp_register_style('leaflet', PH()->plugin_url() . '/assets/js/leaflet/leaflet.css', array(), '1.7.1');
+                wp_enqueue_style('leaflet');
+
+                wp_register_script('leaflet', PH()->plugin_url() . '/assets/js/leaflet/leaflet.js', array(), '1.7.1', false);
+                wp_enqueue_script('leaflet');
+
+                // Only used for geocoding
+                $api_key = get_option('propertyhive_google_maps_geocoding_api_key');
+                wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+                wp_enqueue_script('googlemaps');
+            }
+            else
+            {
+                $api_key = get_option('propertyhive_google_maps_api_key');
+                wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+                wp_enqueue_script('googlemaps');
+            }
 
             wp_enqueue_media();
             wp_enqueue_script( 'propertyhive_admin_meta_boxes' );

@@ -129,12 +129,30 @@ jQuery( function($){
     });
     toggle_department_specific_options();
 
-    $('[name=\'propertyhive_auto_incremental_reference_numbers\']').change(function()
+    jQuery('[name=\'propertyhive_maps_provider\']').change(function()
+    {
+        ph_toggle_maps_provider_options();
+    });
+    ph_toggle_maps_provider_options();
+
+    jQuery('[name=\'propertyhive_auto_incremental_reference_numbers\']').change(function()
     {
         ph_toggle_auto_incremental_reference_number_options();
     });
     ph_toggle_auto_incremental_reference_number_options();
 });
+
+function ph_toggle_maps_provider_options()
+{
+    if ( jQuery('[name=\'propertyhive_maps_provider\']:checked').val() == 'osm' )
+    {
+        jQuery('#row_propertyhive_google_maps_api_key').hide();
+    }
+    else
+    {
+        jQuery('#row_propertyhive_google_maps_api_key').show();
+    }
+}
 
 function ph_toggle_auto_incremental_reference_number_options()
 {
