@@ -297,11 +297,21 @@ class PH_Settings_General extends PH_Settings_Page {
 			array( 'title' => __( 'Map Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'map_options' ),
 
             array(
+                'title'   => __( 'Maps Provider', 'propertyhive' ),
+                'id'      => 'propertyhive_maps_provider',
+                'type'    => 'radio',
+                'options' => array(
+                    '' => 'Google Maps',
+                    'osm' => 'OpenStreetMap'
+                ),
+            ),
+
+            array(
                 'title'   => __( 'Google Maps API Key', 'propertyhive' ),
                 'id'      => 'propertyhive_google_maps_api_key',
                 'type'    => 'text',
                 'desc'	=> '<p>' . __( 'If you have a Google Maps API key you can enter it here. You can generate an API key <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">here</a>.<br>This is used when displaying the map when adding/editing properties, and if using our <a href="https://wp-property-hive.com/addons/map-search/" target="_blank">Map Search</a> or <a href="https://wp-property-hive.com/addons/radial-search/" target="_blank">Radial Search</a> add ons.<br>When creating your API key we recommend that you enable the Geocoding library. More about this can be found <a href="https://docs.wp-property-hive.com/user-guide/maps-co-ordinates-and-geocoding/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
-            )
+            ),
 
         );
 

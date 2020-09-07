@@ -89,25 +89,226 @@ class PH_Meta_Box_Property_Coordinates {
         echo '</div>';
         
         echo '
-        <script>
-        
-            var map;
-            var marker;
-            var markerSet = ' . ( ($markerSet) ? 'true' : 'false') . ';
-            var geocoder;
-            jQuery(document).ready(function()
-            {
-                jQuery(\'#_address_postcode\').change(function()
+            <script>
+
+                var map;
+                var marker;
+                var markerSet = ' . ( ($markerSet) ? 'true' : 'false') . ';
+                var geocoder;
+
+                jQuery(document).ready(function()
                 {
-                    do_address_lookup();
-                });
-                jQuery(\'#_address_country\').change(function()
-                {
-                    do_address_lookup();
+                    jQuery(\'#_address_postcode\').change(function()
+                    {
+                        do_address_lookup();
+                    });
+                    jQuery(\'#_address_country\').change(function()
+                    {
+                        do_address_lookup();
+                    });
+
                 });
 
+                function do_address_lookup( force )
+                {
+                    var force = force || false;
+
+                    if ((!markerSet || force) && (jQuery(\'#_address_postcode\').val() != \'\' || force) && jQuery(\'#_address_country\').val() != \'\')
+                    {
+                        var address = jQuery(\'#_address_postcode\').val();
+                        var location_filter = \'\';
+                        if ( jQuery(\'#_address_postcode\').val() != \'\' )
+                        {
+                            location_filter = jQuery(\'#_address_postcode\').val().split(" ");
+                            location_filter = location_filter[0];
+                        }
+                        if (jQuery(\'#_address_four\').val() != \'\')
+                        {
+                            address = jQuery(\'#_address_four\').val() + \', \' + address;
+                        }
+                        if (jQuery(\'#_address_three\').val() != \'\')
+                        {
+                            address = jQuery(\'#_address_three\').val() + \', \' + address;
+                        }
+                        if (jQuery(\'#_address_two\').val() != \'\')
+                        {
+                            address = jQuery(\'#_address_two\').val() + \', \' + address;
+                        }
+                        if (jQuery(\'#_address_street\').val() != \'\')
+                        {
+                            address = jQuery(\'#_address_street\').val() + \', \' + address;
+                        }
+                        if (jQuery(\'#_address_name_number\').val() != \'\')
+                        {
+                            address = jQuery(\'#_address_name_number\').val() + \' \' + address;
+                        }
+                        if (jQuery(\'#_address_country\').val() != \'\')
+                        {
+                            address = address + \', \' + jQuery(\'#_address_country\').val();
+                        }
+
+                        var geocoding_data = { \'address\': address };
+                        if ( location_filter != \'\' )
+                        {   
+                            // Removed as for some reason it was generating a lot of ZERO_RESULTS_FOUND errors
+                            /*geocoding_data.componentRestrictions = {
+                                postalCode : location_filter
+                            }*/
+                        }
+                        
+                        geocoder.geocode( geocoding_data, geocode_callback );
+                    }
+                }
+
+            </script>
+        ';
+
+        if ( get_option('propertyhive_maps_provider') == 'osm' )
+        {
+            echo '
+            <script>
+
+                function geocode_callback( results, status )
+                {
+                    if (status == google.maps.GeocoderStatus.OK) 
+                    {
+                        map.setZoom(16);
+                        
+                        jQuery(\'#_latitude\').val(results[0].geometry.location.lat());
+                        jQuery(\'#_longitude\').val(results[0].geometry.location.lng());
+                        
+                        if ( marker != null )
+                        {
+                            marker.remove();
+                        }
+
+                        marker = L.marker([results[0].geometry.location.lat(), results[0].geometry.location.lng()], { draggable:true }).addTo(map).on(\'moveend\', marker_move_end);
+
+                        map.panTo([results[0].geometry.location.lat(), results[0].geometry.location.lng()]);
+
+                        jQuery(\'#help-marker-not-set\').fadeOut(\'fast\', function()
+                        {
+                            jQuery(\'#help-marker-set\').fadeIn();
+                        });
+                    }
+                    else
+                    {
+                        alert(\'Geocode was not successful for the following reason: \' + status);
+                    }
+                }
+
                 function ph_initialize() {
+                        
+                    geocoder = new google.maps.Geocoder();
+
+                    map = L.map("map_canvas").setView([' . $latitude . ', ' . $longitude . '], ' . $zoom . ');
+
+                    L.tileLayer(\'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
+                        attribution: \'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors\'
+                    }).addTo(map);
+
+                    if (markerSet)
+                    {
+                        marker = L.marker([' . $latitude . ', ' . $longitude . '], { draggable:true }).addTo(map).on(\'moveend\', marker_move_end);
+                    }
+
+                    map.on(\'click\', function(e){
+                        if ( marker != null )
+                        {
+                            marker.remove();
+                        }
+                        marker = L.marker(e.latlng, { draggable:true }).addTo(map).on(\'moveend\', marker_move_end);
+                        jQuery(\'#_latitude\').val(e.latlng.lat);
+                        jQuery(\'#_longitude\').val(e.latlng.lng);
+
+                        jQuery(\'#help-marker-not-set\').fadeOut(\'fast\', function()
+                        {
+                            jQuery(\'#help-marker-set\').fadeIn();
+                        });
+                    });
+                }
+
+                function marker_move_end(e)
+                {
+                    jQuery(\'#_latitude\').val(e.target._latlng.lat);
+                    jQuery(\'#_longitude\').val(e.target._latlng.lng);
+                }
+
+                jQuery(document).ready(function()
+                {
+                    // Watch for lat lng changing
+                    jQuery(\'#_latitude\').keyup(function()
+                    {
+                        var latitude = jQuery(this).val();
+                        var longitude = jQuery(\'#_longitude\').val();
+                        
+                        if ( latitude != \'\' && longitude != \'\' && latitude != \'0\' && longitude != \'0\' )
+                        {
+                            // Both lat and lng exist
+                            map.setZoom(16);
+
+                            if ( marker != null )
+                            {
+                                marker.remove();
+                            }
+                            
+                            marker = L.marker([latitude, longitude], { draggable:true }).addTo(map).on(\'moveend\', marker_move_end);
+
+                            map.panTo( [latitude, longitude] );
+                        }
+                    });
                     
+                    jQuery(\'#_longitude\').keyup(function()
+                    {
+                        var latitude = jQuery(\'#_latitude\').val();
+                        var longitude = jQuery(this).val();
+                        
+                        if ( latitude != \'\' && longitude != \'\' && latitude != \'0\' && longitude != \'0\' )
+                        {
+                            // Both lat and lng exist
+                            map.setZoom(16);
+                            
+                            if ( marker != null )
+                            {
+                                marker.remove();
+                            }
+                            
+                            marker = L.marker([latitude, longitude], { draggable:true }).addTo(map).on(\'moveend\', marker_move_end);
+                            
+                            map.panTo( [latitude, longitude] );
+                        }
+                    });
+                });
+
+            </script>
+            ';
+        }
+        else
+        {
+            echo '
+            <script>
+            
+                function geocode_callback( results, status )
+                {
+                    if (status == google.maps.GeocoderStatus.OK) 
+                    {
+                        map.panTo(results[0].geometry.location);
+                        
+                        map.setZoom(16);
+                        
+                        jQuery(\'#_latitude\').val(results[0].geometry.location.lat());
+                        jQuery(\'#_longitude\').val(results[0].geometry.location.lng());
+                        
+                        marker = ph_create_marker(results[0].geometry.location.lat(), results[0].geometry.location.lng());
+                    }
+                    else
+                    {
+                        alert(\'Geocode was not successful for the following reason: \' + status);
+                    }
+                }
+
+                function ph_initialize() {
+                        
                     geocoder = new google.maps.Geocoder();
                     
                     var starting_lat_lng = new google.maps.LatLng(' . $latitude . ', ' . $longitude . ');
@@ -131,158 +332,101 @@ class PH_Meta_Box_Property_Coordinates {
                         jQuery(\'#_longitude\').val(event.latLng.lng());
                     });
                 }
-                google.maps.event.addDomListener(window, \'load\', ph_initialize);
-                
-                // Watch for lat lng changing
-                jQuery(\'#_latitude\').keyup(function()
+
+                jQuery(document).ready(function()
                 {
-                    var latitude = jQuery(this).val();
-                    var longitude = jQuery(\'#_longitude\').val();
-                    
-                    if ( latitude != \'\' && longitude != \'\' && latitude != \'0\' && longitude != \'0\' )
+                    // Watch for lat lng changing
+                    jQuery(\'#_latitude\').keyup(function()
                     {
-                        // Both lat and lng exist
-                        map.setZoom(16);
+                        var latitude = jQuery(this).val();
+                        var longitude = jQuery(\'#_longitude\').val();
                         
-                        if (!markerSet)
+                        if ( latitude != \'\' && longitude != \'\' && latitude != \'0\' && longitude != \'0\' )
                         {
-                            marker = ph_create_marker(latitude, longitude);
-
-                            markerSet = true;
-                        }
-                        else
-                        {
-                            marker.setPosition( new google.maps.LatLng( latitude, longitude ) );
-                        }
-                        map.panTo( new google.maps.LatLng( latitude, longitude ) );
-                    }
-                });
-                
-                jQuery(\'#_longitude\').keyup(function()
-                {
-                    var latitude = jQuery(\'#_latitude\').val();
-                    var longitude = jQuery(this).val();
-                    
-                    if ( latitude != \'\' && longitude != \'\' && latitude != \'0\' && longitude != \'0\' )
-                    {
-                        // Both lat and lng exist
-                        map.setZoom(16);
-                        
-                        if (!markerSet)
-                        {
-                            marker = ph_create_marker(latitude, longitude);
-
-                            markerSet = true;
-                        }
-                        else
-                        {
-                            marker.setPosition( new google.maps.LatLng( latitude, longitude ) );
-                        }
-                        map.panTo( new google.maps.LatLng( latitude, longitude ) );
-                    }
-                });
-            });
-
-            function do_address_lookup( force )
-            {
-                var force = force || false;
-
-                if ((!markerSet || force) && (jQuery(\'#_address_postcode\').val() != \'\' || force) && jQuery(\'#_address_country\').val() != \'\')
-                {
-                    var address = jQuery(\'#_address_postcode\').val();
-                    var location_filter = \'\';
-                    if ( jQuery(\'#_address_postcode\').val() != \'\' )
-                    {
-                        location_filter = jQuery(\'#_address_postcode\').val().split(" ");
-                        location_filter = location_filter[0];
-                    }
-                    if (jQuery(\'#_address_four\').val() != \'\')
-                    {
-                        address = jQuery(\'#_address_four\').val() + \', \' + address;
-                    }
-                    if (jQuery(\'#_address_three\').val() != \'\')
-                    {
-                        address = jQuery(\'#_address_three\').val() + \', \' + address;
-                    }
-                    if (jQuery(\'#_address_two\').val() != \'\')
-                    {
-                        address = jQuery(\'#_address_two\').val() + \', \' + address;
-                    }
-                    if (jQuery(\'#_address_street\').val() != \'\')
-                    {
-                        address = jQuery(\'#_address_street\').val() + \', \' + address;
-                    }
-                    if (jQuery(\'#_address_name_number\').val() != \'\')
-                    {
-                        address = jQuery(\'#_address_name_number\').val() + \' \' + address;
-                    }
-                    if (jQuery(\'#_address_country\').val() != \'\')
-                    {
-                        address = address + \', \' + jQuery(\'#_address_country\').val();
-                    }
-
-                    var geocoding_data = { \'address\': address };
-                    if ( location_filter != \'\' )
-                    {   
-                        // Removed as for some reason it was generating a lot of ZERO_RESULTS_FOUND errors
-                        /*geocoding_data.componentRestrictions = {
-                            postalCode : location_filter
-                        }*/
-                    }
-                    
-                    geocoder.geocode( geocoding_data, function(results, status) {
-
-                        if (status == google.maps.GeocoderStatus.OK) 
-                        {
-                            map.panTo(results[0].geometry.location);
-                            
+                            // Both lat and lng exist
                             map.setZoom(16);
                             
-                            jQuery(\'#_latitude\').val(results[0].geometry.location.lat());
-                            jQuery(\'#_longitude\').val(results[0].geometry.location.lng());
-                            
-                            marker = ph_create_marker(results[0].geometry.location.lat(), results[0].geometry.location.lng());
-                        }
-                        else
-                        {
-                            alert(\'Geocode was not successful for the following reason: \' + status);
+                            if (!markerSet)
+                            {
+                                marker = ph_create_marker(latitude, longitude);
+
+                                markerSet = true;
+                            }
+                            else
+                            {
+                                marker.setPosition( new google.maps.LatLng( latitude, longitude ) );
+                            }
+                            map.panTo( new google.maps.LatLng( latitude, longitude ) );
                         }
                     });
-                }
-            }
-            
-            function ph_create_marker(lat, lng)
-            {
-                if ( marker != null )
-                {
-                    marker.setMap(null);
-                }
+                    
+                    jQuery(\'#_longitude\').keyup(function()
+                    {
+                        var latitude = jQuery(\'#_latitude\').val();
+                        var longitude = jQuery(this).val();
+                        
+                        if ( latitude != \'\' && longitude != \'\' && latitude != \'0\' && longitude != \'0\' )
+                        {
+                            // Both lat and lng exist
+                            map.setZoom(16);
+                            
+                            if (!markerSet)
+                            {
+                                marker = ph_create_marker(latitude, longitude);
 
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(lat, lng),
-                    map: map,
-                    draggable: true,
-                    title: \''. __( 'Click and drag me to set the exact coordinates', 'propertyhive') . '\'
+                                markerSet = true;
+                            }
+                            else
+                            {
+                                marker.setPosition( new google.maps.LatLng( latitude, longitude ) );
+                            }
+                            map.panTo( new google.maps.LatLng( latitude, longitude ) );
+                        }
+                    });
                 });
-                
-                jQuery(\'#help-marker-not-set\').fadeOut(\'fast\', function()
+
+                function ph_create_marker(lat, lng)
                 {
-                    jQuery(\'#help-marker-set\').fadeIn();
-                });
-                
-                google.maps.event.addListener(marker, \'dragend\', function() 
-                {
-                    var newPosition = marker.getPosition();
-                    jQuery(\'#_latitude\').val(newPosition.lat());
-                    jQuery(\'#_longitude\').val(newPosition.lng());
-                });
-                
-                return marker;
-            }
-        
-        </script>
+                    if ( marker != null )
+                    {
+                        marker.setMap(null);
+                    }
+
+                    marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(lat, lng),
+                        map: map,
+                        draggable: true,
+                        title: \''. __( 'Click and drag me to set the exact coordinates', 'propertyhive') . '\'
+                    });
+                    
+                    jQuery(\'#help-marker-not-set\').fadeOut(\'fast\', function()
+                    {
+                        jQuery(\'#help-marker-set\').fadeIn();
+                    });
+                    
+                    google.maps.event.addListener(marker, \'dragend\', function() 
+                    {
+                        var newPosition = marker.getPosition();
+                        jQuery(\'#_latitude\').val(newPosition.lat());
+                        jQuery(\'#_longitude\').val(newPosition.lng());
+                    });
+                    
+                    return marker;
+                }
+            
+            </script>
+            ';
+        }
+
+        echo '
+            <script>
+                if (window.addEventListener) {
+                    window.addEventListener(\'load\', ph_initialize);
+                }else{
+                    window.attachEvent(\'onload\', ph_initialize);
+                }
+            </script>
         ';
-        
     }
 
     /**
