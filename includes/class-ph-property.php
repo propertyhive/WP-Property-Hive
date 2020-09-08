@@ -926,7 +926,7 @@ class PH_Property {
      */
     public function get_tenure()
     {
-        $term_list = wp_get_post_terms($this->id, 'tenure', array("fields" => "names"));
+        $term_list = wp_get_post_terms($this->id, ( ( $this->_department == 'commercial' ) ? 'commercial_' : '' ) . 'tenure', array("fields" => "names"));
         
         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
         {
