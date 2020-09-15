@@ -542,7 +542,7 @@ class PH_Post_types {
 
     public static function delete_property_media( $post_id ) 
     {
-        if ( get_post_type($post_id) == 'property' )
+        if ( get_post_type($post_id) == 'property' && apply_filters( 'propertyhive_remove_media_on_property_delete', TRUE ) === TRUE )
         {
             $property = new PH_Property( (int)$post_id );
 
