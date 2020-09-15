@@ -271,6 +271,18 @@ function propertyhive_enquiry_form( $property_id = '' )
 
     $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
 
+    if ( get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) != '' )
+    {
+        $disclaimer = get_option( 'propertyhive_property_enquiry_form_disclaimer', '' );
+
+        $form_controls['disclaimer'] = array(
+            'type' => 'checkbox',
+            'label' => $disclaimer,
+            'label_style' => 'width:100%;',
+            'required' => true
+        );
+    }
+
     ph_get_template( 'global/make-enquiry-form.php',array( 'form_controls' => $form_controls ) );
 }
 
@@ -325,18 +337,6 @@ function ph_get_property_enquiry_form_fields( $property_id = '' )
         'label' => __( 'Message', 'propertyhive' ),
         'required' => true
     );
-
-    if ( get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) != '' )
-    {
-        $disclaimer = get_option( 'propertyhive_property_enquiry_form_disclaimer', '' );
-
-        $fields['disclaimer'] = array(
-            'type' => 'checkbox',
-            'label' => $disclaimer,
-            'label_style' => 'width:100%;',
-            'required' => true
-        );
-    }
 
     return $fields;
 }
