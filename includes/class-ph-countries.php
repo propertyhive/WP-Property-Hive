@@ -211,6 +211,12 @@ class PH_Countries {
 				'currency_symbol' => 'Rs',
 				'currency_prefix' => false
 			),
+			'MA' => array(
+				'name' => 'Morocco',
+				'currency_code' => 'MAD',
+				'currency_symbol' => 'د.م.',
+				'currency_prefix' => false
+			),
 			'NO' => array(
 				'name' => 'Norway',
 				'currency_code' => 'NOK',
