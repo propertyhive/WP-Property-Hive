@@ -262,7 +262,7 @@ function ph_get_search_form_fields()
 /**
  * Main function for drawing property enquiry form.
  *
- * @param string $id
+ * @param string $property_id
  * @return void
  */
 function propertyhive_enquiry_form( $property_id = '' )
