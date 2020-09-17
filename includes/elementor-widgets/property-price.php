@@ -61,6 +61,33 @@ class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'text_align',
+			[
+				'label' => __( 'Alignment', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => __( 'Left', 'propertyhive' ),
+						'icon' => 'fa fa-align-left',
+					],
+					'center' => [
+						'title' => __( 'Center', 'propertyhive' ),
+						'icon' => 'fa fa-align-center',
+					],
+					'right' => [
+						'title' => __( 'Right', 'propertyhive' ),
+						'icon' => 'fa fa-align-right',
+					],
+				],
+				'default' => 'left',
+				'toggle' => true,
+				'selectors' => [
+					'{{WRAPPER}} .price' => 'text-align: {{VALUE}}',
+				],
+			]
+		);
+
 		$this->end_controls_section();
 
 	}
