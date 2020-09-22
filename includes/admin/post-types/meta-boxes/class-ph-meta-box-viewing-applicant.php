@@ -192,6 +192,7 @@ jQuery(document).ready(function($)
             action:         'propertyhive_search_contacts',
             keyword:        keyword,
             security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            exclude_ids:    jQuery('#_applicant_contact_ids').val(),
         };
         $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
         {

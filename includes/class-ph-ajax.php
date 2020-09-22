@@ -1083,6 +1083,10 @@ class PH_AJAX {
                     )
                 );
             }
+            if ( isset($_POST['exclude_ids']) && $_POST['exclude_ids'] != '' )
+            {
+                $args['post__not_in'] = explode('|', $_POST['exclude_ids']);
+            }
             
             add_filter( 'posts_where', array( $this, 'search_contacts_where' ), 10, 2 );
             
