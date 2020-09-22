@@ -22,39 +22,66 @@ class PH_Meta_Box_Viewing_Applicant {
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
-        
-        $applicant_contact_id = get_post_meta( $post->ID, '_applicant_contact_id', true );
 
-        if ( !empty($applicant_contact_id) )
+        $applicant_contact_ids = array();
+        if ( isset($_GET['applicant_contact_id']) && ! empty( $_GET['applicant_contact_id'] ) )
         {
-            $contact = new PH_Contact($applicant_contact_id);
-
-            $fields = array(
-                'name' => array(
-                    'label' => __('Name', 'propertyhive'),
-                    'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . $applicant_contact_id . '" data-viewing-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
-                ),
-                'telephone_number' => array(
-                    'label' => __('Telephone Number', 'propertyhive'),
-                    'value' => $contact->telephone_number,
-                ),
-                'email_address' => array(
-                    'label' => __('Email Address', 'propertyhive'),
-                    'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
-                ),
-            );
-
-            $fields = apply_filters( 'propertyhive_viewing_applicant_fields', $fields, $post->ID, $applicant_contact_id );
-
-            foreach ( $fields as $key => $field )
+            $explode_applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
+            foreach ($explode_applicant_contact_ids as $explode_applicant_contact_id)
             {
-                echo '<p class="form-field ' . esc_attr($key) . '">
-            
-                    <label>' . esc_html($field['label']) . '</label>
-                    
-                    ' . $field['value'] . '
-                    
-                </p>';
+                if ( get_post_type( (int)$explode_applicant_contact_id ) == 'contact' )
+                {
+                    $applicant_contact_ids[] = (int)$explode_applicant_contact_id;
+                }
+            }
+        }
+        else
+        {
+            $applicant_contact_ids = get_post_meta($post->ID, '_applicant_contact_id');
+        }
+
+        if ( $applicant_contact_ids == '' )
+        {
+            $applicant_contact_ids = array();
+        }
+        if ( !is_array($applicant_contact_ids) && $applicant_contact_ids != '' && $applicant_contact_ids != 0 )
+        {
+            $applicant_contact_ids = array($applicant_contact_ids);
+        }
+
+        if ( !empty($applicant_contact_ids) )
+        {
+            foreach ( $applicant_contact_ids as $applicant_contact_id )
+            {
+                $contact = new PH_Contact($applicant_contact_id);
+
+                $fields = array(
+                    'name' => array(
+                        'label' => __('Name', 'propertyhive'),
+                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . $applicant_contact_id . '" data-viewing-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
+                    ),
+                    'telephone_number' => array(
+                        'label' => __('Telephone Number', 'propertyhive'),
+                        'value' => $contact->telephone_number,
+                    ),
+                    'email_address' => array(
+                        'label' => __('Email Address', 'propertyhive'),
+                        'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                    ),
+                );
+
+                $fields = apply_filters( 'propertyhive_viewing_applicant_fields', $fields, $post->ID, $applicant_contact_id );
+
+                foreach ( $fields as $key => $field )
+                {
+                    echo '<p class="form-field ' . esc_attr($key) . '">
+
+                        <label>' . esc_html($field['label']) . '</label>
+
+                        ' . $field['value'] . '
+
+                    </p>';
+                }
             }
         }
         else
