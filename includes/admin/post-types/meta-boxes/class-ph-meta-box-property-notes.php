@@ -196,6 +196,8 @@ class PH_Meta_Box_Property_Notes {
             <h4><?php _e( 'Add Note', 'propertyhive' ); ?></h4>
             <p>
                 <textarea type="text" name="note" id="add_note" class="input-text" cols="20" rows="6"></textarea>
+                <br>
+                <input type="checkbox" name="pinned" id="pinned" value="1"> Pin Note
             </p>
             <p>
                 <a href="#" class="add_note button"><?php _e( 'Add', 'propertyhive' ); ?></a>

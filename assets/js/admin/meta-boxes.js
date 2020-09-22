@@ -69,6 +69,7 @@ jQuery( function($){
             post_id:        propertyhive_admin_meta_boxes.post_id,
             note:           $('textarea#add_note').val(),
             note_type:      'propertyhive_note',
+            pinned:         $('#pinned').val(),
             security:       propertyhive_admin_meta_boxes.add_note_nonce,
         };
 
@@ -76,6 +77,7 @@ jQuery( function($){
             $('ul.record_notes').prepend( response );
             $('li#no_notes').hide();
             $('#add_note').val('');
+            $('#pinned').prop("checked", false);
         });
 
         return false;
