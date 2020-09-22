@@ -252,7 +252,6 @@ jQuery(document).ready(function($)
     {
         e.preventDefault();
 
-        viewing_selected_applicants = []; // reset to only allow one applicant for now
         viewing_selected_applicants.push( { id: $(this).attr('href'), post_title: $(this).text() } );
 
         $('#viewing_search_applicant_results').html('');
@@ -288,12 +287,14 @@ function viewing_update_selected_applicants()
     if ( viewing_selected_applicants.length > 0 )
     {
         jQuery('#viewing_selected_applicants').html('<ul></ul>');
+        var selected_applicant_ids = [];
         for ( var i in viewing_selected_applicants )
         {
             jQuery('#viewing_selected_applicants ul').append('<li><a href="' + viewing_selected_applicants[i].id + '" class="viewing-remove-applicant" data-viewing-applicant-id="' + viewing_selected_applicants[i].id + '" data-viewing-applicant-name="' + viewing_selected_applicants[i].post_title + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_applicants[i].post_title + '</li>');
 
-            jQuery('#_applicant_contact_ids').val(viewing_selected_applicants[i].id);
+            selected_applicant_ids.push(viewing_selected_applicants[i].id);
         }
+        jQuery('#_applicant_contact_ids').val(selected_applicant_ids.join('|'));
         jQuery('#viewing_selected_applicants').show();
     }
     else
