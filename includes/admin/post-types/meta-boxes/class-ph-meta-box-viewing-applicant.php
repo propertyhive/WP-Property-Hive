@@ -51,6 +51,7 @@ class PH_Meta_Box_Viewing_Applicant {
 
         if ( !empty($applicant_contact_ids) )
         {
+            $i = 0;
             foreach ( $applicant_contact_ids as $applicant_contact_id )
             {
                 $contact = new PH_Contact($applicant_contact_id);
@@ -72,9 +73,11 @@ class PH_Meta_Box_Viewing_Applicant {
 
                 $fields = apply_filters( 'propertyhive_viewing_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
+                $div_style = $i > 0 ? 'style="border-top:1px solid #ddd"' : '';
+                echo "<div " . $div_style . ">";
                 foreach ( $fields as $key => $field )
                 {
-                    echo '<p class="form-field ' . esc_attr($key) . '">
+                    echo '<p class="form-field ' . esc_attr($key) . '" >
 
                         <label>' . esc_html($field['label']) . '</label>
 
@@ -82,6 +85,8 @@ class PH_Meta_Box_Viewing_Applicant {
 
                     </p>';
                 }
+                echo "</div>";
+                ++$i;
             }
         }
         else
