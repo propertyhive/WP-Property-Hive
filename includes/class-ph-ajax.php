@@ -2963,56 +2963,53 @@ class PH_AJAX {
             }
         }*/
 
-        // Loop through contacts and create one viewing each
-        // At the moment it's a 1-to-1 relationship, but might support multiple in the future
-        foreach ( $applicant_contact_ids as $applicant_contact_id )
+        // Insert viewing record
+        $viewing_post = array(
+            'post_title'    => '',
+            'post_content'  => '',
+            'post_type'  => 'viewing',
+            'post_status'   => 'publish',
+            'comment_status'    => 'closed',
+            'ping_status'    => 'closed',
+        );
+
+        // Insert the post into the database
+        $viewing_post_id = wp_insert_post( $viewing_post );
+
+        if ( is_wp_error($viewing_post_id) || $viewing_post_id == 0 )
         {
-            // Insert viewing record
-            $viewing_post = array(
-                'post_title'    => '',
-                'post_content'  => '',
-                'post_type'  => 'viewing',
-                'post_status'   => 'publish',
-                'comment_status'    => 'closed',
-                'ping_status'    => 'closed',
-            );
-                    
-            // Insert the post into the database
-            $viewing_post_id = wp_insert_post( $viewing_post );
-
-            if ( is_wp_error($viewing_post_id) || $viewing_post_id == 0 )
-            {
-                $return = array('error' => 'Failed to create viewing post. Please try again');
-                echo json_encode( $return );
-                die();
-            }
-            
-            add_post_meta( $viewing_post_id, '_start_date_time', ph_clean($_POST['start_date']) . ' ' . ph_clean($_POST['start_time']) );
-            add_post_meta( $viewing_post_id, '_duration', 30 * 60 ); // Stored in seconds. Default to 30 mins
-            add_post_meta( $viewing_post_id, '_property_id', (int)$_POST['property_id'] );
-            add_post_meta( $viewing_post_id, '_applicant_contact_id', $applicant_contact_id );
-            add_post_meta( $viewing_post_id, '_status', 'pending' );
-            add_post_meta( $viewing_post_id, '_feedback_status', '' );
-            add_post_meta( $viewing_post_id, '_feedback', '' );
-            add_post_meta( $viewing_post_id, '_feedback_passed_on', '' );
-
-            if ( !empty($_POST['negotiator_ids']) )
-            {
-                foreach ( $_POST['negotiator_ids'] as $negotiator_id )
-                {
-                    add_post_meta( $viewing_post_id, '_negotiator_id', (int)$negotiator_id );
-                }
-            }
+            $return = array('error' => 'Failed to create viewing post. Please try again');
+            echo json_encode( $return );
+            die();
         }
 
+        add_post_meta( $viewing_post_id, '_start_date_time', ph_clean($_POST['start_date']) . ' ' . ph_clean($_POST['start_time']) );
+        add_post_meta( $viewing_post_id, '_duration', 30 * 60 ); // Stored in seconds. Default to 30 mins
+        add_post_meta( $viewing_post_id, '_property_id', (int)$_POST['property_id'] );
+
         $applicant_contacts = array();
-        foreach ( $applicant_contact_ids  as $applicant_contact_id )
+        foreach ($applicant_contact_ids as $applicant_contact_id)
         {
+            add_post_meta( $viewing_post_id, '_applicant_contact_id', $applicant_contact_id );
+
             $applicant_contacts[] = array(
                 'ID' => $applicant_contact_id,
                 'post_title' => get_the_title($applicant_contact_id),
                 'edit_link' => get_edit_post_link( $applicant_contact_id, '' ),
             );
+        }
+
+        add_post_meta( $viewing_post_id, '_status', 'pending' );
+        add_post_meta( $viewing_post_id, '_feedback_status', '' );
+        add_post_meta( $viewing_post_id, '_feedback', '' );
+        add_post_meta( $viewing_post_id, '_feedback_passed_on', '' );
+
+        if ( !empty($_POST['negotiator_ids']) )
+        {
+            foreach ( $_POST['negotiator_ids'] as $negotiator_id )
+            {
+                add_post_meta( $viewing_post_id, '_negotiator_id', (int)$negotiator_id );
+            }
         }
 
         $return = array('success' => array(
