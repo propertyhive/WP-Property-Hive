@@ -382,12 +382,15 @@ function viewing_update_selected_applicants()
         {
             if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
             {
-                update_post_meta( $post_id, '_applicant_contact_id', ph_clean($_POST['_applicant_contact_ids']) );
-
                 // make the contact an applicant if not already
-                $applicant_contact_ids = explode(",", $_POST['_applicant_contact_ids']);
+                $applicant_contact_ids = array_unique(explode("|", $_POST['_applicant_contact_ids']));
+
+                delete_post_meta( $post_id, '_applicant_contact_id' );
+
                 foreach ( $applicant_contact_ids as $applicant_contact_id )
                 {
+                    add_post_meta( $post_id, '_applicant_contact_id', ph_clean($applicant_contact_id) );
+
                     $existing_contact_types = get_post_meta( $applicant_contact_id, '_contact_types', TRUE );
                     if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
                     {
