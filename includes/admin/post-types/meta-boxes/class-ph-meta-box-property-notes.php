@@ -59,7 +59,8 @@ class PH_Meta_Box_Property_Notes {
 
         echo '<ul class="record_notes" style="max-height:300px; overflow-y:auto">';
 
-        $note_output = array();
+        $pinned_notes = array();
+        $unpinned_notes = array();
 
         if ( !empty($notes) ) 
         {
@@ -106,18 +107,29 @@ class PH_Meta_Box_Property_Notes {
                         break;
                     }
                 }
-
-                $note_output[] = array(
+                $note_content = array(
                     'id' => $note->comment_ID,
                     'post_id' => $note->comment_post_ID,
                     'type' => $comment_content['note_type'],
                     'author' => $note->comment_author,
                     'body' => $note_body,
                     'timestamp' => strtotime($note->comment_date),
-                    'internal' => true
+                    'internal' => true,
+                    'pinned' => ( isset($comment_content['pinned']) && $comment_content['pinned'] == '1' ) ? '1' : '0',
                 );
+
+                if ( $note_content['pinned'] == '1' )
+                {
+                    $pinned_notes[] = $note_content;
+                }
+                else
+                {
+                    $unpinned_notes[] = $note_content;
+                }
             }
         }
+
+        $note_output = array_merge($pinned_notes, $unpinned_notes);
 
         $note_output = apply_filters( 'propertyhive_notes', $note_output, $post );
         $note_output = apply_filters( 'propertyhive_property_notes', $note_output, $post );
@@ -127,9 +139,12 @@ class PH_Meta_Box_Property_Notes {
             // order by date desc. Older PHP versions don't support array_column so just can't order for them
             if ( function_exists('array_column') )
             {
+                $pinned = array_column($note_output, 'pinned');
                 $timestamp = array_column($note_output, 'timestamp');
 
-                array_multisort($timestamp, SORT_DESC, $note_output);
+                array_multisort($pinned, SORT_DESC,
+                                $timestamp, SORT_DESC,
+                                $note_output);
             }
 
             foreach ( $note_output as $note )
