@@ -1317,6 +1317,11 @@ class PH_AJAX {
                 'note' => $note
             );
 
+            if ( isset($_POST['pinned']) && $_POST['pinned'] == '1' )
+            {
+                $comment['pinned'] = '1';
+            }
+
             $comment_id = PH_Comments::insert_note( $post_id, $comment );
 
             if ($comment_id !== FALSE)
