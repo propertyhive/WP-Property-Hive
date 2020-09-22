@@ -158,9 +158,18 @@ class PH_Meta_Box_Viewing_Applicant {
 <script>
 
 var viewing_selected_applicants = [];
-<?php if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '') { ?>
-viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
-<?php } ?>
+<?php
+    if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '')
+    {
+        $applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
+        foreach ($applicant_contact_ids as $applicant_contact_id)
+        {
+            ?>
+            viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
+            <?php
+        }
+    }
+?>
 
 jQuery(document).ready(function($)
 {
