@@ -3589,13 +3589,31 @@ class PH_AJAX {
             $subject = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
             $body = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
 
+            $applicant_names = array();
+            foreach ($applicant_contact_ids as $applicant_contact_id)
+            {
+                $applicant_names[] = get_the_title($applicant_contact_id);
+            }
+            $applicant_names = array_filter($applicant_names);
+
+            $applicant_names_string = '';
+            if ( count($applicant_names) == 1 )
+            {
+                $applicant_names_string = $applicant_names[0];
+            }
+            elseif ( count($applicant_names) > 1 )
+            {
+                $last_applicant = array_pop($applicant_names);
+                $applicant_names_string = implode(', ', $applicant_names) . ' & ' . $last_applicant;
+            }
+
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
-            $subject = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $subject);
+            $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
-            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
+            $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
