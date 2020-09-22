@@ -98,7 +98,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 		$columns['cb'] = '<input type="checkbox" />';
 		$columns['start_date_time'] = __( 'Viewing Date / Time', 'propertyhive' );
         $columns['property'] = __( 'Property', 'propertyhive' );
-        $columns['applicant'] = __( 'Applicant', 'propertyhive' );
+        $columns['applicant'] = __( 'Applicant(s)', 'propertyhive' );
         $columns['status'] = __( 'Status', 'propertyhive' );
         $columns['negotiators'] = __( 'Attending Negotiators', 'propertyhive' );
 
@@ -183,14 +183,19 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
                 }
                 break;
             case 'applicant' :
-                
-                if ( $the_viewing->applicant_contact_id != '' ) 
+                $applicant_contact_ids = get_post_meta( $post->ID, '_applicant_contact_id' );
+                if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
                 {
-                	echo get_the_title($the_viewing->applicant_contact_id);
+                    $applicants = array();
+                    foreach ( $applicant_contact_ids as $applicant_contact_id )
+                    {
+                        $applicants[] = get_the_title($applicant_contact_id);
+                    }
+                    echo implode("<br>", $applicants);
                 }
                 else
                 {
-                	echo '-';
+                    echo '-';
                 }
                 
                 break;
