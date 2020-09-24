@@ -152,16 +152,6 @@ class PH_Meta_Box_Sale_Notes {
 
         echo '</ul>';
         
-        ?>
-        <div class="add_note">
-            <h4><?php _e( 'Add Note', 'propertyhive' ); ?></h4>
-            <p>
-                <textarea type="text" name="note" id="add_note" class="input-text" cols="20" rows="6"></textarea>
-            </p>
-            <p>
-                <a href="#" class="add_note button"><?php _e( 'Add', 'propertyhive' ); ?></a>
-            </p>
-        </div>
-        <?php 
+        include( PH()->plugin_path() . '/includes/admin/views/html-add-note.php' );
     }
 }
