@@ -363,6 +363,7 @@ jQuery(document).ready(function($)
             action:         'propertyhive_search_contacts',
             keyword:    	keyword,
             security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            exclude_ids:    Object.keys(viewing_selected_applicants).join('|'),
         };
 
         $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
@@ -407,7 +408,6 @@ jQuery(document).ready(function($)
 	{
 		e.preventDefault();
 
-		viewing_selected_applicants = []; // reset to only allow one applicant for now
 		viewing_selected_applicants[$(this).attr('href')] = ({ post_title: $(this).text() });
 
 		$('#viewing_search_applicant_results').html('');

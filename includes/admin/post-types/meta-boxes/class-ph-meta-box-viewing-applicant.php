@@ -22,39 +22,71 @@ class PH_Meta_Box_Viewing_Applicant {
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
-        
-        $applicant_contact_id = get_post_meta( $post->ID, '_applicant_contact_id', true );
 
-        if ( !empty($applicant_contact_id) )
+        $applicant_contact_ids = array();
+        if ( isset($_GET['applicant_contact_id']) && ! empty( $_GET['applicant_contact_id'] ) )
         {
-            $contact = new PH_Contact($applicant_contact_id);
-
-            $fields = array(
-                'name' => array(
-                    'label' => __('Name', 'propertyhive'),
-                    'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . $applicant_contact_id . '" data-viewing-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
-                ),
-                'telephone_number' => array(
-                    'label' => __('Telephone Number', 'propertyhive'),
-                    'value' => $contact->telephone_number,
-                ),
-                'email_address' => array(
-                    'label' => __('Email Address', 'propertyhive'),
-                    'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
-                ),
-            );
-
-            $fields = apply_filters( 'propertyhive_viewing_applicant_fields', $fields, $post->ID, $applicant_contact_id );
-
-            foreach ( $fields as $key => $field )
+            $explode_applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
+            foreach ($explode_applicant_contact_ids as $explode_applicant_contact_id)
             {
-                echo '<p class="form-field ' . esc_attr($key) . '">
-            
-                    <label>' . esc_html($field['label']) . '</label>
-                    
-                    ' . $field['value'] . '
-                    
-                </p>';
+                if ( get_post_type( (int)$explode_applicant_contact_id ) == 'contact' )
+                {
+                    $applicant_contact_ids[] = (int)$explode_applicant_contact_id;
+                }
+            }
+        }
+        else
+        {
+            $applicant_contact_ids = get_post_meta($post->ID, '_applicant_contact_id');
+        }
+
+        if ( $applicant_contact_ids == '' )
+        {
+            $applicant_contact_ids = array();
+        }
+        if ( !is_array($applicant_contact_ids) && $applicant_contact_ids != '' && $applicant_contact_ids != 0 )
+        {
+            $applicant_contact_ids = array($applicant_contact_ids);
+        }
+
+        if ( !empty($applicant_contact_ids) )
+        {
+            $i = 0;
+            foreach ( $applicant_contact_ids as $applicant_contact_id )
+            {
+                $contact = new PH_Contact($applicant_contact_id);
+
+                $fields = array(
+                    'name' => array(
+                        'label' => __('Name', 'propertyhive'),
+                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . $applicant_contact_id . '" data-viewing-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
+                    ),
+                    'telephone_number' => array(
+                        'label' => __('Telephone Number', 'propertyhive'),
+                        'value' => $contact->telephone_number,
+                    ),
+                    'email_address' => array(
+                        'label' => __('Email Address', 'propertyhive'),
+                        'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                    ),
+                );
+
+                $fields = apply_filters( 'propertyhive_viewing_applicant_fields', $fields, $post->ID, $applicant_contact_id );
+
+                $div_style = $i > 0 ? 'style="border-top:1px solid #ddd"' : '';
+                echo "<div " . $div_style . ">";
+                foreach ( $fields as $key => $field )
+                {
+                    echo '<p class="form-field ' . esc_attr($key) . '" >
+
+                        <label>' . esc_html($field['label']) . '</label>
+
+                        ' . $field['value'] . '
+
+                    </p>';
+                }
+                echo "</div>";
+                ++$i;
             }
         }
         else
@@ -131,9 +163,18 @@ class PH_Meta_Box_Viewing_Applicant {
 <script>
 
 var viewing_selected_applicants = [];
-<?php if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '') { ?>
-viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
-<?php } ?>
+<?php
+    if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '')
+    {
+        $applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
+        foreach ($applicant_contact_ids as $applicant_contact_id)
+        {
+            ?>
+            viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
+            <?php
+        }
+    }
+?>
 
 jQuery(document).ready(function($)
 {
@@ -192,6 +233,7 @@ jQuery(document).ready(function($)
             action:         'propertyhive_search_contacts',
             keyword:        keyword,
             security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            exclude_ids:    jQuery('#_applicant_contact_ids').val(),
         };
         $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
         {
@@ -215,7 +257,6 @@ jQuery(document).ready(function($)
     {
         e.preventDefault();
 
-        viewing_selected_applicants = []; // reset to only allow one applicant for now
         viewing_selected_applicants.push( { id: $(this).attr('href'), post_title: $(this).text() } );
 
         $('#viewing_search_applicant_results').html('');
@@ -251,12 +292,14 @@ function viewing_update_selected_applicants()
     if ( viewing_selected_applicants.length > 0 )
     {
         jQuery('#viewing_selected_applicants').html('<ul></ul>');
+        var selected_applicant_ids = [];
         for ( var i in viewing_selected_applicants )
         {
             jQuery('#viewing_selected_applicants ul').append('<li><a href="' + viewing_selected_applicants[i].id + '" class="viewing-remove-applicant" data-viewing-applicant-id="' + viewing_selected_applicants[i].id + '" data-viewing-applicant-name="' + viewing_selected_applicants[i].post_title + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_applicants[i].post_title + '</li>');
 
-            jQuery('#_applicant_contact_ids').val(viewing_selected_applicants[i].id);
+            selected_applicant_ids.push(viewing_selected_applicants[i].id);
         }
+        jQuery('#_applicant_contact_ids').val(selected_applicant_ids.join('|'));
         jQuery('#viewing_selected_applicants').show();
     }
     else
@@ -344,12 +387,15 @@ function viewing_update_selected_applicants()
         {
             if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
             {
-                update_post_meta( $post_id, '_applicant_contact_id', ph_clean($_POST['_applicant_contact_ids']) );
-
                 // make the contact an applicant if not already
-                $applicant_contact_ids = explode(",", $_POST['_applicant_contact_ids']);
+                $applicant_contact_ids = array_unique(explode("|", $_POST['_applicant_contact_ids']));
+
+                delete_post_meta( $post_id, '_applicant_contact_id' );
+
                 foreach ( $applicant_contact_ids as $applicant_contact_id )
                 {
+                    add_post_meta( $post_id, '_applicant_contact_id', ph_clean($applicant_contact_id) );
+
                     $existing_contact_types = get_post_meta( $applicant_contact_id, '_contact_types', TRUE );
                     if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
                     {
