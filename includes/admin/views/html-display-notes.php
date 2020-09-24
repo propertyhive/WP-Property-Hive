@@ -1,8 +1,126 @@
+<?php
+
+$args = array(
+	'type'      => 'propertyhive_note',
+	'meta_query' => array(
+		array(
+			'key' => 'related_to',
+			'value' => '"' . $post->ID . '"',
+			'compare' => 'LIKE',
+		),
+	)
+);
+
+$notes = get_comments( $args );
+
+$pinned_notes = array();
+$unpinned_notes = array();
+
+if ( !empty($notes) )
+{
+	foreach( $notes as $note )
+	{
+		$comment_content = unserialize($note->comment_content);
+
+		$note_body = 'Unknown note type';
+		switch ( $comment_content['note_type'] )
+		{
+			case "mailout":
+			{
+				if ( isset($comment_content['method']) && $comment_content['method'] == 'email' && isset($comment_content['email_log_id']) )
+				{
+					$email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . $comment_content['email_log_id'] . "'" );
+					if ( null !== $email_log )
+					{
+						$note_body = '';
+						if ($section == 'property')
+						{
+							$note_body .= 'Included in email mailout to ' . get_the_title($email_log->contact_id) . '.';
+						}
+						elseif ($section == 'contact')
+						{
+							$property_ids = unserialize($email_log->property_ids);
+							$note_body .= 'Mailout sent via email containing ' . count($property_ids) . ' propert' . ( (count($property_ids) != 1) ? 'ies' : 'y' ) . '.';
+						}
+						$note_body .= ' <a href="' . wp_nonce_url( admin_url('?view_propertyhive_email=' . $comment_content['email_log_id'] . '&email_id=' . $comment_content['email_log_id'] ), 'view-email' ) . '" target="_blank">View Email Sent</a>';
+					}
+				}
+				break;
+			}
+			case "action":
+			{
+				switch ( $comment_content['action'] )
+				{
+					case "property_price_change":
+					{
+						$note_body = $comment_content['action'] . '<br>From: ' . $comment_content['original_value'] . '<br>To: ' . $comment_content['new_value'];
+						break;
+					}
+					case "viewing_booked":
+					{
+						$note_body = '<a href="' . get_edit_post_link($comment_content['viewing_id']) . '">Viewing</a> booked';
+						if ( isset($comment_content['property_id']) )
+						{
+							$property = new PH_Property((int)$comment_content['property_id']);
+							$note_body .= ' on <a href="' . get_edit_post_link($comment_content['property_id']) . '">' . $property->get_formatted_full_address() . '</a>';
+						}
+						break;
+					}
+					default:
+					{
+						$note_body = $comment_content['action'];
+						break;
+					}
+				}
+				break;
+			}
+			case "note":
+			{
+				$note_body = $comment_content['note'];
+				break;
+			}
+			case "unsubscribe":
+			{
+				$note_body = 'Contact unsubscribed themselves from emails';
+				break;
+			}
+		}
+		$note_content = array(
+			'id' => $note->comment_ID,
+			'post_id' => $note->comment_post_ID,
+			'type' => $comment_content['note_type'],
+			'author' => $note->comment_author,
+			'body' => $note_body,
+			'timestamp' => strtotime($note->comment_date),
+			'internal' => true,
+			'pinned' => ( isset($comment_content['pinned']) && $comment_content['pinned'] == '1' ) ? '1' : '0',
+		);
+
+		if ( $note_content['pinned'] == '1' )
+		{
+			$pinned_notes[] = $note_content;
+		}
+		else
+		{
+			$unpinned_notes[] = $note_content;
+		}
+	}
+}
+
+$note_output = array_merge($pinned_notes, $unpinned_notes);
+
+if ($section != 'enquiry')
+{
+	$note_output = apply_filters( 'propertyhive_notes', $note_output, $post );
+	$note_output = apply_filters( 'propertyhive_' . $section . '_notes', $note_output, $post );
+}
+?>
 <ul class="record_notes" style="max-height:300px; overflow-y:auto">
 	<?php
-
 	if ( !empty($note_output) )
 	{
+		$datetime_format = get_option('date_format')." \a\\t ".get_option('time_format');
+
 		// order by date desc. Older PHP versions don't support array_column so just can't order for them
 		if ( function_exists('array_column') )
 		{
