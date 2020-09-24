@@ -80,7 +80,6 @@ class PH_Meta_Box_Property_Notes {
                             $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . $comment_content['email_log_id'] . "'" );
                             if ( null !== $email_log ) 
                             {
-                                $property_ids = unserialize($email_log->property_ids);
                                 $note_body = 'Included in email mailout to ' . get_the_title($email_log->contact_id) . '.';
                                 $note_body .= ' <a href="' . wp_nonce_url( admin_url('?view_propertyhive_email=' . $comment_content['email_log_id'] . '&email_id=' . $comment_content['email_log_id'] ), 'view-email' ) . '" target="_blank">View Email Sent</a>';
                             }                                
