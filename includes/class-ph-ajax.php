@@ -1317,7 +1317,7 @@ class PH_AJAX {
                 'note' => $note
             );
 
-            if ( isset($_POST['pinned']) && $_POST['pinned'] == '1' )
+            if ( isset($_POST['pinned']) )
             {
                 $comment['pinned'] = '1';
             }

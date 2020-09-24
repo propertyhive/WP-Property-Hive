@@ -69,9 +69,13 @@ jQuery( function($){
             post_id:        propertyhive_admin_meta_boxes.post_id,
             note:           $('textarea#add_note').val(),
             note_type:      'propertyhive_note',
-            pinned:         $('#pinned').val(),
             security:       propertyhive_admin_meta_boxes.add_note_nonce,
         };
+
+        if ( $('#pinned').prop('checked') )
+        {
+            data.pinned = '1';
+        }
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             $('ul.record_notes').prepend( response );
