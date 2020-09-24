@@ -115,6 +115,24 @@ jQuery( function($){
         return false;
     });
 
+    $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.toggle_note_pinned', function() {
+
+        var note = $(this).closest('li.note');
+
+        var data = {
+            action:           'propertyhive_toggle_note_pinned',
+            note_id:          $(note).attr('rel'),
+            security:         propertyhive_admin_meta_boxes.pin_note_nonce,
+        };
+
+        $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
+
+        }, 'json');
+
+        return false;
+
+    });
+
     // Notes filter
     $('.notes-filter a').click(function(e)
     {
