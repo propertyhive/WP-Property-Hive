@@ -153,7 +153,7 @@ class PH_Meta_Box_Property_Notes {
                 $note_classes[] = 'note-type-' . $note['type'];
 ?>
                 <li rel="<?php echo absint( $note['id'] ) ; ?>" class="<?php echo implode( ' ', $note_classes ); ?>">
-                    <div class="note_content">
+                    <div class="note_content<?php echo ($note['pinned'] == '1') ? ' pinned' : '' ?>">
                         <?php echo wp_kses_post( $note['body'] ); ?>
                     </div>
                     <p class="meta">

@@ -81,10 +81,12 @@ ul.record_notes{padding:2px 0 0}
 ul.record_notes li { padding:0 10px; }
 ul.record_notes li .note_content{padding:10px;background:#efefef;position:relative}
 ul.record_notes li .note_content p{margin:0;padding:0;word-wrap:break-word}
+ul.record_notes li .pinned{background:#f5e57e !important;}
 ul.record_notes li p.meta{padding:10px;color:#999;margin:0;font-size:11px}
 ul.record_notes li p.meta .exact-date{border-bottom:1px dotted #999}
 ul.record_notes li a.delete_note{color:#a00}
 ul.record_notes li .note_content:after{content:"";display:block;position:absolute;bottom:-10px;left:20px;width:0;height:0;border-width:10px 10px 0 0;border-style:solid;border-color:#efefef transparent}
+ul.record_notes li .pinned:after{border-color:#f5e57e transparent !important}
 
 .propertyhive table.form-table table.widefat th {
     padding-right: inherit;
