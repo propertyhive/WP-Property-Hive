@@ -1083,6 +1083,10 @@ class PH_AJAX {
                     )
                 );
             }
+            if ( isset($_POST['exclude_ids']) && $_POST['exclude_ids'] != '' )
+            {
+                $args['post__not_in'] = explode('|', $_POST['exclude_ids']);
+            }
             
             add_filter( 'posts_where', array( $this, 'search_contacts_where' ), 10, 2 );
             
@@ -1871,7 +1875,7 @@ class PH_AJAX {
                 $property_id = get_post_meta( get_the_ID(), '_property_id', TRUE );
                 $property = new PH_Property((int)$property_id);
 
-                $applicant_contact_id = get_post_meta( get_the_ID(), '_applicant_contact_id', TRUE );
+                $applicant_contact_ids = get_post_meta( get_the_ID(), '_applicant_contact_id' );
 
                 $return[] = array(
                     'ID' => get_the_ID(),
@@ -1880,8 +1884,8 @@ class PH_AJAX {
                     'start_date_time_formatted_Hi_jSFY' => date("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
                     'property_id' => $property_id,
                     'property_address' => $property->get_formatted_full_address(),
-                    'applicant_contact_id' => $applicant_contact_id,
-                    'applicant_name' => get_the_title( $applicant_contact_id ),
+                    'applicant_contact_id' => $applicant_contact_ids[0],
+                    'applicant_name' => get_the_title( $applicant_contact_ids[0] ),
                 );
             }
         }
@@ -2959,56 +2963,53 @@ class PH_AJAX {
             }
         }*/
 
-        // Loop through contacts and create one viewing each
-        // At the moment it's a 1-to-1 relationship, but might support multiple in the future
-        foreach ( $applicant_contact_ids as $applicant_contact_id )
+        // Insert viewing record
+        $viewing_post = array(
+            'post_title'    => '',
+            'post_content'  => '',
+            'post_type'  => 'viewing',
+            'post_status'   => 'publish',
+            'comment_status'    => 'closed',
+            'ping_status'    => 'closed',
+        );
+
+        // Insert the post into the database
+        $viewing_post_id = wp_insert_post( $viewing_post );
+
+        if ( is_wp_error($viewing_post_id) || $viewing_post_id == 0 )
         {
-            // Insert viewing record
-            $viewing_post = array(
-                'post_title'    => '',
-                'post_content'  => '',
-                'post_type'  => 'viewing',
-                'post_status'   => 'publish',
-                'comment_status'    => 'closed',
-                'ping_status'    => 'closed',
-            );
-                    
-            // Insert the post into the database
-            $viewing_post_id = wp_insert_post( $viewing_post );
-
-            if ( is_wp_error($viewing_post_id) || $viewing_post_id == 0 )
-            {
-                $return = array('error' => 'Failed to create viewing post. Please try again');
-                echo json_encode( $return );
-                die();
-            }
-            
-            add_post_meta( $viewing_post_id, '_start_date_time', ph_clean($_POST['start_date']) . ' ' . ph_clean($_POST['start_time']) );
-            add_post_meta( $viewing_post_id, '_duration', 30 * 60 ); // Stored in seconds. Default to 30 mins
-            add_post_meta( $viewing_post_id, '_property_id', (int)$_POST['property_id'] );
-            add_post_meta( $viewing_post_id, '_applicant_contact_id', $applicant_contact_id );
-            add_post_meta( $viewing_post_id, '_status', 'pending' );
-            add_post_meta( $viewing_post_id, '_feedback_status', '' );
-            add_post_meta( $viewing_post_id, '_feedback', '' );
-            add_post_meta( $viewing_post_id, '_feedback_passed_on', '' );
-
-            if ( !empty($_POST['negotiator_ids']) )
-            {
-                foreach ( $_POST['negotiator_ids'] as $negotiator_id )
-                {
-                    add_post_meta( $viewing_post_id, '_negotiator_id', (int)$negotiator_id );
-                }
-            }
+            $return = array('error' => 'Failed to create viewing post. Please try again');
+            echo json_encode( $return );
+            die();
         }
 
+        add_post_meta( $viewing_post_id, '_start_date_time', ph_clean($_POST['start_date']) . ' ' . ph_clean($_POST['start_time']) );
+        add_post_meta( $viewing_post_id, '_duration', 30 * 60 ); // Stored in seconds. Default to 30 mins
+        add_post_meta( $viewing_post_id, '_property_id', (int)$_POST['property_id'] );
+
         $applicant_contacts = array();
-        foreach ( $applicant_contact_ids  as $applicant_contact_id )
+        foreach ($applicant_contact_ids as $applicant_contact_id)
         {
+            add_post_meta( $viewing_post_id, '_applicant_contact_id', $applicant_contact_id );
+
             $applicant_contacts[] = array(
                 'ID' => $applicant_contact_id,
                 'post_title' => get_the_title($applicant_contact_id),
                 'edit_link' => get_edit_post_link( $applicant_contact_id, '' ),
             );
+        }
+
+        add_post_meta( $viewing_post_id, '_status', 'pending' );
+        add_post_meta( $viewing_post_id, '_feedback_status', '' );
+        add_post_meta( $viewing_post_id, '_feedback', '' );
+        add_post_meta( $viewing_post_id, '_feedback_passed_on', '' );
+
+        if ( !empty($_POST['negotiator_ids']) )
+        {
+            foreach ( $_POST['negotiator_ids'] as $negotiator_id )
+            {
+                add_post_meta( $viewing_post_id, '_negotiator_id', (int)$negotiator_id );
+            }
         }
 
         $return = array('success' => array(
@@ -3251,11 +3252,15 @@ class PH_AJAX {
 
         if ( $status == 'pending' )
         {
-            $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
             $property_id = get_post_meta( $post_id, '_property_id', TRUE );
-            $applicant_email_address = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+            $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
+            $applicant_email_addresses = array();
+            foreach ($applicant_contact_ids as $applicant_contact_id)
+            {
+                $applicant_email_addresses[] = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+            }
 
-            if ( (int)$applicant_contact_id == '' || (int)$property_id == '' || (int)$applicant_contact_id == 0 || (int)$property_id == 0 || sanitize_email($applicant_email_address) == '' )
+            if ( in_array((int)$property_id, array(0, '')) || !is_array($applicant_contact_ids) || count($applicant_contact_ids) == 0 || count($applicant_email_addresses) == 0 )
             {
 
             }
@@ -3278,7 +3283,7 @@ class PH_AJAX {
                 $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
                 $owner_or_landlord = ( $property_department == 'residential-lettings' ? 'Landlord' : 'Owner' );
 
-                if ( count($owner_contact_ids) > 0) {
+                if ( is_array($owner_contact_ids) && count($owner_contact_ids) > 0) {
 
                     $actions[] = '<a 
                             href="#action_panel_viewing_email_owner_booking_confirmation" 
@@ -3334,7 +3339,7 @@ class PH_AJAX {
             if ( $feedback_status == 'interested' )
             {
                 $actions[] = '<a 
-                    href="' . trim(admin_url(), '/') . '/post-new.php?post_type=viewing&applicant_contact_id=' . get_post_meta( $post_id, '_applicant_contact_id', TRUE ) . '&property_id=' . get_post_meta( $post_id, '_property_id', TRUE ) . '&viewing_id=' . $post_id .'" 
+                    href="' . trim(admin_url(), '/') . '/post-new.php?post_type=viewing&applicant_contact_id=' . implode('|', get_post_meta( $post_id, '_applicant_contact_id' )) . '&property_id=' . get_post_meta( $post_id, '_property_id', TRUE ) . '&viewing_id=' . $post_id .'" 
                     class="button button-success"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . wp_kses_post( __('Book Second Viewing', 'propertyhive') ) . '</a>';
@@ -3560,30 +3565,52 @@ class PH_AJAX {
 
         $post_id = (int)$_POST['viewing_id'];
 
-        $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+        $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
 
-        if ( (int)$applicant_contact_id == '' || (int)$property_id == '' || (int)$applicant_contact_id == 0 || (int)$property_id == 0 )
+        if ( !is_array($applicant_contact_ids) || (int)$property_id == '' || count($applicant_contact_ids) == 0 || (int)$property_id == 0 )
         {
             wp_send_json_error();
         }
 
         $property = new PH_Property((int)$property_id);
 
-        $to = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+        $to = array();
+        foreach ($applicant_contact_ids as $applicant_contact_id)
+        {
+            $to[] = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+        }
 
-        if ( sanitize_email($to) != '' )
+        if ( sanitize_email(implode($to)) != '' )
         {
             $subject = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
             $body = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
 
+            $applicant_names = array();
+            foreach ($applicant_contact_ids as $applicant_contact_id)
+            {
+                $applicant_names[] = get_the_title($applicant_contact_id);
+            }
+            $applicant_names = array_filter($applicant_names);
+
+            $applicant_names_string = '';
+            if ( count($applicant_names) == 1 )
+            {
+                $applicant_names_string = $applicant_names[0];
+            }
+            elseif ( count($applicant_names) > 1 )
+            {
+                $last_applicant = array_pop($applicant_names);
+                $applicant_names_string = implode(', ', $applicant_names) . ' & ' . $last_applicant;
+            }
+
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
-            $subject = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $subject);
+            $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
-            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
+            $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
@@ -3616,7 +3643,7 @@ class PH_AJAX {
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
         $property_department = get_post_meta( $property_id, '_department' );
 
-        $applicant_contact_id = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+        $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
         $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
  
         if ( $owner_contact_ids > 0 ) {
@@ -3633,6 +3660,24 @@ class PH_AJAX {
                 if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
             }
 
+            $applicant_names = array();
+            foreach ($applicant_contact_ids as $applicant_contact_id)
+            {
+                $applicant_names[] = get_the_title($applicant_contact_id);
+            }
+            $applicant_names = array_filter($applicant_names);
+
+            $applicant_names_string = '';
+            if ( count($applicant_names) == 1 )
+            {
+                $applicant_names_string = $applicant_names[0];
+            }
+            elseif ( count($applicant_names) > 1 )
+            {
+                $last_applicant = array_pop($applicant_names);
+                $applicant_names_string = implode(', ', $applicant_names) . ' & ' . $last_applicant;
+            }
+
             $property = new PH_Property((int)$property_id);
 
             $to = implode(",", $owner_emails);
@@ -3642,13 +3687,13 @@ class PH_AJAX {
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', implode(", ", $owner_names), $subject);
-            $subject = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $subject);
+            $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', implode(", ", $owner_names), $body);
-            $body = str_replace('[applicant_name]', get_the_title($applicant_contact_id), $body);
+            $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
@@ -3864,7 +3909,7 @@ class PH_AJAX {
                     <thead>
                         <tr>
                             <th style="text-align:left;">' . __( 'Date', 'propertyhive' ) . ' / ' . __( 'Time', 'propertyhive' ) . '</th>
-                            <th style="text-align:left;">' . __( 'Applicant', 'propertyhive' ) . '</th>
+                            <th style="text-align:left;">' . __( 'Applicant(s)', 'propertyhive' ) . '</th>
                             <th style="text-align:left;">' . __( 'Attending Negotiator(s)', 'propertyhive' ) . '</th>
                             <th style="text-align:left;">' . __( 'Status', 'propertyhive' ) . '</th>
                         </tr>
@@ -3878,9 +3923,17 @@ class PH_AJAX {
                     echo '<tr>';
                         echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("H:i jS F Y", strtotime(get_post_meta(get_the_ID(), '_start_date_time', TRUE))) . '</a></td>';
                         echo '<td style="text-align:left;">';
-                        if ( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE) != '' )
+                        $applicant_contact_ids = get_post_meta(get_the_ID(), '_applicant_contact_id');
+                        if (!empty($applicant_contact_ids))
                         {
-                            echo  '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a>';
+                            $i = 0;
+                            foreach ($applicant_contact_ids as $applicant_contact_id)
+                            {
+                                if ( $i > 0 ) { echo '<br>'; }
+
+                                echo  '<a href="' . get_edit_post_link( $applicant_contact_id, '' ) . '">' . get_the_title($applicant_contact_id) . '</a>';
+                                ++$i;
+                            }
                         }
                         else
                         {

@@ -157,7 +157,7 @@ class PH_Comments {
 				}
 
 				// get applicant
-				$applicant_ids = get_post_meta( $post_id, '_applicant_contact_id', TRUE );
+				$applicant_ids = get_post_meta( $post_id, '_applicant_contact_id' );
 				if ( !empty($applicant_ids) )
 				{
 					if ( !is_array($applicant_ids) )
