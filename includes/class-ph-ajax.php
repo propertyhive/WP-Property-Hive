@@ -24,6 +24,7 @@ class PH_AJAX {
 		$ajax_events = array(
 			'add_note' => false,
 			'delete_note' => false,
+			'toggle_note_pinned' => false,
 			'search_contacts' => false,
             'search_properties' => false,
             'search_negotiators' => false,
@@ -1363,7 +1364,38 @@ class PH_AJAX {
 
 		wp_send_json_error();
 	}
-    
+
+    /**
+     * Change existing note entry to be pinned
+     */
+    public function toggle_note_pinned() {
+
+        //check_ajax_referer( 'pin-note', 'security' );
+
+        $note_id = (int)$_POST['note_id'];
+
+        if ( $note_id > 0 ) {
+
+            $comment = get_comment($note_id);
+            $comment_content = unserialize($comment->comment_content);
+
+            if (isset($comment_content['pinned']))
+            {
+                unset($comment_content['pinned']);
+            }
+            else
+            {
+                $comment_content['pinned'] = '1';
+            }
+
+            wp_update_comment( array('comment_ID' => $_POST['note_id'], 'comment_content' => serialize($comment_content)) );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
     /**
      * Delete order note via ajax
      */
