@@ -267,9 +267,16 @@ function ph_get_search_form_fields()
  */
 function propertyhive_enquiry_form( $property_id = '' )
 {
+    global $post;
+    
     $form_controls = ph_get_property_enquiry_form_fields( $property_id );
 
     $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
+
+    $form_controls['property_id'] = array(
+        'type' => 'hidden',
+        'value' => ( $property_id != '' ? $property_id : $post->ID )
+    );
 
     if ( get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) != '' )
     {
@@ -297,14 +304,11 @@ function ph_get_property_enquiry_form_fields( $property_id = '' )
 
     $fields = array();
 
-    $fields['property_id'] = array(
-        'type' => 'hidden',
-        'value' => ( $property_id != '' ? $property_id : $post->ID )
-    );
-
     $fields['name'] = array(
         'type' => 'text',
         'label' => __( 'Full Name', 'propertyhive' ),
+        'show_label' => true,
+        'before' => '<div class="control control-name">',
         'required' => true
     );
     if ( is_user_logged_in() )
@@ -317,6 +321,8 @@ function ph_get_property_enquiry_form_fields( $property_id = '' )
     $fields['email_address'] = array(
         'type' => 'email',
         'label' => __( 'Email Address', 'propertyhive' ),
+        'show_label' => true,
+        'before' => '<div class="control control-email_address">',
         'required' => true
     );
     if ( is_user_logged_in() )
@@ -329,12 +335,16 @@ function ph_get_property_enquiry_form_fields( $property_id = '' )
     $fields['telephone_number'] = array(
         'type' => 'text',
         'label' => __( 'Number', 'propertyhive' ),
+        'show_label' => true,
+        'before' => '<div class="control control-telephone_number">',
         'required' => true
     );
 
     $fields['message'] = array(
         'type' => 'textarea',
         'label' => __( 'Message', 'propertyhive' ),
+        'show_label' => true,
+        'before' => '<div class="control control-message">',
         'required' => true
     );
 
