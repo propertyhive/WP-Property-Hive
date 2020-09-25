@@ -25,6 +25,7 @@ class PH_AJAX {
 			'add_note' => false,
 			'delete_note' => false,
 			'toggle_note_pinned' => false,
+			'get_notes_grid' => false,
 			'search_contacts' => false,
             'search_properties' => false,
             'search_negotiators' => false,
@@ -1394,6 +1395,14 @@ class PH_AJAX {
         }
 
         wp_send_json_error();
+    }
+
+    public function get_notes_grid() {
+
+        $post = get_post((int)$_POST['post_id']);
+
+        $section = $_POST['section'];
+        include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
     }
 
     /**

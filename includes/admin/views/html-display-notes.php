@@ -177,6 +177,7 @@ if ($section != 'enquiry')
 	?>
 	<li id="no_notes" style="text-align:center;<?php echo (!empty($note_output)) ? 'display:none;' : '';  ?>"><?php echo __( 'There are no notes to display', 'propertyhive' ); ?></li>
 </ul>
+<input id="notes_grid_section" type="hidden" value="<?php echo $section; ?>" >
 
 
 <div class="add_note">
