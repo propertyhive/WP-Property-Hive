@@ -129,6 +129,17 @@ jQuery( function($){
 
         }, 'json');
 
+        var data = {
+            action:         'propertyhive_get_notes_grid',
+            post_id:        propertyhive_admin_meta_boxes.post_id,
+            section:        jQuery('#notes_grid_section').val(),
+        };
+
+        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+        {
+            jQuery('#propertyhive_notes_container').html(response);
+        }, 'html');
+
         return false;
 
     });
