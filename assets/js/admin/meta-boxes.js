@@ -72,10 +72,22 @@ jQuery( function($){
             security:       propertyhive_admin_meta_boxes.add_note_nonce,
         };
 
+        if ( $('#pinned').prop('checked') )
+        {
+            data.pinned = '1';
+        }
+
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
-            $('ul.record_notes').prepend( response );
-            $('li#no_notes').hide();
-            $('#add_note').val('');
+            var data = {
+                action:         'propertyhive_get_notes_grid',
+                post_id:        propertyhive_admin_meta_boxes.post_id,
+                section:        jQuery('#notes_grid_section').val(),
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                jQuery('#propertyhive_notes_container').html(response);
+            }, 'html');
         });
 
         return false;
@@ -98,15 +110,48 @@ jQuery( function($){
         };
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
-            $(note).remove();
+            var data = {
+                action:         'propertyhive_get_notes_grid',
+                post_id:        propertyhive_admin_meta_boxes.post_id,
+                section:        jQuery('#notes_grid_section').val(),
+            };
 
-            if ($('ul.record_notes li').length <= 1)
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
             {
-                $('li#no_notes').show();
-            }
+                jQuery('#propertyhive_notes_container').html(response);
+            }, 'html');
         }, 'json');
 
         return false;
+    });
+
+    $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.toggle_note_pinned', function() {
+
+        var note = $(this).closest('li.note');
+
+        var data = {
+            action:           'propertyhive_toggle_note_pinned',
+            note_id:          $(note).attr('rel'),
+            security:         propertyhive_admin_meta_boxes.pin_note_nonce,
+        };
+
+        $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
+
+            var data = {
+                action:         'propertyhive_get_notes_grid',
+                post_id:        propertyhive_admin_meta_boxes.post_id,
+                section:        jQuery('#notes_grid_section').val(),
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                jQuery('#propertyhive_notes_container').html(response);
+            }, 'html');
+
+        }, 'json');
+
+        return false;
+
     });
 
     // Notes filter
