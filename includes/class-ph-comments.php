@@ -52,7 +52,6 @@ class PH_Comments {
 			$clauses['where'] .= ' OR comment_post_ID = "' . $post->ID . '" ) ';
 		}
 
-
 		return $clauses;
 	}
 
@@ -323,7 +322,11 @@ class PH_Comments {
 		{
 			$screen = get_current_screen();
 
-			if ( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale' ) ) ) )
+			if ( 
+				( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale' ) ) ) )
+				||
+				( wp_doing_ajax() && isset($_POST['action']) && $_POST['action'] == 'propertyhive_get_notes_grid' )
+			)
 			{
 				return $clauses; // Don't hide when viewing Property Hive record
 			}
