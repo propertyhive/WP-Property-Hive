@@ -169,20 +169,41 @@ class PH_Meta_Box_Contact_Relationships {
                     ++$tab;
                 }
 
+                $applicant_departments_count = array(
+                    'residential-sales' => 0,
+                    'residential-lettings' => 0,
+                    'commercial' => 0,
+                );
                 foreach ($applicant_profiles as $key => $applicant_profile)
                 {
                     $label = __( 'New Applicant', 'propertyhive' );
-                    if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
+
+                    if ( isset($applicant_profile['department']) )
                     {
-                        $label = __( 'Sales Applicant', 'propertyhive' );
-                    }
-                    elseif ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-lettings' )
-                    {
-                        $label = __( 'Lettings Applicant', 'propertyhive' );
-                    }
-                    elseif ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'commercial' )
-                    {
-                        $label = __( 'Commercial Applicant', 'propertyhive' );
+                        if ( isset($applicant_profile['relationship_name']) && $applicant_profile['relationship_name'] != '' )
+                        {
+                            $label = __( $applicant_profile['relationship_name'], 'propertyhive' );
+                        }
+                        else
+                        {
+                            if ( $applicant_profile['department'] == 'residential-sales' )
+                            {
+                                $label = __( 'Sales Applicant', 'propertyhive' );
+                            }
+                            elseif ( $applicant_profile['department'] == 'residential-lettings' )
+                            {
+                                $label = __( 'Lettings Applicant', 'propertyhive' );
+                            }
+                            elseif ( $applicant_profile['department'] == 'commercial' )
+                            {
+                                $label = __( 'Commercial Applicant', 'propertyhive' );
+                            }
+                        }
+
+                        if ( isset($applicant_departments_count[$applicant_profile['department']]) )
+                        {
+                            ++$applicant_departments_count[$applicant_profile['department']];
+                        }
                     }
                     echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
                         <a href="#tab_applicant_data_' . $key . '">' . $label . '</a>
@@ -317,8 +338,33 @@ class PH_Meta_Box_Contact_Relationships {
                             }
                         }
                         propertyhive_wp_radio( $args );
-                        
+
                         echo '<div class="propertyhive-applicant-residential-sales-details-' . $key . '">';
+
+                        // Display Relationship Name if it's already set
+                        // Or we're editing a profile and at least two of this department exist
+                        // Or we're creating a new profile and one of that department exist
+                        if (
+                            isset($applicant_profile['relationship_name'])
+                            ||
+                            ( isset($applicant_profile['department']) && $applicant_departments_count['residential-sales'] > 1 )
+                            ||
+                            ( !isset($applicant_profile['department']) && $applicant_departments_count['residential-sales'] > 0 )
+                        ) {
+                            // Relationship Name
+                            propertyhive_wp_text_input( array(
+                                'id' => '_relationship_name_residential-sales_' . $key,
+                                'label' => __( 'Name', 'propertyhive' ),
+                                'desc_tip' => false,
+                                'type' => 'text',
+                                'class' => '',
+                                'custom_attributes' => array(
+                                    'style' => 'width:100%; max-width:323px;'
+                                ),
+                                'placeholder' => 'Sales Applicant',
+                                'value' => ( ( isset($applicant_profile['relationship_name']) ) ? $applicant_profile['relationship_name'] : '' )
+                            ) );
+                        }
 
                         // Price
                         propertyhive_wp_text_input( array( 
@@ -420,6 +466,31 @@ class PH_Meta_Box_Contact_Relationships {
 
                         echo '<div class="propertyhive-applicant-residential-lettings-details-' . $key . '">';
 
+                        // Display Relationship Name if it's already set
+                        // Or we're editing a profile and at least two of this department exist
+                        // Or we're creating a new profile and one of that department exist
+                        if (
+                            isset($applicant_profile['relationship_name'])
+                            ||
+                            ( isset($applicant_profile['department']) && $applicant_departments_count['residential-lettings'] > 1 )
+                            ||
+                            ( !isset($applicant_profile['department']) && $applicant_departments_count['residential-lettings'] > 0 )
+                        ) {
+                            // Relationship Name
+                            propertyhive_wp_text_input( array(
+                                'id' => '_relationship_name_residential-lettings_' . $key,
+                                'label' => __( 'Name', 'propertyhive' ),
+                                'desc_tip' => false,
+                                'type' => 'text',
+                                'class' => '',
+                                'custom_attributes' => array(
+                                    'style' => 'width:100%; max-width:323px;'
+                                ),
+                                'placeholder' => 'Lettings Applicant',
+                                'value' => ( ( isset($applicant_profile['relationship_name']) ) ? $applicant_profile['relationship_name'] : '' )
+                            ) );
+                        }
+
                         // Rent / Rent Frequency
                         $rent_frequency = ( ( isset($applicant_profile['rent_frequency']) ) ? $applicant_profile['rent_frequency'] : '' );
                         echo '<p class="form-field rent_field ">
@@ -514,6 +585,31 @@ class PH_Meta_Box_Contact_Relationships {
                         echo '</div>'; // end 'propertyhive-applicant-residential-details-' . $key
 
                         echo '<div class="propertyhive-applicant-commercial-details-' . $key . '">';
+
+                        // Display Relationship Name if it's already set
+                        // Or we're editing a profile and at least two of this department exist
+                        // Or we're creating a new profile and one of that department exist
+                        if (
+                            isset($applicant_profile['relationship_name'])
+                            ||
+                            ( isset($applicant_profile['department']) && $applicant_departments_count['commercial'] > 1 )
+                            ||
+                            ( !isset($applicant_profile['department']) && $applicant_departments_count['commercial'] > 0 )
+                        ) {
+                            // Relationship Name
+                            propertyhive_wp_text_input( array(
+                                'id' => '_relationship_name_commercial_' . $key,
+                                'label' => __( 'Name', 'propertyhive' ),
+                                'desc_tip' => false,
+                                'type' => 'text',
+                                'class' => '',
+                                'custom_attributes' => array(
+                                    'style' => 'width:100%; max-width:323px;'
+                                ),
+                                'placeholder' => 'Commercial Applicant',
+                                'value' => ( ( isset($applicant_profile['relationship_name']) ) ? $applicant_profile['relationship_name'] : '' ),
+                            ) );
+                        }
 
                         $args = array( 
                             'id' => '_applicant_available_as_' . $key,
@@ -981,6 +1077,11 @@ class PH_Meta_Box_Contact_Relationships {
                     {
                         $applicant_profile['commercial_property_types'] = ph_clean($_POST['_applicant_commercial_property_types_' . $i]);
                     }
+                }
+
+                if ( isset($_POST['_relationship_name_' . $_POST['_applicant_department_' . $i] . '_' . $i]) &&  $_POST['_relationship_name_' . $_POST['_applicant_department_' . $i] . '_' . $i] != '')
+                {
+                    $applicant_profile['relationship_name'] = ph_clean($_POST['_relationship_name_' . $_POST['_applicant_department_' . $i] . '_' . $i]);
                 }
 
                 if ( isset($_POST['_applicant_locations_' . $i]) && is_array($_POST['_applicant_locations_' . $i]) && !empty($_POST['_applicant_locations_' . $i]) )
