@@ -1399,10 +1399,15 @@ class PH_AJAX {
 
     public function get_notes_grid() {
 
+        global $post;
+        
         $post = get_post((int)$_POST['post_id']);
 
         $section = $_POST['section'];
         include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
+
+        // Quit out
+        die();
     }
 
     /**

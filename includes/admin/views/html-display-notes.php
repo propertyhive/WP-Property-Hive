@@ -1,11 +1,12 @@
 <?php
 
 $args = array(
+	'post_id' => (int)$post->ID,
 	'type'      => 'propertyhive_note',
 	'meta_query' => array(
 		array(
 			'key' => 'related_to',
-			'value' => '"' . $post->ID . '"',
+			'value' => '"' . (int)$post->ID . '"',
 			'compare' => 'LIKE',
 		),
 	)

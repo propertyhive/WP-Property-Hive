@@ -78,10 +78,16 @@ jQuery( function($){
         }
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
-            $('ul.record_notes').prepend( response );
-            $('li#no_notes').hide();
-            $('#add_note').val('');
-            $('#pinned').prop("checked", false);
+            var data = {
+                action:         'propertyhive_get_notes_grid',
+                post_id:        propertyhive_admin_meta_boxes.post_id,
+                section:        jQuery('#notes_grid_section').val(),
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                jQuery('#propertyhive_notes_container').html(response);
+            }, 'html');
         });
 
         return false;
@@ -104,12 +110,16 @@ jQuery( function($){
         };
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
-            $(note).remove();
+            var data = {
+                action:         'propertyhive_get_notes_grid',
+                post_id:        propertyhive_admin_meta_boxes.post_id,
+                section:        jQuery('#notes_grid_section').val(),
+            };
 
-            if ($('ul.record_notes li').length <= 1)
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
             {
-                $('li#no_notes').show();
-            }
+                jQuery('#propertyhive_notes_container').html(response);
+            }, 'html');
         }, 'json');
 
         return false;
@@ -127,18 +137,18 @@ jQuery( function($){
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
 
+            var data = {
+                action:         'propertyhive_get_notes_grid',
+                post_id:        propertyhive_admin_meta_boxes.post_id,
+                section:        jQuery('#notes_grid_section').val(),
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                jQuery('#propertyhive_notes_container').html(response);
+            }, 'html');
+
         }, 'json');
-
-        var data = {
-            action:         'propertyhive_get_notes_grid',
-            post_id:        propertyhive_admin_meta_boxes.post_id,
-            section:        jQuery('#notes_grid_section').val(),
-        };
-
-        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
-        {
-            jQuery('#propertyhive_notes_container').html(response);
-        }, 'html');
 
         return false;
 
