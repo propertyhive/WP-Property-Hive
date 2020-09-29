@@ -120,6 +120,15 @@ if ($section != 'enquiry')
 	<?php
 	if ( !empty($note_output) )
 	{
+		foreach ( $note_output as $key => $note )
+		{
+			// Set pinned parameter for any notes added by third party plugins
+			if ( !isset($note['pinned']) )
+			{
+				$note_output[$key]['pinned'] = 0;
+			}
+		}
+
 		$datetime_format = get_option('date_format')." \a\\t ".get_option('time_format');
 
 		// order by date desc. Older PHP versions don't support array_column so just can't order for them
