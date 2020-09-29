@@ -43,7 +43,9 @@ class PH_Meta_Box_Sale_Notes {
 
         echo '</ul>';
 
-        $section = 'sale';
-        include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
+        echo '<div id="propertyhive_notes_container">';
+            $section = 'sale';
+            include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
+        echo '</div>';
     }
 }
