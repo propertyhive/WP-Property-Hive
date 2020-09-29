@@ -43,9 +43,10 @@ class PH_Meta_Box_Property_Notes {
             }
 
         echo '</ul>';
+
         echo '<div id="propertyhive_notes_container">';
-        $section = 'property';
-        include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
+            $section = 'property';
+            include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
         echo '</div>';
     }
 }

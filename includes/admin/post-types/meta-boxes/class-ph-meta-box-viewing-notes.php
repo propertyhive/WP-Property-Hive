@@ -43,7 +43,9 @@ class PH_Meta_Box_Viewing_Notes {
 
         echo '</ul>';
 
-        $section = 'viewing';
-        include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
+        echo '<div id="propertyhive_notes_container">';
+            $section = 'viewing';
+            include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
+        echo '</div>';
     }
 }
