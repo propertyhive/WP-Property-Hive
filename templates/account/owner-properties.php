@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		}
 		else
 		{
-			'<p class="propertyhive-info">' . _e( 'No upcoming viewings scheduled', 'propertyhive' ) . '</p>';
+			'<p class="propertyhive-info">' . _e( 'No properties found', 'propertyhive' ) . '</p>';
 		}
 	?>
 
