@@ -181,7 +181,7 @@ class PH_Rest_Api {
 										if ($image_url !== false)
 										{
 											$images_array[] = array(
-												'url' => $image_url['url'],
+												'url' => $image_url,
 											);
 										}
 									}
@@ -216,7 +216,7 @@ class PH_Rest_Api {
 										if ($floorplan_url !== false)
 										{
 											$floorplans_array[] = array(
-												'url' => $floorplan_url['url'],
+												'url' => $floorplan_url,
 											);
 										}
 									}
@@ -251,7 +251,7 @@ class PH_Rest_Api {
 										if ($brochure_url !== false)
 										{
 											$brochures_array[] = array(
-												'url' => $brochure_url['url'],
+												'url' => $brochure_url,
 											);
 										}
 									}
@@ -286,7 +286,7 @@ class PH_Rest_Api {
 										if ($epc_url !== false)
 										{
 											$epcs_array[] = array(
-												'url' => $epc_url['url'],
+												'url' => $epc_url,
 											);
 										}
 									}
