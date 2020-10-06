@@ -112,6 +112,10 @@ class PH_Rest_Api {
 			'features',
 			'description',
 			'office',
+			'images',
+			'floorplans',
+			'brochures',
+			'epcs',
 			'virtual_tours',
 		);
 
@@ -149,7 +153,147 @@ class PH_Rest_Api {
 		            				'email_address' => $property->office_email_address,
 		            			); 
 		            			break; 
-		            		}
+							}
+							case "images":
+							{
+								$images_array = array();
+								if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
+								{
+									$image_urls = $property->_photo_urls;
+									if ( !is_array($image_urls) ) { $image_urls = array(); }
+
+									foreach ( $image_urls as $image_url )
+									{
+										if ( isset($image_url['url']) )
+										{
+											$images_array[] = array(
+												'url' => $image_url['url'],
+											);
+										}
+									}
+								}
+								else
+								{
+									$image_ids = $property->get_gallery_attachment_ids();
+									foreach ( $image_ids as $image_id )
+									{
+										$image_url = wp_get_attachment_url($image_id);
+										if ($image_url !== false)
+										{
+											$images_array[] = array(
+												'url' => $image_url['url'],
+											);
+										}
+									}
+								}
+								return $images_array;
+								break;
+							}
+							case "floorplans":
+							{
+								$floorplans_array = array();
+								if ( get_option('propertyhive_floorplans_stored_as', '') == 'urls' )
+								{
+									$floorplan_urls = $property->_floorplan_urls;
+									if ( !is_array($floorplan_urls) ) { $floorplan_urls = array(); }
+
+									foreach ( $floorplan_urls as $floorplan_url )
+									{
+										if ( isset($floorplan_url['url']) )
+										{
+											$floorplans_array[] = array(
+												'url' => $floorplan_url['url'],
+											);
+										}
+									}
+								}
+								else
+								{
+									$floorplan_ids = $property->get_floorplan_attachment_ids();
+									foreach ( $floorplan_ids as $floorplan_id )
+									{
+										$floorplan_url = wp_get_attachment_url($floorplan_id);
+										if ($floorplan_url !== false)
+										{
+											$floorplans_array[] = array(
+												'url' => $floorplan_url['url'],
+											);
+										}
+									}
+								}
+								return $floorplans_array;
+								break;
+							}
+							case "brochures":
+							{
+								$brochures_array = array();
+								if ( get_option('propertyhive_brochures_stored_as', '') == 'urls' )
+								{
+									$brochure_urls = $property->_brochure_urls;
+									if ( !is_array($brochure_urls) ) { $brochure_urls = array(); }
+
+									foreach ( $brochure_urls as $brochure_url )
+									{
+										if ( isset($brochure_url['url']) )
+										{
+											$brochures_array[] = array(
+												'url' => $brochure_url['url'],
+											);
+										}
+									}
+								}
+								else
+								{
+									$brochure_ids = $property->get_brochure_attachment_ids();
+									foreach ( $brochure_ids as $brochure_id )
+									{
+										$brochure_url = wp_get_attachment_url($brochure_id);
+										if ($brochure_url !== false)
+										{
+											$brochures_array[] = array(
+												'url' => $brochure_url['url'],
+											);
+										}
+									}
+								}
+								return $brochures_array;
+								break;
+							}
+							case "epcs":
+							{
+								$epcs_array = array();
+								if ( get_option('propertyhive_epcs_stored_as', '') == 'urls' )
+								{
+									$epc_urls = $property->_epc_urls;
+									if ( !is_array($epc_urls) ) { $epc_urls = array(); }
+
+									foreach ( $epc_urls as $epc_url )
+									{
+										if ( isset($epc_url['url']) )
+										{
+											$epcs_array[] = array(
+												'url' => $epc_url['url'],
+											);
+										}
+									}
+								}
+								else
+								{
+									$epc_ids = $property->get_epc_attachment_ids();
+									foreach ( $epc_ids as $epc_id )
+									{
+										$epc_url = wp_get_attachment_url($epc_id);
+										if ($epc_url !== false)
+										{
+											$epcs_array[] = array(
+												'url' => $epc_url['url'],
+											);
+										}
+									}
+								}
+								return $epcs_array;
+								break;
+							}
 		            		case "virtual_tours":
 		            		{
 		            			return $property->get_virtual_tours();
