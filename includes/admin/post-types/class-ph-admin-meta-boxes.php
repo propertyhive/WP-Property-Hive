@@ -211,7 +211,7 @@ class PH_Admin_Meta_Boxes {
                         if ( $j > $deleting_applicant_profile )
                         {
                             $this_applicant_profile = get_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j );
-                            update_post_meta( (int)$_GET['post'], '_applicant_profile_' . ($j - 1), $this_applicant_profile );
+                            update_post_meta( (int)$_GET['post'], '_applicant_profile_' . ($j - 1), $this_applicant_profile[0] );
                             delete_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j );
                         }
                     }
