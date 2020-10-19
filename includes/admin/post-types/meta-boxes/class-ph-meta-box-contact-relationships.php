@@ -344,12 +344,15 @@ class PH_Meta_Box_Contact_Relationships {
                         // Display Relationship Name if it's already set
                         // Or we're editing a profile and at least two of this department exist
                         // Or we're creating a new profile and one of that department exist
+                        // Or the filter is set that always displays the name field
                         if (
                             isset($applicant_profile['relationship_name'])
                             ||
                             ( isset($applicant_profile['department']) && $applicant_departments_count['residential-sales'] > 1 )
                             ||
                             ( !isset($applicant_profile['department']) && $applicant_departments_count['residential-sales'] > 0 )
+                            ||
+                            ( apply_filters( 'propertyhive_always_show_applicant_relationship_name', false ) === true )
                         ) {
                             // Relationship Name
                             propertyhive_wp_text_input( array(
@@ -469,12 +472,15 @@ class PH_Meta_Box_Contact_Relationships {
                         // Display Relationship Name if it's already set
                         // Or we're editing a profile and at least two of this department exist
                         // Or we're creating a new profile and one of that department exist
+                        // Or the filter is set that always displays the name field
                         if (
                             isset($applicant_profile['relationship_name'])
                             ||
                             ( isset($applicant_profile['department']) && $applicant_departments_count['residential-lettings'] > 1 )
                             ||
                             ( !isset($applicant_profile['department']) && $applicant_departments_count['residential-lettings'] > 0 )
+                            ||
+                            ( apply_filters( 'propertyhive_always_show_applicant_relationship_name', false ) === true )
                         ) {
                             // Relationship Name
                             propertyhive_wp_text_input( array(
@@ -589,12 +595,15 @@ class PH_Meta_Box_Contact_Relationships {
                         // Display Relationship Name if it's already set
                         // Or we're editing a profile and at least two of this department exist
                         // Or we're creating a new profile and one of that department exist
+                        // Or the filter is set that always displays the name field
                         if (
                             isset($applicant_profile['relationship_name'])
                             ||
                             ( isset($applicant_profile['department']) && $applicant_departments_count['commercial'] > 1 )
                             ||
                             ( !isset($applicant_profile['department']) && $applicant_departments_count['commercial'] > 0 )
+                            ||
+                            ( apply_filters( 'propertyhive_always_show_applicant_relationship_name', false ) === true )
                         ) {
                             // Relationship Name
                             propertyhive_wp_text_input( array(
