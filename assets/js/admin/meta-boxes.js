@@ -67,6 +67,7 @@ jQuery( function($){
         if ( $(this).text() == 'Adding...' ) { return false; }
 
         $(this).html('Adding...');
+        $(this).attr('disabled', 'disabled');
  
         var data = {
             action:         'propertyhive_add_note',
