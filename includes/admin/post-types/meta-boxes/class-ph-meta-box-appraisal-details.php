@@ -25,7 +25,7 @@ class PH_Meta_Box_Appraisal_Details {
 ?>
 <script>
 
-jQuery(window).load(function()
+jQuery(window).on('load', function()
 {
     redraw_appraisal_details_meta_box();
 });
