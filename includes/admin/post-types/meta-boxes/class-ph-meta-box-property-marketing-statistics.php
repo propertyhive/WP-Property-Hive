@@ -32,7 +32,7 @@ class PH_Meta_Box_Property_Marketing_Statistics {
         
         echo '<script>
 
-            jQuery(window).load(function()
+            jQuery(window).on(\'load\', function()
             {
                 jQuery(\'#statistics_date_from\').on(\'change\', function(e) {
                     reload_marketing_statistics();

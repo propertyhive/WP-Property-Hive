@@ -194,7 +194,7 @@ jQuery(document).ready(function($)
 	});
 });
 
-jQuery(window).load(function($)
+jQuery(window).on('load', function($)
 {
 	redraw_appraisal_actions();
 });

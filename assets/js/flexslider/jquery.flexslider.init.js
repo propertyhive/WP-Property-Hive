@@ -1,4 +1,4 @@
-jQuery(window).load(function() {
+jQuery(window).on('load', function() {
     ph_init_slideshow();
 });
 

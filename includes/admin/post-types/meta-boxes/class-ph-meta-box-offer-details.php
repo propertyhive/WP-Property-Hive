@@ -25,7 +25,7 @@ class PH_Meta_Box_Offer_Details {
 ?>
 <script>
 
-jQuery(window).load(function()
+jQuery(window).on('load', function()
 {
     redraw_offer_details_meta_box();
 });
