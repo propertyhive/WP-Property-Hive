@@ -623,7 +623,7 @@ class PH_Property {
                 if ( $rent != '' )
                 {
                     $price_units = get_commercial_price_units( );
-                    $rent .= ' ' . ( isset($price_units[$this->_rent_units]) ? $price_units[$this->_rent_units] : $this->_rent_units );
+                    $rent .= ' ' . __( ( isset($price_units[$this->_rent_units]) ? $price_units[$this->_rent_units] : $this->_rent_units ), 'propertyhive' );
                 }
             }
         }
