@@ -178,9 +178,29 @@ function get_property_map( $args = array() )
 		            if ( $marker_icon_url !== FALSE )
 		            {
 		?>
-		var custom_icon = L.icon({
-		    iconUrl: '<?php echo $marker_icon_url; ?>'
-		});
+		var icon_options = { iconUrl: '<?php echo $marker_icon_url; ?>' }
+		<?php
+						$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
+						if ( $size !== FALSE && !empty($size) )
+						{
+							if (isset($current_settings['custom_icon_anchor_position']) && $current_settings['custom_icon_anchor_position'] == 'center')
+							{
+								$icon_anchor_width = floor($size[0] / 2);
+								$icon_anchor_height = floor($size[1] / 2);
+							}
+							else
+							{
+								$icon_anchor_width = floor($size[0] / 2);
+								$icon_anchor_height = $size[1];
+							}
+
+		?>
+		icon_options.iconSize = [<?php echo $size[0]; ?>, <?php echo $size[1]; ?>];
+		icon_options.iconAnchor = [<?php echo $icon_anchor_width; ?>, <?php echo $icon_anchor_height; ?>];
+		<?php
+						}
+		?>
+		var custom_icon = L.icon(icon_options);
 		<?php
 		                $icon_code = ', { icon: custom_icon }';
 		            }
