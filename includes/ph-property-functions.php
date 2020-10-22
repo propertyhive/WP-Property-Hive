@@ -183,7 +183,7 @@ function get_property_map( $args = array() )
 						$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
 						if ( $size !== FALSE && !empty($size) )
 						{
-							if (isset($current_settings['custom_icon_anchor_position']) && $current_settings['custom_icon_anchor_position'] == 'center')
+							if (isset($map_add_on_settings['custom_icon_anchor_position']) && $map_add_on_settings['custom_icon_anchor_position'] == 'center')
 							{
 								$icon_anchor_width = floor($size[0] / 2);
 								$icon_anchor_height = floor($size[1] / 2);
