@@ -154,6 +154,20 @@ class PH_Admin_Matching_Applicants {
                                 $new_to_email_addresses[] = sanitize_email($to_email_address);
                             }
 
+                            $cc_email_addresses = explode(",", $_POST['cc_email_address']);
+                            $new_cc_email_addresses = array();
+                            foreach ( $cc_email_addresses as $cc_email_address )
+                            {
+                                $new_cc_email_addresses[] = sanitize_email($cc_email_address);
+                            }
+
+                            $bcc_email_addresses = explode(",", $_POST['bcc_email_address']);
+                            $new_bcc_email_addresses = array();
+                            foreach ( $bcc_email_addresses as $bcc_email_address )
+                            {
+                                $new_bcc_email_addresses[] = sanitize_email($bcc_email_address);
+                            }
+
         					// Email info entered. Time to send emails
                             $this->send_emails(
                                 (int)$contact_id, 
@@ -163,7 +177,9 @@ class PH_Admin_Matching_Applicants {
                                 sanitize_email($_POST['from_email_address']),
                                 ph_clean($_POST['subject']),
                                 sanitize_textarea_field($_POST['body']),
-                                implode(",", $new_to_email_addresses)
+                                implode(",", $new_to_email_addresses),
+                                implode(",", $new_cc_email_addresses),
+                                implode(",", $new_bcc_email_addresses)
                             );
                         }
 
@@ -532,7 +548,7 @@ class PH_Admin_Matching_Applicants {
         return array_merge($hot_applicants, $applicants);
 	}
 
-    public function send_emails( $contact_id, $applicant_profile, $email_property_ids, $from_name, $from_email_address, $subject, $body, $to_email_address = '' )
+    public function send_emails( $contact_id, $applicant_profile, $email_property_ids, $from_name, $from_email_address, $subject, $body, $to_email_address = '', $cc_email_address = '', $bcc_email_address = '' )
     {
         global $wpdb;
 
@@ -571,6 +587,8 @@ class PH_Admin_Matching_Applicants {
                 'property_ids' => serialize($email_property_ids),
                 'applicant_profile_id' => $applicant_profile,
                 'to_email_address' => $to_email_address,
+                'cc_email_address' => $cc_email_address,
+                'bcc_email_address' => $bcc_email_address,
                 'from_name' => $from_name,
                 'from_email_address' => $from_email_address,
                 'subject' => stripslashes($subject),
@@ -583,6 +601,8 @@ class PH_Admin_Matching_Applicants {
                 '%d',
                 '%s',
                 '%d',
+                '%s',
+                '%s',
                 '%s',
                 '%s',
                 '%s',

@@ -643,6 +643,8 @@ Should you need to cancel or amend this viewing please do not hesitate to contac
             property_ids text NOT NULL,
             applicant_profile_id tinyint(3) unsigned NOT NULL,
             to_email_address varchar(255) NOT NULL,
+            cc_email_address varchar(255) NOT NULL,
+            bcc_email_address varchar(255) NOT NULL,
             from_name varchar(255) NOT NULL,
             from_email_address varchar(255) NOT NULL,
             subject varchar(255) NOT NULL,
