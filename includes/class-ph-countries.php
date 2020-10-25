@@ -93,9 +93,12 @@ class PH_Countries {
 		{
 			if ( $country['currency_code'] == $currency_code )
 			{
+				$currency_symbol = apply_filters( 'propertyhive_currency_symbol', $country['currency_symbol'], $currency_code);
+				$currency_prefix = apply_filters( 'propertyhive_currency_prefix', $country['currency_prefix'], $currency_code);
+				
 				return array(
-					'currency_symbol' => $country['currency_symbol'],
-					'currency_prefix' => $country['currency_prefix']
+					'currency_symbol' => $currency_symbol,
+					'currency_prefix' => $currency_prefix
 				);
 			}
 		}
