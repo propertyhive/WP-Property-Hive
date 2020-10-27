@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.5.1
-Stable tag: 1.4.71
+Stable tag: 1.4.72
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.72 - 2020-10-27 =
+* Added ability to add Cc/Bcc email addresses when sending matches
+* Corrected marker anchoring on property details map when using the Map Search add on and a custom icon has been uploaded
+* Prevent notes from getting added multiple times by disabling the 'Add Note' form whilst one is getting submitted
+* Run commercial rent frequency through translation function so they can be translated/substituted
+* Added new filter 'propertyhive_always_show_applicant_relationship_name' to allow applicant relationship name field to be shown all the time, not only when multiple relationships exist
+* Added new filters 'propertyhive_currency_symbol' and 'propertyhive_currency_prefix' so currency symbol and prefix can be overwritten
+* jQuery migrate tweaks to support later jQuery version
 
 = 1.4.71 =
 * Added ability to pin notes so they stick to the top
