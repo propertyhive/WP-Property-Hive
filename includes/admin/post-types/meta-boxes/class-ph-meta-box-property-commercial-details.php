@@ -401,7 +401,7 @@ class PH_Meta_Box_Property_Commercial_Details {
         foreach ( $size_options as $key => $value )
         {
             echo '<option value="' . $key . '"';
-            if ( $key == $floor_area_units )
+            if ( $key == $floor_area_units || ($floor_area_units == '' && $key == apply_filters('propertyhive_default_commercial_floor_area_unit', 'sqft')) )
             {
                 echo ' selected';
             }
