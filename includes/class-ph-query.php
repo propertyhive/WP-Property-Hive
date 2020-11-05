@@ -816,6 +816,15 @@ class PH_Query {
         		$address_keywords[] = str_replace("-", " ", ph_clean($_REQUEST['address_keyword']));
         	}
 
+			if ( strpos( $_REQUEST['address_keyword'], '.' ) !== FALSE )
+			{
+				$address_keywords[] = str_replace(".", "", ph_clean($_REQUEST['address_keyword']));
+			}
+			if ( stripos( $_REQUEST['address_keyword'], 'st ' ) !== FALSE )
+			{
+				$address_keywords[] = str_ireplace("st ", "st. ", ph_clean($_REQUEST['address_keyword']));
+			}
+
 	      	$meta_query = array('relation' => 'OR');
 
 	      	$address_fields_to_query = array(
@@ -1889,6 +1898,15 @@ class PH_Query {
         	{
         		$keywords[] = str_replace("-", " ", ph_clean($_REQUEST['keyword']));
         	}
+
+			if ( strpos( $_REQUEST['keyword'], '.' ) !== FALSE )
+			{
+				$keywords[] = str_replace(".", "", ph_clean($_REQUEST['keyword']));
+			}
+			if ( stripos( $_REQUEST['keyword'], 'st ' ) !== FALSE )
+			{
+				$keywords[] = str_ireplace("st ", "st. ", ph_clean($_REQUEST['keyword']));
+			}
 
 	      	$meta_query = array( 'relation' => 'OR' );
 
