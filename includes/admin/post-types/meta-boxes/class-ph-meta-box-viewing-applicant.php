@@ -88,6 +88,12 @@ class PH_Meta_Box_Viewing_Applicant {
                 echo "</div>";
                 ++$i;
             }
+            if ( isset($_GET['applicant_contact_id']) && ! empty( $_GET['applicant_contact_id'] ) )
+            {
+                ?>
+                <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo $_GET['applicant_contact_id']; ?>">
+                <?php
+            }
         }
         else
         {
