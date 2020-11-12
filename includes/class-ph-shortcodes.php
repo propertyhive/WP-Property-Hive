@@ -687,6 +687,8 @@ class PH_Shortcodes {
 	 */
 	public static function similar_properties( $atts ) {
 
+		global $property;
+
 		$atts = shortcode_atts( array(
 			'per_page'					=> '2',
 			'columns'					=> '2',
@@ -698,6 +700,11 @@ class PH_Shortcodes {
 			'availability_id'	=> '',
 			'no_results_output' => '',
 		), $atts, 'similar_properties' );
+
+		if ( $atts['property_id'] == '' && isset($property->id) )
+		{
+			$atts['property_id'] = $property->id;
+		}
 
 		if ($atts['property_id'] != '')
 		{
