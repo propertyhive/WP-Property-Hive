@@ -721,51 +721,67 @@ function ph_get_applicant_requirements_form_fields()
         }
     }
 
-    $args = array(
-        'hide_empty' => false,
-        'parent' => 0
-    );
-    $terms = get_terms( 'location', $args );
-
-    $options = array();
-
-    $selected_value = '';
-    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+    if ( get_option('propertyhive_applicant_locations_type') != 'text' )
     {
-        $options = array( '' => __( 'All Locations', 'propertyhive' ) );
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'location', $args );
 
-        foreach ($terms as $term)
+        $options = array();
+
+        $selected_value = '';
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
-            $options[$term->term_id] = $term->name;
+            $options = array( '' => __( 'All Locations', 'propertyhive' ) );
 
-            $args = array(
-                'hide_empty' => false,
-                'parent' => $term->term_id
-            );
-            $subterms = get_terms( 'location', $args );
-
-            if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+            foreach ($terms as $term)
             {
-                foreach ($subterms as $term)
+                $options[$term->term_id] = $term->name;
+
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $term->term_id
+                );
+                $subterms = get_terms( 'location', $args );
+
+                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
-                    $options[$term->term_id] = '- ' . $term->name;
+                    foreach ($subterms as $term)
+                    {
+                        $options[$term->term_id] = '- ' . $term->name;
+                    }
                 }
             }
         }
-    }
 
-    if ( !empty($options) )
+        if ( !empty($options) )
+        {
+            $fields['location'] = array(
+                'type' => 'select',
+                'label' => __( 'Location', 'propertyhive' ),
+                'required' => false,
+                'options' => $options,
+            );
+
+            if ( is_user_logged_in() && isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+            {
+                $fields['location']['value'] = $applicant_profile['locations'][0];
+            }
+        }
+    }
+    else
     {
-        $fields['location'] = array(
-            'type' => 'select',
+        $fields['location_text'] = array(
+            'type' => 'text',
             'label' => __( 'Location', 'propertyhive' ),
-            'required' => false,
-            'options' => $options,
+            'required' => false
         );
 
-        if ( is_user_logged_in() && isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+        if ( is_user_logged_in() && isset($applicant_profile['location_text']) && $applicant_profile['location_text'] != '' )
         {
-            $fields['location']['value'] = $applicant_profile['locations'][0];
+            $fields['location_text']['value'] = $applicant_profile['location_text'];
         }
     }
 
