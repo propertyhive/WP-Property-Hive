@@ -180,22 +180,30 @@
                     }
                 }
             }
-            if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+            if ( get_option('propertyhive_applicant_locations_type') != 'text' )
             {
-                $terms = get_terms('location', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['locations']));
-                if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
+                if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
                 {
-                    $sliced_terms = array_slice( $terms, 0, 2 );
+                    $terms = get_terms('location', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['locations']));
+                    if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
+                    {
+                        $sliced_terms = array_slice( $terms, 0, 2 );
 
+                        $requirements[] = array(
+                            'label' => __( 'Locations', 'propertyhive' ),
+                            'value' => implode(", ", $sliced_terms) . ( (count($terms) > 2) ? ' <span title="' . addslashes( implode(", ", $terms) ) .'">+ ' . (count($terms) - 2) . ' more</span>' : '' ),
+                        );
+                    }
+                }
+            }
+            else
+            {
+                if ( isset($applicant_profile['location_text']) && trim($applicant_profile['location_text']) != '' )
+                {
                     $requirements[] = array(
-                        'label' => __( 'Locations', 'propertyhive' ),
-                        'value' => implode(", ", $sliced_terms) . ( (count($terms) > 2) ? ' <span title="' . addslashes( implode(", ", $terms) ) .'">+ ' . (count($terms) - 2) . ' more</span>' : '' ),
+                        'label' => __( 'Location', 'propertyhive' ),
+                        'value' => trim($applicant_profile['location_text']),
                     );
-
-                    /*echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                        <strong>Locations:</strong><br>
-                        ' . implode(", ", $sliced_terms) . ( (count($terms) > 2) ? ' <span title="' . addslashes( implode(", ", $terms) ) .'">+ ' . (count($terms) - 2) . ' more</span>' : '' ) . '
-                    </div>';*/
                 }
             }
 
