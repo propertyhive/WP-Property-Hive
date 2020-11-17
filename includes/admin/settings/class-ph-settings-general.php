@@ -415,6 +415,16 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title'   => __( 'When Selecting Applicant Locations', 'propertyhive' ),
+                'id'      => 'propertyhive_applicant_locations_type',
+                'type'    => 'radio',
+                'options' => array(
+                    'free_type' => __( 'Allow Locations To Be Freetyped', 'propertyhive' ),
+                    '' => __( 'Select From A Predefined List (Editable from \'Custom Fields\')', 'propertyhive' ),
+                ),
+            ),
+
+            array(
                 'title'   => __( 'Enable Auto-Incremental Reference Numbers', 'propertyhive' ),
                 'id'      => 'propertyhive_auto_incremental_reference_numbers',
                 'type'    => 'checkbox',
