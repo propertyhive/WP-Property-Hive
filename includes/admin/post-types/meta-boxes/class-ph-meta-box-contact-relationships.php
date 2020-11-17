@@ -724,6 +724,8 @@ class PH_Meta_Box_Contact_Relationships {
                         echo '</div>'; // end 'propertyhive-applicant-commercial-details-' . $key
 
                         // Locations
+                        if ( get_option('propertyhive_applicant_locations_type') != 'text' )
+                        {
                     ?>
                         <p class="form-field"><label for="_applicant_locations_<?php echo $key; ?>"><?php _e( 'Locations', 'propertyhive' ); ?></label>
                         <select id="_applicant_locations_<?php echo $key; ?>" name="_applicant_locations_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add location..." class="multiselect attribute_values">
@@ -798,6 +800,18 @@ class PH_Meta_Box_Contact_Relationships {
                             ?>
                         </select></p>
                     <?php
+                        }
+                        else
+                        {
+                            propertyhive_wp_text_input( array(
+                                'id' => '_applicant_location_text_' . $key,
+                                'label' => __( 'Location', 'propertyhive' ),
+                                'desc_tip' => false,
+                                'type' => 'text',
+                                'class' => '',
+                                'value' => ( ( isset($applicant_profile['location_text']) ) ? $applicant_profile['location_text'] : '' )
+                            ) );
+                        }
 
                         do_action('propertyhive_contact_applicant_requirements_details_fields', $thepostid, $key);
 
@@ -1093,9 +1107,19 @@ class PH_Meta_Box_Contact_Relationships {
                     $applicant_profile['relationship_name'] = ph_clean($_POST['_relationship_name_' . $_POST['_applicant_department_' . $i] . '_' . $i]);
                 }
 
-                if ( isset($_POST['_applicant_locations_' . $i]) && is_array($_POST['_applicant_locations_' . $i]) && !empty($_POST['_applicant_locations_' . $i]) )
+                if ( get_option('propertyhive_applicant_locations_type') != 'text' )
                 {
-                    $applicant_profile['locations'] = ph_clean($_POST['_applicant_locations_' . $i]);
+                    if ( isset($_POST['_applicant_locations_' . $i]) && is_array($_POST['_applicant_locations_' . $i]) && !empty($_POST['_applicant_locations_' . $i]) )
+                    {
+                        $applicant_profile['locations'] = ph_clean($_POST['_applicant_locations_' . $i]);
+                    }
+                }
+                else
+                {
+                    if ( isset($_POST['_applicant_location_text_' . $i]) && !empty($_POST['_applicant_location_text_' . $i]) )
+                    {
+                        $applicant_profile['location_text'] = ph_clean($_POST['_applicant_location_text_' . $i]);
+                    }
                 }
 
                 $applicant_profile['notes'] = sanitize_textarea_field($_POST['_applicant_requirement_notes_' . $i]);
