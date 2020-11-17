@@ -111,10 +111,6 @@
                     {
                         //$requirements[] = 'Max Price: ' . $applicant['applicant_profile']['max_price'];
                     }
-                    if ( isset($applicant['applicant_profile']['locations']) && is_array($applicant['applicant_profile']['locations']) && !empty($applicant['applicant_profile']['locations']) )
-                    {
-                        //$requirements[] = 'Max Price: ' . $applicant['applicant_profile']['max_price'];
-                    }
 
                     $requirements = apply_filters( 'propertyhive_applicant_requirements_display', $requirements, $applicant['contact_id'], $applicant['applicant_profile'] );
                     
