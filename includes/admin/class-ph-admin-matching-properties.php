@@ -443,6 +443,113 @@ class PH_Admin_Matching_Properties {
                     'type' => 'NUMERIC'
                 );
             }
+
+            if ( get_option('propertyhive_applicant_locations_type') == 'text' )
+            {
+                if ( isset($applicant_profile['location_text']) && $applicant_profile['location_text'] != '' )
+                {
+                    $address_keywords = array( $applicant_profile['location_text'] );
+                    if ( strpos( $applicant_profile['location_text'], ' ' ) !== FALSE )
+                    {
+                        $address_keywords[] = str_replace(" ", "-", ph_clean($applicant_profile['location_text']));
+                    }
+                    if ( strpos( $applicant_profile['location_text'], '-' ) !== FALSE )
+                    {
+                        $address_keywords[] = str_replace("-", " ", ph_clean($applicant_profile['location_text']));
+                    }
+
+                    if ( strpos( $applicant_profile['location_text'], '.' ) !== FALSE )
+                    {
+                        $address_keywords[] = str_replace(".", "", ph_clean($applicant_profile['location_text']));
+                    }
+                    if ( stripos( $applicant_profile['location_text'], 'st ' ) !== FALSE )
+                    {
+                        $address_keywords[] = str_ireplace("st ", "st. ", ph_clean($applicant_profile['location_text']));
+                    }
+
+                    $location_query = array('relation' => 'OR');
+
+                    $address_fields_to_query = array(
+                        '_reference_number',
+                        '_address_street',
+                        '_address_two',
+                        '_address_three',
+                        '_address_four',
+                        '_address_postcode'
+                    );
+
+                    $address_fields_to_query = apply_filters( 'propertyhive_address_fields_to_query', $address_fields_to_query );
+
+                    foreach ( $address_keywords as $address_keyword )
+                    {
+                        foreach ( $address_fields_to_query as $address_field )
+                        {
+                            if ( $address_field == '_address_postcode' ) { continue; } // ignore postcode as that is handled differently afterwards
+
+                            $location_query[] = array(
+                                'key'     => $address_field,
+                                'value'   => $address_keyword,
+                                'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+                            );
+                        }
+                    }
+                    if ( in_array('_address_postcode', $address_fields_to_query) )
+                    {
+                        if ( strlen($applicant_profile['location_text']) <= 4 )
+                        {
+                            $location_query[] = array(
+                                'key'     => '_address_postcode',
+                                'value'   => ph_clean( $applicant_profile['location_text'] ),
+                                'compare' => '='
+                            );
+                            $location_query[] = array(
+                                'key'     => '_address_postcode',
+                                'value'   => '^' . ph_clean( $applicant_profile['location_text'] ) . '[ ]',
+                                'compare' => 'RLIKE'
+                            );
+                        }
+                        else
+                        {
+                            $postcode = ph_clean( $applicant_profile['location_text'] );
+
+                            if ( preg_match('#^(GIR ?0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]([0-9ABEHMNPRV-Y])?)|[0-9][A-HJKPS-UW])[0-9][ABD-HJLNP-UW-Z]{2})$#i', $postcode) )
+                            {
+                                // UK postcode found with no space
+
+                                if ( strlen($postcode) == 5 )
+                                {
+                                    $first_part = substr($postcode, 0, 2);
+                                    $last_part = substr($postcode, 2, 3);
+
+                                    $postcode = $first_part . ' ' . $last_part;
+                                }
+                                elseif ( strlen($postcode) == 6 )
+                                {
+                                    $first_part = substr($postcode, 0, 3);
+                                    $last_part = substr($postcode, 3, 3);
+
+                                    $postcode = $first_part . ' ' . $last_part;
+                                }
+                                elseif ( strlen($postcode) == 7 )
+                                {
+                                    $first_part = substr($postcode, 0, 4);
+                                    $last_part = substr($postcode, 4, 3);
+
+                                    $postcode = $first_part . ' ' . $last_part;
+                                }
+                            }
+
+                            $location_query[] = array(
+                                'key'     => '_address_postcode',
+                                'value'   => ph_clean( $postcode ),
+                                'compare' => 'LIKE'
+                            );
+                        }
+                    }
+                    $meta_query[] = $location_query;
+                }
+            }
+            print_r($meta_query);
             $args['meta_query'] = $meta_query;
 
             // Term query
@@ -471,14 +578,17 @@ class PH_Admin_Matching_Properties {
                     );
                 }
             }
-            if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+            if ( get_option('propertyhive_applicant_locations_type') != 'text' )
             {
-                $tax_query[] = array(
-                    'taxonomy' => 'location',
-                    'field'    => 'term_id',
-                    'terms'    => $applicant_profile['locations'],
-                    'operator' => 'IN',
-                );
+                if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
+                {
+                    $tax_query[] = array(
+                        'taxonomy' => 'location',
+                        'field'    => 'term_id',
+                        'terms'    => $applicant_profile['locations'],
+                        'operator' => 'IN',
+                    );
+                }
             }
             $property_match_statuses = get_option( 'propertyhive_property_match_statuses', '' );
             if ( $property_match_statuses != '' && is_array($property_match_statuses) && !empty($property_match_statuses) )
