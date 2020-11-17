@@ -933,6 +933,11 @@ class PH_AJAX {
                 $applicant_profile['locations'] = array(ph_clean($_POST['location']));
             }
 
+            if ( isset($_POST['location_text']) && !empty($_POST['location_text']) )
+            {
+                $applicant_profile['location_text'] = ph_clean($_POST['location_text']);
+            }
+
             $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? sanitize_textarea_field($_POST['additional_requirements']) : '' );
 
             $applicant_profile['send_matching_properties'] = 'yes';
