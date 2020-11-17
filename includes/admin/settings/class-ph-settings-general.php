@@ -419,7 +419,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 'id'      => 'propertyhive_applicant_locations_type',
                 'type'    => 'radio',
                 'options' => array(
-                    'free_type' => __( 'Allow Locations To Be Freetyped', 'propertyhive' ),
+                    'text' => __( 'Allow Locations To Be Freetyped', 'propertyhive' ),
                     '' => __( 'Select From A Predefined List (Editable from \'Custom Fields\')', 'propertyhive' ),
                 ),
             ),
