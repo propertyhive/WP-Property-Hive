@@ -470,7 +470,6 @@ class PH_Admin_Matching_Properties {
                     $location_query = array('relation' => 'OR');
 
                     $address_fields_to_query = array(
-                        '_reference_number',
                         '_address_street',
                         '_address_two',
                         '_address_three',
