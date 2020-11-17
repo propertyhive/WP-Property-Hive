@@ -549,7 +549,6 @@ class PH_Admin_Matching_Properties {
                     $meta_query[] = $location_query;
                 }
             }
-            print_r($meta_query);
             $args['meta_query'] = $meta_query;
 
             // Term query
