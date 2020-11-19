@@ -422,6 +422,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     'text' => __( 'Allow Locations To Be Freetyped', 'propertyhive' ),
                     '' => __( 'Select From A Predefined List (Editable from \'Custom Fields\')', 'propertyhive' ),
                 ),
+                'desc'  => '<i>' . __( 'When this setting is changed, locations selected using the other method will no longer be used for matching', 'propertyhive' ) . '</i>',
             ),
 
             array(
