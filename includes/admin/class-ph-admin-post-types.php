@@ -23,6 +23,7 @@ class PH_Admin_Post_Types {
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'include_post_type_handlers' ) );
 		add_filter( 'post_updated_messages', array( $this, 'post_updated_messages' ) );
+		add_action( 'pre_get_posts', array( $this, 'refresh_property_office_filtering' ));
         add_action( 'admin_print_scripts', array( $this, 'remove_month_filter' ) );
 		add_action( 'admin_print_scripts', array( $this, 'disable_autosave' ) );
 
@@ -750,6 +751,7 @@ class PH_Admin_Post_Types {
         $output = '';
         
         $output .= $this->viewing_status_filter();
+        $output .= $this->property_office_filter();
         $output .= $this->viewing_attending_negotiator_filter();
 
         echo apply_filters( 'propertyhive_viewing_filters', $output );
@@ -801,6 +803,29 @@ class PH_Admin_Post_Types {
         return $output;
     }
 
+
+    public function refresh_property_office_filtering( $query ) {
+        remove_filter('posts_join', array( $this, 'filter_by_property_office')  );
+
+        if ( ! empty( $_GET['_office_id'] ) && in_array( $query->query['post_type'], array(
+	        'viewing',
+	        'offer',
+	        'sale',
+        ))) {
+            add_filter('posts_join', array( $this, 'filter_by_property_office' ) );
+        };
+    }
+
+
+    public function filter_by_property_office($query) {
+        global $wpdb;
+
+        return $query . '
+           INNER JOIN ' . $wpdb->postmeta . ' AS property_meta ON property_meta.post_id = wp_posts.ID AND property_meta.meta_key = "_property_id"
+           INNER JOIN ' . $wpdb->postmeta . ' AS property_office_meta ON property_office_meta.post_id = property_meta.meta_value AND property_office_meta.meta_key = "_office_id"
+             AND property_office_meta.meta_value = ' . (int) $_GET['_office_id'];
+    }
+
     /**
      * Show a viewing attending negotiator filter box
      */
@@ -849,6 +874,7 @@ class PH_Admin_Post_Types {
         $output = '';
         
         $output .= $this->offer_status_filter();
+        $output .= $this->property_office_filter();
 
         echo apply_filters( 'propertyhive_offer_filters', $output );
     }
@@ -892,6 +918,7 @@ class PH_Admin_Post_Types {
         $output = '';
         
         $output .= $this->sale_status_filter();
+        $output .= $this->property_office_filter();
 
         echo apply_filters( 'propertyhive_sale_filters', $output );
     }
