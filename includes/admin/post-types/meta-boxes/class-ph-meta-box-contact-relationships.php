@@ -806,7 +806,8 @@ class PH_Meta_Box_Contact_Relationships {
                             propertyhive_wp_text_input( array(
                                 'id' => '_applicant_location_text_' . $key,
                                 'label' => __( 'Location', 'propertyhive' ),
-                                'desc_tip' => false,
+                                'desc_tip' => true,
+                                'description' => __( 'If the applicant has several search locations, you should Add Relationship for each different location', 'propertyhive' ),
                                 'type' => 'text',
                                 'class' => '',
                                 'value' => ( ( isset($applicant_profile['location_text']) ) ? $applicant_profile['location_text'] : '' )
