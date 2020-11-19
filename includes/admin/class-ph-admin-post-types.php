@@ -202,7 +202,7 @@ class PH_Admin_Post_Types {
         $output .= $this->property_availability_filter();
         $output .= $this->property_location_filter();
         $output .= $this->property_office_filter();
-        $output .= $this->property_negotiator_filter();
+        $output .= $this->negotiator_filter();
 
         echo apply_filters( 'propertyhive_property_filters', $output );
     }
@@ -279,9 +279,9 @@ class PH_Admin_Post_Types {
     }
     
     /**
-     * Show a property negotiator filter box
+     * Show a negotiator filter box
      */
-    public function property_negotiator_filter() {
+    public function negotiator_filter() {
         global $wp_query, $post;
         
         $selected = '';
@@ -655,7 +655,7 @@ class PH_Admin_Post_Types {
         $output = '';
         
         $output .= $this->appraisal_status_filter();
-        $output .= $this->appraisal_attending_negotiator_filter();
+        $output .= $this->negotiator_filter();
 
         echo apply_filters( 'propertyhive_appraisal_filters', $output );
     }
@@ -703,56 +703,17 @@ class PH_Admin_Post_Types {
     }
 
     /**
-     * Show an appraisal attending negotiator filter box
-     */
-    public function appraisal_attending_negotiator_filter() {
-        global $wp_query;
-
-        $selected_negotiator_id = isset( $_GET['_negotiator_id']) ? (int)$_GET['_negotiator_id'] : '';
-        
-        // Status filtering
-        $output = '<select name="_negotiator_id" id="dropdown_appraisal_negotiator_id">';
-            
-            $output .= '<option value="">Attending Negotiator</option>';
-            $output .= '<option value="">All Negotiators</option>';
-
-            $args = array(
-                'number' => 9999,
-                'orderby' => 'display_name',
-                'role__not_in' => array('property_hive_contact', 'subscriber') 
-            );
-            $user_query = new WP_User_Query( $args );
-
-            if ( ! empty( $user_query->results ) ) 
-            {
-                foreach ( $user_query->results as $user ) 
-                {
-                    $output .= '<option value="' . $user->ID . '"';
-                    if ( $user->ID == $selected_negotiator_id )
-                    {
-                        $output .= ' selected';
-                    }
-                    $output .= '>' . $user->display_name . '</option>';
-                }
-            }
-            
-        $output .= '</select>';
-
-        return $output;
-    }
-
-    /**
      * Show a viewing filter box
      */
     public function viewing_filters() {
         global $wp_query;
-        
+
         // Department filtering
         $output = '';
-        
+
         $output .= $this->viewing_status_filter();
         $output .= $this->property_office_filter();
-        $output .= $this->viewing_attending_negotiator_filter();
+        $output .= $this->negotiator_filter();
 
         echo apply_filters( 'propertyhive_viewing_filters', $output );
     }
@@ -824,45 +785,6 @@ class PH_Admin_Post_Types {
            INNER JOIN ' . $wpdb->postmeta . ' AS property_meta ON property_meta.post_id = wp_posts.ID AND property_meta.meta_key = "_property_id"
            INNER JOIN ' . $wpdb->postmeta . ' AS property_office_meta ON property_office_meta.post_id = property_meta.meta_value AND property_office_meta.meta_key = "_office_id"
              AND property_office_meta.meta_value = ' . (int) $_GET['_office_id'];
-    }
-
-    /**
-     * Show a viewing attending negotiator filter box
-     */
-    public function viewing_attending_negotiator_filter() {
-        global $wp_query;
-
-        $selected_negotiator_id = isset( $_GET['_negotiator_id']) ? (int)$_GET['_negotiator_id'] : '';
-        
-        // Status filtering
-        $output = '<select name="_negotiator_id" id="dropdown_viewing_negotiator_id">';
-            
-            $output .= '<option value="">Attending Negotiator</option>';
-            $output .= '<option value="">All Negotiators</option>';
-
-            $args = array(
-                'number' => 9999,
-                'orderby' => 'display_name',
-                'role__not_in' => array('property_hive_contact', 'subscriber') 
-            );
-            $user_query = new WP_User_Query( $args );
-
-            if ( ! empty( $user_query->results ) ) 
-            {
-                foreach ( $user_query->results as $user ) 
-                {
-                    $output .= '<option value="' . $user->ID . '"';
-                    if ( $user->ID == $selected_negotiator_id )
-                    {
-                        $output .= ' selected';
-                    }
-                    $output .= '>' . $user->display_name . '</option>';
-                }
-            }
-            
-        $output .= '</select>';
-
-        return $output;
     }
 
     /**
