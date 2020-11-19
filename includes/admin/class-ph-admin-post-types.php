@@ -772,7 +772,7 @@ class PH_Admin_Post_Types {
         global $wpdb;
 
         return $query . '
-           INNER JOIN ' . $wpdb->postmeta . ' AS property_meta ON property_meta.post_id = wp_posts.ID AND property_meta.meta_key = "_property_id"
+           INNER JOIN ' . $wpdb->postmeta . ' AS property_meta ON property_meta.post_id = ' . $wpdb->posts . '.ID AND property_meta.meta_key = "_property_id"
            INNER JOIN ' . $wpdb->postmeta . ' AS property_office_meta ON property_office_meta.post_id = property_meta.meta_value AND property_office_meta.meta_key = "_office_id"
              AND property_office_meta.meta_value = ' . (int) $_GET['_office_id'];
     }
