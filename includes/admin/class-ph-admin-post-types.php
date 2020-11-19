@@ -282,25 +282,15 @@ class PH_Admin_Post_Types {
      * Show a negotiator filter box
      */
     public function negotiator_filter() {
-        global $wp_query, $post;
-        
-        $selected = '';
-        if ( isset( $_GET['_negotiator_id'] ) && ! empty( $_GET['_negotiator_id'] ) )
-        {
-            $selected = (int)$_GET['_negotiator_id'];
-        }
-        
-        $args = array(
+
+	    return wp_dropdown_users(array(
             'name' => '_negotiator_id', 
             'id' => 'dropdown_property_negotiator_id',
             'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
-            'selected' => $selected,
+            'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int) $_GET['_negotiator_id'],
             'echo' => false,
             'role__not_in' => array('property_hive_contact', 'subscriber') 
-        );
-        $output = wp_dropdown_users($args);
-
-        return $output;
+        ));
     }
 
     /**
