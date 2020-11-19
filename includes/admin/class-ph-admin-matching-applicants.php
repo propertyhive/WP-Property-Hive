@@ -556,10 +556,8 @@ class PH_Admin_Matching_Applicants {
 
                                             foreach ( $address_keywords as $address_keyword )
                                             {
-                                                echo $address_keyword;
                                                 foreach ( $location_address_fields as $address_field )
                                                 {
-                                                    echo $address_field;
                                                     if ( $address_field == '_address_postcode' ) { continue; } // ignore postcode as that is handled differently afterwards
 
                                                     if (
