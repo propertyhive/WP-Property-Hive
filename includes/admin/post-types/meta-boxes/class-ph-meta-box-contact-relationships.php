@@ -1025,6 +1025,8 @@ class PH_Meta_Box_Contact_Relationships {
         {
             for ( $i = 0; $i < $num_applicant_profiles; ++$i )
             {
+                $existing_applicant_profile = get_post_meta( $post_id, '_applicant_profile_' . $i, TRUE );
+
                 $applicant_profile = array();
                 $applicant_profile['department'] = ph_clean($_POST['_applicant_department_' . $i]);
                 if ( $_POST['_applicant_department_' . $i] == 'residential-sales' )
@@ -1113,12 +1115,24 @@ class PH_Meta_Box_Contact_Relationships {
                     {
                         $applicant_profile['locations'] = ph_clean($_POST['_applicant_locations_' . $i]);
                     }
+
+                    // If the other type of location is set for this applicant, retain that data
+                    if ( !empty($existing_applicant_profile) && isset($existing_applicant_profile['location_text']) && $existing_applicant_profile['location_text'] != '' )
+                    {
+                        $applicant_profile['location_text'] = ph_clean($existing_applicant_profile['location_text']);
+                    }
                 }
                 else
                 {
                     if ( isset($_POST['_applicant_location_text_' . $i]) && !empty($_POST['_applicant_location_text_' . $i]) )
                     {
                         $applicant_profile['location_text'] = ph_clean($_POST['_applicant_location_text_' . $i]);
+                    }
+
+                    // If the other type of location is set for this applicant, retain that data
+                    if ( !empty($existing_applicant_profile) && isset($existing_applicant_profile['locations']) && !empty($existing_applicant_profile['locations']) )
+                    {
+                        $applicant_profile['locations'] = ph_clean($existing_applicant_profile['locations']);
                     }
                 }
 
