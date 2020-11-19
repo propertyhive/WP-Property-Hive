@@ -349,7 +349,7 @@ class PH_Property {
         if ( $this->_department == 'commercial' )
         {
             if ( 
-                !is_admin() &&
+                ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) &&
                 $this->_for_sale == 'yes' && $this->_price_poa == 'yes' &&
                 $this->_to_rent == 'yes' && $this->_rent_poa == 'yes'
             )
@@ -505,7 +505,7 @@ class PH_Property {
 
         if ( $this->_for_sale == 'yes' )
         {
-            if ( !is_admin() && $this->_price_poa == 'yes' )
+            if ( ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) && $this->_price_poa == 'yes' )
             {
                 $price .= __( 'POA', 'propertyhive' );
             }
@@ -574,7 +574,7 @@ class PH_Property {
 
         if ( $this->_to_rent == 'yes' )
         {
-            if ( !is_admin() && $this->_rent_poa == 'yes' )
+            if ( ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) && $this->_rent_poa == 'yes' )
             {
                 $rent .= __( 'POA', 'propertyhive' );
             }
