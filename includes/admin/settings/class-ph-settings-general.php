@@ -415,17 +415,6 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
-                'title'   => __( 'When Selecting Applicant Locations', 'propertyhive' ),
-                'id'      => 'propertyhive_applicant_locations_type',
-                'type'    => 'radio',
-                'options' => array(
-                    'text' => __( 'Allow Locations To Be Freetyped', 'propertyhive' ),
-                    '' => __( 'Select From A Predefined List (Editable from \'Custom Fields\')', 'propertyhive' ),
-                ),
-                'desc'  => '<i>' . __( 'When this setting is changed, locations selected using the other method will no longer be used for matching', 'propertyhive' ) . '</i>',
-            ),
-
-            array(
                 'title'   => __( 'Enable Auto-Incremental Reference Numbers', 'propertyhive' ),
                 'id'      => 'propertyhive_auto_incremental_reference_numbers',
                 'type'    => 'checkbox',
@@ -479,6 +468,17 @@ class PH_Settings_General extends PH_Settings_Page {
                 'id'        => 'propertyhive_applicant_match_price_range_percentage_higher',
                 'type'      => 'number',
                 'default'   => '5',
+            ),
+
+            array(
+                'title'   => __( 'When Selecting Applicant Locations', 'propertyhive' ),
+                'id'      => 'propertyhive_applicant_locations_type',
+                'type'    => 'radio',
+                'options' => array(
+                    'text' => __( 'Allow Locations To Be Freetyped', 'propertyhive' ),
+                    '' => __( 'Select From A Predefined List (Editable from \'Custom Fields\')', 'propertyhive' ),
+                ),
+                'desc'  => '<i>' . __( 'When this setting is changed, locations selected using the other method will no longer be used for matching', 'propertyhive' ) . '</i>',
             ),
 
             array( 'type' => 'sectionend', 'id' => 'applicant_registration_options'),
