@@ -195,3 +195,101 @@ function propertyhive_compile_less_styles() {
         }
     }*/
 }
+
+function propertyhive_is_location_in_address( $property, $location )
+{
+    $address_keywords = array( $location );
+    if ( strpos( $location, ' ' ) !== FALSE )
+    {
+        $address_keywords[] = str_replace(" ", "-", ph_clean($location));
+    }
+    if ( strpos( $location, '-' ) !== FALSE )
+    {
+        $address_keywords[] = str_replace("-", " ", ph_clean($location));
+    }
+
+    if ( strpos( $location, '.' ) !== FALSE )
+    {
+        $address_keywords[] = str_replace(".", "", ph_clean($location));
+    }
+    if ( stripos( $location, 'st ' ) !== FALSE )
+    {
+        $address_keywords[] = str_ireplace("st ", "st. ", ph_clean($location));
+    }
+
+    $location_address_fields = array(
+        '_address_street',
+        '_address_two',
+        '_address_three',
+        '_address_four',
+        '_address_postcode'
+    );
+    $location_address_fields = apply_filters( 'propertyhive_address_fields_to_query', $location_address_fields );
+
+    foreach ( $address_keywords as $address_keyword )
+    {
+        foreach ( $location_address_fields as $address_field )
+        {
+            if ( $address_field == '_address_postcode' ) { continue; } // ignore postcode as that is handled differently afterwards
+
+            if (
+                ( get_option( 'propertyhive_address_keyword_compare', '=' ) == '=' && strcasecmp($address_keyword, $property->{$address_field}) == 0 )
+                ||
+                ( get_option( 'propertyhive_address_keyword_compare', '=' ) == 'LIKE' && stripos($property->{$address_field}, $address_keyword) !== false )
+            )
+            {
+                return true;
+            }
+        }
+    }
+    if ( !$location_matched && in_array('_address_postcode', $location_address_fields) )
+    {
+        if ( strlen($location) <= 4 )
+        {
+            // if location is just the first part of postcode, check if it is present at the start of the postcode
+            if ( strcasecmp($address_keyword, substr($property->_address_postcode, 0, strlen($address_keyword))) == 0 )
+            {
+                return true;
+            }
+        }
+        else
+        {
+            $postcode = ph_clean($location);
+            $postcodes = array(strtolower($postcode));
+
+            if ( preg_match('#^(GIR ?0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]([0-9ABEHMNPRV-Y])?)|[0-9][A-HJKPS-UW])[0-9][ABD-HJLNP-UW-Z]{2})$#i', $postcode) )
+            {
+                // UK postcode found with no space
+
+                if ( strlen($postcode) == 5 )
+                {
+                    $first_part = substr($postcode, 0, 2);
+                    $last_part = substr($postcode, 2, 3);
+
+                    $postcodes[] = strtolower($first_part . ' ' . $last_part);
+                }
+                elseif ( strlen($postcode) == 6 )
+                {
+                    $first_part = substr($postcode, 0, 3);
+                    $last_part = substr($postcode, 3, 3);
+
+                    $postcodes[] = strtolower($first_part . ' ' . $last_part);
+                }
+                elseif ( strlen($postcode) == 7 )
+                {
+                    $first_part = substr($postcode, 0, 4);
+                    $last_part = substr($postcode, 4, 3);
+
+                    $postcodes[] = strtolower($first_part . ' ' . $last_part);
+                }
+            }
+
+            if ( in_array(strtolower($property->_address_postcode), $postcodes) )
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
