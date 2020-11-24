@@ -242,7 +242,7 @@ function propertyhive_is_location_in_address( $property, $location )
             }
         }
     }
-    if ( !$location_matched && in_array('_address_postcode', $location_address_fields) )
+    if ( in_array('_address_postcode', $location_address_fields) )
     {
         if ( strlen($location) <= 4 )
         {
