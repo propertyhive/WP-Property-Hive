@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.5.1
-Stable tag: 1.4.72
+Tested up to: 5.5.3
+Stable tag: 1.4.73
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,20 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.73 - 2020-11-29 =
+* Match properties to applicants based on freetype location and radius (if radial search add on active). New setting under 'Property Hive > Settings > General > Miscellaneous > Applicant Options' to enable this
+* Added ability to filter viewings, offers and sales by office
+* Added ability to filter viewings and appraisals by date
+* Property searches by address on the frontend now take into account 'St.' vs 'St'
+* Similar properties shortcode now doesn't require a property ID to be passed through as an attribute and works off property being viewed
+* Corrected commercial properties not showing as POA when loaded via AJAX, such as when using the Infinite Scroll add on
+* Corrected applicants not being carried across when using 'Book Second Viewing' action
+* Display a notice if there are applicant match emails queued but the email queue cron doesn't appear to be running
+* Added status of match email to notes grids to highlight if it's queued or failed
+* Added new filter 'propertyhive_default_commercial_floor_area_unit' to specify default units when entering commercial properties
+* Added new filter 'propertyhive_default_commercial_search_floor_area_unit' to specify units used in search forms when filtering commercial properties by size
+* Declared compatibility for WordPress 5.5.3
 
 = 1.4.72 - 2020-10-27 =
 * Added ability to add Cc/Bcc email addresses when sending matches
