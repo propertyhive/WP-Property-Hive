@@ -107,6 +107,7 @@ class PH_AJAX {
             'dismiss_notice_missing_search_results' => false,
             'dismiss_notice_missing_google_maps_api_key' => false,
             'dismiss_notice_invalid_expired_license_key' => false,
+            'dismiss_notice_email_cron_not_running' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -149,6 +150,11 @@ class PH_AJAX {
         // Quit out
         die();
     }
+
+	public function dismiss_notice_email_cron_not_running()
+	{
+		update_option( 'email_cron_not_running_dismissed', 'yes' );
+	}
 
 	/**
 	 * Output headers for JSON requests
