@@ -1121,6 +1121,10 @@ class PH_Meta_Box_Contact_Relationships {
                     if ( !empty($existing_applicant_profile) && isset($existing_applicant_profile['location_text']) && $existing_applicant_profile['location_text'] != '' )
                     {
                         $applicant_profile['location_text'] = ph_clean($existing_applicant_profile['location_text']);
+                        if ( isset($existing_applicant_profile['location_radius']) && $existing_applicant_profile['location_radius'] != '' )
+                        {
+                            $applicant_profile['location_radius'] = ph_clean($existing_applicant_profile['location_radius']);
+                        }
                     }
                 }
                 else
