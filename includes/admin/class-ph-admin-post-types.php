@@ -670,6 +670,7 @@ class PH_Admin_Post_Types {
         
         $output .= $this->appraisal_status_filter();
         $output .= $this->negotiator_filter();
+        $output .= $this->date_range_filter();
 
         echo apply_filters( 'propertyhive_appraisal_filters', $output );
     }
@@ -1051,6 +1052,8 @@ class PH_Admin_Post_Types {
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
+
+            $vars = $this->filter_start_date_time_by_date_range($vars);
         }
         elseif ( 'viewing' === $typenow ) 
         {
@@ -1131,30 +1134,8 @@ class PH_Admin_Post_Types {
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
-	        if (
-	              ! empty( $_GET['_date_range_label'] )
-	           && ! empty( $_GET['_date_range_from'] )
-	           && ! empty( $_GET['_date_range_to'] )
-	           && $_GET['_date_range_label'] !== 'Any Time'
-	           && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_from']) !== false
-	           && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_to']) !== false
-	        )
-	        {
-		        $vars['meta_query'] = array_merge($vars['meta_query'], array (
-			        array(
-				        'key' => '_start_date_time',
-				        'value' => $_GET['_date_range_from'],
-				        'type'  => 'date',
-				        'compare' => '>='
-			        ),
-			        array(
-				        'key' => '_start_date_time',
-				        'value' => $_GET['_date_range_to'],
-				        'type'  => 'date',
-				        'compare' => '<='
-			        ),
-		        ));
-	        }
+
+            $vars = $this->filter_start_date_time_by_date_range($vars);
         }
         elseif ( 'offer' === $typenow ) 
         {
@@ -1178,6 +1159,36 @@ class PH_Admin_Post_Types {
         $vars = apply_filters( 'propertyhive_property_filter_query', $vars, $typenow );
 
         return $vars;
+    }
+
+    private function filter_start_date_time_by_date_range($vars)
+    {
+	    if (
+		    ! empty( $_GET['_date_range_label'] )
+		    && ! empty( $_GET['_date_range_from'] )
+		    && ! empty( $_GET['_date_range_to'] )
+		    && $_GET['_date_range_label'] !== 'Any Time'
+		    && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_from']) !== false
+		    && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_to']) !== false
+	    )
+	    {
+		    $vars['meta_query'] = array_merge($vars['meta_query'], array (
+			    array(
+				    'key' => '_start_date_time',
+				    'value' => $_GET['_date_range_from'],
+				    'type'  => 'date',
+				    'compare' => '>='
+			    ),
+			    array(
+				    'key' => '_start_date_time',
+				    'value' => $_GET['_date_range_to'],
+				    'type'  => 'date',
+				    'compare' => '<='
+			    ),
+		    ));
+	    }
+
+	    return $vars;
     }
 
     public function posts_join( $join ) {
