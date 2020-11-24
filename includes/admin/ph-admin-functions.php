@@ -293,3 +293,25 @@ function propertyhive_is_location_in_address( $property, $location )
 
     return false;
 }
+
+function propertyhive_human_time_difference($timestamp)
+{
+	$now = time() ;
+
+	if ( ! $timestamp )
+	{
+		return __( 'never', 'propertyhive' );
+	}
+	if ( $now - $timestamp > 0 )
+	{
+		return sprintf( __( '%s ago', 'propertyhive' ), human_time_diff( $timestamp, $now ) );
+	}
+	else if ( $now - $timestamp < 0 )
+	{
+		return sprintf( __( 'in %s', 'propertyhive' ), human_time_diff( $timestamp, $now ) );
+	}
+	else
+	{
+		return __( 'now', 'propertyhive' );
+	}
+}
