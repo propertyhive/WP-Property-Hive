@@ -394,7 +394,7 @@ class PH_Admin {
 
                 if ( isset($license['active']) && $license['active'] != '1' )
                 {
-                    $output = __( 'You\'re Property Hive license key is inactive.', 'propertyhive' );
+                    $output = __( 'Your Property Hive license key is inactive.', 'propertyhive' );
                 }
                 else
                 {
