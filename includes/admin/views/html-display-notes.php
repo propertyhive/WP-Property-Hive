@@ -31,19 +31,34 @@ if ( !empty($notes) )
 				if ( isset($comment_content['method']) && $comment_content['method'] == 'email' && isset($comment_content['email_log_id']) )
 				{
 					$email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . $comment_content['email_log_id'] . "'" );
+
 					if ( null !== $email_log )
 					{
+						$next_cron_run = '';
+						$emailStatus = '';
+						$note_suffix = '';
+						switch ($email_log->status) {
+							case '':
+								$next_cron_run = $next_cron_run ?: propertyhive_human_time_difference( wp_next_scheduled( 'propertyhive_process_email_log' ) );
+								$email_status  =  __( 'queued', 'propertyhive' );
+								$note_suffix   = '<em>(' . __( 'Due to be sent', 'propertyhive' ) . ' ' . $next_cron_run . ')</em>';
+								break;
+							case 'fail1':
+							case 'fail2':
+								$email_status = '<b>' . __( 'failed', 'propertyhive' ) . '</b>';
+								break;
+						}
 						$note_body = '';
 						if ($section == 'property')
 						{
-							$note_body .= 'Included in email mailout to ' . get_the_title($email_log->contact_id) . '.';
+							$note_body .= 'Included in ' . $email_status . ' email mailout to ' . get_the_title($email_log->contact_id) . '. ' . $note_suffix;
 						}
 						elseif ($section == 'contact')
 						{
 							$property_ids = unserialize($email_log->property_ids);
-							$note_body .= 'Mailout sent via email containing ' . count($property_ids) . ' propert' . ( (count($property_ids) != 1) ? 'ies' : 'y' ) . '.';
+							$note_body .= count($property_ids) . ' propert' . ( (count($property_ids) != 1) ? 'ies' : 'y' ) . ' included in ' . $email_status . ' email mailout. ' . $note_suffix;
 						}
-						$note_body .= ' <a href="' . wp_nonce_url( admin_url('?view_propertyhive_email=' . $comment_content['email_log_id'] . '&email_id=' . $comment_content['email_log_id'] ), 'view-email' ) . '" target="_blank">View Email Sent</a>';
+						$note_body .= ' <a href="' . wp_nonce_url( admin_url('?view_propertyhive_email=' . $comment_content['email_log_id'] . '&email_id=' . $comment_content['email_log_id'] ), 'view-email' ) . '" target="_blank">View Mailout</a>';
 					}
 				}
 				break;

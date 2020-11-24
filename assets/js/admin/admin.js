@@ -65,6 +65,19 @@ jQuery( function ( $ ) {
 			$( '#ph_notice_invalid_expired_license_key' ).fadeOut();
 		});
 	});
+
+	$( '#ph_dismiss_notice_email_cron_not_running' ).click(function(e)
+	{
+		e.preventDefault();
+
+		var data = {
+			'action': 'propertyhive_dismiss_notice_email_cron_not_running'
+		};
+
+		$.post( ajaxurl, data, function(response) {
+			$( '#ph_notice_email_cron_not_running' ).fadeOut();
+		});
+	});
 });
 
 function activateTipTip() {

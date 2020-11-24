@@ -307,6 +307,8 @@ class PH_Admin {
 
     public function review_admin_notices()
     {
+	    global $wpdb;
+
         if ( current_user_can( 'manage_options' ) )
         {
             $propertyhive_review_prompt_due_timestamp = get_option( 'propertyhive_review_prompt_due_timestamp', 0 );
@@ -392,7 +394,7 @@ class PH_Admin {
 
                 if ( isset($license['active']) && $license['active'] != '1' )
                 {
-                    $output = __( 'You\'re Property Hive license key is inactive.', 'propertyhive' );
+                    $output = __( 'Your Property Hive license key is inactive.', 'propertyhive' );
                 }
                 else
                 {
@@ -413,6 +415,23 @@ class PH_Admin {
                     </div>";
                 }
             }
+
+            // Email Cron Warning
+            $queuedEmailsExist = (bool) $wpdb->get_var("SELECT 1 FROM " . $wpdb->prefix . "ph_email_log WHERE	status = '' LIMIT 1");
+            $cronIsNextScheduled = wp_next_scheduled('propertyhive_process_email_log');
+	        if ($queuedEmailsExist && ( $cronIsNextScheduled === false || $cronIsNextScheduled < strtotime('5 minutes ago') ) )
+	        {
+                echo '
+                    <div class="notice notice-error" id="ph_notice_email_cron_not_running">
+                        <p>' . __( 'Your emails do not appear to be being sent', 'propertyhive' ) . '
+                        </p>
+                        <p>
+                            <a href="'. admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued') . '" class="button-primary">Go To Email Queue</a>
+                            <a href="" class="button" id="ph_dismiss_notice_email_cron_not_running">Dismiss</a>
+                        </p>
+                    </div>
+                ';
+	        }
         }
     }
 
