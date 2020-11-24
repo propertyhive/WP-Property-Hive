@@ -53,7 +53,7 @@ class PH_Admin_Assets {
             wp_enqueue_style( 'multiselect', PH()->plugin_url() . '/assets/css/jquery.multiselect.css', array(), '2.4.18' );
         }
 
-	    if ( in_array( $screen->id, array( 'edit-viewing' ) ) )
+	    if ( in_array( $screen->id, array( 'edit-viewing', 'edit-appraisal' ) ) )
 	    {
 		    wp_enqueue_style( 'daterangepicker.css', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css' );
 	    }
@@ -125,7 +125,7 @@ class PH_Admin_Assets {
             wp_localize_script( 'propertyhive_dashboard', 'propertyhive_dashboard', $params );
         }
 
-	    if ( in_array( $screen->id, array( 'edit-viewing' ) ) )
+	    if ( in_array( $screen->id, array( 'edit-viewing', 'edit-appraisal' ) ) )
 	    {
 		    wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
 		    wp_enqueue_script( 'daterangepicker.js', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js' );
