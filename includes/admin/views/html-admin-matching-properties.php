@@ -200,9 +200,16 @@
             {
                 if ( isset($applicant_profile['location_text']) && trim($applicant_profile['location_text']) != '' )
                 {
+                    $location_value = trim($applicant_profile['location_text']);
+
+                    if ( isset($applicant_profile['location_radius']) && $applicant_profile['location_radius'] != '' )
+                    {
+                        $location_value .= ' (Within '. $applicant_profile['location_radius'] .' Miles)';
+                    }
+
                     $requirements[] = array(
                         'label' => __( 'Location', 'propertyhive' ),
-                        'value' => trim($applicant_profile['location_text']),
+                        'value' => $location_value,
                     );
                 }
             }

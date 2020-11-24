@@ -114,9 +114,16 @@
 
                     if ( get_option('propertyhive_applicant_locations_type') == 'text' && isset($applicant['applicant_profile']['location_text']) && $applicant['applicant_profile']['location_text'] != '')
                     {
+                        $location_value = $applicant['applicant_profile']['location_text'];
+
+                        if ( isset($applicant['applicant_profile']['location_radius']) && $applicant['applicant_profile']['location_radius'] != '' )
+                        {
+                            $location_value .= ' (Within '. $applicant['applicant_profile']['location_radius'] .' Miles)';
+                        }
+
                         $requirements[] = array(
                             'label' => __( 'Location', 'propertyhive' ),
-                            'value' => $applicant['applicant_profile']['location_text'],
+                            'value' => $location_value,
                         );
                     }
 
