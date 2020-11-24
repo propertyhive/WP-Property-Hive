@@ -427,7 +427,7 @@ class PH_Admin {
                         </p>
                         <p>
                             <a href="'. admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued') . '" class="button-primary">Go To Email Queue</a>
-                            <a href="" class="button" id="ph_dismiss_notice_email_cron_not_running">Dismiss</a>
+                            <!--<a href="" class="button" id="ph_dismiss_notice_email_cron_not_running">Dismiss</a>-->
                         </p>
                     </div>
                 ';
