@@ -1131,7 +1131,14 @@ class PH_Admin_Post_Types {
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
-	        if ( ! empty( $_GET['_date_range_label'] && $_GET['_date_range_label'] !== 'Any Time') )
+	        if (
+	              ! empty( $_GET['_date_range_label'] )
+	           && ! empty( $_GET['_date_range_from'] )
+	           && ! empty( $_GET['_date_range_to'] )
+	           && $_GET['_date_range_label'] !== 'Any Time'
+	           && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_from']) !== false
+	           && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_to']) !== false
+	        )
 	        {
 		        $vars['meta_query'] = array_merge($vars['meta_query'], array (
 			        array(
