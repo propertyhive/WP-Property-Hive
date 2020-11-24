@@ -293,6 +293,30 @@ class PH_Admin_Post_Types {
         ));
     }
 
+	/**
+	 * Show a date range selector
+	 */
+	public function date_range_filter() {
+
+		$date_range_label = empty( $_GET['_date_range_label'] ) ? 'Any Time' : $_GET['_date_range_label'];
+
+		// The date picker doesn't have a concept of 'Any Time', so valid dates must be used
+		// I've used the last and first date of the month (reversed) as it's a range that is not selectable, but is within the current month
+		// If I used an already labelled date range (e.g. 'Today'), it would show as 'Today' when selected
+		// If I use a nearby date range (e.g. 'Yesterday'), if someone actually selected that range it would show as 'Any Time'
+		// If I use a unlikely date range (e.g. 01-01-1970 - 31-12-2070), the custom date range picker would open showing Jan 1970.
+		$date_range_from = empty( $_GET['_date_range_from'] ) ? date('Y-m-d', strtotime('last day of this month')) : $_GET['_date_range_from'];
+		$date_range_to = empty( $_GET['_date_range_to'] ) ? date('Y-m-d', strtotime('first day of this month')) : $_GET['_date_range_to'];
+
+		return "
+            <select name='_date_range_label' id='date_range' style='max-width:25rem;'>
+                <option selected>$date_range_label</option>
+            <select/>
+            <input type='hidden' name='_date_range_from' id='date_range_from' value='$date_range_from'>
+            <input type='hidden' name='_date_range_to' id='date_range_to' value='$date_range_to'>
+        ";
+	}
+
     /**
      * Show a property location filter box
      */
@@ -646,6 +670,7 @@ class PH_Admin_Post_Types {
         
         $output .= $this->appraisal_status_filter();
         $output .= $this->negotiator_filter();
+        $output .= $this->date_range_filter();
 
         echo apply_filters( 'propertyhive_appraisal_filters', $output );
     }
@@ -704,6 +729,7 @@ class PH_Admin_Post_Types {
         $output .= $this->viewing_status_filter();
         $output .= $this->property_office_filter();
         $output .= $this->negotiator_filter();
+        $output .= $this->date_range_filter();
 
         echo apply_filters( 'propertyhive_viewing_filters', $output );
     }
@@ -1026,6 +1052,8 @@ class PH_Admin_Post_Types {
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
+
+            $vars = $this->filter_start_date_time_by_date_range($vars);
         }
         elseif ( 'viewing' === $typenow ) 
         {
@@ -1106,6 +1134,8 @@ class PH_Admin_Post_Types {
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
+
+            $vars = $this->filter_start_date_time_by_date_range($vars);
         }
         elseif ( 'offer' === $typenow ) 
         {
@@ -1129,6 +1159,36 @@ class PH_Admin_Post_Types {
         $vars = apply_filters( 'propertyhive_property_filter_query', $vars, $typenow );
 
         return $vars;
+    }
+
+    private function filter_start_date_time_by_date_range($vars)
+    {
+	    if (
+		    ! empty( $_GET['_date_range_label'] )
+		    && ! empty( $_GET['_date_range_from'] )
+		    && ! empty( $_GET['_date_range_to'] )
+		    && $_GET['_date_range_label'] !== 'Any Time'
+		    && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_from']) !== false
+		    && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_to']) !== false
+	    )
+	    {
+		    $vars['meta_query'] = array_merge($vars['meta_query'], array (
+			    array(
+				    'key' => '_start_date_time',
+				    'value' => $_GET['_date_range_from'],
+				    'type'  => 'date',
+				    'compare' => '>='
+			    ),
+			    array(
+				    'key' => '_start_date_time',
+				    'value' => $_GET['_date_range_to'],
+				    'type'  => 'date',
+				    'compare' => '<='
+			    ),
+		    ));
+	    }
+
+	    return $vars;
     }
 
     public function posts_join( $join ) {
