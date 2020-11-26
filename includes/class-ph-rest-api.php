@@ -107,6 +107,7 @@ class PH_Rest_Api {
 			'outside_space',
 			'on_market',
 			'featured',
+			'location',
 			'availability',
 			'marketing_flags',
 			'features',
