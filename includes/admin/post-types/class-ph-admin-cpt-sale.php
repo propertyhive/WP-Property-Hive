@@ -240,7 +240,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
                 break;
             case 'status' :
                 
-                echo ucwords(str_replace("_", " ", $the_sale->status));
+                echo __( ucwords(str_replace("_", " ", $the_sale->status)), 'propertyhive' );
                 
                 break;
 			default :

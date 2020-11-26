@@ -239,7 +239,7 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
                 
                 break;
             case 'status' :
-                echo ucwords(str_replace("_", " ", $the_offer->status));
+                echo __( ucwords(str_replace("_", " ", $the_offer->status)), 'propertyhive' );
                 break;
 			default :
 				break;
