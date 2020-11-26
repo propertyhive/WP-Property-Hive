@@ -3232,7 +3232,7 @@ class PH_AJAX {
             propertyhive_wp_textarea_input( $args );
         }
 
-        if ( $viewing->status == 'carried_out' )
+        if ( $viewing->status == 'carried_out' || $viewing->status == 'offer_made' )
         {
             echo '<p class="form-field">
         
@@ -3279,7 +3279,7 @@ class PH_AJAX {
             }
         }
 
-        if ( $viewing->status == 'carried_out' && ( $viewing->feedback_status == 'interested' || $viewing->feedback_status == 'not_interested' ) )
+        if ( ($viewing->status == 'carried_out' || $viewing->status == 'offer_made') && ( $viewing->feedback_status == 'interested' || $viewing->feedback_status == 'not_interested' ) )
         {
             echo '<p class="form-field">
         
