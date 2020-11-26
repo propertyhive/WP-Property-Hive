@@ -3196,7 +3196,7 @@ class PH_AJAX {
         
             <label for="">' . __('Status', 'propertyhive') . '</label>
             
-            ' . ucwords(str_replace("_", " ", $viewing->status));
+            ' . __( ucwords(str_replace("_", " ", $viewing->status)), 'propertyhive' );
 
         if ( $viewing->status == 'offer_made' )
         {
@@ -3242,22 +3242,22 @@ class PH_AJAX {
             {
                 case "interested":
                 {
-                    echo 'Interested';
+                    echo __( 'Interested', 'propertyhive' );
                     break;
                 }
                 case "not_interested":
                 {
-                    echo 'Not Interested';
+                    echo __( 'Not Interested', 'propertyhive' );
                     break;
                 }
                 case "not_required":
                 {
-                    echo 'Feedback Not Required';
+                    echo __( 'Feedback Not Required', 'propertyhive' );
                     break;
                 }
                 default:
                 {
-                    echo 'Awaiting Feedback';
+                    echo __( 'Awaiting Feedback', 'propertyhive' );
                 }
             }
 
@@ -3285,7 +3285,7 @@ class PH_AJAX {
         
                 <label for="">' . __('Feedback Passed On', 'propertyhive') . '</label>';
 
-                echo ( ($viewing->feedback_passed_on == 'yes') ? 'Yes' : 'No' );
+                echo ( ($viewing->feedback_passed_on == 'yes') ? __( 'Yes', 'propertyhive' ) : __( 'No', 'propertyhive' ) );
 
             echo '</p>';
         }
@@ -4025,7 +4025,7 @@ class PH_AJAX {
                                 }
                                 else
                                 {
-                                    echo '<em>Unknown user</em>';
+                                    echo '<em>' . __( 'Unknown user', 'propertyhive' ) . '</em>';
                                 }
                                 ++$i;
                             }
@@ -4039,7 +4039,7 @@ class PH_AJAX {
                         echo '<td style="text-align:left;">';
 
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
-                        echo ucwords(str_replace("_", " ", $status));
+                        echo __( ucwords(str_replace("_", " ", $status)), 'propertyhive' );
                         if ( $status == 'pending' )
                         {
                             echo '<br>';
@@ -4059,16 +4059,16 @@ class PH_AJAX {
                             $feedback_status = get_post_meta(get_the_ID(), '_feedback_status', TRUE);
                             switch ( $feedback_status )
                             {
-                                case "interested": { echo 'Applicant Interested'; break; }
-                                case "not_interested": { echo 'Applicant Not Interested'; break; }
-                                case "not_required": { echo 'Feedback Not Required'; break; }
-                                default: { echo 'Awaiting Feedback'; }
+                                case "interested": { echo __( 'Applicant Interested', 'propertyhive' ); break; }
+                                case "not_interested": { echo __( 'Applicant Not Interested', 'propertyhive' ); break; }
+                                case "not_required": { echo __( 'Feedback Not Required', 'propertyhive' ); break; }
+                                default: { echo __( 'Awaiting Feedback', 'propertyhive' ); }
                             }
 
                             if ( $feedback_status == 'interested' || $feedback_status == 'not_interested' )
                             {
                                 $feedback_passed_on = get_post_meta(get_the_ID(), '_feedback_passed_on', TRUE);
-                                echo '<br>' . ( ($feedback_passed_on == 'yes') ? 'Feedback Passed On' : 'Feedback Not Passed On' );
+                                echo '<br>' . ( ($feedback_passed_on == 'yes') ? __( 'Feedback Passed On', 'propertyhive' ) : __( 'Feedback Not Passed On', 'propertyhive' ) );
                             }
                         }
                         echo '</td>';
@@ -4185,7 +4185,7 @@ class PH_AJAX {
                         echo '<td style="text-align:left;">';
 
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
-                        echo ucwords(str_replace("_", " ", $status));
+                        echo __( ucwords(str_replace("_", " ", $status)), 'propertyhive' );
                         if ( $status == 'pending' )
                         {
                             echo '<br>';
@@ -4205,16 +4205,16 @@ class PH_AJAX {
                             $feedback_status = get_post_meta(get_the_ID(), '_feedback_status', TRUE);
                             switch ( get_post_meta(get_the_ID(), '_feedback_status', TRUE) )
                             {
-                                case "interested": { echo 'Applicant Interested'; break; }
-                                case "not_interested": { echo 'Applicant Not Interested'; break; }
-                                case "not_required": { echo 'Feedback Not Required'; break; }
-                                default: { echo 'Awaiting Feedback'; }
+                                case "interested": { echo __( 'Applicant Interested', 'propertyhive' ); break; }
+                                case "not_interested": { echo __( 'Applicant Not Interested', 'propertyhive' ); break; }
+                                case "not_required": { echo __( 'Feedback Not Required', 'propertyhive' ); break; }
+                                default: { echo __( 'Awaiting Feedback', 'propertyhive' ); }
                             }
 
                             if ( $feedback_status == 'interested' || $feedback_status == 'not_interested' )
                             {
                                 $feedback_passed_on = get_post_meta(get_the_ID(), '_feedback_passed_on', TRUE);
-                                echo '<br>' . ( ($feedback_passed_on == 'yes') ? 'Feedback Passed On' : 'Feedback Not Passed On' );
+                                echo '<br>' . ( ($feedback_passed_on == 'yes') ? __( 'Feedback Passed On', 'propertyhive' ) : __( 'Feedback Not Passed On', 'propertyhive' ) );
                             }
                         }
                         echo '</td>';
@@ -4467,7 +4467,7 @@ class PH_AJAX {
             
                 <label for="">' . __('Status', 'propertyhive') . '</label>
                 
-                ' . ucwords(str_replace("_", " ", $offer->status)) . '    
+                ' . __( ucwords(str_replace("_", " ", $offer->status)), 'propertyhive' ) . '    
             
             </p>';
         }
@@ -4762,7 +4762,7 @@ class PH_AJAX {
                         echo '<td style="text-align:left;">' . $offer->get_formatted_amount() . '</td>';
                         echo '<td style="text-align:left;">';
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
-                        echo ucwords(str_replace("_", " ", $status));
+                        echo __( ucwords(str_replace("_", " ", $status)), 'propertyhive' );
                         echo '</td>';
                     echo '</tr>';
                 }
@@ -4865,7 +4865,7 @@ class PH_AJAX {
                         echo '<td style="text-align:left;">' . $offer->get_formatted_amount() . '</td>';
                         echo '<td style="text-align:left;">';
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
-                        echo ucwords(str_replace("_", " ", $status));
+                        echo __( ucwords(str_replace("_", " ", $status)), 'propertyhive' );
                         echo '</td>';
                     echo '</tr>';
                 }
@@ -4911,7 +4911,7 @@ class PH_AJAX {
             
                 <label for="">' . __('Status', 'propertyhive') . '</label>
                 
-                ' . ucwords(str_replace("_", " ", $sale->status)) . '    
+                ' . __( ucwords(str_replace("_", " ", $sale->status)), 'propertyhive' ) . '    
             
             </p>';
         }
@@ -5145,7 +5145,7 @@ class PH_AJAX {
                         echo '<td style="text-align:left;">' . $sale->get_formatted_amount() . '</td>';
                         echo '<td style="text-align:left;">';
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
-                        echo ucwords(str_replace("_", " ", $status));
+                        echo __( ucwords(str_replace("_", " ", $status)), 'propertyhive' );
                         echo '</td>';
                     echo '</tr>';
                 }
@@ -5249,7 +5249,7 @@ class PH_AJAX {
                         echo '<td style="text-align:left;">' . $sale->get_formatted_amount() . '</td>';
                         echo '<td style="text-align:left;">';
                         $status = get_post_meta(get_the_ID(), '_status', TRUE);
-                        echo ucwords(str_replace("_", " ", $status));
+                        echo __( ucwords(str_replace("_", " ", $status)), 'propertyhive' );
                         echo '</td>';
                     echo '</tr>';
                 }
