@@ -1130,7 +1130,9 @@ class PH_AJAX {
                         'address_four' => $contact->_address_four,
                         'address_postcode' => $contact->_address_postcode,
                         'address_country' => $contact->_address_country,
-                        'address_full_formatted' => $contact->get_formatted_full_address('<br>'),
+                        'address_full_formatted' => $contact->get_formatted_full_address(', '),
+                        'telephone_number' => $contact->_telephone_number,
+                        'email_address' => $contact->_email_address,
                     );
                 }
             }
