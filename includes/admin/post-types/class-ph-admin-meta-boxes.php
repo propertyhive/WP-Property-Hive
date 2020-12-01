@@ -99,6 +99,14 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_sale_meta', 'PH_Meta_Box_Sale_Applicant_Solicitor::save', 15, 2 );
         add_action( 'propertyhive_process_sale_meta', 'PH_Meta_Box_Sale_Property_Owner_Solicitor::save', 20, 2 );
 
+        // Save Tenancy Meta Boxes
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Details::save', 10, 2 );
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Applicant::save', 15, 2 );
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Property::save', 20, 2 );
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Deposit_Scheme::save', 25, 2 );
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Management::save', 30, 2 );
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Key_Dates::save', 35, 2 );
+
 		// Error handling (for showing errors from meta boxes on next page load)
 		add_action( 'admin_notices', array( $this, 'output_errors' ) );
 		add_action( 'shutdown', array( $this, 'save_errors' ) );
@@ -110,6 +118,7 @@ class PH_Admin_Meta_Boxes {
         $this->check_remove_solicitor();
         $this->check_create_offer();
         $this->check_create_sale();
+        $this->check_create_tenancy();
 	}
 
     public function redirect_to_tab( $url, $post_id )
@@ -372,6 +381,68 @@ class PH_Admin_Meta_Boxes {
 
             // Do redirect
             wp_redirect( admin_url( 'post.php?post=' . $sale_post_id . '&action=edit' ) );
+            exit();
+        }
+
+    }
+
+    public function check_create_tenancy() {
+        if ( isset( $_GET['create_tenancy'] ) && isset( $_GET['post'] ) ) {
+            if ( get_post_type( (int) $_GET['post'] ) != 'viewing' ) {
+                return;
+            }
+
+            $viewing = new PH_Viewing( (int) $_GET['post'] );
+
+            $tenancy_post = array(
+                'post_title'     => '',
+                'post_content'   => '',
+                'post_type'      => 'tenancy',
+                'post_status'    => 'publish',
+                'comment_status' => 'closed',
+                'ping_status'    => 'closed',
+            );
+
+            // Insert the post into the database
+            $tenancy_post_id = wp_insert_post( $tenancy_post );
+
+            $property_id = $viewing->property_id;
+
+            add_post_meta( $tenancy_post_id, '_applicant_contact_id', $viewing->applicant_contact_id );
+            add_post_meta( $tenancy_post_id, '_property_id', $viewing->property_id );
+
+            add_post_meta( $tenancy_post_id, '_rent', get_post_meta( $property_id, '_rent', true ) );
+            add_post_meta( $tenancy_post_id, '_rent_frequency', get_post_meta( $property_id, '_rent_frequency', true ) );
+            add_post_meta( $tenancy_post_id, '_price_actual', get_post_meta( $property_id, '_price_actual', true ) );
+            add_post_meta( $tenancy_post_id, '_currency', get_post_meta( $property_id, '_currency', true ) );
+
+            add_post_meta( $tenancy_post_id, '_deposit', get_post_meta( $property_id, '_deposit', true ) );
+
+            update_post_meta( (int) $_GET['post'], '_tenancy_id', $tenancy_post_id );
+            update_post_meta( (int) $_GET['post'], '_status', 'offer_made' );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action'    => 'viewing_offer_made',
+            );
+
+            $data = array(
+                'comment_post_ID'      => (int) $_GET['post'],
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date( "Y-m-d H:i:s" ),
+                'comment_content'      => serialize( $comment ),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+
+            // Do redirect
+            wp_redirect( admin_url( 'post.php?post=' . $tenancy_post_id . '&action=edit' ) );
             exit();
         }
 
@@ -1497,6 +1568,145 @@ class PH_Admin_Meta_Boxes {
             add_meta_box( 'propertyhive-sale-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Sale_Actions::output', 'sale', 'side' );
         }
 
+        // TENANCY
+        if (!isset($tabs)) $tabs = array();
+
+        /* TENANCY SUMMARY META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-tenancy-details',
+            'title' => __( 'Tenancy Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Tenancy_Details::output',
+            'screen' => 'tenancy',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-tenancy-property',
+            'title' => __( 'Property', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Tenancy_Property::output',
+            'screen' => 'tenancy',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-tenancy-applicant',
+            'title' => __( 'Tenants', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Tenancy_Applicant::output',
+            'screen' => 'tenancy',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_tenancy_summary_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+
+        $tabs['tab_tenancy_summary'] = array(
+            'name' => __( 'Summary', 'propertyhive' ),
+            'metabox_ids' => $ids,
+            'post_type' => 'tenancy'
+        );
+
+        /* TENANCY DEPOSIT SCHEME META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-tenancy-deposit-scheme',
+            'title' => __( 'Deposit Scheme Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Tenancy_Deposit_Scheme::output',
+            'screen' => 'tenancy',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_tenancy_deposit_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+
+        $tabs['tab_tenancy_deposit_scheme'] = array(
+            'name' => __( 'Deposit Scheme', 'propertyhive' ),
+            'metabox_ids' => $ids,
+            'post_type' => 'tenancy'
+        );
+
+        /* MANAGEMENT META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-tenancy-management',
+            'title' => __( 'Management Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Tenancy_Management::output',
+            'screen' => 'tenancy',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-tenancy-key-dates',
+            'title' => __( 'Key Dates', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Key_Dates::output',
+            'screen' => 'tenancy',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_tenancy_management_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+
+        $tabs['tab_tenancy_management'] = array(
+            'name' => __( 'Management', 'propertyhive' ),
+            'metabox_ids' => $ids,
+            'post_type' => 'tenancy'
+        );
+
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'tenancy' )
+        {
+            /* HISTORY & NOTES META BOXES */
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-tenancy-history-notes',
+                'title' => __( 'Tenancy History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Tenancy_Notes::output',
+                'screen' => 'tenancy',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_tenancy_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+
+            $tabs['tab_tenancy_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'tenancy'
+            );
+        }
+
         $tabs = apply_filters( 'propertyhive_tabs', $tabs );
 
         // Force order of meta boxes
@@ -1504,8 +1714,8 @@ class PH_Admin_Meta_Boxes {
         if ( 
             in_array(
                 get_post_type($post->ID), 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale') )
-            ) 
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy') )
+            )
         )
         {
             foreach ( $tabs as $tab_id => $tab_options)
@@ -1546,7 +1756,7 @@ class PH_Admin_Meta_Boxes {
             !empty($tabs) && 
             in_array(
                 $post->post_type, 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy') )
             )
         )
         {
@@ -1751,7 +1961,7 @@ class PH_Admin_Meta_Boxes {
 		if ( 
             ! in_array( 
                 $post->post_type, 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy') )
             ) 
         ) {
 			return;
