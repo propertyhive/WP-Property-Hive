@@ -136,7 +136,7 @@ class PH_Admin_Post_Types {
     public function remove_month_filter() {
         global $typenow;
         
-        if ($typenow == 'property' || $typenow == 'contact' || $typenow == 'appraisal' || $typenow == 'viewing' || $typenow == 'offer' || $typenow == 'sale')
+        if ( in_array($typenow, array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy')) )
         {
             add_filter('months_dropdown_results', '__return_empty_array');
         }
@@ -183,6 +183,9 @@ class PH_Admin_Post_Types {
                 break;
             case 'sale' :
                 $this->sale_filters();
+                break;
+            case 'tenancy' :
+                $this->tenancy_filters();
                 break;
             default :
                 break;
@@ -895,6 +898,49 @@ class PH_Admin_Post_Types {
 
         return $output;
     }
+
+    /**
+     * Show an tenancy filter box
+     */
+    public function tenancy_filters() {
+        global $wp_query;
+
+        $output = '';
+
+        $output .= $this->tenancy_status_filter();
+
+        echo apply_filters( 'propertyhive_tenancy_filters', $output );
+    }
+
+    /**
+     * Show an tenancy status filter box
+     */
+    public function tenancy_status_filter() {
+        global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'current', 'finished') ) ? $_GET['_status'] : '';
+
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_sale_status">';
+
+            $output .= '<option value="">All Statuses</option>';
+
+            $output .= '<option value="pending"';
+            $output .= selected( 'pending', $selected_status, false );
+            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="current"';
+            $output .= selected( 'current', $selected_status, false );
+            $output .= '> ' . __( 'Current', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="finished"';
+            $output .= selected( 'finished', $selected_status, false );
+            $output .= '> ' . __( 'Finished', 'propertyhive' ) . '</option>';
+
+        $output .= '</select>';
+
+        return $output;
+    }
     
     /**
      * Filters and sorting handler
@@ -987,7 +1033,7 @@ class PH_Admin_Post_Types {
                 );
             }
         }
-        elseif ( 'enquiry' === $typenow ) 
+        elseif ( 'enquiry' === $typenow )
         {
             if ( ! empty( $_GET['_status'] ) ) {
                 $vars['meta_query'][] = array(
@@ -1008,7 +1054,7 @@ class PH_Admin_Post_Types {
                 );
             }
         }
-        elseif ( 'appraisal' === $typenow ) 
+        elseif ( 'appraisal' === $typenow )
         {
             if ( ! empty( $_GET['_status'] ) ) {
                 switch ( sanitize_text_field( $_GET['_status'] ) )
@@ -1154,6 +1200,47 @@ class PH_Admin_Post_Types {
                     'key' => '_status',
                     'value' => sanitize_text_field( $_GET['_status'] ),
                 );
+            }
+        }
+        elseif ( 'tenancy' === $typenow )
+        {
+            if ( ! empty( $_GET['_status'] ) )
+            {
+                switch ( $_GET['_status'] )
+                {
+                    case 'pending' :
+                        $vars['meta_query'][] = array (
+                            'key' => '_start_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '>',
+                        );
+                        break;
+
+                    case 'current' :
+                        $vars['meta_query'][] = array (
+                            'key' => '_start_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '<=',
+                        );
+                        $vars['meta_query'][] = array (
+                            'key' => '_end_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '>=',
+                        );
+                        break;
+
+                    case 'finished':
+                        $vars['meta_query'][] = array (
+                            'key' => '_end_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '<',
+                        );
+                        break;
+                }
             }
         }
 

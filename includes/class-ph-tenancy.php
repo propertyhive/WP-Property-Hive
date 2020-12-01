@@ -93,4 +93,31 @@ class PH_Tenancy {
         $this->post_title          = $result->post_title;
         $this->post_status         = $result->post_status;
     }
+
+    /**
+     * Get the formatted tenancy rent
+     *
+     * @access public
+     * @return string
+     */
+    public function get_formatted_rent( ) {
+
+        $ph_countries = new PH_Countries();
+
+        if ($this->_currency != '')
+        {
+            $currency = $ph_countries->get_currency( $this->_currency );
+        }
+        else
+        {
+            $currency = $ph_countries->get_currency( 'GBP' );
+        }
+
+        $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+        $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+
+        $amount = $this->_rent;
+        return ( ( $amount != '' ) ? $prefix . number_format($amount, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) : '-' ) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' );
+
+    }
 }
