@@ -476,7 +476,6 @@ class PH_Admin_Meta_Boxes {
             'post_type' => 'property'
         );
         
-
         /* PROPERTY DETAILS META BOXES */
         $meta_boxes = array();
         $meta_boxes[5] = array(
@@ -869,7 +868,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_property_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'property'
@@ -1088,7 +1087,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_contact_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'contact'
@@ -1128,7 +1127,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_enquiry_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'enquiry'
@@ -1214,7 +1213,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_appraisal_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'appraisal'
@@ -1302,7 +1301,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_viewing_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'viewing'
@@ -1396,7 +1395,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_offer_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'offer'
@@ -1451,8 +1450,7 @@ class PH_Admin_Meta_Boxes {
             'priority' => 'high'
         );
         
-
-        $meta_boxes = apply_filters( 'propertyhive_offer_summary_meta_boxes', $meta_boxes );
+        $meta_boxes = apply_filters( 'propertyhive_sale_summary_meta_boxes', $meta_boxes );
         ksort($meta_boxes);
 
         $ids = array();
@@ -1490,7 +1488,7 @@ class PH_Admin_Meta_Boxes {
                 $ids[] = $meta_box['id'];
             }
             
-            $tabs['tab_notes'] = array(
+            $tabs['tab_sale_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
                 'post_type' => 'sale'
