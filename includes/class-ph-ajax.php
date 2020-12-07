@@ -250,7 +250,7 @@ class PH_AJAX {
         {
             // Check has associated contact CPT and is published
             $args = array(
-                'post_type' => 'contact',
+                'post_type' => apply_filters( 'propertyhive_allowed_login_post_type', array( 'contact' ) ),
                 'fields' => 'ids',
                 'posts_per_page' => 1,
                 'post_status' => array( 'publish' ),
