@@ -289,7 +289,7 @@ class PH_Admin_Post_Types {
             'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
             'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int) $_GET['_negotiator_id'],
             'echo' => false,
-            'role__not_in' => array('property_hive_contact', 'subscriber') 
+            'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
         ));
     }
 

@@ -1289,7 +1289,7 @@ class PH_AJAX {
                 'number' => 9999,
                 'search' => $keyword . '*',
                 'orderby' => 'display_name',
-                'role__not_in' => array('property_hive_contact', 'subscriber') 
+                'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
             );
             
             $user_query = new WP_User_Query( $args );
