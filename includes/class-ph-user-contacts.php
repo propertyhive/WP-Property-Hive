@@ -26,8 +26,6 @@ class PH_User_Contacts {
 		// Hide users with role 'property_hive_contact' by excluding them from user queries
 		//add_action( 'pre_user_query', array( __CLASS__, 'pre_user_query' ) );
 
-		//add_filter( 'editable_roles', array( __CLASS__, 'remove_ph_contact_role_from_dropdown' ) );
-
 		add_action( 'init', array( __CLASS__, 'listen_for_logout' ) );
 	}
 
@@ -165,13 +163,6 @@ class PH_User_Contacts {
            ) ";
 
         return $user_search;
-	}
-
-	public static function remove_ph_contact_role_from_dropdown( $all_roles ) 
-	{
-	    unset($all_roles['property_hive_contact']);
-
-	    return $all_roles;
 	}
 }
 
