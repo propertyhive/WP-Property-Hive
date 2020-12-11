@@ -28,6 +28,7 @@ class PH_Post_types {
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_media' ), 5 );
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_children' ), 5 );
 
+        add_action( 'save_post', array( __CLASS__, 'create_name_number_street_meta' ), 99, 3 );
         add_action( 'save_post', array( __CLASS__, 'create_concatenated_indexable_meta' ), 99, 3 );
 	}
 
@@ -654,6 +655,46 @@ class PH_Post_types {
                 }
             }
             wp_reset_postdata();
+        }
+    }
+
+    /**
+	 * When saving a property, create a meta field of concatenated address name/number and street to use for searching
+	 *
+	 * @param  int $post_id
+	 * @param  object $post
+	 */
+    public static function create_name_number_street_meta( $post_id, $post, $update )
+    {
+        // $post_id and $post are required
+        if ( empty( $post_id ) || empty( $post ) ) {
+            return;
+        }
+
+        // Dont' save meta boxes for revisions or autosaves
+        if ( defined( 'DOING_AUTOSAVE' ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
+            return;
+        }
+
+        if ( $post->post_type !== 'property' ) {
+            return;
+        }
+
+        $address_name_number = trim( get_post_meta($post_id, '_address_name_number', TRUE) );
+        $address_street = trim( get_post_meta($post_id, '_address_street', TRUE) );
+
+        if ( $address_name_number != '' || $address_street != '' )
+        {
+            $address_name_number_street = trim( $address_name_number . ' ' . $address_street );
+            $existing_concat = get_post_meta($post_id, '_address_name_number_street', TRUE);
+            if( !$existing_concat || $existing_concat !== $address_name_number_street )
+            {
+                update_post_meta($post_id, '_address_name_number_street', $address_name_number_street);
+            }
+        }
+        else
+        {
+            delete_post_meta($post_id, '_address_name_number_street');
         }
     }
 

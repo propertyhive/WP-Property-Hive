@@ -1255,6 +1255,8 @@ class PH_AJAX {
             OR
             (mt1.meta_key='_address_street' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
             OR
+            (mt1.meta_key='_address_name_number_street' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
+            OR
             (mt1.meta_key='_address_2' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')
             OR
             (mt1.meta_key='_address_3' AND mt1.meta_value LIKE '" . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . "%')

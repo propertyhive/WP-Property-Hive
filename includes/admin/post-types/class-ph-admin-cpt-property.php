@@ -465,6 +465,8 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 						OR
 						(mt1.meta_key='_address_street' AND mt1.meta_value LIKE %s)
 						OR
+						(mt1.meta_key='_address_name_number_street' AND mt1.meta_value LIKE %s)
+						OR
 						(mt1.meta_key='_address_2' AND mt1.meta_value LIKE %s)
 						OR
 						(mt1.meta_key='_address_3' AND mt1.meta_value LIKE %s)
@@ -479,6 +481,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 					post_type='property'
 				GROUP BY ID
 				",
+				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
 				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
 				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
 				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
