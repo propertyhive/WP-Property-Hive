@@ -343,7 +343,15 @@ class PH_Shortcodes {
 
 		if ( isset($atts['property_type_id']) && $atts['property_type_id'] != '' )
 		{
-			if ( isset($atts['department']) && $atts['department'] == 'commercial' )
+			// Change field to check when department is specified as commercial, or if commercial is the only active department
+			if (
+				( isset($atts['department']) && $atts['department'] == 'commercial' ) ||
+				(
+					get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
+					get_option( 'propertyhive_active_departments_lettings' ) != 'yes' &&
+					get_option( 'propertyhive_active_departments_commercial' ) == 'yes'
+				)
+			)
 			{
 				$tax_query[] = array(
 		            'taxonomy'  => 'commercial_property_type',
