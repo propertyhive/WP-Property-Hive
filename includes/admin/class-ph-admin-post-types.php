@@ -1229,6 +1229,7 @@ LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta ON " . $wpdb->posts
 LEFT JOIN " . $wpdb->posts . " AS ph_property_filter_posts ON ph_property_filter_posts.ID = ph_property_filter_meta.meta_value
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_name_number ON ph_property_filter_posts.ID = ph_property_filter_meta_name_number.post_id AND ph_property_filter_meta_name_number.meta_key = '_address_name_number'
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_street ON ph_property_filter_posts.ID = ph_property_filter_meta_street.post_id AND ph_property_filter_meta_street.meta_key = '_address_street' 
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_name_number_street ON ph_property_filter_posts.ID = ph_property_filter_meta_name_number_street.post_id AND ph_property_filter_meta_name_number_street.meta_key = '_address_name_number_street'
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_2 ON ph_property_filter_posts.ID = ph_property_filter_meta_2.post_id AND ph_property_filter_meta_2.meta_key = '_address_2' 
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_3 ON ph_property_filter_posts.ID = ph_property_filter_meta_3.post_id AND ph_property_filter_meta_3.meta_key = '_address_3' 
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_4 ON ph_property_filter_posts.ID = ph_property_filter_meta_4.post_id AND ph_property_filter_meta_4.meta_key = '_address_4' 
@@ -1311,6 +1312,8 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
                     (ph_property_filter_meta_name_number.meta_value LIKE $1)
                     OR 
                     (ph_property_filter_meta_street.meta_value LIKE $1)
+                    OR
+                    (ph_property_filter_meta_name_number_street.meta_value LIKE $1)
                     OR 
                     (ph_property_filter_meta_2.meta_value LIKE $1)
                     OR 
