@@ -192,12 +192,19 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
                         $applicants[] = get_the_title($applicant_contact_id);
                     }
                     echo implode("<br>", $applicants);
+
+                    // Add text if this a second, third etc viewing
+                    $viewing_number = $this->count_viewing_number($the_viewing, $applicant_contact_ids);
+                    if ( $viewing_number > 1 )
+                    {
+                        echo ' (' . $this->ordinal_suffix($viewing_number) . ' Viewing)' ;
+                    }
                 }
                 else
                 {
                     echo '-';
                 }
-                
+
                 break;
             case 'status' :
                 
@@ -321,6 +328,98 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 		}
 	}
+
+    /**
+     * Count the previous Carried Out viewings for a property and applicant combination and return the number of this viewing
+     *
+     * @param object $viewing The current viewing
+     * @param array $applicant_contact_ids An array of the applicant contact IDs for this viewing
+     * @return int The sequential number of the viewing
+     */
+    private function count_viewing_number($viewing, $applicant_contact_ids)
+    {
+        if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) && (int)$viewing->property_id > 0 )
+        {
+            $meta_query = array(
+                array(
+                    'key' => '_property_id',
+                    'value' => (int)$viewing->property_id,
+                ),
+                array(
+                    'key' => '_start_date_time',
+                    'value' => $viewing->start_date_time,
+                    'compare' => '<',
+                    'type' => 'DATETIME',
+                ),
+                array(
+                    'key' => '_status',
+                    'value' => 'carried_out',
+                ),
+            );
+            foreach ( $applicant_contact_ids as $applicant_contact_id )
+            {
+                $meta_query[] = array(
+                    'key' => '_applicant_contact_id',
+                    'value' => (int)$applicant_contact_id
+                );
+            }
+
+            $args = array(
+                'post_type'   => 'viewing',
+                'nopaging'    => true,
+                'meta_key'  => '_start_date_time',
+                'post_status'   => 'publish',
+                'meta_query'  => $meta_query,
+                'post__not_in' => array((int)$viewing->ID),
+            );
+            $viewings_query = new WP_Query( $args );
+
+            if ( $viewings_query->have_posts() )
+            {
+                $num_viewings = count($viewings_query->get_posts());
+                return ++$num_viewings;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    /**
+     * Get ordinal suffix (st, nd, rd etc) for any number
+     *
+     * @param int $number
+     * @param bool $return_number Include $n in the string returned
+     * @return string $number including its ordinal suffix
+     */
+    private function ordinal_suffix( $number, $return_number = true )
+    {
+        $n_last = $number % 100;
+        if ( ($n_last > 10 && $n_last << 14) || $number == 0 )
+        {
+            $suffix = 'th';
+        }
+        else
+        {
+            switch( substr($number, -1) )
+            {
+                case '1':
+                    $suffix = 'st';
+                    break;
+                case '2':
+                    $suffix = 'nd';
+                    break;
+                case '3':
+                    $suffix = 'rd';
+                    break;
+                default:
+                    $suffix = 'th';
+                    break;
+            }
+        }
+        return $return_number ? $number . $suffix : $suffix;
+    }
 }
 
 endif;
