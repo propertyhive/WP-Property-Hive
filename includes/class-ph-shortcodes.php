@@ -347,6 +347,7 @@ class PH_Shortcodes {
 			if (
 				( isset($atts['department']) && $atts['department'] == 'commercial' ) ||
 				(
+					!isset($atts['department']) &&
 					get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
 					get_option( 'propertyhive_active_departments_lettings' ) != 'yes' &&
 					get_option( 'propertyhive_active_departments_commercial' ) == 'yes'
