@@ -85,9 +85,12 @@ class PH_Elementor {
 
 		foreach ( $widgets as $widget )
 		{
-			if ( file_exists( dirname(__FILE__) . "/elementor-widgets/" . sanitize_title($widget) . ".php" ) )
+			$widget_dir = 'elementor-widgets';
+			$widget_dir = apply_filters( 'propertyhive_elementor_widget_directory', $widget_dir );
+			if ( file_exists( dirname(__FILE__) . "/" . $widget_dir . "/" . sanitize_title($widget) . ".php" ) )
 			{
-				require_once( dirname(__FILE__) . "/elementor-widgets/" . sanitize_title($widget) . ".php" );
+
+				require_once( dirname(__FILE__) . "/" . $widget_dir . "/" . sanitize_title($widget) . ".php" );
 				$class_name = '\Elementor_' . str_replace(" ", "_", $widget) . '_Widget';
 				\Elementor\Plugin::instance()->widgets_manager->register_widget_type( new $class_name() );
 			}
