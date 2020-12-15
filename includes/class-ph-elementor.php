@@ -86,7 +86,7 @@ class PH_Elementor {
 		foreach ( $widgets as $widget )
 		{
 			$widget_dir = 'elementor-widgets';
-			$widget_dir = apply_filters( 'propertyhive_elementor_widget_directory', $widget_dir );
+			$widget_dir = apply_filters( 'propertyhive_elementor_widget_directory', $widget_dir, $widget );
 			if ( file_exists( dirname(__FILE__) . "/" . $widget_dir . "/" . sanitize_title($widget) . ".php" ) )
 			{
 				require_once( dirname(__FILE__) . "/" . $widget_dir . "/" . sanitize_title($widget) . ".php" );
