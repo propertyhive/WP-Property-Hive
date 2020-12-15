@@ -73,6 +73,7 @@ class PH_Elementor {
 			'Property Bedrooms',
 			'Property Bathrooms',
 			'Property Reception Rooms',
+			'Property Floor Area',
 			'Property Map',
 			'Property Street View',
 			'Property Floorplans',
