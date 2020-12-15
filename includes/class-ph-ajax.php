@@ -3202,6 +3202,14 @@ class PH_AJAX {
             
             ' . __( ucwords(str_replace("_", " ", $viewing->status)), 'propertyhive' );
 
+            // Add text if this a second, third etc viewing
+            $applicant_contact_ids = get_post_meta( $viewing->id, '_applicant_contact_id' );
+            $viewing_number = count_viewing_number($viewing->id, $viewing->property_id, $viewing->start_date_time, $applicant_contact_ids);
+            if ( $viewing_number > 1 )
+            {
+                echo ' - ' . ordinal_suffix($viewing_number) . ' Viewing' ;
+            }
+
         if ( $viewing->status == 'offer_made' )
         {
             if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
@@ -3992,7 +4000,8 @@ class PH_AJAX {
                     $viewings_query->the_post();
 
                     echo '<tr>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("H:i jS F Y", strtotime(get_post_meta(get_the_ID(), '_start_date_time', TRUE))) . '</a></td>';
+                        $viewing_start_date_time = get_post_meta(get_the_ID(), '_start_date_time', TRUE);
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("H:i jS F Y", strtotime($viewing_start_date_time)) . '</a></td>';
                         echo '<td style="text-align:left;">';
                         $applicant_contact_ids = get_post_meta(get_the_ID(), '_applicant_contact_id');
                         if (!empty($applicant_contact_ids))
@@ -4075,6 +4084,13 @@ class PH_AJAX {
                                 echo '<br>' . ( ($feedback_passed_on == 'yes') ? __( 'Feedback Passed On', 'propertyhive' ) : __( 'Feedback Not Passed On', 'propertyhive' ) );
                             }
                         }
+
+                        // Add text if this a second, third etc viewing
+                        $viewing_number = count_viewing_number(get_the_ID(), $_POST['post_id'], $viewing_start_date_time, $applicant_contact_ids);
+                        if ( $viewing_number > 1 )
+                        {
+                            echo '<br>' . ordinal_suffix($viewing_number) . ' Viewing' ;
+                        }
                         echo '</td>';
                     echo '</tr>';
                 }
@@ -4145,7 +4161,8 @@ class PH_AJAX {
                     $property = new PH_Property((int)get_post_meta(get_the_ID(), '_property_id', TRUE));
 
                     echo '<tr>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '') . '">' . date("H:i jS F Y", strtotime(get_post_meta(get_the_ID(), '_start_date_time', TRUE))) . '</a></td>';
+                        $viewing_start_date_time = get_post_meta(get_the_ID(), '_start_date_time', TRUE);
+                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '') . '">' . date("H:i jS F Y", strtotime($viewing_start_date_time)) . '</a></td>';
                         echo '<td style="text-align:left;">';
                         if ( get_post_meta(get_the_ID(), '_property_id', TRUE) != '' )
                         {
@@ -4220,6 +4237,14 @@ class PH_AJAX {
                                 $feedback_passed_on = get_post_meta(get_the_ID(), '_feedback_passed_on', TRUE);
                                 echo '<br>' . ( ($feedback_passed_on == 'yes') ? __( 'Feedback Passed On', 'propertyhive' ) : __( 'Feedback Not Passed On', 'propertyhive' ) );
                             }
+                        }
+
+                        // Add text if this a second, third etc viewing
+                        $applicant_contact_ids = get_post_meta( get_the_ID(), '_applicant_contact_id' );
+                        $viewing_number = count_viewing_number(get_the_ID(), $property->id, $viewing_start_date_time, $applicant_contact_ids);
+                        if ( $viewing_number > 1 )
+                        {
+                            echo '<br>' . ordinal_suffix($viewing_number) . ' Viewing' ;
                         }
                         echo '</td>';
                     echo '</tr>';

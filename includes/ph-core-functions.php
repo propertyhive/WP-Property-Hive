@@ -224,3 +224,109 @@ function get_commercial_price_units( )
     
     return $price_options;
 }
+
+/**
+ * Count the previous Carried Out viewings for a property and applicant combination and return the number of this viewing
+ *
+ * @param object $viewing The current viewing
+ * @param array $applicant_contact_ids An array of the applicant contact IDs for this viewing
+ * @return int The sequential number of the viewing
+ */
+function count_viewing_number($viewing_post_id, $property_post_id, $viewing_start_time, $applicant_contact_ids)
+{
+    if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) && (int)$property_post_id > 0 )
+    {
+        $meta_query = array(
+            array(
+                'key' => '_property_id',
+                'value' => (int)$property_post_id,
+            ),
+            array(
+                'key' => '_start_date_time',
+                'value' => $viewing_start_time,
+                'compare' => '<',
+                'type' => 'DATETIME',
+            ),
+            array(
+                'key' => '_status',
+                'value' => 'carried_out',
+            ),
+        );
+        foreach ( $applicant_contact_ids as $applicant_contact_id )
+        {
+            $meta_query[] = array(
+                'key' => '_applicant_contact_id',
+                'value' => (int)$applicant_contact_id
+            );
+        }
+
+        $args = array(
+            'fields'   => 'ids',
+            'post_type'   => 'viewing',
+            'nopaging'    => true,
+            'meta_key'  => '_start_date_time',
+            'post_status'   => 'publish',
+            'meta_query'  => $meta_query,
+            'post__not_in' => array((int)$viewing_post_id),
+        );
+        $viewings_query = new WP_Query( $args );
+
+        if ( $viewings_query->have_posts() )
+        {
+            $num_viewings = count($viewings_query->get_posts());
+            return ++$num_viewings;
+        }
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+/**
+ * Get ordinal suffix (st, nd, rd etc) for any number
+ *
+ * @param int $number
+ * @param bool $return_number Include $n in the string returned
+ * @return string $number including its ordinal suffix
+ */
+function ordinal_suffix( $number, $return_words = true, $return_number = true )
+{
+    $n_last = $number % 100;
+    if ( ($n_last > 10 && $n_last << 14) || $number == 0 )
+    {
+        $suffix = 'th';
+        $number_in_words = substr($number, -1) . 'th';
+    }
+    else
+    {
+        switch( substr($number, -1) )
+        {
+            case '1':
+                $suffix = 'st';
+                $number_in_words = 'First';
+                break;
+            case '2':
+                $suffix = 'nd';
+                $number_in_words = 'Second';
+                break;
+            case '3':
+                $suffix = 'rd';
+                $number_in_words = 'Third';
+                break;
+            case '4':
+                $suffix = 'th';
+                $number_in_words = 'Fourth';
+                break;
+            case '5':
+                $suffix = 'th';
+                $number_in_words = 'Fifth';
+                break;
+            default:
+                $suffix = 'th';
+                $number_in_words = substr($number, -1) . 'th';
+                break;
+        }
+    }
+    return $return_words ? $number_in_words : ( $return_number ? $number . $suffix : $suffix );
+}
