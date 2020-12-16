@@ -271,7 +271,7 @@ jQuery(document).ready(function($)
                 $('#appraisal_search_property_owner_results').html('<ul style="margin:0; padding:0;"></ul>');
                 for ( var i in response )
                 {
-                    $('#appraisal_search_property_owner_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-appraisal-property-owner-address-name-number="' + response[i].address_name_number + '" data-appraisal-property-owner-address-street="' + response[i].address_street + '" data-appraisal-property-owner-address-two="' + response[i].address_two + '" data-appraisal-property-owner-address-three="' + response[i].address_three + '" data-appraisal-property-owner-address-four="' + response[i].address_four + '" data-appraisal-property-owner-address-postcode="' + response[i].address_postcode + '" data-appraisal-property-owner-address-country="' + response[i].address_country + '"><strong>' + response[i].post_title + '</strong><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
+                    $('#appraisal_search_property_owner_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-appraisal-property-owner-name="' + response[i].post_title + '" data-appraisal-property-owner-address-name-number="' + response[i].address_name_number + '" data-appraisal-property-owner-address-street="' + response[i].address_street + '" data-appraisal-property-owner-address-two="' + response[i].address_two + '" data-appraisal-property-owner-address-three="' + response[i].address_three + '" data-appraisal-property-owner-address-four="' + response[i].address_four + '" data-appraisal-property-owner-address-postcode="' + response[i].address_postcode + '" data-appraisal-property-owner-address-country="' + response[i].address_country + '"><strong>' + response[i].post_title + '</strong><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
                 }
             }
             $('#appraisal_search_property_owner_results').show();
@@ -285,7 +285,7 @@ jQuery(document).ready(function($)
         appraisal_selected_property_owners = []; // reset to only allow one owner for now
         appraisal_selected_property_owners.push( { 
             id: $(this).attr('href'), 
-            post_title: $(this).text(), 
+            post_title: $(this).attr('data-appraisal-property-owner-name'), 
             address_name_number: $(this).attr('data-appraisal-property-owner-address-name-number'), 
             address_street: $(this).attr('data-appraisal-property-owner-address-street'), 
             address_two: $(this).attr('data-appraisal-property-owner-address-two'), 
