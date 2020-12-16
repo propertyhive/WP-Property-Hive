@@ -377,7 +377,7 @@ jQuery(document).ready(function($)
 	        	$('#viewing_search_applicant_results').html('<ul style="margin:0; padding:0;"></ul>');
 	        	for ( var i in response )
 	        	{
-	        		$('#viewing_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;"><strong>' + response[i].post_title + '</strong><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
+	        		$('#viewing_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-applicant-name="' + response[i].post_title + '"><strong>' + response[i].post_title + '</strong><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
 	        	}
 	        }
 			$('#viewing_search_applicant_results').show();
@@ -408,7 +408,7 @@ jQuery(document).ready(function($)
 	{
 		e.preventDefault();
 
-		viewing_selected_applicants[$(this).attr('href')] = ({ post_title: $(this).text() });
+		viewing_selected_applicants[$(this).attr('href')] = ({ post_title: $(this).attr('data-applicant-name') });
 
 		$('#viewing_search_applicant_results').html('');
 		$('#viewing_search_applicant_results').hide();
