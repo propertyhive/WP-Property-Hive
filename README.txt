@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.5.3
-Stable tag: 1.4.73
+Tested up to: 5.6
+Stable tag: 1.4.74
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,21 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.74 - 2020-12-16 =
+* Ensure viewing feedback is still shown on a property record even after it's progressed to an offer
+* Flag if a viewing is a 2nd, 3rd viewing etc. Shown in the 'Status' column in every viewings grid and when on a viewing record
+* Added ability to search contacts in main contacts list by address
+* When doing a contact lookup, when adding a viewing for example, to help differentiate between contacts with the same or similar names we'll now display the phone number and email address in the results
+* Tweaks to search logic when searching for a property when adding a viewing so any combination of house name/number and street should return the relevant result. Previously you could only search for one or the other
+* Include property 'Location' field in REST API
+* New Elementor widget, Floor Area, for commercial properties
+* Added ability for third party add ons to add their own Property Hive Elementor widgets
+* When using the [properties] shortcode and wanting to filter by commercial property type, but commercial is the only active department, don't require department to be explicilty passed through
+* Added filter 'property_negotiator_exclude_roles' to negotiator drodowns to give more control over roles excluded. Added for our Property Portal add on whereby agents can now have a user login
+* Added filter 'propertyhive_rest_api_property_field_callback' so data returned from REST API can be modified
+* Correct PHP notice on saving property with no size entered regarding non-numeric values
+* Declared compatibility for WordPress 5.6
 
 = 1.4.73 - 2020-11-29 =
 * Match properties to applicants based on freetype location and radius (if radial search add on active). New setting under 'Property Hive > Settings > General > Miscellaneous > Applicant Options' to enable this
