@@ -131,23 +131,28 @@ class PH_Rest_Api {
 		            {
 		            	$property = new PH_Property($object[ 'id' ]);
 
+		            	$return = '';
+
 		            	switch ($field_name)
 		            	{
 		            		case "price":
 		            		{ 
 		            			if ( $property->_poa != 'yes' )
 		            			{
-		            				if ( $property->_department == 'residential-lettings' ) { return $property->_rent; }else{ return $property->_price; } 
+		            				if ( $property->_department == 'residential-lettings' ) { $return = $property->_rent; }else{ $return = $property->_price; } 
 		            			}
-
-		            			return '';
+		            			else
+		            			{
+		            				$return = '';
+		            			}
+		            			break;
 		            		}
-		            		case "price_formatted": { return $property->get_formatted_price(); break; }
-		            		case "features": { return $property->get_features(); break; }
-		            		case "description": { return $property->get_formatted_description(); break; }
+		            		case "price_formatted": { $return = $property->get_formatted_price(); break; }
+		            		case "features": { $return = $property->get_features(); break; }
+		            		case "description": { $return = $property->get_formatted_description(); break; }
 		            		case "office": 
 		            		{ 
-		            			return array(
+		            			$return = array(
 		            				'name' => $property->office_name,
 		            				'address' => $property->office_address,
 		            				'telephone_number' => $property->office_telephone_number,
@@ -187,7 +192,7 @@ class PH_Rest_Api {
 										}
 									}
 								}
-								return $images_array;
+								$return = $images_array;
 								break;
 							}
 							case "floorplans":
@@ -222,7 +227,7 @@ class PH_Rest_Api {
 										}
 									}
 								}
-								return $floorplans_array;
+								$return = $floorplans_array;
 								break;
 							}
 							case "brochures":
@@ -257,7 +262,7 @@ class PH_Rest_Api {
 										}
 									}
 								}
-								return $brochures_array;
+								$return = $brochures_array;
 								break;
 							}
 							case "epcs":
@@ -292,19 +297,22 @@ class PH_Rest_Api {
 										}
 									}
 								}
-								return $epcs_array;
+								$return = $epcs_array;
 								break;
 							}
 		            		case "virtual_tours":
 		            		{
-		            			return $property->get_virtual_tours();
+		            			$return = $property->get_virtual_tours();
 		            			break;
 		            		}
 		            		default:
 		            		{
-		            			return $property->{$field_name};			            	
+		            			$return = $property->{$field_name};			            	
 				            }
 				        }
+
+				        $return = apply_filters( 'propertyhive_rest_api_property_field_callback', $return, $field_name, $property );
+				        return $return;
 		            },
 		            'update_callback' => null,
 		            'schema' => null,
