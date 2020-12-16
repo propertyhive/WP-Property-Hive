@@ -234,10 +234,10 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 				// Add text if this a second, third etc viewing
 				$applicant_contact_ids = get_post_meta( $post->ID, '_applicant_contact_id' );
-				$viewing_number = count_viewing_number($post->ID, $the_viewing->property_id, $the_viewing->start_date_time, $applicant_contact_ids);
+				$viewing_number = ph_count_viewing_number($post->ID, $the_viewing->property_id, $the_viewing->start_date_time, $applicant_contact_ids);
 				if ( $viewing_number > 1 )
 				{
-					echo '<br>' . ordinal_suffix($viewing_number) . ' Viewing' ;
+					echo '<br>' . ph_ordinal_suffix($viewing_number) . ' Viewing' ;
 				}
                 
                 break;

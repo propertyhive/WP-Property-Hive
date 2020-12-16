@@ -232,7 +232,7 @@ function get_commercial_price_units( )
  * @param array $applicant_contact_ids An array of the applicant contact IDs for this viewing
  * @return int The sequential number of the viewing
  */
-function count_viewing_number($viewing_post_id, $property_post_id, $viewing_start_time, $applicant_contact_ids)
+function ph_count_viewing_number($viewing_post_id, $property_post_id, $viewing_start_time, $applicant_contact_ids)
 {
     if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) && (int)$property_post_id > 0 )
     {
@@ -290,7 +290,7 @@ function count_viewing_number($viewing_post_id, $property_post_id, $viewing_star
  * @param bool $return_number Include $n in the string returned
  * @return string $number including its ordinal suffix
  */
-function ordinal_suffix( $number, $return_words = true, $return_number = true )
+function ph_ordinal_suffix( $number, $return_words = true, $return_number = true )
 {
     $n_last = $number % 100;
     if ( ($n_last > 10 && $n_last << 14) || $number == 0 )
