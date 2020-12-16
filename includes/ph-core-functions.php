@@ -264,16 +264,16 @@ function ph_count_viewing_number($viewing_post_id, $property_post_id, $viewing_s
             'fields'   => 'ids',
             'post_type'   => 'viewing',
             'nopaging'    => true,
-            'meta_key'  => '_start_date_time',
             'post_status'   => 'publish',
             'meta_query'  => $meta_query,
             'post__not_in' => array((int)$viewing_post_id),
+            'orderby' => 'none'
         );
         $viewings_query = new WP_Query( $args );
 
         if ( $viewings_query->have_posts() )
         {
-            $num_viewings = count($viewings_query->get_posts());
+            $num_viewings = $viewings_query->found_posts;
             return ++$num_viewings;
         }
     }
