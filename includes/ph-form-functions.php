@@ -425,33 +425,9 @@ function ph_get_user_details_form_fields()
  *
  * @return array
  */
-function ph_get_applicant_requirements_form_fields()
+function ph_get_applicant_requirements_form_fields($applicant_profile = false)
 {
     global $post;
-
-    if ( is_user_logged_in() )
-    {
-        $current_user = wp_get_current_user();
-        $applicant_profile = false;
-
-        if ( $current_user instanceof WP_User )
-        {
-            $contact = new PH_Contact( '', $current_user->ID );
-
-            if ( is_array($contact->contact_types) && in_array('applicant', $contact->contact_types) )
-            {
-                if (
-                    $contact->applicant_profiles != '' &&
-                    $contact->applicant_profiles > 0 &&
-                    $contact->applicant_profile_0 != '' &&
-                    is_array($contact->applicant_profile_0)
-                )
-                {
-                    $applicant_profile = $contact->applicant_profile_0;
-                }
-            }
-        }
-    }
 
     $fields = array();
 

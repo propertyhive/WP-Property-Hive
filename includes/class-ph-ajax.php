@@ -949,7 +949,7 @@ class PH_AJAX {
             $applicant_profile['send_matching_properties'] = 'yes';
             //$applicant_profile['auto_match_disabled'] = ''; // don't know what to do about this yet. Should probably look at global setting and reflect that
 
-            update_post_meta( $contact_post_id, '_applicant_profile_0', $applicant_profile );
+            update_post_meta( $contact_post_id, '_applicant_profile_' . ( isset($_POST['profile_id']) && $_POST['profile_id'] != '' ? (int)$_POST['profile_id'] : '0' ), $applicant_profile );
 
             $return['success'] = true;
 

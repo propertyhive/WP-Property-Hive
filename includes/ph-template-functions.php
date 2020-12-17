@@ -1199,17 +1199,34 @@ if ( ! function_exists( 'propertyhive_my_account_requirements' ) ) {
      */
     function propertyhive_my_account_requirements() {
 
-        $form_controls = ph_get_applicant_requirements_form_fields();
-    
-        $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls );
+        $user_id = get_current_user_id();
 
-        // Remove office as this is only required on initial sign up (at the moment anyway)
-        if ( isset($form_controls['office_id']) )
+        $contact = new PH_Contact( '', $user_id );
+
+        if ( is_array($contact->contact_types) && in_array('applicant', $contact->contact_types) )
         {
-            unset($form_controls['office_id']);
-        }
+            $applicant_profiles = $contact->applicant_profiles;
 
-        ph_get_template( 'account/requirements.php', array( 'form_controls' => $form_controls ) );
+            for ( $i = 0; $i < $applicant_profiles; ++$i )
+            {
+                $form_controls = ph_get_applicant_requirements_form_fields($contact->{'applicant_profile_' . $i});
+            
+                $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls );
+
+                $form_controls['profile_id'] = array(
+                    'type' => 'hidden',
+                    'value' => $i,
+                );
+
+                // Remove office as this is only required on initial sign up (at the moment anyway)
+                if ( isset($form_controls['office_id']) )
+                {
+                    unset($form_controls['office_id']);
+                }
+
+                ph_get_template( 'account/requirements.php', array( 'form_controls' => $form_controls ) );
+            }
+        }
     }
 }
 
