@@ -38,6 +38,11 @@
 .propertyhive-my-account .my-account-navigation { float:left; width:30%; }
 .propertyhive-my-account .my-account-sections { float:right; width:68%; }
 
+form.account-requirements-form .ms-options-wrap,
+form.applicant-registration-form .ms-options-wrap { width:66%; display:inline-block; }
+form.account-requirements-form .ms-options-wrap label:first-child,
+form.applicant-registration-form .ms-options-wrap label:first-child { width:100%; }
+
 .property-enquiry-form {  }
 .property-enquiry-form .control { margin-bottom:5px; }
 .property-enquiry-form .control label { display:block; }

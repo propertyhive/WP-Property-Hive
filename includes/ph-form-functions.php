@@ -589,12 +589,13 @@ function ph_get_applicant_requirements_form_fields($applicant_profile = false)
                 'label' => __( 'Property Type', 'propertyhive' ),
                 'before' => '<div class="control control-property_type residential-only">',
                 'required' => false,
+                'multiselect' => true,
                 'options' => $options,
             );
 
             if ( is_user_logged_in() && isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
             {
-                $fields['property_type']['value'] = $applicant_profile['property_types'][0];
+                $fields['property_type']['value'] = $applicant_profile['property_types'];
             }
         }
     }
@@ -687,12 +688,13 @@ function ph_get_applicant_requirements_form_fields($applicant_profile = false)
                 'label' => __( 'Property Type', 'propertyhive' ),
                 'before' => '<div class="control control-commercial_property_type commercial-only">',
                 'required' => false,
+                'multiselect' => true,
                 'options' => $options,
             );
 
             if ( is_user_logged_in() && isset($applicant_profile['commercial_property_types']) && is_array($applicant_profile['commercial_property_types']) && !empty($applicant_profile['commercial_property_types']) )
             {
-                $fields['commercial_property_type']['value'] = $applicant_profile['commercial_property_types'][0];
+                $fields['commercial_property_type']['value'] = $applicant_profile['commercial_property_types'];
             }
         }
     }
@@ -738,12 +740,13 @@ function ph_get_applicant_requirements_form_fields($applicant_profile = false)
                 'type' => 'select',
                 'label' => __( 'Location', 'propertyhive' ),
                 'required' => false,
+                'multiselect' => true,
                 'options' => $options,
             );
 
             if ( is_user_logged_in() && isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
             {
-                $fields['location']['value'] = $applicant_profile['locations'][0];
+                $fields['location']['value'] = $applicant_profile['locations'];
             }
         }
     }
@@ -1068,7 +1071,11 @@ function ph_form_field( $key, $field )
                 }
                 else
                 {
-                    if ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($option_key, $_REQUEST[$key]) )
+                    if ( 
+                        ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($option_key, $_REQUEST[$key]) )
+                        ||
+                        ( !isset($_REQUEST[$key]) && in_array($option_key, $field['value']) )
+                    ) 
                     {
                         $output .= ' selected';
                     }

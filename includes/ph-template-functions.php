@@ -1211,7 +1211,7 @@ if ( ! function_exists( 'propertyhive_my_account_requirements' ) ) {
             {
                 $form_controls = ph_get_applicant_requirements_form_fields($contact->{'applicant_profile_' . $i});
             
-                $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls );
+                $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls, $contact->{'applicant_profile_' . $i} );
 
                 $form_controls['profile_id'] = array(
                     'type' => 'hidden',
