@@ -9,6 +9,30 @@ jQuery(document).ready(function($)
         toggleApplicantRegistrationDepartmentFields();
     });
 
+    if ( jQuery('form.applicant-registration-form select.ph-form-multiselect').length > 0 )
+    {
+        jQuery('form.applicant-registration-form select.ph-form-multiselect').each(function()
+        {
+            jQuery(this).multiselect({
+                texts: {
+                    placeholder: jQuery(this).data('blank-option')
+                }
+            });
+        });
+    }
+
+    if ( jQuery('form.account-requirements-form select.ph-form-multiselect').length > 0 )
+    {
+        jQuery('form.account-requirements-form select.ph-form-multiselect').each(function()
+        {
+            jQuery(this).multiselect({
+                texts: {
+                    placeholder: jQuery(this).data('blank-option')
+                }
+            });
+        });
+    }
+
 	// Login form being submitted
     $('body').on('submit', 'form[name=\'ph_login_form\']', function()
     {
