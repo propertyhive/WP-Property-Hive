@@ -1429,7 +1429,7 @@ class PH_AJAX {
 
     public function get_notes_grid() {
 
-        global $post;
+        global $wpdb, $post;
         
         $post = get_post((int)$_POST['post_id']);
 
