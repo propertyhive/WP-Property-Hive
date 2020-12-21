@@ -1074,7 +1074,7 @@ function ph_form_field( $key, $field )
                     if ( 
                         ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($option_key, $_REQUEST[$key]) )
                         ||
-                        ( !isset($_REQUEST[$key]) && in_array($option_key, $field['value']) )
+                        ( !isset($_REQUEST[$key]) && is_array($field['value']) && in_array($option_key, $field['value']) )
                     ) 
                     {
                         $output .= ' selected';

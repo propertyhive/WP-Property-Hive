@@ -903,7 +903,7 @@ class PH_AJAX {
 
                 if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
                 {
-                    $applicant_profile['property_types'] = array(ph_clean($_POST['property_type']));
+                    $applicant_profile['property_types'] = is_array(ph_clean($_POST['property_type'])) ? ph_clean($_POST['property_type']) : array(ph_clean($_POST['property_type']));
                 }
             }
 
@@ -930,13 +930,13 @@ class PH_AJAX {
 
                 if ( isset($_POST['commercial_property_type']) && !empty($_POST['commercial_property_type']) )
                 {
-                    $applicant_profile['commercial_property_types'] = array(ph_clean($_POST['commercial_property_type']));
+                    $applicant_profile['commercial_property_types'] = is_array(ph_clean($_POST['commercial_property_type'])) ? ph_clean($_POST['commercial_property_type']) : array(ph_clean($_POST['commercial_property_type']));
                 }
             }
 
             if ( isset($_POST['location']) && !empty($_POST['location']) )
             {
-                $applicant_profile['locations'] = array(ph_clean($_POST['location']));
+                $applicant_profile['locations'] = is_array(ph_clean($_POST['location'])) ? ph_clean($_POST['location']) : array(ph_clean($_POST['location']));
             }
 
             if ( isset($_POST['location_text']) && !empty($_POST['location_text']) )
