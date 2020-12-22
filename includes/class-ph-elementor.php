@@ -79,6 +79,7 @@ class PH_Elementor {
 			'Property Floorplans',
 			'Property EPCs',
 			'Property Enquiry Form',
+			'Property Tabbed Details',
 		);
 
 		$widgets = apply_filters( 'propertyhive_elementor_widgets', $widgets );
