@@ -440,7 +440,7 @@ class PH_Meta_Box_Property_Coordinates {
         update_post_meta( $post_id, '_latitude', ph_clean($_POST['_latitude']) );
         update_post_meta( $post_id, '_longitude', ph_clean($_POST['_longitude']) );
 
-        do_action('propertyhive_save_property_coordinates_fields', $post_id);
+        do_action('propertyhive_save_property_coordinates', $post_id);
     }
 
 }
