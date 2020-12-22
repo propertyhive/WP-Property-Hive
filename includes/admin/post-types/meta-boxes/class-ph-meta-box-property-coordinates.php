@@ -65,6 +65,8 @@ class PH_Meta_Box_Property_Coordinates {
             <a href="#" onclick="do_address_lookup( true ); return false;">' . __( 'Obtain Co-ordinates', 'propertyhive' ) . '</a>
         </p>';
 
+        do_action('propertyhive_property_coordinates_fields');
+
         echo '<div class="map_canvas" id="map_canvas" style="height:350px;"></div>';
         
         
@@ -437,6 +439,8 @@ class PH_Meta_Box_Property_Coordinates {
         
         update_post_meta( $post_id, '_latitude', ph_clean($_POST['_latitude']) );
         update_post_meta( $post_id, '_longitude', ph_clean($_POST['_longitude']) );
+
+        do_action('propertyhive_save_property_coordinates_fields', $post_id);
     }
 
 }
