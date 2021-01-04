@@ -1080,7 +1080,7 @@ function ph_form_field( $key, $field )
                         $output .= ' selected';
                     }
                 }
-                $output .= '>' . esc_html( $value ) . '</option>';
+                $output .= '>' . esc_html( __( $value, 'propertyhive' ) ) . '</option>';
             }
 
             $output .= '</select>';
