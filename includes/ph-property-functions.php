@@ -206,6 +206,7 @@ function get_property_map( $args = array() )
 		            }
 		        }
 		    }
+		    do_action( 'propertyhive_property_map_actions' );
 		?>
 
 		L.marker([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>]<?php echo $icon_code; ?>).addTo(property_map<?php echo $id_suffix; ?>);
@@ -293,6 +294,8 @@ function get_property_map( $args = array() )
 		<?php do_action( 'propertyhive_property_map_marker_options' ); ?>
 
 		property_marker<?php echo $id_suffix; ?> = new google.maps.Marker(marker_options);
+
+		<?php do_action( 'propertyhive_property_map_actions' ); ?>
 	}
 	
 	if(window.addEventListener) {
@@ -304,6 +307,7 @@ function get_property_map( $args = array() )
 </script>
 <?php
 		}
+		do_action( 'propertyhive_property_map_after' );
 	}
 }
 
