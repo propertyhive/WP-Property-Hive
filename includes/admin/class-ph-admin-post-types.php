@@ -1251,7 +1251,11 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
 
         if ( 'contact' === $typenow ) 
         {
-            $phone_number = preg_replace( "/[^0-9,]/", "", ph_clean($_GET['s']) );
+            $phone_number = '';
+            if ( is_numeric(substr(ph_clean($_GET['s']), 0, 1)) )
+            {
+                $phone_number = preg_replace( "/[^0-9,]/", "", ph_clean($_GET['s']) );
+            }
 
             $where = preg_replace(
                 "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
