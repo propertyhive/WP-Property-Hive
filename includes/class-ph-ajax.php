@@ -3703,6 +3703,8 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
+            $body = apply_filters( 'viewing_applicant_booking_confirmation_email_body', $body, $post_id, $property_id );
+
             $from = $property->office_email_address;
             if ( sanitize_email($from) == '' )
             {
@@ -3785,6 +3787,8 @@ class PH_AJAX {
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+
+            $body = apply_filters( 'viewing_owner_booking_confirmation_email_body', $body, $post_id, $property_id );
 
             $from = $property->office_email_address;
             if ( sanitize_email($from) == '' )
