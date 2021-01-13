@@ -1,0 +1,13 @@
+
+/* Hide the default columns */
+.wp-list-table .column-date,
+.wp-list-table .column-title {
+    display: none;
+}
+
+/* Hide the default quick inline edit inputs */
+.inline-edit-col-left:not(.inline-edit-ph),
+.inline-edit-col-center:not(.inline-edit-ph),
+.inline-edit-col-right:not(.inline-edit-ph) {
+    display: none;
+}

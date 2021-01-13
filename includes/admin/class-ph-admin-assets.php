@@ -58,6 +58,11 @@ class PH_Admin_Assets {
 		    wp_enqueue_style( 'daterangepicker.css', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css' );
 	    }
 
+	    if ( in_array( $screen->id, array( 'edit-key_date') ) )
+	    {
+		    wp_enqueue_style( 'admin-hide-default-post-data.css', PH()->plugin_url() . '/assets/css/admin-hide-default-post-data.css', PH_VERSION );
+	    }
+
         /*if ( in_array( $screen->id, array( 'dashboard' ) ) ) {
             wp_enqueue_style( 'propertyhive_admin_dashboard_styles', PH()->plugin_url() . '/assets/css/dashboard.css', array(), PH_VERSION );
         }*/
@@ -130,6 +135,11 @@ class PH_Admin_Assets {
 		    wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
 		    wp_enqueue_script( 'daterangepicker.js', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js' );
 		    wp_enqueue_script( 'date_range_filter.js', PH()->plugin_url() . '/assets/js/admin/date_range_filter.js', array('jquery', 'moment.js', 'daterangepicker.js'), PH_VERSION );
+	    }
+
+	    if ( in_array( $screen->id, array( 'edit-key_date' ) ) )
+	    {
+		    wp_enqueue_script( 'inline-edit-key_date.js', PH()->plugin_url() . '/assets/js/admin/inline-edit-key_date.js', array('jquery'), PH_VERSION );
 	    }
 
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
