@@ -115,6 +115,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         {
             $sections[ 'furnished' ] = __( 'Furnished', 'propertyhive' );
             add_action( 'propertyhive_admin_field_custom_fields_furnished', array( $this, 'custom_fields_furnished_setting' ) );
+            $sections[ 'management_key_date_type' ] = __( 'Management Dates', 'propertyhive' );
+            add_action( 'propertyhive_admin_field_custom_fields_management_key_date_type', array( $this, 'custom_fields_management_key_date_type_setting' ) );
         }
 
         // Other
@@ -209,6 +211,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     
                     case "furnished": { $settings = $this->get_custom_fields_furnished_setting(); break; }
                     case "furnished-delete": { $settings = $this->get_custom_fields_delete($current_id, 'furnished', __( 'Furnished', 'propertyhive' )); break; }
+                    case "management_key_date_type": { $settings = $this->get_custom_fields_management_key_date_type_setting(); break; }
+                    case "management_key_date_type-delete": { $settings = $this->get_custom_fields_delete($current_id, 'management_key_date_type', __( 'Management Dates', 'propertyhive' )); break; }
 
                     case "marketing-flag": { $settings = $this->get_custom_fields_marketing_flag_setting(); break; }
                     case "marketing-flag-delete": { $settings = $this->get_custom_fields_delete($current_id, 'marketing_flag', __( 'Marketing Flag', 'propertyhive' )); break; }
@@ -1315,6 +1319,137 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     <?php
     }
 
+	public function custom_fields_management_key_date_type_setting() {
+	?>
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				&nbsp;
+			</th>
+			<td class="forminp forminp-button">
+				<a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
+				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management_key_date_type&id=' ); ?>" class="button alignright"><?php _e( 'Add New Management Date', 'propertyhive' ); ?></a>
+			</td>
+		</tr>
+		<?php foreach( array ('property_management' =>  __( 'Property Management', 'propertyhive' ), 'tenancy_management' => __( 'Tenancy Management', 'propertyhive' ) ) as $type => $title): ?>
+		<tr valign="top">
+			<th scope="row" class="titledesc no-auto"><?php _e( $title, 'propertyhive' ) ?></th>
+			<td class="forminp no-auto">
+				<table class="ph_customfields widefat" cellspacing="0">
+					<thead>
+						<tr>
+							<th style="width:1px;">&nbsp;</th>
+							<th style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
+							<th style="width:40%;"><?php _e( 'Description', 'propertyhive' ); ?></th>
+							<th><?php _e( 'Recurrence', 'propertyhive' ); ?></th>
+							<th>&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody>
+				<?php
+					$args = array(
+						'hide_empty' => false,
+						'parent' => 0
+					);
+					$terms = get_terms( 'management_key_date_type', $args );
+
+					if ( !empty( $terms ) && !is_wp_error( $terms ) )
+					{
+						$recurrence_rules = get_option( 'propertyhive_key_date_type', array() );
+						$recurrence_rules = is_array( $recurrence_rules ) ? $recurrence_rules : array();
+
+						foreach ($terms as $term)
+						{
+							$recurrence_type = isset($recurrence_rules[$term->term_id]) ? $recurrence_rules[$term->term_id]['recurrence_type'] : '';
+
+							if ( $recurrence_type !== $type)
+							{
+								continue;
+							}
+
+
+							$recurrence_rule = isset($recurrence_rules[$term->term_id]) ? $recurrence_rules[$term->term_id]['recurrence_rule'] : '';
+							$recurrence = array('FREQ' => '', 'INTERVAL' => '');
+							foreach (explode(';', $recurrence_rule) as $key_value_pair) {
+								list($key, $value) = explode('=', $key_value_pair);
+								$recurrence[$key] = $value;
+							}
+
+							$frequency = '';
+							if ($recurrence['INTERVAL'] <= 1)
+							{
+								$frequencies = array(
+									'ONCE' => __( 'Once', 'propertyhive' ),
+									'DAILY' => __( 'Daily', 'propertyhive' ),
+									'WEEKLY' => __( 'Weekly', 'propertyhive' ),
+									'MONTHLY' => __( 'Monthly', 'propertyhive' ),
+									'YEARLY' => __( 'Annually', 'propertyhive' ),
+								);
+
+								$frequency = $frequencies[$recurrence['FREQ']];
+							}
+							else
+							{
+								$interval = $recurrence['INTERVAL'];
+								if (extension_loaded('intl'))
+								{
+									$formatter = new NumberFormatter(get_locale(), NumberFormatter::SPELLOUT);
+									$interval = $formatter->format($recurrence['INTERVAL']);
+								}
+
+								$periods = array(
+									'DAILY' => __( 'days', 'propertyhive' ),
+									'WEEKLY' => __( 'weeks', 'propertyhive' ),
+									'MONTHLY' => __( 'months', 'propertyhive' ),
+									'YEARLY' => __( 'years', 'propertyhive' ),
+								);
+
+
+								$frequency = sprintf('Every %s %s', $interval, $periods[$recurrence['FREQ']]);
+							}
+
+							?>
+							<tr>
+								<td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
+								<td class="id"><?php echo $term->term_id; ?></td>
+								<td><?php echo $term->name; ?></td>
+								<td><?php echo $frequency ?></td>
+								<td class="settings">
+									<a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management_key_date_type&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
+									<a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management_key_date_type-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
+								</td>
+							</tr>
+							<?php
+						}
+					}
+					else
+					{
+						?>
+						<tr>
+							<td><?php echo __( 'No management dates found', 'propertyhive' ); ?></td>
+							<td class="settings">
+
+							</td>
+						</tr>
+						<?php
+					}
+					?>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				&nbsp;
+			</th>
+			<td class="forminp forminp-button">
+				<a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
+				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management_key_date_type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Management Date', 'propertyhive' ); ?></a>
+			</td>
+		</tr>
+		<?php
+	}
+
     /**
      * Output list of marketing flag options
      *
@@ -2001,7 +2136,30 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             wp_reset_postdata();
                         }
 
-                        if ($num_properties > 0 || $num_applicants > 0)
+	                    // Get number of key dates assigned to this term
+	                    $num_key_dates= 0;
+	                    if ( $taxonomy == 'management_key_date_type' )
+	                    {
+		                    $query_args = array(
+			                    'post_type' => 'key_date',
+			                    'nopaging' => true,
+			                    'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+			                    'tax_query' => array(
+				                    array(
+					                    'taxonomy' => $taxonomy,
+					                    'field'    => 'id',
+					                    'terms'    => $current_id,
+				                    ),
+			                    ),
+		                    );
+		                    $key_date_query = new WP_Query( $query_args );
+
+		                    $num_key_dates = $key_date_query->found_posts;
+
+		                    wp_reset_postdata();
+	                    }
+
+                        if ($num_properties > 0 || $num_applicants > 0 || $num_key_dates > 0 )
                         {
                             $alternative_terms = array();
                             
@@ -2060,18 +2218,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                 'options'   => $alternative_terms,
                                 'type'      => 'select',
                                 'desc_tip'  =>  false,
-                                'desc'      => __( 'There are properties or applicants that have this term assigned to them. Which, if any, term should they be reassigned to?' , 'propertyhive' )
+                                'desc'      => __( 'There are properties, applicants or management dates that have this term assigned to them. Which, if any, term should they be reassigned to?' , 'propertyhive' )
                             );
-                        }
-                        else
-                        {
-                            // There are properties assigned to this term
-                            $args[] = array(
-                                'title' => __( 'Re-assign to', 'propertyhive' ),
-                                'id'        => 'reassign_to',
-                                'type'      => 'html',
-                                'html'      => __( 'No properties or applicants assigned to this term' , 'propertyhive' )
-                            );    
                         }
 
                         $args[] = array( 'type' => 'sectionend', 'id' => 'custom_field_' . $taxonomy . '_' . $current_id . '_delete' );
@@ -2315,6 +2463,106 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         return apply_filters( 'propertyhive_custom_field_furnished_settings', $args );
     }
 
+	/**
+	 * Show key date add/edit options
+	 *
+	 * @return string
+	 */
+	public function get_custom_fields_management_key_date_type_setting()
+	{
+		$current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+
+		$taxonomy = 'management_key_date_type';
+		$term_name = '';
+		if ($current_id != '')
+		{
+			$term = get_term( $current_id, $taxonomy );
+			$term_name = $term->name;
+		}
+
+		$recurrence = get_option( 'propertyhive_key_date_type', array() );
+		if ( ! is_array($recurrence) )
+		{
+			$recurrence = array();
+		}
+		$recurrence_rule = isset($recurrence[$current_id]) ? $recurrence[$current_id]['recurrence_rule'] : '';
+		$recurrence_type = isset($recurrence[$current_id]) ? $recurrence[$current_id]['recurrence_type'] : '';
+
+		$recurrence = array(
+			'FREQ' => 'ONCE',
+			'INTERVAL' => '1',
+		);
+		foreach (explode(';', $recurrence_rule) as $key_value_pair){
+			list($key, $value) = explode('=', $key_value_pair);
+			$recurrence[$key] = $value;
+		}
+
+		$interval_disabled = $recurrence['FREQ'] == 'ONCE' ? array('disabled' => 'disabled') : array();
+
+		$args = array(
+
+			array( 'title' => __( ( $current_id == '' ? 'Add New Management Date' : 'Edit Management Date' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_management_key_date_type_settings' ),
+
+			array(
+				'title' => __( 'Description', 'propertyhive' ),
+				'id'        => 'management_key_date_type_name',
+				'default'   => $term_name,
+				'type'      => 'text',
+				'desc_tip'  =>  false,
+			),
+
+			array(
+				'title' => __( 'Type', 'propertyhive' ),
+				'id'        => 'management_key_date_type_recurrence_type',
+				'default'   => $recurrence_type,
+				'type'      => 'select',
+				'desc_tip'  =>  false,
+				'options' => array(
+					'tenancy_management' => __( 'Tenancy Management', 'propertyhive' ),
+					'property_management' => __( 'Property Management', 'propertyhive' ),
+				),
+			),
+
+			array(
+				'title' => __( 'Frequency', 'propertyhive' ),
+				'id'        => 'management_key_date_type_recurrence_freq',
+				'default'   => $recurrence['FREQ'],
+				'type'      => 'select',
+				'desc_tip'  =>  false,
+				'options' => array(
+					'ONCE' => __( 'Once', 'propertyhive' ),
+					'DAILY' => __( 'Daily', 'propertyhive' ),
+					'WEEKLY' => __( 'Weekly', 'propertyhive' ),
+					'MONTHLY' => __( 'Monthly', 'propertyhive' ),
+					'YEARLY' => __( 'Yearly', 'propertyhive' ),
+				),
+				'custom_attributes' => array('onchange' => "
+					jQuery('#management_key_date_type_recurrence_interval').prop( 'disabled', this.value == 'ONCE');
+				"),
+			),
+
+			array(
+				'title' => __( 'Interval', 'propertyhive' ),
+				'id'        => 'management_key_date_type_recurrence_interval',
+				'default'   => $recurrence['INTERVAL'],
+				'type'      => 'number',
+				'desc_tip'  =>  false,
+				'custom_attributes' => array_merge( array( 'min' => '1', 'required' => 'true'), $interval_disabled ),
+			),
+
+			array(
+				'type'      => 'hidden',
+				'id'        => 'taxonomy',
+				'default'     => $taxonomy
+			),
+
+			array( 'type' => 'sectionend', 'id' => 'custom_field_management_key_date_type_settings' )
+
+		);
+
+		return apply_filters( 'propertyhive_custom_field_management_key_date_type_setting', $args );
+	}
+
     /**
      * Show marketing flag add/edit options
      *
@@ -2459,6 +2707,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "tenure":
                     case "commercial-tenure":
                     case "furnished":
+                    case "management_key_date_type":
                     case "marketing-flag":
                     case "property-feature":
                     {
@@ -2511,6 +2760,24 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             update_option( 'propertyhive_availability_departments', $availability_departments );
                         }
 
+	                    if ( $current_section == 'management_key_date_type' )
+	                    {
+		                    $options = get_option( 'propertyhive_key_date_type', array() );
+		                    if ( !is_array($options) ) { $options = array(); }
+
+		                    $recurrence = array();
+		                    if (isset($_POST['management_key_date_type_recurrence_freq'])) {
+			                    $recurrence[] = 'FREQ=' . $_POST['management_key_date_type_recurrence_freq'];
+		                    }
+		                    if (isset($_POST['management_key_date_type_recurrence_interval'])) {
+			                    $recurrence[] = 'INTERVAL=' . $_POST['management_key_date_type_recurrence_interval'];
+		                    }
+
+	                        $options[$current_id]['recurrence_rule'] = join(';', $recurrence);
+		                    $options[$current_id]['recurrence_type'] = $_POST['management_key_date_type_recurrence_type'];
+		                    update_option( 'propertyhive_key_date_type', $options );
+	                    }
+
                         break;
                     }
                     case "availability-delete":
@@ -2523,6 +2790,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "sale-by-delete":
                     case "tenure-delete":
                     case "furnished-delete":
+                    case "management_key_date_type-delete":
                     case "marketing-flag-delete":
                     case "property-feature-delete":
                     {
