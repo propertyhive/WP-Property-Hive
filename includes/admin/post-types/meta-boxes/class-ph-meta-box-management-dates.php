@@ -1,28 +1,36 @@
 <?php
-/**
- * Tenancy Key Dates
- *
- * @author 		PropertyHive
- * @category 	Admin
- */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * PH_Meta_Box_Key_Dates
+ * PH_Meta_Box_Management_Dates
  */
-class PH_Meta_Box_Key_Dates {
+class PH_Meta_Box_Management_Dates {
 
 	/**
 	 * Output the metabox
 	 */
 	public static function output( $post ) {
-        global $wpdb, $thepostid;
 
-        echo '<div class="propertyhive_meta_box">';
+		$property_id = $post->_property_id;
+		$tenancy_id = $post->ID;
 
-        echo '</div>';
-        
+		$key_dates = get_posts(array (
+			'post_type' => 'key_date',
+			'meta_query' => array(
+				'relation' => 'OR',
+				array(
+					'key' => '_tenancy_id',
+					'value' => $tenancy_id
+				),
+				array(
+					'key' => '_property_id',
+					'value' => $property_id
+				),
+			),
+		));
+
+		include PH()->plugin_path() . '/includes/admin/views/html-meta-box-table.php';
     }
 
     /**
