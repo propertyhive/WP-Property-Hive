@@ -215,6 +215,19 @@ class PH_Post_types {
                 'public'                => true
             )
         );
+
+		register_taxonomy( 'management_key_date_type',
+			'key_date',
+			array(
+				'label'                 => __( 'Management Dates', 'propertyhive' ),
+				'hierarchical'          => true,
+				'show_ui'               => false,
+				'show_in_nav_menus'     => false,
+				'query_var'             => is_admin(),
+				'rewrite'               => false,
+				'public'                => true
+			)
+		);
 			
 		do_action( 'do_action_after_register_taxonomies' );
 	}
