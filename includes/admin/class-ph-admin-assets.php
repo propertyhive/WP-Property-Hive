@@ -129,7 +129,7 @@ class PH_Admin_Assets {
 	    {
 		    wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
 		    wp_enqueue_script( 'daterangepicker.js', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js' );
-		    wp_enqueue_script( 'date_range_filter.js', PH()->plugin_url() . '/assets/js/admin/date_range_filter.js', array('jquery', 'moment.js', 'daterangepicker.js'), rand() );
+		    wp_enqueue_script( 'date_range_filter.js', PH()->plugin_url() . '/assets/js/admin/date_range_filter.js', array('jquery', 'moment.js', 'daterangepicker.js'), PH_VERSION );
 	    }
 
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
