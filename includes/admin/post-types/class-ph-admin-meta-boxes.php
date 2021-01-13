@@ -105,7 +105,7 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Property::save', 20, 2 );
         add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Deposit_Scheme::save', 25, 2 );
         add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Management::save', 30, 2 );
-        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Key_Dates::save', 35, 2 );
+        add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Management_Key_Dates::save', 35, 2 );
 
 		// Error handling (for showing errors from meta boxes on next page load)
 		add_action( 'admin_notices', array( $this, 'output_errors' ) );
@@ -1653,9 +1653,9 @@ class PH_Admin_Meta_Boxes {
         );
 
         $meta_boxes[10] = array(
-            'id' => 'propertyhive-tenancy-key-dates',
-            'title' => __( 'Key Dates', 'propertyhive' ),
-            'callback' => 'PH_Meta_Box_Key_Dates::output',
+            'id' => 'propertyhive-management-dates',
+            'title' => __( 'Management', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Management_Dates::output',
             'screen' => 'tenancy',
             'context' => 'normal',
             'priority' => 'high'
