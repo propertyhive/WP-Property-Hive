@@ -105,6 +105,27 @@ jQuery( function($){
         return false;
     });
 
+    $('.select_all').change(function()
+    {
+        if ( this.checked )
+        {
+            $('input[name=\'term_id[]\']').attr('checked', 'checked');
+
+            // If at least one has been checked, enable Delete Selected button
+            if ( $('input[name=\'term_id[]\']:checked').length > 0 )
+            {
+                $('a.batch-delete').attr('disabled', false);
+            }
+        }
+        else
+        {
+            $('input[name=\'term_id[]\']').removeAttr('checked');
+
+            // Disable Delete Selected button
+            $('a.batch-delete').attr('disabled', 'disabled');
+        }
+    });
+
     $('input[name=\'term_id[]\']').change(function()
     {
         if ( $('input[name=\'term_id[]\']:checked').length > 0 )
@@ -114,6 +135,12 @@ jQuery( function($){
         else
         {
             $('a.batch-delete').attr('disabled', 'disabled');
+        }
+
+        // If we're unchecking a term, uncheck the Select All box
+        if ( !this.checked )
+        {
+            $('.select_all').removeAttr('checked');
         }
     });
 

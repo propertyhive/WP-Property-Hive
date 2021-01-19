@@ -294,7 +294,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Availability', 'propertyhive' ); ?></th>
                             <th class="department"><?php _e( 'Applies To', 'propertyhive' ); ?></th>
@@ -403,7 +403,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <?php do_action( 'propertyhive_custom_field_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php _e( 'Property Type', 'propertyhive' ); ?></th>
@@ -514,7 +514,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php _e( 'Property Type', 'propertyhive' ); ?></th>
@@ -625,7 +625,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Location', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -758,7 +758,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Parking', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -841,7 +841,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Outside Space', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -924,7 +924,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Price Qualifier', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -1007,7 +1007,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Sale By', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -1090,7 +1090,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Tenure', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -1173,7 +1173,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Tenure', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -1256,7 +1256,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Furnished', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -1339,7 +1339,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Marketing Flag', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
@@ -1422,7 +1422,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 <table class="ph_customfields widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="cb" style="width:1px;">&nbsp;</th>
+                            <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
                             <th class="type"><?php _e( 'Property Feature', 'propertyhive' ); ?></th>
                             <th class="settings">&nbsp;</th>
