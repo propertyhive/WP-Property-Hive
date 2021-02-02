@@ -319,7 +319,9 @@ function tenancy_update_selected_applicants()
     public static function save( $post_id, $post ) {
         global $wpdb;
 
-        $contact_post_ids = array();
+        $tenancy_notes_to_write = array();
+
+        $existing_applicants = get_post_meta($post->ID, '_applicant_contact_id');
 
         if ( isset($_POST['_tenancy_applicant_create_new']) && !empty($_POST['_tenancy_applicant_create_new']) )
         {
@@ -335,7 +337,7 @@ function tenancy_update_selected_applicants()
                     'comment_status'    => 'closed',
                     'ping_status'    => 'closed',
                 );
-                        
+
                 // Insert the post into the database
                 $contact_post_id = wp_insert_post( $contact_post );
 
@@ -368,11 +370,13 @@ function tenancy_update_selected_applicants()
                     }
                     update_post_meta( $contact_post_id, '_applicant_profile_0', array( 'department' => $department, 'send_matching_properties' => '' ) );
 
-                    update_post_meta( $post_id, '_applicant_contact_id', $contact_post_id );
+                    add_post_meta( $post_id, '_applicant_contact_id', $contact_post_id );
 
-                    $contact_post_ids[] = $contact_post_id;
+                    $tenancy_notes_to_write[] = array(
+                        'contact_post_id' => $contact_post_id,
+                        'note_action' => empty($existing_applicants) ? 'tenancy_booked' : 'added_to_tenancy',
+                    );
                 }
-                
             }
         }
         else
@@ -381,10 +385,15 @@ function tenancy_update_selected_applicants()
             {
                 $applicant_contact_ids = array_unique(explode("|", $_POST['_applicant_contact_ids']));
 
-                delete_post_meta( $post_id, '_applicant_contact_id' );
+                if ( !is_array($existing_applicants) )
+                {
+                    $existing_applicants = array($existing_applicants);
+                }
+
+                $applicants_to_add = array_diff($applicant_contact_ids, $existing_applicants);
 
                 // make the contact an applicant if not already
-                foreach ( $applicant_contact_ids as $applicant_contact_id )
+                foreach ( $applicants_to_add as $applicant_contact_id )
                 {
                     add_post_meta( $post_id, '_applicant_contact_id', ph_clean($applicant_contact_id) );
 
@@ -399,21 +408,24 @@ function tenancy_update_selected_applicants()
                         update_post_meta( $applicant_contact_id, '_contact_types', $existing_contact_types );
                     }
 
-                    $contact_post_ids[] = $applicant_contact_id;
+                    $tenancy_notes_to_write[] = array(
+                        'contact_post_id' => $applicant_contact_id,
+                        'note_action' => empty($existing_applicants) ? 'tenancy_booked' : 'added_to_tenancy',
+                    );
                 }
             }
         }
 
-        if ( !empty($contact_post_ids) )
+        if ( !empty($tenancy_notes_to_write) )
         {
-            foreach ( $contact_post_ids as $contact_post_id )
+            foreach ( $tenancy_notes_to_write as $tenancy_note )
             {
                 // Add note/comment to contact
                 $current_user = wp_get_current_user();
 
                 $comment = array(
                     'note_type' => 'action',
-                    'action' => 'tenancy_booked',
+                    'action' => $tenancy_note['note_action'],
                     'tenancy_id' => $post_id,
                 );
                 if ( isset($_POST['_property_id']) && !empty($_POST['_property_id']) )
@@ -422,7 +434,7 @@ function tenancy_update_selected_applicants()
                 }
 
                 $data = array(
-                    'comment_post_ID'      => $contact_post_id,
+                    'comment_post_ID'      => $tenancy_note['contact_post_id'],
                     'comment_author'       => $current_user->display_name,
                     'comment_author_email' => 'propertyhive@noreply.com',
                     'comment_author_url'   => '',

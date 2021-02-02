@@ -82,6 +82,26 @@ if ( !empty($notes) )
 						}
 						break;
 					}
+					case "tenancy_booked":
+					{
+						$note_body = '<a href="' . get_edit_post_link($comment_content['tenancy_id']) . '">Tenancy</a> created';
+						if ( isset($comment_content['property_id']) )
+						{
+							$property = new PH_Property((int)$comment_content['property_id']);
+							$note_body .= ' on <a href="' . get_edit_post_link($comment_content['property_id']) . '">' . $property->get_formatted_full_address() . '</a>';
+						}
+						break;
+					}
+					case "added_to_tenancy":
+					{
+						$note_body = 'Added to <a href="' . get_edit_post_link($comment_content['tenancy_id']) . '">tenancy</a>';
+						if ( isset($comment_content['property_id']) )
+						{
+							$property = new PH_Property((int)$comment_content['property_id']);
+							$note_body .= ' on <a href="' . get_edit_post_link($comment_content['property_id']) . '">' . $property->get_formatted_full_address() . '</a>';
+						}
+						break;
+					}
 					default:
 					{
 						$note_body = $comment_content['action'];
