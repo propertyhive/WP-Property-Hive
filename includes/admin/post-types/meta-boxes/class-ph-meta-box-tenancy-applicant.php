@@ -70,6 +70,7 @@ class PH_Meta_Box_Tenancy_Applicant {
                         'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
                     ),
                 );
+                echo '<input type="hidden" name="existing_tenancy_applicant" value="' . $applicant_contact_id . '">';
 
                 $fields = apply_filters( 'propertyhive_tenancy_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
@@ -88,47 +89,38 @@ class PH_Meta_Box_Tenancy_Applicant {
                 echo "</div>";
                 ++$i;
             }
-            if ( isset($_GET['applicant_contact_id']) && ! empty( $_GET['applicant_contact_id'] ) )
-            {
-                ?>
-                <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo $_GET['applicant_contact_id']; ?>">
-                <?php
-            }
         }
-        else
-        {
-            echo '<div id="tenancy_applicant_search_existing">';
+        ?>
+        <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo ( !empty($applicant_contact_ids) ? implode('|', $applicant_contact_ids ) : '' ); ?>">
 
-                echo '<p class="form-field">
-                
-                    <label for="tenancy_applicant_search">' . __('Search Applicants', 'propertyhive') . '</label>
-                    
-                    <span style="position:relative;">
+        <div id="tenancy_applicant_search_existing">
+            <p class="form-field">
 
-                        <input type="text" name="tenancy_applicant_search" id="tenancy_applicant_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
+                <label for="tenancy_applicant_search"><?php echo __(( empty($applicant_contact_ids) ? 'Search Applicants' : 'Add Applicants' ), 'propertyhive'); ?></label>
 
-                        <div id="tenancy_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
+                <span style="position:relative;">
 
-                        <div id="tenancy_selected_applicants" style="display:none;"></div>
+                    <input type="text" name="tenancy_applicant_search" id="tenancy_applicant_search" style="width:100%;" placeholder="<?php echo __( 'Search Existing Contacts', 'propertyhive' ); ?>..." autocomplete="false">
 
-                    </span>
-                    
-                </p>
+                    <div id="tenancy_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
-                <p class="form-field">
-                
-                    <label for="">&nbsp;</label>
-                    
-                    <a href="" class="create-tenancy-applicant button">Create New Applicant</a>
-                    
-                </p>';
+                    <div id="tenancy_selected_applicants" style="display:none;"></div>
 
-                echo '<input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="">';
+                </span>
 
-            echo '</div>';
+            </p>
 
-            echo '<div id="tenancy_applicant_create_new" style="display:none">';
+            <p class="form-field">
 
+                <label for="">&nbsp;</label>
+
+                <a href="" class="create-tenancy-applicant button">Create New Applicant</a>
+
+            </p>
+        </div>
+            
+        <div id="tenancy_applicant_create_new" style="display:none">
+            <?php
                 $args = array( 
                     'id' => '_applicant_name', 
                     'label' => __( 'Name', 'propertyhive' ), 
@@ -153,34 +145,29 @@ class PH_Meta_Box_Tenancy_Applicant {
                     'type' => 'email'
                 );
                 propertyhive_wp_text_input( $args );
-
-                echo '<p class="form-field">
-                
-                    <label for="">&nbsp;</label>
-                    
-                    <a href="" class="create-tenancy-applicant-cancel">Cancel and Search Existing Applicants</a>
-                    
-                </p>';
-
-            echo '</div>';
-
-            echo '<input type="hidden" name="_tenancy_applicant_create_new" id="_tenancy_applicant_create_new" value="">';
-?>
-<script>
-
-var tenancy_selected_applicants = [];
-<?php
-    if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '')
-    {
-        $applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
-        foreach ($applicant_contact_ids as $applicant_contact_id)
-        {
             ?>
-            tenancy_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
-            <?php
-        }
-    }
-?>
+            <p class="form-field">
+                <label for="">&nbsp;</label>
+                <a href="" class="create-tenancy-applicant-cancel">Cancel and Search Existing Applicants</a>
+            </p>
+        </div>
+        <input type="hidden" name="_tenancy_applicant_create_new" id="_tenancy_applicant_create_new" value="">
+
+        <script>
+
+        var tenancy_selected_applicants = [];
+        <?php
+            if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '')
+            {
+                $applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
+                foreach ($applicant_contact_ids as $applicant_contact_id)
+                {
+                    ?>
+                    tenancy_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
+                    <?php
+                }
+            }
+        ?>
 
 jQuery(document).ready(function($)
 {
@@ -293,19 +280,20 @@ jQuery(document).ready(function($)
 
 function tenancy_update_selected_applicants()
 {
-    jQuery('#_applicant_contact_ids').val('');
+    var applicant_contact_ids = jQuery("input[name='existing_tenancy_applicant']").map(function(){
+        return jQuery(this).val();
+    }).get();
 
     if ( tenancy_selected_applicants.length > 0 )
     {
         jQuery('#tenancy_selected_applicants').html('<ul></ul>');
-        var selected_applicant_ids = [];
+
         for ( var i in tenancy_selected_applicants )
         {
             jQuery('#tenancy_selected_applicants ul').append('<li><a href="' + tenancy_selected_applicants[i].id + '" class="tenancy-remove-applicant" data-tenancy-applicant-id="' + tenancy_selected_applicants[i].id + '" data-tenancy-applicant-name="' + tenancy_selected_applicants[i].post_title + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + tenancy_selected_applicants[i].post_title + '</li>');
 
-            selected_applicant_ids.push(tenancy_selected_applicants[i].id);
+            applicant_contact_ids.push(tenancy_selected_applicants[i].id);
         }
-        jQuery('#_applicant_contact_ids').val(selected_applicant_ids.join('|'));
         jQuery('#tenancy_selected_applicants').show();
     }
     else
@@ -313,14 +301,12 @@ function tenancy_update_selected_applicants()
         jQuery('#tenancy_selected_applicants').html('');
         jQuery('#tenancy_selected_applicants').hide();
     }
-
+    jQuery('#_applicant_contact_ids').val(applicant_contact_ids.join('|'));
     jQuery('#_applicant_contact_ids').trigger('change');
 }
 
 </script>
-<?php
-        }
-	    
+<?php 
         echo '</div>';
         
         echo '</div>';
@@ -436,7 +422,7 @@ function tenancy_update_selected_applicants()
                 }
 
                 $data = array(
-                    'comment_post_ID'      => $applicant_contact_id,
+                    'comment_post_ID'      => $contact_post_id,
                     'comment_author'       => $current_user->display_name,
                     'comment_author_email' => 'propertyhive@noreply.com',
                     'comment_author_url'   => '',
