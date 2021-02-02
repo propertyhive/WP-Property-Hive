@@ -199,12 +199,20 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				break;
 			case 'applicant' :
 
-				echo get_the_title( $the_tenancy->applicant_contact_id );
-				echo '<div class="row-actions">';
-				echo 'T: ' . get_post_meta( $the_tenancy->applicant_contact_id, '_telephone_number', true ) . '<br>';
-				echo 'E: ' . get_post_meta( $the_tenancy->applicant_contact_id, '_email_address', true );
-				echo '</div>';
-
+				$applicant_contact_ids = get_post_meta( $post->ID, '_applicant_contact_id' );
+				if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
+				{
+					$applicants = array();
+					foreach ( $applicant_contact_ids as $applicant_contact_id )
+					{
+						$applicants[] = get_the_title($applicant_contact_id);
+					}
+					echo implode("<br>", $applicants);
+				}
+				else
+				{
+					echo '-';
+				}
 				break;
 			case 'dates' :
 				echo 'Start Date: ' . ( $the_tenancy->_start_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_start_date ) ) : '-' ) . '<br>';
