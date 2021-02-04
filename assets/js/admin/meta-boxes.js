@@ -201,6 +201,41 @@ jQuery( function($){
         $('.notes-filter a').removeClass('current');
         $(this).addClass('current');
     });
+
+    // Key Dates
+    $('[id=\'propertyhive-management-dates\']').on( 'click', 'a.add_key_date', function() {
+
+        if ( !$('#_add_key_date_description').val() || !$('#_add_key_date_due').val() ) return;
+
+        if ( $(this).text() == 'Adding...' ) { return false; }
+
+        $(this).html('Adding...');
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:               'propertyhive_add_key_date',
+            post_id:              propertyhive_admin_meta_boxes.post_id,
+            key_date_type:        $('#_add_key_date_type').val(),
+            key_date_description: $('#_add_key_date_description').val(),
+            key_date_due:         $('#_add_key_date_due').val(),
+            key_date_hours:       $('#_add_key_date_due_hours').val(),
+            key_date_minutes:     $('#_add_key_date_due_minutes').val(),
+        };
+
+        $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
+            var data = {
+                action:         'propertyhive_get_management_dates_grid',
+                post_id:        propertyhive_admin_meta_boxes.post_id,
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                jQuery('#propertyhive_management_dates_container').html(response);
+            }, 'html');
+        });
+
+        return false;
+    });
     
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
