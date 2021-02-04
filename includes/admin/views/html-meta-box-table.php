@@ -1,3 +1,10 @@
+<?php
+    $key_date_type_terms = get_terms( 'management_key_date_type', array(
+        'hide_empty' => false,
+        'parent' => 0
+    ) );
+?>
+
 <form id="posts-filter" method="get">
 
 	<input type="hidden" name="post_status" class="post_status_page" value="all">
@@ -162,7 +169,6 @@
 		<div class="tablenav bottom">
 
 			<div class="alignleft actions bulkactions">
-				<input type="button" id="doaction2" class="button action" value="Add Key Date">
 			</div>
 
 			<div class="alignleft actions">
@@ -188,7 +194,55 @@
 			<br class="clear">
 
 		</div>
+        <div class="propertyhive_meta_box">
+            <div class="options_group">
+                <p class="form-field _add_key_date_type_field">
+                    <label for="_add_key_date_type"><?php echo __('Key Date Type', 'propertyhive'); ?></label>
+                    <select id="_add_key_date_type" name="_add_key_date_type" class="select short">
+                        <?php
+                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                        {
+                            foreach ($key_date_type_terms as $key_date_type_term)
+                            {
+                                $output .= '<option value="' . $key_date_type_term->term_id . '">' . $key_date_type_term->name . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                </p>
+                <p class="form-field _add_key_date_description_field">
+                    <label for="_add_key_date_description"><?php echo __('Description', 'propertyhive'); ?></label>
+                    <input type="text" id="_add_key_date_description" name="_add_key_date_description" value="" class="short">
+                </p>
+                <p class="form-field _add_key_date_due_field">
+                    <label for="_add_key_date_due"><?php echo __('Date Due', 'propertyhive'); ?></label>
+                    <input type="text" id="_add_key_date_due" name="_add_key_date_due" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="<?php echo date("Y-m-d"); ?>">
 
+                    <select id="_add_key_date_due_hours" name="_add_key_date_due_hours" class="select short" style="width:55px">';
+                        <?php
+                        for ( $i = 0; $i < 23; ++$i )
+                        {
+                            $j = str_pad($i, 2, '0', STR_PAD_LEFT);
+                            echo '<option value="' . $j . '">' . $j . '</option>';
+                        }
+                        ?>
+                    </select>
+                    :
+                    <select id="_add_key_date_due_minutes" name="_add_key_date_due_minutes" class="select short" style="width:55px">
+                        <?php
+                        for ( $i = 0; $i < 60; $i+=5 )
+                        {
+                            $j = str_pad($i, 2, '0', STR_PAD_LEFT);
+                            echo '<option value="' . $j . '">' . $j . '</option>';
+                        }
+                        ?>
+                    </select>
+                </p>
+                <p>
+                    <a href="#" class="add_key_date button"><?php _e( 'Add Key Date', 'propertyhive' ); ?></a>
+                </p>
+            </div>
+        </div>
 	</div>
 
 </form>

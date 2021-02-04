@@ -29,8 +29,9 @@ class PH_Meta_Box_Management_Dates {
 				),
 			),
 		));
-
-		include PH()->plugin_path() . '/includes/admin/views/html-meta-box-table.php';
+		echo '<div id="propertyhive_management_dates_container">';
+			include PH()->plugin_path() . '/includes/admin/views/html-meta-box-table.php';
+		echo '</div>';
     }
 
     /**

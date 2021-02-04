@@ -97,6 +97,10 @@ class PH_AJAX {
             'get_property_sales_meta_box' => false,
             'get_contact_sales_meta_box' => false,
 
+            // Tenancy actions
+            'add_key_date' => false,
+            'get_management_dates_grid' => false,
+
             'validate_save_contact' => false,
             'applicant_registration' => true,
             'login' => true,
@@ -1376,7 +1380,7 @@ class PH_AJAX {
 
 		// Quit out
 		die();
-	}
+    }
 
 	/**
 	 * Delete order note via ajax
@@ -5436,6 +5440,72 @@ class PH_AJAX {
         
         echo '</div>';
 
+        die();
+    }
+
+    /**
+	 * Add new management key date via ajax
+	 */
+    public function add_key_date()
+    {
+        $parent_post_id = (int)$_POST['post_id'];
+
+        if ( $parent_post_id > 0 ) {
+            $date_description = wp_kses_post( trim( stripslashes( $_POST['key_date_description'] ) ) );
+            $date_type_id = ph_clean( stripslashes( $_POST['key_date_type'] ) );
+            $date_due = ph_clean($_POST['key_date_due']) . ' ' . ph_clean($_POST['key_date_hours']) . ':' . ph_clean($_POST['key_date_minutes']);
+
+            $parent_post_type = get_post_type( $parent_post_id );
+
+            // Insert key date record
+            $key_date_post = array(
+                'post_title' => $date_description,
+                'post_content' => '',
+                'post_type' => 'key_date',
+                'post_status' => 'publish',
+                'comment_status' => 'closed',
+                'ping_status' => 'closed',
+            );
+
+            // Insert the post into the database
+            $key_date_post_id = wp_insert_post( $key_date_post );
+
+            if ( is_wp_error($key_date_post_id) || $key_date_post_id == 0 )
+            {
+                $return = array('error' => 'Failed to create key date post. Please try again');
+                echo json_encode( $return );
+                die();
+            }
+
+            add_post_meta( $key_date_post_id, '_date_due', $date_due );
+            add_post_meta( $key_date_post_id, '_key_date_status', 'pending' );
+            add_post_meta( $key_date_post_id, '_key_date_type_id', $date_type_id );
+
+            switch ( $parent_post_type )
+            {
+                case 'property' :
+                {
+                    add_post_meta( $key_date_post_id, '_property_id', $parent_post_id );
+                    break;
+                }
+                case 'tenancy' :
+                {
+                    add_post_meta( $key_date_post_id, '_tenancy_id', $parent_post_id );
+
+                    $parent_property_id = get_post_meta( $parent_post_id, '_property_id', true );
+                    add_post_meta( $key_date_post_id, '_property_id', $parent_property_id );
+                    break;
+                }
+            }
+        }
+        die();
+    }
+
+    public function get_management_dates_grid()
+    {
+        include( PH()->plugin_path() . '/includes/admin/views/html-meta-box-table.php' );
+
+        // Quit out
         die();
     }
 }
