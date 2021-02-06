@@ -3,61 +3,120 @@
         'hide_empty' => false,
         'parent' => 0
     ) );
+
+    $parent_post_type = get_post_type( $post_id );
+
+    $meta_query = array();
+
+    switch ( $parent_post_type )
+    {
+        case 'property' :
+        {
+            $meta_query = array(
+                'key' => '_property_id',
+                'value' => $post_id
+            );
+            break;
+        }
+        case 'tenancy' :
+        {
+            $parent_property_id = get_post_meta( $post_id, '_property_id', true );
+            $meta_query = array(
+                array(
+                    'relation' => 'OR',
+                    array(
+                        'key' => '_tenancy_id',
+                        'value' => $post_id,
+                    ),
+                    array(
+                        'key' => '_property_id',
+                        'value' => $parent_property_id,
+                    ),
+                ),
+            );
+            break;
+        }
+    }
+
+    if ( isset($selected_status) && !empty($selected_status) )
+    {
+        switch ( $selected_status )
+        {
+            case 'upcoming_and_overdue':
+            {
+                $meta_query[] = array(
+                    'key' => '_key_date_status',
+                    'value' => 'pending',
+                );
+
+                $upcoming_threshold = new DateTime(PH_Key_Date::UPCOMING_THRESHOLD);
+                $meta_query[] = array(
+                    'key' => '_date_due',
+                    'value' => $upcoming_threshold->format('Y-m-d'),
+                    'type' => 'date',
+                    'compare' => '<=',
+                );
+                break;
+            }
+            default:
+            {
+                $meta_query[] = array(
+                    'key' => '_key_date_status',
+                    'value' => $selected_status,
+                );
+                break;
+            }
+        }
+    }
+
+    if ( isset($selected_type) && !empty($selected_type) )
+    {
+        $meta_query[] = array(
+            'key' => '_key_date_type_id',
+            'value' => $selected_type,
+        );
+    }
+
+    $key_dates = get_posts(array (
+        'post_type' => 'key_date',
+        'meta_query' => $meta_query,
+    ));
 ?>
 
 <form id="posts-filter" method="get">
 
-	<input type="hidden" name="post_status" class="post_status_page" value="all">
-	<input type="hidden" name="post_type" class="post_type_page" value="key_date">
-
 	<div class="inside">
 
-		<input type="hidden" name="orderby" value="date_due"><input type="hidden" name="order" value="asc">
-
-		<input type="hidden" name="post_status" class="post_status_page" value="all">
-		<input type="hidden" name="post_type" class="post_type_page" value="key_date">
-
-
-		<input type="hidden" id="_wpnonce" name="_wpnonce" value="70772481ef">
-		<input type="hidden" name="_wp_http_referer" value="/wp-admin/edit.php?post_type=key_date&orderby=date_due&order=asc&status=upcoming_and_overdue&filter_action=Filter">
 		<div class="tablenav top">
-
-			<div class="alignleft actions bulkactions">
-				<label for="bulk-action-selector-top" class="screen-reader-text">Select bulk
-					action</label><select name="action" id="bulk-action-selector-top">
-					<option value="-1">Bulk actions</option>
-					<option value="edit" class="hide-if-no-js">Edit</option>
-					<option value="trash">Move to Bin</option>
-				</select>
-				<input type="submit" id="doaction" class="button action" value="Apply">
-			</div>
 
 			<div class="alignleft actions">
 
-				<select name="_key_date_type_id">
-					<option value="">All Types</option>
-					<option value="83">Empty Property Check</option>
-					<option value="84">Eoin's Birthday</option>
-					<option value="80">Gas Safety Certificate</option>
-					<option value="79">Inspection</option>
-					<option value="81">Legionella Risk Assessment</option>
-					<option value="77">Move In</option>
-					<option value="78">Move Out</option>
-				</select>
+            <select name="_key_date_type_id" id="_type_id_filter">
+                <option value=""><?php echo __( 'All Types', 'propertyhive' ); ?></option>
+                <?php
+                if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                {
+                    foreach ($key_date_type_terms as $key_date_type_term)
+                    {
+                        $output .= '<option value="' . $key_date_type_term->term_id . '"' . ( isset($selected_type) && $selected_type == $key_date_type_term->term_id ) ? ' selected' : '' . '>' . $key_date_type_term->name . '</option>';
+                    }
+                }
+                ?>
+			</select>
 
-                <select name="status" id="dropdown_sale_status">
-					<option value="">All Statuses</option>
-					<option value="upcoming_and_overdue" selected="selected">Upcoming & Overdue</option>
-					<option value="booked"> Booked</option>
-					<option value="complete"> Complete</option>
-					<option value="pending"> Pending</option>
-				</select>
+            <select name="status" id="_date_status_filter">
+                <option value="">All Statuses</option>
+                <option value="upcoming_and_overdue" <?php echo ( isset($selected_status) && $selected_status == 'upcoming_and_overdue' ) ? 'selected' : ''; ?>>Upcoming & Overdue</option>
+                <option value="booked" <?php echo ( isset($selected_status) && $selected_status == 'booked' ) ? 'selected' : ''; ?>> Booked</option>
+                <option value="complete" <?php echo ( isset($selected_status) && $selected_status == 'complete' ) ? 'selected' : ''; ?>> Complete</option>
+                <option value="pending" <?php echo ( isset($selected_status) && $selected_status == 'pending' ) ? 'selected' : ''; ?>> Pending</option>
+            </select>
 
-                <input type="submit" name="filter_action" id="post-query-submit" class="button" value="Filter">
+            <input type="button" name="filter_action" id="filter-key-dates-grid" class="button" value="Filter">
 
             </div>
 			<div class="tablenav-pages one-page">
-                <span class="displaying-num">3 items</span>
+                <span class="displaying-num"><?php echo count($key_dates); ?> items</span>
 				<span class="pagination-links">
                     <span class="tablenav-pages-navspan button disabled" aria-hidden="true">«</span>
                     <span class="tablenav-pages-navspan button disabled" aria-hidden="true">‹</span>
@@ -77,27 +136,19 @@
 
 		</div>
 
-
 		<h2 class="screen-reader-text">Posts list</h2>
 		<table class="wp-list-table widefat fixed striped table-view-list posts" style="border-collapse: collapse;">
 
 			<thead>
                 <tr>
-                    <td id="cb" class="manage-column column-cb check-column">
-                        <label class="screen-reader-text" for="cb-select-all-1">Select all</label>
-                        <input id="cb-select-all-1" type="checkbox">
-                    </td>
                     <th scope="col" id="description" class="manage-column column-description">
                         Description
                     </th>
-                    <th scope="col" id="description" class="manage-column column-description">
+                    <th scope="col" id="tenants" class="manage-column column-tenants">
                         Tenants
                     </th>
-                    <th scope="col" id="date_due" class="manage-column column-date_due sorted asc">
-                        <a href="http://propertyhive.test/wp-admin/edit.php?post_type=key_date&orderby=date_due&order=desc&status=upcoming_and_overdue&filter_action=Filter">
-                            <span>Date Due</span>
-                            <span class="sorting-indicator"></span>
-                        </a>
+                    <th scope="col" id="date_due" class="manage-column column-date_due">
+                        <span>Date Due</span>
                     </th>
                     <th scope="col" id="status" class="manage-column column-status">
                         Status
@@ -106,56 +157,78 @@
 			</thead>
 
 			<tbody id="the-list">
-
-                <tr id="post-92" class="iedit author-self level-0 post-92 type-key_date status-publish hentry">
-                    <th scope="row" class="check-column">
-                        <label class="screen-reader-text" for="cb-select-92"> Select Inspection </label>
-                        <input id="cb-select-92" type="checkbox" name="post[]" value="92">
-                        <div class="locked-indicator">
-                            <span class="locked-indicator-icon" aria-hidden="true"></span>
-                            <span class="screen-reader-text">“Inspection“ is locked</span>
-                        </div>
-                    </th>
-                    <td class="description column-description" data-colname="Description">
-                        <div class="cell-main-content">Inspection</div>
-                        <div class="row-actions">
-                            <span class="inline hide-if-no-js">
-                                <button type="button" class="button-link editinline" aria-label="Quick edit “Inspection” inline" aria-expanded="false">
-                                    Quick&nbsp;Edit
-                                </button>
-                            </span>
-                        </div>
-                    </td>
-                    <td class="date_due column-date_due" data-colname="Date Due">
-                        <div class="cell-main-content">Mickey Mouse</div>
-                    </td>
-                    <td class="date_due column-date_due" data-colname="Date Due">
-                        <div class="cell-main-content">13th December 2020</div>
-                    </td>
-                    <td class="status column-status" data-colname="Status">
-                        <div class="cell-main-content">Overdue</div>
-                    </td>
-                </tr>
+                <?php
+                if ( count($key_dates) > 0 )
+                {
+                    foreach ( $key_dates as $key_date_post )
+                    {
+                        $key_date = new PH_Key_Date( $key_date_post );
+                        ?>
+                        <tr id="post-<?php echo $key_date_post->ID; ?>" class="iedit author-self level-0 post-<?php echo $key_date_post->ID; ?> type-key_date status-publish hentry">
+                            <td class="description column-description" data-colname="Description">
+                                <div class="cell-main-content"><?php echo $key_date->description(); ?></div>
+                                <div class="row-actions">
+                                    <span class="inline hide-if-no-js">
+                                        <button type="button" class="button-link editinline" aria-label="Quick edit “<?php echo $key_date->description(); ?>” inline" aria-expanded="false">
+                                            Quick&nbsp;Edit
+                                        </button>
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="date_due column-tenants" data-colname="Tenants">
+                                <div class="cell-main-content">
+                                <?php
+                                    $tenants = '-';
+                                    $tenancy  = $key_date->tenancy();
+                                    if ( $tenancy->id )
+                                    {
+                                        $applicant_contact_ids = get_post_meta( $tenancy->id, '_applicant_contact_id' );
+                                        if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
+                                        {
+                                            $applicants = array();
+                                            foreach ( $applicant_contact_ids as $applicant_contact_id )
+                                            {
+                                                $applicants[] = get_the_title($applicant_contact_id);
+                                            }
+                                            $tenants =  implode("<br>", $applicants);
+                                        }
+                                    }
+                                    echo $tenants;
+                                ?>
+                                </div>
+                            </td>
+                            <td class="date_due column-date_due" data-colname="Date Due">
+                                <div class="cell-main-content"><?php echo $key_date->date_due()->format( 'jS F Y' ); ?></div>
+                            </td>
+                            <td class="status column-status" data-colname="Status">
+                                <div class="cell-main-content"><?php echo ucwords( $key_date->status() ); ?></div>
+                            </td>
+                        </tr>
+                        <?php
+                    }
+                }
+                else
+                {
+                    ?>
+                    <tr class="no-items">
+                        <td class="colspanchange" colspan="4">No key dates found</td>
+                    </tr>
+                    <?php
+                }
+                ?>
 			</tbody>
 
 			<tfoot>
 
                 <tr>
-                    <td id="cb" class="manage-column column-cb check-column">
-                        <label class="screen-reader-text" for="cb-select-all-2">Select all</label>
-                        <input id="cb-select-all-2" type="checkbox">
-                    </td>
                     <th scope="col" class="manage-column column-description">
                         Description
                     </th>
-                    <th scope="col" class="manage-column column-description">
+                    <th scope="col" class="manage-column column-tenants">
                         Tenants
                     </th>
                     <th scope="col" class="manage-column column-date_due sorted asc">
-                        <a href="http://propertyhive.test/wp-admin/edit.php?post_type=key_date&orderby=date_due&order=desc&status=upcoming_and_overdue&filter_action=Filter">
-                            <span>Date Due</span>
-                            <span class="sorting-indicator"></span>
-                        </a>
+                        <span>Date Due</span>
                     </th>
                     <th scope="col" class="manage-column column-status">
                         Status
