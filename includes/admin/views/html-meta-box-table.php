@@ -69,11 +69,11 @@
         }
     }
 
-    if ( isset($selected_type) && !empty($selected_type) )
+    if ( isset($selected_type_id) && !empty($selected_type_id) )
     {
         $meta_query[] = array(
             'key' => '_key_date_type_id',
-            'value' => $selected_type,
+            'value' => $selected_type_id,
         );
     }
 
@@ -94,11 +94,12 @@
             <select name="_key_date_type_id" id="_type_id_filter">
                 <option value=""><?php echo __( 'All Types', 'propertyhive' ); ?></option>
                 <?php
-                if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                if ( !empty( $key_date_type_terms ) && !is_wp_error( $key_date_type_terms ) )
                 {
                     foreach ($key_date_type_terms as $key_date_type_term)
                     {
-                        $output .= '<option value="' . $key_date_type_term->term_id . '"' . ( isset($selected_type) && $selected_type == $key_date_type_term->term_id ) ? ' selected' : '' . '>' . $key_date_type_term->name . '</option>';
+                        $selected = ( isset($selected_type_id) && $selected_type_id == $key_date_type_term->term_id ) ? ' selected' : '';
+                        echo '<option value="' . $key_date_type_term->term_id . '"' . $selected . '>' . $key_date_type_term->name . '</option>';
                     }
                 }
                 ?>
@@ -273,11 +274,11 @@
                     <label for="_add_key_date_type"><?php echo __('Key Date Type', 'propertyhive'); ?></label>
                     <select id="_add_key_date_type" name="_add_key_date_type" class="select short">
                         <?php
-                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                        if ( !empty( $key_date_type_terms ) && !is_wp_error( $key_date_type_terms ) )
                         {
                             foreach ($key_date_type_terms as $key_date_type_term)
                             {
-                                $output .= '<option value="' . $key_date_type_term->term_id . '">' . $key_date_type_term->name . '</option>';
+                                echo '<option value="' . $key_date_type_term->term_id . '">' . $key_date_type_term->name . '</option>';
                             }
                         }
                         ?>
