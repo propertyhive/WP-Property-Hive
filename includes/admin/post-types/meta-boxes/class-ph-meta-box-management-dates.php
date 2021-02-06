@@ -12,23 +12,8 @@ class PH_Meta_Box_Management_Dates {
 	 */
 	public static function output( $post ) {
 
-		$property_id = $post->_property_id;
-		$tenancy_id = $post->ID;
+		$post_id = $post->ID;
 
-		$key_dates = get_posts(array (
-			'post_type' => 'key_date',
-			'meta_query' => array(
-				'relation' => 'OR',
-				array(
-					'key' => '_tenancy_id',
-					'value' => $tenancy_id
-				),
-				array(
-					'key' => '_property_id',
-					'value' => $property_id
-				),
-			),
-		));
 		echo '<div id="propertyhive_management_dates_container">';
 			include PH()->plugin_path() . '/includes/admin/views/html-meta-box-table.php';
 		echo '</div>';

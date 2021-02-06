@@ -5503,6 +5503,18 @@ class PH_AJAX {
 
     public function get_management_dates_grid()
     {
+        $post_id = $_POST['post_id'];
+
+        if ( isset($_POST['selected_type_id']) )
+        {
+            $selected_type_id = $_POST['selected_type_id'];
+        }
+
+        if ( isset($_POST['selected_status']) )
+        {
+            $selected_status = $_POST['selected_status'];
+        }
+
         include( PH()->plugin_path() . '/includes/admin/views/html-meta-box-table.php' );
 
         // Quit out

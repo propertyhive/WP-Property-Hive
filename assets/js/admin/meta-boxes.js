@@ -224,8 +224,8 @@ jQuery( function($){
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             var data = {
-                action:         'propertyhive_get_management_dates_grid',
-                post_id:        propertyhive_admin_meta_boxes.post_id,
+                action:  'propertyhive_get_management_dates_grid',
+                post_id: propertyhive_admin_meta_boxes.post_id,
             };
 
             jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
@@ -233,6 +233,28 @@ jQuery( function($){
                 jQuery('#propertyhive_management_dates_container').html(response);
             }, 'html');
         });
+
+        return false;
+    });
+
+    $('[id=\'propertyhive-management-dates\']').on( 'click', '#filter-key-dates-grid', function() {
+
+        if ( $(this).val() == 'Updating...' ) { return false; }
+
+        $(this).val('Updating...');
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:           'propertyhive_get_management_dates_grid',
+            post_id:          propertyhive_admin_meta_boxes.post_id,
+            selected_type_id: $('#_type_id_filter').val(),
+            selected_status:  $('#_date_status_filter').val(),
+        };
+
+        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+        {
+            jQuery('#propertyhive_management_dates_container').html(response);
+        }, 'html');
 
         return false;
     });
