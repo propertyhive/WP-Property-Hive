@@ -115,7 +115,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         {
             $sections[ 'furnished' ] = __( 'Furnished', 'propertyhive' );
             add_action( 'propertyhive_admin_field_custom_fields_furnished', array( $this, 'custom_fields_furnished_setting' ) );
-            $sections[ 'management_key_date_type' ] = __( 'Management Dates', 'propertyhive' );
+            $sections[ 'management-key-date-type' ] = __( 'Management Dates', 'propertyhive' );
             add_action( 'propertyhive_admin_field_custom_fields_management_key_date_type', array( $this, 'custom_fields_management_key_date_type_setting' ) );
         }
 
@@ -211,8 +211,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     
                     case "furnished": { $settings = $this->get_custom_fields_furnished_setting(); break; }
                     case "furnished-delete": { $settings = $this->get_custom_fields_delete($current_id, 'furnished', __( 'Furnished', 'propertyhive' )); break; }
-                    case "management_key_date_type": { $settings = $this->get_custom_fields_management_key_date_type_setting(); break; }
-                    case "management_key_date_type-delete": { $settings = $this->get_custom_fields_delete($current_id, 'management_key_date_type', __( 'Management Dates', 'propertyhive' )); break; }
+                    case "management-key-date-type": { $settings = $this->get_custom_fields_management_key_date_type_setting(); break; }
+                    case "management-key-date-type-delete": { $settings = $this->get_custom_fields_delete($current_id, 'management_key_date_type', __( 'Management Dates', 'propertyhive' )); break; }
 
                     case "marketing-flag": { $settings = $this->get_custom_fields_marketing_flag_setting(); break; }
                     case "marketing-flag-delete": { $settings = $this->get_custom_fields_delete($current_id, 'marketing_flag', __( 'Marketing Flag', 'propertyhive' )); break; }
@@ -1327,7 +1327,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 			</th>
 			<td class="forminp forminp-button">
 				<a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
-				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management_key_date_type&id=' ); ?>" class="button alignright"><?php _e( 'Add New Management Date', 'propertyhive' ); ?></a>
+				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management-key-date-type&id=' ); ?>" class="button alignright"><?php _e( 'Add New Management Date', 'propertyhive' ); ?></a>
 			</td>
 		</tr>
 		<?php foreach( array ('property_management' =>  __( 'Property Management', 'propertyhive' ), 'tenancy_management' => __( 'Tenancy Management', 'propertyhive' ) ) as $type => $title): ?>
@@ -1414,8 +1414,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 								<td><?php echo $term->name; ?></td>
 								<td><?php echo $frequency ?></td>
 								<td class="settings">
-									<a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management_key_date_type&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
-									<a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management_key_date_type-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
+									<a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management-key-date-type&id=' . $term->term_id ); ?>"><?php echo __( 'Edit', 'propertyhive' ); ?></a>
+									<a class="button" href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management-key-date-type-delete&id=' . $term->term_id ); ?>"><?php echo __( 'Delete', 'propertyhive' ); ?></a>
 								</td>
 							</tr>
 							<?php
@@ -1425,10 +1425,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 					{
 						?>
 						<tr>
-							<td><?php echo __( 'No management dates found', 'propertyhive' ); ?></td>
-							<td class="settings">
-
-							</td>
+							<td colspan="5"><?php echo __( 'No management dates found', 'propertyhive' ); ?></td>
 						</tr>
 						<?php
 					}
@@ -1444,7 +1441,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 			</th>
 			<td class="forminp forminp-button">
 				<a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
-				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management_key_date_type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Management Date', 'propertyhive' ); ?></a>
+				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management-key-date-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Management Date', 'propertyhive' ); ?></a>
 			</td>
 		</tr>
 		<?php
@@ -2491,11 +2488,15 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 		$recurrence = array(
 			'FREQ' => 'ONCE',
 			'INTERVAL' => '1',
-		);
-		foreach (explode(';', $recurrence_rule) as $key_value_pair){
-			list($key, $value) = explode('=', $key_value_pair);
-			$recurrence[$key] = $value;
-		}
+        );
+
+        if ( !empty($recurrence_rule) )
+        {
+            foreach (explode(';', $recurrence_rule) as $key_value_pair){
+                list($key, $value) = explode('=', $key_value_pair);
+                $recurrence[$key] = $value;
+            }
+        }
 
 		$interval_disabled = $recurrence['FREQ'] == 'ONCE' ? array('disabled' => 'disabled') : array();
 
@@ -2707,7 +2708,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "tenure":
                     case "commercial-tenure":
                     case "furnished":
-                    case "management_key_date_type":
+                    case "management-key-date-type":
                     case "marketing-flag":
                     case "property-feature":
                     {
@@ -2760,7 +2761,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             update_option( 'propertyhive_availability_departments', $availability_departments );
                         }
 
-	                    if ( $current_section == 'management_key_date_type' )
+	                    if ( $current_section == 'management-key-date-type' )
 	                    {
 		                    $options = get_option( 'propertyhive_key_date_type', array() );
 		                    if ( !is_array($options) ) { $options = array(); }
@@ -2790,7 +2791,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "sale-by-delete":
                     case "tenure-delete":
                     case "furnished-delete":
-                    case "management_key_date_type-delete":
+                    case "management-key-date-type-delete":
                     case "marketing-flag-delete":
                     case "property-feature-delete":
                     {
