@@ -124,6 +124,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'BB' => array(
+				'name' => 'Barbados',
+				'currency_code' => 'BBD',
+				'currency_symbol' => '$',
+				'currency_prefix' => true
+			),
 			'BE' => array(
 				'name' => 'Belgium',
 				'currency_code' => 'EUR',
