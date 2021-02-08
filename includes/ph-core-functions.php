@@ -234,6 +234,7 @@ function get_commercial_price_units( )
  */
 function ph_count_viewing_number($viewing_post_id, $property_post_id, $viewing_start_time, $applicant_contact_ids)
 {
+    return 0;
     if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) && (int)$property_post_id > 0 )
     {
         $meta_query = array(
