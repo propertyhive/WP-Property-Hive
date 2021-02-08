@@ -4822,7 +4822,7 @@ class PH_AJAX {
             if ( $offers_query->have_posts() )
             {
                 $columns = array(
-                    'date' => __( 'Offer Date', 'propertyhive' ) . ' / ' . __( 'Time', 'propertyhive' ),
+                    'date' => __( 'Offer Date', 'propertyhive' ),
                     'applicant' => __( 'Applicant', 'propertyhive' ),
                     'amount' => __( 'Offer Amount', 'propertyhive' ),
                     'status' => __( 'Status', 'propertyhive' ),
@@ -4920,7 +4920,7 @@ class PH_AJAX {
             if ( $offers_query->have_posts() )
             {
                 $columns = array(
-                    'date' => __( 'Offer Date', 'propertyhive' ) . ' / ' . __( 'Time', 'propertyhive' ),
+                    'date' => __( 'Offer Date', 'propertyhive' ),
                     'property' => __( 'Property', 'propertyhive' ),
                     'property_owner' => __( 'Property Owner', 'propertyhive' ),
                     'amount' => __( 'Offer Amount', 'propertyhive' ),
@@ -5247,14 +5247,23 @@ class PH_AJAX {
 
             if ( $sales_query->have_posts() )
             {
+                $columns = array(
+                    'date' => __( 'Sale Date', 'propertyhive' ),
+                    'applicant' => __( 'Applicant', 'propertyhive' ),
+                    'amount' => __( 'Sale Amount', 'propertyhive' ),
+                    'status' => __( 'Status', 'propertyhive' ),
+                );
+
+                $columns = apply_filters( 'propertyhive_property_sales_columns', $columns );
+
                 echo '<table style="width:100%">
                     <thead>
-                        <tr>
-                            <th style="text-align:left;">' . __( 'Sale Date', 'propertyhive' ) . '</th>
-                            <th style="text-align:left;">' . __( 'Applicant', 'propertyhive' ) . '</th>
-                            <th style="text-align:left;">' . __( 'Sale Amount', 'propertyhive' ) . '</th>
-                            <th style="text-align:left;">' . __( 'Status', 'propertyhive' ) . '</th>
-                        </tr>
+                        <tr>';
+                foreach ( $columns as $column_key => $column )
+                {
+                    echo '<th style="text-align:left;">' . $column . '</th>';
+                }
+                echo '</tr>
                     </thead>
                     <tbody>';
 
@@ -5264,14 +5273,27 @@ class PH_AJAX {
 
                     $sale = new PH_Sale(get_the_ID());
 
+                    $column_data = array(
+                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a>',
+                        'applicant' => '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a>',
+                        'amount' => $sale->get_formatted_amount(),
+                        'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
+                    );
+
                     echo '<tr>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a></td>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a></td>';
-                        echo '<td style="text-align:left;">' . $sale->get_formatted_amount() . '</td>';
+                    foreach ( $columns as $column_key => $column )
+                    {
                         echo '<td style="text-align:left;">';
-                        $status = get_post_meta(get_the_ID(), '_status', TRUE);
-                        echo __( ucwords(str_replace("_", " ", $status)), 'propertyhive' );
+
+                            if ( isset( $column_data[$column_key] ) )
+                            {
+                                echo $column_data[$column_key];
+                            }
+
+                            do_action( 'propertyhive_property_sales_custom_column', $column_key );
+
                         echo '</td>';
+                    }
                     echo '</tr>';
                 }
 
@@ -5323,15 +5345,24 @@ class PH_AJAX {
 
             if ( $sales_query->have_posts() )
             {
+                $columns = array(
+                    'date' => __( 'Sale Date', 'propertyhive' ),
+                    'property' => __( 'Property', 'propertyhive' ),
+                    'property_owner' => __( 'Property Owner', 'propertyhive' ),
+                    'amount' => __( 'Sale Amount', 'propertyhive' ),
+                    'status' => __( 'Status', 'propertyhive' ),
+                );
+
+                $columns = apply_filters( 'propertyhive_contact_sales_columns', $columns );
+
                 echo '<table style="width:100%">
                     <thead>
-                        <tr>
-                            <th style="text-align:left;">' . __( 'Offer Date', 'propertyhive' ) . '</th>
-                            <th style="text-align:left;">' . __( 'Property', 'propertyhive' ) . '</th>
-                            <th style="text-align:left;">' . __( 'Property Owner', 'propertyhive' ) . '</th>
-                            <th style="text-align:left;">' . __( 'Offer Amount', 'propertyhive' ) . '</th>
-                            <th style="text-align:left;">' . __( 'Status', 'propertyhive' ) . '</th>
-                        </tr>
+                        <tr>';
+                foreach ( $columns as $column_key => $column )
+                {
+                    echo '<th style="text-align:left;">' . $column . '</th>';
+                }
+                echo '</tr>
                     </thead>
                     <tbody>';
 
@@ -5342,40 +5373,51 @@ class PH_AJAX {
                     $sale = new PH_Sale(get_the_ID());
 
                     $property = new PH_Property((int)get_post_meta(get_the_ID(), '_property_id', TRUE));
-
-                    echo '<tr>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID(), '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a></td>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a></td>';
-                        echo '<td style="text-align:left;">';
-
-                        $owner_contact_ids = $property->_owner_contact_id;
-                        if ( 
-                            ( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 ) 
-                            ||
-                            ( is_array($owner_contact_ids) && !empty($owner_contact_ids) )
-                        )
+                    $property_owners = '';
+                    $owner_contact_ids = $property->_owner_contact_id;
+                    if ( 
+                        ( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 ) 
+                        ||
+                        ( is_array($owner_contact_ids) && !empty($owner_contact_ids) )
+                    )
+                    {
+                        if ( !is_array($owner_contact_ids) )
                         {
-                            if ( !is_array($owner_contact_ids) )
-                            {
-                                $owner_contact_ids = array($owner_contact_ids);
-                            }
-
-                            foreach ( $owner_contact_ids as $owner_contact_id )
-                            {
-                                echo get_the_title($owner_contact_id) . '<br>';
-                                echo '<div style="color:#BBB">';
-                                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
-                                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
-                                echo '</div>';
-                            }
+                            $owner_contact_ids = array($owner_contact_ids);
                         }
 
-                        echo '</td>';
-                        echo '<td style="text-align:left;">' . $sale->get_formatted_amount() . '</td>';
+                        foreach ( $owner_contact_ids as $owner_contact_id )
+                        {
+                            $property_owners .= get_the_title($owner_contact_id) . '<br>';
+                            $property_owners .= '<div style="color:#BBB">';
+                            $property_owners .= 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
+                            $property_owners .= 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+                            $property_owners .= '</div>';
+                        }
+                    }
+
+                    $column_data = array(
+                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a>',
+                        'property' => '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a>',
+                        'property_owner' => $property_owners,
+                        'amount' => $sale->get_formatted_amount(),
+                        'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
+                    );
+
+                    echo '<tr>';
+                    foreach ( $columns as $column_key => $column )
+                    {
                         echo '<td style="text-align:left;">';
-                        $status = get_post_meta(get_the_ID(), '_status', TRUE);
-                        echo __( ucwords(str_replace("_", " ", $status)), 'propertyhive' );
+
+                            if ( isset( $column_data[$column_key] ) )
+                            {
+                                echo $column_data[$column_key];
+                            }
+
+                            do_action( 'propertyhive_contact_sales_custom_column', $column_key );
+
                         echo '</td>';
+                    }
                     echo '</tr>';
                 }
 
