@@ -226,65 +226,6 @@ function get_commercial_price_units( )
 }
 
 /**
- * Count the previous Carried Out viewings for a property and applicant combination and return the number of this viewing
- *
- * @param object $viewing The current viewing
- * @param array $applicant_contact_ids An array of the applicant contact IDs for this viewing
- * @return int The sequential number of the viewing
- */
-function ph_count_viewing_number($viewing_post_id, $property_post_id, $viewing_start_time, $applicant_contact_ids)
-{
-    return 0;
-    if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) && (int)$property_post_id > 0 )
-    {
-        $meta_query = array(
-            array(
-                'key' => '_property_id',
-                'value' => (int)$property_post_id,
-            ),
-            array(
-                'key' => '_start_date_time',
-                'value' => $viewing_start_time,
-                'compare' => '<',
-                'type' => 'DATETIME',
-            ),
-            array(
-                'key' => '_status',
-                'value' => 'carried_out',
-            ),
-        );
-        foreach ( $applicant_contact_ids as $applicant_contact_id )
-        {
-            $meta_query[] = array(
-                'key' => '_applicant_contact_id',
-                'value' => (int)$applicant_contact_id
-            );
-        }
-
-        $args = array(
-            'fields'   => 'ids',
-            'post_type'   => 'viewing',
-            'nopaging'    => true,
-            'post_status'   => 'publish',
-            'meta_query'  => $meta_query,
-            'post__not_in' => array((int)$viewing_post_id),
-            'orderby' => 'none'
-        );
-        $viewings_query = new WP_Query( $args );
-
-        if ( $viewings_query->have_posts() )
-        {
-            $num_viewings = $viewings_query->found_posts;
-            return ++$num_viewings;
-        }
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-/**
  * Get ordinal suffix (st, nd, rd etc) for any number
  *
  * @param int $number
