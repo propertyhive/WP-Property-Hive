@@ -3213,11 +3213,10 @@ class PH_AJAX {
             ' . __( ucwords(str_replace("_", " ", $viewing->status)), 'propertyhive' );
 
             // Add text if this a second, third etc viewing
-            $applicant_contact_ids = get_post_meta( $viewing->id, '_applicant_contact_id' );
-            $viewing_number = ph_count_viewing_number($viewing->id, $viewing->property_id, $viewing->start_date_time, $applicant_contact_ids);
-            if ( $viewing_number > 1 )
+            $related_viewings = get_post_meta( $viewing->id, '_related_viewings', TRUE );
+            if ( isset($related_viewings['previous']) && count($related_viewings['previous']) > 0 )
             {
-                echo ' - ' . ph_ordinal_suffix($viewing_number) . ' Viewing' ;
+                echo ' - ' . ph_ordinal_suffix(count($related_viewings['previous'])+1) . ' ' . __( 'Viewing', 'propertyhive' );
             }
 
         if ( $viewing->status == 'offer_made' )
@@ -4099,10 +4098,10 @@ class PH_AJAX {
                     }
 
                     // Add text if this a second, third etc viewing
-                    $viewing_number = ph_count_viewing_number(get_the_ID(), $_POST['post_id'], $viewing_start_date_time, $applicant_contact_ids);
-                    if ( $viewing_number > 1 )
+                    $related_viewings = get_post_meta( get_the_ID(), '_related_viewings', TRUE );
+                    if ( isset($related_viewings['previous']) && count($related_viewings['previous']) > 0 )
                     {
-                        $status_output .= '<br>' . ph_ordinal_suffix($viewing_number) . ' ' . __( 'Viewing', 'propertyhive' );
+                        $status_output .= '<br>' . ph_ordinal_suffix(count($related_viewings['previous'])+1) . ' ' . __( 'Viewing', 'propertyhive' );
                     }
 
                     $column_data = array(
@@ -4272,11 +4271,10 @@ class PH_AJAX {
                     }
 
                     // Add text if this a second, third etc viewing
-                    $applicant_contact_ids = get_post_meta( get_the_ID(), '_applicant_contact_id' );
-                    $viewing_number = ph_count_viewing_number(get_the_ID(), $property->id, $viewing_start_date_time, $applicant_contact_ids);
-                    if ( $viewing_number > 1 )
+                    $related_viewings = get_post_meta( get_the_ID(), '_related_viewings', TRUE );
+                    if ( isset($related_viewings['previous']) && count($related_viewings['previous']) > 0 )
                     {
-                        $status_output .= '<br>' . ph_ordinal_suffix($viewing_number) . ' Viewing' ;
+                        $status_output .= '<br>' . ph_ordinal_suffix(count($related_viewings['previous'])+1) . ' ' . __( 'Viewing', 'propertyhive' );
                     }
 
                     $column_data = array(

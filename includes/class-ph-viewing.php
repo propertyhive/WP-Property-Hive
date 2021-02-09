@@ -93,4 +93,76 @@ class PH_Viewing {
         $this->post_title          = $result->post_title;
         $this->post_status         = $result->post_status;
     }
+
+    public function get_related_viewings()
+    {
+        $related_viewings = array(
+            'previous' => array(),
+            'next' => array(),
+            'all' => array()
+        );
+
+        $applicant_contact_ids = get_post_meta($this->id, '_applicant_contact_id');
+        $applicant_contact_ids = !empty($applicant_contact_ids) ? ( is_array($applicant_contact_ids) ? $applicant_contact_ids : array($applicant_contact_ids) ) : array();
+
+        $property_id = get_post_meta($this->id, '_property_id', TRUE);
+        $property_id = !empty($property_id) ? $property_id : '';
+
+        $primary_viewing_start_date_time = get_post_meta($this->id, '_start_date_time', TRUE);
+
+        $meta_query = array(
+            array(
+                'key' => '_property_id',
+                'value' => (int)$property_id,
+            ),
+            array(
+                'key' => '_status',
+                'value' => 'cancelled',
+                'compare' => '!='
+            ),
+        );
+        foreach ( $applicant_contact_ids as $applicant_contact_id )
+        {
+            $meta_query[] = array(
+                'key' => '_applicant_contact_id',
+                'value' => (int)$applicant_contact_id
+            );
+        }
+
+        $args = array(
+            'fields'   => 'ids',
+            'post_type' => 'viewing',
+            'nopaging'  => true,
+            'post_status' => 'publish',
+            'meta_query' => $meta_query,
+            'post__not_in' => array($this->id),
+            'orderby' => 'none'
+        );
+
+        $viewings_query = new WP_Query( $args );
+
+        if ( $viewings_query->have_posts() )
+        {
+            while ( $viewings_query->have_posts() )
+            {
+                $viewings_query->the_post();
+
+                $viewing_start_date_time = get_post_meta(get_the_ID(), '_start_date_time', TRUE);
+
+                if ( strtotime($viewing_start_date_time) <= strtotime($primary_viewing_start_date_time) )
+                {
+                    $related_viewings['previous'][] = get_the_ID();
+                }
+                else
+                {
+                    $related_viewings['next'][] = get_the_ID();
+                }
+
+                $related_viewings['all'][] = get_the_ID();
+            }
+        }
+        wp_reset_postdata();
+
+        return $related_viewings;
+    }
 }
