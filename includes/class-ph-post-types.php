@@ -30,6 +30,9 @@ class PH_Post_types {
 
         add_action( 'save_post', array( __CLASS__, 'create_name_number_street_meta' ), 99, 3 );
         add_action( 'save_post', array( __CLASS__, 'create_concatenated_indexable_meta' ), 99, 3 );
+
+        add_action( 'save_post', array( __CLASS__, 'store_related_viewings' ), 99, 3 );
+        add_action( 'updated_post_meta', array( __CLASS__, 'store_related_viewings_meta_change' ), 10, 4 );
 	}
 
 	/**
@@ -782,6 +785,155 @@ class PH_Post_types {
             if( !$existing_concat || $existing_concat !== $descs_concat )
             {
                 update_post_meta($post_id, '_descriptions_concatenated', $descs_concat);
+            }
+        }
+    }
+
+    /**
+     * @param  int $post_id
+     * @param  object $post
+     */
+    public static function store_related_viewings( $post_id, $post, $update )
+    {
+        // $post_id and $post are required
+        if ( empty( $post_id ) || empty( $post ) ) {
+            return;
+        }
+
+        // Dont' save meta boxes for revisions or autosaves
+        if ( defined( 'DOING_AUTOSAVE' ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
+            return;
+        }
+
+        if ( $post->post_type !== 'property' && $post->post_type !== 'contact' && $post->post_type !== 'viewing' ) {
+            return;
+        }
+
+        $viewing_ids = array();
+
+        switch ( $post->post_type )
+        {
+            case "property":
+            {
+                // get all viewings for this property
+                $meta_query = array(
+                    array(
+                        'key' => '_property_id',
+                        'value' => $post_id,
+                    )
+                );
+
+                $args = array(
+                    'fields'   => 'ids',
+                    'post_type' => 'viewing',
+                    'nopaging' => true,
+                    'post_status' => 'publish',
+                    'meta_query' => $meta_query,
+                    'orderby' => 'none'
+                );
+
+                $viewings_query = new WP_Query( $args );
+
+                if ( $viewings_query->have_posts() )
+                {
+                    while ( $viewings_query->have_posts() )
+                    {
+                        $viewings_query->the_post();
+
+                        $viewing_ids[] = get_the_ID();
+                    }
+                }
+                wp_reset_postdata();
+
+                break;
+            }
+            case "contact":
+            {
+                // get all viewings for this contact
+                $meta_query = array(
+                    array(
+                        'key' => '_applicant_contact_id',
+                        'value' => $post_id,
+                    )
+                );
+
+                $args = array(
+                    'fields'   => 'ids',
+                    'post_type' => 'viewing',
+                    'nopaging' => true,
+                    'post_status' => 'publish',
+                    'meta_query' => $meta_query,
+                    'orderby' => 'none'
+                );
+
+                $viewings_query = new WP_Query( $args );
+
+                if ( $viewings_query->have_posts() )
+                {
+                    while ( $viewings_query->have_posts() )
+                    {
+                        $viewings_query->the_post();
+
+                        $viewing_ids[] = get_the_ID();
+                    }
+                }
+                wp_reset_postdata();
+
+                break;
+            }
+            case "viewing":
+            {
+                $viewing_ids[] = $post_id;
+
+                break;
+            }
+        }
+
+        if ( !empty($viewing_ids) )
+        {
+            foreach ( $viewing_ids as $viewing_id )
+            {
+                $viewing = new PH_Viewing( $viewing_id );
+
+                $related_viewings = $viewing->get_related_viewings();
+
+                update_post_meta( $post_id, '_related_viewings', $related_viewings );
+
+                if ( !empty($related_viewings['all']) )
+                {
+                    foreach ( $related_viewings['all'] as $related_viewing_id )
+                    {
+                        $other_viewing = new PH_Viewing( $related_viewing_id );
+
+                        $other_related_viewings = $other_viewing->get_related_viewings();
+
+                        update_post_meta( $related_viewing_id, '_related_viewings', $other_related_viewings );
+                    }
+                }
+            }
+        }
+    }
+
+    public static function store_related_viewings_meta_change( $meta_id, $object_id, $meta_key, $meta_value )
+    {
+        if ( get_post_type($object_id) == 'viewing' && ( $meta_key == '_status' || $meta_key == '_start_date_time' ) )
+        {
+            $viewing = new PH_Viewing( $object_id );
+
+            $related_viewings = $viewing->get_related_viewings();
+
+            update_post_meta( $object_id, '_related_viewings', $related_viewings );
+
+            if ( !empty($related_viewings['all']) )
+            {
+                foreach ( $related_viewings['all'] as $related_viewing_id )
+                {
+                    $other_viewing = new PH_Viewing( $related_viewing_id );
+
+                    $other_related_viewings = $other_viewing->get_related_viewings();
+
+                    update_post_meta( $related_viewing_id, '_related_viewings', $other_related_viewings );
+                }
             }
         }
     }
