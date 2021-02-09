@@ -25,29 +25,3 @@ jQuery(function($) {
         }
     }
 });
-
-jQuery(function($) {
-    $( 'body' ).on( 'click', 'input[name="bulk_edit"]', function() {
-
-        // Add the WordPress default spinner just before the button
-        $( this ).after('<span class="spinner is-active"></span>');
-
-        var bulk_edit_row = $( 'tr#bulk-edit' ),
-            post_ids = [],
-            status = bulk_edit_row.find( 'select[name="_key_date_status"] option:selected' ).val()
-
-        bulk_edit_row.find( '#bulk-titles' ).children().each( function() {
-            post_ids.push( $( this ).attr( 'id' ).replace( /^(ttle)/i, '' ) );
-        });
-
-        $.ajax({
-            url: ajaxurl,
-            type: 'POST',
-            data: {
-                action: 'save_key_date_bulk',
-                post_ids: post_ids,
-                _key_date_status: status,
-            }
-        });
-    });
-});
