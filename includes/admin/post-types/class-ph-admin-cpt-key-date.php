@@ -36,8 +36,8 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 							<legend class="inline-edit-legend">Quick Edit</legend>
 							<div class="inline-edit-col">
 								<label>
-									<span class="title">Type</span>
-									<span class="key_date-type"></span>
+									<span class="title">Description</span>
+									<span class="key_date-description"></span>
 								</label>
 								<label>
 									<span class="title">Property</span>

@@ -1329,19 +1329,34 @@ class PH_Admin_Post_Types {
                         );
                         break;
                     case 'pending':
-                    case 'upcoming_and_overdue':
                         $vars['meta_query'][] = array(
                             'key' => '_key_date_status',
                             'value' => 'pending',
                         );
-	                $upcoming_threshold = new DateTime(PH_Key_Date::UPCOMING_THRESHOLD);
-	                $vars['meta_query'][] = array(
+                        break;
+                    case 'upcoming_and_overdue':
+                        $vars['meta_query'][] = array(
+                            'key' => '_key_date_status',
+                            'value' => array('pending', 'booked'),
+                            'compare' => 'IN'
+                        );
+                        $upcoming_threshold = new DateTime(PH_Key_Date::UPCOMING_THRESHOLD);
+                        $vars['meta_query'][] = array(
                             'key' => '_date_due',
                             'value' => $upcoming_threshold->format('Y-m-d'),
                             'type' => 'date',
-                            'compare' => $value == 'pending' ? '>' : '<=',
+                            'compare' => '<=',
                         );
+                        break;
                 }
+            }
+
+            if ( !empty( $_GET['_key_date_type_id'] ) )
+            {
+                $vars['meta_query'][] = array(
+                    'key' => '_key_date_type_id',
+                    'value' => (int)$_GET['_key_date_type_id'],
+                );
             }
         }
 
