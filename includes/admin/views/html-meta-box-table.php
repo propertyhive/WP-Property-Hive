@@ -4,6 +4,9 @@
         'parent' => 0
     ) );
 
+    $recurrence_rules = get_option( 'propertyhive_key_date_type', array() );
+    $recurrence_rules = is_array( $recurrence_rules ) ? $recurrence_rules : array();
+
     $parent_post_type = get_post_type( $post_id );
 
     $meta_query = array();
@@ -13,8 +16,14 @@
         case 'property' :
         {
             $meta_query = array(
-                'key' => '_property_id',
-                'value' => $post_id
+                array(
+                    'key' => '_property_id',
+                    'value' => $post_id,
+                ),
+                array(
+                    'key' => '_tenancy_id',
+                    'compare' => 'NOT EXISTS',
+                ),
             );
             break;
         }
@@ -98,8 +107,12 @@
                 {
                     foreach ($key_date_type_terms as $key_date_type_term)
                     {
-                        $selected = ( isset($selected_type_id) && $selected_type_id == $key_date_type_term->term_id ) ? ' selected' : '';
-                        echo '<option value="' . $key_date_type_term->term_id . '"' . $selected . '>' . $key_date_type_term->name . '</option>';
+                        $recurrence_type = isset($recurrence_rules[$key_date_type_term->term_id]) ? $recurrence_rules[$key_date_type_term->term_id]['recurrence_type'] : '';
+                        if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
+                        {
+                            $selected = ( isset($selected_type_id) && $selected_type_id == $key_date_type_term->term_id ) ? ' selected' : '';
+                            echo '<option value="' . $key_date_type_term->term_id . '"' . $selected . '>' . $key_date_type_term->name . '</option>';
+                        }
                     }
                 }
                 ?>
@@ -278,7 +291,11 @@
                         {
                             foreach ($key_date_type_terms as $key_date_type_term)
                             {
-                                echo '<option value="' . $key_date_type_term->term_id . '">' . $key_date_type_term->name . '</option>';
+                                $recurrence_type = isset($recurrence_rules[$key_date_type_term->term_id]) ? $recurrence_rules[$key_date_type_term->term_id]['recurrence_type'] : '';
+                                if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
+                                {
+                                    echo '<option value="' . $key_date_type_term->term_id . '">' . $key_date_type_term->name . '</option>';
+                                }
                             }
                         }
                         ?>
