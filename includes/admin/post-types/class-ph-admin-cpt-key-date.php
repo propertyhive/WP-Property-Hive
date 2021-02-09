@@ -14,7 +14,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 		public function __construct() {
 			$this->type = 'key_date';
 
-			add_filter( 'manage_edit-key_date_columns', array( $this, 'columns' ) );
+			add_filter( 'manage_edit-key_date_columns', array( $this, 'edit_columns' ) );
 			add_action( 'manage_key_date_posts_custom_column', array( $this, 'custom_columns' ) );
 			add_filter( 'manage_edit-key_date_sortable_columns', array( $this, 'sortable_columns' ) );
 			add_filter( 'request', array( $this, 'custom_sorts' ) );
@@ -69,15 +69,27 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			}
 		}
 
-		public function columns( array $columns ) {
+		/**
+		 * Change the columns shown in admin.
+		 */
+		public function edit_columns( $existing_columns ) {
 
-			return array_merge( $columns, array(
-				'description' => __( 'Description', 'propertyhive' ),
-				'property'    => __( 'Property', 'propertyhive' ),
-				'tenants'     => __( 'Tenants', 'propertyhive' ),
-				'date_due'    => __( 'Date Due', 'propertyhive' ),
-				'status'      => __( 'Status', 'propertyhive' ),
-			) );
+			if ( empty( $existing_columns ) && ! is_array( $existing_columns ) )
+			{
+				$existing_columns = array();
+			}
+
+			unset( $existing_columns['title'], $existing_columns['comments'], $existing_columns['date'] );
+
+			$columns                = array();
+			$columns['cb']          = '<input type="checkbox" />';
+			$columns['description'] = __( 'Description', 'propertyhive' );
+			$columns['property']    = __( 'Property', 'propertyhive' );
+			$columns['tenants']     = __( 'Tenants', 'propertyhive' );
+			$columns['date_due']    = __( 'Date Due', 'propertyhive' );
+			$columns['status']      = __( 'Status', 'propertyhive' );
+
+			return array_merge( $columns, $existing_columns );
 		}
 
 		/**
