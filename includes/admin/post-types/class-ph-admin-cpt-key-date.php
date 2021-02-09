@@ -20,8 +20,8 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			add_filter( 'request', array( $this, 'custom_sorts' ) );
 			add_action( 'quick_edit_custom_box', array( $this, 'key_date_custom_quick_edit_box' ), 10, 3 );
 			add_action( 'save_post', array( $this, 'save_key_date' ) );
-			add_action( 'bulk_edit_custom_box', array( $this, 'key_date_custom_bulk_edit_box' ), 10, 3 );
-			add_action( 'wp_ajax_save_key_date_bulk', array( $this, 'save_key_date_bulk' ) );
+
+			add_filter( 'bulk_actions-edit-key_date', array( $this, 'remove_bulk_actions') );
 
 			parent::__construct();
 		}
@@ -66,44 +66,6 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 							</div>
 						</fieldset>
 					<?php
-			}
-		}
-
-		function key_date_custom_bulk_edit_box( $column_name, $post_type ) {
-			global $post;
-
-			if ( $post_type == 'key_date' && $column_name == 'description' )
-			{
-				?>
-				<fieldset class="inline-edit-col-left inline-edit-ph inline-edit-key_date">
-					<legend class="inline-edit-legend">Bulk Edit</legend>
-					<div id="bulk-title-div">
-						<div id="bulk-titles"></div>
-					</div>
-					<div class="inline-edit-col">
-						<label>
-							<span class="title">Status</span>
-							<span class="input-text-wrap">
-								<?php
-									$selected_value = get_post_meta( $post->ID, '_key_date_status', true );
-									$output = '<select name="_key_date_status">';
-
-									foreach ( array('pending', 'booked', 'complete') as $status )
-									{
-										$output .= '<option value="' . $status . '"';
-										$output .= selected($status, $selected_value, false );
-										$output .= '>' . ucwords($status) . '</option>';
-									}
-
-									$output .= '</select>';
-
-									echo $output;
-								?>
-							</span>
-						</label>
-					</div>
-				</fieldset>
-				<?php
 			}
 		}
 
@@ -222,6 +184,15 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			return $vars;
 		}
 
+		/**
+		 * Remove bulk edit option
+		 * @param  array $actions
+		 */
+		public function remove_bulk_actions( $actions ) {
+			unset( $actions['edit'] );
+			return $actions;
+		}
+
 		function save_key_date( $post_id ) {
 
 			if ( $post_id == null || get_post_type($post_id) != 'key_date' || empty( $_POST['_key_date_status'] ) )
@@ -230,19 +201,6 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			}
 
 			update_post_meta( $post_id, '_key_date_status', $_POST['_key_date_status'] );
-		}
-
-		function save_key_date_bulk() {
-
-			if ( empty( $_POST[ 'post_ids' ] ) )
-			{
-				return;
-			}
-
-			foreach ( $_POST[ 'post_ids' ] as $id )
-			{
-				$this->save_key_date($id);
-			}
 		}
 	}
 }
