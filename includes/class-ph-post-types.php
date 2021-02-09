@@ -32,6 +32,7 @@ class PH_Post_types {
         add_action( 'save_post', array( __CLASS__, 'create_concatenated_indexable_meta' ), 99, 3 );
 
         add_action( 'save_post', array( __CLASS__, 'store_related_viewings' ), 99, 3 );
+        add_action( 'updated_post_meta', array( __CLASS__, 'store_related_viewings_meta_change' ), 10, 4 );
 	}
 
 	/**
@@ -908,6 +909,30 @@ class PH_Post_types {
 
                         update_post_meta( $related_viewing_id, '_related_viewings', $other_related_viewings );
                     }
+                }
+            }
+        }
+    }
+
+    public static function store_related_viewings_meta_change( $meta_id, $object_id, $meta_key, $meta_value )
+    {
+        if ( get_post_type($object_id) == 'viewing' && ( $meta_key == '_status' || $meta_key == '_start_date_time' ) )
+        {
+            $viewing = new PH_Viewing( $object_id );
+
+            $related_viewings = $viewing->get_related_viewings();
+
+            update_post_meta( $object_id, '_related_viewings', $related_viewings );
+
+            if ( !empty($related_viewings['all']) )
+            {
+                foreach ( $related_viewings['all'] as $related_viewing_id )
+                {
+                    $other_viewing = new PH_Viewing( $related_viewing_id );
+
+                    $other_related_viewings = $other_viewing->get_related_viewings();
+
+                    update_post_meta( $related_viewing_id, '_related_viewings', $other_related_viewings );
                 }
             }
         }
