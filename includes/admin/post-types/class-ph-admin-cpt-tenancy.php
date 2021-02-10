@@ -199,20 +199,8 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				break;
 			case 'applicant' :
 
-				$applicant_contact_ids = get_post_meta( $post->ID, '_applicant_contact_id' );
-				if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
-				{
-					$applicants = array();
-					foreach ( $applicant_contact_ids as $applicant_contact_id )
-					{
-						$applicants[] = get_the_title($applicant_contact_id);
-					}
-					echo implode("<br>", $applicants);
-				}
-				else
-				{
-					echo '-';
-				}
+				echo $the_tenancy->get_tenants();
+
 				break;
 			case 'dates' :
 				echo 'Start Date: ' . ( $the_tenancy->_start_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_start_date ) ) : '-' ) . '<br>';
@@ -226,18 +214,7 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				break;
 			case 'status' :
 
-				if ( $the_tenancy->_start_date && strtotime( $the_tenancy->_start_date ) > time() )
-				{
-					echo __( 'Pending', 'propertyhive' );
-				}
-				elseif ( $the_tenancy->_start_date && strtotime( $the_tenancy->_start_date ) <= time() && time() < strtotime( $the_tenancy->_end_date ) )
-				{
-					echo __( 'Current', 'propertyhive' );
-				}
-				elseif ( $the_tenancy->_start_date && strtotime( $the_tenancy->_start_date ) < time() )
-				{
-					echo __( 'Finished', 'propertyhive' );
-				}
+				echo $the_tenancy->get_status();
 
 				break;
 			default :
