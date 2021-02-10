@@ -49,6 +49,11 @@ class PH_Admin_Dashboard {
         {
         	wp_add_dashboard_widget( 'propertyhive_dashboard_my_upcoming_appointments', __( 'My Upcoming Appointments', 'propertyhive' ), array( $this, 'my_upcoming_appointments_widget' ) );
         }
+
+		if ( get_option( 'propertyhive_module_disabled_management', '' ) != 'yes' )
+		{
+			wp_add_dashboard_widget( 'propertyhive_dashboard_upcoming_overdue_key_dates', __( 'Upcoming/Overdue Key Dates', 'propertyhive' ), array( $this, 'upcoming_overdue_key_dates_widget' ) );
+		}
 	}
 
 	/*
@@ -73,6 +78,14 @@ class PH_Admin_Dashboard {
 	public function my_upcoming_appointments_widget()
 	{
 		echo '<div id="ph_dashboard_my_upcoming_appointments">Loading...</div>';
+	}
+
+	/*
+	 * Property Hive Upcoming & Overdue Key Dates Widget
+	 */
+	public function upcoming_overdue_key_dates_widget()
+	{
+		echo '<div id="ph_dashboard_upcoming_overdue_key_dates">Loading...</div>';
 	}
 }
 
