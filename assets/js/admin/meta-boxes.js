@@ -231,6 +231,7 @@ jQuery( function($){
             jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
             {
                 jQuery('#propertyhive_management_dates_container').html(response);
+                initialise_datepicker();
             }, 'html');
         });
 
@@ -254,6 +255,7 @@ jQuery( function($){
         jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
         {
             jQuery('#propertyhive_management_dates_container').html(response);
+            initialise_datepicker();
         }, 'html');
 
         return false;
