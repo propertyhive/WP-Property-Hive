@@ -130,7 +130,7 @@
 
             </div>
 			<div class="tablenav-pages one-page">
-                <span class="displaying-num"><?php echo count($key_dates); ?> items</span>
+                <span class="displaying-num"><?php echo count($key_dates); ?> item<?php echo count($key_dates) > 1 ? 's' : ''; ?></span>
 				<span class="pagination-links">
                     <span class="tablenav-pages-navspan button disabled" aria-hidden="true">«</span>
                     <span class="tablenav-pages-navspan button disabled" aria-hidden="true">‹</span>
@@ -241,7 +241,7 @@
                     <th scope="col" class="manage-column column-tenants">
                         Tenants
                     </th>
-                    <th scope="col" class="manage-column column-date_due sorted asc">
+                    <th scope="col" class="manage-column column-date_due">
                         <span>Date Due</span>
                     </th>
                     <th scope="col" class="manage-column column-status">
@@ -262,7 +262,7 @@
 			</div>
 
             <div class="tablenav-pages one-page">
-                <span class="displaying-num">3 items</span>
+                <span class="displaying-num"><?php echo count($key_dates); ?> item<?php echo count($key_dates) > 1 ? 's' : ''; ?></span>
                 <span class="pagination-links">
                     <span class="tablenav-pages-navspan button disabled" aria-hidden="true">«</span>
                     <span class="tablenav-pages-navspan button disabled" aria-hidden="true">‹</span>
