@@ -120,4 +120,57 @@ class PH_Tenancy {
         return ( ( $amount != '' ) ? $prefix . number_format($amount, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) : '-' ) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' );
 
     }
+
+    /**
+     * Get the tenancy status
+     *
+     * @access public
+     * @return string
+     */
+    public function get_status()
+    {
+        if ( $this->_start_date && strtotime( $this->_start_date ) > time() )
+        {
+            return __( 'Pending', 'propertyhive' );
+        }
+        elseif ( $this->_start_date && strtotime( $this->_start_date ) <= time() && time() < strtotime( $this->_end_date ) )
+        {
+            return __( 'Current', 'propertyhive' );
+        }
+        elseif ( $this->_end_date && strtotime( $this->_end_date ) < time() )
+        {
+            return __( 'Finished', 'propertyhive' );
+        }
+    }
+
+    /**
+     * Get a list of tenants on the property
+     *
+     * @access public
+     * @param bool $add hyperlinks
+     * @return string
+     */
+    public function get_tenants( $add_hyperlinks = false )
+    {
+        $applicant_contact_ids = get_post_meta( $this->id, '_applicant_contact_id' );
+        if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
+        {
+            $applicants = array();
+            foreach ( $applicant_contact_ids as $applicant_contact_id )
+            {
+                $applicant_name = get_the_title($applicant_contact_id);
+                if ( $add_hyperlinks )
+                {
+                    $edit_link = get_edit_post_link( $applicant_contact_id );
+                    $applicant_name = '<a href="' . esc_url( $edit_link ) . '">' . $applicant_name . '</a>';
+                }
+                $applicants[] = $applicant_name;
+            }
+            return implode("<br>", $applicants);
+        }
+        else
+        {
+            return '-';
+        }
+    }
 }

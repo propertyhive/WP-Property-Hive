@@ -921,6 +921,16 @@ class PH_Admin_Meta_Boxes {
 
 				/* MANAGEMENT META BOXES */
 				$meta_boxes    = array();
+
+                $meta_boxes[5] = array(
+                    'id' => 'propertyhive-property-tenancies',
+                    'title' => __( 'Tenancies', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Property_Tenancies::output',
+                    'screen' => 'property',
+                    'context' => 'normal',
+                    'priority' => 'high'
+                );
+
 				$meta_boxes[10] = array(
 					'id'       => 'propertyhive-management-dates',
 					'title'    => __( 'Management', 'propertyhive' ),
