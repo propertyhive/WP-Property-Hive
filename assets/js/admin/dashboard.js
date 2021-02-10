@@ -71,4 +71,28 @@ jQuery(window).on('load', function()
 			
 		}, 'json');
 	}
+
+	// Load upcoming and overdue key dates, if div is present (i.e. if management module hasn't been disabled)
+	if ( jQuery('#ph_dashboard_upcoming_overdue_key_dates').length > 0 )
+	{
+		var data = {
+			action: 'propertyhive_get_upcoming_overdue_key_dates',
+			security: 'get_upcoming_overdue_key_dates'
+		};
+
+		jQuery.post(propertyhive_dashboard.ajax_url, data, function(response)
+		{
+			if ( response == '' || response.length == 0 )
+			{
+				jQuery('#ph_dashboard_upcoming_overdue_key_dates').html('No upcoming key dates found');
+				return;
+			}
+
+			jQuery('#ph_dashboard_upcoming_overdue_key_dates').html('<ul></ul>')
+			for ( var i in response )
+			{
+				jQuery('#ph_dashboard_upcoming_overdue_key_dates ul').append('<li><a class="rsswidget" style="font-weight:400" href="' + response[i].key_date_edit_link + '">' + response[i].description + '</a> ' + response[i].upcoming_overdue_status + ' on <a class="rsswidget" style="font-weight:400" href="' + response[i].property_edit_link + '">' + response[i].property_address + '</a><br><small style="opacity:0.85">' + response[i].due_date_time_formatted + '</small></li>');
+			}
+		}, 'json');
+	}
 });

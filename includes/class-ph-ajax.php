@@ -38,6 +38,7 @@ class PH_AJAX {
             'get_news' => false,
             'get_viewings_awaiting_applicant_feedback' => false,
             'get_my_upcoming_appointments' => false,
+            'get_upcoming_overdue_key_dates' => false,
 
             // Property actions
             'get_property_marketing_statistics_meta_box' => false,
@@ -2092,6 +2093,90 @@ class PH_AJAX {
 
             $return = array_slice($return, 0, 10);
         }
+
+        echo json_encode($return);
+
+        die();
+    }
+
+    public function get_upcoming_overdue_key_dates()
+    {
+        global $post;
+
+        $this->json_headers();
+
+        $return = array();
+
+        $meta_query = array(
+            array(
+                'key' => '_key_date_status',
+                'value' => 'pending',
+            ),
+        );
+
+        $upcoming_threshold = new DateTime(PH_Key_Date::UPCOMING_THRESHOLD);
+        $meta_query[] = array(
+            'key' => '_date_due',
+            'value' => $upcoming_threshold->format('Y-m-d'),
+            'type' => 'date',
+            'compare' => '<=',
+        );
+
+        $args = array(
+            'post_type' => 'key_date',
+            'fields' => 'ids',
+            'post_status' => 'publish',
+            'meta_query' => $meta_query,
+            'meta_key' => '_date_due',
+            'orderby' => 'meta_value',
+            'order' => 'ASC',
+        );
+
+
+        $key_dates_query = new WP_Query( $args );
+
+        if ( $key_dates_query->have_posts() )
+        {
+            while ( $key_dates_query->have_posts() )
+            {
+                $key_dates_query->the_post();
+
+                $key_date = new PH_Key_Date( get_post( get_the_ID() ) );
+
+                $property_id = get_post_meta( get_the_ID(), '_property_id', TRUE );
+                $property = new PH_Property((int)$property_id);
+                $property_edit_link = get_edit_post_link( $property_id );
+
+                $tenancy_id = get_post_meta( get_the_ID(), '_tenancy_id', TRUE );
+                if ( !empty($tenancy_id) )
+                {
+                    $key_date_edit_link = get_edit_post_link( $tenancy_id );
+                }
+                else
+                {
+                    $key_date_edit_link = $property_edit_link;
+                }
+
+                $due_date = $key_date->date_due();
+                $date_format = 'jS F Y';
+                if ( $due_date->format('H:i') != '00:00' )
+                {
+                    $date_format = 'H:i ' . $date_format;
+                }
+
+                $return[] = array(
+                    'ID' => get_the_ID(),
+                    'key_date_edit_link' => $key_date_edit_link . '#propertyhive-management-dates',
+                    'description' => $key_date->description(),
+                    'upcoming_overdue_status' => $key_date->status(),
+                    'property_edit_link' => $property_edit_link,
+                    'property_address' => $property->get_formatted_full_address(),
+                    'due_date_time_formatted' => $due_date->format($date_format),
+                );
+            }
+        }
+
+        wp_reset_postdata();
 
         echo json_encode($return);
 
