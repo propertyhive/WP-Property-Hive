@@ -41,6 +41,7 @@ class PH_AJAX {
 
             // Property actions
             'get_property_marketing_statistics_meta_box' => false,
+            'get_property_tenancies_grid' => false,
 
             // Contact actions
             'create_contact_login' => false,
@@ -5516,6 +5517,21 @@ class PH_AJAX {
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-meta-box-table.php' );
+
+        // Quit out
+        die();
+    }
+
+    public function get_property_tenancies_grid()
+    {
+        $post_id = $_POST['post_id'];
+
+        if ( isset($_POST['selected_status']) )
+        {
+            $selected_status = $_POST['selected_status'];
+        }
+
+        include( PH()->plugin_path() . '/includes/admin/views/html-property-tenancies-meta-box.php' );
 
         // Quit out
         die();
