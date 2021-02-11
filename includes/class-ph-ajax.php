@@ -2152,11 +2152,11 @@ class PH_AJAX {
                 $tenancy_id = get_post_meta( get_the_ID(), '_tenancy_id', TRUE );
                 if ( !empty($tenancy_id) )
                 {
-                    $key_date_edit_link = get_edit_post_link( $tenancy_id );
+                    $key_date_edit_link = get_edit_post_link( $tenancy_id ) . '#propertyhive-tenancy-management%7Cpropertyhive-management-dates';
                 }
                 else
                 {
-                    $key_date_edit_link = $property_edit_link;
+                    $key_date_edit_link = $property_edit_link . '#propertyhive-property-tenancies%7Cpropertyhive-management-dates';
                 }
 
                 $due_date = $key_date->date_due();
@@ -2168,7 +2168,7 @@ class PH_AJAX {
 
                 $return[] = array(
                     'ID' => get_the_ID(),
-                    'key_date_edit_link' => $key_date_edit_link . '#propertyhive-management-dates',
+                    'key_date_edit_link' => $key_date_edit_link,
                     'description' => $key_date->description(),
                     'upcoming_overdue_status' => $key_date->status(),
                     'property_edit_link' => $property_edit_link,
