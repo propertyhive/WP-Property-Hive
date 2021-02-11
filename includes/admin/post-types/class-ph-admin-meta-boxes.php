@@ -916,11 +916,12 @@ class PH_Admin_Meta_Boxes {
         }
 
 		if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' ) {
-			if ( get_option( 'propertyhive_module_disabled_management', '' ) != 'yes' ) {
 
-                if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-lettings' )
+            if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-lettings' )
+            {
+                if ( get_option( 'propertyhive_module_disabled_tenancies', '' ) != 'yes' )
                 {
-                    /* MANAGEMENT META BOXES */
+                    /* TENANCY MANAGEMENT META BOXES */
                     $meta_boxes    = array();
 
                     $meta_boxes[5] = array(

@@ -115,8 +115,12 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         {
             $sections[ 'furnished' ] = __( 'Furnished', 'propertyhive' );
             add_action( 'propertyhive_admin_field_custom_fields_furnished', array( $this, 'custom_fields_furnished_setting' ) );
-            $sections[ 'management-key-date-type' ] = __( 'Management Dates', 'propertyhive' );
-            add_action( 'propertyhive_admin_field_custom_fields_management_key_date_type', array( $this, 'custom_fields_management_key_date_type_setting' ) );
+
+            if ( get_option( 'propertyhive_module_disabled_tenancies', '' ) != 'yes' )
+            {
+                $sections[ 'management-key-date-type' ] = __( 'Management Dates', 'propertyhive' );
+                add_action( 'propertyhive_admin_field_custom_fields_management_key_date_type', array( $this, 'custom_fields_management_key_date_type_setting' ) );
+            }
         }
 
         // Other
