@@ -918,41 +918,44 @@ class PH_Admin_Meta_Boxes {
 		if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' ) {
 			if ( get_option( 'propertyhive_module_disabled_management', '' ) != 'yes' ) {
 
-				/* MANAGEMENT META BOXES */
-				$meta_boxes    = array();
+                if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-lettings' )
+                {
+                    /* MANAGEMENT META BOXES */
+                    $meta_boxes    = array();
 
-                $meta_boxes[5] = array(
-                    'id' => 'propertyhive-property-tenancies',
-                    'title' => __( 'Tenancies', 'propertyhive' ),
-                    'callback' => 'PH_Meta_Box_Property_Tenancies::output',
-                    'screen' => 'property',
-                    'context' => 'normal',
-                    'priority' => 'high'
-                );
+                    $meta_boxes[5] = array(
+                        'id' => 'propertyhive-property-tenancies',
+                        'title' => __( 'Tenancies', 'propertyhive' ),
+                        'callback' => 'PH_Meta_Box_Property_Tenancies::output',
+                        'screen' => 'property',
+                        'context' => 'normal',
+                        'priority' => 'high'
+                    );
 
-				$meta_boxes[10] = array(
-					'id'       => 'propertyhive-management-dates',
-					'title'    => __( 'Management Dates', 'propertyhive' ),
-					'callback' => 'PH_Meta_Box_Management_Dates::output',
-					'screen'   => 'property',
-					'context'  => 'normal',
-					'priority' => 'high'
-				);
+                    $meta_boxes[10] = array(
+                        'id'       => 'propertyhive-management-dates',
+                        'title'    => __( 'Management Dates', 'propertyhive' ),
+                        'callback' => 'PH_Meta_Box_Management_Dates::output',
+                        'screen'   => 'property',
+                        'context'  => 'normal',
+                        'priority' => 'high'
+                    );
 
-				$meta_boxes = apply_filters( 'propertyhive_property_management_meta_boxes', $meta_boxes );
-				ksort( $meta_boxes );
+                    $meta_boxes = apply_filters( 'propertyhive_property_management_meta_boxes', $meta_boxes );
+                    ksort( $meta_boxes );
 
-				$ids = array();
-				foreach ( $meta_boxes as $meta_box ) {
-					add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
-					$ids[] = $meta_box['id'];
-				}
+                    $ids = array();
+                    foreach ( $meta_boxes as $meta_box ) {
+                        add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                        $ids[] = $meta_box['id'];
+                    }
 
-				$tabs['tab_property_management'] = array(
-					'name'        => __( 'Management', 'propertyhive' ),
-					'metabox_ids' => $ids,
-					'post_type'   => 'property'
-				);
+                    $tabs['tab_property_management'] = array(
+                        'name'        => __( 'Management', 'propertyhive' ),
+                        'metabox_ids' => $ids,
+                        'post_type'   => 'property'
+                    );
+                }
 			}
 		}
 
