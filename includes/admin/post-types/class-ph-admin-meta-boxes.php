@@ -954,7 +954,8 @@ class PH_Admin_Meta_Boxes {
                     $tabs['tab_property_management'] = array(
                         'name'        => __( 'Management', 'propertyhive' ),
                         'metabox_ids' => $ids,
-                        'post_type'   => 'property'
+                        'post_type'   => 'property',
+                        'ajax_actions' => array( 'get_property_tenancies_grid^' . wp_create_nonce( 'get_property_tenancies_grid' ) ),
                     );
                 }
 			}
