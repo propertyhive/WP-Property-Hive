@@ -1,49 +1,4 @@
 <?php
-    /*add_action( 'quick_edit_custom_box', 'key_date_meta_box_custom_quick_edit_box' );
-
-    function key_date_meta_box_custom_quick_edit_box( $column_name, $post_type, $taxonomy ) {
-        global $post;
-
-        if ($post_type == 'key_date' && $column_name == 'description')
-        {
-            ?>
-                    <fieldset class="inline-edit-col-left inline-edit-ph inline-edit-key_date">
-                        <legend class="inline-edit-legend">Quick Edit</legend>
-                        <div class="inline-edit-col">
-                            <label>
-                                <span class="title">Description</span>
-                                <span class="key_date-description"></span>
-                            </label>
-                            <label>
-                                <span class="title">Property</span>
-                                <span class="key_date-property"></span>
-                            </label>
-                            <label>
-                                <span class="title">Status</span>
-                                <span class="input-text-wrap">
-                                    <?php
-                                        $selected_value = get_post_meta( $post->ID, '_key_date_status', true );
-                                        $output = '<select name="_key_date_status">';
-
-                                        foreach ( array( 'pending', 'booked', 'complete' ) as $status )
-                                        {
-                                                $output .= '<option value="' . $status . '"';
-                                                $output .= selected($status, $selected_value, false );
-                                                $output .= '>' . ucwords($status) . '</option>';
-                                        }
-
-                                        $output .= '</select>';
-
-                                        echo $output;
-                                    ?>
-                                </span>
-                            </label>
-                        </div>
-                    </fieldset>
-                <?php
-        }
-    }*/
-
     $key_date_type_terms = get_terms( 'management_key_date_type', array(
         'hide_empty' => false,
         'parent' => 0
@@ -223,18 +178,18 @@
                     {
                         $key_date = new PH_Key_Date( $key_date_post );
                         ?>
-                        <tr id="post-<?php echo $key_date_post->ID; ?>" class="iedit author-self level-0 post-<?php echo $key_date_post->ID; ?> type-key_date status-publish hentry">
+                        <tr id="post-<?php echo $key_date_post->ID; ?>" class="post-<?php echo $key_date_post->ID; ?> key-date-row">
                             <td class="description column-description" data-colname="Description">
                                 <div class="cell-main-content"><?php echo $key_date->description(); ?></div>
                                 <div class="row-actions">
                                     <span class="inline hide-if-no-js">
-                                        <button type="button" class="button-link editinline" aria-label="Quick edit “<?php echo $key_date->description(); ?>” inline" aria-expanded="false">
+                                        <button type="button" id="<?php echo $key_date_post->ID; ?>" class="button-link meta-box-quick-edit">
                                             Quick&nbsp;Edit
                                         </button>
                                     </span>
                                 </div>
                             </td>
-                            <td class="date_due column-tenants" data-colname="Tenants">
+                            <td class="tenants column-tenants" data-colname="Tenants">
                                 <div class="cell-main-content">
                                 <?php
                                     $tenants = '-';
@@ -257,10 +212,21 @@
                                 </div>
                             </td>
                             <td class="date_due column-date_due" data-colname="Date Due">
-                                <div class="cell-main-content"><?php echo $key_date->date_due()->format( 'jS F Y' ); ?></div>
+                                <?php
+                                    if ( $key_date->date_due()->format( 'H:i' ) == '00:00' )
+                                    {
+                                        $date_format = 'jS F Y';
+                                    }
+                                    else
+                                    {
+                                        $date_format = 'H:i jS F Y';
+                                    }
+                                ?>
+                                <div class="cell-main-content"><?php echo $key_date->date_due()->format( $date_format ); ?></div>
                             </td>
                             <td class="status column-status" data-colname="Status">
                                 <div class="cell-main-content"><?php echo ucwords( $key_date->status() ); ?></div>
+                                <div class="hidden hidden-date-type-id"><?php echo $key_date->key_date_type_id(); ?></div>
                             </td>
                         </tr>
                         <?php

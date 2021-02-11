@@ -102,6 +102,8 @@ class PH_AJAX {
             // Tenancy actions
             'add_key_date' => false,
             'get_management_dates_grid' => false,
+            'get_key_dates_quick_edit_row' => false,
+            'save_key_date' => false,
 
             'validate_save_contact' => false,
             'applicant_registration' => true,
@@ -5604,6 +5606,33 @@ class PH_AJAX {
         include( PH()->plugin_path() . '/includes/admin/views/html-management-dates-meta-box.php' );
 
         // Quit out
+        die();
+    }
+
+    public function get_key_dates_quick_edit_row()
+    {
+        $post_id = $_POST['post_id'];
+
+        include( PH()->plugin_path() . '/includes/admin/views/html-key-dates-quick-edit.php' );
+
+        // Quit out
+        die();
+    }
+
+    public function save_key_date()
+    {
+        $key_date_post_id = (int)$_POST['post_id'];
+
+        $args = array(
+            'ID' => $key_date_post_id,
+            'post_title' => $_POST['description'],
+        );
+        wp_update_post( $args );
+
+        update_post_meta( $key_date_post_id, '_date_due', $_POST['due_date_time'] );
+        update_post_meta( $key_date_post_id, '_key_date_status', $_POST['status'] );
+        update_post_meta( $key_date_post_id, '_key_date_type_id', $_POST['type'] );
+
         die();
     }
 
