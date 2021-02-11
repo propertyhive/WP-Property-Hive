@@ -1342,7 +1342,6 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 					<thead>
 						<tr>
 							<th style="width:1px;">&nbsp;</th>
-							<th style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
 							<th style="width:40%;"><?php _e( 'Description', 'propertyhive' ); ?></th>
 							<th><?php _e( 'Recurrence', 'propertyhive' ); ?></th>
 							<th>&nbsp;</th>
@@ -1414,7 +1413,6 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 							?>
 							<tr>
 								<td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
-								<td class="id"><?php echo $term->term_id; ?></td>
 								<td><?php echo $term->name; ?></td>
 								<td><?php echo $frequency ?></td>
 								<td class="settings">
