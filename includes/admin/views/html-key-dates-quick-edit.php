@@ -3,7 +3,7 @@
         <div class="options_group">
             <p class="form-field">
                 <label for="date_description">Description</label>
-                <input type="text" id="date_description" style="width:120px;" value="<?php echo isset( $_POST['description'] ) ? $_POST['description'] : ''; ?>">
+                <input type="text" id="date_description" class="short" value="<?php echo isset( $_POST['description'] ) ? $_POST['description'] : ''; ?>">
             </p>
             <p class="form-field">
                 <label for="key_date_status">Status</label>
