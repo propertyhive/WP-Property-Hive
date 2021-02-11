@@ -589,7 +589,10 @@ class PH_Post_types {
 					'query_var'             => true,
 					'supports'              => false,
 					'show_in_nav_menus'     => false,
-					'show_in_menu'          => false
+					'show_in_menu'          => false,
+					'capabilities' => array(
+						'create_posts' => 'do_not_allow'
+					),
 				)
 			)
 		);
