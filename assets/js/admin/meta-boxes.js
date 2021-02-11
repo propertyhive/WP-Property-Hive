@@ -315,7 +315,7 @@ jQuery( function($){
             post_id: date_post_id,
             description: quick_edit_row.find('#date_description').val(),
             status: quick_edit_row.find('#key_date_status').val(),
-            due_date_time: quick_edit_row.find('#date_due').val() + ' ' + quick_edit_row.find('#date_due_hours').val() + ':' + quick_edit_row.find('#date_due_minutes').val(),
+            due_date_time: quick_edit_row.find('#date_due_quick_edit').val() + ' ' + quick_edit_row.find('#date_due_hours_quick_edit').val() + ':' + quick_edit_row.find('#date_due_minutes_quick_edit').val(),
             type: quick_edit_row.find('#date_type').val(),
         };
 

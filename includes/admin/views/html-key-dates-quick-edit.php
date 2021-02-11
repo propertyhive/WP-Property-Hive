@@ -31,10 +31,10 @@
                 <?php
                 $due_date_time = isset( $_POST['due_date_time'] ) ? strtotime($_POST['due_date_time']) : '';
                 ?>
-                <label for="date_due">Due Date</label>
-                <input type="text" id="date_due" name="date_due" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="<?php echo date('Y-m-d', $due_date_time); ?>">
+                <label for="date_due_quick_edit">Due Date</label>
+                <input type="text" id="date_due_quick_edit" name="date_due_quick_edit" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="<?php echo date('Y-m-d', $due_date_time); ?>">
 
-                <select id="date_due_hours" name="date_due_hours" class="select short" style="width:55px">';
+                <select id="date_due_hours_quick_edit" name="date_due_hours_quick_edit" class="select short" style="width:55px">';
                     <?php
                     for ( $i = 0; $i < 23; ++$i )
                     {
@@ -46,7 +46,7 @@
                     ?>
                 </select>
                 :
-                <select id="date_due_minutes" name="date_due_minutes" class="select short" style="width:55px">
+                <select id="date_due_minutes_quick_edit" name="date_due_minutes_quick_edit" class="select short" style="width:55px">
                     <?php
                     for ( $i = 0; $i < 60; $i+=5 )
                     {
