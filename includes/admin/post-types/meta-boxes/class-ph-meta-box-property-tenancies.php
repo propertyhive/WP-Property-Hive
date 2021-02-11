@@ -22,9 +22,7 @@ class PH_Meta_Box_Property_Tenancies {
         
         $post_id = $post->ID;
 
-		echo '<div id="propertyhive_property_tenancies_container">';
-			include PH()->plugin_path() . '/includes/admin/views/html-property-tenancies-meta-box.php';
-		echo '</div>';
+		echo '<div id="propertyhive_property_tenancies_grid">Loading...</div>';
         
     }
 

@@ -357,7 +357,7 @@ jQuery( function($){
 
         jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
         {
-            jQuery('#propertyhive_property_tenancies_container').html(response);
+            jQuery('#propertyhive_property_tenancies_grid').html(response);
         }, 'html');
 
         return false;
