@@ -97,35 +97,32 @@ class PH_Admin_Menus {
 	    if ( get_option('propertyhive_module_disabled_tenancies', '') != 'yes' )
 	    {
 	        add_submenu_page( 'propertyhive', __( 'Tenancies', 'propertyhive' ), __( 'Tenancies', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=tenancy'/*, array( $this, 'attributes_page' )*/ );
-	    }
 
-		if ( get_option('propertyhive_module_disabled_management', '') != 'yes' )
-		{
-			$count = '';
-			$args = array(
-				'post_type' => 'key_date',
-				'nopaging' => true,
-				'fields' => 'ids',
-				'meta_query' => array(
-					array(
-						'key' => '_key_date_status',
-						'value' => 'pending'
-					),
-					array(
-						'key' => '_date_due',
-						'value' => date('Y-m-d'),
-						'type' => 'date',
-						'compare' => '<=',
-					),
-				),
-			);
-			$enquiry_query = new WP_Query( $args );
-			if ( $enquiry_query->have_posts() )
-			{
-				$count = ' <span class="update-plugins count-' . $enquiry_query->found_posts . '"><span class="plugin-count">' . $enquiry_query->found_posts . '</span></span>';
-			}
-			add_submenu_page( 'propertyhive', __( 'Management', 'propertyhive' ), __( 'Management', 'propertyhive' ) . $count, 'manage_propertyhive', 'edit.php?post_type=key_date&orderby=date_due&order=asc&status=upcoming_and_overdue&filter_action=Filter' );
-		}
+            $count = '';
+            $args = array(
+                'post_type' => 'key_date',
+                'nopaging' => true,
+                'fields' => 'ids',
+                'meta_query' => array(
+                    array(
+                        'key' => '_key_date_status',
+                        'value' => 'pending'
+                    ),
+                    array(
+                        'key' => '_date_due',
+                        'value' => date('Y-m-d'),
+                        'type' => 'date',
+                        'compare' => '<=',
+                    ),
+                ),
+            );
+            $enquiry_query = new WP_Query( $args );
+            if ( $enquiry_query->have_posts() )
+            {
+                $count = ' <span class="update-plugins count-' . $enquiry_query->found_posts . '"><span class="plugin-count">' . $enquiry_query->found_posts . '</span></span>';
+            }
+            add_submenu_page( 'propertyhive', __( 'Management', 'propertyhive' ), __( 'Management', 'propertyhive' ) . $count, 'manage_propertyhive', 'edit.php?post_type=key_date&orderby=date_due&order=asc&status=upcoming_and_overdue&filter_action=Filter' );
+	    }
 
     	if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
 	    {
