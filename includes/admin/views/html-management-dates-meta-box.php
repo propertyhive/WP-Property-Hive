@@ -1,4 +1,49 @@
 <?php
+    /*add_action( 'quick_edit_custom_box', 'key_date_meta_box_custom_quick_edit_box' );
+
+    function key_date_meta_box_custom_quick_edit_box( $column_name, $post_type, $taxonomy ) {
+        global $post;
+
+        if ($post_type == 'key_date' && $column_name == 'description')
+        {
+            ?>
+                    <fieldset class="inline-edit-col-left inline-edit-ph inline-edit-key_date">
+                        <legend class="inline-edit-legend">Quick Edit</legend>
+                        <div class="inline-edit-col">
+                            <label>
+                                <span class="title">Description</span>
+                                <span class="key_date-description"></span>
+                            </label>
+                            <label>
+                                <span class="title">Property</span>
+                                <span class="key_date-property"></span>
+                            </label>
+                            <label>
+                                <span class="title">Status</span>
+                                <span class="input-text-wrap">
+                                    <?php
+                                        $selected_value = get_post_meta( $post->ID, '_key_date_status', true );
+                                        $output = '<select name="_key_date_status">';
+
+                                        foreach ( array( 'pending', 'booked', 'complete' ) as $status )
+                                        {
+                                                $output .= '<option value="' . $status . '"';
+                                                $output .= selected($status, $selected_value, false );
+                                                $output .= '>' . ucwords($status) . '</option>';
+                                        }
+
+                                        $output .= '</select>';
+
+                                        echo $output;
+                                    ?>
+                                </span>
+                            </label>
+                        </div>
+                    </fieldset>
+                <?php
+        }
+    }*/
+
     $key_date_type_terms = get_terms( 'management_key_date_type', array(
         'hide_empty' => false,
         'parent' => 0

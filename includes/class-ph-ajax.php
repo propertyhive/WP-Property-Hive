@@ -5601,7 +5601,7 @@ class PH_AJAX {
             $selected_status = $_POST['selected_status'];
         }
 
-        include( PH()->plugin_path() . '/includes/admin/views/html-meta-box-table.php' );
+        include( PH()->plugin_path() . '/includes/admin/views/html-management-dates-meta-box.php' );
 
         // Quit out
         die();
