@@ -1188,51 +1188,53 @@ class PH_AJAX {
             );
 
             $meta_query = array(
-                'relation' => 'OR',
                 array(
-                    'key' => '_address_name_number',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_street',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_name_number_street',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_street',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_two',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_three',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_four',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_postcode',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_reference_number',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => '='
+                    'relation' => 'OR',
+                    array(
+                        'key' => '_address_name_number',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_street',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_name_number_street',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_street',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_two',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_three',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_four',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_postcode',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_reference_number',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => '='
+                    ),
                 ),
             );
 
@@ -1243,7 +1245,7 @@ class PH_AJAX {
                     'value' => ph_clean($_POST['department']),
                 );
             }
-
+            
             if ( !empty($meta_query) )
             {
                 $args['meta_query'] = $meta_query;
