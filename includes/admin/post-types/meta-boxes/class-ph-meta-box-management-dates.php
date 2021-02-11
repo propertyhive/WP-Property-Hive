@@ -24,8 +24,6 @@ class PH_Meta_Box_Management_Dates {
      */
     public static function save( $post_id, $post ) {
         global $wpdb;
-
-	    do_action( 'propertyhive_save_tenancy_key_dates', $post_id );
     }
 
 }
