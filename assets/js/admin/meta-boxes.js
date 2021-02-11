@@ -261,6 +261,87 @@ jQuery( function($){
         return false;
     });
 
+    $('[id=\'propertyhive-management-dates\']').on( 'click', '.meta-box-quick-edit', function() {
+
+        var post_id = $(this).attr('id');
+        var original_row = $('.post-' + post_id);
+
+        $('.quick-edit-row').hide();
+        $('.key-date-row').show();
+        original_row.hide();
+
+        if ( $('#quick-edit-' + post_id).length > 0 )
+        {
+            $('#quick-edit-' + post_id).show();
+        }
+        else
+        {
+            original_row.after('<tr id="quick-edit-' + post_id + '" class="quick-edit-row"><td colspan="4">Loading...</td></tr>');
+
+            var data = {
+                action: 'propertyhive_get_key_dates_quick_edit_row',
+                post_id: propertyhive_admin_meta_boxes.post_id,
+                date_post_id: post_id,
+                description: $('.post-' + post_id + ' .description .cell-main-content').text(),
+                status: $('.post-' + post_id + ' .status .cell-main-content').text(),
+                due_date_time: $('.post-' + post_id + ' .date_due .cell-main-content').text(),
+                type: $('.post-' + post_id + ' .hidden-date-type-id').text(),
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                $('#quick-edit-' + post_id).html(response);
+                initialise_datepicker();
+            }, 'html');
+        }
+
+        return false;
+
+    });
+
+    $('[id=\'propertyhive-management-dates\']').on( 'click', '.save-quick-edit', function() {
+
+        var date_post_id = $(this).attr('id');
+
+        if ( $(this).text() == 'Saving...' ) { return false; }
+
+        $(this).text('Saving...');
+        $(this).attr('disabled', 'disabled');
+
+        var quick_edit_row = $('#quick-edit-' + date_post_id);
+
+        var data = {
+            action: 'propertyhive_save_key_date',
+            post_id: date_post_id,
+            description: quick_edit_row.find('#date_description').val(),
+            status: quick_edit_row.find('#key_date_status').val(),
+            due_date_time: quick_edit_row.find('#date_due').val() + ' ' + quick_edit_row.find('#date_due_hours').val() + ':' + quick_edit_row.find('#date_due_minutes').val(),
+            type: quick_edit_row.find('#date_type').val(),
+        };
+
+        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+        {
+            var data = {
+                action:           'propertyhive_get_management_dates_grid',
+                post_id:          propertyhive_admin_meta_boxes.post_id,
+                selected_type_id: $('#_type_id_filter').val(),
+                selected_status:  $('#_date_status_filter').val(),
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                jQuery('#propertyhive_management_dates_container').html(response);
+                initialise_datepicker();
+            }, 'html');
+        }, 'html');
+
+    });
+
+    $('[id=\'propertyhive-management-dates\']').on( 'click', '.cancel-quick-edit', function() {
+        $('.quick-edit-row').hide();
+        $('.post-' + $(this).attr('id')).show();
+    });
+
     $('[id=\'propertyhive-property-tenancies\']').on( 'click', '#filter-property-tenancies-grid', function() {
 
         if ( $(this).val() == 'Updating...' ) { return false; }

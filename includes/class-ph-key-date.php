@@ -38,6 +38,10 @@ class PH_Key_Date {
 		return new DateTime($this->_date_due);
 	}
 
+	public function key_date_type_id() {
+		return $this->_key_date_type_id;
+	}
+
 	public function status() {
 
 		switch ($this->_key_date_status)
