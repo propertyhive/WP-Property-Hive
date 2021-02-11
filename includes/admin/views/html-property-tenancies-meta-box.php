@@ -74,12 +74,7 @@
         <input type="button" name="filter_action" id="filter-property-tenancies-grid" class="button" value="Filter">
     </div>
     <div class='tablenav-pages one-page'>
-        <span class="displaying-num"><?php echo $tenancies_count; ?> item<?php echo $tenancies_count > 1 ? 's' : ''; ?></span>
-        <span class='pagination-links'><span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>
-        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>
-        <span class="paging-input"><label for="current-page-selector" class="screen-reader-text">Current Page</label><input class='current-page' id='current-page-selector' type='text' name='paged' value='1' size='1' aria-describedby='table-paging' /><span class='tablenav-paging-text'> of <span class='total-pages'>1</span></span></span>
-        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>
-        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span></span>
+        <span class="displaying-num"><?php echo $tenancies_count; ?> item<?php echo $tenancies_count != 1 ? 's' : ''; ?></span>
     </div>
     <br class="clear" />
 </div>
@@ -128,14 +123,3 @@
     ?>
     </tbody>
 </table>
-<div class="tablenav bottom">
-    <div class='tablenav-pages one-page'>
-        <span class="displaying-num"><?php echo $tenancies_count; ?> item<?php echo $tenancies_count > 1 ? 's' : ''; ?></span>
-        <span class='pagination-links'><span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>
-        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>
-        <span class="screen-reader-text">Current Page</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">1 of <span class='total-pages'>1</span></span></span>
-        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>
-        <span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span></span>
-    </div>
-    <br class="clear" />
-</div>
