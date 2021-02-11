@@ -37,8 +37,8 @@ class PH_Admin_Post_Types {
 		add_action( 'delete_post', array( $this, 'delete_post' ) );
 		add_action( 'wp_trash_post', array( $this, 'trash_post' ) );
 		add_action( 'untrash_post', array( $this, 'untrash_post' ) );
-        
-        
+
+
 	}
 
 	/**
@@ -56,6 +56,8 @@ class PH_Admin_Post_Types {
         include( 'post-types/class-ph-admin-cpt-viewing.php' );
         include( 'post-types/class-ph-admin-cpt-offer.php' );
         include( 'post-types/class-ph-admin-cpt-sale.php' );
+        include( 'post-types/class-ph-admin-cpt-tenancy.php' );
+        include( 'post-types/class-ph-admin-cpt-key-date.php' );
 	}
 
 	/**
@@ -135,7 +137,7 @@ class PH_Admin_Post_Types {
     public function remove_month_filter() {
         global $typenow;
         
-        if ($typenow == 'property' || $typenow == 'contact' || $typenow == 'appraisal' || $typenow == 'viewing' || $typenow == 'offer' || $typenow == 'sale')
+        if ( in_array($typenow, array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date')) )
         {
             add_filter('months_dropdown_results', '__return_empty_array');
         }
@@ -182,6 +184,12 @@ class PH_Admin_Post_Types {
                 break;
             case 'sale' :
                 $this->sale_filters();
+                break;
+            case 'tenancy' :
+                $this->tenancy_filters();
+                break;
+            case 'key_date' :
+                $this->key_date_filters();
                 break;
             default :
                 break;
@@ -894,6 +902,116 @@ class PH_Admin_Post_Types {
 
         return $output;
     }
+
+    /**
+     * Show an tenancy filter box
+     */
+    public function tenancy_filters() {
+        global $wp_query;
+
+        $output = '';
+
+        $output .= $this->tenancy_status_filter();
+
+        echo apply_filters( 'propertyhive_tenancy_filters', $output );
+    }
+
+    /**
+     * Show an tenancy status filter box
+     */
+    public function tenancy_status_filter() {
+        global $wp_query;
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'current', 'finished') ) ? $_GET['_status'] : '';
+
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_sale_status">';
+
+            $output .= '<option value="">All Statuses</option>';
+
+            $output .= '<option value="pending"';
+            $output .= selected( 'pending', $selected_status, false );
+            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="current"';
+            $output .= selected( 'current', $selected_status, false );
+            $output .= '> ' . __( 'Current', 'propertyhive' ) . '</option>';
+
+            $output .= '<option value="finished"';
+            $output .= selected( 'finished', $selected_status, false );
+            $output .= '> ' . __( 'Finished', 'propertyhive' ) . '</option>';
+
+        $output .= '</select>';
+
+        return $output;
+    }
+
+	public function key_date_filters() {
+		global $wp_query;
+
+		$output = '';
+
+		$output .= $this->key_date_type_filter();
+		$output .= $this->key_date_status_filter();
+
+		echo apply_filters( 'propertyhive_tenancy_filters', $output );
+	}
+
+	public function key_date_type_filter() {
+
+		$selected_value = ! empty($_GET['_key_date_type_id']) ? (int) $_GET['_key_date_type_id'] : '';
+		$terms = get_terms( 'management_key_date_type', array(
+			'hide_empty' => false,
+			'parent' => 0
+		) );
+
+		$output  = '<select name="_key_date_type_id">';
+		$output .= '<option value="">' . __( 'All Types', 'propertyhive' ) . '</option>';
+
+		if ( !empty( $terms ) && !is_wp_error( $terms ) )
+		{
+			foreach ($terms as $term)
+			{
+				$output .= '<option value="' . $term->term_id . '"';
+				$output .= selected($term->term_id, $selected_value, false );
+				$output .= '>' . $term->name . '</option>';
+			}
+		}
+
+		$output .= '</select>';
+
+		return $output;
+	}
+
+
+	public function key_date_status_filter() {
+
+		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'booked', 'complete', 'pending') ) ? $_GET['status'] : '';
+
+		$output  = '<select name="status" id="dropdown_sale_status">';
+
+		$output .= '<option value="">All Statuses</option>';
+
+		$output .= '<option value="upcoming_and_overdue"';
+		$output .= selected( 'upcoming_and_overdue', $selected_status, false );
+		$output .= '>' . __( 'Upcoming & Overdue', 'propertyhive' ) . '</option>';
+
+		$output .= '<option value="booked"';
+		$output .= selected( 'booked', $selected_status, false );
+		$output .= '> ' . __( 'Booked', 'propertyhive' ) . '</option>';
+
+		$output .= '<option value="complete"';
+		$output .= selected( 'complete', $selected_status, false );
+		$output .= '> ' . __( 'Complete', 'propertyhive' ) . '</option>';
+
+		$output .= '<option value="pending"';
+		$output .= selected( 'pending', $selected_status, false );
+		$output .= '> ' . __( 'Pending', 'propertyhive' ) . '</option>';
+
+		$output .= '</select>';
+
+		return $output;
+	}
     
     /**
      * Filters and sorting handler
@@ -986,7 +1104,7 @@ class PH_Admin_Post_Types {
                 );
             }
         }
-        elseif ( 'enquiry' === $typenow ) 
+        elseif ( 'enquiry' === $typenow )
         {
             if ( ! empty( $_GET['_status'] ) ) {
                 $vars['meta_query'][] = array(
@@ -1007,7 +1125,7 @@ class PH_Admin_Post_Types {
                 );
             }
         }
-        elseif ( 'appraisal' === $typenow ) 
+        elseif ( 'appraisal' === $typenow )
         {
             if ( ! empty( $_GET['_status'] ) ) {
                 switch ( sanitize_text_field( $_GET['_status'] ) )
@@ -1152,6 +1270,92 @@ class PH_Admin_Post_Types {
                 $vars['meta_query'][] = array(
                     'key' => '_status',
                     'value' => sanitize_text_field( $_GET['_status'] ),
+                );
+            }
+        }
+        elseif ( 'tenancy' === $typenow )
+        {
+            if ( ! empty( $_GET['_status'] ) )
+            {
+                switch ( $_GET['_status'] )
+                {
+                    case 'pending' :
+                        $vars['meta_query'][] = array (
+                            'key' => '_start_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '>',
+                        );
+                        break;
+
+                    case 'current' :
+                        $vars['meta_query'][] = array (
+                            'key' => '_start_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '<=',
+                        );
+                        $vars['meta_query'][] = array (
+                            'key' => '_end_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '>=',
+                        );
+                        break;
+
+                    case 'finished':
+                        $vars['meta_query'][] = array (
+                            'key' => '_end_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '<',
+                        );
+                        break;
+                }
+            }
+        }
+        elseif ( 'key_date' === $typenow )
+        {
+            if ( ! empty( $_GET['status'] ) ) {
+
+                $value = sanitize_text_field( $_GET['status'] );
+
+                switch ($value) {
+                    case 'booked':
+                    case 'complete':
+                        $vars['meta_query'][] = array(
+                            'key' => '_key_date_status',
+                            'value' => $value,
+                        );
+                        break;
+                    case 'pending':
+                        $vars['meta_query'][] = array(
+                            'key' => '_key_date_status',
+                            'value' => 'pending',
+                        );
+                        break;
+                    case 'upcoming_and_overdue':
+                        $vars['meta_query'][] = array(
+                            'key' => '_key_date_status',
+                            'value' => array('pending', 'booked'),
+                            'compare' => 'IN'
+                        );
+                        $upcoming_threshold = new DateTime(PH_Key_Date::UPCOMING_THRESHOLD);
+                        $vars['meta_query'][] = array(
+                            'key' => '_date_due',
+                            'value' => $upcoming_threshold->format('Y-m-d'),
+                            'type' => 'date',
+                            'compare' => '<=',
+                        );
+                        break;
+                }
+            }
+
+            if ( !empty( $_GET['_key_date_type_id'] ) )
+            {
+                $vars['meta_query'][] = array(
+                    'key' => '_key_date_type_id',
+                    'value' => (int)$_GET['_key_date_type_id'],
                 );
             }
         }

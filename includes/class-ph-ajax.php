@@ -38,9 +38,11 @@ class PH_AJAX {
             'get_news' => false,
             'get_viewings_awaiting_applicant_feedback' => false,
             'get_my_upcoming_appointments' => false,
+            'get_upcoming_overdue_key_dates' => false,
 
             // Property actions
             'get_property_marketing_statistics_meta_box' => false,
+            'get_property_tenancies_grid' => false,
 
             // Contact actions
             'create_contact_login' => false,
@@ -96,6 +98,12 @@ class PH_AJAX {
             'offer_declined' => false,
             'get_property_sales_meta_box' => false,
             'get_contact_sales_meta_box' => false,
+
+            // Tenancy actions
+            'add_key_date' => false,
+            'get_management_dates_grid' => false,
+            'get_key_dates_quick_edit_row' => false,
+            'save_key_date' => false,
 
             'validate_save_contact' => false,
             'applicant_registration' => true,
@@ -1180,51 +1188,53 @@ class PH_AJAX {
             );
 
             $meta_query = array(
-                'relation' => 'OR',
                 array(
-                    'key' => '_address_name_number',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_street',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_name_number_street',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_street',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_two',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_three',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_four',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_address_postcode',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => 'LIKE'
-                ),
-                array(
-                    'key' => '_reference_number',
-                    'value' => ph_clean($_POST['keyword']),
-                    'compare' => '='
+                    'relation' => 'OR',
+                    array(
+                        'key' => '_address_name_number',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_street',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_name_number_street',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_street',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_two',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_three',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_four',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_address_postcode',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_reference_number',
+                        'value' => ph_clean($_POST['keyword']),
+                        'compare' => '='
+                    ),
                 ),
             );
 
@@ -1235,7 +1245,7 @@ class PH_AJAX {
                     'value' => ph_clean($_POST['department']),
                 );
             }
-
+            
             if ( !empty($meta_query) )
             {
                 $args['meta_query'] = $meta_query;
@@ -1376,7 +1386,7 @@ class PH_AJAX {
 
 		// Quit out
 		die();
-	}
+    }
 
 	/**
 	 * Delete order note via ajax
@@ -2087,6 +2097,90 @@ class PH_AJAX {
 
             $return = array_slice($return, 0, 10);
         }
+
+        echo json_encode($return);
+
+        die();
+    }
+
+    public function get_upcoming_overdue_key_dates()
+    {
+        global $post;
+
+        $this->json_headers();
+
+        $return = array();
+
+        $meta_query = array(
+            array(
+                'key' => '_key_date_status',
+                'value' => 'pending',
+            ),
+        );
+
+        $upcoming_threshold = new DateTime(PH_Key_Date::UPCOMING_THRESHOLD);
+        $meta_query[] = array(
+            'key' => '_date_due',
+            'value' => $upcoming_threshold->format('Y-m-d'),
+            'type' => 'date',
+            'compare' => '<=',
+        );
+
+        $args = array(
+            'post_type' => 'key_date',
+            'fields' => 'ids',
+            'post_status' => 'publish',
+            'meta_query' => $meta_query,
+            'meta_key' => '_date_due',
+            'orderby' => 'meta_value',
+            'order' => 'ASC',
+        );
+
+
+        $key_dates_query = new WP_Query( $args );
+
+        if ( $key_dates_query->have_posts() )
+        {
+            while ( $key_dates_query->have_posts() )
+            {
+                $key_dates_query->the_post();
+
+                $key_date = new PH_Key_Date( get_post( get_the_ID() ) );
+
+                $property_id = get_post_meta( get_the_ID(), '_property_id', TRUE );
+                $property = new PH_Property((int)$property_id);
+                $property_edit_link = get_edit_post_link( $property_id );
+
+                $tenancy_id = get_post_meta( get_the_ID(), '_tenancy_id', TRUE );
+                if ( !empty($tenancy_id) )
+                {
+                    $key_date_edit_link = get_edit_post_link( $tenancy_id ) . '#propertyhive-tenancy-management%7Cpropertyhive-management-dates';
+                }
+                else
+                {
+                    $key_date_edit_link = $property_edit_link . '#propertyhive-property-tenancies%7Cpropertyhive-management-dates';
+                }
+
+                $due_date = $key_date->date_due();
+                $date_format = 'jS F Y';
+                if ( $due_date->format('H:i') != '00:00' )
+                {
+                    $date_format = 'H:i ' . $date_format;
+                }
+
+                $return[] = array(
+                    'ID' => get_the_ID(),
+                    'key_date_edit_link' => $key_date_edit_link,
+                    'description' => $key_date->description(),
+                    'upcoming_overdue_status' => $key_date->status(),
+                    'property_edit_link' => $property_edit_link,
+                    'property_address' => $property->get_formatted_full_address(),
+                    'due_date_time_formatted' => $due_date->format($date_format),
+                );
+            }
+        }
+
+        wp_reset_postdata();
 
         echo json_encode($return);
 
@@ -5436,6 +5530,126 @@ class PH_AJAX {
         
         echo '</div>';
 
+        die();
+    }
+
+    /**
+	 * Add new management key date via ajax
+	 */
+    public function add_key_date()
+    {
+        $parent_post_id = (int)$_POST['post_id'];
+
+        if ( $parent_post_id > 0 ) {
+            $date_description = wp_kses_post( trim( stripslashes( $_POST['key_date_description'] ) ) );
+            $date_type_id = ph_clean( stripslashes( $_POST['key_date_type'] ) );
+            $date_due = ph_clean($_POST['key_date_due']) . ' ' . ph_clean($_POST['key_date_hours']) . ':' . ph_clean($_POST['key_date_minutes']);
+
+            $parent_post_type = get_post_type( $parent_post_id );
+
+            // Insert key date record
+            $key_date_post = array(
+                'post_title' => $date_description,
+                'post_content' => '',
+                'post_type' => 'key_date',
+                'post_status' => 'publish',
+                'comment_status' => 'closed',
+                'ping_status' => 'closed',
+            );
+
+            // Insert the post into the database
+            $key_date_post_id = wp_insert_post( $key_date_post );
+
+            if ( is_wp_error($key_date_post_id) || $key_date_post_id == 0 )
+            {
+                $return = array('error' => 'Failed to create key date post. Please try again');
+                echo json_encode( $return );
+                die();
+            }
+
+            add_post_meta( $key_date_post_id, '_date_due', $date_due );
+            add_post_meta( $key_date_post_id, '_key_date_status', 'pending' );
+            add_post_meta( $key_date_post_id, '_key_date_type_id', $date_type_id );
+
+            switch ( $parent_post_type )
+            {
+                case 'property' :
+                {
+                    add_post_meta( $key_date_post_id, '_property_id', $parent_post_id );
+                    break;
+                }
+                case 'tenancy' :
+                {
+                    add_post_meta( $key_date_post_id, '_tenancy_id', $parent_post_id );
+
+                    $parent_property_id = get_post_meta( $parent_post_id, '_property_id', true );
+                    add_post_meta( $key_date_post_id, '_property_id', $parent_property_id );
+                    break;
+                }
+            }
+        }
+        die();
+    }
+
+    public function get_management_dates_grid()
+    {
+        $post_id = $_POST['post_id'];
+
+        if ( isset($_POST['selected_type_id']) )
+        {
+            $selected_type_id = $_POST['selected_type_id'];
+        }
+
+        if ( isset($_POST['selected_status']) )
+        {
+            $selected_status = $_POST['selected_status'];
+        }
+
+        include( PH()->plugin_path() . '/includes/admin/views/html-management-dates-meta-box.php' );
+
+        // Quit out
+        die();
+    }
+
+    public function get_key_dates_quick_edit_row()
+    {
+        $post_id = $_POST['post_id'];
+
+        include( PH()->plugin_path() . '/includes/admin/views/html-key-dates-quick-edit.php' );
+
+        // Quit out
+        die();
+    }
+
+    public function save_key_date()
+    {
+        $key_date_post_id = (int)$_POST['post_id'];
+
+        $args = array(
+            'ID' => $key_date_post_id,
+            'post_title' => $_POST['description'],
+        );
+        wp_update_post( $args );
+
+        update_post_meta( $key_date_post_id, '_date_due', $_POST['due_date_time'] );
+        update_post_meta( $key_date_post_id, '_key_date_status', $_POST['status'] );
+        update_post_meta( $key_date_post_id, '_key_date_type_id', $_POST['type'] );
+
+        die();
+    }
+
+    public function get_property_tenancies_grid()
+    {
+        $post_id = $_POST['post_id'];
+
+        if ( isset($_POST['selected_status']) )
+        {
+            $selected_status = $_POST['selected_status'];
+        }
+
+        include( PH()->plugin_path() . '/includes/admin/views/html-property-tenancies-meta-box.php' );
+
+        // Quit out
         die();
     }
 }

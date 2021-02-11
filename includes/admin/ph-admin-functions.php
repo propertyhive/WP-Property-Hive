@@ -33,6 +33,8 @@ function ph_get_screen_ids() {
         'offer',
         'edit-sale',
         'sale',
+        'tenancy',
+        'edit-key_date',
         'dashboard_page_ph-installed',
         'property-hive_page_ph-settings',
         'admin_page_ph-generate-applicant-list',
