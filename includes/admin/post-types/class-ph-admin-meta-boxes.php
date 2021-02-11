@@ -932,7 +932,7 @@ class PH_Admin_Meta_Boxes {
 
 				$meta_boxes[10] = array(
 					'id'       => 'propertyhive-management-dates',
-					'title'    => __( 'Management', 'propertyhive' ),
+					'title'    => __( 'Management Dates', 'propertyhive' ),
 					'callback' => 'PH_Meta_Box_Management_Dates::output',
 					'screen'   => 'property',
 					'context'  => 'normal',
@@ -1694,7 +1694,7 @@ class PH_Admin_Meta_Boxes {
 
         $meta_boxes[10] = array(
             'id' => 'propertyhive-management-dates',
-            'title' => __( 'Management', 'propertyhive' ),
+            'title' => __( 'Management Dates', 'propertyhive' ),
             'callback' => 'PH_Meta_Box_Management_Dates::output',
             'screen' => 'tenancy',
             'context' => 'normal',
@@ -1972,6 +1972,7 @@ class PH_Admin_Meta_Boxes {
 	 * @param  object $post
 	 */
 	public function save_meta_boxes( $post_id, $post ) {
+
 		// $post_id and $post are required
 		if ( empty( $post_id ) || empty( $post ) ) {
 			return;
