@@ -79,6 +79,7 @@ class PH_Elementor {
 			'Property Floorplans',
 			'Property EPCs',
 			'Property Enquiry Form',
+			'Property Embedded Virtual Tours',
 			'Property Tabbed Details',
 		);
 
