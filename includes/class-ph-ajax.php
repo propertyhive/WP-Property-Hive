@@ -4148,9 +4148,9 @@ class PH_AJAX {
                             {
                                 $negotiators[] = '<em>' . __( 'Unknown user', 'propertyhive' ) . '</em>';
                             }
-
-                            $negotiators = implode(', ', $negotiators);
                         }
+
+                        $negotiators = implode(', ', $negotiators);
                     }
                     else
                     {
@@ -4321,9 +4321,9 @@ class PH_AJAX {
                             {
                                 $negotiators[] = '<em>' . __( 'Unknown user', 'propertyhive' ) . '</em>';
                             }
-
-                            $negotiators = implode(', ', $negotiators);
                         }
+
+                        $negotiators = implode(', ', $negotiators);
                     }
                     else
                     {
