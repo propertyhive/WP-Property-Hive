@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.6.1
-Stable tag: 1.4.76
+Stable tag: 1.4.77
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.4.77 - 2021-02-12 =
+* Added new Elementor widget: Embedded Virtual Tours
+* Added ability to add embedded virtual tours to 'Tabbed Details' Elementor widget
+* Added new filter 'propertyhive_show_admin_menu_enquiry_count' to determine if open enquiry count in admin menu should be calculated and displayed. Should return true or false, defaults to true
+* Corrected issue with viewing grids not loading on property and contact records when multiple attending staff
 
 = 1.4.76 - 2021-02-11 =
 * Added Barbados as supported country
