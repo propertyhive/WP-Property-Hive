@@ -111,7 +111,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 							'floorplan' => __( 'Floorplans', 'propertyhive' ),
 							'brochure' => __( 'Brochures', 'propertyhive' ),
 							'epc' => __( 'EPCs', 'propertyhive' ),
-							'virtual_tour' => __( 'Virtual Tours', 'propertyhive' ),
+							'virtual_tour' => __( 'Virtual Tour Links', 'propertyhive' ),
+							'embedded_virtual_tour' => __( 'Virtual Tours Embedded', 'propertyhive' ),
 							'map' => __( 'Map View', 'propertyhive' ),
 							'street_view' => __( 'Street View', 'propertyhive' ),
 							'make_enquiry' => __( 'Make Enquiry Form', 'propertyhive' ),
@@ -323,6 +324,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 					break;
 				}
 				case "virtual_tour":
+				case "embedded_virtual_tour":
 				{
 					$virtual_tours = $property->get_virtual_tours();
 					if ( !empty($virtual_tours) )
@@ -537,6 +539,23 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 											foreach ( $virtual_tours as $virtual_tour )
 											{
 												echo '<a href="' . $virtual_tour['url'] . '" target="_blank" rel="nofollow">' . $virtual_tour['label'] . '</a>';
+											}
+
+											echo '</div>';
+										}
+										break;
+									}
+									case "embedded_virtual_tour":
+									{
+										$virtual_tours = $property->get_virtual_tours();
+
+										if ( !empty($virtual_tours) )
+										{
+											echo '<div class="virtual-tours">';
+
+											foreach ( $virtual_tours as $virtual_tour )
+											{
+												echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowFullScreen frameborder="0"></iframe>';
 											}
 
 											echo '</div>';
