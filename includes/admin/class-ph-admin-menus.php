@@ -55,26 +55,29 @@ class PH_Admin_Menus {
         if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
 	    {
 	    	$count = '';
-	    	$args = array(
-	    		'post_type' => 'enquiry',
-	    		'nopaging' => true,
-	    		'fields' => 'ids',
-	    		'meta_query' => array(
-	    			array(
-	    				'key' => '_status',
-	    				'value' => 'open'
-	    			),
-	    			array(
-	    				'key' => '_negotiator_id',
-	    				'value' => ''
-	    			),
-	    		),
-	    	);
-	    	$enquiry_query = new WP_Query( $args );
-	    	if ( $enquiry_query->have_posts() )
+	    	if ( apply_filters( 'propertyhive_show_admin_menu_enquiry_count', TRUE ) === TRUE )
 	    	{
-	    		$count = ' <span class="update-plugins count-' . $enquiry_query->found_posts . '"><span class="plugin-count">' . $enquiry_query->found_posts . '</span></span>';
-	    	}
+		    	$args = array(
+		    		'post_type' => 'enquiry',
+		    		'nopaging' => true,
+		    		'fields' => 'ids',
+		    		'meta_query' => array(
+		    			array(
+		    				'key' => '_status',
+		    				'value' => 'open'
+		    			),
+		    			array(
+		    				'key' => '_negotiator_id',
+		    				'value' => ''
+		    			),
+		    		),
+		    	);
+		    	$enquiry_query = new WP_Query( $args );
+		    	if ( $enquiry_query->have_posts() )
+		    	{
+		    		$count = ' <span class="update-plugins count-' . $enquiry_query->found_posts . '"><span class="plugin-count">' . $enquiry_query->found_posts . '</span></span>';
+		    	}
+		    }
         	add_submenu_page( 'propertyhive', __( 'Enquiries', 'propertyhive' ), __( 'Enquiries', 'propertyhive' ) . $count, 'manage_propertyhive', 'edit.php?post_type=enquiry'/*, array( $this, 'attributes_page' )*/ );
         }
         
