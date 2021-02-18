@@ -171,6 +171,41 @@ class PH_AJAX {
 		header( 'Content-Type: application/json; charset=utf-8' );
 	}
 
+    /**
+     * Format contact data for display in a meta box list
+     */
+    private function formatted_contact_meta_box_data( $contact_post_id, $add_edit_link = true )
+    {
+        if ( $add_edit_link )
+        {
+            $contact_text = '<a href="' . get_edit_post_link( $contact_post_id, '' ) . '">' . get_the_title($contact_post_id) . '</a>';
+        }
+        else
+        {
+            $contact_text = get_the_title($contact_post_id);
+        }
+
+        $telephone_number = get_post_meta( $contact_post_id, '_telephone_number', true );
+        if( !empty($telephone_number) )
+        {
+            $contact_details = 'T: ' . $telephone_number;
+        }
+
+        $email_address = get_post_meta( $contact_post_id, '_email_address', true );
+        if( !empty($email_address) )
+        {
+            $contact_details .= ( $contact_details != '' ) ? '<br>' : '';
+            $contact_details .= 'E: ' . $email_address;
+        }
+
+        if ( $contact_details != '' )
+        {
+            $contact_text .= '<div class="row-actions visible">' . $contact_details . '</div>';
+        }
+
+        return $contact_text;
+    }
+
     public function create_contact_login()
     {
         check_ajax_referer( 'create-login', 'security' );
@@ -4123,7 +4158,7 @@ class PH_AJAX {
                     {
                         foreach ($applicant_contact_ids as $applicant_contact_id)
                         {
-                            $applicant_contacts[] = '<a href="' . get_edit_post_link( $applicant_contact_id, '' ) . '">' . get_the_title($applicant_contact_id) . '</a>';
+                            $applicant_contacts[] = $this->formatted_contact_meta_box_data($applicant_contact_id);
                         }
 
                         $applicant_contacts = implode('<br>', $applicant_contacts);
@@ -4939,9 +4974,11 @@ class PH_AJAX {
 
                     $offer = new PH_Offer(get_the_ID());
 
+                    $applicant_text = $this->formatted_contact_meta_box_data(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE));
+
                     $column_data = array(
                         'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a>',
-                        'applicant' => '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a>',
+                        'applicant' => $applicant_text,
                         'amount' => $offer->get_formatted_amount(),
                         'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
                     );
@@ -5054,11 +5091,7 @@ class PH_AJAX {
 
                         foreach ( $owner_contact_ids as $owner_contact_id )
                         {
-                            $property_owners .= get_the_title($owner_contact_id) . '<br>';
-                            $property_owners .= '<div style="color:#BBB">';
-                            $property_owners .= 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
-                            $property_owners .= 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
-                            $property_owners .= '</div>';
+                            $property_owners .= $this->formatted_contact_meta_box_data($owner_contact_id, false);
                         }
                     }
 
@@ -5365,9 +5398,10 @@ class PH_AJAX {
 
                     $sale = new PH_Sale(get_the_ID());
 
+                    $applicant_text = $this->formatted_contact_meta_box_data(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE));
                     $column_data = array(
                         'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a>',
-                        'applicant' => '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE), '' ) . '">' . get_the_title(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE)) . '</a>',
+                        'applicant' => $applicant_text,
                         'amount' => $sale->get_formatted_amount(),
                         'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
                     );
@@ -5480,11 +5514,7 @@ class PH_AJAX {
 
                         foreach ( $owner_contact_ids as $owner_contact_id )
                         {
-                            $property_owners .= get_the_title($owner_contact_id) . '<br>';
-                            $property_owners .= '<div style="color:#BBB">';
-                            $property_owners .= 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
-                            $property_owners .= 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
-                            $property_owners .= '</div>';
+                            $property_owners .= $this->formatted_contact_meta_box_data($owner_contact_id, false);
                         }
                     }
 

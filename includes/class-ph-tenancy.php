@@ -150,7 +150,7 @@ class PH_Tenancy {
      * @param bool $add hyperlinks
      * @return string
      */
-    public function get_tenants( $add_hyperlinks = false )
+    public function get_tenants( $add_hyperlinks = false, $additional_contact_details = false )
     {
         $applicant_contact_ids = get_post_meta( $this->id, '_applicant_contact_id' );
         if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
@@ -163,6 +163,26 @@ class PH_Tenancy {
                 {
                     $edit_link = get_edit_post_link( $applicant_contact_id );
                     $applicant_name = '<a href="' . esc_url( $edit_link ) . '">' . $applicant_name . '</a>';
+                }
+                if ( $additional_contact_details )
+                {
+                    $telephone_number = get_post_meta( $applicant_contact_id, '_telephone_number', true );
+                    if( !empty($telephone_number) )
+                    {
+                        $contact_details = 'T: ' . $telephone_number;
+                    }
+
+                    $email_address = get_post_meta( $applicant_contact_id, '_email_address', true );
+                    if( !empty($email_address) )
+                    {
+                        $contact_details .= ( $contact_details != '' ) ? '<br>' : '';
+                        $contact_details .= 'E: ' . $email_address;
+                    }
+
+                    if ( $contact_details != '' )
+                    {
+                        $applicant_name .= '<div class="row-actions visible">' . $contact_details . '</div>';
+                    }
                 }
                 $applicants[] = $applicant_name;
             }
