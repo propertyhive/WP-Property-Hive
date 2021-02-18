@@ -51,6 +51,8 @@ class PH_Meta_Box_Tenancy_Management {
             
         </p>';
 
+        do_action('propertyhive_management_details_fields');
+
         echo '</div>';
         
         echo '</div>';
