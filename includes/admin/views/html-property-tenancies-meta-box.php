@@ -105,7 +105,7 @@
                                 End Date: <?php echo $the_tenancy->_end_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_end_date ) ) : '-'; ?>
                             </a>
                         </td>
-                        <td class='applicant column-applicant' data-colname="Tenants"><?php echo $the_tenancy->get_tenants( true ); ?></td>
+                        <td class='applicant column-applicant' data-colname="Tenants"><?php echo $the_tenancy->get_tenants( true, true ); ?></td>
                         <td class='rent column-rent' data-colname="Rent"><?php echo $the_tenancy->get_formatted_rent(); ?></td>
                         <td class='status column-status' data-colname="Status"><?php echo $the_tenancy->get_status(); ?></td>
                     </tr>
