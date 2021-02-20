@@ -267,7 +267,8 @@ class PH_Admin_Menus {
 	 */
 	public function generate_applicant_list_page() {
 		include_once( 'class-ph-admin-applicant-list.php' );
-		PH_Admin_Applicant_List::output();
+		$ph_admin_applicant_list = new PH_Admin_Applicant_List();
+		$ph_admin_applicant_list->output();
 	}
 
 	/**
