@@ -231,7 +231,7 @@ function viewing_update_selected_properties()
 
             foreach ($enquiry_meta as $key => $value)
             {
-                if ( ! in_array( $key, $ignore_keys ) && substr( $key, 0, 1 ) != '_' && strpos($key, 'recaptcha') === FALSE )
+                if ( ! in_array( $key, $ignore_keys ) && ( substr( $key, 0, 1 ) != '_' || $key == '_property_id' ) && strpos($key, 'recaptcha') === FALSE )
                 {
                     if ( $key == '_property_id' || $key == 'property_id' )
                     {
@@ -241,6 +241,8 @@ function viewing_update_selected_properties()
                             $property_links[] = '<a href="' . get_edit_post_link( $sub_value ) . '">' . get_the_title( $sub_value ) . '</a>';
                         }
                         $value = implode('<br>', $property_links);
+
+                        $key = 'property';
                     }
                     else
                     {
