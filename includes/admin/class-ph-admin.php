@@ -31,6 +31,20 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'view_email' ) );
         add_action( 'admin_init', array( $this, 'preview_emails' ) );
         add_action( 'admin_init', array( $this, 'record_recently_viewed' ) );
+        add_action( 'admin_init', array( $this, 'export_applicant_list' ) );
+    }
+
+    public function export_applicant_list()
+    {
+        if ( 
+            isset($_POST['submitted_applicant_list']) && $_POST['submitted_applicant_list'] == '1' &&
+            isset($_POST['export_applicant_list_results']) && $_POST['export_applicant_list_results'] == '1' 
+        ) 
+        {
+            include_once( 'class-ph-admin-applicant-list.php' );
+            $ph_admin_applicant_list = new PH_Admin_Applicant_List();
+            $ph_admin_applicant_list->export();
+        }
     }
 
     public function record_recently_viewed()

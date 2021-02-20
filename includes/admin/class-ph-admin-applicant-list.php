@@ -23,7 +23,7 @@ class PH_Admin_Applicant_List {
 	 * @access public
 	 * @return void
 	 */
-	public static function output() {
+	public function output() {
 
         $property_types = array();
         $locations = array();
@@ -32,9 +32,9 @@ class PH_Admin_Applicant_List {
 
 	<h1>Generate Applicant List</h1>
 
-	<form method="post" id="mainform" action="" enctype="multipart/form-data" class="applicant-list-form">
+	<form method="post" id="mainform" action="" class="applicant-list-form">
 
-        <input type="hidden" name="submitted" value="1">
+        <input type="hidden" name="submitted_applicant_list" value="1">
 
 		<div id="poststuff" class="propertyhive_meta_box">
 
@@ -73,17 +73,17 @@ class PH_Admin_Applicant_List {
 			</p>
 
 			<p class="form-field sales-only">
-				<label>Price</label>
+				<label>Maximum Price</label>
 				<input type="text" name="maximum_price" value="<?php if ( isset($_POST['maximum_price']) ) { echo esc_attr( $_POST['maximum_price'] ); } ?>">
 			</p>
 
 			<p class="form-field lettings-only">
-				<label>Rent (PCM)</label>
+				<label>Maximum Rent (PCM)</label>
 				<input type="text" name="maximum_rent" value="<?php if ( isset($_POST['maximum_rent']) ) { echo esc_attr( $_POST['maximum_rent'] ); } ?>">
 			</p>
 
 			<p class="form-field residential-only">
-				<label>Bedrooms</label>
+				<label>Minimum Bedrooms</label>
 				<input type="number" name="minimum_bedrooms" class="short" value="<?php if ( isset($_POST['minimum_bedrooms']) ) { echo esc_attr( $_POST['minimum_bedrooms'] ); } ?>">
 			</p>
 
@@ -211,7 +211,9 @@ class PH_Admin_Applicant_List {
             <?php do_action('propertyhive_applicant_list_additional_fields'); ?>
 
             <p class="form-field">
-            <input type="submit" value="<?php echo __( 'Generate Applicant List', 'propertyhive' ); ?>" class="button-primary">
+                <input type="submit" value="<?php echo __( 'Generate Applicant List', 'propertyhive' ); ?>" class="button-primary">
+                <a href="" class="button" id="export_applicant_list_results_button">Export To CSV</a>
+                <input type="hidden" name="export_applicant_list_results" value="">
             </p>
 
 		</div>
@@ -221,233 +223,9 @@ class PH_Admin_Applicant_List {
     <div class="applicant-list-results">
 
         <?php 
-            if ( isset($_POST['submitted']) && $_POST['submitted'] == '1' ) 
+            if ( isset($_POST['submitted_applicant_list']) && $_POST['submitted_applicant_list'] == '1' ) 
             { 
-                $search_property_types = array();
-                if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' ) )
-                {
-                    if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
-                    {
-                        foreach ( $_POST['property_types'] as $property_type )
-                        {
-                            $search_property_types[] = (int)$property_type;
-
-                            $args = array(
-                                'hide_empty' => false,
-                                'parent' => $property_type
-                            );
-                            $terms = get_terms( 'property_type', $args );
-
-                            if ( !empty( $terms ) && !is_wp_error( $terms ) )
-                            {
-                                foreach ($terms as $term)
-                                {
-                                    $search_property_types[] = $term->term_id;
-
-                                    $args = array(
-                                        'hide_empty' => false,
-                                        'parent' => $term->term_id
-                                    );
-                                    $subterms = get_terms( 'property_type', $args );
-                                    
-                                    if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
-                                    {
-                                        foreach ($subterms as $term)
-                                        {
-                                            $search_property_types[] = $term->term_id;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    $search_property_types = array_unique($search_property_types);
-                }
-
-                $search_locations = array();
-                if ( isset($_POST['locations']) && is_array($_POST['locations']) && !empty($_POST['locations']) )
-                {
-                    foreach ( $_POST['locations'] as $location )
-                    {
-                        $search_locations[] = (int)$location;
-
-                        $args = array(
-                            'hide_empty' => false,
-                            'parent' => $location
-                        );
-                        $terms = get_terms( 'location', $args );
-
-                        if ( !empty( $terms ) && !is_wp_error( $terms ) )
-                        {
-                            foreach ($terms as $term)
-                            {
-                                $search_locations[] = $term->term_id;
-
-                                $args = array(
-                                    'hide_empty' => false,
-                                    'parent' => $term->term_id
-                                );
-                                $subterms = get_terms( 'location', $args );
-                                
-                                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
-                                {
-                                    foreach ($subterms as $term)
-                                    {
-                                        $search_locations[] = $term->term_id;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                $search_locations = array_unique($search_locations);
-
-                $args = array(
-                    'post_type' => 'contact',
-                    'fields' => 'ids',
-                    'nopaging' => true,
-                );
-
-                $args['meta_query'] = array();
-
-                $args['meta_query'][] = array(
-                    'key' => '_contact_types',
-                    'value' => 'applicant',
-                    'compare' => 'LIKE'
-                );
-
-                $applicant_query = new WP_Query($args);
-
-                $results = array();
-
-                if ( $applicant_query->have_posts() )
-                {
-                    while ( $applicant_query->have_posts() )
-                    {
-                        $applicant_query->the_post();
-
-                        $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
-                        if ( $num_applicant_profiles == '' )
-                        {
-                            $num_applicant_profiles = 0;
-                        }
-
-                        for ( $i = 0; $i < $num_applicant_profiles; ++$i )
-                        {
-                            $profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
-
-                            $match = true;
-
-                            if ( !isset($profile['send_matching_properties']) || ( isset($profile['send_matching_properties']) && $profile['send_matching_properties'] != 'yes' ) )
-                            {
-                                $match = false;
-                            }
-
-                            if ( isset($_POST['department']) )
-                            {
-                                if ( isset($profile['department']) && $profile['department'] != ph_clean($_POST['department']) )
-                                {
-                                    $match = false;
-                                }
-                            }
-
-                            if ( isset($_POST['department']) && $_POST['department'] == 'residential-sales' )
-                            {
-                                if ( isset($_POST['maximum_price']) && ph_clean($_POST['maximum_price']) != '' ) 
-                                {
-                                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
-
-                                    if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' && $profile['max_price_actual'] != 0 && $profile['max_price_actual'] < $price )
-                                    {
-                                        $match = false;
-                                    }
-                                }
-                            }
-                            if ( isset($_POST['department']) && $_POST['department'] == 'residential-lettings' )
-                            {
-                                if ( isset($_POST['maximum_rent']) && ph_clean($_POST['maximum_rent']) != '' )
-                                {
-                                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
-
-                                    if ( isset($profile['max_rent_actual']) && $profile['max_rent_actual'] != '' && $profile['max_rent_actual'] != 0 && $profile['max_rent_actual'] < $price )
-                                    {
-                                        $match = false;
-                                    }
-                                }
-                            }
-                            if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' ) )
-                            {
-                                if ( isset($_POST['minimum_bedrooms']) && ph_clean($_POST['minimum_bedrooms']) != '' ) 
-                                {
-                                    $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
-
-                                    if ( isset($profile['min_beds']) && $profile['min_beds'] != '' && $profile['min_beds'] != 0 && $profile['min_beds'] > $beds )
-                                    {
-                                        $match = false;
-                                    }
-                                }
-
-                                // Property Types
-                                if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
-                                {
-                                    $found_type = false;
-                                    foreach ( $search_property_types as $search_property_type )
-                                    {
-                                        if ( isset($profile['property_types']) && is_array($profile['property_types']) && in_array($search_property_type, $profile['property_types']) )
-                                        {
-                                            $found_type = true;
-                                        }
-                                    }
-
-                                    if ( !$found_type )
-                                    {
-                                        $match = false;
-                                    }
-                                }
-                            }
-
-                            if ( isset($_POST['locations']) && is_array($_POST['locations']) && !empty($_POST['locations']) )
-                            {
-                                $found_type = false;
-                                foreach ( $search_locations as $search_location )
-                                {
-                                    if ( isset($profile['locations']) && is_array($profile['locations']) && in_array($search_location, $profile['locations']) )
-                                    {
-                                        $found_type = true;
-                                    }
-                                }
-
-                                if ( !$found_type )
-                                {
-                                    $match = false;
-                                }
-                            }
-
-                            $match = apply_filters( 'propertyhive_applicant_list_check', $match, get_the_ID(), $profile );
-
-                            if ( $match )
-                            {
-                                $contact_details = array();
-                                if ( get_post_meta( get_the_ID(), '_telephone_number', TRUE ) != '' )
-                                {
-                                    $contact_details[] = 'T: ' . get_post_meta( get_the_ID(), '_telephone_number', TRUE );
-                                }
-                                if ( get_post_meta( get_the_ID(), '_email_address', TRUE ) != '' )
-                                {
-                                    $contact_details[] = 'E: ' . get_post_meta( get_the_ID(), '_email_address', TRUE );
-                                }
-                                $results[] = array(
-                                    'name' => get_the_title(),
-                                    'edit_link' => get_edit_post_link(get_the_ID()),
-                                    'contact_details' => implode("<br>", $contact_details),
-                                    'profile' => $profile
-                                );
-                            }
-                        }
-                    }
-                }
-
-                wp_reset_postdata();
+                $results = $this->generate_results();
         ?>
         <br>
         <div class="applicant-list-results">
@@ -469,7 +247,18 @@ class PH_Admin_Applicant_List {
                     ?>
                     <tr>
                         <td><a href="<?php echo $result['edit_link'] ?>" target="_blank"><?php echo $result['name']; ?></a></td>
-                        <td><?php echo ( ( $result['contact_details'] != '' ) ? $result['contact_details'] : '-' ); ?></td>
+                        <td><?php
+                            $contact_details = array();
+                            if ( $result['telephone_number'] != '' )
+                            {
+                                $contact_details[] = 'T: ' . $result['telephone_number'];
+                            }
+                            if ( $result['email_address'] != '' )
+                            {
+                                $contact_details[] = 'E: ' . $result['email_address'];
+                            }
+                            echo !empty($contact_details) ? implode("<br>", $contact_details) : '-';
+                        ?></td>
                         <td><?php
                             if ( isset($result['profile']['department']) )
                             {
@@ -667,6 +456,14 @@ jQuery( function(jQuery) {
         toggleDepartmentFields();
     });
 
+    jQuery('#export_applicant_list_results_button').click(function(e)
+    {
+        e.preventDefault();
+        jQuery('input[name=\'export_applicant_list_results\']').val('1');
+        jQuery('#mainform').submit();
+
+        setTimeout(function() { jQuery('input[name=\'export_applicant_list_results\']').val(''); }, 1000);
+    });
 });
 
 jQuery(window).resize(function() {
@@ -677,6 +474,436 @@ jQuery(window).resize(function() {
 <?php
 	}
 
+    public function generate_results()
+    {
+        $search_property_types = array();
+        if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' ) )
+        {
+            if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
+            {
+                foreach ( $_POST['property_types'] as $property_type )
+                {
+                    $search_property_types[] = (int)$property_type;
+
+                    $args = array(
+                        'hide_empty' => false,
+                        'parent' => $property_type
+                    );
+                    $terms = get_terms( 'property_type', $args );
+
+                    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                    {
+                        foreach ($terms as $term)
+                        {
+                            $search_property_types[] = $term->term_id;
+
+                            $args = array(
+                                'hide_empty' => false,
+                                'parent' => $term->term_id
+                            );
+                            $subterms = get_terms( 'property_type', $args );
+                            
+                            if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                            {
+                                foreach ($subterms as $term)
+                                {
+                                    $search_property_types[] = $term->term_id;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $search_property_types = array_unique($search_property_types);
+        }
+
+        $search_locations = array();
+        if ( isset($_POST['locations']) && is_array($_POST['locations']) && !empty($_POST['locations']) )
+        {
+            foreach ( $_POST['locations'] as $location )
+            {
+                $search_locations[] = (int)$location;
+
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $location
+                );
+                $terms = get_terms( 'location', $args );
+
+                if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                {
+                    foreach ($terms as $term)
+                    {
+                        $search_locations[] = $term->term_id;
+
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => $term->term_id
+                        );
+                        $subterms = get_terms( 'location', $args );
+                        
+                        if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                        {
+                            foreach ($subterms as $term)
+                            {
+                                $search_locations[] = $term->term_id;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $search_locations = array_unique($search_locations);
+
+        $args = array(
+            'post_type' => 'contact',
+            'fields' => 'ids',
+            'nopaging' => true,
+        );
+
+        $args['meta_query'] = array();
+
+        $args['meta_query'][] = array(
+            'key' => '_contact_types',
+            'value' => 'applicant',
+            'compare' => 'LIKE'
+        );
+
+        $applicant_query = new WP_Query($args);
+
+        $results = array();
+
+        if ( $applicant_query->have_posts() )
+        {
+            while ( $applicant_query->have_posts() )
+            {
+                $applicant_query->the_post();
+
+                $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
+                if ( $num_applicant_profiles == '' )
+                {
+                    $num_applicant_profiles = 0;
+                }
+
+                for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+                {
+                    $profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
+
+                    $match = true;
+
+                    if ( !isset($profile['send_matching_properties']) || ( isset($profile['send_matching_properties']) && $profile['send_matching_properties'] != 'yes' ) )
+                    {
+                        $match = false;
+                    }
+
+                    if ( isset($_POST['department']) )
+                    {
+                        if ( isset($profile['department']) && $profile['department'] != ph_clean($_POST['department']) )
+                        {
+                            $match = false;
+                        }
+                    }
+
+                    if ( isset($_POST['department']) && $_POST['department'] == 'residential-sales' )
+                    {
+                        if ( isset($_POST['maximum_price']) && ph_clean($_POST['maximum_price']) != '' ) 
+                        {
+                            $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
+
+                            if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' && $profile['max_price_actual'] != 0 && $profile['max_price_actual'] < $price )
+                            {
+                                $match = false;
+                            }
+                        }
+                    }
+                    if ( isset($_POST['department']) && $_POST['department'] == 'residential-lettings' )
+                    {
+                        if ( isset($_POST['maximum_rent']) && ph_clean($_POST['maximum_rent']) != '' )
+                        {
+                            $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
+
+                            if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' && $profile['max_price_actual'] != 0 && $profile['max_price_actual'] < $price )
+                            {
+                                $match = false;
+                            }
+                        }
+                    }
+                    if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' ) )
+                    {
+                        if ( isset($_POST['minimum_bedrooms']) && ph_clean($_POST['minimum_bedrooms']) != '' ) 
+                        {
+                            $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
+
+                            if ( isset($profile['min_beds']) && $profile['min_beds'] != '' && $profile['min_beds'] != 0 && $profile['min_beds'] > $beds )
+                            {
+                                $match = false;
+                            }
+                        }
+
+                        // Property Types
+                        if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
+                        {
+                            $found_type = false;
+                            foreach ( $search_property_types as $search_property_type )
+                            {
+                                if ( isset($profile['property_types']) && is_array($profile['property_types']) && in_array($search_property_type, $profile['property_types']) )
+                                {
+                                    $found_type = true;
+                                }
+                            }
+
+                            if ( !$found_type )
+                            {
+                                $match = false;
+                            }
+                        }
+                    }
+
+                    if ( isset($_POST['locations']) && is_array($_POST['locations']) && !empty($_POST['locations']) )
+                    {
+                        $found_type = false;
+                        foreach ( $search_locations as $search_location )
+                        {
+                            if ( isset($profile['locations']) && is_array($profile['locations']) && in_array($search_location, $profile['locations']) )
+                            {
+                                $found_type = true;
+                            }
+                        }
+
+                        if ( !$found_type )
+                        {
+                            $match = false;
+                        }
+                    }
+
+                    $match = apply_filters( 'propertyhive_applicant_list_check', $match, get_the_ID(), $profile );
+
+                    if ( $match )
+                    {
+                        $contact =  new PH_Contact( get_the_ID() );
+
+                        $results[] = array(
+                            'contact_id' => get_the_ID(),
+                            'applicant_profile_id' => $i,
+                            'name' => get_the_title(),
+                            'edit_link' => get_edit_post_link(get_the_ID()),
+                            'telephone_number' => $contact->_telephone_number,
+                            'email_address' => $contact->_email_address,
+                            'address' => $contact->get_formatted_full_address(),
+                            'profile' => $profile
+                        );
+                    }
+                }
+            }
+        }
+
+        wp_reset_postdata();
+
+        return $results;
+    }
+
+    private function array_2_csv($results)
+    {
+        $locations = array();
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'location', $args );
+
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            {
+                $locations[$term->term_id] = esc_html( $term->name );
+
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $term->term_id
+                );
+                $subterms = get_terms( 'location', $args );
+                
+                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                {
+                    foreach ($subterms as $term)
+                    {
+                        $locations[$term->term_id] = esc_html( $term->name );
+
+                        $args = array(
+                            'hide_empty' => false,
+                            'parent' => $term->term_id
+                        );
+                        $subsubterms = get_terms( 'location', $args );
+                        
+                        if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
+                        {
+                            foreach ($subsubterms as $term)
+                            {
+                                $locations[$term->term_id] = esc_html( $term->name );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $property_types = array();
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'property_type', $args );
+
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            {
+                $property_types[$term->term_id] = esc_html( $term->name );
+
+                $args = array(
+                    'hide_empty' => false,
+                    'parent' => $term->term_id
+                );
+                $subterms = get_terms( 'property_type', $args );
+                
+                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
+                {
+                    foreach ($subterms as $term)
+                    {
+                        $property_types[$term->term_id] = esc_html( $term->name );
+                    }
+                }
+            }
+        }
+
+        ob_start();
+
+        $df = fopen("php://output", 'w');
+
+        $columns = array(
+            'name' => __( 'Name', 'propertyhive' ),
+            'email_address' => __( 'Email Address', 'propertyhive' ),
+            'telephone_number' => __( 'Telephone Number', 'propertyhive' ),
+            'address' => __( 'Address', 'propertyhive' ),
+            'department' => __( 'Department', 'propertyhive' ),
+        );
+
+        if ( isset($_POST['department']) )
+        {
+            switch ( $_POST['department'] )
+            {
+                case "residential-sales":
+                {
+                    $columns['maximum_price'] = __( 'Maximum Price', 'propertyhive' );
+                    break;
+                }
+                case "residential-lettings":
+                {
+                    $columns['maximum_rent'] = __( 'Maximum Rent (PCM)', 'propertyhive' );
+                    break;
+                }
+            }
+            if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
+            {
+                $columns['minimum_bedrooms'] = __( 'Minimum Bedrooms', 'propertyhive' );
+                $columns['property_types'] = __( 'Property Types', 'propertyhive' );
+            }
+        }
+        
+        $columns['locations'] = __( 'Locations', 'propertyhive' );
+        $columns['additional_requirements'] = __( 'Additional Requirements', 'propertyhive' );
+
+        $columns = apply_filters( 'propertyhive_export_applicant_list_columns', $columns, $_POST );
+
+        fputcsv($df, $columns);
+
+        foreach ($results as $result) 
+        {
+            $columns = array(
+                'name' => $result['name'],
+                'email_address' => $result['email_address'],
+                'telephone_number' => $result['telephone_number'],
+                'address' => $result['address'],
+                'department' => __( ucwords(str_replace("-", " ", $result['profile']['department'])), 'propertyhive' ),
+            );
+
+            if ( isset($_POST['department']) )
+            {
+                switch ( $_POST['department'] )
+                {
+                    case "residential-sales":
+                    {
+                        $columns['maximum_price'] = $result['profile']['max_price'];
+                        break;
+                    }
+                    case "residential-lettings":
+                    {
+                        $columns['maximum_rent'] = $result['profile']['max_price_actual'];
+                        break;
+                    }
+                }
+                if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
+                {
+                    $columns['minimum_bedrooms'] = $result['profile']['min_beds'];
+
+                    $output_types = array();
+                    if ( isset($result['profile']['property_types']) && is_array($result['profile']['property_types']) && !empty($result['profile']['property_types']) )
+                    {
+                        foreach ( $result['profile']['property_types'] as $profile_type )
+                        {
+                            $output_types[] = $property_types[$profile_type];
+                        }
+                    }
+                    $columns['property_types'] = implode(", ", $output_types);
+                }
+            }
+            
+            $output_locations = array();
+            if ( isset($result['profile']['locations']) && is_array($result['profile']['locations']) && !empty($result['profile']['locations']) )
+            {
+                foreach ( $result['profile']['locations'] as $profile_location )
+                {
+                    $output_locations[] = $locations[$profile_location];
+                }
+            }
+            $columns['locations'] = implode(", ", $output_locations);
+
+            $columns['additional_requirements'] = isset($result['profile']['notes']) ? $result['profile']['notes'] : '';          
+
+            $columns = apply_filters( 'propertyhive_export_applicant_list_row_data', $columns, $_POST, $result['contact_id'], $result['applicant_profile_id'] );
+
+            fputcsv($df, $columns);
+        }
+        fclose($df);
+
+        return ob_get_clean();
+    }
+
+    public function export()
+    {
+        $filename = 'applicant-list-' . date("YmdHis") . '.csv';
+
+        // disable caching
+        $now = gmdate("D, d M Y H:i:s");
+        header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+        header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+        header("Last-Modified: {$now} GMT");
+
+        // force download  
+        header("Content-Type: application/force-download");
+        header("Content-Type: application/octet-stream");
+        header("Content-Type: application/download");
+
+        // disposition / encoding on response body
+        header("Content-Disposition: attachment;filename={$filename}");
+        header("Content-Transfer-Encoding: binary");
+
+        $results = $this->generate_results();
+
+        echo $this->array_2_csv($results);        
+
+        die();
+    }
 }
 
 endif;
