@@ -32,8 +32,13 @@ class PH_Meta_Box_Property_Enquiries {
                 'post_type'   => 'enquiry', 
                 'nopaging'    => true,
                 'meta_query'  => array(
+                    'relation' => 'OR',
                     array(
                         'key' => 'property_id',
+                        'value' => $post->ID
+                    ),
+                    array(
+                        'key' => '_property_id',
                         'value' => $post->ID
                     )
                 )
