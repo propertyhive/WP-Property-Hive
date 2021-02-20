@@ -251,7 +251,7 @@ function viewing_update_selected_properties()
                     
                     echo '<p class="form-field enquiry_details_field">
             
-                            <label>' . $key . '</label>
+                            <label>' . ucwords( str_replace('_', ' ', trim($key, "_") ) ) . '</label>
                           
                             ' . nl2br( $value ) . '
                           
