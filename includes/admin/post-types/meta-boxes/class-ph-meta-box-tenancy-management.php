@@ -51,7 +51,7 @@ class PH_Meta_Box_Tenancy_Management {
             
         </p>';
 
-        do_action('propertyhive_management_details_fields');
+        do_action('propertyhive_tenancy_management_details_fields');
 
         echo '</div>';
         
@@ -69,6 +69,7 @@ class PH_Meta_Box_Tenancy_Management {
 	    update_post_meta( $post_id, '_management_fee', ph_clean($_POST['_management_fee']) );
 	    update_post_meta( $post_id, '_management_fee_units', ph_clean($_POST['_management_fee_units']) );
 
+	    do_action( 'propertyhive_save_tenancy_management_details', $post_id );
     }
 
 }
