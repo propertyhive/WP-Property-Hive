@@ -178,7 +178,7 @@ class PH_AJAX {
     {
         if ( $add_edit_link )
         {
-            $contact_text = '<a href="' . get_edit_post_link( $contact_post_id, '' ) . '">' . get_the_title($contact_post_id) . '</a>';
+            $contact_text = '<a href="' . get_edit_post_link( $contact_post_id, '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . get_the_title($contact_post_id) . '</a>';
         }
         else
         {
@@ -4234,7 +4234,7 @@ class PH_AJAX {
                     }
 
                     $column_data = array(
-                        'date_time' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("H:i jS F Y", strtotime($viewing_start_date_time)) . '</a>',
+                        'date_time' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("H:i jS F Y", strtotime($viewing_start_date_time)) . '</a>',
                         'applicants' =>  $applicant_contacts,
                         'negotiators' => $negotiators,
                         'status' => $status_output,
@@ -4334,7 +4334,7 @@ class PH_AJAX {
                     $property = new PH_Property((int)get_post_meta(get_the_ID(), '_property_id', TRUE));
                     if ( get_post_meta(get_the_ID(), '_property_id', TRUE) != '' )
                     {
-                        $property_output = '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a>';
+                        $property_output = '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . $property->get_formatted_full_address() . '</a>';
                     }
                     else
                     {
@@ -4407,7 +4407,7 @@ class PH_AJAX {
                     }
 
                     $column_data = array(
-                        'date_time' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("H:i jS F Y", strtotime($viewing_start_date_time)) . '</a>',
+                        'date_time' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("H:i jS F Y", strtotime($viewing_start_date_time)) . '</a>',
                         'property' =>  $property_output,
                         'negotiators' => $negotiators,
                         'status' => $status_output,
@@ -4977,7 +4977,7 @@ class PH_AJAX {
                     $applicant_text = $this->formatted_contact_meta_box_data(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE));
 
                     $column_data = array(
-                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a>',
+                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a>',
                         'applicant' => $applicant_text,
                         'amount' => $offer->get_formatted_amount(),
                         'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
@@ -5096,8 +5096,8 @@ class PH_AJAX {
                     }
 
                     $column_data = array(
-                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a>',
-                        'property' => '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a>',
+                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a>',
+                        'property' => '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . $property->get_formatted_full_address() . '</a>',
                         'property_owner' => $property_owners,
                         'amount' => $offer->get_formatted_amount(),
                         'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
@@ -5400,7 +5400,7 @@ class PH_AJAX {
 
                     $applicant_text = $this->formatted_contact_meta_box_data(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE));
                     $column_data = array(
-                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a>',
+                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a>',
                         'applicant' => $applicant_text,
                         'amount' => $sale->get_formatted_amount(),
                         'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
@@ -5519,8 +5519,8 @@ class PH_AJAX {
                     }
 
                     $column_data = array(
-                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a>',
-                        'property' => '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '">' . $property->get_formatted_full_address() . '</a>',
+                        'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a>',
+                        'property' => '<a href="' . get_edit_post_link( get_post_meta(get_the_ID(), '_property_id', TRUE), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . $property->get_formatted_full_address() . '</a>',
                         'property_owner' => $property_owners,
                         'amount' => $sale->get_formatted_amount(),
                         'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
