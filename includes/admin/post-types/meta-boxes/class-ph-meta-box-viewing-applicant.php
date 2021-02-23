@@ -70,6 +70,7 @@ class PH_Meta_Box_Viewing_Applicant {
                         'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
                     ),
                 );
+                echo '<input type="hidden" name="existing_viewing_applicant" value="' . $applicant_contact_id . '">';
 
                 $fields = apply_filters( 'propertyhive_viewing_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
@@ -88,243 +89,235 @@ class PH_Meta_Box_Viewing_Applicant {
                 echo "</div>";
                 ++$i;
             }
-            if ( isset($_GET['applicant_contact_id']) && ! empty( $_GET['applicant_contact_id'] ) )
-            {
-                ?>
-                <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo $_GET['applicant_contact_id']; ?>">
-                <?php
-            }
         }
-        else
-        {
-            echo '<div id="viewing_applicant_search_existing">';
+        ?>
+        <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo ( !empty($applicant_contact_ids) ? implode('|', $applicant_contact_ids ) : '' ); ?>">
 
-                echo '<p class="form-field">
-                
-                    <label for="viewing_applicant_search">' . __('Search Applicants', 'propertyhive') . '</label>
-                    
-                    <span style="position:relative;">
+        <div id="viewing_applicant_search_existing">
 
-                        <input type="text" name="viewing_applicant_search" id="viewing_applicant_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
+            <p class="form-field">
 
-                        <div id="viewing_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
+                <label for="viewing_applicant_search"><?php echo __('Search Applicants', 'propertyhive'); ?></label>
 
-                        <div id="viewing_selected_applicants" style="display:none;"></div>
+                <span style="position:relative;">
 
-                    </span>
-                    
-                </p>
+                    <input type="text" name="viewing_applicant_search" id="viewing_applicant_search" style="width:100%;" placeholder="<?php echo __( 'Search Existing Contacts', 'propertyhive' ); ?>..." autocomplete="false">
 
-                <p class="form-field">
-                
-                    <label for="">&nbsp;</label>
-                    
-                    <a href="" class="create-viewing-applicant button">Create New Applicant</a>
-                    
-                </p>';
+                    <div id="viewing_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
-                echo '<input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="">';
+                    <div id="viewing_selected_applicants" style="display:none;"></div>
 
-            echo '</div>';
+                </span>
 
-            echo '<div id="viewing_applicant_create_new" style="display:none">';
+            </p>
 
-                $args = array( 
-                    'id' => '_applicant_name', 
-                    'label' => __( 'Name', 'propertyhive' ), 
-                    'desc_tip' => false, 
-                    'type' => 'text'
-                );
-                propertyhive_wp_text_input( $args );
+            <p class="form-field">
 
-                $args = array( 
-                    'id' => '_applicant_telephone_number', 
-                    'label' => __( 'Telephone Number', 'propertyhive' ), 
-                    'desc_tip' => false, 
-                    'type' => 'text'
-                );
-                propertyhive_wp_text_input( $args );
+                <label for="">&nbsp;</label>
 
-                $args = array( 
-                    'id' => '_applicant_email_address', 
-                    'label' => __( 'Email Address', 'propertyhive' ), 
-                    'desc_tip' => false,
-                    'description' => 'Upon booking a new applicant record will be created with these details.',
-                    'type' => 'email'
-                );
-                propertyhive_wp_text_input( $args );
+                <a href="" class="create-viewing-applicant button">Create New Applicant</a>
 
-                echo '<p class="form-field">
-                
-                    <label for="">&nbsp;</label>
-                    
-                    <a href="" class="create-viewing-applicant-cancel">Cancel and Search Existing Applicants</a>
-                    
-                </p>';
+            </p>
 
-            echo '</div>';
+        </div>
 
-            echo '<input type="hidden" name="_viewing_applicant_create_new" id="_viewing_applicant_create_new" value="">';
-?>
-<script>
-
-var viewing_selected_applicants = [];
-<?php
-    if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '')
-    {
-        $applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
-        foreach ($applicant_contact_ids as $applicant_contact_id)
-        {
-            ?>
-            viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
+        <div id="viewing_applicant_create_new" style="display:none">
             <?php
-        }
-    }
-?>
 
-jQuery(document).ready(function($)
-{
-    viewing_update_selected_applicants();
+            $args = array(
+                'id' => '_applicant_name',
+                'label' => __( 'Name', 'propertyhive' ),
+                'desc_tip' => false,
+                'type' => 'text',
+            );
+            propertyhive_wp_text_input( $args );
 
-    $('a.create-viewing-applicant').click(function(e)
-    {
-        e.preventDefault();
+            $args = array(
+                'id' => '_applicant_telephone_number',
+                'label' => __( 'Telephone Number', 'propertyhive' ),
+                'desc_tip' => false,
+                'type' => 'text',
+            );
+            propertyhive_wp_text_input( $args );
 
-        $('#_viewing_applicant_create_new').val('1');
+            $args = array(
+                'id' => '_applicant_email_address',
+                'label' => __( 'Email Address', 'propertyhive' ),
+                'desc_tip' => false,
+                'description' => 'Upon booking a new applicant record will be created with these details.',
+                'type' => 'email',
+            );
+            propertyhive_wp_text_input( $args );
+            ?>
 
-        $('#viewing_applicant_search_existing').hide();
-        $('#viewing_applicant_create_new').fadeIn();
-    });
+            <p class="form-field">
 
-    $('a.create-viewing-applicant-cancel').click(function(e)
-    {
-        e.preventDefault();
+                <label for="">&nbsp;</label>
 
-        $('#_viewing_applicant_create_new').val('');
+                <a href="" class="create-viewing-applicant-cancel">Cancel and Search Existing Applicants</a>
 
-        $('#viewing_applicant_create_new').hide();
-        $('#viewing_applicant_search_existing').fadeIn();
-        
-    });
+            </p>
 
-    $('#viewing_applicant_search').on('keyup keypress', function(e)
-    {
-        var keyCode = e.charCode || e.keyCode || e.which;
-        if (keyCode == 13)
-        {
-            event.preventDefault();
-            return false;
-        }
-    });
+        </div>
 
-    $('#viewing_applicant_search').keyup(function()
-    {
-        var keyword = $(this).val();
+        <input type="hidden" name="_viewing_applicant_create_new" id="_viewing_applicant_create_new" value="">
+        <script>
 
-        if (keyword.length == 0)
-        {
-            $('#viewing_search_applicant_results').html('');
-            $('#viewing_search_applicant_results').hide();
-            return false;
-        }
-
-        if (keyword.length < 3)
-        {
-            $('#viewing_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
-            $('#viewing_search_applicant_results').show();
-            return false;
-        }
-
-        var data = {
-            action:         'propertyhive_search_contacts',
-            keyword:        keyword,
-            security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
-            exclude_ids:    jQuery('#_applicant_contact_ids').val(),
-        };
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
-        {
-            if (response == '' || response.length == 0)
+        var viewing_selected_applicants = [];
+        <?php
+            if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '')
             {
-                $('#viewing_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+                $applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
+                foreach ($applicant_contact_ids as $applicant_contact_id)
+                {
+                    ?>
+                    viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
+                    <?php
+                }
+            }
+        ?>
+
+        jQuery(document).ready(function($)
+        {
+            viewing_update_selected_applicants();
+
+            $('a.create-viewing-applicant').click(function(e)
+            {
+                e.preventDefault();
+
+                $('#_viewing_applicant_create_new').val('1');
+
+                $('#viewing_applicant_search_existing').hide();
+                $('#viewing_applicant_create_new').fadeIn();
+            });
+
+            $('a.create-viewing-applicant-cancel').click(function(e)
+            {
+                e.preventDefault();
+
+                $('#_viewing_applicant_create_new').val('');
+
+                $('#viewing_applicant_create_new').hide();
+                $('#viewing_applicant_search_existing').fadeIn();
+            });
+
+            $('#viewing_applicant_search').on('keyup keypress', function(e)
+            {
+                var keyCode = e.charCode || e.keyCode || e.which;
+                if (keyCode == 13)
+                {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            $('#viewing_applicant_search').keyup(function()
+            {
+                var keyword = $(this).val();
+
+                if (keyword.length == 0)
+                {
+                    $('#viewing_search_applicant_results').html('');
+                    $('#viewing_search_applicant_results').hide();
+                    return false;
+                }
+
+                if (keyword.length < 3)
+                {
+                    $('#viewing_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+                    $('#viewing_search_applicant_results').show();
+                    return false;
+                }
+
+                var data = {
+                    action:         'propertyhive_search_contacts',
+                    keyword:        keyword,
+                    security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+                    exclude_ids:    jQuery('#_applicant_contact_ids').val(),
+                };
+                $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+                {
+                    if (response == '' || response.length == 0)
+                    {
+                        $('#viewing_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+                    }
+                    else
+                    {
+                        $('#viewing_search_applicant_results').html('<ul style="margin:0; padding:0;"></ul>');
+                        for ( var i in response )
+                        {
+                            $('#viewing_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-applicant-name="' + response[i].post_title + '"><strong>' + response[i].post_title + '</strong><br><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
+                        }
+                    }
+                    $('#viewing_search_applicant_results').show();
+                });
+            });
+
+            $('body').on('click', '#viewing_search_applicant_results ul li a', function(e)
+            {
+                e.preventDefault();
+
+                viewing_selected_applicants.push( { id: $(this).attr('href'), post_title: $(this).attr('data-applicant-name') } );
+
+                $('#viewing_search_applicant_results').html('');
+                $('#viewing_search_applicant_results').hide();
+
+                $('#viewing_applicant_search').val('');
+
+                viewing_update_selected_applicants();
+            });
+
+            $('body').on('click', 'a.viewing-remove-applicant', function(e)
+            {
+                e.preventDefault();
+
+                var applicant_id = $(this).attr('href');
+
+                for (var key in viewing_selected_applicants)
+                {
+                    if (viewing_selected_applicants[key].id == applicant_id )
+                    {
+                        viewing_selected_applicants.splice(key, 1);
+                    }
+                }
+
+                viewing_update_selected_applicants();
+            });
+        });
+
+        function viewing_update_selected_applicants()
+        {
+            var applicant_contact_ids = jQuery("input[name='existing_viewing_applicant']").map(function(){
+                return jQuery(this).val();
+            }).get();
+
+            if ( viewing_selected_applicants.length > 0 )
+            {
+                jQuery('#viewing_selected_applicants').html('<ul></ul>');
+
+                for ( var i in viewing_selected_applicants )
+                {
+                    jQuery('#viewing_selected_applicants ul').append('<li><a href="' + viewing_selected_applicants[i].id + '" class="viewing-remove-applicant" data-viewing-applicant-id="' + viewing_selected_applicants[i].id + '" data-viewing-applicant-name="' + viewing_selected_applicants[i].post_title + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_applicants[i].post_title + '</li>');
+
+                    applicant_contact_ids.push(viewing_selected_applicants[i].id);
+                }
+                jQuery('#viewing_selected_applicants').show();
             }
             else
             {
-                $('#viewing_search_applicant_results').html('<ul style="margin:0; padding:0;"></ul>');
-                for ( var i in response )
-                {
-                    $('#viewing_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-applicant-name="' + response[i].post_title + '"><strong>' + response[i].post_title + '</strong><br><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
-                }
+                jQuery('#viewing_selected_applicants').html('');
+                jQuery('#viewing_selected_applicants').hide();
             }
-            $('#viewing_search_applicant_results').show();
-        });
-    });
 
-    $('body').on('click', '#viewing_search_applicant_results ul li a', function(e)
-    {
-        e.preventDefault();
-
-        viewing_selected_applicants.push( { id: $(this).attr('href'), post_title: $(this).attr('data-applicant-name') } );
-
-        $('#viewing_search_applicant_results').html('');
-        $('#viewing_search_applicant_results').hide();
-
-        $('#viewing_applicant_search').val('');
-
-        viewing_update_selected_applicants();
-    });
-
-    $('body').on('click', 'a.viewing-remove-applicant', function(e)
-    {
-        e.preventDefault();
-
-        var applicant_id = $(this).attr('href');
-
-        for (var key in viewing_selected_applicants) 
-        {
-            if (viewing_selected_applicants[key].id == applicant_id ) 
-            {
-                viewing_selected_applicants.splice(key, 1);
-            }
+            jQuery('#_applicant_contact_ids').val(applicant_contact_ids.join('|'));
+            jQuery('#_applicant_contact_ids').trigger('change');
         }
 
-        viewing_update_selected_applicants();
-    });
-});
-
-function viewing_update_selected_applicants()
-{
-    jQuery('#_applicant_contact_ids').val('');
-
-    if ( viewing_selected_applicants.length > 0 )
-    {
-        jQuery('#viewing_selected_applicants').html('<ul></ul>');
-        var selected_applicant_ids = [];
-        for ( var i in viewing_selected_applicants )
-        {
-            jQuery('#viewing_selected_applicants ul').append('<li><a href="' + viewing_selected_applicants[i].id + '" class="viewing-remove-applicant" data-viewing-applicant-id="' + viewing_selected_applicants[i].id + '" data-viewing-applicant-name="' + viewing_selected_applicants[i].post_title + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_applicants[i].post_title + '</li>');
-
-            selected_applicant_ids.push(viewing_selected_applicants[i].id);
-        }
-        jQuery('#_applicant_contact_ids').val(selected_applicant_ids.join('|'));
-        jQuery('#viewing_selected_applicants').show();
-    }
-    else
-    {
-        jQuery('#viewing_selected_applicants').html('');
-        jQuery('#viewing_selected_applicants').hide();
-    }
-
-    jQuery('#_applicant_contact_ids').trigger('change');
-}
-
-</script>
-<?php
-        }
+        </script>
+        <?php
+        echo '</div>';
 
         echo '</div>';
-        
-        echo '</div>';
-        
     }
 
     /**
@@ -333,7 +326,9 @@ function viewing_update_selected_applicants()
     public static function save( $post_id, $post ) {
         global $wpdb;
 
-        $contact_post_ids = array();
+        $viewing_notes_to_write = array();
+
+        $existing_applicants = get_post_meta($post->ID, '_applicant_contact_id');
 
         if ( isset($_POST['_viewing_applicant_create_new']) && !empty($_POST['_viewing_applicant_create_new']) )
         {
@@ -382,11 +377,13 @@ function viewing_update_selected_applicants()
                     }
                     update_post_meta( $contact_post_id, '_applicant_profile_0', array( 'department' => $department, 'send_matching_properties' => '' ) );
 
-                    update_post_meta( $post_id, '_applicant_contact_id', $contact_post_id );
+                    add_post_meta( $post_id, '_applicant_contact_id', $contact_post_id );
 
-                    $contact_post_ids[] = $contact_post_id;
+                    $viewing_notes_to_write[] = array(
+                        'contact_post_id' => $contact_post_id,
+                        'note_action' => empty($existing_applicants) ? 'viewing_booked' : 'added_to_viewing',
+                    );
                 }
-                
             }
         }
         else
@@ -395,10 +392,15 @@ function viewing_update_selected_applicants()
             {
                 $applicant_contact_ids = array_unique(explode("|", $_POST['_applicant_contact_ids']));
 
-                delete_post_meta( $post_id, '_applicant_contact_id' );
+                if ( !is_array($existing_applicants) )
+                {
+                    $existing_applicants = array($existing_applicants);
+                }
+
+                $applicants_to_add = array_diff($applicant_contact_ids, $existing_applicants);
 
                 // make the contact an applicant if not already
-                foreach ( $applicant_contact_ids as $applicant_contact_id )
+                foreach ( $applicants_to_add as $applicant_contact_id )
                 {
                     add_post_meta( $post_id, '_applicant_contact_id', ph_clean($applicant_contact_id) );
 
@@ -413,21 +415,24 @@ function viewing_update_selected_applicants()
                         update_post_meta( $applicant_contact_id, '_contact_types', $existing_contact_types );
                     }
 
-                    $contact_post_ids[] = $applicant_contact_id;
+                    $viewing_notes_to_write[] = array(
+                        'contact_post_id' => $applicant_contact_id,
+                        'note_action' => empty($existing_applicants) ? 'viewing_booked' : 'added_to_viewing',
+                    );
                 }
             }
         }
 
-        if ( !empty($contact_post_ids) )
+        if ( !empty($viewing_notes_to_write) )
         {
-            foreach ( $contact_post_ids as $contact_post_id )
+            foreach ( $viewing_notes_to_write as $viewing_note )
             {
                 // Add note/comment to contact
                 $current_user = wp_get_current_user();
 
                 $comment = array(
                     'note_type' => 'action',
-                    'action' => 'viewing_booked',
+                    'action' => $viewing_note['note_action'],
                     'viewing_id' => $post_id,
                 );
                 if ( isset($_POST['_property_id']) && !empty($_POST['_property_id']) )
@@ -436,7 +441,7 @@ function viewing_update_selected_applicants()
                 }
 
                 $data = array(
-                    'comment_post_ID'      => $contact_post_id,
+                    'comment_post_ID'      => $viewing_note['contact_post_id'],
                     'comment_author'       => $current_user->display_name,
                     'comment_author_email' => 'propertyhive@noreply.com',
                     'comment_author_url'   => '',
