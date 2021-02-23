@@ -116,6 +116,8 @@ class PH_AJAX {
             'dismiss_notice_missing_google_maps_api_key' => false,
             'dismiss_notice_invalid_expired_license_key' => false,
             'dismiss_notice_email_cron_not_running' => false,
+
+            'open_admin_list_lightbox' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -162,6 +164,24 @@ class PH_AJAX {
 	public function dismiss_notice_email_cron_not_running()
 	{
 		update_option( 'email_cron_not_running_dismissed', 'yes' );
+	}
+
+    public function open_admin_list_lightbox()
+	{
+        $post_id = $_POST['post_id'];
+        $post_type = get_post_type($post_id);
+
+		switch( $post_type )
+        {
+            case 'viewing':
+            {
+                $the_viewing = new PH_Viewing($post_id);
+                include( PH()->plugin_path() . '/includes/admin/views/html-viewing-list-popup.php' );
+                break;
+            }
+        }
+
+        die();
 	}
 
 	/**
