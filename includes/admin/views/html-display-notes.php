@@ -35,7 +35,7 @@ if ( !empty($notes) )
 					if ( null !== $email_log )
 					{
 						$next_cron_run = '';
-						$emailStatus = '';
+						$email_status = '';
 						$note_suffix = '';
 						switch ($email_log->status) {
 							case '':
