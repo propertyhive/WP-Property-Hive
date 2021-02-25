@@ -208,6 +208,12 @@ class PH_Countries {
 				'currency_symbol' => '&yen;',
 				'currency_prefix' => true
 			),
+			'LU' => array(
+				'name' => 'Luxembourg',
+				'currency_code' => 'EUR',
+				'currency_symbol' => '&euro;',
+				'currency_prefix' => false
+			),
 			'MT' => array(
 				'name' => 'Malta',
 				'currency_code' => 'EUR',
