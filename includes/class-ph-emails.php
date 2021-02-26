@@ -198,7 +198,7 @@ class PH_Emails {
 		    	lock_id = ''
 		    AND
 		    	send_at <= '" . date("Y-m-d H:i:s") . "'
-		    LIMIT 25
+		    LIMIT " . apply_filters( 'propertyhive_email_process_limit', 25 ) . "
 		");
 
 		// We now have up to 25 emails locked. Get this 25 and attempt to send
