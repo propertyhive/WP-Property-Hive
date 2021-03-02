@@ -14,27 +14,15 @@ jQuery( function ( $ ) {
 	// Tooltips
 	$( document.body ).trigger( 'init_tooltips' );
 
-	$( '.open_lightbox' ).click(function(e)
+	$( document ).on('click', '.viewing-lightbox', function(e)
 	{
 		e.preventDefault();
 		
-		var post_id = $(this).attr('id');
+		var post_id = $(this).attr('data-viewing-id');
 
 		$.fancybox.open({
-			src  : '#viewing_quick_view_lightbox_' + post_id,
-			type : 'inline',
-			opts : {
-				smallBtn: true
-			}
-		});
-
-		var data = {
-			'action': 'propertyhive_open_admin_list_lightbox',
-			'post_id': post_id
-		};
-
-		$.post( ajaxurl, data, function(response) {
-			$('#viewing_quick_view_lightbox_' + post_id).html(response);
+			src  : ajaxurl + '?action=propertyhive_get_viewing_lightbox&post_id=' + post_id,
+			type : 'ajax'
 		});
 	});
 

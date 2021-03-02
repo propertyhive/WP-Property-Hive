@@ -1,0 +1,1 @@
+PROPERTY DETAILS IN VIEW <?php echo $property_id; ?>
