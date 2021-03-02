@@ -367,6 +367,238 @@ jQuery( function($){
     $(".propertyhive_meta_box select.multiselect").chosen();
 });
 
+// VIEWINGS //
+jQuery(window).on('load', function()
+{
+    //redraw_viewing_details_meta_box(); // called from within redraw_viewing_actions()
+    redraw_viewing_actions();
+});
+
+function redraw_viewing_details_meta_box()
+{
+    if ( jQuery('#propertyhive_viewing_details_meta_box_container').length > 0 )
+    {
+        jQuery('#propertyhive_viewing_details_meta_box_container').html('Loading...');
+
+        var data = {
+            action:         'propertyhive_get_viewing_details_meta_box',
+            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            security:       propertyhive_admin_meta_boxes.viewing_details_meta_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            jQuery('#propertyhive_viewing_details_meta_box_container').html(response);
+        }, 'html');
+    }
+}
+
+function redraw_viewing_actions()
+{
+    if ( jQuery('#propertyhive_viewing_actions_meta_box_container').length > 0 )
+    {
+        jQuery('#propertyhive_viewing_actions_meta_box_container').html('Loading...');
+
+        var data = {
+            action:         'propertyhive_get_viewing_actions',
+            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            jQuery('#propertyhive_viewing_actions_meta_box_container').html(response);
+        }, 'html');
+    }
+
+    redraw_viewing_details_meta_box();
+}
+
+jQuery(document).ready(function($)
+{
+    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.viewing-action', function(e)
+    {
+        e.preventDefault();
+
+        var this_href = $(this).attr('href');
+
+        $(this).attr('disabled', 'disabled');
+
+        if ( this_href == '#action_panel_viewing_carried_out' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_carried_out',
+                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_email_applicant_booking_confirmation' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_email_applicant_booking_confirmation',
+                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_email_owner_booking_confirmation' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_email_owner_booking_confirmation',
+                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_feedback_not_required' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_feedback_not_required',
+                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_revert_feedback_passed_on' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_feedback_passed_on',
+                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_revert_pending' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_revert_pending',
+                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_revert_feedback_pending' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_revert_feedback_pending',
+                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        $('#propertyhive_viewing_actions_meta_box').stop().fadeOut(300, function()
+        {
+            $(this_href).stop().fadeIn(300, function()
+            {
+                
+            });
+        });
+    });
+
+    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.action-cancel', function(e)
+    {
+        e.preventDefault();
+
+        redraw_viewing_actions();
+    });
+
+    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.cancelled-reason-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        // Submit interested feedback
+        var data = {
+            action:         'propertyhive_viewing_cancelled',
+            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            cancelled_reason: $('#_cancelled_reason').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+    });
+
+    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.interested-feedback-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        // Submit interested feedback
+        var data = {
+            action:         'propertyhive_viewing_interested_feedback',
+            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            feedback:       $('#_interested_feedback').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+    });
+
+    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.not-interested-feedback-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        // Submit interested feedback
+        var data = {
+            action:         'propertyhive_viewing_not_interested_feedback',
+            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            feedback:       $('#_not_interested_feedback').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+    })
+});
+
 function initialise_datepicker() {
     jQuery( ".date-picker" ).datepicker({
         dateFormat: "yy-mm-dd",

@@ -326,6 +326,8 @@ class PH_Comments {
 				( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy' ) ) ) )
 				||
 				( wp_doing_ajax() && isset($_POST['action']) && $_POST['action'] == 'propertyhive_get_notes_grid' )
+				||
+				( wp_doing_ajax() && isset($_GET['action']) && strpos($_GET['action'], 'propertyhive_') !== FALSE && strpos($_GET['action'], '_lightbox') !== FALSE )
 			)
 			{
 				return $clauses; // Don't hide when viewing Property Hive record

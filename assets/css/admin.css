@@ -156,3 +156,9 @@ table.ph_offices .primary input {
 .ph-recently-viewed-popup ul li { margin:0; padding:0; }
 .ph-recently-viewed-popup ul li a { display:block; padding:10px 15px; }
 .ph-recently-viewed-popup ul li a:hover { background:#F1F1F2; }
+
+.propertyhive-lightbox-details { white-space:nowrap; }
+.propertyhive-lightbox-details .propertyhive-lightbox-left { display:inline-block; vertical-align:top; border-right:1px solid #CCC; padding-right:24px; min-width:400px; }
+.propertyhive-lightbox-details .propertyhive-lightbox-notes { display:inline-block; vertical-align:top; border-right:1px solid #CCC; padding-left:24px; padding-right:24px; min-width:400px; }
+.propertyhive-lightbox-details .propertyhive-lightbox-actions { display:inline-block; vertical-align:top; padding-left:24px; white-space:normal; width:280px; }
+.propertyhive-lightbox-details .propertyhive-lightbox-buttons { background:#EEE; padding:10px; text-align:right; margin-top:20px; }
