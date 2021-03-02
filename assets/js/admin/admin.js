@@ -14,18 +14,6 @@ jQuery( function ( $ ) {
 	// Tooltips
 	$( document.body ).trigger( 'init_tooltips' );
 
-	$( document ).on('click', '.viewing-lightbox', function(e)
-	{
-		e.preventDefault();
-		
-		var post_id = $(this).attr('data-viewing-id');
-
-		$.fancybox.open({
-			src  : ajaxurl + '?action=propertyhive_get_viewing_lightbox&post_id=' + post_id,
-			type : 'ajax'
-		});
-	});
-
 	$( '#ph_dismiss_notice_leave_review' ).click(function(e)
 	{
 		e.preventDefault();

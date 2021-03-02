@@ -1,3 +1,6 @@
+var ph_lightbox_open = false;
+var ph_lightbox_post_id;
+
 jQuery( function($){
     
     $('.propertyhive_meta_box #property_rooms').sortable({
@@ -365,6 +368,26 @@ jQuery( function($){
     
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
+
+    $( document ).on('click', '.viewing-lightbox', function(e)
+    {
+        e.preventDefault();
+        
+        ph_lightbox_post_id = $(this).attr('data-viewing-id');
+
+        $.fancybox.open({
+            src  : ajaxurl + '?action=propertyhive_get_viewing_lightbox&post_id=' + ph_lightbox_post_id,
+            type : 'ajax',
+            beforeLoad: function()
+            {
+                ph_lightbox_open = true;
+            },
+            afterClose: function()
+            {
+                ph_lightbox_open = false;
+            }
+        });
+    });
 });
 
 // VIEWINGS //
@@ -382,7 +405,7 @@ function redraw_viewing_details_meta_box()
 
         var data = {
             action:         'propertyhive_get_viewing_details_meta_box',
-            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
             security:       propertyhive_admin_meta_boxes.viewing_details_meta_nonce,
         };
 
@@ -398,10 +421,10 @@ function redraw_viewing_actions()
     if ( jQuery('#propertyhive_viewing_actions_meta_box_container').length > 0 )
     {
         jQuery('#propertyhive_viewing_actions_meta_box_container').html('Loading...');
-
+        
         var data = {
             action:         'propertyhive_get_viewing_actions',
-            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
             security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
         };
 
@@ -416,7 +439,7 @@ function redraw_viewing_actions()
 
 jQuery(document).ready(function($)
 {
-    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.viewing-action', function(e)
+    $(document).on('click', 'a.viewing-action', function(e)
     {
         e.preventDefault();
 
@@ -428,7 +451,7 @@ jQuery(document).ready(function($)
         {
             var data = {
                 action:         'propertyhive_viewing_carried_out',
-                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };
             jQuery.post( ajaxurl, data, function(response) 
@@ -442,7 +465,7 @@ jQuery(document).ready(function($)
         {
             var data = {
                 action:         'propertyhive_viewing_email_applicant_booking_confirmation',
-                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };
             jQuery.post( ajaxurl, data, function(response) 
@@ -456,7 +479,7 @@ jQuery(document).ready(function($)
         {
             var data = {
                 action:         'propertyhive_viewing_email_owner_booking_confirmation',
-                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };
             jQuery.post( ajaxurl, data, function(response) 
@@ -470,7 +493,7 @@ jQuery(document).ready(function($)
         {
             var data = {
                 action:         'propertyhive_viewing_feedback_not_required',
-                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };
             jQuery.post( ajaxurl, data, function(response) 
@@ -484,7 +507,7 @@ jQuery(document).ready(function($)
         {
             var data = {
                 action:         'propertyhive_viewing_feedback_passed_on',
-                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };
             jQuery.post( ajaxurl, data, function(response) 
@@ -498,7 +521,7 @@ jQuery(document).ready(function($)
         {
             var data = {
                 action:         'propertyhive_viewing_revert_pending',
-                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };
             jQuery.post( ajaxurl, data, function(response) 
@@ -512,7 +535,7 @@ jQuery(document).ready(function($)
         {
             var data = {
                 action:         'propertyhive_viewing_revert_feedback_pending',
-                viewing_id:     propertyhive_admin_meta_boxes.post_id,
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };
             jQuery.post( ajaxurl, data, function(response) 
@@ -531,14 +554,14 @@ jQuery(document).ready(function($)
         });
     });
 
-    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.action-cancel', function(e)
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.action-cancel', function(e)
     {
         e.preventDefault();
 
         redraw_viewing_actions();
     });
 
-    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.cancelled-reason-action-submit', function(e)
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.cancelled-reason-action-submit', function(e)
     {
         e.preventDefault();
 
@@ -547,7 +570,7 @@ jQuery(document).ready(function($)
         // Submit interested feedback
         var data = {
             action:         'propertyhive_viewing_cancelled',
-            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
             cancelled_reason: $('#_cancelled_reason').val(),
             security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
         };
@@ -558,7 +581,7 @@ jQuery(document).ready(function($)
         }, 'json');
     });
 
-    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.interested-feedback-action-submit', function(e)
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.interested-feedback-action-submit', function(e)
     {
         e.preventDefault();
 
@@ -567,7 +590,7 @@ jQuery(document).ready(function($)
         // Submit interested feedback
         var data = {
             action:         'propertyhive_viewing_interested_feedback',
-            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
             feedback:       $('#_interested_feedback').val(),
             security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
         };
@@ -578,7 +601,7 @@ jQuery(document).ready(function($)
         }, 'json');
     });
 
-    $('#propertyhive_viewing_actions_meta_box_container').on('click', 'a.not-interested-feedback-action-submit', function(e)
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.not-interested-feedback-action-submit', function(e)
     {
         e.preventDefault();
 
@@ -587,7 +610,7 @@ jQuery(document).ready(function($)
         // Submit interested feedback
         var data = {
             action:         'propertyhive_viewing_not_interested_feedback',
-            viewing_id:     propertyhive_admin_meta_boxes.post_id,
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
             feedback:       $('#_not_interested_feedback').val(),
             security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
         };

@@ -9,9 +9,11 @@
 
 			<h3><?php echo __( 'Viewing Details', 'propertyhive' ); ?></h3>
 
-			<?php
-		        include( PH()->plugin_path() . '/includes/admin/views/html-viewing-details-meta-box.php' );
-		    ?>
+			<div id="propertyhive_viewing_details_meta_box_container">
+				<?php
+			        include( PH()->plugin_path() . '/includes/admin/views/html-viewing-details-meta-box.php' );
+			    ?>
+			</div>
 
 		</div>
 
@@ -60,8 +62,10 @@
 
 		<h3><?php echo __( 'Actions', 'propertyhive' ); ?></h3>
 
-		<?php include( PH()->plugin_path() . '/includes/admin/views/html-viewing-actions.php' ); ?>
-
+		<div id="propertyhive_viewing_actions_meta_box_container">
+			<?php include( PH()->plugin_path() . '/includes/admin/views/html-viewing-actions.php' ); ?>
+		</div>
+	
 	</div>
 
 	<div style="clear:both"></div>
@@ -69,7 +73,9 @@
 	<!-- BUTTONS -->
 	<div class="propertyhive-lightbox-buttons">
 		<a href="" class="button"><?php echo __( 'Close', 'propertyhive' ); ?></a>
-		<a href="" class="button"><?php echo __( 'Go To Viewing', 'propertyhive' ); ?></a>
+		<a href="" class="button button-primary"><?php echo __( 'Go To Viewing', 'propertyhive' ); ?></a>
+		<a href="" class="button">&lt;</a>
+		<a href="" class="button">&gt;</a>
 	</div>
 
 </div>
