@@ -542,7 +542,12 @@ class PH_Admin {
 
             $body = stripslashes(sanitize_textarea_field($_POST['body']));
 
-            $body = str_replace("[contact_name]", get_the_title((int)$_GET['contact_id']), $body);
+            if ( isset($_GET['contact_id']) )
+            {
+                $contact = new PH_Contact((int)$_GET['contact_id']);
+                $body = str_replace("[contact_name]", $contact->post_title, $body);
+                $body = str_replace("[contact_dear]", $contact->dear(), $body);
+            }
             $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
 
             if ( strpos($body, '[properties]') !== FALSE )

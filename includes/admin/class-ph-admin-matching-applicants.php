@@ -577,14 +577,16 @@ class PH_Admin_Matching_Applicants {
 
         $current_user = wp_get_current_user();
 
+        $contact = new PH_Contact($contact_id);
         if ( $to_email_address == '' )
         {
-            $to_email_address = get_post_meta( $contact_id, '_email_address', TRUE );
+            $to_email_address = $contact->email_address;
         }
 
         $subject = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $subject);
 
-        $body = str_replace("[contact_name]", get_the_title($contact_id), $body);
+        $body = str_replace("[contact_name]", $contact->post_title, $body);
+        $body = str_replace("[contact_dear]", $contact->dear(), $body);
         $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
 
         if ( strpos($body, '[properties]') !== FALSE )

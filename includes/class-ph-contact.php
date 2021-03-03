@@ -170,4 +170,16 @@ class PH_Contact {
         
         return $return;
     }
+
+    /**
+     * Get the dear field if populated, fallback to the full name if not
+     *
+     * @access public
+     * @return string
+     */
+    public function dear()
+    {
+        $dear = $this->_dear;
+        return  !empty($dear) ? $dear : $this->post_title;
+    }
 }
