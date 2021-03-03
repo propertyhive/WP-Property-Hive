@@ -206,6 +206,24 @@ class PH_AJAX {
         return $contact_text;
     }
 
+    /**
+     * Return a list string, comma delimited with an ampersand(&) before the final item
+     */
+    private function get_list_string( $list_items )
+    {
+        $list_string = '';
+        if ( count($list_items) == 1 )
+        {
+            $list_string = $list_items[0];
+        }
+        elseif ( count($list_items) > 1 )
+        {
+            $last_item = array_pop($list_items);
+            $list_string = implode(', ', $list_items) . ' & ' . $last_item;
+        }
+        return $list_string;
+    }
+
     public function create_contact_login()
     {
         check_ajax_referer( 'create-login', 'security' );
@@ -3804,22 +3822,18 @@ class PH_AJAX {
             $body = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
 
             $applicant_names = array();
+            $applicant_dears = array();
             foreach ($applicant_contact_ids as $applicant_contact_id)
             {
-                $applicant_names[] = get_the_title($applicant_contact_id);
+                $applicant_contact = new PH_Contact($applicant_contact_id);
+                $applicant_names[] = $applicant_contact->post_title;
+                $applicant_dears[] = $applicant_contact->dear();
             }
             $applicant_names = array_filter($applicant_names);
+            $applicant_dears = array_filter($applicant_dears);
 
-            $applicant_names_string = '';
-            if ( count($applicant_names) == 1 )
-            {
-                $applicant_names_string = $applicant_names[0];
-            }
-            elseif ( count($applicant_names) > 1 )
-            {
-                $last_applicant = array_pop($applicant_names);
-                $applicant_names_string = implode(', ', $applicant_names) . ' & ' . $last_applicant;
-            }
+            $applicant_names_string = $this->get_list_string($applicant_names);
+            $applicant_dears_string = $this->get_list_string($applicant_dears);
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
@@ -3828,6 +3842,7 @@ class PH_AJAX {
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
+            $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
@@ -3869,15 +3884,23 @@ class PH_AJAX {
 
             $owner_emails = array();
             $owner_names = array();
+            $owner_dears = array();
     
             foreach ($owner_contact_ids as $owner_id) 
             {
-                $owner_email = sanitize_email( get_post_meta($owner_id, '_email_address', TRUE) );
-                $owner_name = get_the_title($owner_id);
+                $owner_contact = new PH_Contact($owner_id);
+
+                $owner_email = sanitize_email( $owner_contact->email_address );
+                $owner_name = $owner_contact->post_title;
+                $owner_dear = $owner_contact->dear();
 
                 if( ! empty($owner_email) ) array_push($owner_emails, $owner_email);
                 if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
+                if( ! empty($owner_dear) ) array_push($owner_dears, $owner_dear);
             }
+
+            $owner_names_string = $this->get_list_string($owner_names);
+            $owner_dears_string = $this->get_list_string($owner_dears);
 
             $applicant_names = array();
             foreach ($applicant_contact_ids as $applicant_contact_id)
@@ -3886,16 +3909,7 @@ class PH_AJAX {
             }
             $applicant_names = array_filter($applicant_names);
 
-            $applicant_names_string = '';
-            if ( count($applicant_names) == 1 )
-            {
-                $applicant_names_string = $applicant_names[0];
-            }
-            elseif ( count($applicant_names) > 1 )
-            {
-                $last_applicant = array_pop($applicant_names);
-                $applicant_names_string = implode(', ', $applicant_names) . ' & ' . $last_applicant;
-            }
+            $applicant_names_string = $this->get_list_string($applicant_names);
 
             $property = new PH_Property((int)$property_id);
 
@@ -3905,13 +3919,14 @@ class PH_AJAX {
             $body = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
-            $subject = str_replace('[owner_name]', implode(", ", $owner_names), $subject);
+            $subject = str_replace('[owner_name]', $owner_names_string, $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
-            $body = str_replace('[owner_name]', implode(", ", $owner_names), $body);
+            $body = str_replace('[owner_name]', $owner_names_string, $body);
+            $body = str_replace('[owner_dear]', $owner_dears_string, $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);

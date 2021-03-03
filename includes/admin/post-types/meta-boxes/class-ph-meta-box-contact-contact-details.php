@@ -55,7 +55,14 @@ class PH_Meta_Box_Contact_Contact_Details {
             'desc_tip' => false,
             'placeholder' => __( 'e.g. Works nights so do not call between 11am and 2pm', 'propertyhive' ), 
         ) );
-        
+
+        propertyhive_wp_text_input( array(
+            'id' => '_dear',
+            'label' => __( 'Dear', 'propertyhive' ),
+            'desc_tip' => true,
+            'description' => __( 'How the contact\'s name should appear on the salutation line of documents and emails. This can be brought out with the contact_dear tags. If this isn\'t populated, the whole contact name will be used', 'propertyhive' ),
+            'type' => 'text'
+        ) );
 
         do_action('propertyhive_contact_contact_details_fields');
 	    
@@ -119,6 +126,7 @@ class PH_Meta_Box_Contact_Contact_Details {
         update_post_meta( $post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_email_address'])) );
         update_post_meta( $post_id, '_contact_notes', sanitize_textarea_field($_POST['_contact_notes']) );
         update_post_meta( $post_id, '_forbidden_contact_methods', ( (isset($_POST['_forbidden_contact_methods'])) ? ph_clean($_POST['_forbidden_contact_methods']) : '' ) );
+        update_post_meta( $post_id, '_dear',  ph_clean($_POST['_dear']) );
 
         do_action( 'propertyhive_save_contact_contact_details', $post_id );
     }

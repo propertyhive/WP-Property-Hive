@@ -582,7 +582,7 @@ Kind regards,
 [similar_properties]", 'propertyhive' ), '', 'no' );
 
         add_option( 'propertyhive_property_match_default_email_subject', __( 'We found [property_count] that might be of interest to you', 'propertyhive' ), '', 'no' );
-        add_option( 'propertyhive_property_match_default_email_body', __( "Hi [contact_name],
+        add_option( 'propertyhive_property_match_default_email_body', __( "Hi [contact_dear],
 
 Based on your requirements, we've found [property_count] below that we believe might be suitable for you:
 
@@ -595,7 +595,7 @@ Kind regards,
 " . get_bloginfo('name'), 'propertyhive' ), '', 'no' );
 
         add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', 'Your Viewing On [property_address]', '', 'no' );
-        add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', "Dear [applicant_name],
+        add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', "Dear [applicant_dear],
 
 This is confirmation that your viewing on [property_address] has been booked for [viewing_time] on [viewing_date].
 
@@ -604,7 +604,7 @@ Should you need to cancel or amend your booking please do not hesitate to contac
 " . get_bloginfo('name'), '', 'no' );
 
         add_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', 'Viewing Booked On [property_address]', '', 'no' );
-        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', "Dear [owner_name],
+        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', "Dear [owner_dear],
 
 This is confirmation that a viewing has been booked at your property, [property_address], for [viewing_time] on [viewing_date].
 
