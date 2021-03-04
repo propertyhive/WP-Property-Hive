@@ -75,8 +75,8 @@
 	<div class="propertyhive-lightbox-buttons">
 		<a href="" class="button button-close"><?php echo __( 'Close', 'propertyhive' ); ?></a>
 		<a href="<?php echo get_edit_post_link($post->ID); ?>" class="button button-primary"><?php echo __( 'Go To Viewing', 'propertyhive' ); ?></a>
-		<a href="" class="button button-prev">&lt;</a>
-		<a href="" class="button button-next">&gt;</a>
+		<a href="" class="button button-prev" style="display:none">&lt;</a>
+		<a href="" class="button button-next" style="display:none">&gt;</a>
 	</div>
 
 </div>
