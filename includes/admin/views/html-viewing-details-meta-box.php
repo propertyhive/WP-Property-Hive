@@ -2,6 +2,8 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+$readonly = isset($readonly) ? $readonly : false;
+
 echo '<div class="propertyhive_meta_box">';
         
     echo '<div class="options_group">';
@@ -40,17 +42,30 @@ echo '<div class="propertyhive_meta_box">';
 
     if ( $viewing->status == 'cancelled' )
     {
-        $args = array( 
-            'id' => '_cancelled_reason', 
-            'label' => __( 'Reason Cancelled', 'propertyhive' ), 
-            'desc_tip' => false, 
-            'class' => '',
-            'value' => $viewing->cancelled_reason,
-            'custom_attributes' => array(
-                'style' => 'width:95%; max-width:500px;'
-            )
-        );
-        propertyhive_wp_textarea_input( $args );
+        if ( $readonly )
+        {
+            echo '<p class="form-field">
+    
+                <label for="">' . __('Reason Cancelled', 'propertyhive') . '</label>
+
+                ' . nl2br(esc_html($viewing->cancelled_reason)) . '
+
+            </p>';
+        }
+        else
+        {
+            $args = array( 
+                'id' => '_cancelled_reason', 
+                'label' => __( 'Reason Cancelled', 'propertyhive' ), 
+                'desc_tip' => false, 
+                'class' => '',
+                'value' => $viewing->cancelled_reason,
+                'custom_attributes' => array(
+                    'style' => 'width:95%; max-width:500px;'
+                )
+            );
+            propertyhive_wp_textarea_input( $args );
+        }
     }
 
     if ( $viewing->status == 'carried_out' || $viewing->status == 'offer_made' )
@@ -86,17 +101,30 @@ echo '<div class="propertyhive_meta_box">';
 
         if ( $viewing->feedback_status == 'interested' || $viewing->feedback_status == 'not_interested' )
         {
-            $args = array( 
-                'id' => '_feedback', 
-                'label' => __( 'Feedback', 'propertyhive' ), 
-                'desc_tip' => false, 
-                'class' => '',
-                'value' => $viewing->feedback,
-                'custom_attributes' => array(
-                    'style' => 'width:95%; max-width:500px;'
-                )
-            );
-            propertyhive_wp_textarea_input( $args );
+            if ( $readonly )
+            {
+                echo '<p class="form-field">
+        
+                    <label for="">' . __('Feedback', 'propertyhive') . '</label>
+
+                    ' . nl2br(esc_html($viewing->feedback)) . '
+
+                </p>';
+            }
+            else
+            {
+                $args = array( 
+                    'id' => '_feedback', 
+                    'label' => __( 'Feedback', 'propertyhive' ), 
+                    'desc_tip' => false, 
+                    'class' => '',
+                    'value' => $viewing->feedback,
+                    'custom_attributes' => array(
+                        'style' => 'width:95%; max-width:500px;'
+                    )
+                );
+                propertyhive_wp_textarea_input( $args );
+            }
         }
     }
 

@@ -11,6 +11,7 @@
 
 			<div id="propertyhive_viewing_details_meta_box_container">
 				<?php
+					$readonly = true;
 			        include( PH()->plugin_path() . '/includes/admin/views/html-viewing-details-meta-box.php' );
 			    ?>
 			</div>

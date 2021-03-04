@@ -3332,6 +3332,8 @@ class PH_AJAX {
 
         $viewing = new PH_Viewing((int)$_POST['viewing_id']);
 
+        $readonly = isset($_POST['readonly']) ? filter_var($_POST['readonly'], FILTER_VALIDATE_BOOLEAN) : false;
+
         include( PH()->plugin_path() . '/includes/admin/views/html-viewing-details-meta-box.php' );
 
         die();
