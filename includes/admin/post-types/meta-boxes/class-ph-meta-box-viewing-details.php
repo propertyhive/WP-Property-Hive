@@ -30,6 +30,7 @@ class PH_Meta_Box_Viewing_Details {
     public static function save( $post_id, $post ) {
         global $wpdb;
     
+        if ( isset($_POST['_cancelled_reason']) ) { update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field($_POST['_cancelled_reason']) ); }
         if ( isset($_POST['_feedback']) ) { update_post_meta( $post_id, '_feedback', sanitize_textarea_field($_POST['_feedback']) ); }
 
         do_action( 'propertyhive_save_viewing_details', $post_id );
