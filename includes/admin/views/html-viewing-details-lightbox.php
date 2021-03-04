@@ -30,8 +30,20 @@
 
 		</div>
 
+		<!-- OWNER/LANDLORD DETAILS -->
+		<div class="propertyhive-lightbox-contact-details">
+
+			<h3><?php echo __( ( get_post_meta((int)$viewing->property_id, '_department', TRUE) == 'residential-lettings' ? 'Landlord' : 'Owner' ) . ' Details', 'propertyhive' ); ?></h3>
+
+			<?php
+				$contact_ids = get_post_meta($post->ID, '_owner_contact_id');
+		        include( PH()->plugin_path() . '/includes/admin/views/html-lightbox-contact-details.php' );
+		    ?>
+
+		</div>
+
 		<!-- APPLICANT DETAILS -->
-		<div class="propertyhive-lightbox-applicant-details">
+		<div class="propertyhive-lightbox-contact-details">
 
 			<h3><?php echo __( 'Applicant Details', 'propertyhive' ); ?></h3>
 
