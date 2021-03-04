@@ -509,6 +509,7 @@ function redraw_viewing_details_meta_box()
             action:         'propertyhive_get_viewing_details_meta_box',
             viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
             security:       propertyhive_admin_meta_boxes.viewing_details_meta_nonce,
+            readonly:       ph_lightbox_open
         };
 
         jQuery.post( ajaxurl, data, function(response) 
