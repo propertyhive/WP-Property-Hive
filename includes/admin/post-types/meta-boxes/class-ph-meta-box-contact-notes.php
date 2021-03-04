@@ -21,6 +21,8 @@ class PH_Meta_Box_Contact_Notes {
     public static function output( $post ) {
         global $wpdb, $propertyhive, $post;
 
+        $section = 'contact';
+
         echo '<ul class="subsubsub notes-filter" style="float:none; padding-left:10px;">';
 
             $notes_filters = array(
@@ -36,7 +38,7 @@ class PH_Meta_Box_Contact_Notes {
             $i = 0;
             foreach ( $notes_filters as $class => $label )
             {
-                echo '<li><a href="" data-filter-class="' . ( $class == '' ? '*' : 'note-type-' . $class ) . '">' . $label . '</a>';
+                echo '<li><a href="" data-section="' . $section . '" data-filter-class="' . ( $class == '' ? '*' : 'note-type-' . $class ) . '">' . $label . '</a>';
                 if ( $i < count($notes_filters) - 1 ) { echo ' |&nbsp; '; }
                 echo '</li>';
                 ++$i;
@@ -44,8 +46,7 @@ class PH_Meta_Box_Contact_Notes {
             
         echo '</ul>';
 
-        echo '<div id="propertyhive_notes_container">';
-            $section = 'contact';
+        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">';
             include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
         echo '</div>';
 

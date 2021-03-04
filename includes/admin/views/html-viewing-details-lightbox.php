@@ -49,8 +49,9 @@
 		<h3><?php echo __( 'Notes', 'propertyhive' ); ?></h3>
 
 		<?php
-	        echo '<div id="propertyhive_notes_container">';
-	            $section = 'viewing';
+			$section = 'viewing';
+
+	        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">';
 	            include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
 	        echo '</div>';
 	    ?>
@@ -72,10 +73,10 @@
 
 	<!-- BUTTONS -->
 	<div class="propertyhive-lightbox-buttons">
-		<a href="" class="button"><?php echo __( 'Close', 'propertyhive' ); ?></a>
-		<a href="" class="button button-primary"><?php echo __( 'Go To Viewing', 'propertyhive' ); ?></a>
-		<a href="" class="button">&lt;</a>
-		<a href="" class="button">&gt;</a>
+		<a href="" class="button button-close"><?php echo __( 'Close', 'propertyhive' ); ?></a>
+		<a href="<?php echo get_edit_post_link($post->ID); ?>" class="button button-primary"><?php echo __( 'Go To Viewing', 'propertyhive' ); ?></a>
+		<a href="" class="button button-prev">&lt;</a>
+		<a href="" class="button button-next">&gt;</a>
 	</div>
 
 </div>
