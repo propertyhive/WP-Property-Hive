@@ -4045,7 +4045,7 @@ class PH_AJAX {
                     }
 
                     $column_data = array(
-                        'date_time' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("H:i jS F Y", strtotime($viewing_start_date_time)) . '</a>',
+                        'date_time' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '" class="viewing-lightbox" data-viewing-id="' . get_the_ID() . '">' . date("H:i jS F Y", strtotime($viewing_start_date_time)) . '</a>',
                         'property' =>  $property_output,
                         'negotiators' => $negotiators,
                         'status' => $status_output,

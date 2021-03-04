@@ -65,7 +65,7 @@ class PH_Admin_Assets {
 
         if ( 
             get_option('propertyhive_module_disabled_viewings', '') != 'yes' &&
-            in_array( $screen->id, array( 'property' ) ) 
+            in_array( $screen->id, array( 'property', 'contact' ) ) 
         )
 	    {
 		    wp_enqueue_style( 'propertyhive_fancybox_css', PH()->plugin_url() . '/assets/css/jquery.fancybox.css', array(), '3.3.5' );
@@ -152,7 +152,7 @@ class PH_Admin_Assets {
 
         if ( 
             get_option('propertyhive_module_disabled_viewings', '') != 'yes' &&
-            in_array( $screen->id, array( 'property' ) ) 
+            in_array( $screen->id, array( 'property', 'contact' ) ) 
         )
         {
 		    wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/jquery.fancybox.js', array('jquery'), '3.3.5' );
