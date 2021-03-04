@@ -21,34 +21,7 @@ class PH_Meta_Box_Viewing_Details {
 
         $viewing = new PH_Viewing($post->ID);
         
-        echo '<div id="propertyhive_viewing_details_meta_box_container">Loading...</div>';
-?>
-<script>
-
-jQuery(window).on('load', function()
-{
-    redraw_viewing_details_meta_box();
-});
-
-function redraw_viewing_details_meta_box()
-{
-    jQuery('#propertyhive_viewing_details_meta_box_container').html('Loading...');
-
-    var data = {
-        action:         'propertyhive_get_viewing_details_meta_box',
-        viewing_id:     <?php echo $post->ID; ?>,
-        security:       '<?php echo wp_create_nonce( 'viewing-details-meta-box' ); ?>',
-    };
-
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
-    {
-        jQuery('#propertyhive_viewing_details_meta_box_container').html(response);
-    }, 'html');
-}
-
-</script>
-<?php
-        
+        echo '<div id="propertyhive_viewing_details_meta_box_container">Loading...</div>'; 
     }
 
     /**
@@ -57,6 +30,7 @@ function redraw_viewing_details_meta_box()
     public static function save( $post_id, $post ) {
         global $wpdb;
     
+        if ( isset($_POST['_cancelled_reason']) ) { update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field($_POST['_cancelled_reason']) ); }
         if ( isset($_POST['_feedback']) ) { update_post_meta( $post_id, '_feedback', sanitize_textarea_field($_POST['_feedback']) ); }
 
         do_action( 'propertyhive_save_viewing_details', $post_id );
