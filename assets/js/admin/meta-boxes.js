@@ -380,9 +380,7 @@ jQuery( function($){
     {
         e.preventDefault();
         
-        ph_lightbox_post_id = $(this).attr('data-viewing-id');
-
-        ph_open_details_lightbox();
+        ph_open_details_lightbox($(this).attr('data-viewing-id'), 'viewing');
     });
 
     $( document ).on('click', '.propertyhive-lightbox-buttons a.button-close', function(e)
@@ -403,9 +401,7 @@ jQuery( function($){
 
             if ( post_id == ph_lightbox_post_id )
             {
-                ph_lightbox_post_id = previous_post_id;
-
-                ph_open_details_lightbox();
+                ph_open_details_lightbox(previous_post_id, 'viewing');
 
                 return;
             }
@@ -425,9 +421,7 @@ jQuery( function($){
 
             if (use_next)
             {
-                ph_lightbox_post_id = post_id;
-
-                ph_open_details_lightbox();
+                ph_open_details_lightbox(post_id, 'viewing');
 
                 return;
             }
@@ -440,16 +434,56 @@ jQuery( function($){
     });
 });
 
-function ph_open_details_lightbox()
+function ph_open_details_lightbox(post_id, section)
 {
+    ph_lightbox_post_id = post_id;
+
     jQuery.fancybox.close();
 
     jQuery.fancybox.open({
-        src  : ajaxurl + '?action=propertyhive_get_viewing_lightbox&post_id=' + ph_lightbox_post_id,
+        src  : ajaxurl + '?action=propertyhive_get_' + section + '_lightbox&post_id=' + ph_lightbox_post_id,
         type : 'ajax',
         beforeLoad: function()
         {
             ph_lightbox_open = true;
+        },
+        afterShow: function()
+        {
+            // hide/show next/prev buttons
+            var found_current = false;
+            var previous_exist = false;
+            var next_exist = false;
+            jQuery('a[data-' + section + '-id]').each(function()
+            {
+                var post_id = jQuery(this).attr('data-' + section + '-id');
+
+                if ( found_current )
+                {
+                    next_exist = true;
+                }
+
+                if ( post_id == ph_lightbox_post_id )
+                {
+                    // this is the lightbox being viewed
+                    found_current = true;
+                }
+                else
+                {
+                    if ( !found_current )
+                    {
+                        previous_exist = true;
+                    }
+                }
+            });
+
+            if ( previous_exist )
+            {
+                jQuery('.propertyhive-lightbox-buttons a.button-prev').show();
+            }
+            if ( next_exist )
+            {
+                jQuery('.propertyhive-lightbox-buttons a.button-next').show();
+            }
         },
         beforeClose: function()
         {
