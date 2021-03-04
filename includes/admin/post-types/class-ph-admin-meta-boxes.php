@@ -277,6 +277,8 @@ class PH_Admin_Meta_Boxes {
 
             $viewing = new PH_Viewing((int)$_GET['post']);
 
+            $viewing_applicant_ids = $viewing->get_applicant_ids();
+
             $offer_post = array(
               'post_title'    => '',
               'post_content'  => '',
@@ -291,7 +293,12 @@ class PH_Admin_Meta_Boxes {
             
             add_post_meta( $offer_post_id, '_status', 'pending' );
             add_post_meta( $offer_post_id, '_amount', '' );
-            add_post_meta( $offer_post_id, '_applicant_contact_id', $viewing->applicant_contact_id );
+
+            foreach( $viewing_applicant_ids as $viewing_applicant_id )
+            {
+                add_post_meta( $offer_post_id, '_applicant_contact_id', $viewing_applicant_id );
+            }
+
             add_post_meta( $offer_post_id, '_applicant_solicitor_contact_id', '' );
             add_post_meta( $offer_post_id, '_property_id', $viewing->property_id );
             add_post_meta( $offer_post_id, '_property_owner_solicitor_contact_id', '' );
@@ -336,6 +343,8 @@ class PH_Admin_Meta_Boxes {
 
             $offer = new PH_Offer((int)$_GET['post']);
 
+            $offer_applicant_ids = $offer->get_applicant_ids();
+
             $sale_post = array(
               'post_title'    => '',
               'post_content'  => '',
@@ -350,7 +359,12 @@ class PH_Admin_Meta_Boxes {
             
             add_post_meta( $sale_post_id, '_status', 'current' );
             add_post_meta( $sale_post_id, '_amount', $offer->amount );
-            add_post_meta( $sale_post_id, '_applicant_contact_id', $offer->applicant_contact_id );
+
+            foreach( $offer_applicant_ids as $offer_applicant_id )
+            {
+                add_post_meta( $sale_post_id, '_applicant_contact_id', $offer_applicant_id );
+            }
+
             add_post_meta( $sale_post_id, '_applicant_solicitor_contact_id', $offer->applicant_solicitor_contact_id );
             add_post_meta( $sale_post_id, '_property_id', $offer->property_id );
             add_post_meta( $sale_post_id, '_property_owner_solicitor_contact_id', $offer->property_owner_solicitor_contact_id );
@@ -393,6 +407,8 @@ class PH_Admin_Meta_Boxes {
 
             $viewing = new PH_Viewing( (int) $_GET['post'] );
 
+            $viewing_applicant_ids = $viewing->get_applicant_ids();
+
             $tenancy_post = array(
                 'post_title'     => '',
                 'post_content'   => '',
@@ -407,7 +423,11 @@ class PH_Admin_Meta_Boxes {
 
             $property_id = $viewing->property_id;
 
-            add_post_meta( $tenancy_post_id, '_applicant_contact_id', $viewing->applicant_contact_id );
+            foreach( $viewing_applicant_ids as $viewing_applicant_id )
+            {
+                add_post_meta( $tenancy_post_id, '_applicant_contact_id', $viewing_applicant_id );
+            }
+
             add_post_meta( $tenancy_post_id, '_property_id', $viewing->property_id );
 
             add_post_meta( $tenancy_post_id, '_rent', get_post_meta( $property_id, '_rent', true ) );

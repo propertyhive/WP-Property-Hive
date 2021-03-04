@@ -165,4 +165,19 @@ class PH_Viewing {
 
         return $related_viewings;
     }
+
+    public function get_applicant_ids()
+    {
+        $applicant_contact_ids = get_post_meta( $this->id, '_applicant_contact_id' );
+        if ( $applicant_contact_ids == '' )
+        {
+            $applicant_contact_ids = array();
+        }
+        if ( !is_array($applicant_contact_ids) && $applicant_contact_ids != '' && $applicant_contact_ids != 0 )
+        {
+            $applicant_contact_ids = array($applicant_contact_ids);
+        }
+
+        return $applicant_contact_ids;
+    }
 }

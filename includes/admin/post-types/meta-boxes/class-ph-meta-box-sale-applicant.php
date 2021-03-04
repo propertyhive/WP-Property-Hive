@@ -23,38 +23,55 @@ class PH_Meta_Box_Sale_Applicant {
         
         echo '<div class="options_group">';
         
-        $applicant_contact_id = get_post_meta( $post->ID, '_applicant_contact_id', true );
+        $applicant_contact_ids = get_post_meta($post->ID, '_applicant_contact_id');
 
-        if ( !empty($applicant_contact_id) )
+        if ( $applicant_contact_ids == '' )
         {
-            $contact = new PH_Contact($applicant_contact_id);
+            $applicant_contact_ids = array();
+        }
+        if ( !is_array($applicant_contact_ids) && $applicant_contact_ids != '' && $applicant_contact_ids != 0 )
+        {
+            $applicant_contact_ids = array($applicant_contact_ids);
+        }
 
-            $fields = array(
-                'name' => array(
-                    'label' => __('Name', 'propertyhive'),
-                    'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . $applicant_contact_id . '" data-viewing-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
-                ),
-                'telephone_number' => array(
-                    'label' => __('Telephone Number', 'propertyhive'),
-                    'value' => $contact->telephone_number,
-                ),
-                'email_address' => array(
-                    'label' => __('Email Address', 'propertyhive'),
-                    'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
-                ),
-            );
-
-            $fields = apply_filters( 'propertyhive_sale_applicant_fields', $fields, $post->ID, $applicant_contact_id );
-
-            foreach ( $fields as $key => $field )
+        if ( !empty($applicant_contact_ids) )
+        {
+            $i = 0;
+            foreach ( $applicant_contact_ids as $applicant_contact_id )
             {
-                echo '<p class="form-field ' . esc_attr($key) . '">
-            
-                    <label>' . esc_html($field['label']) . '</label>
-                    
-                    ' . $field['value'] . '
-                    
-                </p>';
+                $contact = new PH_Contact($applicant_contact_id);
+
+                $fields = array(
+                    'name' => array(
+                        'label' => __('Name', 'propertyhive'),
+                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-sale-applicant-id="' . $applicant_contact_id . '" data-sale-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
+                    ),
+                    'telephone_number' => array(
+                        'label' => __('Telephone Number', 'propertyhive'),
+                        'value' => $contact->telephone_number,
+                    ),
+                    'email_address' => array(
+                        'label' => __('Email Address', 'propertyhive'),
+                        'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                    ),
+                );
+
+                $fields = apply_filters( 'propertyhive_sale_applicant_fields', $fields, $post->ID, $applicant_contact_id );
+
+                $div_style = $i > 0 ? 'style="border-top:1px solid #ddd"' : '';
+                echo "<div " . $div_style . ">";
+                foreach ( $fields as $key => $field )
+                {
+                    echo '<p class="form-field ' . esc_attr($key) . '" >
+
+                        <label>' . esc_html($field['label']) . '</label>
+
+                        ' . $field['value'] . '
+
+                    </p>';
+                }
+                echo "</div>";
+                ++$i;
             }
         }
         else

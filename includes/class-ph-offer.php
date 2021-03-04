@@ -107,4 +107,72 @@ class PH_Offer {
         return ( ( $amount != '' ) ? $prefix . number_format($amount , 0) : '-' );
 
     }
+
+    /**
+     * Get a list of applicants on the offer
+     *
+     * @access public
+     * @param bool $add_hyperlinks
+     * @param bool $additional_contact_details
+     * @param bool $contact_details_visible
+     * @return array
+     */
+    public function get_applicants( $add_hyperlinks = false, $additional_contact_details = false, $contact_details_visible = true )
+    {
+        $applicant_contact_ids = get_post_meta( $this->id, '_applicant_contact_id' );
+        if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
+        {
+            $applicants = array();
+            foreach ( $applicant_contact_ids as $applicant_contact_id )
+            {
+                $applicant_name = get_the_title($applicant_contact_id);
+                if ( $add_hyperlinks )
+                {
+                    $edit_link = get_edit_post_link( $applicant_contact_id );
+                    $applicant_name = '<a href="' . esc_url( $edit_link ) . '">' . $applicant_name . '</a>';
+                }
+                if ( $additional_contact_details )
+                {
+                    $telephone_number = get_post_meta( $applicant_contact_id, '_telephone_number', true );
+                    if( !empty($telephone_number) )
+                    {
+                        $contact_details = 'T: ' . $telephone_number;
+                    }
+
+                    $email_address = get_post_meta( $applicant_contact_id, '_email_address', true );
+                    if( !empty($email_address) )
+                    {
+                        $contact_details .= ( $contact_details != '' ) ? '<br>' : '';
+                        $contact_details .= 'E: ' . $email_address;
+                    }
+
+                    if ( $contact_details != '' )
+                    {
+                        $applicant_name .= '<div class="row-actions' . ($contact_details_visible ? ' visible' : '') . '">' . $contact_details . '</div>';
+                    }
+                }
+                $applicants[] = $applicant_name;
+            }
+            return implode("<br>", $applicants);
+        }
+        else
+        {
+            return '-';
+        }
+    }
+
+    public function get_applicant_ids()
+    {
+        $applicant_contact_ids = get_post_meta( $this->id, '_applicant_contact_id' );
+        if ( $applicant_contact_ids == '' )
+        {
+            $applicant_contact_ids = array();
+        }
+        if ( !is_array($applicant_contact_ids) && $applicant_contact_ids != '' && $applicant_contact_ids != 0 )
+        {
+            $applicant_contact_ids = array($applicant_contact_ids);
+        }
+
+        return $applicant_contact_ids;
+    }
 }

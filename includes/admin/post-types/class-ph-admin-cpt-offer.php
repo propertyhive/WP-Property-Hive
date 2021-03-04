@@ -99,7 +99,7 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
 		$columns['offer_date_time'] = __( 'Offer Date / Time', 'propertyhive' );
         $columns['property'] = __( 'Property', 'propertyhive' );
         $columns['property_owner'] = __( 'Property Owner', 'propertyhive' );
-        $columns['applicant'] = __( 'Applicant', 'propertyhive' );
+        $columns['applicant'] = __( 'Applicant(s)', 'propertyhive' );
         $columns['amount'] = __( 'Amount', 'propertyhive' );
         $columns['status'] = __( 'Status', 'propertyhive' );
 
@@ -219,19 +219,8 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
                 break;
             case 'applicant' :
                 
-                if ( $the_offer->applicant_contact_id != '' )
-                {
-	                echo get_the_title($the_offer->applicant_contact_id);
-	                echo '<div class="row-actions">';
-	                echo 'T: ' . get_post_meta($the_offer->applicant_contact_id, '_telephone_number', TRUE) . '<br>';
-	                echo 'E: ' . get_post_meta($the_offer->applicant_contact_id, '_email_address', TRUE);
-	                echo '</div>';
-            	}
-            	else
-            	{
-            		echo '-';
-            	}
-                
+                echo $the_offer->get_applicants( false, true, false );
+
                 break;
             case 'amount' :
                 
