@@ -1,3 +1,6 @@
+var ph_lightbox_open = false; // Used to determine if a details lightbox is open and therefore which post ID (stored in ph_lightbox_post_id) to pass through to AJAX requests
+var ph_lightbox_post_id;
+
 jQuery( function($){
     
     $('.propertyhive_meta_box #property_rooms').sortable({
@@ -60,9 +63,11 @@ jQuery( function($){
     $('ul.ph-tabs li:visible').eq(0).find('a').click();
     
     // Notes
-    //$('#propertyhive-property-notes, #propertyhive-contact-notes, #propertyhive-enquiry-notes, #propertyhive-viewing-notes, #propertyhive-offer-notes, #propertyhive-sale-notes').on( 'click', 'a.add_note', function() {
-    $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.add_note', function() {
-        if ( ! $('textarea#add_note').val() ) return;
+    $(document).on( 'click', '[id^=\'propertyhive_\'][id$=\'_notes_container\'] a.add_note', function() 
+    {
+        var section = $(this).attr('data-section');
+
+        if ( ! $('#propertyhive_' +  section + '_notes_container textarea#add_note').val() ) return;
 
         if ( $(this).text() == 'Adding...' ) { return false; }
 
@@ -71,13 +76,13 @@ jQuery( function($){
  
         var data = {
             action:         'propertyhive_add_note',
-            post_id:        propertyhive_admin_meta_boxes.post_id,
-            note:           $('textarea#add_note').val(),
+            post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            note:           $('#propertyhive_' +  section + '_notes_container textarea#add_note').val(),
             note_type:      'propertyhive_note',
             security:       propertyhive_admin_meta_boxes.add_note_nonce,
         };
 
-        if ( $('#pinned').prop('checked') )
+        if ( $('#propertyhive_' +  section + '_notes_container input[name=\'pinned\']').prop('checked') )
         {
             data.pinned = '1';
         }
@@ -85,21 +90,23 @@ jQuery( function($){
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             var data = {
                 action:         'propertyhive_get_notes_grid',
-                post_id:        propertyhive_admin_meta_boxes.post_id,
-                section:        jQuery('#notes_grid_section').val(),
+                post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                section:        section,
             };
 
             jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
             {
-                jQuery('#propertyhive_notes_container').html(response);
+                jQuery('#propertyhive_' +  section + '_notes_container').html(response);
             }, 'html');
         });
 
         return false;
     });
 
-    $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.delete_note', function() {
-        
+    $(document).on( 'click', '[id^=\'propertyhive_\'][id$=\'_notes_container\'] a.delete_note', function() 
+    {
+        var section = $(this).attr('data-section');
+
         if ( $(this).text() == 'Deleting...' ) { return; }
 
         var confirm_box = confirm('Are you sure you wish to delete this note?');
@@ -121,20 +128,22 @@ jQuery( function($){
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             var data = {
                 action:         'propertyhive_get_notes_grid',
-                post_id:        propertyhive_admin_meta_boxes.post_id,
-                section:        jQuery('#notes_grid_section').val(),
+                post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                section:        section,
             };
 
             jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
             {
-                jQuery('#propertyhive_notes_container').html(response);
+                jQuery('#propertyhive_' +  section + '_notes_container').html(response);
             }, 'html');
         }, 'json');
 
         return false;
     });
 
-    $('[id^=\'propertyhive-\'][id$=\'-notes\']').on( 'click', 'a.toggle_note_pinned', function() {
+    $(document).on( 'click', '[id^=\'propertyhive_\'][id$=\'_notes_container\'] a.toggle_note_pinned', function()
+    {
+        var section = $(this).attr('data-section');
 
         if ( $(this).text().indexOf('...') >= 0 ) { return; }
 
@@ -160,13 +169,13 @@ jQuery( function($){
 
             var data = {
                 action:         'propertyhive_get_notes_grid',
-                post_id:        propertyhive_admin_meta_boxes.post_id,
-                section:        jQuery('#notes_grid_section').val(),
+                post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                section:        section,
             };
 
             jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
             {
-                jQuery('#propertyhive_notes_container').html(response);
+                jQuery('#propertyhive_' +  section + '_notes_container').html(response);
             }, 'html');
 
         }, 'json');
@@ -181,24 +190,25 @@ jQuery( function($){
         e.preventDefault();
 
         var note_type = $(this).attr('data-filter-class');
+        var section = $(this).attr('data-section');
 
         if ( note_type == '*' )
         {
             // show all notes
-            $('.record_notes li').show();
+            $('#propertyhive_' +  section + '_notes_container .record_notes li').show();
 
-            if ( $('.record_notes li').length > 1 )
+            if ( $('#propertyhive_' +  section + '_notes_container .record_notes li').length > 1 )
             {
-                $('.record_notes li#no_notes').hide();
+                $('#propertyhive_' +  section + '_notes_container .record_notes li#no_notes').hide();
             }
         }
         else
         {
-            $('.record_notes li').hide();
-            $('.record_notes li.' + note_type).show();
+            $('#propertyhive_' +  section + '_notes_container .record_notes li').hide();
+            $('#propertyhive_' +  section + '_notes_container .record_notes li.' + note_type).show();
         }
 
-        $('.notes-filter a').removeClass('current');
+        $(this).parent().parent().find('a').removeClass('current');
         $(this).addClass('current');
     });
 
@@ -365,6 +375,354 @@ jQuery( function($){
     
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
+
+    $( document ).on('click', '.viewing-lightbox', function(e)
+    {
+        e.preventDefault();
+        
+        ph_open_details_lightbox($(this).attr('data-viewing-id'), 'viewing');
+    });
+
+    $( document ).on('click', '.propertyhive-lightbox-buttons a.button-close', function(e)
+    {
+        e.preventDefault();
+
+        $.fancybox.close();
+    });
+
+    $( document ).on('click', '.propertyhive-lightbox-buttons a.button-prev', function(e)
+    {
+        e.preventDefault();
+
+        var previous_post_id = false;
+        $('a[data-viewing-id]').each(function()
+        {
+            var post_id = $(this).attr('data-viewing-id');
+
+            if ( post_id == ph_lightbox_post_id )
+            {
+                ph_open_details_lightbox(previous_post_id, 'viewing');
+
+                return;
+            }
+
+            previous_post_id = post_id;
+        });
+    });
+
+    $( document ).on('click', '.propertyhive-lightbox-buttons a.button-next', function(e)
+    {
+        e.preventDefault();
+
+        var use_next = false;
+        $('a[data-viewing-id]').each(function()
+        {
+            var post_id = $(this).attr('data-viewing-id');
+
+            if (use_next)
+            {
+                ph_open_details_lightbox(post_id, 'viewing');
+
+                return;
+            }
+
+            if ( post_id == ph_lightbox_post_id )
+            {
+                use_next = true;
+            }
+        });
+    });
+});
+
+function ph_open_details_lightbox(post_id, section)
+{
+    ph_lightbox_post_id = post_id;
+
+    jQuery.fancybox.close();
+
+    jQuery.fancybox.open({
+        src  : ajaxurl + '?action=propertyhive_get_' + section + '_lightbox&post_id=' + ph_lightbox_post_id,
+        type : 'ajax',
+        beforeLoad: function()
+        {
+            ph_lightbox_open = true;
+        },
+        afterShow: function()
+        {
+            // hide/show next/prev buttons
+            var found_current = false;
+            var previous_exist = false;
+            var next_exist = false;
+            jQuery('a[data-' + section + '-id]').each(function()
+            {
+                var post_id = jQuery(this).attr('data-' + section + '-id');
+
+                if ( found_current )
+                {
+                    next_exist = true;
+                }
+
+                if ( post_id == ph_lightbox_post_id )
+                {
+                    // this is the lightbox being viewed
+                    found_current = true;
+                }
+                else
+                {
+                    if ( !found_current )
+                    {
+                        previous_exist = true;
+                    }
+                }
+            });
+
+            if ( previous_exist )
+            {
+                jQuery('.propertyhive-lightbox-buttons a.button-prev').show();
+            }
+            if ( next_exist )
+            {
+                jQuery('.propertyhive-lightbox-buttons a.button-next').show();
+            }
+        },
+        beforeClose: function()
+        {
+            ph_lightbox_open = false;
+        }
+    });
+}
+
+// VIEWINGS //
+jQuery(window).on('load', function()
+{
+    //redraw_viewing_details_meta_box(); // called from within redraw_viewing_actions()
+    redraw_viewing_actions();
+});
+
+function redraw_viewing_details_meta_box()
+{
+    if ( jQuery('#propertyhive_viewing_details_meta_box_container').length > 0 )
+    {
+        jQuery('#propertyhive_viewing_details_meta_box_container').html('Loading...');
+
+        var data = {
+            action:         'propertyhive_get_viewing_details_meta_box',
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            security:       propertyhive_admin_meta_boxes.viewing_details_meta_nonce,
+            readonly:       ph_lightbox_open
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            jQuery('#propertyhive_viewing_details_meta_box_container').html(response);
+        }, 'html');
+    }
+}
+
+function redraw_viewing_actions()
+{
+    if ( jQuery('#propertyhive_viewing_actions_meta_box_container').length > 0 )
+    {
+        jQuery('#propertyhive_viewing_actions_meta_box_container').html('Loading...');
+        
+        var data = {
+            action:         'propertyhive_get_viewing_actions',
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            jQuery('#propertyhive_viewing_actions_meta_box_container').html(response);
+        }, 'html');
+    }
+
+    redraw_viewing_details_meta_box();
+}
+
+jQuery(document).ready(function($)
+{
+    $(document).on('click', 'a.viewing-action', function(e)
+    {
+        e.preventDefault();
+
+        var this_href = $(this).attr('href');
+
+        $(this).attr('disabled', 'disabled');
+
+        if ( this_href == '#action_panel_viewing_carried_out' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_carried_out',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_email_applicant_booking_confirmation' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_email_applicant_booking_confirmation',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_email_owner_booking_confirmation' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_email_owner_booking_confirmation',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_feedback_not_required' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_feedback_not_required',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_revert_feedback_passed_on' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_feedback_passed_on',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_revert_pending' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_revert_pending',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_revert_feedback_pending' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_revert_feedback_pending',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        $('#propertyhive_viewing_actions_meta_box').stop().fadeOut(300, function()
+        {
+            $(this_href).stop().fadeIn(300, function()
+            {
+                
+            });
+        });
+    });
+
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.action-cancel', function(e)
+    {
+        e.preventDefault();
+
+        redraw_viewing_actions();
+    });
+
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.cancelled-reason-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        // Submit interested feedback
+        var data = {
+            action:         'propertyhive_viewing_cancelled',
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            cancelled_reason: $('#_cancelled_reason').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+    });
+
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.interested-feedback-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        // Submit interested feedback
+        var data = {
+            action:         'propertyhive_viewing_interested_feedback',
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            feedback:       $('#_interested_feedback').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+    });
+
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.not-interested-feedback-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        // Submit interested feedback
+        var data = {
+            action:         'propertyhive_viewing_not_interested_feedback',
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            feedback:       $('#_not_interested_feedback').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+    })
 });
 
 function initialise_datepicker() {

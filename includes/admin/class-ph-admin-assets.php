@@ -63,6 +63,14 @@ class PH_Admin_Assets {
 		    wp_enqueue_style( 'admin-hide-default-post-data.css', PH()->plugin_url() . '/assets/css/admin-hide-default-post-data.css', PH_VERSION );
 	    }
 
+        if ( 
+            get_option('propertyhive_module_disabled_viewings', '') != 'yes' &&
+            in_array( $screen->id, array( 'property', 'contact' ) ) 
+        )
+	    {
+		    wp_enqueue_style( 'propertyhive_fancybox_css', PH()->plugin_url() . '/assets/css/jquery.fancybox.css', array(), '3.3.5' );
+	    }
+
         /*if ( in_array( $screen->id, array( 'dashboard' ) ) ) {
             wp_enqueue_style( 'propertyhive_admin_dashboard_styles', PH()->plugin_url() . '/assets/css/dashboard.css', array(), PH_VERSION );
         }*/
@@ -142,6 +150,14 @@ class PH_Admin_Assets {
 		    wp_enqueue_script( 'inline-edit-key_date.js', PH()->plugin_url() . '/assets/js/admin/inline-edit-key_date.js', array('jquery'), PH_VERSION );
 	    }
 
+        if ( 
+            get_option('propertyhive_module_disabled_viewings', '') != 'yes' &&
+            in_array( $screen->id, array( 'property', 'contact' ) ) 
+        )
+        {
+		    wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/jquery.fancybox.js', array('jquery'), '3.3.5' );
+	    }
+
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
         {
             wp_enqueue_script( 'ajax-chosen' );
@@ -182,6 +198,8 @@ class PH_Admin_Assets {
                 'post_id'                       => isset( $post->ID ) ? $post->ID : '',
                 'add_note_nonce'                => wp_create_nonce("add-note"),
                 'delete_note_nonce'             => wp_create_nonce("delete-note"),
+                'viewing_details_meta_nonce'    => wp_create_nonce( 'viewing-details-meta-box' ),
+                'viewing_actions_nonce'         => wp_create_nonce( 'viewing-actions' )
             );
             wp_localize_script( 'propertyhive_admin_meta_boxes', 'propertyhive_admin_meta_boxes', $params );
 

@@ -21,32 +21,33 @@ class PH_Meta_Box_Tenancy_Notes {
     public static function output( $post ) {
         global $wpdb, $propertyhive, $post;
 
+        $section = 'tenancy';
+
 	    echo '<ul class="subsubsub notes-filter" style="float:none; padding-left:10px;">';
 
-	    $notes_filters = array(
-		    '' =>  __( 'All', 'propertyhive' ),
-		    'mailout' =>  __( 'Mailout', 'propertyhive' ),
-		    'note' =>  __( 'Note', 'propertyhive' ),
-		    'action' =>  __( 'System Change', 'propertyhive' ),
-	    );
+		    $notes_filters = array(
+			    '' =>  __( 'All', 'propertyhive' ),
+			    'mailout' =>  __( 'Mailout', 'propertyhive' ),
+			    'note' =>  __( 'Note', 'propertyhive' ),
+			    'action' =>  __( 'System Change', 'propertyhive' ),
+		    );
 
-	    $notes_filters = apply_filters( 'propertyhive_notes_filters', $notes_filters, $post );
-	    $notes_filters = apply_filters( 'propertyhive_tenancy_notes_filters', $notes_filters, $post );
+		    $notes_filters = apply_filters( 'propertyhive_notes_filters', $notes_filters, $post );
+		    $notes_filters = apply_filters( 'propertyhive_tenancy_notes_filters', $notes_filters, $post );
 
-	    $i = 0;
-	    foreach ( $notes_filters as $class => $label )
-	    {
-		    echo '<li><a href="" data-filter-class="' . ( $class == '' ? '*' : 'note-type-' . $class ) . '">' . $label . '</a>';
-		    if ( $i < count($notes_filters) - 1 ) { echo ' |&nbsp; '; }
-		    echo '</li>';
-		    ++$i;
-	    }
+		    $i = 0;
+		    foreach ( $notes_filters as $class => $label )
+		    {
+			    echo '<li><a href="" data-section="' . $section . '" data-filter-class="' . ( $class == '' ? '*' : 'note-type-' . $class ) . '">' . $label . '</a>';
+			    if ( $i < count($notes_filters) - 1 ) { echo ' |&nbsp; '; }
+			    echo '</li>';
+			    ++$i;
+		    }
 
 	    echo '</ul>';
 
-	    echo '<div id="propertyhive_notes_container">';
-	    $section = 'tenancy';
-	    include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
+	    echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">';
+	    	include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
 	    echo '</div>';
     }
 }

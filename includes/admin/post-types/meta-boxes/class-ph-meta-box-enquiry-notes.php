@@ -21,8 +21,9 @@ class PH_Meta_Box_Enquiry_Notes {
     public static function output( $post ) {
         global $propertyhive, $post;
 
-        echo '<div id="propertyhive_notes_container">';
-            $section = 'enquiry';
+        $section = 'enquiry';
+
+        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">';
             include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
         echo '</div>';
     }
