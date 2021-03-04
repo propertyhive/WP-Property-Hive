@@ -4825,11 +4825,6 @@ class PH_AJAX {
             }
         }
 
-        if ( $status == 'declined' )
-        {
-            
-        }
-
         if ( $status == 'accepted' || $status == 'declined' )
         {
             $actions[] = '<a 
@@ -4965,7 +4960,7 @@ class PH_AJAX {
             {
                 $columns = array(
                     'date' => __( 'Offer Date', 'propertyhive' ),
-                    'applicant' => __( 'Applicant', 'propertyhive' ),
+                    'applicant' => __( 'Applicant(s)', 'propertyhive' ),
                     'amount' => __( 'Offer Amount', 'propertyhive' ),
                     'status' => __( 'Status', 'propertyhive' ),
                 );
@@ -4989,11 +4984,25 @@ class PH_AJAX {
 
                     $offer = new PH_Offer(get_the_ID());
 
-                    $applicant_text = $this->formatted_contact_meta_box_data(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE));
+                    $applicant_contact_ids = get_post_meta(get_the_ID(), '_applicant_contact_id');
+                    $applicant_contacts = array();
+                    if (!empty($applicant_contact_ids))
+                    {
+                        foreach ($applicant_contact_ids as $applicant_contact_id)
+                        {
+                            $applicant_contacts[] = $this->formatted_contact_meta_box_data($applicant_contact_id);
+                        }
+
+                        $applicant_contacts = implode('<br>', $applicant_contacts);
+                    }
+                    else
+                    {
+                        $applicant_contacts = '-';
+                    }
 
                     $column_data = array(
                         'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_offer_date_time', TRUE))) . '</a>',
-                        'applicant' => $applicant_text,
+                        'applicant' => $applicant_contacts,
                         'amount' => $offer->get_formatted_amount(),
                         'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
                     );
@@ -5389,7 +5398,7 @@ class PH_AJAX {
             {
                 $columns = array(
                     'date' => __( 'Sale Date', 'propertyhive' ),
-                    'applicant' => __( 'Applicant', 'propertyhive' ),
+                    'applicant' => __( 'Applicant(s)', 'propertyhive' ),
                     'amount' => __( 'Sale Amount', 'propertyhive' ),
                     'status' => __( 'Status', 'propertyhive' ),
                 );
@@ -5413,10 +5422,25 @@ class PH_AJAX {
 
                     $sale = new PH_Sale(get_the_ID());
 
-                    $applicant_text = $this->formatted_contact_meta_box_data(get_post_meta(get_the_ID(), '_applicant_contact_id', TRUE));
+                    $applicant_contact_ids = get_post_meta(get_the_ID(), '_applicant_contact_id');
+                    $applicant_contacts = array();
+                    if (!empty($applicant_contact_ids))
+                    {
+                        foreach ($applicant_contact_ids as $applicant_contact_id)
+                        {
+                            $applicant_contacts[] = $this->formatted_contact_meta_box_data($applicant_contact_id);
+                        }
+
+                        $applicant_contacts = implode('<br>', $applicant_contacts);
+                    }
+                    else
+                    {
+                        $applicant_contacts = '-';
+                    }
+
                     $column_data = array(
                         'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime(get_post_meta(get_the_ID(), '_sale_date_time', TRUE))) . '</a>',
-                        'applicant' => $applicant_text,
+                        'applicant' => $applicant_contacts,
                         'amount' => $sale->get_formatted_amount(),
                         'status' => __( ucwords(str_replace("_", " ", get_post_meta(get_the_ID(), '_status', TRUE))), 'propertyhive' ),
                     );

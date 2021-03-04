@@ -99,7 +99,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 		$columns['sale_date_time'] = __( 'Sale Date', 'propertyhive' );
         $columns['property'] = __( 'Property', 'propertyhive' );
         $columns['property_owner'] = __( 'Property Owner', 'propertyhive' );
-        $columns['applicant'] = __( 'Applicant', 'propertyhive' );
+        $columns['applicant'] = __( 'Applicant(s)', 'propertyhive' );
         $columns['amount'] = __( 'Amount', 'propertyhive' );
         $columns['status'] = __( 'Status', 'propertyhive' );
 
@@ -219,18 +219,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
                 break;
             case 'applicant' :
                 
-                if ( $the_sale->applicant_contact_id != '' )
-                {
-	                echo get_the_title($the_sale->applicant_contact_id);
-	                echo '<div class="row-actions">';
-	                echo 'T: ' . get_post_meta($the_sale->applicant_contact_id, '_telephone_number', TRUE) . '<br>';
-	                echo 'E: ' . get_post_meta($the_sale->applicant_contact_id, '_email_address', TRUE);
-	                echo '</div>';
-	            }
-                else
-                {
-                	echo '-';
-                }
+                $the_sale->get_applicants( false, true, false );
                 
                 break;
             case 'amount' :
