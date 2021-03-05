@@ -423,7 +423,7 @@ jQuery( function($){
             {
                 ph_open_details_lightbox(post_id, 'viewing');
 
-                return;
+                return false;
             }
 
             if ( post_id == ph_lightbox_post_id )
