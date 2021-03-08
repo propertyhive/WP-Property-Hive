@@ -85,6 +85,21 @@ class PH_Settings_General extends PH_Settings_Page {
             ++$i;
         }
 
+        $active_departments_html = '';
+        
+
+        $settings[] = array(
+            'title'   => __( 'Active Departments', 'propertyhive' ),
+            'id'      => 'propertyhive_active_departments',
+            'type'    => 'html',
+            'html'    => '<fieldset>
+                <legend class="screen-reader-text"><span>Active Departments</span></legend>
+                <label for="propertyhive_active_departments_sales">
+                    <input name="propertyhive_active_departments_sales" id="propertyhive_active_departments_sales" type="checkbox" value="1" checked="checked"> Residential Sales
+                </label>
+            </fieldset>',
+        );
+
         $settings[] = array(
             'title'   => __( 'Primary Department', 'propertyhive' ),
             'id'      => 'propertyhive_primary_department',
