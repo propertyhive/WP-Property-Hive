@@ -133,6 +133,7 @@ class PH_Sale {
                 }
                 if ( $additional_contact_details )
                 {
+                    $contact_details = '';
                     $telephone_number = get_post_meta( $applicant_contact_id, '_telephone_number', true );
                     if( !empty($telephone_number) )
                     {
