@@ -49,7 +49,7 @@ class PH_Key_Date {
 			case 'pending':
 				switch(true)
 				{
-					case $this->date_due() <= new DateTime(PH_Key_Date::OVERDUE_THRESHOLD):
+					case $this->date_due() < new DateTime(PH_Key_Date::OVERDUE_THRESHOLD):
 						return 'overdue';
 					case $this->date_due() <= new DateTime(PH_Key_Date::UPCOMING_THRESHOLD):
 						return 'upcoming';
