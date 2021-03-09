@@ -213,9 +213,36 @@ jQuery( function($){
     });
 
     // Key Dates
+    var previous_key_date_type;
+    $('[id=\'propertyhive-management-dates\']').on( 'focus', '#_add_key_date_type', function() {
+        previous_key_date_type = $(this).find("option:selected").text();
+    });
+
+    $('[id=\'propertyhive-management-dates\']').on( 'change', '#_add_key_date_type', function() {
+        var selected_key_date_type = $('#_add_key_date_type option:selected').text();
+        if( $('#_add_key_date_type').val() == '' )
+        {
+            $('#_add_key_date_description').val('');
+        }
+        else
+        {
+            var current_description = $('#_add_key_date_description').val();
+
+            if ( current_description == '' || current_description == previous_key_date_type )
+            {
+                $('#_add_key_date_description').val(selected_key_date_type);
+            }
+        }
+
+        previous_key_date_type = selected_key_date_type;
+    });
+
     $('[id=\'propertyhive-management-dates\']').on( 'click', 'a.add_key_date', function() {
 
-        if ( !$('#_add_key_date_description').val() || !$('#_add_key_date_due').val() ) return;
+        if ( !$('#_add_key_date_type').val() || !$('#_add_key_date_description').val() || !$('#_add_key_date_due').val() )
+        {
+            return false;
+        }
 
         if ( $(this).text() == 'Adding...' ) { return false; }
 
