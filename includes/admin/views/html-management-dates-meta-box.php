@@ -88,6 +88,7 @@
 
     $key_dates = get_posts(array (
         'post_type' => 'key_date',
+        'nopaging' => true,
         'meta_query' => $meta_query,
     ));
 ?>
