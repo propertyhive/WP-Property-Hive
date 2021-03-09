@@ -468,32 +468,33 @@ function ph_get_applicant_requirements_form_fields($applicant_profile = false)
         'options' => $offices
     );
 
+    $ph_departments = ph_get_departments();
     $departments = array();
-    $value = '';
-    if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
+
+    $show_residential_fields = false;
+    $show_commercial_fields = false;
+    foreach ( $ph_departments as $key => $department )
     {
-        $departments['residential-sales'] = __( 'Properties To Buy', 'propertyhive' );
-        if ($value == '' && (get_option( 'propertyhive_primary_department' ) == 'residential-sales' || get_option( 'propertyhive_primary_department' ) === FALSE) )
+        if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
         {
-            $value = 'residential-sales';
+            $departments[$key] = $department;
+            if ($value == '' && (get_option( 'propertyhive_primary_department' ) == $key || get_option( 'propertyhive_primary_department' ) === FALSE) )
+            {
+                $value = $key;
+            }
+
+            if ( in_array($key, array('residential-sales', 'residential-lettings')) || in_array(ph_get_custom_department_based_on($key), array('residential-sales', 'residential-lettings')) )
+            {
+                $show_residential_fields = true;
+            }
+
+            if ( in_array($key, array('commercial')) || in_array(ph_get_custom_department_based_on($key), array('commercial')) )
+            {
+                $show_commercial_fields = true;
+            }
         }
     }
-    if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
-    {
-        $departments['residential-lettings'] = __( 'Properties For Rent', 'propertyhive' );
-        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'residential-lettings')
-        {
-            $value = 'residential-lettings';
-        }
-    }
-    if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
-    {
-        $departments['commercial'] = __( 'Commercial Properties', 'propertyhive' );
-        if ($value == '' && get_option( 'propertyhive_primary_department' ) == 'commercial')
-        {
-            $value = 'commercial';
-        }
-    }
+
     $fields['department'] = array(
         'type' => 'radio',
         'label' => __( 'Looking For', 'propertyhive' ),
@@ -511,7 +512,7 @@ function ph_get_applicant_requirements_form_fields($applicant_profile = false)
         $fields['department']['type'] = 'hidden';
     }
 
-    if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' || get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
+    if ( $show_residential_fields )
     {
         $fields['maximum_price'] = array(
             'type' => 'number',
@@ -600,7 +601,7 @@ function ph_get_applicant_requirements_form_fields($applicant_profile = false)
         }
     }
 
-    if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+    if ( $show_commercial_fields  )
     {
         $fields['available_as_sale'] = array(
             'type' => 'checkbox',
