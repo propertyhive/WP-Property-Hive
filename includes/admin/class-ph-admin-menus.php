@@ -119,10 +119,10 @@ class PH_Admin_Menus {
                     ),
                 ),
             );
-            $enquiry_query = new WP_Query( $args );
-            if ( $enquiry_query->have_posts() )
+            $key_date_query = new WP_Query( $args );
+            if ( $key_date_query->have_posts() )
             {
-                $count = ' <span class="update-plugins count-' . $enquiry_query->found_posts . '"><span class="plugin-count">' . $enquiry_query->found_posts . '</span></span>';
+                $count = ' <span class="update-plugins count-' . $key_date_query->found_posts . '"><span class="plugin-count">' . $key_date_query->found_posts . '</span></span>';
             }
             add_submenu_page( 'propertyhive', __( 'Management', 'propertyhive' ), __( 'Management', 'propertyhive' ) . $count, 'manage_propertyhive', 'edit.php?post_type=key_date&orderby=date_due&order=asc&status=upcoming_and_overdue&filter_action=Filter' );
 	    }
