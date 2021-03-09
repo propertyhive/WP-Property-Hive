@@ -165,7 +165,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         // Only save meta info if department is 'residential-lettings'
         $department = get_post_meta($post_id, '_department', TRUE);
         
-        if ($department == 'residential-lettings')
+        if ( $department == 'residential-lettings' || ph_get_custom_department_based_on( $department ) == 'residential-lettings' )
         {
             update_post_meta( $post_id, '_currency', ph_clean($_POST['_rent_currency']) );
 
