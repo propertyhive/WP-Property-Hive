@@ -309,6 +309,56 @@ jQuery( function($){
 
     });
 
+    $('[id=\'propertyhive-management-dates\']').on( 'change', '#key_date_status', function() {
+
+        var quick_edit_row = $(this).closest('tr');
+        var next_key_date_checkbox = quick_edit_row.find('#next_key_date_checkbox');
+
+        if (next_key_date_checkbox.length !== 0)
+        {
+            if ( this.value == 'complete' )
+            {
+                // Show Book Next checkbox
+                next_key_date_checkbox.removeClass('hidden');
+            }
+            else
+            {
+                if( !next_key_date_checkbox.hasClass('hidden') )
+                {
+                    // Hide Book Next checkbox
+                    next_key_date_checkbox.addClass('hidden');
+
+                    // Hide Next Key Date field, if visible
+                    var next_key_date_field = quick_edit_row.find('#next_key_date_field');
+                    if( !next_key_date_field.hasClass('hidden') )
+                    {
+                        next_key_date_field.addClass('hidden');
+                    }
+
+                    // Uncheck Book Next checkbox
+                    quick_edit_row.find('#book_next_key_date').prop( 'checked', false );
+                }
+            }
+        }
+    });
+
+    $('[id=\'propertyhive-management-dates\']').on( 'click', '#book_next_key_date', function() {
+
+        // Show/Hide Next Key Date field when checkbox is checked and unchecked
+        var next_key_date_field = $(this).closest('tr').find('#next_key_date_field');
+        if( this.checked )
+        {
+            next_key_date_field.removeClass('hidden');
+        }
+        else
+        {
+            if( !next_key_date_field.hasClass('hidden') )
+            {
+                next_key_date_field.addClass('hidden');
+            }
+        }
+    });
+
     $('[id=\'propertyhive-management-dates\']').on( 'click', '.save-quick-edit', function() {
 
         var date_post_id = $(this).attr('id');
@@ -328,6 +378,14 @@ jQuery( function($){
             due_date_time: quick_edit_row.find('#date_due_quick_edit').val() + ' ' + quick_edit_row.find('#date_due_hours_quick_edit').val() + ':' + quick_edit_row.find('#date_due_minutes_quick_edit').val(),
             type: quick_edit_row.find('#date_type').val(),
         };
+
+        if (quick_edit_row.find('#book_next_key_date').length !== 0)
+        {
+            if ( quick_edit_row.find('#book_next_key_date').is(":checked") )
+            {
+                data.next_key_date = quick_edit_row.find('#next_key_date').val() + ' ' + quick_edit_row.find('#next_key_date_hours').val() + ':' + quick_edit_row.find('#next_key_date_minutes').val();
+            }
+        }
 
         jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
         {

@@ -5344,6 +5344,41 @@ class PH_AJAX {
         update_post_meta( $key_date_post_id, '_key_date_status', $_POST['status'] );
         update_post_meta( $key_date_post_id, '_key_date_type_id', $_POST['type'] );
 
+        if ( isset($_POST['next_key_date']) )
+        {
+            // Insert next key date record
+            $next_key_date_post = array(
+                'post_title' => $_POST['description'],
+                'post_content' => '',
+                'post_type' => 'key_date',
+                'post_status' => 'publish',
+                'comment_status' => 'closed',
+                'ping_status' => 'closed',
+            );
+
+            // Insert the post into the database
+            $next_key_date_post_id = wp_insert_post( $next_key_date_post );
+
+            if ( is_wp_error($next_key_date_post_id) || $next_key_date_post_id == 0 )
+            {
+                $return = array('error' => 'Failed to create next key date post. Please try again');
+                echo json_encode( $return );
+                die();
+            }
+
+            add_post_meta( $next_key_date_post_id, '_date_due', $_POST['next_key_date'] );
+            add_post_meta( $next_key_date_post_id, '_key_date_status', 'pending' );
+            add_post_meta( $next_key_date_post_id, '_key_date_type_id', $_POST['type'] );
+
+            if( metadata_exists('post', $key_date_post_id, '_property_id') ) {
+                add_post_meta( $next_key_date_post_id, '_property_id', get_post_meta($key_date_post_id, '_property_id', true) );
+            }
+
+            if( metadata_exists('post', $key_date_post_id, '_tenancy_id') ) {
+                add_post_meta( $next_key_date_post_id, '_tenancy_id', get_post_meta($key_date_post_id, '_tenancy_id', true) );
+            }
+        }
+
         die();
     }
 
