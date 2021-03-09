@@ -203,7 +203,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         // Only save meta info if department is 'residential-sales'
         $department = get_post_meta($post_id, '_department', TRUE);
         
-        if ($department == 'residential-sales')
+        if ( $department == 'residential-sales' || ph_get_custom_department_based_on( $department ) == 'residential-sales' )
         {
             update_post_meta( $post_id, '_currency', ph_clean($_POST['_price_currency']) );
 
