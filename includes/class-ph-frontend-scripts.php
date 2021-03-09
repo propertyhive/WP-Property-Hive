@@ -111,6 +111,7 @@ class PH_Frontend_Scripts {
 			wp_localize_script( 'propertyhive_account', 'propertyhive_account_params', apply_filters( 'propertyhive_account_params', array(
 				'ajax_url'        		=> PH()->ajax_url(),
 				'my_account_url'  		=> get_permalink( ph_get_page_id('my_account') ),
+				'custom_departments'	=> ph_get_custom_departments(),
 				'login_nonce'	  		=> wp_create_nonce( "ph_login" ),
 				'register_nonce'	  	=> wp_create_nonce( "ph_register" ),
 				'details_nonce'	  		=> wp_create_nonce( "ph_details" ),
