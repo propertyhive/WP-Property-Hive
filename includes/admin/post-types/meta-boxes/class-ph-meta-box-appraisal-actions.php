@@ -141,7 +141,7 @@ jQuery(document).ready(function($)
 		// Submit interested feedback
 		var data = {
 	        action:         'propertyhive_appraisal_carried_out',
-	        appraisal_id:   <?php echo $post->ID; ?>,<?php if ($department == 'residential-sales') { ?>
+	        appraisal_id:   <?php echo $post->ID; ?>,<?php if ($department == 'residential-sales' || ph_get_custom_department_based_on($department) == 'residential-sales' ) { ?>
 	        price: 			$('#_price').val(),<?php }else{ ?>
 	        rent: 			$('#_price').val(),
 	    	rent_frequency: $('#_rent_frequency').val(),<?php } ?>

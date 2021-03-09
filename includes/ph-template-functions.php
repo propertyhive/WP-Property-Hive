@@ -275,7 +275,12 @@ if ( ! function_exists( 'propertyhive_template_loop_floor_area' ) ) {
      * @return void
      */
     function propertyhive_template_loop_floor_area() {
-        ph_get_template( 'search/floor-area.php' );
+        global $property;
+
+        if ( $property->department == 'commercial' || ph_get_custom_department_based_on( $property->department ) == 'commercial' )
+        {
+            ph_get_template( 'search/floor-area.php' );
+        }
     }
 }
 
@@ -312,8 +317,21 @@ if ( ! function_exists( 'propertyhive_template_loop_price' ) ) {
             }
         }
 
+        $price_qualifier = '';
+        if (
+            ( 
+                $property->department == 'residential-sales' || 
+                ph_get_custom_department_based_on($property->department) == 'residential-sales' ||
+                $property->department == 'commercial' || 
+                ph_get_custom_department_based_on($property->department) == 'commercial'
+            ) &&
+            $property->price_qualifier != ''
+        )
+        {
+            $price_qualifier = $property->price_qualifier;
+        }
 
-        ph_get_template( 'search/price.php', array( 'fees' => $fees ) );
+        ph_get_template( 'search/price.php', array( 'price_qualifier' => $price_qualifier, 'fees' => $fees ) );
     }
 }
 
@@ -543,7 +561,12 @@ if ( ! function_exists( 'propertyhive_template_single_floor_area' ) ) {
      * @return void
      */
     function propertyhive_template_single_floor_area() {
-        ph_get_template( 'single-property/floor-area.php' );
+        global $property;
+
+        if ( $property->department == 'commercial' || ph_get_custom_department_based_on( $property->department ) == 'commercial' )
+        {
+            ph_get_template( 'single-property/floor-area.php' );
+        }
     }
 }
 
@@ -580,7 +603,21 @@ if ( ! function_exists( 'propertyhive_template_single_price' ) ) {
             }
         }
 
-        ph_get_template( 'single-property/price.php', array( 'fees' => $fees ) );
+        $price_qualifier = '';
+        if (
+            ( 
+                $property->department == 'residential-sales' || 
+                ph_get_custom_department_based_on($property->department) == 'residential-sales' ||
+                $property->department == 'commercial' || 
+                ph_get_custom_department_based_on($property->department) == 'commercial'
+            ) &&
+            $property->price_qualifier != ''
+        )
+        {
+            $price_qualifier = $property->price_qualifier;
+        }
+
+        ph_get_template( 'single-property/price.php', array( 'price_qualifier' => $price_qualifier, 'fees' => $fees ) );
     }
 }
 
@@ -623,7 +660,7 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
             );
         }
 
-        if ( $property->department != 'commercial' ) 
+        if ( $property->department != 'commercial' && ph_get_custom_department_based_on( $property->department ) != 'commercial' ) 
         {
             if ( $property->bedrooms > 0 )
             {
@@ -666,7 +703,7 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
             }
         }
 
-        if ( $property->department == 'residential-sales' ) 
+        if ( $property->department == 'residential-sales' || ph_get_custom_department_based_on( $property->department ) == 'residential-sales' ) 
         {
             if ( $property->tenure != '' )
             {
@@ -677,7 +714,7 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
             }
         }
 
-        if ( $property->department == 'residential-lettings' ) 
+        if ( $property->department == 'residential-lettings' || ph_get_custom_department_based_on( $property->department ) == 'residential-lettings' ) 
         {
             if ( $property->furnished != '' )
             {

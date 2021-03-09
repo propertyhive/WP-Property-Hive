@@ -13,7 +13,7 @@
 			<h2><a href="<?php echo get_the_permalink( $property->id ); ?>"><?php echo get_the_title( $property->id ); ?></a></h2>
 			<p>
 				<strong><?php echo $property->get_formatted_price(); ?></strong> | <?php 
-					if ( $property->department != 'commercial' )
+					if ( $property->department != 'commercial' && ph_get_custom_department_based_on( $property->department ) != 'commercial' )
 					{
 						echo $property->bedrooms . ' bed ';
 					}

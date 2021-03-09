@@ -39,7 +39,7 @@ class PH_Meta_Box_Offer_Property {
 
             echo '<p class="form-field">
             
-                <label>' . ( ( $property->department == 'residential-lettings' ) ? __('Landlord', 'propertyhive') : __('Owner', 'propertyhive') ) . '</label>';
+                <label>' . ( ( $property->department == 'residential-lettings' || ph_get_custom_department_based_on($property->department) == 'residential-lettings' ) ? __('Landlord', 'propertyhive') : __('Owner', 'propertyhive') ) . '</label>';
 
             $owner_contact_ids = $property->_owner_contact_id;
             if ( 
@@ -64,7 +64,7 @@ class PH_Meta_Box_Offer_Property {
             }
             else
             {
-                echo 'No ' . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified';
+                echo 'No ' . ( ( $property->department == 'residential-lettings' || ph_get_custom_department_based_on($property->department) == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified';
             }
                 
             echo '</p>';

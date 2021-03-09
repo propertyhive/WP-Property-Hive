@@ -344,6 +344,11 @@ class PH_Countries {
 		$countries = $this->countries;
 
 		$department = get_post_meta( $postID, '_department', true );
+		if ( ph_get_custom_department_based_on( $department ) !== false )
+        {
+        	$department = ph_get_custom_department_based_on( $department );
+        }
+        
 		$country = get_post_meta( $postID, '_address_country', true );
 
 		if (isset($countries[$country]))

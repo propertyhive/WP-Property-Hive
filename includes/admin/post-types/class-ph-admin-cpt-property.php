@@ -167,7 +167,26 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 		$columns['address'] = __( 'Address', 'propertyhive' );
 
+		$commercial_department_active = false;
 		if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
+		{
+			$commercial_department_active = true;
+		}
+		else
+		{
+			$custom_departments = ph_get_custom_departments();
+			if ( !empty($custom_departments) )
+			{
+				foreach ( $custom_departments as $key => $department )
+				{
+					if ( isset($department['based_on']) && $department['based_on'] == 'commercial' )
+					{
+						$commercial_department_active = true;
+					}
+				}
+			}
+		}
+		if ( $commercial_department_active )
         {
             $columns['size'] = __( 'Size', 'propertyhive' );
         }
@@ -249,7 +268,18 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 				if ( $the_property->bedrooms != '' || $the_property->property_type != '' )
 				{
-					echo '<br>' . ( ( ( $the_property->department == 'residential-sales' || $the_property->department == 'residential-lettings' ) && $the_property->bedrooms != '' ) ? $the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' ) . ' ' : '' ) . $the_property->property_type;
+					echo '<br>' . ( 
+						( 
+							( 
+								$the_property->department == 'residential-sales' || 
+								$the_property->department == 'residential-lettings' ||
+								ph_get_custom_department_based_on($the_property->department) == 'residential-sales' || 
+								ph_get_custom_department_based_on($the_property->department) == 'residential-lettings'
+							)
+							&& 
+							$the_property->bedrooms != '' 
+						) ? $the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' ) . ' ' : '' 
+					) . $the_property->property_type;
 				}
 
 				// Get actions
@@ -335,7 +365,11 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 }
                 else
                 {
-                	if ( $the_property->_department == 'residential-sales' && $the_property->price_qualifier != '' )
+                	if ( 
+                		( $the_property->_department == 'residential-sales' || ph_get_custom_department_based_on($the_property->_department) == 'residential-sales' )
+                		&& 
+                		$the_property->price_qualifier != '' 
+                	)
                 	{
                 		$price .= '<br>' . $the_property->price_qualifier;
                 	}

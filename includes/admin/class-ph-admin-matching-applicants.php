@@ -258,7 +258,7 @@ class PH_Admin_Matching_Applicants {
         if ( $property !== FALSE )
         {
             $property_types = array();
-            $prefix = $property->department == 'commercial' ? 'commercial_' : '';
+            $prefix = $property->department == 'commercial' || ph_get_custom_department_based_on($property->department) == 'commercial' ? 'commercial_' : '';
             $term_list = wp_get_post_terms($property_id, $prefix . 'property_type', array("fields" => "all"));
             if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
             {
@@ -372,9 +372,9 @@ class PH_Admin_Matching_Applicants {
                                 {
                                     ++$matching_elements;
 
-                                    if ( $property->department != 'commercial' )
+                                    if ( $property->department != 'commercial' && ph_get_custom_department_based_on($property->department) != 'commercial' )
                                     {
-                                        if ( $property->department == 'residential-sales' )
+                                        if ( $property->department == 'residential-sales' || ph_get_custom_department_based_on($property->department) == 'residential-sales' )
                                         {
                                             if ( $percentage_lower != '' && $percentage_higher != '' )
                                             {

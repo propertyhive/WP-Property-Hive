@@ -64,17 +64,17 @@ function toggleDepartmentFields()
                     }
                 }
 
-                if (selectedDepartment == 'residential-sales')
+                if ( selectedDepartment == 'residential-sales' || ( propertyhive_search_params.custom_departments[selectedDepartment] && propertyhive_search_params.custom_departments[selectedDepartment].based_on == 'residential-sales' ) )
                 {
                     jQuery(this).find('.sales-only').css('display', display);
                     jQuery(this).find('.residential-only').css('display', display);
                 }
-                else if (selectedDepartment == 'residential-lettings')
+                else if ( selectedDepartment == 'residential-lettings' || ( propertyhive_search_params.custom_departments[selectedDepartment] && propertyhive_search_params.custom_departments[selectedDepartment].based_on == 'residential-lettings' ))
                 {
                     jQuery(this).find('.lettings-only').css('display', display);
                     jQuery(this).find('.residential-only').css('display', display);
                 }
-                else if (selectedDepartment == 'commercial')
+                else if ( selectedDepartment == 'commercial' || ( propertyhive_search_params.custom_departments[selectedDepartment] && propertyhive_search_params.custom_departments[selectedDepartment].based_on == 'commercial' ) )
                 {
                     jQuery(this).find('.commercial-only').css('display', display);
                     jQuery(this).find('.commercial-sales-only').css('display', 'none');
