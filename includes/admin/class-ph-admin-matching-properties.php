@@ -299,7 +299,13 @@ class PH_Admin_Matching_Properties {
                 'key' => '_on_market',
                 'value' => 'yes'
             );
-            if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
+            if ( 
+                isset($applicant_profile['department']) && 
+                (
+                    $applicant_profile['department'] == 'residential-sales' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales'
+                )
+            )
             {
                 $meta_query[] = array(
                     'key' => '_department',
@@ -363,7 +369,13 @@ class PH_Admin_Matching_Properties {
                     );
                 }
             }
-            elseif ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-lettings' )
+            elseif ( 
+                isset($applicant_profile['department']) && 
+                (
+                    $applicant_profile['department'] == 'residential-lettings' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-lettings'
+                )
+            )
             {
                 $meta_query[] = array(
                     'key' => '_department',
@@ -380,7 +392,15 @@ class PH_Admin_Matching_Properties {
                 }
             }
 
-            if ( isset($applicant_profile['department']) && ( $applicant_profile['department'] == 'residential-sales' || $applicant_profile['department'] == 'residential-lettings' ) )
+            if ( 
+                isset($applicant_profile['department']) && 
+                ( 
+                    $applicant_profile['department'] == 'residential-sales' || 
+                    $applicant_profile['department'] == 'residential-lettings' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-lettings'
+                ) 
+            )
             {
                 if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
                 {
@@ -392,7 +412,13 @@ class PH_Admin_Matching_Properties {
                     );
                 }
             }
-            if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'commercial' )
+            if ( 
+                isset($applicant_profile['department']) && 
+                (
+                    $applicant_profile['department'] == 'commercial' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'commercial'
+                )
+            )
             {
                 if ( isset($applicant_profile['available_as']) && is_array($applicant_profile['available_as']) && !empty($applicant_profile['available_as']) )
                 {
@@ -552,7 +578,15 @@ class PH_Admin_Matching_Properties {
 
             // Term query
             $tax_query = array('relation' => 'AND');
-            if ( isset($applicant_profile['department']) && ( $applicant_profile['department'] == 'residential-sales' || $applicant_profile['department'] == 'residential-lettings' ) )
+            if ( 
+                isset($applicant_profile['department']) && 
+                ( 
+                    $applicant_profile['department'] == 'residential-sales' || 
+                    $applicant_profile['department'] == 'residential-lettings' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-lettings'
+                ) 
+            )
             {
                 if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
                 {
@@ -564,7 +598,13 @@ class PH_Admin_Matching_Properties {
                     );
                 }
             }
-            if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'commercial' )
+            if ( 
+                isset($applicant_profile['department']) && 
+                (
+                    $applicant_profile['department'] == 'commercial' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'commercial'
+                )
+            )
             {
                 if ( isset($applicant_profile['commercial_property_types']) && is_array($applicant_profile['commercial_property_types']) && !empty($applicant_profile['commercial_property_types']) )
                 {

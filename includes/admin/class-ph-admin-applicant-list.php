@@ -400,6 +400,7 @@ class PH_Admin_Applicant_List {
 </div>
 <script>
 
+var custom_departments = <?php echo json_encode(ph_get_custom_departments()); ?>;
 function toggleDepartmentFields()
 {
     if (jQuery('#mainform').length > 0)
@@ -425,17 +426,17 @@ function toggleDepartmentFields()
                 // use that display
                 var display = 'block';
 
-                if (selectedDepartment == 'residential-sales')
+                if ( selectedDepartment == 'residential-sales' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == 'residential-sales' ) )
                 {
                     jQuery(this).find('.sales-only').css('display', display);
                     jQuery(this).find('.residential-only').css('display', display);
                 }
-                else if (selectedDepartment == 'residential-lettings')
+                else if ( selectedDepartment == 'residential-lettings' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == 'residential-lettings' ) )
                 {
                     jQuery(this).find('.lettings-only').css('display', display);
                     jQuery(this).find('.residential-only').css('display', display);
                 }
-                else if (selectedDepartment == 'commercial')
+                else if ( selectedDepartment == 'commercial' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == 'commercial' ) )
                 {
                     jQuery(this).find('.commercial-only').css('display', display);
                 }
@@ -477,7 +478,15 @@ jQuery(window).resize(function() {
     public function generate_results()
     {
         $search_property_types = array();
-        if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' ) )
+        if ( 
+            isset($_POST['department']) && 
+            ( 
+                $_POST['department'] == 'residential-sales' || 
+                $_POST['department'] == 'residential-lettings' ||
+                ph_get_custom_department_based_on($_POST['department']) == 'residential-sales' ||
+                ph_get_custom_department_based_on($_POST['department']) == 'residential-lettings'
+            ) 
+        )
         {
             if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
             {
@@ -604,7 +613,7 @@ jQuery(window).resize(function() {
                         }
                     }
 
-                    if ( isset($_POST['department']) && $_POST['department'] == 'residential-sales' )
+                    if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_POST['department']) == 'residential-sales' ) )
                     {
                         if ( isset($_POST['maximum_price']) && ph_clean($_POST['maximum_price']) != '' ) 
                         {
@@ -616,7 +625,7 @@ jQuery(window).resize(function() {
                             }
                         }
                     }
-                    if ( isset($_POST['department']) && $_POST['department'] == 'residential-lettings' )
+                    if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_POST['department']) == 'residential-lettings' ) )
                     {
                         if ( isset($_POST['maximum_rent']) && ph_clean($_POST['maximum_rent']) != '' )
                         {
@@ -628,7 +637,15 @@ jQuery(window).resize(function() {
                             }
                         }
                     }
-                    if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' ) )
+                    if ( 
+                        isset($_POST['department']) && 
+                        ( 
+                            $_POST['department'] == 'residential-sales' || 
+                            $_POST['department'] == 'residential-lettings' ||
+                            ph_get_custom_department_based_on($_POST['department']) == 'residential-sales' ||
+                            ph_get_custom_department_based_on($_POST['department']) == 'residential-lettings'
+                        ) 
+                    )
                     {
                         if ( isset($_POST['minimum_bedrooms']) && ph_clean($_POST['minimum_bedrooms']) != '' ) 
                         {
@@ -790,7 +807,12 @@ jQuery(window).resize(function() {
 
         if ( isset($_POST['department']) )
         {
-            switch ( $_POST['department'] )
+            $department = ph_clean($_POST['department']);
+            if ( ph_get_custom_department_based_on($department) !== FALSE )
+            {
+                $department = ph_get_custom_department_based_on($department);
+            }
+            switch ( $department )
             {
                 case "residential-sales":
                 {
@@ -803,7 +825,7 @@ jQuery(window).resize(function() {
                     break;
                 }
             }
-            if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
+            if ( $department == 'residential-sales' || $department == 'residential-lettings' )
             {
                 $columns['minimum_bedrooms'] = __( 'Minimum Bedrooms', 'propertyhive' );
                 $columns['property_types'] = __( 'Property Types', 'propertyhive' );
@@ -829,7 +851,12 @@ jQuery(window).resize(function() {
 
             if ( isset($_POST['department']) )
             {
-                switch ( $_POST['department'] )
+                $department = ph_clean($_POST['department']);
+                if ( ph_get_custom_department_based_on($department) !== FALSE )
+                {
+                    $department = ph_get_custom_department_based_on($department);
+                }
+                switch ( $department )
                 {
                     case "residential-sales":
                     {
@@ -842,7 +869,7 @@ jQuery(window).resize(function() {
                         break;
                     }
                 }
-                if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
+                if ( $department == 'residential-sales' || $department == 'residential-lettings' )
                 {
                     $columns['minimum_bedrooms'] = $result['profile']['min_beds'];
 

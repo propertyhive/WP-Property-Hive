@@ -54,7 +54,7 @@ class PH_Meta_Box_Property_Actions {
 
 		        if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
             	{
-			        if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-sales' )
+			        if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-sales' || ph_get_custom_department_based_on(get_post_meta( $post->ID, '_department', TRUE )) == 'residential-sales' )
 			        {
 				        $actions[] = '<a 
 				                href="#action_panel_record_offer" 

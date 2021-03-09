@@ -101,15 +101,75 @@ function ph_get_search_form_fields()
         }
     }
 
+    $sales_department_active = false;
+    if ( array_key_exists('residential-sales', $departments) )
+    {
+        $sales_department_active = true;
+    }
+    else
+    {
+        $custom_departments = ph_get_custom_departments();
+        if ( !empty($custom_departments) )
+        {
+            foreach ( $custom_departments as $key => $department )
+            {
+                if ( isset($department['based_on']) && $department['based_on'] == 'residential-sales' )
+                {
+                    $sales_department_active = true;
+                }
+            }
+        }
+    }
+
+    $lettings_department_active = false;
+    if ( array_key_exists('residential-lettings', $departments) )
+    {
+        $lettings_department_active = true;
+    }
+    else
+    {
+        $custom_departments = ph_get_custom_departments();
+        if ( !empty($custom_departments) )
+        {
+            foreach ( $custom_departments as $key => $department )
+            {
+                if ( isset($department['based_on']) && $department['based_on'] == 'residential-lettings' )
+                {
+                    $lettings_department_active = true;
+                }
+            }
+        }
+    }
+
+    $commercial_department_active = false;
+    if ( array_key_exists('commercial', $departments) )
+    {
+        $commercial_department_active = true;
+    }
+    else
+    {
+        $custom_departments = ph_get_custom_departments();
+        if ( !empty($custom_departments) )
+        {
+            foreach ( $custom_departments as $key => $department )
+            {
+                if ( isset($department['based_on']) && $department['based_on'] == 'commercial' )
+                {
+                    $commercial_department_active = true;
+                }
+            }
+        }
+    }
+
     $fields['department'] = array(
         'type' => 'radio',
         'options' => $department_options,
         'value' => $default_value
     );
 
-    if ( array_key_exists('residential-sales', $departments) || array_key_exists('residential-lettings', $departments) )
+    if ( $sales_department_active || $lettings_department_active )
     {
-        if ( array_key_exists('residential-sales', $departments) )
+        if ( $sales_department_active )
         {
             $prices = array(
                 '' => __( 'No preference', 'propertyhive' ),
@@ -140,7 +200,7 @@ function ph_get_search_form_fields()
             );
         }
 
-        if ( array_key_exists('residential-lettings', $departments) )
+        if ( $lettings_department_active )
         {
             $prices = array(
                 '' => __( 'No preference', 'propertyhive' ),
@@ -186,7 +246,7 @@ function ph_get_search_form_fields()
         );
     }
 
-    if ( array_key_exists('commercial', $departments) )
+    if ( $commercial_department_active )
     {
         $sizes = array(
             '' => __( 'No preference', 'propertyhive' ),

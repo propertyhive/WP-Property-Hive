@@ -625,7 +625,14 @@ class PH_Admin_Meta_Boxes {
             'post_type' => 'property'
         );
 
-        if ( get_post_meta( $post->ID, '_department', TRUE ) == 'commercial' && isset($post->post_parent) && $post->post_parent == 0 )
+        if ( 
+            ( 
+                get_post_meta( $post->ID, '_department', TRUE ) == 'commercial' || 
+                ph_get_custom_department_based_on(get_post_meta( $post->ID, '_department', TRUE )) == 'commercial' 
+            ) && 
+            isset($post->post_parent) && 
+            $post->post_parent == 0 
+        )
         {
             $meta_boxes = array();
             $meta_boxes[5] = array(
@@ -841,7 +848,10 @@ class PH_Admin_Meta_Boxes {
 
             if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
             {
-                if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-sales' )
+                if ( 
+                    get_post_meta( $post->ID, '_department', TRUE ) == 'residential-sales' ||
+                    ph_get_custom_department_based_on(get_post_meta( $post->ID, '_department', TRUE )) == 'residential-sales' 
+                )
                 {
                     /* PROPERTY OFFERS META BOXES */
                     $meta_boxes = array();
@@ -937,7 +947,10 @@ class PH_Admin_Meta_Boxes {
 
 		if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' ) {
 
-            if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-lettings' )
+            if ( 
+                get_post_meta( $post->ID, '_department', TRUE ) == 'residential-lettings' ||
+                ph_get_custom_department_based_on(get_post_meta( $post->ID, '_department', TRUE )) == 'residential-lettings'
+            )
             {
                 if ( get_option( 'propertyhive_module_disabled_tenancies', '' ) != 'yes' )
                 {
@@ -1094,7 +1107,13 @@ class PH_Admin_Meta_Boxes {
                     {
                         $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
 
-                        if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
+                        if ( 
+                            isset($applicant_profile['department']) && 
+                            (
+                                $applicant_profile['department'] == 'residential-sales' ||
+                                ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' 
+                            )
+                        )
                         {
                             $show_offers = true;
                             $show_sales = true;
