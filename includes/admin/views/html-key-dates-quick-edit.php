@@ -72,10 +72,8 @@
                     $parent_post_type = get_post_type( $post_id );
                     if ( !empty( $key_date_type_terms ) && !is_wp_error( $key_date_type_terms ) )
                     {
-                        var_dump($_POST['type']);
                         foreach ($key_date_type_terms as $key_date_type_term)
                         {
-                            var_dump($key_date_type_term->term_id);
                             $recurrence_type = isset($recurrence_rules[$key_date_type_term->term_id]) ? $recurrence_rules[$key_date_type_term->term_id]['recurrence_type'] : '';
                             if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
                             {
