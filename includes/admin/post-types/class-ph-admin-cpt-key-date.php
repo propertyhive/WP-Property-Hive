@@ -37,7 +37,9 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 							<div class="inline-edit-col">
 								<label>
 									<span class="title">Description</span>
-									<span class="key_date-description"></span>
+									<span class="input-text-wrap">
+										<input type="text" name="_key_date_description" class="short" style="width:200px;" value="<?php //echo get_the_title($post->ID); ?>">
+									</span>
 								</label>
 								<label>
 									<span class="title">Property</span>
@@ -48,6 +50,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 									<span class="input-text-wrap">
 										<?php
 											$selected_value = get_post_meta( $post->ID, '_key_date_status', true );
+
 											$output = '<select name="_key_date_status">';
 
 											foreach ( array( 'pending', 'booked', 'complete' ) as $status )
@@ -213,6 +216,18 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			}
 
 			update_post_meta( $post_id, '_key_date_status', $_POST['_key_date_status'] );
+
+			$existing_description = get_the_title($post_id);
+
+			if ( !empty( $_POST['_key_date_description'] ) && $_POST['_key_date_description'] != $existing_description )
+			{
+				$post_update = array(
+					'ID'         => $post_id,
+					'post_title' => $_POST['_key_date_description'],
+				);
+
+				wp_update_post( $post_update );
+			}
 		}
 	}
 }

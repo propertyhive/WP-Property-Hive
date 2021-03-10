@@ -24,7 +24,7 @@ jQuery(function($) {
             quick_edit_save_button.addClass('alignmiddle').removeClass('alignright').before('&nbsp;');
 
             $( ':input[name="_key_date_status"] option[value="' + real_status + '"]', specific_post_edit_row ).attr("selected", "selected").text(display_status);
-            $( '.key_date-description', specific_post_edit_row ).text(description);
+            $( ':input[name="_key_date_description"]', specific_post_edit_row).val(description);
             $( '.key_date-property', specific_post_edit_row ).text(property);
         }
     }
