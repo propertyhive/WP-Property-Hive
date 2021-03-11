@@ -24,6 +24,7 @@ if ( !empty($contact_ids) )
 		T: <?php echo get_post_meta((int)$contact_id, '_telephone_number', TRUE); ?><br>
 		E: <?php echo get_post_meta((int)$contact_id, '_email_address', TRUE); ?>
 	</div>
+	<?php do_action( 'propertyhive_lightbox_contact_details', (int)$contact_id, $post->ID ); ?>
 </div>
 <?php
 	}
