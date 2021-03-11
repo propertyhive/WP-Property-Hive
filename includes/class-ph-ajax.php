@@ -1642,6 +1642,14 @@ class PH_AJAX {
                             $fields_to_check[] = '_office_email_address_sales';
                             break;
                         }
+                        default:
+                        {
+                            $fields_to_check[] = '_office_email_address_' . str_replace("residential-", "", $property_department);
+                            $fields_to_check[] = '_office_email_address_sales';
+                            $fields_to_check[] = '_office_email_address_lettings';
+                            $fields_to_check[] = '_office_email_address_commercial';
+                            break;
+                        }
                     }
                     
                     foreach ( $fields_to_check as $field_to_check )
