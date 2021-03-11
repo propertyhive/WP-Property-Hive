@@ -474,6 +474,23 @@ class PH_Install {
                     'name' => 'Chain Free'
                 )
             ),
+            'management_key_date_type' => array(
+                array(
+                    'name' => 'Initial Inventory',
+                    'recurrence_type' => 'tenancy_management',
+                    'recurrence_rule' => 'FREQ=ONCE',
+                ),
+                array(
+                    'name' => 'Inspection',
+                    'recurrence_type' => 'tenancy_management',
+                    'recurrence_rule' => 'FREQ=MONTHLY;INTERVAL=3',
+                ),
+                array(
+                    'name' => 'Gas Safety Check',
+                    'recurrence_type' => 'property_management',
+                    'recurrence_rule' => 'FREQ=YEARLY;INTERVAL=1',
+                ),
+            ),
 		);
 
         $availability_departments = get_option( 'propertyhive_availability_departments', array() );
@@ -506,6 +523,19 @@ class PH_Install {
                             if ( $taxonomy == 'availability' && is_array($term['departments']) && !empty($term['departments']) )
                             {
                                 $availability_departments[$return['term_id']] = $term['departments'];
+                            }
+
+                            if ( $taxonomy == 'management_key_date_type' && isset($term['recurrence_type']) && isset($term['recurrence_rule']) )
+                            {
+                                $options = get_option( 'propertyhive_key_date_type', array() );
+                                if ( !is_array($options) ) { $options = array(); }
+
+                                $options[$return['term_id']] = array(
+                                    'recurrence_rule' => $term['recurrence_rule'],
+                                    'recurrence_type' => $term['recurrence_type'],
+                                );
+
+                                update_option( 'propertyhive_key_date_type', $options );
                             }
                         }
                         else
