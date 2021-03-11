@@ -352,8 +352,6 @@ class PH_Meta_Box_Property_Coordinates {
                             if (!markerSet)
                             {
                                 marker = ph_create_marker(latitude, longitude);
-
-                                markerSet = true;
                             }
                             else
                             {
@@ -376,8 +374,6 @@ class PH_Meta_Box_Property_Coordinates {
                             if (!markerSet)
                             {
                                 marker = ph_create_marker(latitude, longitude);
-
-                                markerSet = true;
                             }
                             else
                             {
@@ -413,6 +409,8 @@ class PH_Meta_Box_Property_Coordinates {
                         jQuery(\'#_latitude\').val(newPosition.lat());
                         jQuery(\'#_longitude\').val(newPosition.lng());
                     });
+
+                    markerSet = true;
                     
                     return marker;
                 }
