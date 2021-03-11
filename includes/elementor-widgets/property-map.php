@@ -32,7 +32,7 @@ class Elementor_Property_Map_Widget extends \Elementor\Widget_Base {
 			'settings_section',
 			[
 				'label' => __( 'Map Settings', 'propertyhive' ),
-				'tab' => \Elementor\Controls_Manager::TAB_SETTINGS,
+				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
 			]
 		);
 
@@ -76,7 +76,7 @@ class Elementor_Property_Map_Widget extends \Elementor\Widget_Base {
 				),
 				'separator' => 'before',
 			]
-		);	
+		);
 
 		$this->end_controls_section();
 
