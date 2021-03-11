@@ -2549,8 +2549,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 				'id'        => 'management_key_date_type_recurrence_interval',
 				'default'   => $recurrence['INTERVAL'],
 				'type'      => 'number',
-				'desc_tip'  =>  false,
 				'custom_attributes' => array_merge( array( 'min' => '1', 'required' => 'true'), $interval_disabled ),
+				'desc'  => '<p>When setting a key date to Complete, these settings are used to calculate the date the next one should occur.<br>For example, if a key date should happen every 3 months, set Frequency to "Monthly" and Interval to "3".</p>',
 			),
 
 			array(
