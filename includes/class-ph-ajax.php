@@ -576,7 +576,13 @@ class PH_AJAX {
             $applicant_profile = array();
             $applicant_profile['department'] = $_POST['department'];
 
-            if ( $_POST['department'] == 'residential-sales' )
+            $base_department = $_POST['department'];
+            if ( !in_array( $base_department, array('residential-sales', 'residential-lettings', 'commercial') ) )
+            {
+                $base_department = ph_get_custom_department_based_on($base_department);
+            }
+
+            if ( $base_department == 'residential-sales' )
             {
                 $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
 
@@ -598,7 +604,7 @@ class PH_AJAX {
                     $applicant_profile['match_price_range_higher_actual'] = $price + ( $price * ( $percentage_higher / 100 ) );
                 }
             }
-            elseif ( $_POST['department'] == 'residential-lettings' )
+            elseif ( $base_department == 'residential-lettings' )
             {
                 $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
 
@@ -608,7 +614,7 @@ class PH_AJAX {
                 $applicant_profile['max_price_actual'] = $price_actual;
             }
 
-            if ( $_POST['department'] == 'residential-sales' || $_POST['department'] == 'residential-lettings' )
+            if ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' )
             {
                 $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
                 $applicant_profile['min_beds'] = $beds;
@@ -619,7 +625,7 @@ class PH_AJAX {
                 }
             }
 
-            if ( $_POST['department'] == 'commercial' )
+            if ( $base_department == 'commercial' )
             {
                 $available_as = array();
                 if ( isset($_POST['available_as_sale']) && $_POST['available_as_sale'] == 'yes' )
