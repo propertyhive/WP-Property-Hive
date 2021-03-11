@@ -200,12 +200,11 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 		}
 
 		/**
-		 * Remove bulk edit option
+		 * Remove bulk edit actions
 		 * @param  array $actions
 		 */
 		public function remove_bulk_actions( $actions ) {
-			unset( $actions['edit'] );
-			return $actions;
+			return array();
 		}
 
 		function save_key_date( $post_id ) {
