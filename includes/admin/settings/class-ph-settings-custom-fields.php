@@ -118,7 +118,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
             if ( get_option( 'propertyhive_module_disabled_tenancies', '' ) != 'yes' )
             {
-                $sections[ 'management-key-date-type' ] = __( 'Management Dates', 'propertyhive' );
+                $sections[ 'management-key-date-type' ] = __( 'Management Date Types', 'propertyhive' );
                 add_action( 'propertyhive_admin_field_custom_fields_management_key_date_type', array( $this, 'custom_fields_management_key_date_type_setting' ) );
             }
         }
@@ -216,7 +216,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "furnished": { $settings = $this->get_custom_fields_furnished_setting(); break; }
                     case "furnished-delete": { $settings = $this->get_custom_fields_delete($current_id, 'furnished', __( 'Furnished', 'propertyhive' )); break; }
                     case "management-key-date-type": { $settings = $this->get_custom_fields_management_key_date_type_setting(); break; }
-                    case "management-key-date-type-delete": { $settings = $this->get_custom_fields_delete($current_id, 'management_key_date_type', __( 'Management Dates', 'propertyhive' )); break; }
+                    case "management-key-date-type-delete": { $settings = $this->get_custom_fields_delete($current_id, 'management_key_date_type', __( 'Management Date Types', 'propertyhive' )); break; }
 
                     case "marketing-flag": { $settings = $this->get_custom_fields_marketing_flag_setting(); break; }
                     case "marketing-flag-delete": { $settings = $this->get_custom_fields_delete($current_id, 'marketing_flag', __( 'Marketing Flag', 'propertyhive' )); break; }
@@ -1331,7 +1331,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 			</th>
 			<td class="forminp forminp-button">
 				<a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
-				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management-key-date-type&id=' ); ?>" class="button alignright"><?php _e( 'Add New Management Date', 'propertyhive' ); ?></a>
+				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management-key-date-type&id=' ); ?>" class="button alignright"><?php _e( 'Add New Management Date Type', 'propertyhive' ); ?></a>
 			</td>
 		</tr>
 		<?php foreach( array ('property_management' =>  __( 'Property Management', 'propertyhive' ), 'tenancy_management' => __( 'Tenancy Management', 'propertyhive' ) ) as $type => $title): ?>
@@ -1427,7 +1427,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 					{
 						?>
 						<tr>
-							<td colspan="5"><?php echo __( 'No management dates found', 'propertyhive' ); ?></td>
+							<td colspan="5"><?php echo __( 'No management date types found', 'propertyhive' ); ?></td>
 						</tr>
 						<?php
 					}
@@ -1443,7 +1443,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 			</th>
 			<td class="forminp forminp-button">
 				<a href="" class="button alignright batch-delete" disabled><?php echo __( 'Delete Selected', 'propertyhive' ); ?></a>
-				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management-key-date-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Management Date', 'propertyhive' ); ?></a>
+				<a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=customfields&section=management-key-date-type&id=' ); ?>" class="button alignright"><?php echo __( 'Add New Management Date Type', 'propertyhive' ); ?></a>
 			</td>
 		</tr>
 		<?php
@@ -2504,7 +2504,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
 		$args = array(
 
-			array( 'title' => __( ( $current_id == '' ? 'Add New Management Date' : 'Edit Management Date' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_management_key_date_type_settings' ),
+			array( 'title' => __( ( $current_id == '' ? 'Add New Management Date Type' : 'Edit Management Date Type' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_management_key_date_type_settings' ),
 
 			array(
 				'title' => __( 'Description', 'propertyhive' ),
