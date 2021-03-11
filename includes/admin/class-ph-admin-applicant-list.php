@@ -812,6 +812,9 @@ jQuery(window).resize(function() {
             {
                 $department = ph_get_custom_department_based_on($department);
             }
+        }
+        if ( isset($department) )
+        {
             switch ( $department )
             {
                 case "residential-sales":
@@ -849,13 +852,8 @@ jQuery(window).resize(function() {
                 'department' => __( ucwords(str_replace("-", " ", $result['profile']['department'])), 'propertyhive' ),
             );
 
-            if ( isset($_POST['department']) )
+            if ( isset($department) )
             {
-                $department = ph_clean($_POST['department']);
-                if ( ph_get_custom_department_based_on($department) !== FALSE )
-                {
-                    $department = ph_get_custom_department_based_on($department);
-                }
                 switch ( $department )
                 {
                     case "residential-sales":
