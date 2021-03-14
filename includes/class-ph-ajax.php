@@ -104,6 +104,7 @@ class PH_AJAX {
             'add_key_date' => false,
             'get_management_dates_grid' => false,
             'get_key_dates_quick_edit_row' => false,
+            'check_key_date_recurrence' => false,
             'save_key_date' => false,
 
             'validate_save_contact' => false,
@@ -5325,6 +5326,60 @@ class PH_AJAX {
         $post_id = $_POST['post_id'];
 
         include( PH()->plugin_path() . '/includes/admin/views/html-key-dates-quick-edit.php' );
+
+        // Quit out
+        die();
+    }
+
+    public function check_key_date_recurrence()
+    {
+        $post_id = $_POST['post_id'];
+
+        $next_key_date = '';
+
+        $key_date = new PH_Key_Date(get_post($post_id));
+        $key_date_due = $key_date->date_due();
+
+        $key_date_type = $key_date->key_date_type_id();
+
+        $recurrence_rules = get_option( 'propertyhive_key_date_type', array() );
+        $recurrence_rules = is_array( $recurrence_rules ) ? $recurrence_rules : array();
+
+        if ( isset($recurrence_rules[$key_date_type]) && isset( $recurrence_rules[$key_date_type]['recurrence_rule'] ) )
+        {
+            foreach (explode(';', $recurrence_rules[$key_date_type]['recurrence_rule']) as $key_value_pair){
+                list($key, $value) = explode('=', $key_value_pair);
+                $recurrence[strtolower($key)] = $value;
+            }
+
+            if ( isset($recurrence['freq']) && $recurrence['freq'] != 'ONCE' )
+            {
+                $interval = isset($recurrence['interval']) ? $recurrence['interval'] : '1';
+                switch( $recurrence['freq'] )
+                {
+                    case 'DAILY':
+                        $frequency = 'day';
+                        break;
+                    case 'WEEKLY':
+                        $frequency = 'week';
+                        break;
+                    case 'MONTHLY':
+                        $frequency = 'month';
+                        break;
+                    case 'YEARLY':
+                        $frequency = 'year';
+                        break;
+                }
+
+                if ( isset($frequency) )
+                {
+                    $next_key_date = date_add($key_date_due, date_interval_create_from_date_string($interval . ' ' . $frequency));
+                    $next_key_date = date_format($next_key_date, 'Y-m-d');
+                }
+            }
+        }
+
+        echo $next_key_date;
 
         // Quit out
         die();
