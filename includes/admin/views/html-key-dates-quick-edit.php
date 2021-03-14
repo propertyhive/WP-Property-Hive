@@ -107,42 +107,30 @@
                         $next_key_date = '';
                         $next_key_date_hours = '00';
                         $next_key_date_minutes = '00';
-                        if ( isset($recurrence_rules[$_POST['type']]) && isset( $recurrence_rules[$_POST['type']]['recurrence_rule'] ) )
+
+                        $interval = isset($recurrence['interval']) ? $recurrence['interval'] : '1';
+                        switch( $recurrence['freq'] )
                         {
-                            $recurrence = array();
+                            case 'DAILY':
+                                $frequency = 'day';
+                                break;
+                            case 'WEEKLY':
+                                $frequency = 'week';
+                                break;
+                            case 'MONTHLY':
+                                $frequency = 'month';
+                                break;
+                            case 'YEARLY':
+                                $frequency = 'year';
+                                break;
+                        }
 
-                            foreach (explode(';', $recurrence_rules[$_POST['type']]['recurrence_rule']) as $key_value_pair){
-                                list($key, $value) = explode('=', $key_value_pair);
-                                $recurrence[strtolower($key)] = $value;
-                            }
-
-                            if ( isset($recurrence['freq']) )
-                            {
-                                $interval = isset($recurrence['interval']) ? $recurrence['interval'] : '1';
-                                switch( $recurrence['freq'] )
-                                {
-                                    case 'DAILY':
-                                        $frequency = 'day';
-                                        break;
-                                    case 'WEEKLY':
-                                        $frequency = 'week';
-                                        break;
-                                    case 'MONTHLY':
-                                        $frequency = 'month';
-                                        break;
-                                    case 'YEARLY':
-                                        $frequency = 'year';
-                                        break;
-                                }
-
-                                if ( isset($frequency) )
-                                {
-                                    $next_key_timestamp = strtotime('+' . $interval . ' ' . $frequency, $due_date_time);
-                                    $next_key_date = date('Y-m-d', $next_key_timestamp);
-                                    $next_key_date_hours = date('H', $next_key_timestamp);
-                                    $next_key_date_minutes = date('i', $next_key_timestamp);
-                                }
-                            }
+                        if ( isset($frequency) )
+                        {
+                            $next_key_timestamp = strtotime('+' . $interval . ' ' . $frequency, $due_date_time);
+                            $next_key_date = date('Y-m-d', $next_key_timestamp);
+                            $next_key_date_hours = date('H', $next_key_timestamp);
+                            $next_key_date_minutes = date('i', $next_key_timestamp);
                         }
                     ?>
                     <p id="next_key_date_field" class="form-field hidden">
