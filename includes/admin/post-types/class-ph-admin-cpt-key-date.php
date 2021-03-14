@@ -66,6 +66,15 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 										?>
 									</span>
 								</label>
+								<label id="book_next_key_date_label" style="display: none;">
+									Book next key date?&nbsp;&nbsp;<input type="checkbox" id="book_next_key_date_checkbox" name="book_next_key_date" >
+								</label>
+								<label id="next_date_due_label" style="display: none;">
+									<span class="title">Next Date</span>
+									<span class="input-text-wrap">
+										<input type="text" id="next_date_due" name="next_date_due" class="short" placeholder="yyyy-mm-dd" style="width:120px;" value="">
+									</span>
+								</label>
 							</div>
 						</fieldset>
 					<?php
@@ -226,6 +235,40 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 				);
 
 				wp_update_post( $post_update );
+			}
+
+			if ( isset($_POST['book_next_key_date']) && $_POST['book_next_key_date'] == 'on' && isset($_POST['next_date_due']) && $_POST['next_date_due'] != '' )
+			{
+				// Insert next key date record
+				$next_key_date_post = array(
+					'post_title' => $_POST['_key_date_description'],
+					'post_content' => '',
+					'post_type' => 'key_date',
+					'post_status' => 'publish',
+					'comment_status' => 'closed',
+					'ping_status' => 'closed',
+				);
+
+				// Insert the post into the database
+				// Remove save_post hook temporarily to prevent it running again on wp_insert_post
+				remove_action( 'save_post', array( $this, 'save_key_date' ) );
+				$next_key_date_post_id = wp_insert_post( $next_key_date_post );
+				add_action( 'save_post', array( $this, 'save_key_date' ) );
+
+				if ( !is_wp_error($next_key_date_post_id) && $next_key_date_post_id != 0 )
+				{
+					add_post_meta( $next_key_date_post_id, '_date_due', $_POST['next_date_due'] );
+					add_post_meta( $next_key_date_post_id, '_key_date_status', 'pending' );
+					add_post_meta( $next_key_date_post_id, '_key_date_type_id', get_post_meta($post_id, '_key_date_type_id', true) );
+
+					if( metadata_exists('post', $post_id, '_property_id') ) {
+						add_post_meta( $next_key_date_post_id, '_property_id', get_post_meta($post_id, '_property_id', true) );
+					}
+
+					if( metadata_exists('post', $post_id, '_tenancy_id') ) {
+						add_post_meta( $next_key_date_post_id, '_tenancy_id', get_post_meta($post_id, '_tenancy_id', true) );
+					}
+				}
 			}
 		}
 	}
