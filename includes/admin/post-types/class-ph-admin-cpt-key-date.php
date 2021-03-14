@@ -38,7 +38,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 								<label>
 									<span class="title">Description</span>
 									<span class="input-text-wrap">
-										<input type="text" name="_key_date_description" class="short" style="width:200px;" value="<?php //echo get_the_title($post->ID); ?>">
+										<input type="text" name="_key_date_description" class="short" style="width:200px;" value="">
 									</span>
 								</label>
 								<label>
