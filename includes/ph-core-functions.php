@@ -190,18 +190,6 @@ function ph_get_custom_departments( $active_only = true )
     return $return;
 }
 
-function ph_get_custom_department( $department )
-{
-    $custom_departments = get_option( 'propertyhive_custom_departments', array() );
-            
-    if ( isset($custom_departments[$department]) )
-    {
-        return $custom_departments[$department];
-    }
-
-    return false;
-}
-
 function ph_get_custom_department_based_on( $department )
 {
     $custom_departments = get_option( 'propertyhive_custom_departments', array() );
