@@ -12,6 +12,23 @@ jQuery(function($) {
 
         if ( id > 0 ) {
 
+            var data = {
+                action: 'propertyhive_check_key_date_recurrence',
+                post_id: id,
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                if ( response == '' )
+                {
+                    $( '#book_next_key_date_label', specific_post_edit_row ).addClass("disabled");
+                }
+                else
+                {
+                    $( ':input[name="next_date_due"]', specific_post_edit_row).val(response);
+                }
+            });
+
             var specific_post_edit_row = $( '#edit-' + id ),
                 quick_edit_save_button = $( 'button.save', specific_post_edit_row ),
                 specific_post_row = $( '#post-' + id ),
@@ -24,8 +41,44 @@ jQuery(function($) {
             quick_edit_save_button.addClass('alignmiddle').removeClass('alignright').before('&nbsp;');
 
             $( ':input[name="_key_date_status"] option[value="' + real_status + '"]', specific_post_edit_row ).attr("selected", "selected").text(display_status);
-            $( '.key_date-description', specific_post_edit_row ).text(description);
+            $( ':input[name="_key_date_description"]', specific_post_edit_row).val(description);
             $( '.key_date-property', specific_post_edit_row ).text(property);
         }
+
+        $( ':input[name="_key_date_status"]', specific_post_edit_row ).on( 'change', function() {
+
+            if ( !$( '#book_next_key_date_label', specific_post_edit_row ).hasClass('disabled') )
+            {
+                if ( this.value == 'complete' )
+                {
+                    // Show Book Next checkbox
+                    $( '#book_next_key_date_label', specific_post_edit_row ).show();
+                }
+                else
+                {
+                    // Hide Book Next checkbox
+                    $( '#book_next_key_date_label', specific_post_edit_row ).hide();
+
+                    // Hide Next Key Date field, if visible
+                    $( '#next_date_due_label', specific_post_edit_row ).hide();
+
+                    // Uncheck Book Next checkbox
+                    $( '#book_next_key_date_checkbox', specific_post_edit_row ).prop( 'checked', false );
+                }
+            }
+        });
+
+        $( '#book_next_key_date_checkbox', specific_post_edit_row ).on( 'click',  function() {
+
+            // Show/Hide Next Key Date field when checkbox is checked and unchecked
+            if( this.checked )
+            {
+                $( '#next_date_due_label', specific_post_edit_row ).show();
+            }
+            else
+            {
+                $( '#next_date_due_label', specific_post_edit_row ).hide();
+            }
+        });
     }
 });

@@ -88,6 +88,7 @@
 
     $key_dates = get_posts(array (
         'post_type' => 'key_date',
+        'nopaging' => true,
         'meta_query' => $meta_query,
     ));
 ?>
@@ -252,6 +253,7 @@
         <p class="form-field _add_key_date_type_field">
             <label for="_add_key_date_type"><?php echo __('Key Date Type', 'propertyhive'); ?></label>
             <select id="_add_key_date_type" name="_add_key_date_type" class="select short">
+                <option value="">Select Type</option>
                 <?php
                 if ( !empty( $key_date_type_terms ) && !is_wp_error( $key_date_type_terms ) )
                 {

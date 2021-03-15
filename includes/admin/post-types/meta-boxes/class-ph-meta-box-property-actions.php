@@ -64,6 +64,18 @@ class PH_Meta_Box_Property_Actions {
 			        }
 			    }
 
+				if ( get_option('propertyhive_module_disabled_tenancies', '') != 'yes' )
+				{
+					if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-lettings' )
+					{
+						$actions[] = '<a
+								href="' . admin_url('post-new.php?post_type=tenancy&property_id=' . $post->ID) . '"
+								class="button"
+								style="width:100%; margin-bottom:7px; text-align:center"
+							>' . __('Create Tenancy', 'propertyhive') . '</a>';
+					}
+				}
+
 			    $actions = apply_filters( 'propertyhive_admin_property_actions', $actions, $post->ID );
 
 		        if ( !empty($actions) )

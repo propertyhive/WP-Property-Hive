@@ -104,6 +104,7 @@ class PH_AJAX {
             'add_key_date' => false,
             'get_management_dates_grid' => false,
             'get_key_dates_quick_edit_row' => false,
+            'check_key_date_recurrence' => false,
             'save_key_date' => false,
 
             'validate_save_contact' => false,
@@ -5350,6 +5351,60 @@ class PH_AJAX {
         die();
     }
 
+    public function check_key_date_recurrence()
+    {
+        $post_id = $_POST['post_id'];
+
+        $next_key_date = '';
+
+        $key_date = new PH_Key_Date(get_post($post_id));
+        $key_date_due = $key_date->date_due();
+
+        $key_date_type = $key_date->key_date_type_id();
+
+        $recurrence_rules = get_option( 'propertyhive_key_date_type', array() );
+        $recurrence_rules = is_array( $recurrence_rules ) ? $recurrence_rules : array();
+
+        if ( isset($recurrence_rules[$key_date_type]) && isset( $recurrence_rules[$key_date_type]['recurrence_rule'] ) )
+        {
+            foreach (explode(';', $recurrence_rules[$key_date_type]['recurrence_rule']) as $key_value_pair){
+                list($key, $value) = explode('=', $key_value_pair);
+                $recurrence[strtolower($key)] = $value;
+            }
+
+            if ( isset($recurrence['freq']) && $recurrence['freq'] != 'ONCE' )
+            {
+                $interval = isset($recurrence['interval']) ? $recurrence['interval'] : '1';
+                switch( $recurrence['freq'] )
+                {
+                    case 'DAILY':
+                        $frequency = 'day';
+                        break;
+                    case 'WEEKLY':
+                        $frequency = 'week';
+                        break;
+                    case 'MONTHLY':
+                        $frequency = 'month';
+                        break;
+                    case 'YEARLY':
+                        $frequency = 'year';
+                        break;
+                }
+
+                if ( isset($frequency) )
+                {
+                    $next_key_date = date_add($key_date_due, date_interval_create_from_date_string($interval . ' ' . $frequency));
+                    $next_key_date = date_format($next_key_date, 'Y-m-d');
+                }
+            }
+        }
+
+        echo $next_key_date;
+
+        // Quit out
+        die();
+    }
+
     public function save_key_date()
     {
         $key_date_post_id = (int)$_POST['post_id'];
@@ -5363,6 +5418,41 @@ class PH_AJAX {
         update_post_meta( $key_date_post_id, '_date_due', $_POST['due_date_time'] );
         update_post_meta( $key_date_post_id, '_key_date_status', $_POST['status'] );
         update_post_meta( $key_date_post_id, '_key_date_type_id', $_POST['type'] );
+
+        if ( isset($_POST['next_key_date']) )
+        {
+            // Insert next key date record
+            $next_key_date_post = array(
+                'post_title' => $_POST['description'],
+                'post_content' => '',
+                'post_type' => 'key_date',
+                'post_status' => 'publish',
+                'comment_status' => 'closed',
+                'ping_status' => 'closed',
+            );
+
+            // Insert the post into the database
+            $next_key_date_post_id = wp_insert_post( $next_key_date_post );
+
+            if ( is_wp_error($next_key_date_post_id) || $next_key_date_post_id == 0 )
+            {
+                $return = array('error' => 'Failed to create next key date post. Please try again');
+                echo json_encode( $return );
+                die();
+            }
+
+            add_post_meta( $next_key_date_post_id, '_date_due', $_POST['next_key_date'] );
+            add_post_meta( $next_key_date_post_id, '_key_date_status', 'pending' );
+            add_post_meta( $next_key_date_post_id, '_key_date_type_id', $_POST['type'] );
+
+            if( metadata_exists('post', $key_date_post_id, '_property_id') ) {
+                add_post_meta( $next_key_date_post_id, '_property_id', get_post_meta($key_date_post_id, '_property_id', true) );
+            }
+
+            if( metadata_exists('post', $key_date_post_id, '_tenancy_id') ) {
+                add_post_meta( $next_key_date_post_id, '_tenancy_id', get_post_meta($key_date_post_id, '_tenancy_id', true) );
+            }
+        }
 
         die();
     }
