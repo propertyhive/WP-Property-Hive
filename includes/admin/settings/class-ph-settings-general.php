@@ -57,8 +57,10 @@ class PH_Settings_General extends PH_Settings_Page {
 	 * @return array
 	 */
 	public function get_settings() {
-		  
+		
+        $default_departments = ph_get_departments(true);
         $departments = ph_get_departments();
+        $custom_departments = ph_get_custom_departments(false);
 
 		$settings = array(
 
@@ -66,24 +68,83 @@ class PH_Settings_General extends PH_Settings_Page {
         
         );
 
-        $i = 0;
+        $active_departments_html = '<div id="active_departments">';
+        
         foreach ( $departments as $key => $value )
         {
-            $checkboxgroup = 'middle';
-            if ( $i == 0 ) { $checkboxgroup = 'start'; }
-            if ( $i == (count($departments) - 1) ) { $checkboxgroup = 'end'; }
-
-            $settings[] = array(
-                'title'   => __( 'Active Departments', 'propertyhive' ),
-                'desc'    => $value,
-                'id'      => 'propertyhive_active_departments_' . str_replace("residential-", "", $key),
-                'type'    => 'checkbox',
-                'default' => ( ( in_array($key, array('residential-sales', 'residential-lettings', 'commercial')) ) ? 'yes' : '' ),
-                'checkboxgroup' => $checkboxgroup,
-            );
-
-            ++$i;
+            if ( ph_get_custom_department($key) !== false )
+            {
+                
+            }
+            else
+            {
+                $active_departments_html .= '<fieldset>
+                    <legend class="screen-reader-text"><span>' . __( 'Active Departments', 'propertyhive' ) . '</span></legend>
+                    <label for="propertyhive_active_departments_' . str_replace("residential-", "", $key) . '">
+                        <input name="propertyhive_active_departments_' . str_replace("residential-", "", $key) . '" id="propertyhive_active_departments_' . str_replace("residential-", "", $key) . '" type="checkbox" value="1" ' . checked( get_option('propertyhive_active_departments_' . str_replace("residential-", "", $key)) , 'yes', false ) . '> ' . $value . '
+                    </label>
+                </fieldset>';
+            }
         }
+
+        if ( !empty($custom_departments) )
+        {
+            foreach ( $custom_departments as $key => $custom_department )
+            {
+                // key will be custom-0, for example
+                $active_departments_html .= '<fieldset id="propertyhive_active_department_fieldset_' . $key . '">
+                    <legend class="screen-reader-text"><span>' . __( 'Active Departments', 'propertyhive' ) . '</span></legend>
+                    <label>
+                        <input name="propertyhive_active_departments_' . $key . '" type="checkbox" value="1" ' . checked( get_option('propertyhive_active_departments_' . $key), 'yes', false ) . '> 
+                        <input type="text" name="propertyhive_active_departments_name_' . $key . '" value="' . $custom_department['name'] . '">
+                        ' . __( 'based on', 'propertyhive' ) . '
+                        <select name="propertyhive_active_departments_based_on_' . $key . '">
+                            <option value=""></option>';
+                        foreach ( $default_departments as $dept_key => $value )
+                        {
+                            $active_departments_html .= '<option value="' . $dept_key . '"' . selected( $custom_department['based_on'], $dept_key, false ) . '>' . $value . '</option>';
+                        }
+                        $active_departments_html .= '
+                        </select>
+                        <a href="" class="delete-department" data-department="' . $key . '">Delete</a>
+                    </label>
+                </fieldset>';
+            }
+        }
+
+        $active_departments_html .= '</div>
+        <a href="" id="add_department">+ ' . __( 'Add Department', 'propertyhive' ) . '</a>
+        <input type="hidden" name="propertyhive_new_custom_departments" id="propertyhive_new_custom_departments" value="0">
+        <input type="hidden" name="propertyhive_custom_departments" id="propertyhive_custom_departments" value="' . implode(",", array_keys($custom_departments)) . '">
+        <input type="hidden" name="propertyhive_custom_departments_original" id="propertyhive_custom_departments_original" value="' . implode(",", array_keys($custom_departments)) . '">
+        ';
+
+        $active_departments_html .= '<div id="active_department_template" style="display:none">
+            <fieldset id="propertyhive_active_department_fieldset_template">
+                <legend class="screen-reader-text"><span>' . __( 'Active Departments', 'propertyhive' ) . '</span></legend>
+                <label>
+                    <input name="propertyhive_active_departments_template" type="checkbox" value="1" checked> 
+                    <input type="text" name="propertyhive_active_departments_name_template" value=""> 
+                    ' . __( 'based on', 'propertyhive' ) . '
+                    <select name="propertyhive_active_departments_based_on_template">
+                        <option value=""></option>';
+            foreach ( $default_departments as $key => $value )
+            {
+                $active_departments_html .= '<option value="' . $key . '">' . $value . '</option>';
+            }
+            $active_departments_html .= '
+                    </select>
+                    <a href="" class="delete-department" data-department="template">Delete</a>
+                </label>
+            </fieldset>
+        </div>';
+
+        $settings[] = array(
+            'title'   => __( 'Active Departments', 'propertyhive' ),
+            'id'      => 'propertyhive_active_departments',
+            'type'    => 'html',
+            'html'    => $active_departments_html,
+        );
 
         $settings[] = array(
             'title'   => __( 'Primary Department', 'propertyhive' ),
@@ -663,6 +724,89 @@ class PH_Settings_General extends PH_Settings_Page {
 			$settings = $this->get_settings();
 
 			PH_Admin_Settings::save_fields( $settings );
+
+            $departments = ph_get_departments();
+
+            foreach ( $departments as $key => $value )
+            {
+                if ( substr($key, 0, 6) == 'phnew-' )
+                {
+                    // Ignore new departments as we'll deal with them separately
+                    continue;
+                }
+
+                if ( 
+                    isset($_POST['propertyhive_active_departments_' . str_replace("residential-", "", $key)])
+                )
+                {
+                    $option_value = 'yes';
+                }
+                else
+                {
+                    $option_value = 'no';
+                }
+
+                update_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key), $option_value );
+            }
+
+            $custom_departments = array();
+            if ( isset($_POST['propertyhive_custom_departments']) && !empty($_POST['propertyhive_custom_departments']) )
+            {
+                $submitted_custom_departments = explode(",", $_POST['propertyhive_custom_departments']);
+                $submitted_custom_departments = array_filter($submitted_custom_departments);
+                if ( !empty($submitted_custom_departments) )
+                {
+                    foreach ( $submitted_custom_departments as $submitted_custom_department )
+                    {
+                        if ( 
+                            isset($_POST['propertyhive_active_departments_' . $submitted_custom_department])
+                        )
+                        {
+                            $option_value = 'yes';
+                        }
+                        else
+                        {
+                            $option_value = 'no';
+                        }
+
+                        $key = $submitted_custom_department;
+                        if ( substr($submitted_custom_department, 0, 6) == 'phnew-' )
+                        {
+                            $key = sanitize_title($_POST['propertyhive_active_departments_name_' . $submitted_custom_department]);
+                        }
+
+                        $custom_departments[$key] = array(
+                            'name' => ph_clean($_POST['propertyhive_active_departments_name_' . $submitted_custom_department ]),
+                            'based_on' => ph_clean($_POST['propertyhive_active_departments_based_on_' . $submitted_custom_department ])
+                        );
+
+                        update_option( 'propertyhive_active_departments_' . $key, $option_value );
+                    }
+                }
+            }
+
+            update_option( 'propertyhive_custom_departments', $custom_departments );
+
+            // TO DO: Cater for deleted departments
+            if ( isset($_POST['propertyhive_custom_departments_original']) && !empty($_POST['propertyhive_custom_departments_original']) )
+            {
+                $original_custom_departments = explode(",", $_POST['propertyhive_custom_departments_original']);
+                $original_custom_departments = array_filter($original_custom_departments);
+                if ( !empty($original_custom_departments) )
+                {
+                    $submitted_custom_departments = explode(",", $_POST['propertyhive_custom_departments']);
+                    $submitted_custom_departments = array_filter($submitted_custom_departments);
+
+                    foreach ( $original_custom_departments as $original_custom_department )
+                    {
+                        if ( !in_array($original_custom_department, $submitted_custom_departments) )
+                        {
+                            // no longer present
+                            delete_option( 'propertyhive_active_departments_' . $original_custom_department );
+                        }
+                    }
+                }
+            }
 
 			flush_rewrite_rules();
 		}

@@ -17,7 +17,7 @@
             $requirements = array();
 
             if ( 
-                isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' &&
+                isset($applicant_profile['department']) && ( $applicant_profile['department'] == 'residential-sales' || ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' ) &&
                 isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0
             )
             {
@@ -27,7 +27,7 @@
                 );
             }
             if ( 
-                isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales'
+                isset($applicant_profile['department']) && ( $applicant_profile['department'] == 'residential-sales' || ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' )
             )
             {
                 if ( $percentage_lower != '' && $percentage_higher != '' )
@@ -70,7 +70,7 @@
                 }
             }
             if ( 
-                isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-lettings' &&
+                isset($applicant_profile['department']) && ( $applicant_profile['department'] == 'residential-lettings' || ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-lettings' ) &&
                 isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0
             )
             {
@@ -81,7 +81,12 @@
             }
             if ( 
                 isset($applicant_profile['department']) && 
-                ( $applicant_profile['department'] == 'residential-sales' || $applicant_profile['department'] == 'residential-lettings' )
+                ( 
+                    $applicant_profile['department'] == 'residential-sales' || 
+                    $applicant_profile['department'] == 'residential-lettings' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' ||
+                    ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-lettings'
+                )
             )
             {
                 if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
@@ -107,7 +112,7 @@
             }
             if ( 
                 isset($applicant_profile['department']) && 
-                ( $applicant_profile['department'] == 'commercial' )
+                ( $applicant_profile['department'] == 'commercial' || ph_get_custom_department_based_on($applicant_profile['department']) == 'commercial' )
             )
             {
                 if ( isset($applicant_profile['available_as']) && is_array($applicant_profile['available_as']) && !empty($applicant_profile['available_as']) )
@@ -271,7 +276,7 @@
                             echo '<div style="margin-bottom:7px; font-size:15px;">
                                 <strong>' . ( ($property->_department == 'residential-lettings') ? __('Rent', 'propertyhive') : __('Price', 'propertyhive') ) . ': ' . $property->price_qualifier . ' ' . $property->get_formatted_price() . '</strong>
                                 | ';
-                            if ($property->department != 'commercial')
+                            if ($property->department != 'commercial' || ph_get_custom_department_based_on($property->department) == 'commercial')
                             {
                                 echo $property->bedrooms . ' bed | ';
                             }

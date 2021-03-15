@@ -9,16 +9,10 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-global $post, $property;
-
-if ($property->department == 'commercial')
-{
+global $property;
 ?>
 <div class="floor-area">
 
 	<?php echo $property->get_formatted_floor_area(); ?>
 
 </div>
-<?php
-}
-?>

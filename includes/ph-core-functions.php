@@ -170,7 +170,51 @@ function ph_get_image_size( $image_size ) {
     return $size;
 }
 
-function ph_get_departments()
+function ph_get_custom_departments( $active_only = true )
+{
+    $return = array();
+
+    $custom_departments = get_option( 'propertyhive_custom_departments', array() );
+            
+    if ( is_array($custom_departments) && !empty($custom_departments) )
+    {
+        foreach ( $custom_departments as $key => $custom_department )
+        {
+            if ( !$active_only || ( $active_only && get_option('propertyhive_active_departments_' . $key) == 'yes' ) )
+            {
+                $return[$key] = $custom_department;
+            }
+        }
+    }
+
+    return $return;
+}
+
+function ph_get_custom_department( $department )
+{
+    $custom_departments = get_option( 'propertyhive_custom_departments', array() );
+            
+    if ( isset($custom_departments[$department]) )
+    {
+        return $custom_departments[$department];
+    }
+
+    return false;
+}
+
+function ph_get_custom_department_based_on( $department )
+{
+    $custom_departments = get_option( 'propertyhive_custom_departments', array() );
+            
+    if ( isset($custom_departments[$department]['based_on']) )
+    {
+        return $custom_departments[$department]['based_on'];
+    }
+
+    return false;
+}
+
+function ph_get_departments( $raw = false )
 {
     $departments = array(
         'residential-sales' => __( 'Residential Sales', 'propertyhive' ),
@@ -178,7 +222,7 @@ function ph_get_departments()
         'commercial' => __( 'Commercial', 'propertyhive' ),
     );
 
-    return apply_filters( 'propertyhive_departments', $departments );
+    return $raw ? $departments : apply_filters( 'propertyhive_departments', $departments );
 }
 
 function get_area_units()

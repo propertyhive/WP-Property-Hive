@@ -115,6 +115,7 @@ if ( ! class_exists( 'PropertyHive' ) )
     
             // Hooks
             add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'action_links' ) );
+            add_filter( 'propertyhive_departments', array( $this, 'setup_custom_departments' ) );
             //add_action( 'widgets_init', array( $this, 'include_widgets' ) );
             add_action( 'init', array( $this, 'init' ), 0 );
             add_action( 'init', array( $this, 'include_template_functions' ) );
@@ -126,6 +127,18 @@ if ( ! class_exists( 'PropertyHive' ) )
     
             // Loaded action
             do_action( 'propertyhive_loaded' );
+        }
+
+        public function setup_custom_departments( $departments )
+        {
+            $custom_departments = ph_get_custom_departments();
+
+            foreach ( $custom_departments as $key => $custom_department )
+            {
+                $departments[$key] = __( $custom_department['name'], 'propertyhive' );
+            }
+
+            return $departments;
         }
 
         public function exclude_notes_from_comment_count($post_id) {

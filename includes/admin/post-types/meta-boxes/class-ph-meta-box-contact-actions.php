@@ -55,7 +55,10 @@ class PH_Meta_Box_Contact_Actions {
 	                    {
 	                        $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
 
-	                        if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
+	                        if ( 
+	                        	isset($applicant_profile['department']) && 
+	                        	( $applicant_profile['department'] == 'residential-sales' || ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' )
+	                        )
 	                        {
 	                            $show_offers = true;
 	                            $show_sales = true;

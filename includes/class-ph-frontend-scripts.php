@@ -101,6 +101,12 @@ class PH_Frontend_Scripts {
 
 		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
 
+		if ( wp_script_is( 'propertyhive_search' ) ) {
+			wp_localize_script( 'propertyhive_search', 'propertyhive_search_params', apply_filters( 'propertyhive_search_params', array(
+				'custom_departments'	=> ph_get_custom_departments(),
+			) ) );
+		}
+
 		if ( wp_script_is( 'propertyhive_make_enquiry' ) ) {
 			wp_localize_script( 'propertyhive_make_enquiry', 'propertyhive_make_property_enquiry_params', apply_filters( 'propertyhive_make_property_enquiry_params', array(
 				'ajax_url'        => PH()->ajax_url()
@@ -111,6 +117,7 @@ class PH_Frontend_Scripts {
 			wp_localize_script( 'propertyhive_account', 'propertyhive_account_params', apply_filters( 'propertyhive_account_params', array(
 				'ajax_url'        		=> PH()->ajax_url(),
 				'my_account_url'  		=> get_permalink( ph_get_page_id('my_account') ),
+				'custom_departments'	=> ph_get_custom_departments(),
 				'login_nonce'	  		=> wp_create_nonce( "ph_login" ),
 				'register_nonce'	  	=> wp_create_nonce( "ph_register" ),
 				'details_nonce'	  		=> wp_create_nonce( "ph_details" ),

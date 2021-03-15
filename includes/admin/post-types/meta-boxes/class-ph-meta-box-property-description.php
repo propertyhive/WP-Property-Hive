@@ -127,6 +127,7 @@ class PH_Meta_Box_Property_Description {
         
         echo '<script>
             
+            var custom_departments = ' . json_encode(ph_get_custom_departments()) . ';
             jQuery(document).ready(function()
             {
                 jQuery(\'#property_descriptions\').on(\'keyup\', \'input[name=\\\'_description_name[]\\\']\', function()
@@ -178,7 +179,7 @@ class PH_Meta_Box_Property_Description {
             {
                  var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
                  
-                 if (selectedDepartment == \'commercial\')
+                 if ( selectedDepartment == \'commercial\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'commercial\' ) )
                  {
                     jQuery(\'#propertyhive-property-description\').show();
                  }

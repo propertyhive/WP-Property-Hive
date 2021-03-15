@@ -1,5 +1,55 @@
 jQuery( function($){
 
+    $('a#add_department').click(function(e)
+    {
+        e.preventDefault();
+
+        var new_department_html = $('#active_department_template').html();
+
+        new_department_html = new_department_html.replace(/template/g, 'phnew-' + $('#propertyhive_new_custom_departments').val());
+
+        $('#active_departments').append(new_department_html);
+
+        var new_custom_departments = $('#propertyhive_custom_departments').val();
+        if ( new_custom_departments != '' )
+        {
+            new_custom_departments += ',';
+        }
+        new_custom_departments += 'phnew-' + $('#propertyhive_new_custom_departments').val();
+        $('#propertyhive_custom_departments').val( new_custom_departments );
+
+        $('#propertyhive_new_custom_departments').val( parseInt($('#propertyhive_new_custom_departments').val()) + 1 );
+    });
+    
+    $(document).on('click', 'a.delete-department', function(e)
+    {
+        e.preventDefault();
+
+        var confirmBox = confirm('Are you sure you wish to delete this department?');
+
+        if (confirmBox)
+        {
+            var custom_department_key = $(this).attr('data-department');
+
+            $('#propertyhive_active_department_fieldset_' + custom_department_key).remove();
+
+            var new_custom_departments = '';
+            var existing_new_custom_departments = $('#propertyhive_custom_departments').val().split(",");
+            for ( var i in existing_new_custom_departments )
+            {
+                if ( existing_new_custom_departments[i] != custom_department_key )
+                {
+                    if ( new_custom_departments != '' )
+                    {
+                        new_custom_departments += ',';
+                    }
+                    new_custom_departments += existing_new_custom_departments[i];
+                }
+            }
+            $('#propertyhive_custom_departments').val( new_custom_departments );
+        }
+    });
+
     $('input.colorpick').wpColorPicker();
 
     $('form').submit(function()
