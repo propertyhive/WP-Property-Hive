@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.7
-Stable tag: 1.4.79
+Stable tag: 1.5.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,14 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.0 - 2021-03-15 =
+* Added the ability to add custom departments under 'Property Hive > Settings > General'. This should satisfy one of our most common support queries, as well as open Property Hive upto a whole host of new businesses
+* New property management and tenancies module taken out of BETA
+* Added address of contacts to new viewing details lightboxes
+* Added new 'propertyhive_lightbox_contact_details' action to new viewing details lightboxes
+* Corrected issue with owner/landlord details not showing in new viewing details lightboxes
+* Corrected Elementor map widget not showing options since recent Elementor update
 
 = 1.4.79 - 2021-03-08 =
 * New workflow when clicking to view viewings from a property or contact record. We'll now show a popup that shows viewing details, allows you to add notes and perform actions, and paginate through them without needing to click into the actual viewing. Aimed at making following up viewings a quicker process
