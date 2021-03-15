@@ -346,7 +346,7 @@ class PH_Property {
         $prefix = '';
         $suffix = '';
 
-        if ( $this->_department == 'commercial' )
+        if ( $this->_department == 'commercial' || ph_get_custom_department_based_on( $this->_department ) == 'commercial' )
         {
             if ( 
                 ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) &&
@@ -458,7 +458,13 @@ class PH_Property {
                 }
                 $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
                 $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
-                switch ($this->_department)
+
+                $department = $this->_department;
+                if ( ph_get_custom_department_based_on( $department ) !== false )
+                {
+                    $department = ph_get_custom_department_based_on( $department );
+                }
+                switch ($department)
                 {
                     case "residential-sales":
                     {
@@ -770,7 +776,12 @@ class PH_Property {
      */
     public function get_formatted_description( ) {
 
-        if ( $this->_department == 'commercial' )
+        $department = $this->_department;
+        if ( ph_get_custom_department_based_on( $department ) !== false )
+        {
+            $department = ph_get_custom_department_based_on( $department );
+        }
+        if ( $department == 'commercial' )
         {
             $description = $this->get_formatted_descriptions(); // Haven't called this commercial_descriptions as we might use generic descriptions for other area going forward
         }
@@ -854,7 +865,7 @@ class PH_Property {
      */
     public function get_property_type()
     {
-        $term_list = wp_get_post_terms($this->id, ( ( $this->_department == 'commercial' ) ? 'commercial_' : '' ) . 'property_type', array("fields" => "names"));
+        $term_list = wp_get_post_terms($this->id, ( ( $this->_department == 'commercial' || ph_get_custom_department_based_on( $this->_department ) == 'commercial' ) ? 'commercial_' : '' ) . 'property_type', array("fields" => "names"));
         
         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
         {
@@ -926,7 +937,7 @@ class PH_Property {
      */
     public function get_tenure()
     {
-        $term_list = wp_get_post_terms($this->id, ( ( $this->_department == 'commercial' ) ? 'commercial_' : '' ) . 'tenure', array("fields" => "names"));
+        $term_list = wp_get_post_terms($this->id, ( ( $this->_department == 'commercial' || ph_get_custom_department_based_on( $this->_department ) == 'commercial' ) ? 'commercial_' : '' ) . 'tenure', array("fields" => "names"));
         
         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
         {

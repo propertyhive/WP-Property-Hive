@@ -16,12 +16,9 @@ global $property;
 	<?php echo $property->get_formatted_price(); ?>
 	
 	<?php
-        if (
-            ( $property->department == 'residential-sales' || $property->department == 'commercial' ) &&
-            $property->price_qualifier != ''
-        )
+        if ( $price_qualifier != '' )
         {
-            echo ' <span class="price-qualifier">' . $property->price_qualifier . '</span>';
+            echo ' <span class="price-qualifier">' . $price_qualifier . '</span>';
         }
 
         if ( $fees != '' )

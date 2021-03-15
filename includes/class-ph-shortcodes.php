@@ -98,7 +98,7 @@ class PH_Shortcodes {
 		$form_controls = apply_filters( 'propertyhive_search_form_fields_after', $form_controls, $atts );
 
 	    if (
-	    	isset($atts['default_department']) && in_array($atts['default_department'], array('residential-sales', 'residential-lettings', 'commercial')) &&
+	    	isset($atts['default_department']) && in_array($atts['default_department'], array_keys( ph_get_departments() )) &&
 	    	( !isset($_REQUEST['department']) )
 	    )
 	    {
@@ -125,7 +125,7 @@ class PH_Shortcodes {
 			'order'  			=> 'desc',
 			'meta_key' 			=> '_price_actual',
 			'ids'     			=> '',
-			'department'		=> '', // residential-sales / residential-lettings / commercial
+			'department'		=> '', // residential-sales / residential-lettings / commercial / any custom department
 			'minimum_price'		=> '',
 			'maximum_price'		=> '',
 			'bedrooms'			=> '',
@@ -151,7 +151,7 @@ class PH_Shortcodes {
 			)
 		);
 
-		if ( isset($atts['department']) && in_array($atts['department'], array("residential-sales", "residential-lettings", "commercial")) )
+		if ( isset($atts['department']) && in_array($atts['department'], array_keys( ph_get_departments() )) )
 		{
 			$meta_query[] = array(
 				'key' => '_department',
@@ -169,7 +169,13 @@ class PH_Shortcodes {
 			);
 		}
 
-		if ( isset($atts['department']) && $atts['department'] == 'residential-sales' && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
+		$base_department = $atts['department'];
+		if ( $atts['department'] !== '' && !in_array($atts['department'], array_keys( ph_get_departments( true ) )) )
+		{
+			$base_department = ph_get_custom_department_based_on($base_department);
+		}
+
+		if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
         {
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
@@ -190,7 +196,7 @@ class PH_Shortcodes {
             );
         }
 
-        if ( isset($atts['department']) && $atts['department'] == 'residential-sales' && isset($atts['maximum_price']) && $atts['maximum_price'] != '' )
+        if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['maximum_price']) && $atts['maximum_price'] != '' )
         {
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
@@ -355,7 +361,7 @@ class PH_Shortcodes {
 		{
 			// Change field to check when department is specified as commercial, or if commercial is the only active department
 			if (
-				( isset($atts['department']) && $atts['department'] == 'commercial' ) ||
+				( isset($atts['department']) && $base_department == 'commercial' ) ||
 				(
 					!isset($atts['department']) &&
 					get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
@@ -391,7 +397,7 @@ class PH_Shortcodes {
 
 		// Change default meta key when department is specified as commercial, or if commercial is the only active department
 		if (
-			( isset($atts['department']) && $atts['department'] == 'commercial' ) ||
+			( isset($atts['department']) && $base_department == 'commercial' ) ||
 			(
 				get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
 				get_option( 'propertyhive_active_departments_lettings' ) != 'yes' &&

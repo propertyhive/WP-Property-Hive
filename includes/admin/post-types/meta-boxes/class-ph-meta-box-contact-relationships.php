@@ -143,7 +143,7 @@ class PH_Meta_Box_Contact_Relationships {
                 {
                     $owner_type = __( 'Property Owner', 'propertyhive' );
                     $department = get_post_meta($property_post->ID, '_department', TRUE);
-                    if ($department == 'residential-lettings')
+                    if ( $department == 'residential-lettings' || ph_get_custom_department_based_on($department) == 'residential-lettings' )
                     {
                         $owner_type = __( 'Property Landlord', 'propertyhive' );
                     }   
@@ -158,7 +158,7 @@ class PH_Meta_Box_Contact_Relationships {
                 {
                     $owner_type = __( 'Potential Owner', 'propertyhive' );
                     $department = get_post_meta($appraisal_post->ID, '_department', TRUE);
-                    if ($department == 'residential-lettings')
+                    if ( $department == 'residential-lettings' || ph_get_custom_department_based_on($department) == 'residential-lettings' )
                     {
                         $owner_type = __( 'Potential Landlord', 'propertyhive' );
                     }   
@@ -186,18 +186,7 @@ class PH_Meta_Box_Contact_Relationships {
                         }
                         else
                         {
-                            if ( $applicant_profile['department'] == 'residential-sales' )
-                            {
-                                $label = __( 'Sales Applicant', 'propertyhive' );
-                            }
-                            elseif ( $applicant_profile['department'] == 'residential-lettings' )
-                            {
-                                $label = __( 'Lettings Applicant', 'propertyhive' );
-                            }
-                            elseif ( $applicant_profile['department'] == 'commercial' )
-                            {
-                                $label = __( 'Commercial Applicant', 'propertyhive' );
-                            }
+                            $label = __( ucwords(str_replace('-', ' ', str_replace('residential-', '', $applicant_profile['department']))) . ' Applicant', 'propertyhive' );
                         }
 
                         if ( isset($applicant_departments_count[$applicant_profile['department']]) )
@@ -889,6 +878,7 @@ class PH_Meta_Box_Contact_Relationships {
                     <script>
 
                         var applicant_details_changed_' . $key . ' = false;
+                        var custom_departments = ' . json_encode(ph_get_custom_departments()) . ';
                         jQuery(document).ready(function()
                         {
                             showHideApplicantDepartmentMetaBox_' . $key . '();
@@ -922,27 +912,22 @@ class PH_Meta_Box_Contact_Relationships {
                             jQuery(\'.propertyhive-applicant-residential-lettings-details-' . $key . '\').hide();
                             jQuery(\'.propertyhive-applicant-commercial-details-' . $key . '\').hide();
                             
-                            switch (jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . $key . '\\\']:checked\').val())
-                            {
-                                case "residential-sales":
-                                {
-                                    jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').show();
-                                    jQuery(\'.propertyhive-applicant-residential-sales-details-' . $key . '\').show();
-                                    break;
-                                }
-                                case "residential-lettings":
-                                {
-                                    jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').show();
-                                    jQuery(\'.propertyhive-applicant-residential-lettings-details-' . $key . '\').show();
-                                    break;
-                                }
-                                case "commercial":
-                                {
-                                    jQuery(\'.propertyhive-applicant-commercial-details-' . $key . '\').show();
-                                    break;
-                                }
-                            }
+                            var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . $key . '\\\']:checked\').val();
                             
+                            if ( selectedDepartment == \'residential-sales\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'residential-sales\' ) )
+                            {
+                                jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').show();
+                                jQuery(\'.propertyhive-applicant-residential-sales-details-' . $key . '\').show();
+                            }
+                            else if ( selectedDepartment == \'residential-lettings\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'residential-lettings\' ) )
+                            {
+                                jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').show();
+                                jQuery(\'.propertyhive-applicant-residential-lettings-details-' . $key . '\').show();
+                            }
+                            else if ( selectedDepartment == \'commercial\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'commercial\' ) )
+                            {
+                                jQuery(\'.propertyhive-applicant-commercial-details-' . $key . '\').show();
+                            }                            
                         }
                         
                     </script>';
@@ -1030,7 +1015,7 @@ class PH_Meta_Box_Contact_Relationships {
 
                 $applicant_profile = array();
                 $applicant_profile['department'] = ph_clean($_POST['_applicant_department_' . $i]);
-                if ( $_POST['_applicant_department_' . $i] == 'residential-sales' )
+                if ( $_POST['_applicant_department_' . $i] == 'residential-sales' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-sales' )
                 {
                     $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['_applicant_maximum_price_' . $i]));
 
@@ -1056,7 +1041,7 @@ class PH_Meta_Box_Contact_Relationships {
                         }
                     }
                 }
-                elseif ( $_POST['_applicant_department_' . $i] == 'residential-lettings' )
+                elseif ( $_POST['_applicant_department_' . $i] == 'residential-lettings' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-lettings' )
                 {
                     $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_maximum_rent_' . $i]));
 
@@ -1074,7 +1059,12 @@ class PH_Meta_Box_Contact_Relationships {
                     $applicant_profile['max_price_actual'] = $price_actual;
                 }
 
-                if ( $_POST['_applicant_department_' . $i] == 'residential-sales' || $_POST['_applicant_department_' . $i] == 'residential-lettings' )
+                if ( 
+                    $_POST['_applicant_department_' . $i] == 'residential-sales' ||
+                    $_POST['_applicant_department_' . $i] == 'residential-lettings' ||
+                    ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-sales' ||
+                    ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-lettings'
+                )
                 {
                     $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['_applicant_minimum_bedrooms_' . $i]));
                     $applicant_profile['min_beds'] = $beds;
@@ -1085,7 +1075,7 @@ class PH_Meta_Box_Contact_Relationships {
                     }
                 }
 
-                if ( $_POST['_applicant_department_' . $i] == 'commercial' )
+                if ( $_POST['_applicant_department_' . $i] == 'commercial' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'commercial' )
                 {
                     $applicant_profile['available_as'] = ( isset($_POST['_applicant_available_as_' . $i]) && !empty($_POST['_applicant_available_as_' . $i]) ) ? ph_clean($_POST['_applicant_available_as_' . $i]) : array();
 

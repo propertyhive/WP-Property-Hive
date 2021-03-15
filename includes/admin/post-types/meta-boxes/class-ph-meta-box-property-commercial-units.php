@@ -133,7 +133,7 @@ class PH_Meta_Box_Property_Commercial_Units {
         // Only save meta info if department is 'commercial'
         $department = get_post_meta($post_id, '_department', TRUE);
         
-        if ( $department == 'commercial' )
+        if ( $department == 'commercial' || ph_get_custom_department_based_on($department) == 'commercial' )
         {
             
         }

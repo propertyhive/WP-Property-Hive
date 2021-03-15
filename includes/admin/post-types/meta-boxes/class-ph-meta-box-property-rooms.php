@@ -149,6 +149,7 @@ class PH_Meta_Box_Property_Rooms {
         
         echo '<script>
             
+            var custom_departments = ' . json_encode(ph_get_custom_departments()) . ';
             jQuery(document).ready(function()
             {
                 jQuery(\'#property_rooms\').on(\'keyup\', \'input[name=\\\'_room_name[]\\\']\', function()
@@ -200,7 +201,7 @@ class PH_Meta_Box_Property_Rooms {
             {
                  var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
                  
-                 if (selectedDepartment == \'residential-sales\' || selectedDepartment == \'residential-lettings\')
+                 if ( selectedDepartment == \'residential-sales\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'residential-sales\' ) || selectedDepartment == \'residential-lettings\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'residential-lettings\' ) )
                  {
                     jQuery(\'#propertyhive-property-rooms\').show();
                  }

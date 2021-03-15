@@ -44,7 +44,8 @@ class PH_Meta_Box_Property_Department {
         echo '<div class="options_group">';
 
         $departments = ph_get_departments();
-        
+        $custom_departments = ph_get_custom_departments();
+
         $department_options = array();
 
         foreach ( $departments as $key => $value )
@@ -122,6 +123,8 @@ class PH_Meta_Box_Property_Department {
         echo '
         <script>
             
+            var ph_custom_departments = ' . json_encode($custom_departments) . ';
+
             jQuery(document).ready(function()
             {
                 //showHideDepartmentMetaBox();
@@ -147,8 +150,9 @@ class PH_Meta_Box_Property_Department {
                 var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
                  
                 jQuery(\'#propertyhive-property-\' + selectedDepartment + \'-details\').show();
+                if ( ph_custom_departments[selectedDepartment] ) { jQuery(\'#propertyhive-property-\' + ph_custom_departments[selectedDepartment].based_on + \'-details\').show(); }
 
-                if (selectedDepartment.indexOf(\'residential\') != -1)
+                if ( selectedDepartment.indexOf(\'residential\') != -1 || ( ph_custom_departments[selectedDepartment] && ph_custom_departments[selectedDepartment].based_on.indexOf(\'residential\') != -1 ) )
                 {
                     jQuery(\'#propertyhive-property-residential-details\').show();
                 }
