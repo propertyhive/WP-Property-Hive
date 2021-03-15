@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) )
 class PH_Key_Date {
 
 	const UPCOMING_THRESHOLD = '+ 7 DAYS';
-	const OVERDUE_THRESHOLD = 'Today';
 
 	/** @var int */
 	public $id;
@@ -47,9 +46,11 @@ class PH_Key_Date {
 		switch ($this->_key_date_status)
 		{
 			case 'pending':
+
+				$overdue_threshold = ( date_format($this->date_due(), 'H:i') == '00:00' ) ? 'Today' : 'Now';
 				switch(true)
 				{
-					case $this->date_due() <= new DateTime(PH_Key_Date::OVERDUE_THRESHOLD):
+					case $this->date_due() < new DateTime($overdue_threshold):
 						return 'overdue';
 					case $this->date_due() <= new DateTime(PH_Key_Date::UPCOMING_THRESHOLD):
 						return 'upcoming';
