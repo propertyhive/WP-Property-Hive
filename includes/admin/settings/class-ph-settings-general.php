@@ -72,7 +72,7 @@ class PH_Settings_General extends PH_Settings_Page {
         
         foreach ( $departments as $key => $value )
         {
-            if ( ph_get_custom_department($key) !== false )
+            if ( isset($custom_departments[$key]) )
             {
                 
             }
