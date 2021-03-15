@@ -528,6 +528,8 @@ function ph_get_applicant_requirements_form_fields($applicant_profile = false)
         'options' => $offices
     );
 
+    $value = '';
+
     $ph_departments = ph_get_departments();
     $departments = array();
 
