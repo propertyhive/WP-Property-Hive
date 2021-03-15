@@ -176,22 +176,13 @@
                     <td class="tenants column-tenants" data-colname="Tenants">
                         <div class="cell-main-content">
                         <?php
-                            $tenants = '-';
-                            $tenancy  = $key_date->tenancy();
-                            if ( $tenancy->id )
+                            $tenants = '';
+                            if ( !empty($key_date->tenancy_id) )
                             {
-                                $applicant_contact_ids = get_post_meta( $tenancy->id, '_applicant_contact_id' );
-                                if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
-                                {
-                                    $applicants = array();
-                                    foreach ( $applicant_contact_ids as $applicant_contact_id )
-                                    {
-                                        $applicants[] = get_the_title($applicant_contact_id);
-                                    }
-                                    $tenants =  implode("<br>", $applicants);
-                                }
+                                $tenancy = $key_date->tenancy();
+                                $tenants = $tenancy->get_tenants(false, true);
                             }
-                            echo $tenants;
+                            echo !empty($tenants) ? $tenants : '-';
                         ?>
                         </div>
                     </td>

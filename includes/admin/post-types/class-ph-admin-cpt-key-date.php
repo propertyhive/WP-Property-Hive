@@ -119,7 +119,22 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			switch ( $column ) {
 
 				case 'description' :
-					echo '<div class="cell-main-content">' . $key_date->description() . '</div>';
+					echo '<div class="cell-main-content">';
+					$opening_link_tag = false;
+					if ( !empty($key_date->tenancy_id) ) 
+					{
+						echo '<a href="' . get_edit_post_link((int)$key_date->tenancy_id) . '#propertyhive-tenancy-management%7Cpropertyhive-management-dates">'; 
+						$opening_link_tag = true; 
+					}
+					else
+					{ 
+						if ( !empty($key_date->property_id) ) 
+						{
+							echo '<a href="' . get_edit_post_link((int)$key_date->property_id) . '#propertyhive-property-tenancies%7Cpropertyhive-management-dates">'; 
+							$opening_link_tag = true; 
+						}
+					}
+					echo $key_date->description() . ( $opening_link_tag ? '</a>' : '' ) . '</div>';
 					echo '<div class="row-actions">';
 
 					$actions = array();
@@ -148,20 +163,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 				case 'tenants' :
 					if ( $tenancy->id )
 					{
-						$applicant_contact_ids = get_post_meta( $tenancy->id, '_applicant_contact_id' );
-						if ( is_array($applicant_contact_ids) && !empty($applicant_contact_ids) )
-						{
-							$applicants = array();
-							foreach ( $applicant_contact_ids as $applicant_contact_id )
-							{
-								$applicants[] = get_the_title($applicant_contact_id);
-							}
-							echo implode("<br>", $applicants);
-						}
-						else
-						{
-							echo '-';
-						}
+						echo $tenancy->get_tenants(false, true);
 					}
 					else
 					{

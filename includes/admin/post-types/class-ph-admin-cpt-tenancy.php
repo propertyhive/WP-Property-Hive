@@ -199,7 +199,7 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				break;
 			case 'applicant' :
 
-				echo $the_tenancy->get_tenants();
+				echo $the_tenancy->get_tenants(false, true);
 
 				break;
 			case 'dates' :
