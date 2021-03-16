@@ -236,7 +236,7 @@ if ( ! function_exists( 'propertyhive_template_loop_property_thumbnail' ) ) {
      * @return void
      */
     function propertyhive_template_loop_property_thumbnail() {
-        echo propertyhive_get_property_thumbnail();
+        echo propertyhive_get_property_thumbnail( apply_filters( 'property_search_results_thumbnail_size', 'medium' ) );
     }
 }
 
