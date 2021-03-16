@@ -68,7 +68,7 @@ class PH_Admin_Assets {
             in_array( $screen->id, array( 'property', 'contact' ) ) 
         )
 	    {
-		    wp_enqueue_style( 'propertyhive_fancybox_css', PH()->plugin_url() . '/assets/css/jquery.fancybox.css', array(), '3.3.5' );
+		    wp_enqueue_style( 'propertyhive_fancybox_css', PH()->plugin_url() . '/assets/css/jquery.fancybox.css', array(), '3.5.7' );
 	    }
 
         /*if ( in_array( $screen->id, array( 'dashboard' ) ) ) {
@@ -155,7 +155,7 @@ class PH_Admin_Assets {
             in_array( $screen->id, array( 'property', 'contact' ) ) 
         )
         {
-		    wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/jquery.fancybox.js', array('jquery'), '3.3.5' );
+		    wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/jquery.fancybox.js', array('jquery'), '3.5.7' );
 	    }
 
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 

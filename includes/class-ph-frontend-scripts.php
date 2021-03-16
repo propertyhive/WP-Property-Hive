@@ -57,8 +57,8 @@ class PH_Frontend_Scripts {
 		// Register any scripts for later use, or used as dependencies
 		wp_register_script( 'jquery-cookie', $assets_path . 'js/jquery-cookie/jquery.cookie' . $suffix . '.js', array( 'jquery' ), '1.3.1', true );
 
-		wp_register_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.3.5', true );
-		wp_register_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css', array(), '3.3.5' );
+		wp_register_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.5.7', true );
+		wp_register_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css', array(), '3.5.7' );
 
 		if ( get_option('propertyhive_lettings_fees_display_search_results', '') == 'yes' )
 		{
