@@ -5,15 +5,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Serve properties using the REST API
+ * Yoast SEO Compatibility
  *
- * @class 		PH_Rest_Api
+ * @class 		PH_Yoast_SEO
  * @version		1.0.0
  * @package		PropertyHive/Classes/
  * @category	Class
  * @author 		PropertyHive
  */
-class PH_Yoast_API {
+class PH_Yoast_SEO {
 
 	/** @var PH_Rest_Api The single instance of the class */
 	protected static $_instance = null;
@@ -76,4 +76,4 @@ class PH_Yoast_API {
 
 }
 
-PH_Yoast_API::init();
+PH_Yoast_SEO::init();
