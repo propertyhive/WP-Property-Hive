@@ -5,11 +5,9 @@
 	<div class="propertyhive-lightbox-left">
 
 		<!-- VIEWING DETAILS -->
-		<div class="propertyhive-lightbox-property-details">
+		<div class="propertyhive-lightbox-viewing-details">
 
-			<h3 style="margin-bottom:5px"><?php echo __( 'Viewing Details', 'propertyhive' ); ?></h3>
-
-			<div style="margin-bottom:12px; font-size:1.05em"><?php echo date("l jS F Y", strtotime($viewing->start_date_time)); ?> at <?php echo date("H:i", strtotime($viewing->start_date_time)); ?></div>
+			<h3><?php echo __( 'Viewing Details', 'propertyhive' ); ?></h3>
 
 			<div id="propertyhive_viewing_details_meta_box_container">
 				<?php
@@ -17,6 +15,11 @@
 			        include( PH()->plugin_path() . '/includes/admin/views/html-viewing-details-meta-box.php' );
 			    ?>
 			</div>
+
+			<?php
+				$readonly = true;
+		        include( PH()->plugin_path() . '/includes/admin/views/html-viewing-event-meta-box.php' );
+		    ?>
 
 		</div>
 
