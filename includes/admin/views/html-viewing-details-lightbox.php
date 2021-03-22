@@ -7,7 +7,9 @@
 		<!-- VIEWING DETAILS -->
 		<div class="propertyhive-lightbox-property-details">
 
-			<h3><?php echo __( 'Viewing Details', 'propertyhive' ); ?></h3>
+			<h3 style="margin-bottom:5px"><?php echo __( 'Viewing Details', 'propertyhive' ); ?></h3>
+
+			<div style="margin-bottom:12px; font-size:1.05em"><?php echo date("l jS F Y", strtotime($viewing->start_date_time)); ?> at <?php echo date("H:i", strtotime($viewing->start_date_time)); ?></div>
 
 			<div id="propertyhive_viewing_details_meta_box_container">
 				<?php
