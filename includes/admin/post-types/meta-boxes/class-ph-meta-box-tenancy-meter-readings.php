@@ -25,8 +25,10 @@ class PH_Meta_Box_Tenancy_Meter_Readings {
 
         $meter_readings = get_post_meta( $thepostid, '_meter_readings', true );
 
-        $meter_reading_types = array('gas', 'water', 'electricity');
+        $meter_reading_types = apply_filters( 'propertyhive_tenancy_meter_reading_types' , array('gas', 'water', 'electricity'));
 
+        $i = 1;
+        $num_meter_reading_types = count($meter_reading_types);
         foreach ( $meter_reading_types as $meter_reading_type )
         {
             $args = array(
@@ -47,10 +49,10 @@ class PH_Meta_Box_Tenancy_Meter_Readings {
             );
             propertyhive_wp_text_input( $args );
 
-            if ( $meter_reading_type !== 'electricity' )
-            {
+            if ($i < $num_meter_reading_types) {
                 echo '<hr>';
             }
+            $i++;
         }
 
         do_action('propertyhive_tenancy_meter_readings_fields');
@@ -67,7 +69,7 @@ class PH_Meta_Box_Tenancy_Meter_Readings {
         global $wpdb;
 
         $meter_readings = array();
-        $meter_reading_types = array('gas', 'water', 'electricity');
+        $meter_reading_types = apply_filters( 'propertyhive_tenancy_meter_reading_types' , array('gas', 'water', 'electricity'));
 
         foreach ( $meter_reading_types as $meter_reading_type )
         {
