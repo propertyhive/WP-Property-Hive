@@ -55,7 +55,7 @@ class PH_Meta_Box_Tenancy_Deposit_Scheme {
         );
         propertyhive_wp_text_input( $args );
 
-        do_action('propertyhive_tenancy_deposit_fields');
+        do_action('propertyhive_tenancy_deposit_scheme_fields');
         
         echo '</div>';
         
@@ -68,7 +68,7 @@ class PH_Meta_Box_Tenancy_Deposit_Scheme {
      */
     public static function save( $post_id, $post ) {
         global $wpdb;
-//die('<pre>' . print_r($_POST, true));
+
         update_post_meta( $post_id, '_deposit_scheme', ph_clean($_POST['_deposit_scheme']) );
         update_post_meta( $post_id, '_deposit_registration_date', ph_clean($_POST['_deposit_registration_date']) );
         update_post_meta( $post_id, '_deposit_reference', ph_clean($_POST['_deposit_reference']) );
