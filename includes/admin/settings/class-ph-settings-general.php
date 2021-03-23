@@ -526,6 +526,15 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title' => __( 'Applicant Registration Page', 'propertyhive' ),
+                'id'        => 'propertyhive_applicant_registration_page_id',
+                'type'      => 'single_select_page',
+                'default'   => '',
+                'css'       => 'min-width:300px;',
+                'desc'  => __( 'This sets the \'Applicant Registration\' page. This page should contain the [applicant_registration_form] shortcode', 'propertyhive' ),
+            ),
+
+            array(
                 'title' => __( 'Match Price Range % (Lower)', 'propertyhive' ),
                 'id'        => 'propertyhive_applicant_match_price_range_percentage_lower',
                 'type'      => 'number',
