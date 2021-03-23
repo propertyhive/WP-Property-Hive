@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 <form name="ph_account_details_form" class="propertyhive-form account-details-form" action="" method="post">
  	
 	<div id="detailsSuccess" style="display:none;" class="alert alert-success alert-box success">
-        <?php _e( 'Thank you. Your details have been updated succesfully.', 'propertyhive' ); ?>
+        <?php _e( 'Thank you. Your details have been updated successfully.', 'propertyhive' ); ?>
     </div>
     <div id="detailsError" style="display:none;" class="alert alert-danger alert-box">
         <?php _e( 'An error occurred whilst trying to update your details. Please try again.', 'propertyhive' ); ?>
