@@ -38,18 +38,22 @@ class PH_User_Contacts {
 	public static function redirect_to_my_account_if_logged_in() {
 
 		$login_page_id = get_option( 'propertyhive_applicant_login_page_id', '' );
-		$register_page_id = get_option( 'propertyhive_applicant_register_page_id', '' );
+		$register_page_id = get_option( 'propertyhive_applicant_registration_page_id', '' );
 
-		if ( get_queried_object_id() == $login_page_id || get_queried_object_id() == $register_page_id )
+		if ( 
+			is_user_logged_in() && 
+			!empty(get_queried_object_id()) &&
+			( 
+				( !empty($login_page_id) && get_queried_object_id() == $login_page_id ) || 
+				( !empty($register_page_id) && get_queried_object_id() == $register_page_id )
+			) 
+		)
 		{
-			if ( is_user_logged_in() )
+			$my_account_page_id = get_option( 'propertyhive_my_account_page_id', '' );
+			if ( !empty($my_account_page_id) )
 			{
-				$my_account_page_id = get_option( 'propertyhive_my_account_page_id', '' );
-				if ( !empty($my_account_page_id) )
-				{
-					wp_redirect( get_permalink($my_account_page_id) );
-					exit();
-				}
+				wp_redirect( get_permalink($my_account_page_id) );
+				exit();
 			}
 		}
 	}
