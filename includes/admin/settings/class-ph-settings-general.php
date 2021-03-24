@@ -522,7 +522,16 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'      => 'single_select_page',
                 'default'   => '',
                 'css'       => 'min-width:300px;',
-                'desc'  => __( 'This sets the \'My Account\' page. This page should contain the [propertyhive_my_account] shortcode', 'propertyhive' ),
+                'desc'  => __( 'This page should contain the [propertyhive_my_account] shortcode', 'propertyhive' ),
+            ),
+
+            array(
+                'title' => __( 'Applicant Login Page', 'propertyhive' ),
+                'id'        => 'propertyhive_applicant_login_page_id',
+                'type'      => 'single_select_page',
+                'default'   => '',
+                'css'       => 'min-width:300px;',
+                'desc'  => __( 'This page should contain the [propertyhive_login_form] shortcode', 'propertyhive' ),
             ),
 
             array(
@@ -531,7 +540,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'      => 'single_select_page',
                 'default'   => '',
                 'css'       => 'min-width:300px;',
-                'desc'  => __( 'This sets the \'Applicant Registration\' page. This page should contain the [applicant_registration_form] shortcode', 'propertyhive' ),
+                'desc'  => __( 'This page should contain the [applicant_registration_form] shortcode', 'propertyhive' ),
             ),
 
             array(
