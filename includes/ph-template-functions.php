@@ -75,11 +75,50 @@ function ph_generator_tag( $gen, $type ) {
  * @return array
  */
 function ph_body_class( $classes ) {
+    global $wp_query;
+
     $classes = (array) $classes;
 
     if ( is_propertyhive() ) {
         $classes[] = 'propertyhive';
         $classes[] = 'propertyhive-page';
+    }
+
+    // If we're on a single property, add body classes for taxonomy fields and department
+    if ( is_single() )
+    {
+        $post = $wp_query->get_queried_object();
+        if ( $post->post_type === 'property' )
+        {
+            // Duplication of the code in post-template-php that is done for search results posts in get_post_class()
+            // All public taxonomies.
+            $taxonomies = get_taxonomies( array( 'public' => true ) );
+            foreach ( (array) $taxonomies as $taxonomy ) {
+                if ( is_object_in_taxonomy( $post->post_type, $taxonomy ) ) {
+                    foreach ( (array) get_the_terms( $post->ID, $taxonomy ) as $term ) {
+                        if ( empty( $term->slug ) ) {
+                            continue;
+                        }
+
+                        $term_class = sanitize_html_class( $term->slug, $term->term_id );
+                        if ( is_numeric( $term_class ) || ! trim( $term_class, '-' ) ) {
+                            $term_class = $term->term_id;
+                        }
+
+                        // 'post_tag' uses the 'tag' prefix for backward compatibility.
+                        if ( 'post_tag' == $taxonomy ) {
+                            $classes[] = 'tag-' . $term_class;
+                        } else {
+                            $classes[] = sanitize_html_class( $taxonomy . '-' . $term_class, $taxonomy . '-' . $term->term_id );
+                        }
+                    }
+                }
+            }
+            //
+
+            $property = get_property( $post->ID );
+            $classes[] = 'department-' . $property->department;
+        }
     }
 
     return array_unique( $classes );
