@@ -130,6 +130,16 @@ echo '<div class="propertyhive_meta_box">';
 
     if ( ($viewing->status == 'carried_out' || $viewing->status == 'offer_made') && ( $viewing->feedback_status == 'interested' || $viewing->feedback_status == 'not_interested' ) )
     {
+        $datetime_format = get_option('date_format')." \a\\t ".get_option('time_format');
+
+        echo '<p class="form-field">
+
+            <label for="">' . __('Date Feedback Received', 'propertyhive') . '</label>';
+
+            echo ( !empty($viewing->feedback_received_date) ? date( $datetime_format, strtotime($viewing->feedback_received_date) ) : __( 'Unknown', 'propertyhive' ) );
+
+        echo '</p>';
+
         echo '<p class="form-field">
     
             <label for="">' . __('Feedback Passed On', 'propertyhive') . '</label>';

@@ -3727,6 +3727,7 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_feedback_status', '' );
             update_post_meta( $post_id, '_feedback_passed_on', '' );
+            delete_post_meta( $post_id, '_feedback_received_date' );
 
             // Add note/comment to viewing
             $comment = array(
@@ -3754,6 +3755,7 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'pending' );
             update_post_meta( $post_id, '_feedback_status', '' );
+            delete_post_meta( $post_id, '_feedback_received_date' );
 
             // Add note/comment to viewing
             $comment = array(
