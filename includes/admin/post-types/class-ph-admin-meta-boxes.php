@@ -1726,33 +1726,6 @@ class PH_Admin_Meta_Boxes {
             'post_type' => 'tenancy'
         );
 
-        /* TENANCY METER READINGS META BOXES */
-        $meta_boxes = array();
-        $meta_boxes[5] = array(
-            'id' => 'propertyhive-tenancy-meter-readings',
-            'title' => __( 'Meter Readings', 'propertyhive' ),
-            'callback' => 'PH_Meta_Box_Tenancy_Meter_Readings::output',
-            'screen' => 'tenancy',
-            'context' => 'normal',
-            'priority' => 'high'
-        );
-
-        $meta_boxes = apply_filters( 'propertyhive_tenancy_meter_readings_meta_boxes', $meta_boxes );
-        ksort($meta_boxes);
-
-        $ids = array();
-        foreach ($meta_boxes as $meta_box)
-        {
-            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
-            $ids[] = $meta_box['id'];
-        }
-
-        $tabs['tab_tenancy_meter_readings'] = array(
-            'name' => __( 'Meter Readings', 'propertyhive' ),
-            'metabox_ids' => $ids,
-            'post_type' => 'tenancy'
-        );
-
         /* MANAGEMENT META BOXES */
         $meta_boxes = array();
         $meta_boxes[5] = array(
@@ -1785,6 +1758,33 @@ class PH_Admin_Meta_Boxes {
 
         $tabs['tab_tenancy_management'] = array(
             'name' => __( 'Management', 'propertyhive' ),
+            'metabox_ids' => $ids,
+            'post_type' => 'tenancy'
+        );
+
+        /* TENANCY METER READINGS META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-tenancy-meter-readings',
+            'title' => __( 'Meter Readings', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Tenancy_Meter_Readings::output',
+            'screen' => 'tenancy',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_tenancy_meter_readings_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+
+        $tabs['tab_tenancy_meter_readings'] = array(
+            'name' => __( 'Meter Readings', 'propertyhive' ),
             'metabox_ids' => $ids,
             'post_type' => 'tenancy'
         );
