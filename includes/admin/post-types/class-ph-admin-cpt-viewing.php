@@ -45,6 +45,9 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 		add_action( 'quick_edit_custom_box',  array( $this, 'quick_edit' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'bulk_and_quick_edit_save_post' ), 10, 2 );*/
 
+		add_action( 'add_post_meta', array( $this, 'check_viewing_feedback_add' ), 10, 3 );
+		add_action( 'update_post_meta', array( $this, 'check_viewing_feedback_update' ), 10, 4 );
+
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
 	}
@@ -326,6 +329,26 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 		if ( 'viewing' == $typenow ) {
 
+		}
+	}
+
+	public static function check_viewing_feedback_add( $object_id, $meta_key, $meta_value )
+	{
+		if ( get_post_type($object_id) == 'viewing' && $meta_key == '_feedback_status' && in_array($meta_value, array( 'interested', 'not_interested' )) )
+		{
+			update_post_meta( (int)$object_id, '_feedback_received_date', date("Y-m-d H:i:s") );
+		}
+	}
+
+	public static function check_viewing_feedback_update( $meta_id, $object_id, $meta_key, $meta_value )
+	{
+		if ( get_post_type($object_id) == 'viewing' && $meta_key == '_feedback_status' && in_array($meta_value, array( 'interested', 'not_interested' )) )
+		{
+			$original_value = get_post_meta( $object_id, '_feedback_status', TRUE );
+			if ( in_array($original_value, array( '', 'not_required' )) )
+			{
+				update_post_meta( (int)$object_id, '_feedback_received_date', date("Y-m-d H:i:s") );
+			}
 		}
 	}
 }
