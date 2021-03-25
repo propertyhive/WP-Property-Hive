@@ -1839,17 +1839,38 @@ class PH_AJAX {
 
         foreach ($enquiry_meta as $key => $value)
         {
-            if ( strpos($key, 'name') !== false )
+            if ( strpos(strtolower($key), 'name') !== false && $value[0] != '' )
             {
-                $name = $value[0];
+                if ( $name === false )
+                {
+                    $name = $value[0];
+                }
+                else
+                {
+                    $name .= ' ' . $value[0];
+                }
             }
-            elseif ( strpos($key, 'email') !== false )
+            elseif ( strpos(strtolower($key), 'email') !== false && $value[0] != '' )
             {
-                $email = $value[0];
+                if ( $email === false )
+                {
+                    $email = $value[0];
+                }
+                else
+                {
+                    $email .= ',' . $value[0];
+                }
             }
-            elseif ( strpos($key, 'telephone') !== false )
+            elseif ( strpos(strtolower($key), 'phone') !== false && $value[0] != '' )
             {
-                $telephone = $value[0];
+                if ( $telephone === false )
+                {
+                    $telephone = $value[0];
+                }
+                else
+                {
+                    $telephone .= ',' . $value[0];
+                }
             }
         }
 
