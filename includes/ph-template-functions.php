@@ -118,6 +118,8 @@ function ph_body_class( $classes ) {
 
             $property = get_property( $post->ID );
             $classes[] = 'department-' . $property->department;
+            $classes[] = 'on-market-' . ( $property->on_market == 'yes' ? 'yes' : 'no' );
+            $classes[] = 'featured-' . ( $property->featured == 'yes' ? 'yes' : 'no' );
         }
     }
 
