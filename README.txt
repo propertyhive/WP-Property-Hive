@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.7
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,17 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.2 - 2021-03-29 =
+* Display feedback received date on viewings
+* Added classes to single property page body tag for department, on market, featured and taxonomy fields eg. availability, marketing flags. This allows different styling to be applied based on a property's features or for elements to be shown/hidden (for example, hide the enquiry button if a property is not on market)
+* Improved contact creation from enquiry including better checking for phone numbers and email addresses to support enquiries from different sources where the field names aren't always the same
+* Added filter 'propertyhive_tenancy_meter_reading_types' to customise meter reading types
+* Added new settings to store appliant registration and login pages. This allows us to redirect to the my account page if someone is already logged in but lands on the login page, as well as use by other add ons
+* Swapped meter readings and management tabs
+* Corrected undefined index error on tenancies list when tenants have no contact details entered
+* Corrected typo in various success messages: succesfully -> successfully
+* Corrected action name for custom deposit scheme fields
 
 = 1.5.1 - 2021-03-23 =
 * Added support for Rank Math SEO plugin whereby property taxonomies and off market properties are removed from XML sitemaps
