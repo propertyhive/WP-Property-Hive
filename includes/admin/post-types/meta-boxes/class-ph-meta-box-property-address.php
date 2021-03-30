@@ -553,7 +553,8 @@ class PH_Meta_Box_Property_Address {
 
         if ( !empty($_POST['location_id']) )
         {
-            wp_set_post_terms( $post_id, ph_clean($_POST['location_id']), 'location' );
+            $location_ids = is_array($_POST['location_id']) ? array_map( 'intval', $_POST['location_id'] ) : (int)$_POST['location_id'];
+            wp_set_post_terms( $post_id, $location_ids, 'location' );
         }
         else
         {
