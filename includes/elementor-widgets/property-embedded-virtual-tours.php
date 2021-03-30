@@ -79,6 +79,18 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 			]
 		);
 
+		$this->add_control(
+			'oembed',
+			[
+				'label' => __( 'Use oEmbed', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SWITCHER,
+				'label_on' => __( 'Yes', 'propertyhive' ),
+				'label_off' => __( 'No', 'propertyhive' ),
+				'return_value' => 'yes',
+				'default' => 'no',
+			]
+		);
+
 		$this->end_controls_section();
 
 	}
@@ -112,7 +124,15 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 
 				foreach ( $virtual_tours as $virtual_tour )
 				{
-					echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowFullScreen frameborder="0"></iframe>';
+					if ( isset($settings['oembed']) && $settings['oembed'] == 'yes' )
+					{
+						$embed_code = wp_oembed_get($virtual_tour['url']);
+        				echo $embed_code;
+					}
+					else
+					{
+						echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowFullScreen frameborder="0"></iframe>';
+					}
 				}
 
 			echo '</div>';
