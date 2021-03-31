@@ -1934,14 +1934,14 @@ class PH_Query {
 	      	$meta_query = array( 'relation' => 'OR' );
 
 	      	$fields_to_query = array(
+	      		'_features_concatenated',
+	      		'_descriptions_concatenated',
 	      		'_reference_number',
 	      		'_address_street',
 	      		'_address_two',
 	      		'_address_three',
 	      		'_address_four',
 	      		'_address_postcode',
-	      		'_features_concatenated',
-	      		'_descriptions_concatenated'
 	      	);
 
 	      	$fields_to_query = apply_filters( 'propertyhive_keyword_fields_to_query', $fields_to_query );
