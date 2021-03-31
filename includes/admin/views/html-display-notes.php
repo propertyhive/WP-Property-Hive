@@ -130,6 +130,11 @@ if ( !empty($notes) )
 				$note_body = 'Contact unsubscribed themselves from emails';
 				break;
 			}
+			case "status_change": // Believe this is only used by maintenance jobs add on
+			{
+				$note_body = 'Status changed from ' . $comment_content['previous_status'] . ' to ' . $comment_content['new_status'];
+				break;
+			}
 		}
 		$note_content = array(
 			'id' => $note->comment_ID,
