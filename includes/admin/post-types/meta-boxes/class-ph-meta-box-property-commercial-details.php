@@ -246,9 +246,9 @@ class PH_Meta_Box_Property_Commercial_Details {
         
         <select name="_rent_units" id="_rent_units">
             <option value="pw"' . ( ($rent_units == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
-            <option value="pcm"' . ( ($rent_units == 'pcm' || $rent_units == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
+            <option value="pcm"' . ( ($rent_units == 'pcm') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
             <option value="pq"' . ( ($rent_units == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
-            <option value="pa"' . ( ($rent_units == 'pa') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>';
+            <option value="pa"' . ( ($rent_units == 'pa' || $rent_units == '') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>';
         foreach ( $price_options as $key => $value )
         {
             echo '<option value="' . $key . '"';
