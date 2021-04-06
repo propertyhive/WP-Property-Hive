@@ -818,7 +818,7 @@ class PH_Meta_Box_Contact_Relationships {
                             'id' => '_send_matching_properties_' . $key, 
                             'label' => __( 'Send Matching Properties', 'propertyhive' ), 
                             'desc_tip' => false, 
-                            'value' => ( ( ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == 'yes' ) || !isset($applicant_profile['send_matching_properties']) ) ? 'yes' : '' )
+                            'value' => ( ( ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == 'yes' ) || ( !isset($applicant_profile['send_matching_properties']) && apply_filters( 'propertyhive_default_applicant_send_matching_properties', true ) === true ) ) ? 'yes' : '' )
                         ) );
 
                         $auto_property_match = get_option( 'propertyhive_auto_property_match', '' );
