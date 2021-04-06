@@ -93,7 +93,7 @@ echo '<p class="form-field">
 
 var viewing_selected_properties = [];
 <?php if (isset($_GET['property_id']) && $_GET['property_id'] != '') { $property = new PH_Property((int)$_GET['property_id']); ?>
-viewing_selected_properties.push({ id: <?php echo (int)$_GET['property_id']; ?>, post_title: '<?php echo $property->get_formatted_full_address(); ?>' });
+viewing_selected_properties.push({ id: <?php echo (int)$_GET['property_id']; ?>, post_title: '<?php echo addslashes($property->get_formatted_full_address()); ?>' });
 <?php } ?>
 var viewing_search_properties_timeout;
 
