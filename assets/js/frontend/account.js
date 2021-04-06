@@ -240,7 +240,7 @@ jQuery(document).ready(function($)
         return false;
     });
 
-	$('.my-account-navigation a[href^=\'#\']').click(function(e)
+	$('.my-account-navigation a[href^=\'#\']').on('click', function(e)
 	{
 		e.preventDefault();
 
@@ -255,6 +255,29 @@ jQuery(document).ready(function($)
 		});
 		$(this).parent().addClass('active');
 	});
+
+});
+
+jQuery(window).on('load', function() {
+
+    if ( window.location.hash != '' )
+    {
+        if ( jQuery('.my-account-navigation a[href=\'' + window.location.hash + '\']').length > 0 )
+        {
+            var this_href = window.location.hash;
+            // Hide/show sections
+            jQuery('.my-account-sections > div').hide();
+            jQuery('.my-account-sections ' + this_href).show();
+
+            // Remove/add active class on nav/tabs
+            jQuery('.my-account-navigation a').each(function()
+            {
+                jQuery(this).parent().removeClass('active');
+            });
+            jQuery('.my-account-navigation a[href=\'' + window.location.hash + '\']').parent().addClass('active');
+        }
+    }
+
 });
 
 jQuery(window).resize(function() {
