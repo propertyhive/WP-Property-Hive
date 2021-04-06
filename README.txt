@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.7
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.3 - 2021-04-06 =
+* Changed default rent frequency to be PA when adding commercial properties
+* Added oEmbed option in Elementor embedded virtual tours widget
+* Default my account tab if hash is present in URL (i.e. #my-account-saved_searches)
+* Swapped order of address meta fields queried during keyword search to resolve issue when keyword and radius is set
+* Corrected issue with setting property on new viewing if address has an apostrophe
+* Include new note type of 'status_change' in notes grids to support old way of recording maintenance job status changes
+* Improved sanitization of locations when selecting them on a property record to prevent issue with new terms being created
 
 = 1.5.2 - 2021-03-29 =
 * Display feedback received date on viewings
