@@ -78,6 +78,7 @@ function redraw_appraisal_details_meta_box()
 
                 switch (ph_clean($_POST['_valued_rent_frequency']))
                 {
+                    case "pd": { $price = ($rent * 365) / 12; break; }
                     case "pppw":
                     {
                         $bedrooms = get_post_meta( $postID, '_bedrooms', true );

@@ -391,6 +391,7 @@ class PH_Countries {
 				$price = $rent; // Stored in pcm
 	            switch ($rent_frequency)
 	            {
+	            	case "pd": { $price = ($rent * 365) / 12; break; }
                     case "pppw":
                     {
                         $bedrooms = get_post_meta( $postID, '_bedrooms', true );

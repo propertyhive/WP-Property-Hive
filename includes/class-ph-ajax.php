@@ -2393,6 +2393,7 @@ class PH_AJAX {
                     <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . $appraisal->valued_rent . '" placeholder="" style="width:10%; min-width:100px;">
                 
                     <select id="_valued_rent_frequency" name="_valued_rent_frequency" class="select" style="width:auto">
+                        <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
                         <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . __('Per Person Per Week', 'propertyhive') . '</option>
                         <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
                         <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
@@ -2604,6 +2605,7 @@ class PH_AJAX {
                         <input type="text" id="_price" name="_price" style="width:100%;" value="' . get_post_meta( $post_id, '_valued_rent', TRUE ) . '">
 
                         <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:100%">
+                            <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
                             <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . __('Per Person Per Week', 'propertyhive') . '</option>
                             <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
                             <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
@@ -2690,6 +2692,7 @@ class PH_AJAX {
 
                 switch (ph_clean($_POST['rent_frequency']))
                 {
+                    case "pd": { $price = ($rent * 365) / 12; break; }
                     case "pppw":
                     {
                         $bedrooms = get_post_meta( $postID, '_bedrooms', true );
