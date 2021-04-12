@@ -83,7 +83,7 @@ class PH_Admin_Assets {
      * Enqueue scripts
      */
     public function admin_scripts() {
-        global $wp_query, $post;
+        global $wp_query, $post, $tabs;
 
         $screen       = get_current_screen();
         $ph_screen_id = sanitize_title( __( 'PropertyHive', 'propertyhive' ) );
@@ -115,6 +115,42 @@ class PH_Admin_Assets {
         //wp_register_script( 'flot-stack', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.stack' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
 
         wp_enqueue_script( 'propertyhive_admin' );
+
+        $params = array();
+
+        // Add a bit better support for Gutenberg if enabled somehow (i.e. using Houzez) to load AJAX grids
+        if ( 
+            function_exists( 'use_block_editor_for_post_type' ) && 
+            use_block_editor_for_post_type( get_post_type($post->ID) ) && 
+            !isset( $_GET['classic-editor'] ) &&
+            is_array($tabs) &&
+            !empty($tabs)
+        )
+        {
+            $ajax_actions = array();
+
+            foreach ( $tabs as $key => $tab )
+            {
+                if ( isset($tab['ajax_actions']) && !empty($tab['ajax_actions']) )
+                {
+                    foreach ( $tab['ajax_actions'] as $ajax_action )
+                    {
+                        $ajax_actions[] = $ajax_action;
+                    }
+                }
+            }
+
+            if ( !empty($ajax_actions) )
+            {
+                $params = array(
+                    'ajax_actions' => $ajax_actions,
+                    'post_id' => $post->ID,
+                );
+                
+            }
+        }
+        
+        wp_localize_script( 'propertyhive_admin', 'propertyhive_admin', $params );
 
         $recently_viewed = get_user_meta( get_current_user_id(), '_propertyhive_recently_viewed', TRUE );
         if ( !is_array($recently_viewed) )
