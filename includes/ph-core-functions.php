@@ -20,7 +20,7 @@ include( 'ph-page-functions.php' );
 include( 'ph-property-functions.php' );
 
 /**
- * Get template part (for templates like the single-product).
+ * Get template part (for templates like the single-property).
  *
  * @access public
  * @param mixed $slug
