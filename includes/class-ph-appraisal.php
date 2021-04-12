@@ -183,6 +183,7 @@ class PH_Appraisal {
                 {
                     switch ( $this->_valued_rent_frequency )
                     {
+                        case "pd": { $price = ($price * 365) / 52; break; }
                         case "pw": { $price = ($price * 12) / 52; break; }
                         case "pq": { $price = ($price * 12) / 4; break; }
                         case "pa": { $price = ($price * 12); break; }
