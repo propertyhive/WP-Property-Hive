@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.7
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,14 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.4 - 2021-04-13=
+* Added new rent frequency of 'Per Day' for lettings properties
+* Correct YouTube links used in any Elementor widgets that reference embedded virtual tours, converting https://www.youtube.com/watch?v=xxxxxxxx to https://www.youtube.com/embed/xxxxxxxx
+* Added a prompt to import demo data for new installations of Property Hive, including ability to dismiss it
+* Added a new 'Demo Data' settings tab for new installations of Property Hive, including ability to hide it
+* Ensure AJAX grids load on property record (i.e. Viewings grid) when block editor used for whatever reason (i.e. when using Houzez and Houzez Data Bridge add on)
+* Added filter 'propertyhive_default_applicant_send_matching_properties' to specify default 'send matching properties' status when an applicant is created
 
 = 1.5.3 - 2021-04-06 =
 * Changed default rent frequency to be PA when adding commercial properties
