@@ -35,6 +35,17 @@ class PH_Admin_Settings {
             $settings[] = include( 'settings/class-ph-settings-custom-fields.php' );
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
             $settings[] = include( 'settings/class-ph-settings-licenses.php' );
+
+            // Only show demo data tab if demo data add on not active, tab not dismissed and if newly installed since 2021-04-13 00:00:00
+            if ( 
+            	!class_exists('PH_Demo_Data') && 
+            	get_option( 'propertyhive_install_timestamp', '' ) >= 1618268400 &&
+            	get_option( 'propertyhive_hide_demo_data_tab', '' ) != 'yes'
+            )
+            {
+            	$settings[] = include( 'settings/class-ph-settings-demo-data.php' );
+            }
+
             $settings[] = include( 'settings/class-ph-settings-add-ons.php' );
 
 			if ( apply_filters('propertyhive_show_get_involved_settings_tab', true) ) {

@@ -32,6 +32,17 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'preview_emails' ) );
         add_action( 'admin_init', array( $this, 'record_recently_viewed' ) );
         add_action( 'admin_init', array( $this, 'export_applicant_list' ) );
+        add_action( 'admin_init', array( $this, 'check_hide_demo_data_tab' ) );
+    }
+
+    public function check_hide_demo_data_tab()
+    {
+        if ( isset($_GET['tab']) && $_GET['tab'] == 'demodata' && isset($_GET['hidetab']) )
+        {
+            update_option( 'propertyhive_hide_demo_data_tab', 'yes' );
+            wp_redirect( admin_url('admin.php?page=ph-settings') );
+            die();
+        }
     }
 
     public function export_applicant_list()
