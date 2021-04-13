@@ -120,6 +120,7 @@ class PH_Admin_Assets {
 
         // Add a bit better support for Gutenberg if enabled somehow (i.e. using Houzez) to load AJAX grids
         if ( 
+            isset($post->ID) &&
             function_exists( 'use_block_editor_for_post_type' ) && 
             use_block_editor_for_post_type( get_post_type($post->ID) ) && 
             !isset( $_GET['classic-editor'] ) &&
