@@ -120,6 +120,7 @@ function ph_body_class( $classes ) {
             $classes[] = 'department-' . $property->department;
             $classes[] = 'on-market-' . ( $property->on_market == 'yes' ? 'yes' : 'no' );
             $classes[] = 'featured-' . ( $property->featured == 'yes' ? 'yes' : 'no' );
+            $classes[] = 'office-' . $property->office_id;
         }
     }
 
@@ -158,6 +159,7 @@ function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
     }
     $classes[] = 'property';
     $classes[] = 'department-' . $property->department;
+    $classes[] = 'office-' . $property->office_id;
 
     return $classes;
 }
