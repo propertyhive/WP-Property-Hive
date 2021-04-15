@@ -131,6 +131,11 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 					}
 					else
 					{
+						$virtual_tour['url'] = preg_replace(
+							"/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i",
+							"//www.youtube.com/embed/$2",
+							$virtual_tour['url']
+						);
 						echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowFullScreen frameborder="0"></iframe>';
 					}
 				}
