@@ -29,6 +29,9 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	public function __construct() {
 		$this->type = 'viewing';
 
+		// Admin notices
+		add_action( 'admin_notices', array( $this, 'viewing_admin_notices') );
+
 		// Before data updates
 		add_action( 'pre_post_update', array( $this, 'pre_post_update' ) );
 		add_filter( 'wp_insert_post_data', array( $this, 'wp_insert_post_data' ) );
@@ -50,6 +53,57 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
+	}
+
+	/**
+	 * Output admin notices relating to viewing
+	 */
+	public function viewing_admin_notices()
+	{
+		global $post;
+
+		$screen = get_current_screen();
+
+		if ( $screen->id == 'viewing' && isset($_GET['post']) && get_post_type($_GET['post']) == 'viewing' )
+		{
+			$viewing = new PH_Viewing((int)$_GET['post']);
+			$related_viewings = $viewing->_related_viewings;
+
+			// There is either a previous or next viewing for this applicant/property combination
+			if (
+				$viewing->_status != 'cancelled'
+				&&
+				is_array($related_viewings)
+				&&
+				isset($related_viewings['previous']) && isset($related_viewings['next'])
+				&&
+				( count($related_viewings['previous']) > 0 || count($related_viewings['next']) > 0 )
+			)
+			{
+				$message = __( "This is the " . strtolower(ph_ordinal_suffix(count($related_viewings['previous'])+1)) . ' viewing for this applicant at this property.<br>', 'propertyhive' );
+
+				if ( count($related_viewings['previous']) > 0 )
+				{
+					$previous_viewing_id = end($related_viewings['previous']);
+					$message .= '<a href="' . get_edit_post_link( $previous_viewing_id, '' ) . '"><< Go to previous</a>';
+				}
+
+				if ( count($related_viewings['next']) > 0 )
+				{
+					$next_viewing_id = $related_viewings['next'][0];
+
+					// If there are links to next and previous, show a divider
+					if ( isset($previous_viewing_id) )
+					{
+						$message .= ' | ';
+					}
+
+					$message .= '<a href="' . get_edit_post_link( $next_viewing_id, '' ) . '">Go to next >></a>';
+				}
+
+				echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
+			}
+		}
 	}
 
 	/**
