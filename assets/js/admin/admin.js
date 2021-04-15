@@ -26,6 +26,19 @@ jQuery( function ( $ ) {
 		});
 	});
 
+	$( '#ph_dismiss_notice_demo_data' ).click(function(e)
+	{
+		e.preventDefault();
+
+		var data = {
+			'action': 'propertyhive_dismiss_notice_demo_data'
+		};
+
+		$.post( ajaxurl, data, function(response) {
+			$( '#ph_notice_demo_data' ).fadeOut();
+		});
+	});
+
 	$( '#ph_dismiss_notice_missing_search_results' ).click(function(e)
 	{
 		e.preventDefault();

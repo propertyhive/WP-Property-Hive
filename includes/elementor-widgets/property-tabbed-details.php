@@ -555,6 +555,11 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 											foreach ( $virtual_tours as $virtual_tour )
 											{
+												$virtual_tour['url'] = preg_replace(
+													"/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i",
+													"//www.youtube.com/embed/$2",
+													$virtual_tour['url']
+												);
 												echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowFullScreen frameborder="0"></iframe>';
 											}
 
