@@ -821,6 +821,7 @@ class PH_Admin_Post_Types {
         
         $output .= $this->offer_status_filter();
         $output .= $this->property_office_filter();
+        $output .= $this->date_range_filter();
 
         echo apply_filters( 'propertyhive_offer_filters', $output );
     }
@@ -865,6 +866,7 @@ class PH_Admin_Post_Types {
         
         $output .= $this->sale_status_filter();
         $output .= $this->property_office_filter();
+        $output .= $this->date_range_filter();
 
         echo apply_filters( 'propertyhive_sale_filters', $output );
     }
@@ -1171,7 +1173,7 @@ class PH_Admin_Post_Types {
                 );
             }
 
-            $vars = $this->filter_start_date_time_by_date_range($vars);
+            $vars = $this->filter_by_date_range($vars);
         }
         elseif ( 'viewing' === $typenow ) 
         {
@@ -1253,7 +1255,7 @@ class PH_Admin_Post_Types {
                 );
             }
 
-            $vars = $this->filter_start_date_time_by_date_range($vars);
+            $vars = $this->filter_by_date_range($vars);
         }
         elseif ( 'offer' === $typenow ) 
         {
@@ -1263,6 +1265,8 @@ class PH_Admin_Post_Types {
                     'value' => sanitize_text_field( $_GET['_status'] ),
                 );
             }
+
+            $vars = $this->filter_by_date_range($vars, '_offer_date_time');
         }
         elseif ( 'sale' === $typenow ) 
         {
@@ -1272,6 +1276,8 @@ class PH_Admin_Post_Types {
                     'value' => sanitize_text_field( $_GET['_status'] ),
                 );
             }
+
+            $vars = $this->filter_by_date_range($vars, '_sale_date_time');
         }
         elseif ( 'tenancy' === $typenow )
         {
@@ -1365,7 +1371,7 @@ class PH_Admin_Post_Types {
         return $vars;
     }
 
-    private function filter_start_date_time_by_date_range($vars)
+    private function filter_by_date_range($vars, $meta_key = '_start_date_time')
     {
 	    if (
 		    ! empty( $_GET['_date_range_label'] )
@@ -1378,13 +1384,13 @@ class PH_Admin_Post_Types {
 	    {
 		    $vars['meta_query'] = array_merge($vars['meta_query'], array (
 			    array(
-				    'key' => '_start_date_time',
+				    'key' => $meta_key,
 				    'value' => $_GET['_date_range_from'],
 				    'type'  => 'date',
 				    'compare' => '>='
 			    ),
 			    array(
-				    'key' => '_start_date_time',
+				    'key' => $meta_key,
 				    'value' => $_GET['_date_range_to'],
 				    'type'  => 'date',
 				    'compare' => '<='
