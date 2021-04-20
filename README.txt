@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.7
-Stable tag: 1.5.4
+Tested up to: 5.7.1
+Stable tag: 1.5.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,7 +90,18 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 == Changelog ==
 
-= 1.5.4 - 2021-04-13=
+= 1.5.5 - 2021-04-20 =
+* Added previous and next links to top of viewings when there are multiple viewings for same applicant/property
+* Added date filter to admin offers and sales lists
+* Exclude password protected properties from shortcode output
+* When adding a tenancy the automatically calculated end date will be 1 day less the selected term. So a 12 month tenancy starting on 1st April 2021 will now have an end date calculated as 31st March 2022, as opposed to 1st April 2022
+* Added ability to delete a management key date from tenancies and properties
+* Can now search tenancies in backend by property address or tenant name(s)
+* Corrected issue with searching for viewing, offers and sales by address
+* Added office ID class to individual property results and single property body tag on frontend
+* Declared compatibility for WordPress 5.7.1
+
+= 1.5.4 - 2021-04-13 =
 * Added new rent frequency of 'Per Day' for lettings properties
 * Correct YouTube links used in any Elementor widgets that reference embedded virtual tours, converting https://www.youtube.com/watch?v=xxxxxxxx to https://www.youtube.com/embed/xxxxxxxx
 * Added a prompt to import demo data for new installations of Property Hive, including ability to dismiss it
