@@ -192,14 +192,6 @@ class PH_Meta_Box_Tenancy_Details {
                         end_date.setDate( end_date.getDate() - 1 );
                         jQuery(\'#_end_date\').val( end_date.toISOString().substring(0, 10) );
                     }
-                    if ( jQuery(\'#_review_date\').val() == \'\' )
-                    {
-                        var end_date = new Date(jQuery(\'#_end_date\').val());
-
-                        var review_date = new Date( end_date.getTime() - ( 90 * ms_in_day ) );
-
-                        jQuery(\'#_review_date\').val( review_date.toISOString().substring(0, 10) );
-                    }
                 }
             });
 
