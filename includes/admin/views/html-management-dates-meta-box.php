@@ -170,6 +170,10 @@
                                 <button type="button" id="<?php echo $key_date_post->ID; ?>" class="button-link meta-box-quick-edit">
                                     Quick&nbsp;Edit
                                 </button>
+                                 | 
+                            </span>
+                            <span class="trash">
+                                <a href="" id="<?php echo $key_date_post->ID; ?>" class="submitdelete meta-box-delete">Delete</a>
                             </span>
                         </div>
                     </td>
