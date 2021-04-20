@@ -336,6 +336,46 @@ jQuery( function($){
 
     });
 
+    $('[id=\'propertyhive-management-dates\']').on( 'click', '.meta-box-delete', function() {
+
+        var confirm_box = confirm('Are you sure you wish to delete this key date?');
+        if (!confirm_box)
+        {
+            return confirm_box;
+        }
+
+        var post_id = $(this).attr('id');
+
+        if ( $('#quick-edit-' + post_id).length > 0 )
+        {
+            $('#quick-edit-' + post_id).show();
+        }
+        else
+        {
+            var data = {
+                action: 'propertyhive_delete_key_date',
+                date_post_id: post_id,
+            };
+
+            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+            {
+                var data = {
+                    action:  'propertyhive_get_management_dates_grid',
+                    post_id: propertyhive_admin_meta_boxes.post_id,
+                };
+
+                jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+                {
+                    jQuery('#propertyhive_management_dates_container').html(response);
+                    initialise_datepicker();
+                }, 'html');
+            }, 'json');
+        }
+
+        return false;
+
+    });
+
     $('[id=\'propertyhive-management-dates\']').on( 'change', '#key_date_status', function() {
 
         var quick_edit_row = $(this).closest('tr');

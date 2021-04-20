@@ -106,6 +106,7 @@ class PH_AJAX {
             'get_key_dates_quick_edit_row' => false,
             'check_key_date_recurrence' => false,
             'save_key_date' => false,
+            'delete_key_date' => false,
 
             'validate_save_contact' => false,
             'applicant_registration' => true,
@@ -5488,6 +5489,20 @@ class PH_AJAX {
                 add_post_meta( $next_key_date_post_id, '_tenancy_id', get_post_meta($key_date_post_id, '_tenancy_id', true) );
             }
         }
+
+        die();
+    }
+
+    public function delete_key_date()
+    {
+        $this->json_headers();
+
+        $date_post_id = (int)$_POST['date_post_id'];
+
+        wp_delete_post($date_post_id, TRUE);
+
+        $return = array('success' => true);
+        echo json_encode( $return );
 
         die();
     }
