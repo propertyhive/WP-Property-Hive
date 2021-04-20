@@ -1432,7 +1432,7 @@ LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_4 ON " . $wpdb->po
 LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_postcode ON " . $wpdb->posts . ".ID = ph_appraisal_filter_meta_postcode.post_id AND ph_appraisal_filter_meta_postcode.meta_key = '_address_postcode'
 ";
         }
-        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow ) 
+        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow || 'tenancy' === $typenow ) 
         {
             $join .= " 
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta ON " . $wpdb->posts . ".ID = ph_property_filter_meta.post_id AND ph_property_filter_meta.meta_key = '_property_id'
@@ -1514,7 +1514,7 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
                 $where 
             );
         }
-        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow ) 
+        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow || 'tenancy' === $typenow ) 
         {
             $where = preg_replace(
                 "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
