@@ -416,7 +416,8 @@ class PH_Shortcodes {
 			'order'               => $atts['order'],
 			'posts_per_page'      => $atts['posts_per_page'],
 			'meta_query'		  => $meta_query,
-			'tax_query'		  	  => $tax_query
+			'tax_query'		  	  => $tax_query,
+			'has_password' 		  => false,
 		);
 		if ( ! empty( $atts['meta_key'] ) ) {
 			$args['meta_key'] = $atts['meta_key'];
@@ -536,6 +537,7 @@ class PH_Shortcodes {
 			'order' 				=> $atts['order'],
 			'meta_query' 			=> $meta_query,
 			'tax_query' 			=> $tax_query,
+			'has_password' 			=> false,
 		);
 
 		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
@@ -606,6 +608,7 @@ class PH_Shortcodes {
 			'posts_per_page' 		=> $atts['per_page'],
 			'orderby' 				=> $atts['orderby'],
 			'order' 				=> $atts['order'],
+			'has_password' 			=> false,
 		);
 
 		$meta_query = array(
@@ -762,6 +765,7 @@ class PH_Shortcodes {
 				'posts_per_page' 		=> $atts['per_page'],
 				'orderby' 				=> $atts['orderby'],
 				'order' 				=> $atts['order'],
+				'has_password' 			=> false,
 			);
 
 			$meta_query = array();
