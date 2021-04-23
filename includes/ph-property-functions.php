@@ -156,7 +156,7 @@ function get_property_map( $args = array() )
 ?>
 <script>
 
-	var property_map<?php echo $id_suffix; ?>; // Global declaration of the map
+	var property_map<?php echo $id_suffix; ?>;
 
 	function initialize_property_map<?php echo $id_suffix; ?>() 
 	{
@@ -229,9 +229,8 @@ function get_property_map( $args = array() )
 ?>
 <script>
 
-	// We declare vars globally so developers can access them
-	var property_map<?php echo $id_suffix; ?>; // Global declaration of the map
-	var property_marker<?php echo $id_suffix; ?>; // Global declaration of the marker
+	var property_map<?php echo $id_suffix; ?>;
+	var property_marker<?php echo $id_suffix; ?>;
 			
 	function initialize_property_map<?php echo $id_suffix; ?>() {
 				
