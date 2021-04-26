@@ -73,7 +73,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 					],
 					[
 						'tab_title' => __( 'Virtual Tour', 'propertyhive' ),
-						'tab_display' => array('virtual_tour'),
+						'tab_display' => array('embedded_virtual_tour'),
 					],
 					[
 						'tab_title' => __( 'Map View', 'propertyhive' ),
