@@ -288,6 +288,16 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 	{
 		global $property;
 
+		if ( is_null($property) && isset($post->ID) && get_post_type($post->ID) == 'property' )
+		{
+			$property = new PH_Property($post->ID);
+		}
+
+		if ( is_null($property) )
+		{
+			return false;
+		}
+
 		$tab_display = $item['tab_display'];
 
 		$show = false;
@@ -356,7 +366,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 		global $property, $post;
 		
-		if ( is_null($property) && isset($post->ID) && get_post_type($post->ID) )
+		if ( is_null($property) && isset($post->ID) && get_post_type($post->ID) == 'property' )
 		{
 			$property = new PH_Property($post->ID);
 		}
