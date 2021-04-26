@@ -17,7 +17,7 @@ class PH_Template_Loader {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_filter( 'template_include', array( $this, 'template_loader' ), 99 );
+		add_filter( 'template_include', array( $this, 'template_loader' ) );
 	}
 
 	/**
