@@ -1894,11 +1894,9 @@ class PH_AJAX {
 
         if ( $name === false || $email === false )
         {
-            // This nonce is not valid.
             die( json_encode( array('error' => 'Name or email address not found') ) );
         }
 
-        // We've not imported this property before
         $postdata = array(
             'post_excerpt'   => '',
             'post_content'   => '',
@@ -1921,7 +1919,6 @@ class PH_AJAX {
         }
 
         if ( $telephone !== FALSE ) { 
-            update_post_meta( $contact_post_id, '_telephone_number', ph_clean( $telephone ) );
             update_post_meta( $contact_post_id, '_telephone_number', ph_clean( ph_clean_telephone_number( $telephone ) ) );
         }
 
