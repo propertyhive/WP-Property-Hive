@@ -1716,6 +1716,11 @@ class PH_AJAX {
                 $message .= strip_tags($label) . ": " . strip_tags($value) . "\n";
             }
 
+            $property_enquiries_url = get_edit_post_link( (int)$property_ids[0] ) . '#propertyhive-property-enquiries';
+            $property_enquiries_link = '<a href="' . $property_enquiries_url . '">click here</a>';
+            $message .= "\n" . __( "To manage this enquiry please ", 'propertyhive' ) . $property_enquiries_link;
+            $message .= __( ". If this link doesn't work, please copy and paste the following into a browser: ", 'propertyhive' ) . "\n" . $property_enquiries_url;
+
             $message = apply_filters( 'propertyhive_property_enquiry_post_body', $message, $property_ids );
             
             $from_email_address = get_option('propertyhive_email_from_address', '');
