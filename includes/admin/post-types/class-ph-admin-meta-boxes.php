@@ -1223,6 +1223,18 @@ class PH_Admin_Meta_Boxes {
                     );
                 }
             }
+
+            if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
+            {
+                /* CONTACT ENQUIRIES META BOXES */
+                add_meta_box( 'propertyhive-contact-enquiries', __( 'Enquiries', 'propertyhive' ), 'PH_Meta_Box_Contact_Enquiries::output', 'contact', 'normal', 'high' );
+                $tabs['tab_contact_enquiries'] = array(
+                    'name' => __( 'Enquiries', 'propertyhive' ),
+                    'metabox_ids' => array('propertyhive-contact-enquiries'),
+                    'post_type' => 'contact'
+                );
+            }
+
             $meta_boxes = array();
             $meta_boxes[5] = array(
                 'id' => 'propertyhive-contact-history-notes',
