@@ -228,6 +228,7 @@ function viewing_update_selected_properties()
             
             $name = false;
             $email = false;
+            $property = false;
 
             foreach ($enquiry_meta as $key => $value)
             {
@@ -243,6 +244,8 @@ function viewing_update_selected_properties()
                         $value = implode('<br>', $property_links);
 
                         $key = 'property';
+
+                        $property = true;
                     }
                     else
                     {
@@ -288,19 +291,21 @@ function viewing_update_selected_properties()
 
                 $contact_query = new WP_Query( $args );
 
+                $enquiry_contact_type = $property ? 'Applicant' : 'Contact';
+
                 if ( $contact_query->have_posts() )
                 {
                     while ( $contact_query->have_posts() )
                     {
                         $contact_query->the_post();
 
-                        echo '<a href="' . get_edit_post_link(get_the_ID(), '') . '" class="button" style="position:absolute; top:0; right:0;">' . __( 'View Contact', 'propertyhive' ) . '</a>';
+                        echo '<a href="' . get_edit_post_link(get_the_ID(), '') . '" class="button" style="position:absolute; top:0; right:0;">' . __( 'View ' . $enquiry_contact_type, 'propertyhive' ) . '</a>';
                     }
                 }
                 else
                 {
-    ?>
-                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo __( 'Create Contact', 'propertyhive' ); ?></a>
+                ?>
+                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo __( 'Create ' . $enquiry_contact_type, 'propertyhive' ); ?></a>
 
                     <script>
                         jQuery(document).ready(function($)
@@ -312,7 +317,7 @@ function viewing_update_selected_properties()
                                     e.preventDefault();
 
                                     $(this).attr('disabled', 'disabled');
-                                    $(this).html('<?php echo __( 'Creating Contact...', 'propertyhive' ); ?>');
+                                    $(this).html('<?php echo __( 'Creating ' . $enquiry_contact_type . '...', 'propertyhive' ); ?>');
 
                                     var data = {
                                         action:         'propertyhive_create_contact_from_enquiry',
@@ -325,14 +330,14 @@ function viewing_update_selected_properties()
                                         if (response.error)
                                         {
                                             $(that).attr('disabled', false);
-                                            $(that).html('<?php echo __( 'Create Contact', 'propertyhive' ); ?>');
+                                            $(that).html('<?php echo __( 'Create ' . $enquiry_contact_type, 'propertyhive' ); ?>');
                                         }
                                         if (response.success)
                                         {
                                             $(that).attr('disabled', false);
                                             $(that).addClass('button-primary');
                                             $(that).attr('href', response.success);
-                                            $(that).html('<?php echo __( 'Contact Created. View Now', 'propertyhive' ); ?>');
+                                            $(that).html('<?php echo __( $enquiry_contact_type . ' Created. View Now', 'propertyhive' ); ?>');
                                         }
                                     }, 'json');
                                 }
