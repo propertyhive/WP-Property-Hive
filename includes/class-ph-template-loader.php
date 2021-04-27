@@ -17,7 +17,14 @@ class PH_Template_Loader {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_filter( 'template_include', array( $this, 'template_loader' ) );
+
+		$priority = 10;
+		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		if ( is_plugin_active( 'oxygen/functions.php' ) )
+        {
+        	$priority = 99;
+        }
+		add_filter( 'template_include', array( $this, 'template_loader' ), $priority );
 	}
 
 	/**
