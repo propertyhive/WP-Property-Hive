@@ -1677,14 +1677,16 @@ class PH_AJAX {
             {
                 $to = get_option( 'admin_email' );
             }
+
+            $enquiry_title = apply_filters( 'propertyhive_online_viewing_enquiry_title', 'Property Enquiry' );
             
             if ( count($property_ids) == 1 )
             {
-                $subject = __( 'New Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( (int)$property_ids[0] );
+                $subject = __( 'New ' . $enquiry_title, 'propertyhive' ) . ': ' . get_the_title( (int)$property_ids[0] );
             }
             else
             {
-                $subject = __( 'Multiple Property Enquiry', 'propertyhive' ) . ': ' . count($property_ids) . ' Properties';
+                $subject = __( 'Multiple ' . $enquiry_title, 'propertyhive' ) . ': ' . count($property_ids) . ' Properties';
             }
             $message = __( "You have received a property enquiry via your website. Please find details of the enquiry below", 'propertyhive' ) . "\n\n";
             
@@ -1763,11 +1765,12 @@ class PH_AJAX {
                     // Now insert into enquiries section of WordPress
                     if ( count($property_ids) == 1 )
                     {
-                        $title = __( 'Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( (int)$property_ids[0] );
+                        $enquiry_title = apply_filters( 'propertyhive_online_viewing_enquiry_title', 'Property Enquiry' );
+                        $title = __( $enquiry_title, 'propertyhive' ) . ': ' . get_the_title( (int)$property_ids[0] );
                     }
                     else
                     {
-                        $title = __( 'Multiple Property Enquiry', 'propertyhive' );
+                        $title = __( 'Multiple ' . $enquiry_title, 'propertyhive' );
                     }
                     if ( isset($_POST['name']) && ! empty($_POST['name']) )
                     {
