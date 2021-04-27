@@ -252,22 +252,23 @@ function viewing_update_selected_properties()
                         $value = ( ( isset( $value[0] ) && ! empty( $value[0] )) ? $value[0] : '-' );
                     }
                     
-                    echo '<p class="form-field enquiry_details_field">
-            
-                            <label>' . ucwords( str_replace('_', ' ', trim($key, "_") ) ) . '</label>
-                          
-                            ' . nl2br( $value ) . '
-                          
-                          </p>';
-
                     if ( strpos($key, 'name') !== false && $value != '-' )
                     {
                         $name = $value;
                     }
                     if ( strpos($key, 'email') !== false && $value != '-' )
                     {
+                        $value = '<a href="mailto:' . $value . '">' . $value . '</a>';
                         $email = $value;
                     }
+
+                    echo '<p class="form-field enquiry_details_field">
+
+                            <label>' . ucwords( str_replace('_', ' ', trim($key, "_") ) ) . '</label>
+
+                            ' . nl2br( $value ) . '
+
+                          </p>';
                 }
             }
 
