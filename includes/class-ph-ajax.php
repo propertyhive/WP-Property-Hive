@@ -1849,6 +1849,7 @@ class PH_AJAX {
         $name = false;
         $email = false;
         $telephone = false;
+        $property_id = false;
 
         foreach ($enquiry_meta as $key => $value)
         {
@@ -1884,6 +1885,10 @@ class PH_AJAX {
                 {
                     $telephone .= ',' . $value[0];
                 }
+            }
+            elseif ( !$property_id && strpos(strtolower($key), 'property_id') !== false && $value[0] != '' )
+            {
+                $property_id = (int)$value[0];
             }
         }
 
@@ -1921,6 +1926,96 @@ class PH_AJAX {
         }
 
         if ( $email !== FALSE ) { update_post_meta( $contact_post_id, '_email_address', ph_clean( $email ) ); }
+
+        // Enquiry is related to a property, so create an applicant record for the contact
+        if ( $property_id !== false && get_post_type( $property_id ) == 'property' )
+        {
+            update_post_meta( $contact_post_id, '_applicant_profiles', '1' );
+
+            $applicant_profile = array();
+            $applicant_profile['department'] = get_post_meta( $property_id, '_department', TRUE );
+
+            $base_department = $applicant_profile['department'];
+            if ( !in_array( $base_department, array('residential-sales', 'residential-lettings', 'commercial') ) )
+            {
+                $base_department = ph_get_custom_department_based_on($base_department);
+            }
+
+            if ( $base_department == 'residential-sales' )
+            {
+                $property_price = preg_replace("/[^0-9]/", '', ph_clean(get_post_meta( $property_id, '_price', TRUE )));
+
+                if ( !empty($property_price) )
+                {
+                    $applicant_profile['max_price'] = $property_price;
+
+                    // Not used yet but could be if introducing currencies in the future.
+                    $applicant_profile['max_price_actual'] = $property_price;
+
+                    $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
+                    $percentage_higher = get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' );
+
+                    if ( $percentage_lower != '' && $percentage_higher != '' )
+                    {
+                        $applicant_profile['match_price_range_lower'] = $property_price - ( $property_price * ( $percentage_lower / 100 ) );
+                        $applicant_profile['match_price_range_lower_actual'] = $property_price - ( $property_price * ( $percentage_lower / 100 ) );
+
+                        $applicant_profile['match_price_range_higher'] = $property_price + ( $property_price * ( $percentage_higher / 100 ) );
+                        $applicant_profile['match_price_range_higher_actual'] = $property_price + ( $property_price * ( $percentage_higher / 100 ) );
+                    }
+                }
+            }
+            elseif ( $base_department == 'residential-lettings' )
+            {
+                $property_rent = preg_replace("/[^0-9]/", '', ph_clean(get_post_meta( $property_id, '_rent', TRUE )));
+                $property_rent_freq = get_post_meta( $property_id, '_rent_frequency', TRUE );
+
+                $applicant_profile['max_rent'] = $property_rent;
+                $applicant_profile['rent_frequency'] = $property_rent_freq;
+
+                $price_actual = $property_rent; // Used for ordering properties. Stored in pcm
+                switch ( $property_rent_freq )
+                {
+                    case "pw": { $price_actual = ($property_rent * 52) / 12; break; }
+                    case "pcm": { $price_actual = $property_rent; break; }
+                    case "pq": { $price_actual = ($property_rent * 4) / 52; break; }
+                    case "pa": { $price_actual = ($property_rent / 52); break; }
+                }
+                $applicant_profile['max_price_actual'] = $price_actual;
+            }
+
+            if ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' )
+            {
+                $beds = preg_replace("/[^0-9]/", '', ph_clean(get_post_meta( $property_id, '_bedrooms', TRUE )));
+                $applicant_profile['min_beds'] = $beds;
+            }
+
+            if ( $base_department == 'commercial' )
+            {
+                $property_for_sale = get_post_meta( $property_id, '_for_sale', TRUE );
+                $property_to_rent = get_post_meta( $property_id, '_to_rent', TRUE );
+
+                $available_as = array();
+                if ( $property_for_sale == 'yes' )
+                {
+                    $available_as[] = 'sale';
+                }
+                if ( $property_to_rent == 'yes' )
+                {
+                    $available_as[] = 'rent';
+                }
+                $applicant_profile['available_as'] = $available_as;
+            }
+
+            $applicant_profile['send_matching_properties'] = '';
+            $applicant_profile['auto_match_disabled'] = 'yes';
+
+            $applicant_profile['added_from_enquiry'] = 'yes';
+
+            update_post_meta( $contact_post_id, '_applicant_profile_0', $applicant_profile );
+
+            update_post_meta( $contact_post_id, '_contact_types', array( 'applicant' ) );
+        }
 
         do_action('propertyhive_create_contact_from_enquiry', $enquiry_post_id, $contact_post_id);
 
