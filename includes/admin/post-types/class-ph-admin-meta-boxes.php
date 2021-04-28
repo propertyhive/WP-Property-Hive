@@ -1106,42 +1106,9 @@ class PH_Admin_Meta_Boxes {
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'contact' )
         {
-            $show_viewings = false;
-            $show_offers = false;
-            $show_sales = false;
-
             $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
-            if ( is_array($contact_types) && in_array('applicant', $contact_types) )
-            {
-                $show_viewings = true;
 
-                $num_applicant_profiles = get_post_meta( $post->ID, '_applicant_profiles', TRUE );
-                if ( $num_applicant_profiles == '' )
-                {
-                    $num_applicant_profiles = 0;
-                }
-
-                if ( $num_applicant_profiles > 0 ) 
-                {
-                    for ( $i = 0; $i < $num_applicant_profiles; ++$i )
-                    {
-                        $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
-
-                        if ( 
-                            isset($applicant_profile['department']) && 
-                            (
-                                $applicant_profile['department'] == 'residential-sales' ||
-                                ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' 
-                            )
-                        )
-                        {
-                            $show_offers = true;
-                            $show_sales = true;
-                        }
-                    }
-                }
-            }
-            else
+            if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
             {
                 $args = array(
                     'post_type' => 'viewing',
@@ -1155,12 +1122,30 @@ class PH_Admin_Meta_Boxes {
                     )
                 );
                 $viewing_query = new WP_Query( $args );
-                if ($viewing_query->have_posts())
-                {
-                    $show_viewings = true;
-                }
+                $viewing_count = $viewing_query->found_posts;
                 wp_reset_postdata();
 
+                // If contact is an applicant, or is attached to a viewing, show the viewings tab and meta box
+                if (
+                    ( is_array($contact_types) && in_array('applicant', $contact_types) )
+                    ||
+                    $viewing_count > 0
+                )
+                {
+                    /* CONTACT VIEWINGS META BOXES */
+                    add_meta_box( 'propertyhive-contact-viewings', __( 'Viewings', 'propertyhive' ), 'PH_Meta_Box_Contact_Viewings::output', 'contact', 'normal', 'high' );
+
+                    $tabs['tab_viewings'] = array(
+                        'name' => __( 'Viewings (' . $viewing_count . ')', 'propertyhive' ),
+                        'metabox_ids' => array('propertyhive-contact-viewings'),
+                        'post_type' => 'contact',
+                        'ajax_actions' => array( 'get_contact_viewings_meta_box^' . wp_create_nonce( 'get_contact_viewings_meta_box' ) ),
+                    );
+                }
+            }
+
+            if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
+            {
                 $args = array(
                     'post_type' => 'offer',
                     'posts_per_page' => 1,
@@ -1173,10 +1158,7 @@ class PH_Admin_Meta_Boxes {
                     )
                 );
                 $offer_query = new WP_Query( $args );
-                if ($offer_query->have_posts())
-                {
-                    $show_offers = true;
-                }
+                $offer_count = $offer_query->found_posts;
                 wp_reset_postdata();
 
                 $args = array(
@@ -1191,51 +1173,61 @@ class PH_Admin_Meta_Boxes {
                     )
                 );
                 $sale_query = new WP_Query( $args );
-                if ($sale_query->have_posts())
-                {
-                    $show_sales = true;
-                }
+                $sale_count = $sale_query->found_posts;
                 wp_reset_postdata();
-            }
 
-            if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
-            {
-                if ( $show_viewings )
+                $has_sales_applicant_profile = false;
+                if ( $offer_count == 0 || $sale_count == 0 )
                 {
-                    /* CONTACT VIEWINGS META BOXES */
-                    add_meta_box( 'propertyhive-contact-viewings', __( 'Viewings', 'propertyhive' ), 'PH_Meta_Box_Contact_Viewings::output', 'contact', 'normal', 'high' );
-                    
-                    $tabs['tab_viewings'] = array(
-                        'name' => __( 'Viewings', 'propertyhive' ),
-                        'metabox_ids' => array('propertyhive-contact-viewings'),
-                        'post_type' => 'contact',
-                        'ajax_actions' => array( 'get_contact_viewings_meta_box^' . wp_create_nonce( 'get_contact_viewings_meta_box' ) ),
-                    );
-                }
-            }
+                    if ( is_array($contact_types) && in_array('applicant', $contact_types) )
+                    {
+                        $num_applicant_profiles = get_post_meta( $post->ID, '_applicant_profiles', TRUE );
+                        if ( $num_applicant_profiles == '' )
+                        {
+                            $num_applicant_profiles = 0;
+                        }
 
-            if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
-            {
-                if ( $show_offers )
+                        if ( $num_applicant_profiles > 0 )
+                        {
+                            for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+                            {
+                                $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
+
+                                if (
+                                    isset($applicant_profile['department']) &&
+                                    (
+                                        $applicant_profile['department'] == 'residential-sales' ||
+                                        ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales'
+                                    )
+                                )
+                                {
+                                    $has_sales_applicant_profile = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( $has_sales_applicant_profile === true || $offer_count > 0 )
                 {
                     /* CONTACT OFFERS META BOXES */
                     add_meta_box( 'propertyhive-contact-offers', __( 'Offers', 'propertyhive' ), 'PH_Meta_Box_Contact_Offers::output', 'contact', 'normal', 'high' );
                     
                     $tabs['tab_offers'] = array(
-                        'name' => __( 'Offers', 'propertyhive' ),
+                        'name' => __( 'Offers (' . $offer_count . ')', 'propertyhive' ),
                         'metabox_ids' => array('propertyhive-contact-offers'),
                         'post_type' => 'contact',
                         'ajax_actions' => array( 'get_contact_offers_meta_box^' . wp_create_nonce( 'get_contact_offers_meta_box' ) ),
                     );
                 }
 
-                if ( $show_sales )
+                if ( $has_sales_applicant_profile === true || $sale_count > 0 )
                 {
                     /* CONTACT SALES META BOXES */
                     add_meta_box( 'propertyhive-contact-sales', __( 'Sales', 'propertyhive' ), 'PH_Meta_Box_Contact_Sales::output', 'contact', 'normal', 'high' );
                     
                     $tabs['tab_sales'] = array(
-                        'name' => __( 'Sales', 'propertyhive' ),
+                        'name' => __( 'Sales (' . $sale_count . ')', 'propertyhive' ),
                         'metabox_ids' => array('propertyhive-contact-sales'),
                         'post_type' => 'contact',
                         'ajax_actions' => array( 'get_contact_sales_meta_box^' . wp_create_nonce( 'get_contact_sales_meta_box' ) ),
