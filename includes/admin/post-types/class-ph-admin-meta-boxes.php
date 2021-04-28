@@ -938,8 +938,27 @@ class PH_Admin_Meta_Boxes {
                     $ids[] = $meta_box['id'];
                 }
                 
+                $args = array(
+                    'post_type' => 'enquiry',
+                    'nopaging'    => true,
+                    'fields' => 'ids',
+                    'meta_query' => array(
+                        'relation' => 'OR',
+                        array(
+                            'key' => 'property_id',
+                            'value' => $post->ID
+                        ),
+                        array(
+                            'key' => '_property_id',
+                            'value' => $post->ID
+                        )
+                    ),
+                );
+                $enquiry_query = new WP_Query( $args );
+                $enquiry_count = $enquiry_query->found_posts;
+
                 $tabs['tab_enquiries'] = array(
-                    'name' => __( 'Enquiries', 'propertyhive' ),
+                    'name' => __( 'Enquiries (' . $enquiry_count . ')', 'propertyhive' ),
                     'metabox_ids' => $ids,
                     'post_type' => 'property'
                 );
@@ -1226,10 +1245,43 @@ class PH_Admin_Meta_Boxes {
 
             if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
             {
+                $meta_query = array(
+                    'relation' => 'OR',
+                    array(
+                        'key' => '_contact_id',
+                        'value' => $post->ID,
+                    ),
+                );
+
+                $contact_email_address = get_post_meta( $post->ID, '_email_address', TRUE );
+                if ( !empty($contact_email_address) )
+                {
+                    $meta_query[] = array(
+                        'key' => 'email',
+                        'value' => $contact_email_address,
+                    );
+
+                    $meta_query[] = array(
+                        'key' => 'email_address',
+                        'value' => $contact_email_address,
+                    );
+                }
+
+                $args = array(
+                    'post_type' => 'enquiry',
+                    'nopaging'    => true,
+                    'fields' => 'ids',
+                    'meta_query' => $meta_query,
+                );
+                $enquiry_query = new WP_Query( $args );
+                $enquiry_count = $enquiry_query->found_posts;
+
+                wp_reset_postdata();
+
                 /* CONTACT ENQUIRIES META BOXES */
                 add_meta_box( 'propertyhive-contact-enquiries', __( 'Enquiries', 'propertyhive' ), 'PH_Meta_Box_Contact_Enquiries::output', 'contact', 'normal', 'high' );
                 $tabs['tab_contact_enquiries'] = array(
-                    'name' => __( 'Enquiries', 'propertyhive' ),
+                    'name' => __( 'Enquiries (' . $enquiry_count . ')', 'propertyhive' ),
                     'metabox_ids' => array('propertyhive-contact-enquiries'),
                     'post_type' => 'contact'
                 );
