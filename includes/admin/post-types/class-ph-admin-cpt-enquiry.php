@@ -170,17 +170,17 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
     }
     
     /**
-     * Check if we're editing or adding a is_editing_enquiry
+     * Check if we're editing or adding an enquiry
      * @return boolean
      */
     private function is_editing_enquiry() {
-        if ( ! empty( $_GET['post_type'] ) && 'is_editing_enquiry' == $_GET['post_type'] ) {
+        if ( ! empty( $_GET['post_type'] ) && 'enquiry' == $_GET['post_type'] ) {
             return true;
         }
-        if ( ! empty( $_GET['post'] ) && 'is_editing_enquiry' == get_post_type( (int)$_GET['post'] ) ) {
+        if ( ! empty( $_GET['post'] ) && 'enquiry' == get_post_type( (int)$_GET['post'] ) ) {
             return true;
         }
-        if ( ! empty( $_REQUEST['post_id'] ) && 'is_editing_enquiry' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
+        if ( ! empty( $_REQUEST['post_id'] ) && 'enquiry' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
             return true;
         }
         return false;
