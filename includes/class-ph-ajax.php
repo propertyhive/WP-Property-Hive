@@ -1678,7 +1678,7 @@ class PH_AJAX {
                 $to = get_option( 'admin_email' );
             }
 
-            $enquiry_title = apply_filters( 'propertyhive_online_viewing_enquiry_title', 'Property Enquiry' );
+            $enquiry_title = apply_filters( 'propertyhive_property_enquiry_title', 'Property Enquiry' );
             
             if ( count($property_ids) == 1 )
             {
@@ -1770,7 +1770,7 @@ class PH_AJAX {
                     // Now insert into enquiries section of WordPress
                     if ( count($property_ids) == 1 )
                     {
-                        $enquiry_title = apply_filters( 'propertyhive_online_viewing_enquiry_title', 'Property Enquiry' );
+                        $enquiry_title = apply_filters( 'propertyhive_property_enquiry_title', 'Property Enquiry' );
                         $title = __( $enquiry_title, 'propertyhive' ) . ': ' . get_the_title( (int)$property_ids[0] );
                     }
                     else
