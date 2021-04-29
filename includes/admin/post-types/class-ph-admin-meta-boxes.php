@@ -838,9 +838,25 @@ class PH_Admin_Meta_Boxes {
                     add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
                     $ids[] = $meta_box['id'];
                 }
-                
+
+                $args = array(
+                    'post_type'   => 'viewing',
+                    'nopaging'    => true,
+                    'fields'      => 'ids',
+                    'post_status' => 'publish',
+                    'meta_query'  => array(
+                        array(
+                            'key'   => '_property_id',
+                            'value' => $post->ID
+                        ),
+                    ),
+                );
+                $viewings_query = new WP_Query( $args );
+                $viewings_count = $viewings_query->found_posts;
+                wp_reset_postdata();
+
                 $tabs['tab_viewings'] = array(
-                    'name' => __( 'Viewings', 'propertyhive' ),
+                    'name' => __( 'Viewings (' . $viewings_count . ')', 'propertyhive' ),
                     'metabox_ids' => $ids,
                     'post_type' => 'property',
                     'ajax_actions' => array( 'get_property_viewings_meta_box^' . wp_create_nonce( 'get_property_viewings_meta_box' ) ),
@@ -874,9 +890,25 @@ class PH_Admin_Meta_Boxes {
                         add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
                         $ids[] = $meta_box['id'];
                     }
-                    
+
+                    $args = array(
+                        'post_type'   => 'offer',
+                        'nopaging'    => true,
+                        'fields'      => 'ids',
+                        'post_status' => 'publish',
+                        'meta_query'  => array(
+                            array(
+                                'key'   => '_property_id',
+                                'value' => $post->ID
+                            ),
+                        ),
+                    );
+                    $offers_query = new WP_Query( $args );
+                    $offers_count = $offers_query->found_posts;
+                    wp_reset_postdata();
+
                     $tabs['tab_offers'] = array(
-                        'name' => __( 'Offers', 'propertyhive' ),
+                        'name' => __( 'Offers (' . $offers_count . ')', 'propertyhive' ),
                         'metabox_ids' => $ids,
                         'post_type' => 'property',
                         'ajax_actions' => array( 'get_property_offers_meta_box^' . wp_create_nonce( 'get_property_offers_meta_box' ) ),
@@ -902,9 +934,25 @@ class PH_Admin_Meta_Boxes {
                         add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
                         $ids[] = $meta_box['id'];
                     }
+
+                    $args = array(
+                        'post_type'   => 'sale',
+                        'nopaging'    => true,
+                        'fields'      => 'ids',
+                        'post_status' => 'publish',
+                        'meta_query'  => array(
+                            array(
+                                'key'   => '_property_id',
+                                'value' => $post->ID
+                            ),
+                        ),
+                    );
+                    $sales_query = new WP_Query( $args );
+                    $sales_count = $sales_query->found_posts;
+                    wp_reset_postdata();
                     
                     $tabs['tab_sales'] = array(
-                        'name' => __( 'Sales', 'propertyhive' ),
+                        'name' => __( 'Sales (' . $sales_count . ')', 'propertyhive' ),
                         'metabox_ids' => $ids,
                         'post_type' => 'property',
                         'ajax_actions' => array( 'get_property_sales_meta_box^' . wp_create_nonce( 'get_property_sales_meta_box' ) ),
@@ -956,6 +1004,7 @@ class PH_Admin_Meta_Boxes {
                 );
                 $enquiry_query = new WP_Query( $args );
                 $enquiry_count = $enquiry_query->found_posts;
+                wp_reset_postdata();
 
                 $tabs['tab_enquiries'] = array(
                     'name' => __( 'Enquiries (' . $enquiry_count . ')', 'propertyhive' ),
