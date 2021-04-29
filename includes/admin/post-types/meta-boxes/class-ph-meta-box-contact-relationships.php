@@ -301,6 +301,12 @@ class PH_Meta_Box_Contact_Relationships {
                     echo '<div id="tab_applicant_data_' . $key . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                         
                         <div class="options_group applicant-fields-' . $key . '" style="float:left; width:100%;">';
+
+                        // This profile was created automatically from the Create Applicant button on an enquiry
+                        if ( isset( $applicant_profile['added_from_enquiry'] ) && $applicant_profile['added_from_enquiry'] == 'yes' )
+                        {
+                            echo '<div><p style="color:red;" >This applicant profile has been automatically created from an enquiry. Please confirm the requirements below are accurate.</p></div>';
+                        }
                         
                         $department_options = array();
 
