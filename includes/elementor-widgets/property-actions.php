@@ -62,8 +62,8 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 				'label' => __( 'Button Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_1,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property_actions ul li a' => 'background: {{VALUE}}',
@@ -80,8 +80,8 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 				'label' => __( 'Button Text Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_1,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property_actions ul li a' => 'color: {{VALUE}}',

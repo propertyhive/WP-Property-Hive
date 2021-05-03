@@ -53,7 +53,7 @@ class Elementor_Property_Full_Description_Widget extends \Elementor\Widget_Base 
 			[
 				'name' => 'title_typography',
 				'label' => __( 'Title Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Scheme_Typography::TYPOGRAPHY_1,
+				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
 				'selector' => '{{WRAPPER}} .description h4',
 				'condition' => [
 		            'show_title' => 'yes'
@@ -67,8 +67,8 @@ class Elementor_Property_Full_Description_Widget extends \Elementor\Widget_Base 
 				'label' => __( 'Title Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_1,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .description h4' => 'color: {{VALUE}}',
@@ -84,7 +84,7 @@ class Elementor_Property_Full_Description_Widget extends \Elementor\Widget_Base 
 			[
 				'name' => 'description_typography',
 				'label' => __( 'Description Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Scheme_Typography::TYPOGRAPHY_1,
+				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
 				'selector' => '{{WRAPPER}} .description .description-contents',
 			]
 		);
@@ -95,8 +95,8 @@ class Elementor_Property_Full_Description_Widget extends \Elementor\Widget_Base 
 				'label' => __( 'Description Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_1,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .description .description-contents' => 'color: {{VALUE}}',

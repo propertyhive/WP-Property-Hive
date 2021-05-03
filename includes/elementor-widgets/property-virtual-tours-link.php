@@ -41,7 +41,7 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Scheme_Typography::TYPOGRAPHY_1,
+				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
 				'selector' => '{{WRAPPER}} a',
 			]
 		);
@@ -52,8 +52,8 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_1,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'color: {{VALUE}}',
@@ -94,8 +94,8 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
 				'label' => __( 'Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_2,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_2,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'background: {{VALUE}}',
