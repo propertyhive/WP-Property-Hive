@@ -157,12 +157,12 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                             $enquiry_text = 'are ' . count($viewing_ids) . ' existing viewings';
                         }
 
-                        $message = __( 'There ' . $enquiry_text . ' for this applicant at this property.', 'propertyhive' );
+                        $message = '<p>' . __( 'There ' . $enquiry_text . ' for this applicant at this property.', 'propertyhive' ) . '</p>';
                         foreach( $viewing_ids as $viewing_id )
                         {
-                            $message .= '<br><a href="' . get_edit_post_link( $viewing_id ) . '">Edit Viewing</a>';
+                            $message .= '<p><a href="' . get_edit_post_link( $viewing_id ) . '" class="button">' . __( 'Edit Viewing', 'propertyhive' ) . '</a></p>';
                         }
-                        echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
+                        echo "<div class=\"notice notice-info\">$message</div>";
                     }
                 }
             }
