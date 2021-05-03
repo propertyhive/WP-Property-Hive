@@ -285,7 +285,7 @@ function viewing_update_selected_properties()
                     'meta_query' => array(
                         array(
                             'key' => '_email_address',
-                            'value' => $email,
+                            'value' => strip_tags($email),
                         )
                     )
                 );
