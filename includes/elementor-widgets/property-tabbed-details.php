@@ -217,8 +217,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 					'{{WRAPPER}} .elementor-tab-title' => 'color: {{VALUE}};',
 				],
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_1,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
 				],
 			]
 		);
@@ -232,8 +232,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 					'{{WRAPPER}} .elementor-tab-title.elementor-active' => 'color: {{VALUE}};',
 				],
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_4,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_4,
 				],
 			]
 		);
@@ -243,7 +243,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'tab_typography',
 				'selector' => '{{WRAPPER}} .elementor-tab-title',
-				'scheme' => \Elementor\Scheme_Typography::TYPOGRAPHY_1,
+				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
 			]
 		);
 
@@ -265,8 +265,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 					'{{WRAPPER}} .elementor-tab-content' => 'color: {{VALUE}};',
 				],
 				'scheme' => [
-					'type' => \Elementor\Scheme_Color::get_type(),
-					'value' => \Elementor\Scheme_Color::COLOR_3,
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_3,
 				],
 			]
 		);
@@ -276,7 +276,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'content_typography',
 				'selector' => '{{WRAPPER}} .elementor-tab-content',
-				'scheme' => \Elementor\Scheme_Typography::TYPOGRAPHY_3,
+				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_3,
 			]
 		);
 
