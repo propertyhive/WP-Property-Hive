@@ -389,11 +389,15 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 								$tab_title_setting_key = $this->get_repeater_setting_key( 'tab_title', 'tabs', $index );
 
 								$onclick = '';
-								if (in_array('map', $item['tab_display']))
+								if ( in_array('map', $item['tab_display']) )
 								{
+									if ( get_option('propertyhive_maps_provider') == 'osm' )
+									{
+										$onclick .= 'if (property_map != undefined) { property_map.remove(); }';
+									}
 									$onclick .= 'setTimeout(function() { initialize_property_map(); }, 10);';
 								}
-								if (in_array('street_view', $item['tab_display']))
+								if ( in_array('street_view', $item['tab_display']) )
 								{
 									$onclick .= 'setTimeout(function() { initialize_property_street_view(); }, 10);';
 								}
