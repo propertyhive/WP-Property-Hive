@@ -1717,7 +1717,7 @@ class PH_AJAX {
             if ( count($property_ids) == 1 )
             {
                 $post_type_object = get_post_type_object( 'property' );
-                $property_enquiries_url = admin_url( sprintf( $post_type_object->_edit_link . '&action=edit', (int)$property_ids[0] ) );
+                $property_enquiries_url = admin_url( sprintf( $post_type_object->_edit_link . '&action=edit', (int)$property_ids[0] ) ) . '#propertyhive-property-enquiries';
                 $message .= "\n" . __( "To manage this enquiry please visit the following URL", 'propertyhive' ) . ':' . "\n\n";
                 $message .= $property_enquiries_url;
             }
