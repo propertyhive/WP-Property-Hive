@@ -1714,7 +1714,11 @@ class PH_AJAX {
                 $message .= strip_tags($label) . ": " . strip_tags($value) . "\n";
             }
 
-            if ( count($property_ids) == 1 )
+            if ( 
+                count($property_ids) == 1 &&
+                get_option( 'propertyhive_module_disabled_enquiries', '' ) != 'yes' &&
+                get_option( 'propertyhive_store_property_enquiries', 'yes' ) == 'yes'
+            )
             {
                 $post_type_object = get_post_type_object( 'property' );
                 $property_enquiries_url = admin_url( sprintf( $post_type_object->_edit_link . '&action=edit', (int)$property_ids[0] ) ) . '#propertyhive-property-enquiries';
