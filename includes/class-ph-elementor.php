@@ -86,6 +86,7 @@ class PH_Elementor {
 			'Property Brochures Link',
 			'Property Embedded Virtual Tours',
 			'Property Virtual Tours Link',
+			'Back To Search',
 		);
 
 		$widgets = apply_filters( 'propertyhive_elementor_widgets', $widgets );
