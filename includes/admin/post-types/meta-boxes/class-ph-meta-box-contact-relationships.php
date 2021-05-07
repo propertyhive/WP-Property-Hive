@@ -374,7 +374,7 @@ class PH_Meta_Box_Contact_Relationships {
                             'custom_attributes' => array(
                                 'style' => 'width:100%; max-width:150px;'
                             ),
-                            'value' => ( ( isset($applicant_profile['max_price']) ) ? $applicant_profile['max_price'] : '' )
+                            'value' => ( ( isset($applicant_profile['max_price']) ) ? ph_display_price_field( $applicant_profile['max_price'] ) : '' )
                         ) );
 
                         $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
@@ -418,9 +418,9 @@ class PH_Meta_Box_Contact_Relationships {
                             
                                 <label for="_applicant_match_price_range_' . $key . '">' . __('Match Price Range', 'propertyhive') . ' (&pound;)</label>
                                 
-                                <input type="text" class="" name="_applicant_match_price_range_lower_' . $key . '" id="_applicant_match_price_range_lower_' . $key . '" value="' . $match_price_range_lower . '" style="width:20%; max-width:150px;">
+                                <input type="text" class="" name="_applicant_match_price_range_lower_' . $key . '" id="_applicant_match_price_range_lower_' . $key . '" value="' . ph_display_price_field( $match_price_range_lower ) . '" style="width:20%; max-width:150px;">
                                 <span style="float:left; margin:0 5px;">to</span>
-                                <input type="text" class="" name="_applicant_match_price_range_higher_' . $key . '" id="_applicant_match_price_range_higher_' . $key . '" value="' . $match_price_range_higher . '" style="width:20%; max-width:150px;">
+                                <input type="text" class="" name="_applicant_match_price_range_higher_' . $key . '" id="_applicant_match_price_range_higher_' . $key . '" value="' . ph_display_price_field( $match_price_range_higher ) . '" style="width:20%; max-width:150px;">
                                 
                             </p>';
 
@@ -498,7 +498,7 @@ class PH_Meta_Box_Contact_Relationships {
                         
                             <label for="_applicant_maximum_rent_' . $key . '">' . __('Maximum Rent', 'propertyhive') . ' (&pound;)</label>
                             
-                            <input type="text" class="" name="_applicant_maximum_rent_' . $key . '" id="_applicant_maximum_rent_' . $key . '" value="' . ( ( isset($applicant_profile['max_rent']) ) ? $applicant_profile['max_rent'] : '' ) . '" placeholder="" style="width:20%; max-width:150px;">
+                            <input type="text" class="" name="_applicant_maximum_rent_' . $key . '" id="_applicant_maximum_rent_' . $key . '" value="' . ( ( isset($applicant_profile['max_rent']) ) ? ph_display_price_field( $applicant_profile['max_rent']) : '' ) . '" placeholder="" style="width:20%; max-width:150px;">
                             
                             <select id="_applicant_rent_frequency_' . $key . '" name="_applicant_rent_frequency_' . $key . '" class="select short">
                                 <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>

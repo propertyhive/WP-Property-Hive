@@ -134,7 +134,7 @@ class PH_Meta_Box_Tenancy_Details {
             echo '<input type="hidden" name="_rent_currency" value="' . $selected_currency . '">';
         }
 
-        echo '<input type="text" class="" name="_rent" id="_rent" value="' . get_post_meta( $post->ID, '_rent', true ) . '" placeholder="" style="width:70px">
+        echo '<input type="text" class="" name="_rent" id="_rent" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent', true ) ) . '" placeholder="" style="width:70px">
             
             <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:auto">
                 <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
@@ -148,7 +148,7 @@ class PH_Meta_Box_Tenancy_Details {
 		echo '<p class="form-field deposit_field ">
         
             <label for="_summary_deposit">' . __('Deposit', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>
-			<input type="text" class="" name="_deposit" id="_summary_deposit" value="' . get_post_meta( $post->ID, '_deposit', true ) . '" placeholder="" style="width:70px">           
+			<input type="text" class="" name="_deposit" id="_summary_deposit" value="' . ph_display_price_field( get_post_meta( $post->ID, '_deposit', true ) ) . '" placeholder="" style="width:70px">           
         </p>';
 
         $args = array(

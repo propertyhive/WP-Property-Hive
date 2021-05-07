@@ -68,7 +68,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
             echo '<input type="hidden" name="_rent_currency" value="' . $selected_currency . '">';
         }
 
-        echo '<input type="text" class="" name="_rent" id="_rent" value="' . get_post_meta( $post->ID, '_rent', true ) . '" placeholder="" style="width:20%;">
+        echo '<input type="text" class="" name="_rent" id="_rent" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent', true ) ) . '" placeholder="" style="width:20%;">
             
             <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:auto">
                 <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
@@ -97,7 +97,8 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
             'class' => '',
             'custom_attributes' => array(
                 'style' => 'width:20%'
-            )
+            ),
+            'value' => ph_display_price_field( get_post_meta( $post->ID, '_deposit', true ) ),
         ) );
         
         // Furnished
