@@ -29,6 +29,8 @@ class PH_Post_types {
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_children' ), 5 );
         add_action( 'before_delete_post', array( __CLASS__, 'delete_contact_user' ), 5 );
 
+        add_action( 'delete_user', array( $this, 'delete_contact_user_link' ) );
+
         add_action( 'save_post', array( __CLASS__, 'create_name_number_street_meta' ), 99, 3 );
         add_action( 'save_post', array( __CLASS__, 'create_concatenated_indexable_meta' ), 99, 3 );
 
@@ -763,6 +765,34 @@ class PH_Post_types {
                     require_once ABSPATH . 'wp-admin/includes/user.php';
                     wp_delete_user( $contact_user_id );
                 }
+            }
+        }
+    }
+
+    public static function delete_contact_user_link( $user_id )
+    {
+        global $post;
+
+        $args = array(
+            'post_type' => 'contact',
+            'nopaging' => true,
+            'meta_query' => array(
+                array(
+                    'key' => '_user_id',
+                    'value' => (int)$user_id,
+                )
+            )
+        );
+        $agent_query = new WP_Query( $args );
+        if ( $agent_query->have_posts() )
+        {
+            while ( $agent_query->have_posts() )
+            {
+                $agent_query->the_post();
+
+                delete_post_meta( $post->ID, '_user_id' );
+
+                wp_reset_postdata();
             }
         }
     }
