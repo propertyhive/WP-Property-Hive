@@ -224,6 +224,7 @@ function viewing_update_selected_properties()
                 '_action'
             );
             
+            $enquiry_post_id = $post->ID;
             $enquiry_meta = get_metadata( 'post', $post->ID );
             
             $name = false;
@@ -272,84 +273,92 @@ function viewing_update_selected_properties()
                 }
             }
 
-            if ( $name !== false && $email !== false )
+            $enquiry_contact_type = $property ? 'Applicant' : 'Contact';
+            $enquiry_contact_id = get_post_meta( $enquiry_post_id, '_contact_id', true );
+
+            if ( !empty($enquiry_contact_id) )
             {
-                $enquiry_post = $post;
+                echo '<a href="' . get_edit_post_link($enquiry_contact_id, '') . '" class="button" style="position:absolute; top:0; right:0;">' . __( 'View ' . $enquiry_contact_type, 'propertyhive' ) . '</a>';
+            }
+            else
+            {
+                if ( $name !== false && $email !== false )
+                {
+                    $enquiry_post = $post;
 
-                // Check email address doesn't exist already as a contact
-                $args = array(
-                    'post_type' => 'contact',
-                    'post_status' => 'any',
-                    'posts_per_page' => 1,
-                    'fields' => 'ids',
-                    'meta_query' => array(
-                        array(
-                            'key' => '_email_address',
-                            'value' => strip_tags($email),
+                    // Check email address doesn't exist already as a contact
+                    $args = array(
+                        'post_type' => 'contact',
+                        'post_status' => 'any',
+                        'posts_per_page' => 1,
+                        'fields' => 'ids',
+                        'meta_query' => array(
+                            array(
+                                'key' => '_email_address',
+                                'value' => strip_tags($email),
+                            )
                         )
-                    )
-                );
+                    );
 
-                $contact_query = new WP_Query( $args );
+                    $contact_query = new WP_Query( $args );
 
-                $enquiry_contact_type = $property ? 'Applicant' : 'Contact';
-
-                if ( $contact_query->have_posts() )
-                {
-                    while ( $contact_query->have_posts() )
+                    if ( $contact_query->have_posts() )
                     {
-                        $contact_query->the_post();
-
-                        echo '<a href="' . get_edit_post_link(get_the_ID(), '') . '" class="button" style="position:absolute; top:0; right:0;">' . __( 'View ' . $enquiry_contact_type, 'propertyhive' ) . '</a>';
-                    }
-                }
-                else
-                {
-                ?>
-                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo __( 'Create ' . $enquiry_contact_type, 'propertyhive' ); ?></a>
-
-                    <script>
-                        jQuery(document).ready(function($)
+                        while ( $contact_query->have_posts() )
                         {
-                            $('a#create_contact_from_enquiry_button').click(function(e)
+                            $contact_query->the_post();
+
+                            echo '<a href="' . get_edit_post_link(get_the_ID(), '') . '" class="button" style="position:absolute; top:0; right:0;">' . __( 'View ' . $enquiry_contact_type, 'propertyhive' ) . '</a>';
+                        }
+                    }
+                    else
+                    {
+                    ?>
+                        <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo __( 'Create ' . $enquiry_contact_type, 'propertyhive' ); ?></a>
+
+                        <script>
+                            jQuery(document).ready(function($)
                             {
-                                if ($(this).attr('href') == '')
+                                $('a#create_contact_from_enquiry_button').click(function(e)
                                 {
-                                    e.preventDefault();
+                                    if ($(this).attr('href') == '')
+                                    {
+                                        e.preventDefault();
 
-                                    $(this).attr('disabled', 'disabled');
-                                    $(this).html('<?php echo __( 'Creating ' . $enquiry_contact_type . '...', 'propertyhive' ); ?>');
+                                        $(this).attr('disabled', 'disabled');
+                                        $(this).html('<?php echo __( 'Creating ' . $enquiry_contact_type . '...', 'propertyhive' ); ?>');
 
-                                    var data = {
-                                        action:         'propertyhive_create_contact_from_enquiry',
-                                        post_id:        <?php echo $enquiry_post->ID; ?>,
-                                        security:       '<?php echo wp_create_nonce( 'create-content-from-enquiry-nonce-' . $enquiry_post->ID ); ?>',
-                                    };
+                                        var data = {
+                                            action:         'propertyhive_create_contact_from_enquiry',
+                                            post_id:        <?php echo $enquiry_post->ID; ?>,
+                                            security:       '<?php echo wp_create_nonce( 'create-content-from-enquiry-nonce-' . $enquiry_post->ID ); ?>',
+                                        };
 
-                                    var that = this;
-                                    $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
-                                        if (response.error)
-                                        {
-                                            $(that).attr('disabled', false);
-                                            $(that).html('<?php echo __( 'Create ' . $enquiry_contact_type, 'propertyhive' ); ?>');
-                                        }
-                                        if (response.success)
-                                        {
-                                            $(that).attr('disabled', false);
-                                            $(that).addClass('button-primary');
-                                            $(that).attr('href', response.success);
-                                            $(that).html('<?php echo __( $enquiry_contact_type . ' Created. View Now', 'propertyhive' ); ?>');
-                                        }
-                                    }, 'json');
-                                }
+                                        var that = this;
+                                        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
+                                            if (response.error)
+                                            {
+                                                $(that).attr('disabled', false);
+                                                $(that).html('<?php echo __( 'Create ' . $enquiry_contact_type, 'propertyhive' ); ?>');
+                                            }
+                                            if (response.success)
+                                            {
+                                                $(that).attr('disabled', false);
+                                                $(that).addClass('button-primary');
+                                                $(that).attr('href', response.success);
+                                                $(that).html('<?php echo __( $enquiry_contact_type . ' Created. View Now', 'propertyhive' ); ?>');
+                                            }
+                                        }, 'json');
+                                    }
+                                });
                             });
-                        });
-                    </script>
-    <?php
-                }
-                wp_reset_postdata();
+                        </script>
+        <?php
+                    }
+                    wp_reset_postdata();
 
-                $post = $enquiry_post;
+                    $post = $enquiry_post;
+                }
             }
         }
 

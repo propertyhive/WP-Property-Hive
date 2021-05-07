@@ -1927,6 +1927,8 @@ class PH_AJAX {
             die( json_encode( array('error' => 'Error creating contact') ) );
         }
 
+        update_post_meta( $enquiry_post_id, '_contact_id', $contact_post_id );
+
         if ( $telephone !== FALSE ) { 
             update_post_meta( $contact_post_id, '_telephone_number', ph_clean( ph_clean_telephone_number( $telephone ) ) );
         }
