@@ -2016,7 +2016,7 @@ class PH_AJAX {
                 $applicant_profile['available_as'] = $available_as;
             }
 
-            $applicant_profile['send_matching_properties'] = '';
+            $applicant_profile['send_matching_properties'] = apply_filters( 'propertyhive_default_applicant_send_matching_properties', false ) === true ? 'yes' : '';
             $applicant_profile['auto_match_disabled'] = 'yes';
 
             $applicant_profile['added_from_enquiry'] = 'yes';
