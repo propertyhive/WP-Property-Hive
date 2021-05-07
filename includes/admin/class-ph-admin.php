@@ -403,6 +403,7 @@ class PH_Admin {
             }
 
             if ( 
+                get_option('propertyhive_maps_provider') !== 'osm' &&
                 get_option('propertyhive_google_maps_api_key', '') == '' && 
                 !isset($_POST['propertyhive_google_maps_api_key']) &&
                 (
