@@ -66,7 +66,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             echo '<input type="hidden" name="_price_currency" value="' . $selected_currency . '">';
         }
 
-        echo '<input type="text" class="" name="_price" id="_price" value="' . get_post_meta( $post->ID, '_price', true ) . '" placeholder="" style="width:15%;">
+        echo '<input type="text" class="" name="_price" id="_price" value="' . ph_display_price_field( get_post_meta( $post->ID, '_price', true ) ) . '" placeholder="" style="width:15%;">
             
         </p>';
         

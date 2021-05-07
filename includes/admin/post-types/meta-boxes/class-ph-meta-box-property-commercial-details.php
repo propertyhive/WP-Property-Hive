@@ -113,9 +113,9 @@ class PH_Meta_Box_Property_Commercial_Details {
         $price_options = get_commercial_price_units( );
 
         echo '
-        <input type="text" class="" name="_price_from" id="_price_from" value="' . get_post_meta( $post->ID, '_price_from', true ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_price_from" id="_price_from" value="' . ph_display_price_field( get_post_meta( $post->ID, '_price_from', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
         <span style="float:left"> - </span>
-        <input type="text" class="" name="_price_to" id="_price_to" value="' . get_post_meta( $post->ID, '_price_to', true ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_price_to" id="_price_to" value="' . ph_display_price_field( get_post_meta( $post->ID, '_price_to', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
 
         <select name="_price_units" id="_price_units">
             <option value=""></option>';
@@ -240,9 +240,9 @@ class PH_Meta_Box_Property_Commercial_Details {
         $rent_units = get_post_meta( $post->ID, '_rent_units', true );
 
         echo '
-        <input type="text" class="" name="_rent_from" id="_rent_from" value="' . get_post_meta( $post->ID, '_rent_from', true ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_rent_from" id="_rent_from" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent_from', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
         <span style="float:left; padding:0 5px"> - </span>
-        <input type="text" class="" name="_rent_to" id="_rent_to" value="' . get_post_meta( $post->ID, '_rent_to', true ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_rent_to" id="_rent_to" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent_to', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
         
         <select name="_rent_units" id="_rent_units">
             <option value="pw"' . ( ($rent_units == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>

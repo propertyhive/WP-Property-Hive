@@ -39,6 +39,31 @@ function ph_clean_telephone_number( $var ) {
 	return preg_replace( "/[^0-9,]/", "", $var );
 }
 
+/**
+ * Format monetary number value with decimal and thousands separators for display in a form field
+ * @param string
+ * @return string
+ */
+function ph_display_price_field( $var )
+{
+	$float_var = (float)$var;
+
+	// If stored value isn't a valid number with decimals, display as it's stored
+	if ( $float_var !== floatval(0) )
+	{
+		// If there are decimals on the number, display them. If not, display none
+		$decimals = $float_var == intval($var) ? 0 : 2;
+
+		// Get custom decimal and thousands separators, if set
+		$decimal_separator = get_option('propertyhive_price_decimal_separator', '.');
+		$thousands_separator = get_option('propertyhive_price_thousand_separator', ',');
+
+		$var = number_format( $float_var, $decimals, $decimal_separator, $thousands_separator );
+	}
+
+	return (string)$var;
+}
+
 if ( ! function_exists( 'ph_rgb_from_hex' ) ) {
 
 	/**

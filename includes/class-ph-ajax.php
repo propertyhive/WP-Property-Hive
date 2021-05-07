@@ -2492,7 +2492,7 @@ class PH_AJAX {
                     'label' => __( 'Valued Price', 'propertyhive' ) . ' (&pound;)', 
                     'desc_tip' => false, 
                     'class' => 'short',
-                    'value' => $appraisal->valued_price,
+                    'value' => ph_display_price_field( $appraisal->valued_price ),
                 );
                 propertyhive_wp_text_input( $args );
             }
@@ -2504,7 +2504,7 @@ class PH_AJAX {
         
                     <label for="">' . __('Valued Rent', 'propertyhive') . ' (&pound;)</label>
 
-                    <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . $appraisal->valued_rent . '" placeholder="" style="width:10%; min-width:100px;">
+                    <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . ph_display_price_field( $appraisal->valued_rent ) . '" placeholder="" style="width:10%; min-width:100px;">
                 
                     <select id="_valued_rent_frequency" name="_valued_rent_frequency" class="select" style="width:auto">
                         <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
@@ -4555,7 +4555,7 @@ class PH_AJAX {
             'label' => __( 'Offer Amount', 'propertyhive' ) . ' (&pound;)', 
             'desc_tip' => false, 
             'class' => 'short',
-            'value' => ( is_numeric($offer->amount) ? number_format($offer->amount) : '' ),
+            'value' => ( is_numeric($offer->amount) ? ph_display_price_field( $offer->amount ) : '' ),
             'custom_attributes' => array(
                 //'style' => 'width:95%; max-width:500px;'
             )
@@ -5010,7 +5010,7 @@ class PH_AJAX {
             'label' => __( 'Sale Amount', 'propertyhive' ) . ' (&pound;)', 
             'desc_tip' => false, 
             'class' => 'short',
-            'value' => ( is_numeric($sale->amount) ? number_format($sale->amount) : '' ),
+            'value' => ( is_numeric($sale->amount) ? ph_display_price_field( $sale->amount ) : '' ),
             'custom_attributes' => array(
                 //'style' => 'width:95%; max-width:500px;'
             )
