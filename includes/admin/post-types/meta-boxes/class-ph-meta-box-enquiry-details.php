@@ -221,7 +221,8 @@ function viewing_update_selected_properties()
                 '_source',
                 '_negotiator_id',
                 '_office_id',
-                '_action'
+                '_action',
+                '_contact_id',
             );
             
             $enquiry_post_id = $post->ID;
