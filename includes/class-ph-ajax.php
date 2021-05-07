@@ -1715,6 +1715,7 @@ class PH_AJAX {
             }
 
             if ( 
+                apply_filters('propertyhive_enquiry_email_show_manage_link', true) &&
                 count($property_ids) == 1 &&
                 get_option( 'propertyhive_module_disabled_enquiries', '' ) != 'yes' &&
                 get_option( 'propertyhive_store_property_enquiries', 'yes' ) == 'yes'
