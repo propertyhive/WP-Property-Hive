@@ -8,74 +8,7 @@
 
     if ( isset($selected_status) && !empty($selected_status) )
     {
-        switch ( $selected_status )
-        {
-            case "confirmed":
-            {
-                $meta_query[] = array(
-                    'key' => '_status',
-                    'value' => 'pending',
-                );
-                $meta_query[] = array(
-                    'key' => '_all_confirmed',
-                    'value' => 'yes',
-                );
-                break;
-            }
-            case "unconfirmed":
-            {
-                $meta_query[] = array(
-                    'key' => '_status',
-                    'value' => 'pending',
-                );
-                $meta_query[] = array(
-                    'key' => '_all_confirmed',
-                    'value' => '',
-                );
-                break;
-            }
-            case "feedback_passed_on":
-            {
-                $meta_query[] = array(
-                    'key' => '_status',
-                    'value' => 'carried_out',
-                );
-                $meta_query[] = array(
-                    'key' => '_feedback_status',
-                    'value' => array('interested', 'not_interested'),
-                    'compare' => 'IN'
-                );
-                $meta_query[] = array(
-                    'key' => '_feedback_passed_on',
-                    'value' => 'yes',
-                );
-                break;
-            }
-            case "feedback_not_passed_on":
-            {
-                $meta_query[] = array(
-                    'key' => '_status',
-                    'value' => 'carried_out',
-                );
-                $meta_query[] = array(
-                    'key' => '_feedback_status',
-                    'value' => array('interested', 'not_interested'),
-                    'compare' => 'IN'
-                );
-                $meta_query[] = array(
-                    'key' => '_feedback_passed_on',
-                    'value' => '',
-                );
-                break;
-            }
-            default:
-            {
-                $meta_query[] = array(
-                    'key' => '_status',
-                    'value' => sanitize_text_field( $selected_status ),
-                );
-            }
-        }
+        $meta_query = add_viewing_status_meta_query( $meta_query, $selected_status );
     }
 
     $args = array(
