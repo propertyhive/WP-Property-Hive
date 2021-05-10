@@ -39,7 +39,7 @@ Property Hive isn't a theme. It's a platform allowing you to integrate property 
 
 **Integrates with the major software providers and property portals**
 
-If you already use software such as Jupix, Vebra, Dezrez, Reapit, ExpertAgent, LetMC and more then it's easy to get your properties imported on an automatic basis at regular intervals so they display on your website. Our [Property Import Add On](https://wp-property-hive.com/addons/property-import/) can have you and running in minutes.
+If you already use software such as Jupix, Vebra Alto, Dezrez, Reapit, ExpertAgent, LetMC and more then it's easy to get your properties imported on an automatic basis at regular intervals so they display on your website. Our [Property Import Add On](https://wp-property-hive.com/addons/property-import/) can have you and running in minutes.
 
 Likewise, if you send properties to the portals such as Rightmove, Zoopla, OnTheMarket and Gumtree, we have various add ons to allow the exporting of properties to these sites.
 
