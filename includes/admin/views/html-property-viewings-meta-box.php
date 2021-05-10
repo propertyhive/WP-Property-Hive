@@ -152,7 +152,7 @@
                     'status' => $the_viewing->get_status(),
                 );
                 ?>
-                    <tr>
+                    <tr class="status-<?php echo $the_viewing->_status; ?>" >
                     <?php
                         foreach ( $columns as $column_key => $column )
                         {
