@@ -859,7 +859,7 @@ class PH_Admin_Meta_Boxes {
                     'name' => __( 'Viewings', 'propertyhive' ) . ' (' . $viewings_count . ')',
                     'metabox_ids' => $ids,
                     'post_type' => 'property',
-                    'ajax_actions' => array( 'get_property_viewings_meta_box^' . wp_create_nonce( 'get_property_viewings_meta_box' ) ),
+                    'ajax_actions' => array( 'get_property_viewings_meta_box' ),
                 );
             }
 
