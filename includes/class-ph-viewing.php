@@ -314,4 +314,25 @@ class PH_Viewing {
 
         return implode('<br>', $status_items);
     }
+
+    /**
+     * Get the full address of the property attached to the viewing
+     *
+     * @access public
+     * @return string
+     */
+    public function get_property_address()
+    {
+        $property_id = (int)$this->_property_id;
+
+        if ( !empty($property_id) )
+        {
+            $property = new PH_Property( $property_id );
+            return '<a href="' . get_edit_post_link( $property_id, '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . $property->get_formatted_full_address() . '</a>';
+        }
+        else
+        {
+            return '-';
+        }
+    }
 }
