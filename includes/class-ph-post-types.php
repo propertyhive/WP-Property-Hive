@@ -759,7 +759,7 @@ class PH_Post_types {
                 $user_roles = $user_meta->roles;
                 $user_role = array_shift($user_roles);
 
-                if ( in_array($user_role, array( 'property_hive_contact', 'property_hive_agent' )) )
+                if ( in_array($user_role, array( 'property_hive_contact' )) )
                 {
                     // Include user admin functions to get access to wp_delete_user().
                     require_once ABSPATH . 'wp-admin/includes/user.php';
