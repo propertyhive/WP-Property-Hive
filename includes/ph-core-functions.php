@@ -251,8 +251,15 @@ function add_viewing_status_meta_query( $meta_query, $selected_status )
                 'value' => 'pending',
             );
             $meta_query[] = array(
-                'key' => '_all_confirmed',
-                'value' => '',
+                'relation' => 'OR',
+                array(
+                    'key' => '_all_confirmed',
+                    'value' => '',
+                ),
+                array(
+                    'key' => '_all_confirmed',
+                    'compare' => 'NOT EXISTS',
+                )
             );
             break;
         }
