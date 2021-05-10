@@ -213,6 +213,22 @@ function ph_get_departments( $raw = false )
     return $raw ? $departments : apply_filters( 'propertyhive_departments', $departments );
 }
 
+function get_viewing_status_dropdown_values()
+{
+    $viewing_statuses = array(
+        ''                       => __( 'All Statuses', 'propertyhive' ),
+        'pending'                => __( 'Pending', 'propertyhive' ),
+        'confirmed'              => '- ' . __( 'Confirmed', 'propertyhive' ),
+        'unconfirmed'            => '- ' . __( 'Awaiting Confirmation', 'propertyhive' ),
+        'carried_out'            => __( 'Carried Out', 'propertyhive' ),
+        'feedback_passed_on'     => '- ' . __( 'Feedback Passed On', 'propertyhive' ),
+        'feedback_not_passed_on' => '- ' . __( 'Feedback Not Passed On', 'propertyhive' ),
+        'cancelled'              => __( 'Cancelled', 'propertyhive' ),
+    );
+
+    return $viewing_statuses;
+}
+
 function get_area_units()
 {
     $size_options = array(
