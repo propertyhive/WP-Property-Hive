@@ -460,6 +460,7 @@ class PH_Countries {
 					$price = get_post_meta( $postID, '_rent_from', true );
 		            switch ($rent_units)
 		            {
+		            	case "pd": { $price = ($price * 365) / 12; break; }
 		                case "pw": { $price = ($price * 52) / 12; break; }
 		                case "pcm": { $price = $price; break; }
 		                case "pq": { $price = ($price * 4) / 12; break; }
@@ -478,6 +479,7 @@ class PH_Countries {
 		            $price = get_post_meta( $postID, '_rent_to', true );
 		            switch ($rent_units)
 		            {
+		            	case "pd": { $price = ($price * 365) / 12; break; }
 		                case "pw": { $price = ($price * 52) / 12; break; }
 		                case "pcm": { $price = $price; break; }
 		                case "pq": { $price = ($price * 4) / 12; break; }

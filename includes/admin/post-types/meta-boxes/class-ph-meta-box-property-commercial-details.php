@@ -245,6 +245,7 @@ class PH_Meta_Box_Property_Commercial_Details {
         <input type="text" class="" name="_rent_to" id="_rent_to" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent_to', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
         
         <select name="_rent_units" id="_rent_units">
+            <option value="pd"' . ( ($rent_units == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
             <option value="pw"' . ( ($rent_units == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
             <option value="pcm"' . ( ($rent_units == 'pcm') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
             <option value="pq"' . ( ($rent_units == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
