@@ -1157,74 +1157,9 @@ class PH_Admin_Post_Types {
         elseif ( 'viewing' === $typenow ) 
         {
             if ( ! empty( $_GET['_status'] ) ) {
-                switch ( sanitize_text_field( $_GET['_status'] ) )
-                {
-                    case "confirmed":
-                    {
-                        $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => 'pending',
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_all_confirmed',
-                            'value' => 'yes',
-                        );
-                        break;
-                    }
-                    case "unconfirmed":
-                    {
-                        $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => 'pending',
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_all_confirmed',
-                            'value' => '',
-                        );
-                        break;
-                    }
-                    case "feedback_passed_on":
-                    {
-                        $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => 'carried_out',
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_feedback_status',
-                            'value' => array('interested', 'not_interested'),
-                            'compare' => 'IN'
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_feedback_passed_on',
-                            'value' => 'yes',
-                        );
-                        break;
-                    }
-                    case "feedback_not_passed_on":
-                    {
-                         $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => 'carried_out',
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_feedback_status',
-                            'value' => array('interested', 'not_interested'),
-                            'compare' => 'IN'
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_feedback_passed_on',
-                            'value' => '',
-                        );
-                        break;
-                    }
-                    default:
-                    {
-                        $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => sanitize_text_field( $_GET['_status'] ),
-                        );
-                    }
-                }
+
+                $vars['meta_query'] = add_viewing_status_meta_query( $vars['meta_query'], sanitize_text_field( $_GET['_status'] ) );
+
             }
             if ( ! empty( $_GET['_negotiator_id'] ) ) 
             {
