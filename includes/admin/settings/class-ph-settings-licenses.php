@@ -54,7 +54,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
 		$output = '';
 		$input_border_color = '';
-		$renew_link = '<a href="https://wp-property-hive.com/product/12-month-license-key/" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
+		$renew_link = '<a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
 		$valid_license = false;
 
 		if ( is_array($license) && empty($license) && get_option( 'propertyhive_license_key', '' ) != '' )
@@ -77,16 +77,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 					$output = '<span style="color:#900">' . __( 'License expired on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. ' . $renew_link . '</span>';
 					$input_border_color = '#900';
 				}
-				elseif ( 
-					strtotime($license['expires_at']) > time() &&
-					strtotime($license['expires_at']) < (time() + 30 * 24 * 60 * 60)
-				)
-				{
-					// Expires in less than 30 days
-					//$output = '<span style="color:#F90">' . __( 'License expires on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. ' . $renew_link . '</span>';
-					//$input_border_color = '#F90';
-				}
-				elseif (strtotime($license['expires_at']) > time())
+				else
 				{
 					// Valid
 					$output = '<span style="color:#090">' . __( 'License valid', 'propertyhive') . '.</span>';
