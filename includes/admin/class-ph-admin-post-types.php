@@ -752,37 +752,16 @@ class PH_Admin_Post_Types {
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_viewing_status">';
-            
-            $output .= '<option value="">All Statuses</option>';
 
-            $output .= '<option value="pending"';
-            $output .= selected( 'pending', $selected_status, false );
-            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+        $viewing_statuses = get_viewing_status_dropdown_values();
 
-            $output .= '<option value="confirmed"';
-            $output .= selected( 'confirmed', $selected_status, false );
-            $output .= '>- ' . __( 'Confirmed', 'propertyhive' ) . '</option>';
+        foreach ( $viewing_statuses as $status => $display_status )
+        {
+            $output .= '<option value="' . $status . '"';
+            $output .= selected( $status, $selected_status, false );
+            $output .= '>' . $display_status . '</option>';
+        }
 
-            $output .= '<option value="unconfirmed"';
-            $output .= selected( 'unconfirmed', $selected_status, false );
-            $output .= '>- ' . __( 'Awaiting Confirmation', 'propertyhive' ) . '</option>';
-
-            $output .= '<option value="carried_out"';
-            $output .= selected( 'carried_out', $selected_status, false );
-            $output .= '>' . __( 'Carried Out', 'propertyhive' ) . '</option>';
-
-            $output .= '<option value="feedback_passed_on"';
-            $output .= selected( 'feedback_passed_on', $selected_status, false );
-            $output .= '>- ' . __( 'Feedback Passed On', 'propertyhive' ) . '</option>';
-
-            $output .= '<option value="feedback_not_passed_on"';
-            $output .= selected( 'feedback_not_passed_on', $selected_status, false );
-            $output .= '>- ' . __( 'Feedback Not Passed On', 'propertyhive' ) . '</option>';
-
-            $output .= '<option value="cancelled"';
-            $output .= selected( 'cancelled', $selected_status, false );
-            $output .= '>' . __( 'Cancelled', 'propertyhive' ) . '</option>';
-            
         $output .= '</select>';
 
         return $output;
@@ -1178,74 +1157,9 @@ class PH_Admin_Post_Types {
         elseif ( 'viewing' === $typenow ) 
         {
             if ( ! empty( $_GET['_status'] ) ) {
-                switch ( sanitize_text_field( $_GET['_status'] ) )
-                {
-                    case "confirmed":
-                    {
-                        $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => 'pending',
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_all_confirmed',
-                            'value' => 'yes',
-                        );
-                        break;
-                    }
-                    case "unconfirmed":
-                    {
-                        $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => 'pending',
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_all_confirmed',
-                            'value' => '',
-                        );
-                        break;
-                    }
-                    case "feedback_passed_on":
-                    {
-                        $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => 'carried_out',
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_feedback_status',
-                            'value' => array('interested', 'not_interested'),
-                            'compare' => 'IN'
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_feedback_passed_on',
-                            'value' => 'yes',
-                        );
-                        break;
-                    }
-                    case "feedback_not_passed_on":
-                    {
-                         $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => 'carried_out',
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_feedback_status',
-                            'value' => array('interested', 'not_interested'),
-                            'compare' => 'IN'
-                        );
-                        $vars['meta_query'][] = array(
-                            'key' => '_feedback_passed_on',
-                            'value' => '',
-                        );
-                        break;
-                    }
-                    default:
-                    {
-                        $vars['meta_query'][] = array(
-                            'key' => '_status',
-                            'value' => sanitize_text_field( $_GET['_status'] ),
-                        );
-                    }
-                }
+
+                $vars['meta_query'] = add_viewing_status_meta_query( $vars['meta_query'], sanitize_text_field( $_GET['_status'] ) );
+
             }
             if ( ! empty( $_GET['_negotiator_id'] ) ) 
             {
