@@ -36,16 +36,17 @@
 <div class="tablenav top">
     <div class="alignleft actions">
         <select name="_status" id="_viewing_status_filter">
-        <?php
-            $viewing_statuses = get_viewing_status_dropdown_values();
+            <option value=""><?php echo __( 'All Statuses', 'propertyhive' ); ?></option>
+            <?php
+                $viewing_statuses = ph_get_viewing_statuses();
 
-            foreach ( $viewing_statuses as $status => $display_status )
-            {
-                ?>
-                <option value="<?php echo $status; ?>" <?php selected( $status, $selected_status ); ?>><?php echo $display_status; ?></option>
-                <?php
-            }
-        ?>
+                foreach ( $viewing_statuses as $status => $display_status )
+                {
+                    ?>
+                    <option value="<?php echo $status; ?>" <?php selected( $status, $selected_status ); ?>><?php echo $display_status; ?></option>
+                    <?php
+                }
+            ?>
         </select>
         <input type="button" name="filter_action" id="filter-contact-viewings-grid" class="button" value="Filter">
     </div>

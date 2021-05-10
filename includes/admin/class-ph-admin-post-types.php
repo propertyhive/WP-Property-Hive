@@ -753,14 +753,16 @@ class PH_Admin_Post_Types {
         // Status filtering
         $output  = '<select name="_status" id="dropdown_viewing_status">';
 
-        $viewing_statuses = get_viewing_status_dropdown_values();
+            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
 
-        foreach ( $viewing_statuses as $status => $display_status )
-        {
-            $output .= '<option value="' . $status . '"';
-            $output .= selected( $status, $selected_status, false );
-            $output .= '>' . $display_status . '</option>';
-        }
+            $viewing_statuses = ph_get_viewing_statuses();
+
+            foreach ( $viewing_statuses as $status => $display_status )
+            {
+                $output .= '<option value="' . $status . '"';
+                $output .= selected( $status, $selected_status, false );
+                $output .= '>' . $display_status . '</option>';
+            }
 
         $output .= '</select>';
 
