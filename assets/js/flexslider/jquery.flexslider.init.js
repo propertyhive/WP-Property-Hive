@@ -2,6 +2,11 @@ jQuery(window).on('load', function() {
     ph_init_slideshow();
 });
 
+// Resize flexsider image to prevent images showing as incorrect height when lazy loading
+jQuery('#slider img').on('load',function(){
+    jQuery(window).trigger('resize');
+});
+
 function ph_init_slideshow()
 {
     // The slider being synced must be initialized first
