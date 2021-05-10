@@ -859,7 +859,7 @@ class PH_Admin_Meta_Boxes {
                     'name' => __( 'Viewings', 'propertyhive' ) . ' (' . $viewings_count . ')',
                     'metabox_ids' => $ids,
                     'post_type' => 'property',
-                    'ajax_actions' => array( 'get_property_viewings_meta_box^' . wp_create_nonce( 'get_property_viewings_meta_box' ) ),
+                    'ajax_actions' => array( 'get_property_viewings_meta_box' ),
                 );
             }
 
@@ -1188,7 +1188,7 @@ class PH_Admin_Meta_Boxes {
                         'name' => __( 'Viewings', 'propertyhive' ) . ' (' . $viewing_count . ')',
                         'metabox_ids' => array('propertyhive-contact-viewings'),
                         'post_type' => 'contact',
-                        'ajax_actions' => array( 'get_contact_viewings_meta_box^' . wp_create_nonce( 'get_contact_viewings_meta_box' ) ),
+                        'ajax_actions' => array( 'get_contact_viewings_meta_box' ),
                     );
                 }
             }

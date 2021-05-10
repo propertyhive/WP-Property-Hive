@@ -213,6 +213,95 @@ function ph_get_departments( $raw = false )
     return $raw ? $departments : apply_filters( 'propertyhive_departments', $departments );
 }
 
+function get_viewing_status_dropdown_values()
+{
+    $viewing_statuses = array(
+        ''                       => __( 'All Statuses', 'propertyhive' ),
+        'pending'                => __( 'Pending', 'propertyhive' ),
+        'confirmed'              => '- ' . __( 'Confirmed', 'propertyhive' ),
+        'unconfirmed'            => '- ' . __( 'Awaiting Confirmation', 'propertyhive' ),
+        'carried_out'            => __( 'Carried Out', 'propertyhive' ),
+        'feedback_passed_on'     => '- ' . __( 'Feedback Passed On', 'propertyhive' ),
+        'feedback_not_passed_on' => '- ' . __( 'Feedback Not Passed On', 'propertyhive' ),
+        'cancelled'              => __( 'Cancelled', 'propertyhive' ),
+    );
+
+    return $viewing_statuses;
+}
+
+function add_viewing_status_meta_query( $meta_query, $selected_status )
+{
+    switch ( $selected_status )
+    {
+        case "confirmed":
+        {
+            $meta_query[] = array(
+                'key' => '_status',
+                'value' => 'pending',
+            );
+            $meta_query[] = array(
+                'key' => '_all_confirmed',
+                'value' => 'yes',
+            );
+            break;
+        }
+        case "unconfirmed":
+        {
+            $meta_query[] = array(
+                'key' => '_status',
+                'value' => 'pending',
+            );
+            $meta_query[] = array(
+                'key' => '_all_confirmed',
+                'value' => '',
+            );
+            break;
+        }
+        case "feedback_passed_on":
+        {
+            $meta_query[] = array(
+                'key' => '_status',
+                'value' => 'carried_out',
+            );
+            $meta_query[] = array(
+                'key' => '_feedback_status',
+                'value' => array('interested', 'not_interested'),
+                'compare' => 'IN'
+            );
+            $meta_query[] = array(
+                'key' => '_feedback_passed_on',
+                'value' => 'yes',
+            );
+            break;
+        }
+        case "feedback_not_passed_on":
+        {
+            $meta_query[] = array(
+                'key' => '_status',
+                'value' => 'carried_out',
+            );
+            $meta_query[] = array(
+                'key' => '_feedback_status',
+                'value' => array('interested', 'not_interested'),
+                'compare' => 'IN'
+            );
+            $meta_query[] = array(
+                'key' => '_feedback_passed_on',
+                'value' => '',
+            );
+            break;
+        }
+        default:
+        {
+            $meta_query[] = array(
+                'key' => '_status',
+                'value' => sanitize_text_field( $selected_status ),
+            );
+        }
+    }
+    return $meta_query;
+}
+
 function get_area_units()
 {
     $size_options = array(
