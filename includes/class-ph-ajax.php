@@ -3921,6 +3921,7 @@ class PH_AJAX {
     {
         $post_id = $_POST['post_id'];
 
+        $selected_status = '';
         if ( isset($_POST['selected_status']) )
         {
             $selected_status = $_POST['selected_status'];
@@ -3938,6 +3939,7 @@ class PH_AJAX {
     {
         $post_id = $_POST['post_id'];
 
+        $selected_status = '';
         if ( isset($_POST['selected_status']) )
         {
             $selected_status = $_POST['selected_status'];
