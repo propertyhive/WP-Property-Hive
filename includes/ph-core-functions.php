@@ -213,10 +213,9 @@ function ph_get_departments( $raw = false )
     return $raw ? $departments : apply_filters( 'propertyhive_departments', $departments );
 }
 
-function get_viewing_status_dropdown_values()
+function ph_get_viewing_statuses()
 {
     $viewing_statuses = array(
-        ''                       => __( 'All Statuses', 'propertyhive' ),
         'pending'                => __( 'Pending', 'propertyhive' ),
         'confirmed'              => '- ' . __( 'Confirmed', 'propertyhive' ),
         'unconfirmed'            => '- ' . __( 'Awaiting Confirmation', 'propertyhive' ),
