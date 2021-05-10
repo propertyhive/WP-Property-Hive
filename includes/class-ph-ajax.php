@@ -3924,7 +3924,7 @@ class PH_AJAX {
         $selected_status = '';
         if ( isset($_POST['selected_status']) )
         {
-            $selected_status = $_POST['selected_status'];
+            $selected_status = ph_clean($_POST['selected_status']);
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-property-viewings-meta-box.php' );
@@ -3942,7 +3942,7 @@ class PH_AJAX {
         $selected_status = '';
         if ( isset($_POST['selected_status']) )
         {
-            $selected_status = $_POST['selected_status'];
+            $selected_status = ph_clean($_POST['selected_status']);
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-contact-viewings-meta-box.php' );
