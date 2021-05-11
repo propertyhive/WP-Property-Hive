@@ -399,3 +399,19 @@ function ph_ordinal_suffix( $number, $return_words = true, $return_number = true
     }
     return $return_words ? $number_in_words : ( $return_number ? $number . $suffix : $suffix );
 }
+
+/**
+ * Update the _last_active_date meta_key for a contact with the passed date, or if blank, today's date
+ *
+ * @param int $contact_id
+ * @param string $date Date string in Y-m-d format
+ */
+function ph_update_contact_last_active( $contact_post_id, $date = '' )
+{
+    if ( $date === '' )
+    {
+        $date = date( 'Y-m-d' );
+    }
+
+    update_post_meta( $contact_post_id, '_last_active', $date );
+}
