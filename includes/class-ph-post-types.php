@@ -1075,6 +1075,92 @@ class PH_Post_types {
             }
         }
     }
+
+    public static function update_contact_last_active_date( $post_id, $post, $update )
+    {
+        // $post_id and $post are required
+        if ( empty( $post_id ) || empty( $post ) ) {
+            return;
+        }
+
+        // Dont' update meta_key for revisions or autosaves
+        if ( defined( 'DOING_AUTOSAVE' ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
+            return;
+        }
+
+        $post_types_to_update = array( 'contact', 'enquiry' );
+
+        if ( !in_array($post->post_type, $post_types_to_update) ) {
+            return;
+        }
+
+        // The post is being published, either as the first time the post is created, or as a transition from the Auto Draft to Published status
+        if (
+            $post->post_status == 'publish'
+            &&
+            (
+                (
+                    $update === false
+                )
+                ||
+                (
+                    $update === true
+                    &&
+                    isset( $_POST['original_post_status'] )
+                    &&
+                    $_POST['original_post_status'] == 'auto-draft'
+                )
+            )
+        )
+        {
+            switch ( $post->post_type )
+            {
+                case "contact":
+                {
+                    ph_update_contact_last_active( $post_id );
+                    break;
+                }
+                case "enquiry":
+                {
+                    if ( isset($_POST['email']) || isset($_POST['email_address']) )
+                    {
+                        $email_address = isset($_POST['email']) ? $_POST['email'] : $_POST['email_address'];
+
+                        if ( !empty($email_address) )
+                        {
+                            $args = array(
+                                'post_type' => 'contact',
+                                'post_status' => 'any',
+                                'posts_per_page' => 1,
+                                'fields' => 'ids',
+                                'meta_query' => array(
+                                    array(
+                                        'key' => '_email_address',
+                                        'value' => strip_tags($email_address),
+                                    )
+                                )
+                            );
+
+                            $contact_query = new WP_Query( $args );
+
+                            if ( $contact_query->have_posts() )
+                            {
+                                while ( $contact_query->have_posts() )
+                                {
+                                    $contact_query->the_post();
+
+                                    $enquiry_contact_id = get_the_ID();
+                                    ph_update_contact_last_active( $enquiry_contact_id );
+                                }
+                                wp_reset_postdata();
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
 }
 
 new PH_Post_types();
