@@ -36,6 +36,8 @@ class PH_Post_types {
 
         add_action( 'save_post', array( __CLASS__, 'store_related_viewings' ), 99, 3 );
         add_action( 'updated_post_meta', array( __CLASS__, 'store_related_viewings_meta_change' ), 10, 4 );
+
+        add_action( 'wp_insert_post', array( __CLASS__, 'update_contact_last_active_date' ), 99, 3 );
 	}
 
 	/**
