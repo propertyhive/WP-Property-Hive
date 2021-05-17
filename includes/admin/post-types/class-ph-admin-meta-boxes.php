@@ -1266,7 +1266,7 @@ class PH_Admin_Meta_Boxes {
                         'name' => __( 'Offers', 'propertyhive' ) . ' (' . $offer_count . ')',
                         'metabox_ids' => array('propertyhive-contact-offers'),
                         'post_type' => 'contact',
-                        'ajax_actions' => array( 'get_contact_offers_meta_box^' . wp_create_nonce( 'get_contact_offers_meta_box' ) ),
+                        'ajax_actions' => array( 'get_contact_offers_meta_box' ),
                     );
                 }
 
@@ -1279,7 +1279,7 @@ class PH_Admin_Meta_Boxes {
                         'name' => __( 'Sales', 'propertyhive' ) . ' (' . $sale_count . ')',
                         'metabox_ids' => array('propertyhive-contact-sales'),
                         'post_type' => 'contact',
-                        'ajax_actions' => array( 'get_contact_sales_meta_box^' . wp_create_nonce( 'get_contact_sales_meta_box' ) ),
+                        'ajax_actions' => array( 'get_contact_sales_meta_box' ),
                     );
                 }
             }
