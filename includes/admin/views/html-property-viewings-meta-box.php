@@ -80,7 +80,7 @@
                 $edit_link = get_edit_post_link( get_the_ID() );
 
                 $column_data = array(
-                    'date_time' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '" class="viewing-lightbox" data-viewing-id="' . get_the_ID() . '">' . date("H:i jS F Y", strtotime($the_viewing->_start_date_time)) . '</a>',
+                    'date_time' => '<a href="' . $edit_link . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '" class="viewing-lightbox" data-viewing-id="' . get_the_ID() . '">' . date("H:i jS F Y", strtotime($the_viewing->_start_date_time)) . '</a>',
                     'applicants' =>  $the_viewing->get_applicants( true, true ),
                     'negotiators' => $the_viewing->get_negotiators(),
                     'status' => $the_viewing->get_status(),
@@ -114,6 +114,7 @@
             </tr>
             <?php
         }
+        wp_reset_postdata();
     ?>
     </tbody>
 </table>

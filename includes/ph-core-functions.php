@@ -308,6 +308,39 @@ function add_viewing_status_meta_query( $meta_query, $selected_status )
     return $meta_query;
 }
 
+function ph_get_offer_statuses()
+{
+    $offer_statuses = array(
+        'pending'  => __( 'Pending', 'propertyhive' ),
+        'accepted' => __( 'Accepted', 'propertyhive' ),
+        'declined' => __( 'Declined', 'propertyhive' ),
+    );
+
+    return $offer_statuses;
+}
+
+function ph_get_sale_statuses()
+{
+    $sale_statuses = array(
+        'current'        => __( 'Current', 'propertyhive' ),
+        'exchanged'      => __( 'Exchanged', 'propertyhive' ),
+        'completed'      => __( 'Completed', 'propertyhive' ),
+        'fallen_through' => __( 'Fallen Through', 'propertyhive' ),
+    );
+
+    return $sale_statuses;
+}
+
+function ph_get_enquiry_statuses()
+{
+    $enquiry_statuses = array(
+        'open'   => __( 'Open', 'propertyhive' ),
+        'closed' => __( 'Closed', 'propertyhive' ),
+    );
+
+    return $enquiry_statuses;
+}
+
 function get_area_units()
 {
     $size_options = array(
