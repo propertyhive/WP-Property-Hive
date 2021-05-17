@@ -561,6 +561,27 @@ jQuery( function($){
         return false;
     });
 
+    $('[id=\'propertyhive-contact-offers\']').on( 'click', '#filter-contact-offers-grid', function() {
+
+        if ( $(this).val() == 'Updating...' ) { return false; }
+
+        $(this).val('Updating...');
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:           'propertyhive_get_contact_offers_meta_box',
+            post_id:          propertyhive_admin_meta_boxes.post_id,
+            selected_status:  $('#_offer_status_filter').val(),
+        };
+
+        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+        {
+            jQuery('#propertyhive_contact_offers_meta_box').html(response);
+        }, 'html');
+
+        return false;
+    });
+
     $('[id=\'propertyhive-property-sales\']').on( 'click', '#filter-property-sales-grid', function() {
 
         if ( $(this).val() == 'Updating...' ) { return false; }
@@ -577,6 +598,27 @@ jQuery( function($){
         jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
         {
             jQuery('#propertyhive_property_sales_meta_box').html(response);
+        }, 'html');
+
+        return false;
+    });
+
+    $('[id=\'propertyhive-contact-sales\']').on( 'click', '#filter-contact-sales-grid', function() {
+
+        if ( $(this).val() == 'Updating...' ) { return false; }
+
+        $(this).val('Updating...');
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:           'propertyhive_get_contact_sales_meta_box',
+            post_id:          propertyhive_admin_meta_boxes.post_id,
+            selected_status:  $('#_sale_status_filter').val(),
+        };
+
+        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+        {
+            jQuery('#propertyhive_contact_sales_meta_box').html(response);
         }, 'html');
 
         return false;
