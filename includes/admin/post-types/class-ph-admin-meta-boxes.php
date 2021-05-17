@@ -911,7 +911,7 @@ class PH_Admin_Meta_Boxes {
                         'name' => __( 'Offers', 'propertyhive' ) . ' (' . $offers_count . ')',
                         'metabox_ids' => $ids,
                         'post_type' => 'property',
-                        'ajax_actions' => array( 'get_property_offers_meta_box^' . wp_create_nonce( 'get_property_offers_meta_box' ) ),
+                        'ajax_actions' => array( 'get_property_offers_meta_box' ),
                     );
 
                     /* PROPERTY SALES META BOXES */

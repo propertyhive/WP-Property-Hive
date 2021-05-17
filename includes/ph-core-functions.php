@@ -308,6 +308,17 @@ function add_viewing_status_meta_query( $meta_query, $selected_status )
     return $meta_query;
 }
 
+function ph_get_offer_statuses()
+{
+    $viewing_statuses = array(
+        'pending'  => __( 'Pending', 'propertyhive' ),
+        'accepted' => __( 'Accepted', 'propertyhive' ),
+        'declined' => __( 'Declined', 'propertyhive' ),
+    );
+
+    return $viewing_statuses;
+}
+
 function get_area_units()
 {
     $size_options = array(
