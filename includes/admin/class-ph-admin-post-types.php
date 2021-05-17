@@ -575,18 +575,19 @@ class PH_Admin_Post_Types {
         global $wp_query;
 
         $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'open', 'closed' ) ) ? $_GET['_status'] : '';
-        
+
         // Status filtering
         $output  = '<select name="_status" id="dropdown_enquiry_status">';
-            
-            $output .= '<option value="open"';
-            $output .= selected( 'open', $selected_status, false );
-            $output .= '>' . __( 'Open', 'propertyhive' ) . '</option>';
 
-            $output .= '<option value="closed"';
-            $output .= selected( 'closed', $selected_status, false );
-            $output .= '>' . __( 'Closed', 'propertyhive' ) . '</option>';
-            
+            $enquiry_statuses = ph_get_enquiry_statuses();
+
+            foreach ( $enquiry_statuses as $status => $display_status )
+            {
+                $output .= '<option value="' . $status . '"';
+                $output .= selected( $status, $selected_status, false );
+                $output .= '>' . $display_status . '</option>';
+            }
+
         $output .= '</select>';
 
         return $output;
@@ -817,21 +818,18 @@ class PH_Admin_Post_Types {
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_offer_status">';
-            
-            $output .= '<option value="">All Statuses</option>';
 
-            $output .= '<option value="pending"';
-            $output .= selected( 'pending', $selected_status, false );
-            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
 
-            $output .= '<option value="accepted"';
-            $output .= selected( 'accepted', $selected_status, false );
-            $output .= '>' . __( 'Accepted', 'propertyhive' ) . '</option>';
+            $offer_statuses = ph_get_offer_statuses();
 
-            $output .= '<option value="declined"';
-            $output .= selected( 'declined', $selected_status, false );
-            $output .= '>' . __( 'Declined', 'propertyhive' ) . '</option>';
-            
+            foreach ( $offer_statuses as $status => $display_status )
+            {
+                $output .= '<option value="' . $status . '"';
+                $output .= selected( $status, $selected_status, false );
+                $output .= '>' . $display_status . '</option>';
+            }
+
         $output .= '</select>';
 
         return $output;
@@ -863,23 +861,16 @@ class PH_Admin_Post_Types {
         // Status filtering
         $output  = '<select name="_status" id="dropdown_sale_status">';
             
-            $output .= '<option value="">All Statuses</option>';
+            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
 
-            $output .= '<option value="current"';
-            $output .= selected( 'current', $selected_status, false );
-            $output .= '>' . __( 'Current', 'propertyhive' ) . '</option>';
+            $sale_statuses = ph_get_sale_statuses();
 
-            $output .= '<option value="exchanged"';
-            $output .= selected( 'exchanged', $selected_status, false );
-            $output .= '>' . __( 'Exchanged', 'propertyhive' ) . '</option>';
-
-            $output .= '<option value="completed"';
-            $output .= selected( 'completed', $selected_status, false );
-            $output .= '>' . __( 'Completed', 'propertyhive' ) . '</option>';
-
-            $output .= '<option value="fallen_through"';
-            $output .= selected( 'fallen_through', $selected_status, false );
-            $output .= '>' . __( 'Fallen Through', 'propertyhive' ) . '</option>';
+            foreach ( $sale_statuses as $status => $display_status )
+            {
+                $output .= '<option value="' . $status . '"';
+                $output .= selected( $status, $selected_status, false );
+                $output .= '>' . $display_status . '</option>';
+            }
             
         $output .= '</select>';
 
