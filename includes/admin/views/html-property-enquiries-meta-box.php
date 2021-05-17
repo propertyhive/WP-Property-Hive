@@ -122,6 +122,7 @@
             </tr>
             <?php
         }
+        wp_reset_postdata();
     ?>
     </tbody>
 </table>
