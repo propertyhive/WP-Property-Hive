@@ -911,7 +911,7 @@ class PH_Admin_Meta_Boxes {
                         'name' => __( 'Offers', 'propertyhive' ) . ' (' . $offers_count . ')',
                         'metabox_ids' => $ids,
                         'post_type' => 'property',
-                        'ajax_actions' => array( 'get_property_offers_meta_box^' . wp_create_nonce( 'get_property_offers_meta_box' ) ),
+                        'ajax_actions' => array( 'get_property_offers_meta_box' ),
                     );
 
                     /* PROPERTY SALES META BOXES */
@@ -955,7 +955,7 @@ class PH_Admin_Meta_Boxes {
                         'name' => __( 'Sales', 'propertyhive' ) . ' (' . $sales_count . ')',
                         'metabox_ids' => $ids,
                         'post_type' => 'property',
-                        'ajax_actions' => array( 'get_property_sales_meta_box^' . wp_create_nonce( 'get_property_sales_meta_box' ) ),
+                        'ajax_actions' => array( 'get_property_sales_meta_box' ),
                     );
                 }
             }
@@ -1009,7 +1009,8 @@ class PH_Admin_Meta_Boxes {
                 $tabs['tab_enquiries'] = array(
                     'name' => __( 'Enquiries', 'propertyhive' ) . ' (' . $enquiry_count . ')',
                     'metabox_ids' => $ids,
-                    'post_type' => 'property'
+                    'post_type' => 'property',
+                    'ajax_actions' => array( 'get_property_enquiries_meta_box' ),
                 );
             }
         }
@@ -1266,7 +1267,7 @@ class PH_Admin_Meta_Boxes {
                         'name' => __( 'Offers', 'propertyhive' ) . ' (' . $offer_count . ')',
                         'metabox_ids' => array('propertyhive-contact-offers'),
                         'post_type' => 'contact',
-                        'ajax_actions' => array( 'get_contact_offers_meta_box^' . wp_create_nonce( 'get_contact_offers_meta_box' ) ),
+                        'ajax_actions' => array( 'get_contact_offers_meta_box' ),
                     );
                 }
 
@@ -1279,7 +1280,7 @@ class PH_Admin_Meta_Boxes {
                         'name' => __( 'Sales', 'propertyhive' ) . ' (' . $sale_count . ')',
                         'metabox_ids' => array('propertyhive-contact-sales'),
                         'post_type' => 'contact',
-                        'ajax_actions' => array( 'get_contact_sales_meta_box^' . wp_create_nonce( 'get_contact_sales_meta_box' ) ),
+                        'ajax_actions' => array( 'get_contact_sales_meta_box' ),
                     );
                 }
             }
@@ -1324,7 +1325,8 @@ class PH_Admin_Meta_Boxes {
                 $tabs['tab_contact_enquiries'] = array(
                     'name' => __( 'Enquiries', 'propertyhive' ) . ' (' . $enquiry_count . ')',
                     'metabox_ids' => array('propertyhive-contact-enquiries'),
-                    'post_type' => 'contact'
+                    'post_type' => 'contact',
+                    'ajax_actions' => array( 'get_contact_enquiries_meta_box' ),
                 );
             }
 

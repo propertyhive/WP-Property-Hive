@@ -93,4 +93,48 @@ class PH_Enquiry {
         $this->post_title          = $result->post_title;
         $this->post_status         = $result->post_status;
     }
+
+    /**
+     * Get the assigned negotiator
+     *
+     * @access public
+     * @return string
+     */
+    public function get_negotiator()
+    {
+        if ($this->_negotiator_id == '' || $this->_negotiator_id == 0)
+        {
+            return '<em>-- ' . __( 'Unassigned', 'propertyhive' ) . ' --</em>';
+        }
+        else
+        {
+            $userdata = get_userdata( $this->_negotiator_id );
+            if ( $userdata !== FALSE )
+            {
+                return $userdata->display_name;
+            }
+            else
+            {
+                return '<em>Unknown user</em>';
+            }
+        }
+    }
+
+    /**
+     * Get the assigned office
+     *
+     * @access public
+     * @return string
+     */
+    public function get_office()
+    {
+        if ($this->_office_id == '' || $this->_office_id == 0)
+        {
+            return '<em>-- ' . __( 'Unassigned', 'propertyhive' ) . ' --</em>';
+        }
+        else
+        {
+            return get_the_title( $this->_office_id );
+        }
+    }
 }

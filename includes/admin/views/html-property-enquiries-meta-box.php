@@ -1,46 +1,53 @@
 <?php
     $meta_query = array(
         array(
-            'key' => '_applicant_contact_id',
-            'value' => $post_id
+            'relation' => 'OR',
+            array(
+                'key' => 'property_id',
+                'value' => $post_id,
+            ),
+            array(
+                'key' => '_property_id',
+                'value' => $post_id,
+            ),
         ),
     );
 
     if ( isset($selected_status) && !empty($selected_status) )
     {
-        $meta_query = add_viewing_status_meta_query( $meta_query, $selected_status );
+        $meta_query[] = array(
+            'key' => '_status',
+            'value' => $selected_status,
+        );
     }
 
     $args = array(
-        'post_type'   => 'viewing',
+        'post_type'   => 'enquiry',
         'nopaging'    => true,
-        'orderby'     => 'meta_value',
-        'order'       => 'DESC',
-        'meta_key'    => '_start_date_time',
-        'post_status' => 'publish',
         'meta_query'  => $meta_query,
     );
-    $viewings_query = new WP_Query( $args );
-    $viewings_count = $viewings_query->found_posts;
+    $enquiries_query = new WP_Query( $args );
+    $enquiries_count = $enquiries_query->found_posts;
 
     $columns = array(
         'date_time' => __( 'Date', 'propertyhive' ) . ' / ' . __( 'Time', 'propertyhive' ),
-        'property' =>  __( 'Property', 'propertyhive' ),
-        'negotiators' => __( 'Attending Negotiator(s)', 'propertyhive' ),
+        'subject' =>  __( 'Subject', 'propertyhive' ),
         'status' => __( 'Status', 'propertyhive' ),
+        'negotiator' => __( 'Negotiator', 'propertyhive' ),
+        'office' => __( 'Office', 'propertyhive' ),
     );
 
-    $columns = apply_filters( 'propertyhive_contact_viewings_columns', $columns );
+    $columns = apply_filters( 'propertyhive_property_enquiries_columns', $columns );
 ?>
 
 <div class="tablenav top">
     <div class="alignleft actions">
-        <select name="_status" id="_viewing_status_filter">
+        <select name="_status" id="_enquiry_status_filter">
             <option value=""><?php echo __( 'All Statuses', 'propertyhive' ); ?></option>
             <?php
-                $viewing_statuses = ph_get_viewing_statuses();
+                $enquiry_statuses = ph_get_enquiry_statuses();
 
-                foreach ( $viewing_statuses as $status => $display_status )
+                foreach ( $enquiry_statuses as $status => $display_status )
                 {
                     ?>
                     <option value="<?php echo $status; ?>" <?php selected( $status, $selected_status ); ?>><?php echo $display_status; ?></option>
@@ -48,10 +55,10 @@
                 }
             ?>
         </select>
-        <input type="button" name="filter_action" id="filter-contact-viewings-grid" class="button" value="Filter">
+        <input type="button" name="filter_action" id="filter-property-enquiries-grid" class="button" value="Filter">
     </div>
     <div class='tablenav-pages one-page'>
-        <span class="displaying-num"><?php echo $viewings_count; ?> item<?php echo $viewings_count != 1 ? 's' : ''; ?></span>
+        <span class="displaying-num"><?php echo $enquiries_count; ?> item<?php echo $enquiries_count != 1 ? 's' : ''; ?></span>
     </div>
     <br class="clear" />
 </div>
@@ -70,23 +77,24 @@
     </thead>
     <tbody id="the-list">
     <?php
-        if ( $viewings_query->have_posts() )
+        if ( $enquiries_query->have_posts() )
         {
-            while ( $viewings_query->have_posts() )
+            while ( $enquiries_query->have_posts() )
             {
-                $viewings_query->the_post();
-                $the_viewing = new PH_Viewing( get_the_ID() );
+                $enquiries_query->the_post();
+                $the_enquiry = new PH_Enquiry( get_the_ID() );
 
                 $edit_link = get_edit_post_link( get_the_ID() );
 
                 $column_data = array(
-                    'date_time' => '<a href="' . $edit_link . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '" class="viewing-lightbox" data-viewing-id="' . get_the_ID() . '">' . date("H:i jS F Y", strtotime($the_viewing->_start_date_time)) . '</a>',
-                    'property' =>  $the_viewing->get_property_address(),
-                    'negotiators' => $the_viewing->get_negotiators(),
-                    'status' => $the_viewing->get_status(),
+                    'date_time' => '<a href="' . $edit_link . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . get_the_time( 'jS M Y H:i' ) . '</a>',
+                    'subject' => get_the_title(),
+                    'status' => ucfirst( $the_enquiry->status ),
+                    'negotiator' => $the_enquiry->get_negotiator(),
+                    'office' => $the_enquiry->get_office(),
                 );
                 ?>
-                    <tr class="status-<?php echo $the_viewing->_status; ?>" >
+                    <tr class="status-<?php echo $the_enquiry->_status; ?>" >
                     <?php
                         foreach ( $columns as $column_key => $column )
                         {
@@ -97,7 +105,7 @@
                                 echo $column_data[$column_key];
                             }
 
-                            do_action( 'propertyhive_contact_viewings_custom_column', $column_key );
+                            do_action( 'propertyhive_property_enquiries_custom_column', $column_key );
 
                             echo '</td>';
                         }
@@ -110,7 +118,7 @@
         {
             ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="4">No viewings found</td>
+                <td class="colspanchange" colspan="5">No enquiries found</td>
             </tr>
             <?php
         }

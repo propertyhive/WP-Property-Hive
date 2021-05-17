@@ -161,4 +161,99 @@ class PH_Sale {
             return '-';
         }
     }
+
+    /**
+     * Get the full address of the property attached to the sale
+     *
+     * @access public
+     * @return string
+     */
+    public function get_property_address()
+    {
+        $property_id = (int)$this->_property_id;
+
+        if ( !empty($property_id) )
+        {
+            $property = new PH_Property( $property_id );
+            return '<a href="' . get_edit_post_link( $property_id, '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . $property->get_formatted_full_address() . '</a>';
+        }
+        else
+        {
+            return '-';
+        }
+    }
+
+    /**
+     * Get the contact details of the owner(s) of the property attached to the sale
+     *
+     * @access public
+     * @return string
+     */
+    public function get_property_owners()
+    {
+        $property_owners = '-';
+
+        $property_id = (int)$this->_property_id;
+
+        if ( !empty($property_id) )
+        {
+            $property = new PH_Property( $property_id );
+            $owner_contact_ids = $property->_owner_contact_id;
+            if (
+                ( !is_array($owner_contact_ids) && $owner_contact_ids != '' && $owner_contact_ids != 0 )
+                ||
+                ( is_array($owner_contact_ids) && !empty($owner_contact_ids) )
+            )
+            {
+                $property_owners = '';
+
+                if ( !is_array($owner_contact_ids) )
+                {
+                    $owner_contact_ids = array($owner_contact_ids);
+                }
+
+                foreach ( $owner_contact_ids as $owner_contact_id )
+                {
+                    $property_owners .= $this->formatted_contact_meta_box_data($owner_contact_id, false);
+                }
+            }
+        }
+
+        return $property_owners;
+    }
+
+    /**
+     * Format contact data for display in a meta box list
+     */
+    private function formatted_contact_meta_box_data( $contact_post_id, $add_edit_link = true )
+    {
+        if ( $add_edit_link )
+        {
+            $contact_text = '<a href="' . get_edit_post_link( $contact_post_id, '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . get_the_title($contact_post_id) . '</a>';
+        }
+        else
+        {
+            $contact_text = get_the_title($contact_post_id);
+        }
+
+        $telephone_number = get_post_meta( $contact_post_id, '_telephone_number', true );
+        if( !empty($telephone_number) )
+        {
+            $contact_details = 'T: ' . $telephone_number;
+        }
+
+        $email_address = get_post_meta( $contact_post_id, '_email_address', true );
+        if( !empty($email_address) )
+        {
+            $contact_details .= ( $contact_details != '' ) ? '<br>' : '';
+            $contact_details .= 'E: ' . $email_address;
+        }
+
+        if ( $contact_details != '' )
+        {
+            $contact_text .= '<div class="row-actions visible">' . $contact_details . '</div>';
+        }
+
+        return $contact_text;
+    }
 }
