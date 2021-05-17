@@ -1091,6 +1091,15 @@ class PH_Query {
         		$minimum_rent = $ph_countries->convert_price_to_gbp( $minimum_rent, $search_form_currency );
         	}
 
+        	$rent_frequency = apply_filters( 'propertyhive_search_form_rent_frequency', 'pcm' );
+        	switch ($rent_frequency)
+        	{
+        		case "pd": { $minimum_rent = ($minimum_rent * 365) / 12; break; }
+        		case "pw": { $minimum_rent = ($minimum_rent * 52) / 12; break; }
+        		case "pq": { $minimum_rent = ($minimum_rent * 4) / 12; break; }
+        		case "pa": { $minimum_rent = $minimum_rent / 12; break; }
+        	}
+
             $meta_query = array(
                 'key'     => '_price_actual',
                 'value'   => ph_clean( floor( $minimum_rent ) ),
@@ -1128,6 +1137,15 @@ class PH_Query {
         		$maximum_rent = $ph_countries->convert_price_to_gbp( $maximum_rent, $search_form_currency );
         	}
 
+        	$rent_frequency = apply_filters( 'propertyhive_search_form_rent_frequency', 'pcm' );
+        	switch ($rent_frequency)
+        	{
+        		case "pd": { $maximum_rent = ($maximum_rent * 365) / 12; break; }
+        		case "pw": { $maximum_rent = ($maximum_rent * 52) / 12; break; }
+        		case "pq": { $maximum_rent = ($maximum_rent * 4) / 12; break; }
+        		case "pa": { $maximum_rent = $maximum_rent / 12; break; }
+        	}
+
             $meta_query = array(
                 'key'     => '_price_actual',
                 'value'   => ph_clean( ceil( $maximum_rent ) ),
@@ -1158,6 +1176,8 @@ class PH_Query {
 
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
+        	$rent_frequency = apply_filters( 'propertyhive_search_form_rent_frequency', 'pcm' );
+
         	if ( isset($explode_rent_range[0]) && $explode_rent_range[0] != '' )
         	{
         		$minimum_rent = $explode_rent_range[0];
@@ -1167,6 +1187,14 @@ class PH_Query {
 	        		$ph_countries = new PH_Countries();
 
 	        		$minimum_rent = $ph_countries->convert_price_to_gbp( $minimum_rent, $search_form_currency );
+	        	}
+
+	        	switch ($rent_frequency)
+	        	{
+	        		case "pd": { $minimum_rent = ($minimum_rent * 365) / 12; break; }
+	        		case "pw": { $minimum_rent = ($minimum_rent * 52) / 12; break; }
+	        		case "pq": { $minimum_rent = ($minimum_rent * 4) / 12; break; }
+	        		case "pa": { $minimum_rent = $minimum_rent / 12; break; }
 	        	}
 
 	            $meta_query[] = array(
@@ -1185,6 +1213,14 @@ class PH_Query {
 	        		$ph_countries = new PH_Countries();
 
 	        		$maximum_rent = $ph_countries->convert_price_to_gbp( $maximum_rent, $search_form_currency );
+	        	}
+
+	        	switch ($rent_frequency)
+	        	{
+	        		case "pd": { $maximum_rent = ($maximum_rent * 365) / 12; break; }
+	        		case "pw": { $maximum_rent = ($maximum_rent * 52) / 12; break; }
+	        		case "pq": { $maximum_rent = ($maximum_rent * 4) / 12; break; }
+	        		case "pa": { $maximum_rent = $maximum_rent / 12; break; }
 	        	}
 
 	            $meta_query[] = array(
