@@ -115,7 +115,7 @@
         {
             ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="4">No sales found</td>
+                <td class="colspanchange" colspan="5">No sales found</td>
             </tr>
             <?php
         }
