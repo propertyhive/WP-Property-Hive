@@ -299,13 +299,11 @@ function viewing_update_selected_properties()
 
                     if ( $contact_query->have_posts() )
                     {
-                        while ( $contact_query->have_posts() )
+                        foreach ($contact_query->get_posts() as $p) 
                         {
-                            $contact_query->the_post();
+                            $enquiry_contact_id = $p;
 
-                            $enquiry_contact_id = get_the_ID();
                         }
-                        wp_reset_postdata();
                     }
                 }
 
