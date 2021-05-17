@@ -1009,7 +1009,8 @@ class PH_Admin_Meta_Boxes {
                 $tabs['tab_enquiries'] = array(
                     'name' => __( 'Enquiries', 'propertyhive' ) . ' (' . $enquiry_count . ')',
                     'metabox_ids' => $ids,
-                    'post_type' => 'property'
+                    'post_type' => 'property',
+                    'ajax_actions' => array( 'get_property_enquiries_meta_box' ),
                 );
             }
         }
@@ -1324,7 +1325,8 @@ class PH_Admin_Meta_Boxes {
                 $tabs['tab_contact_enquiries'] = array(
                     'name' => __( 'Enquiries', 'propertyhive' ) . ' (' . $enquiry_count . ')',
                     'metabox_ids' => array('propertyhive-contact-enquiries'),
-                    'post_type' => 'contact'
+                    'post_type' => 'contact',
+                    'ajax_actions' => array( 'get_contact_enquiries_meta_box' ),
                 );
             }
 

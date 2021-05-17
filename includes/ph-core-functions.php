@@ -331,6 +331,16 @@ function ph_get_sale_statuses()
     return $sale_statuses;
 }
 
+function ph_get_enquiry_statuses()
+{
+    $enquiry_statuses = array(
+        'open'   => __( 'Open', 'propertyhive' ),
+        'closed' => __( 'Closed', 'propertyhive' ),
+    );
+
+    return $enquiry_statuses;
+}
+
 function get_area_units()
 {
     $size_options = array(
