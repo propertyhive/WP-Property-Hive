@@ -113,7 +113,7 @@
         {
             ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="4">No sales found</td>
+                <td class="colspanchange" colspan="<?php echo count($columns); ?>"><?php echo __( 'No sales found', 'propertyhive' ); ?></td>
             </tr>
             <?php
         }
