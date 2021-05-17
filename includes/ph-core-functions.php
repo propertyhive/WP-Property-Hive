@@ -319,6 +319,18 @@ function ph_get_offer_statuses()
     return $offer_statuses;
 }
 
+function ph_get_sale_statuses()
+{
+    $sale_statuses = array(
+        'current'        => __( 'Current', 'propertyhive' ),
+        'exchanged'      => __( 'Exchanged', 'propertyhive' ),
+        'completed'      => __( 'Completed', 'propertyhive' ),
+        'fallen_through' => __( 'Fallen Through', 'propertyhive' ),
+    );
+
+    return $sale_statuses;
+}
+
 function get_area_units()
 {
     $size_options = array(
