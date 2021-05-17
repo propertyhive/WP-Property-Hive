@@ -83,7 +83,7 @@
                 $edit_link = get_edit_post_link( get_the_ID() );
 
                 $column_data = array(
-                    'date' => '<a href="' . get_edit_post_link( get_the_ID(), '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime($the_sale->_sale_date_time)) . '</a>',
+                    'date' => '<a href="' . $edit_link . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime($the_sale->_sale_date_time)) . '</a>',
                     'applicant' => $the_sale->get_applicants( true, true ),
                     'amount' => $the_sale->get_formatted_amount(),
                     'status' => __( ucwords(str_replace("_", " ", $the_sale->_status)), 'propertyhive' ),
