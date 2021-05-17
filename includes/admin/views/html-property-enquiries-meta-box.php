@@ -118,7 +118,7 @@
         {
             ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="5">No enquiries found</td>
+                <td class="colspanchange" colspan="<?php echo count($columns); ?>"><?php echo __( 'No enquiries found', 'propertyhive' ); ?></td>
             </tr>
             <?php
         }
