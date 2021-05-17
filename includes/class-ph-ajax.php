@@ -100,6 +100,10 @@ class PH_AJAX {
             'get_property_sales_meta_box' => false,
             'get_contact_sales_meta_box' => false,
 
+            // Enquiry actions
+            'get_property_enquiries_meta_box' => false,
+            'get_contact_enquiries_meta_box' => false,
+
             // Tenancy actions
             'add_key_date' => false,
             'get_management_dates_grid' => false,
@@ -4689,6 +4693,42 @@ class PH_AJAX {
         include( PH()->plugin_path() . '/includes/admin/views/html-contact-sales-meta-box.php' );
 
         do_action('propertyhive_contact_sales_fields');
+
+        // Quit out
+        die();
+    }
+
+    public function get_property_enquiries_meta_box()
+    {
+        $post_id = $_POST['post_id'];
+
+        $selected_status = '';
+        if ( isset($_POST['selected_status']) )
+        {
+            $selected_status = ph_clean($_POST['selected_status']);
+        }
+
+        include( PH()->plugin_path() . '/includes/admin/views/html-property-enquiries-meta-box.php' );
+
+        do_action('propertyhive_property_enquiries_fields');
+
+        // Quit out
+        die();
+    }
+
+    public function get_contact_enquiries_meta_box()
+    {
+        $post_id = $_POST['post_id'];
+
+        $selected_status = '';
+        if ( isset($_POST['selected_status']) )
+        {
+            $selected_status = ph_clean($_POST['selected_status']);
+        }
+
+        include( PH()->plugin_path() . '/includes/admin/views/html-contact-enquiries-meta-box.php' );
+
+        do_action('propertyhive_contact_enquiries_fields');
 
         // Quit out
         die();

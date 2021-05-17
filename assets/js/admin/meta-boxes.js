@@ -623,6 +623,48 @@ jQuery( function($){
 
         return false;
     });
+
+    $('[id=\'propertyhive-property-enquiries\']').on( 'click', '#filter-property-enquiries-grid', function() {
+
+        if ( $(this).val() == 'Updating...' ) { return false; }
+
+        $(this).val('Updating...');
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:           'propertyhive_get_property_enquiries_meta_box',
+            post_id:          propertyhive_admin_meta_boxes.post_id,
+            selected_status:  $('#_enquiry_status_filter').val(),
+        };
+
+        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+        {
+            jQuery('#propertyhive_property_enquiries_meta_box').html(response);
+        }, 'html');
+
+        return false;
+    });
+
+    $('[id=\'propertyhive-contact-enquiries\']').on( 'click', '#filter-contact-enquiries-grid', function() {
+
+        if ( $(this).val() == 'Updating...' ) { return false; }
+
+        $(this).val('Updating...');
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:           'propertyhive_get_contact_enquiries_meta_box',
+            post_id:          propertyhive_admin_meta_boxes.post_id,
+            selected_status:  $('#_enquiry_status_filter').val(),
+        };
+
+        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+        {
+            jQuery('#propertyhive_contact_enquiries_meta_box').html(response);
+        }, 'html');
+
+        return false;
+    });
     
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
