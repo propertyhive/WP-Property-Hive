@@ -1357,7 +1357,7 @@ class PH_Admin_Meta_Boxes {
                     }
 
                     $tabs['tab_contact_tenancies'] = array(
-                        'name'        => __( 'Tenancies', 'propertyhive' ) . '(' . $tenancy_count . ')',
+                        'name'        => __( 'Tenancies', 'propertyhive' ) . ' (' . $tenancy_count . ')',
                         'metabox_ids' => $ids,
                         'post_type'   => 'contact',
                         'ajax_actions' => array( 'get_contact_tenancies_grid^' . wp_create_nonce( 'get_contact_tenancies_grid' ) ),
