@@ -86,6 +86,14 @@ class PH_Elementor {
 			'Property Brochures Link',
 			'Property Embedded Virtual Tours',
 			'Property Virtual Tours Link',
+			'Property Office Name',
+			'Property Office Telephone Number',
+			'Property Office Email Address',
+			'Property Office Address',
+			'Property Negotiator Name',
+			'Property Negotiator Telephone Number',
+			'Property Negotiator Email Address',
+			'Property Negotiator Photo',
 			'Back To Search',
 		);
 
