@@ -46,6 +46,7 @@ class PH_AJAX {
 
             // Contact actions
             'create_contact_login' => false,
+            'get_contact_tenancies_grid' => false,
 
             // Appraisal actions
             'get_appraisal_details_meta_box' => false,
@@ -4913,10 +4914,25 @@ class PH_AJAX {
 
         if ( isset($_POST['selected_status']) )
         {
-            $selected_status = $_POST['selected_status'];
+            $selected_status = ph_clean($_POST['selected_status']);
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-property-tenancies-meta-box.php' );
+
+        // Quit out
+        die();
+    }
+
+    public function get_contact_tenancies_grid()
+    {
+        $post_id = $_POST['post_id'];
+
+        if ( isset($_POST['selected_status']) )
+        {
+            $selected_status = ph_clean($_POST['selected_status']);
+        }
+
+        include( PH()->plugin_path() . '/includes/admin/views/html-contact-tenancies-meta-box.php' );
 
         // Quit out
         die();

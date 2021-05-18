@@ -519,6 +519,27 @@ jQuery( function($){
         return false;
     });
 
+    $('[id=\'propertyhive-contact-tenancies\']').on( 'click', '#filter-contact-tenancies-grid', function() {
+
+        if ( $(this).val() == 'Updating...' ) { return false; }
+
+        $(this).val('Updating...');
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:           'propertyhive_get_contact_tenancies_grid',
+            post_id:          propertyhive_admin_meta_boxes.post_id,
+            selected_status:  $('#_tenancy_status_filter').val(),
+        };
+
+        jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+        {
+            jQuery('#propertyhive_contact_tenancies_grid').html(response);
+        }, 'html');
+
+        return false;
+    });
+
     $('[id=\'propertyhive-contact-viewings\']').on( 'click', '#filter-contact-viewings-grid', function() {
 
         if ( $(this).val() == 'Updating...' ) { return false; }

@@ -1285,6 +1285,86 @@ class PH_Admin_Meta_Boxes {
                 }
             }
 
+            if ( get_option( 'propertyhive_module_disabled_tenancies', '' ) != 'yes' )
+            {
+                $args = array(
+                    'post_type' => 'tenancy',
+                    'posts_per_page' => 1,
+                    'fields' => 'ids',
+                    'meta_query' => array(
+                        array(
+                            'key' => '_applicant_contact_id',
+                            'value' => $post->ID
+                        )
+                    )
+                );
+                $tenancy_query = new WP_Query( $args );
+                $tenancy_count = $tenancy_query->found_posts;
+                wp_reset_postdata();
+
+                $has_lettings_applicant_profile = false;
+                if ( $tenancy_count == 0 )
+                {
+                    if ( is_array($contact_types) && in_array('applicant', $contact_types) )
+                    {
+                        $num_applicant_profiles = get_post_meta( $post->ID, '_applicant_profiles', TRUE );
+                        if ( $num_applicant_profiles == '' )
+                        {
+                            $num_applicant_profiles = 0;
+                        }
+
+                        if ( $num_applicant_profiles > 0 )
+                        {
+                            for ( $i = 0; $i < $num_applicant_profiles; ++$i )
+                            {
+                                $applicant_profile = get_post_meta( $post->ID, '_applicant_profile_' . $i, TRUE );
+
+                                if (
+                                    isset($applicant_profile['department']) &&
+                                    (
+                                        $applicant_profile['department'] == 'residential-lettings' ||
+                                        ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-lettings'
+                                    )
+                                )
+                                {
+                                    $has_lettings_applicant_profile = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ( $has_lettings_applicant_profile === true || $tenancy_count > 0 )
+                {
+                    $meta_boxes = array();
+
+                    $meta_boxes[5] = array(
+                        'id' => 'propertyhive-contact-tenancies',
+                        'title' => __( 'Tenancies', 'propertyhive' ),
+                        'callback' => 'PH_Meta_Box_Contact_Tenancies::output',
+                        'screen' => 'contact',
+                        'context' => 'normal',
+                        'priority' => 'high'
+                    );
+
+                    $meta_boxes = apply_filters( 'propertyhive_contact_tenancies_meta_boxes', $meta_boxes );
+                    ksort( $meta_boxes );
+
+                    $ids = array();
+                    foreach ( $meta_boxes as $meta_box ) {
+                        add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                        $ids[] = $meta_box['id'];
+                    }
+
+                    $tabs['tab_contact_tenancies'] = array(
+                        'name'        => __( 'Tenancies', 'propertyhive' ) . '(' . $tenancy_count . ')',
+                        'metabox_ids' => $ids,
+                        'post_type'   => 'contact',
+                        'ajax_actions' => array( 'get_contact_tenancies_grid^' . wp_create_nonce( 'get_contact_tenancies_grid' ) ),
+                    );
+                }
+            }
+
             if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
             {
                 $meta_query = array(
