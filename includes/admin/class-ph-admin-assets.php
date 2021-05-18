@@ -245,6 +245,11 @@ class PH_Admin_Assets {
                 wp_enqueue_script( 'chosen-rtl', PH()->plugin_url() . '/assets/js/chosen/chosen-rtl' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
             }
         }
+
+        if ( in_array( $screen->id, array('profile', 'user', 'user-edit') ) ) 
+        {
+            wp_enqueue_media();
+        }
         
         if ( strpos($screen->id, 'page_ph-settings') !== FALSE )
         {
