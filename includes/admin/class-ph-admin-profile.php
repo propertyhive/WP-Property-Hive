@@ -71,6 +71,16 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 								'type'        => 'select',
 								'options'     => array( '' => __( 'Select an office', 'property' ) ) + $offices,
 							),
+							'telephone_number'    => array(
+								'label'       => __( 'Telephone Number', 'propertyhive' ),
+								'description' => '',
+								'type'        => 'text',
+							),
+							'photo_attachment_id'    => array(
+								'label'       => __( 'Photo', 'propertyhive' ),
+								'description' => '',
+								'type'        => 'image',
+							),
 						),
 					),
 				)
@@ -121,7 +131,57 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 									<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="1" class="<?php echo esc_attr( $field['class'] ); ?>" <?php checked( (int) get_user_meta( $user->ID, $key, true ), 1, true ); ?> />
 								<?php elseif ( ! empty( $field['type'] ) && 'button' === $field['type'] ) : ?>
 									<button type="button" id="<?php echo esc_attr( $key ); ?>" class="button <?php echo esc_attr( $field['class'] ); ?>"><?php echo esc_html( $field['text'] ); ?></button>
-								<?php else : ?>
+								<?php elseif ( ! empty( $field['type'] ) && 'image' === $field['type'] ) : ?>
+									<input type="hidden" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" class="photo-attachment-id" value="<?php echo esc_attr( $this->get_user_meta( $user->ID, $key ) ); ?>" />
+									<div class="photo-attachment-image">
+				                        <?php if ( !empty($this->get_user_meta( $user->ID, $key )) ) { echo wp_get_attachment_image( $this->get_user_meta( $user->ID, $key ), 'thumbnail'); } ?>
+				                    </div>
+									<div class="wp-media-buttons">
+				                        <button class="button propertyhive-add-media" id="propertyhive-add-media"><?php _e('Select', 'propertyhive'); ?></button>
+				                    </div>
+                    				<script>
+
+                    					var file_frame;
+
+                    					jQuery(document).ready(function() 
+                    					{
+										    jQuery('body').on('click', '.propertyhive-add-media', function( event ){
+                       
+						                        event.preventDefault();
+						                       
+						                        // If the media frame already exists, reopen it.
+						                        if ( file_frame ) {
+						                            file_frame.open();
+						                            return;
+						                        }
+
+						                        // Create the media frame.
+					                          	file_frame = wp.media.frames.file_frame = wp.media({
+					                            	multiple: false
+					                          	});
+
+					                          	// When an image is selected, run a callback.
+					                          	file_frame.on( 'select', function() {
+					                              	var selection = file_frame.state().get('selection');
+					           
+					                              	selection.map( function( attachment ) {
+					                           
+					                                  	attachment = attachment.toJSON();
+					                           
+							                            jQuery('#<?php echo esc_attr( $key ); ?>').val(attachment.id);
+							                            
+							                            var photo_html = '<img src="' + attachment.url + '" style="max-width:150px; max-height:150px;" alt=""></li>';
+							                            
+							                            jQuery('.photo-attachment-image').html(photo_html);
+					                              	});
+					                          	});
+					                       
+					                          	// Finally, open the modal
+					                          	file_frame.open();
+						                    });
+										});
+                    				</script>
+								<?php else: ?>
 									<input type="text" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $this->get_user_meta( $user->ID, $key ) ); ?>" class="<?php echo ( ! empty( $field['class'] ) ? esc_attr( $field['class'] ) : 'regular-text' ); ?>" />
 								<?php endif; ?>
 								<p class="description"><?php echo wp_kses_post( $field['description'] ); ?></p>
