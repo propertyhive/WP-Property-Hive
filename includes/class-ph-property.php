@@ -142,6 +142,22 @@ class PH_Property {
         {
             return $this->get_office_email_address();
         }
+        if ( 'negotiator_name' == $key ) 
+        {
+            return $this->get_negotiator_name();
+        }
+        if ( 'negotiator_telephone_number' == $key ) 
+        {
+            return $this->get_negotiator_telephone_number();
+        }
+        if ( 'negotiator_email_address' == $key ) 
+        {
+            return $this->get_negotiator_email_address();
+        }
+        if ( 'negotiator_photo' == $key ) 
+        {
+            return $this->get_negotiator_photo();
+        }
 
         // Get values or default if not set
         $value = get_post_meta( $this->id, $key, true );
@@ -1255,6 +1271,94 @@ class PH_Property {
         return get_post_meta( $this->_office_id, '_office_email_address_' . ( str_replace("residential-", "", $this->_department) ), TRUE );
     }
 
+    public function get_negotiator_name()
+    {   
+        if ( empty($this->_negotiator_id) )
+        {
+            return '';
+        }
+
+        $user = get_userdata( $this->_negotiator_id );
+
+        if ( $user === false )
+        {
+            return '';
+        }
+
+        return $user->display_name;
+    }
+
+    public function get_negotiator_telephone_number( $fallback_to_office = true )
+    {   
+        if ( empty($this->_negotiator_id) )
+        {
+            return '';
+        }
+
+        $user = get_userdata( $this->_negotiator_id );
+
+        if ( $user === false )
+        {
+            return '';
+        }
+
+        $telephone_number = get_user_meta( $this->_negotiator_id, 'telephone_number', true );
+
+        if ( empty($telephone_number) && $fallback_to_office )
+        {
+            // need to fallback
+            $telephone_number = $this->get_office_telephone_number();
+        }
+
+        return $telephone_number;
+    }
+
+    public function get_negotiator_email_address( $fallback_to_office = true )
+    {   
+        if ( empty($this->_negotiator_id) )
+        {
+            return '';
+        }
+
+        $user = get_userdata( $this->_negotiator_id );
+
+        if ( $user === false )
+        {
+            return '';
+        }
+
+        $email_address = $user->user_email;
+
+        if ( empty($email_address) && $fallback_to_office )
+        {
+            // need to fallback
+            $email_address = $this->get_office_email_address();
+        }
+
+        return $email_address;
+    }
+
+    public function get_negotiator_photo()
+    {   
+        if ( empty($this->_negotiator_id) )
+        {
+            return '';
+        }
+
+        $user = get_userdata( $this->_negotiator_id );
+
+        if ( $user === false )
+        {
+            return '';
+        }
+
+        $photo_attachment_id = get_user_meta( $this->_negotiator_id, 'photo_attachment_id', true );
+
+        $photo = wp_get_attachment_image( $photo_attachment_id, 'large' );
+
+        return $photo;
+    }
+
     /**
      * Returns boolean whether the property is featured or not
      *
@@ -1263,7 +1367,7 @@ class PH_Property {
      */
     public function is_featured() {
 
-        if (isset($the_property->_featured) && $the_property->_featured == 'yes')
+        if ( $this->_featured == 'yes' )
         {
             return true;
         }
