@@ -484,6 +484,15 @@ class PH_Admin {
                 ';
 	        }
         }
+
+        if ( isset($_GET['propertyhive_contacts_merged']) )
+        {
+            echo '
+                <div class="notice notice-info">
+                    <p>' . __( 'Contacts merged successfully', 'propertyhive' ) . '</p>
+                </div>
+                ';
+        }
     }
 
     /**

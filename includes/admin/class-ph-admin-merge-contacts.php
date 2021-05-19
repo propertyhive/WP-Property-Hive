@@ -28,9 +28,11 @@ class PH_Admin_Merge_Contacts {
         ?>
         <div class="wrap propertyhive">
 
-        <h1><?php echo __('Merge Duplicate Contacts', 'propertyhive'); ?></h1>
+        <h1><?php echo __('Merge Contacts', 'propertyhive'); ?></h1>
 
-        <p>When you click Save, all records will be moved onto the contact selected as the primary contact, and all other contacts will be moved to trash.</p>
+        <p>When you click 'Merge Contacts', all associated records will be moved onto the contact selected as the primary contact, and all other contacts will be deleted.</p>
+
+        <p><strong>Note:</strong> This action is irreversible.</p>
 
         <?php
 
@@ -43,11 +45,14 @@ class PH_Admin_Merge_Contacts {
         {
             foreach ( $ids_to_merge as $i => $contact_id )
             {
-                echo "<div>";
+                echo '<div style="border:1px solid #CCC; padding:25px; background:#FFF; position:relative">';
                 $contact = new PH_Contact( $contact_id );
 
                 // Initialise array to hold information about each contact
-                $contact_parts = array( '<b>' . ( trim($contact->post_title) != '' ? $contact->post_title : '(' . __('Unnamed Contact', 'propertyhive' ) . ')' ) . '</b>' ) ;
+                $contact_parts = array( '<h3 style="margin:0">' . ( trim($contact->post_title) != '' ? $contact->post_title : '(' . __('Unnamed Contact', 'propertyhive' ) . ')' ) . '</h3>' ) ;
+
+                $date_posted = get_the_date( '', $contact->id );
+                $contact_parts[] = 'Added on ' . $date_posted;
 
                 // Add contact address to contact parts
                 if ( $contact->get_formatted_full_address() != '' )
@@ -120,8 +125,10 @@ class PH_Admin_Merge_Contacts {
 
                 echo implode( '<br>', $contact_parts );
             ?>
-                <input type="radio" id="merge_contact_<?php echo $contact_id; ?>" name="primary_merge_contact" value="<?php echo $contact_id; ?>"<?php if ( $i == 0 ) { echo ' checked'; } ?>>
-                <label for="merge_contact_<?php echo $contact_id; ?>"><?php echo __( 'Primary Contact', 'propertyhive' ); ?></label><br>
+            <label style="position:absolute; right:25px; top:25px;">
+                <?php echo __( 'Use as Primary Contact', 'propertyhive' ); ?>
+                <input type="radio" name="primary_merge_contact" value="<?php echo $contact_id; ?>"<?php if ( $i == 0 ) { echo ' checked'; } ?>>
+            </label>
                 <?php
 
                 echo "</div><br>";
@@ -149,6 +156,9 @@ class PH_Admin_Merge_Contacts {
 
                     if (confirmBox)
                     {
+                        jQuery('#merge_contacts_button').val('Merging Contacts...');
+                        jQuery('#merge_contacts_button').attr('disabled', 'disabled');
+
                         var data = {
                             action:             'propertyhive_merge_contact_records',
                             contact_ids :       '<?php echo $_GET['merge_ids']; ?>',
@@ -160,12 +170,15 @@ class PH_Admin_Merge_Contacts {
                             if (response.error)
                             {
                                 alert(response.error);
+
+                                jQuery('#merge_contacts_button').val('Merge Contacts');
+                                jQuery('#merge_contacts_button').attr('disabled', false);
                             }
                             if (response.success)
                             {
                                 // Redirect to referrer, adding message in admin_notices
+                                window.location.href = '<?php echo admin_url('edit.php?post_type=contact&propertyhive_contacts_merged=1') ?>';
                             }
-
                         });
                     }
                 });
