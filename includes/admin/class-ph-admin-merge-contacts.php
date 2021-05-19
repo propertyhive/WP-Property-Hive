@@ -47,7 +47,7 @@ class PH_Admin_Merge_Contacts {
                 $contact = new PH_Contact( $contact_id );
 
                 // Initialise array to hold information about each contact
-                $contact_parts = array( '<b>' . ( trim($contact->post_title) != '' ? $contact->post_title : '(Unnamed Contact)' ) . '</b>' ) ;
+                $contact_parts = array( '<b>' . ( trim($contact->post_title) != '' ? $contact->post_title : '(' . __('Unnamed Contact', 'propertyhive' ) . ')' ) . '</b>' ) ;
 
                 // Add contact address to contact parts
                 if ( $contact->get_formatted_full_address() != '' )
@@ -72,11 +72,11 @@ class PH_Admin_Merge_Contacts {
                 if ( !empty( $contact_types ) )
                 {
                     $contact_types_lookup = array(
-                        'owner' => 'Owner',
-                        'potentialowner' => 'Potential Owner',
-                        'applicant' => 'Applicant',
-                        'hotapplicant' => 'Hot Applicant',
-                        'thirdparty' => 'Third Party Contact',
+                        'owner' => __( 'Owner', 'propertyhive' ),
+                        'potentialowner' => __( 'Potential Owner', 'propertyhive' ),
+                        'applicant' => __( 'Applicant', 'propertyhive' ),
+                        'hotapplicant' => __( 'Hot Applicant', 'propertyhive' ),
+                        'thirdparty' => __( 'Third Party Contact', 'propertyhive' ),
                     );
 
                     $contact_types_array = array();
@@ -120,7 +120,7 @@ class PH_Admin_Merge_Contacts {
 
                 ?>
                 <input type="radio" id="merge_contact_<?php echo $contact_id; ?>" name="primary_merge_contact" value="<?php echo $contact_id; ?>">
-                <label for="merge_contact_<?php echo $contact_id; ?>">Primary Contact</label><br>
+                <label for="merge_contact_<?php echo $contact_id; ?>"><?php echo __( 'Primary Contact', 'propertyhive' ); ?></label><br>
                 <?php
 
                 echo "</div><br>";
@@ -128,7 +128,7 @@ class PH_Admin_Merge_Contacts {
             ?>
             <p class="form-field">
                 <input type="button" value="<?php echo __( 'Merge Contacts', 'propertyhive' ); ?>" class="button-primary" id="merge_contacts_button">
-                <a href="<?php echo wp_get_raw_referer(); ?>" class="button" id="cancel_merge_button">Cancel</a>
+                <a href="<?php echo wp_get_raw_referer(); ?>" class="button" id="cancel_merge_button"><?php echo __( 'Cancel', 'propertyhive' ); ?></a>
             </p>
 
             <script>
