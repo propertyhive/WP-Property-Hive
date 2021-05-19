@@ -881,6 +881,16 @@ class PH_Admin_Merge_Contacts {
 
             foreach ( $notes as $note )
             {
+                // Want to ignore note if it's an existing 'contact_merged' note. This would be confusing
+                $comment_content = unserialize($note->comment_content);
+                if ( 
+                    isset($comment_content['note_type']) && $comment_content['note_type'] == 'action' &&
+                    isset($comment_content['action']) && $comment_content['action'] == 'contact_merged'
+                )
+                {
+                    continue;
+                }
+
                 // This note could've been assigned to this contact, or this contact could just be related to it
                 // Need to check both
                 if ( $note->comment_post_ID == $child_contact_id )
