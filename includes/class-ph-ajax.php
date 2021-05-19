@@ -2079,6 +2079,8 @@ class PH_AJAX {
 
     public function merge_contact_records()
     {
+        $this->json_headers();
+        
         if ( !isset( $_POST['contact_ids'] ) || !isset( $_POST['primary_contact_id'] ) )
         {
             $return = array('error' => 'Invalid parameters received');
