@@ -426,7 +426,7 @@ class PH_Admin_Merge_Contacts {
     {
         $args = array(
             'post_type' => 'viewing',
-            'nopaging' => true,
+            'posts_per_page' => 1,
             'fields' => 'ids',
             'meta_query' => array(
                 array(
@@ -456,7 +456,7 @@ class PH_Admin_Merge_Contacts {
     {
         $args = array(
             'post_type' => 'offer',
-            'nopaging' => true,
+            'posts_per_page' => 1,
             'fields' => 'ids',
             'meta_query' => array(
                 array(
@@ -486,7 +486,7 @@ class PH_Admin_Merge_Contacts {
     {
         $args = array(
             'post_type' => 'sale',
-            'nopaging' => true,
+            'posts_per_page' => 1,
             'fields' => 'ids',
             'meta_query' => array(
                 array(
@@ -516,7 +516,7 @@ class PH_Admin_Merge_Contacts {
     {
         $args = array(
             'post_type' => 'tenancy',
-            'nopaging' => true,
+            'posts_per_page' => 1,
             'fields' => 'ids',
             'meta_query' => array(
                 array(
@@ -860,7 +860,6 @@ class PH_Admin_Merge_Contacts {
         wp_reset_postdata();
 
         // Copy notes to primary
-
     }
 }
 
