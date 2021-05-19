@@ -543,7 +543,9 @@ class PH_Admin_Merge_Contacts {
      */
     private function get_note_records( $contact, $contact_parts )
     {
-        //$notes_count = get_comments_number($contact->id);
+        global $post;
+
+        $post = get_post((int)$contact->id);
 
         $args = array(
             'post_id' => (int)$contact->id,
