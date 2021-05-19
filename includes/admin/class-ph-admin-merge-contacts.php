@@ -573,7 +573,7 @@ class PH_Admin_Merge_Contacts {
 
     public function do_merge( $primary_contact_id, $contacts_to_merge )
     {
-        global $post;
+        global $wpdb, $post;
 
         // Merge contact_types into primary
         $primary_contact_types = get_post_meta( $primary_contact_id, '_contact_types', true );
@@ -680,10 +680,6 @@ class PH_Admin_Merge_Contacts {
             $primary_dismissed_properties = array_unique($primary_dismissed_properties);
             update_post_meta( $primary_contact_id, '_dismissed_properties', $primary_dismissed_properties );
         }
-
-        // need to merge:
-        // dismissed property
-        // shortlisted properties
 
         // Move appraisal records to primary
         $args = array(
@@ -965,10 +961,10 @@ class PH_Admin_Merge_Contacts {
             }
         }
 
+        // Write a note to all contacts highlighting what has happened
         $current_user = wp_get_current_user();
         foreach ( $contacts_to_merge as $child_contact_id )
         {
-            // Write a note to all contacts highlighting what has happened
             $comment = array(
                 'note_type' => 'action',
                 'action' => 'contact_merged',
@@ -989,6 +985,18 @@ class PH_Admin_Merge_Contacts {
 
             // Move contact being merged to the bin
             wp_trash_post( (int)$child_contact_id );
+        }
+
+        // Update email log
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            $wpdb->query("
+                UPDATE " . $wpdb->prefix . "ph_email_log
+                SET 
+                    contact_id = '" . (int)$primary_contact_id . "'
+                WHERE 
+                    contact_id = '" . (int)$child_contact_id . "'
+            ");
         }
 
         do_action( 'propertyhive_contacts_merged', $primary_contact_id, $contacts_to_merge );
