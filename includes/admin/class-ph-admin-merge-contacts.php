@@ -377,6 +377,7 @@ class PH_Admin_Merge_Contacts {
     private function get_enquiry_records( $contact, $contact_parts )
     {
         $meta_query = array(
+            'relation' => 'OR',
             array(
                 'key' => '_contact_id',
                 'value' => $contact->id,
@@ -384,7 +385,7 @@ class PH_Admin_Merge_Contacts {
         );
 
         // Not including email address lookup in enquiry count as they won't be moved or removed by the merge
-        /*$contact_email_address = $contact->_email_address;
+        $contact_email_address = $contact->_email_address;
         if ( !empty($contact_email_address) )
         {
             $meta_query[] = array(
@@ -396,7 +397,7 @@ class PH_Admin_Merge_Contacts {
                 'key' => 'email_address',
                 'value' => $contact_email_address,
             );
-        }*/
+        }
 
         $args = array(
             'post_type' => 'enquiry',
