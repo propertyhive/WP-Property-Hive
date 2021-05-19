@@ -47,8 +47,23 @@ class PH_Comments {
 		{
 			$clauses['join'] = str_replace( 'INNER JOIN', 'LEFT JOIN', $clauses['join'] );
 
+			// Remove main post ID constraint as it's handled by OR below
+			$strpos_post_id = strpos($clauses['where'], 'comment_post_ID');
+			if ( $strpos_post_id !== FALSE )
+			{
+				$strpos_next_and = strpos($clauses['where'], 'AND', $strpos_post_id);
+				if ( $strpos_next_and !== FALSE )
+				{
+					$clauses['where'] = substr_replace($clauses['where'], ' 1=1 ', $strpos_post_id, $strpos_next_and - $strpos_post_id );
+				}
+			}
+
 			// we're searching for related_to so should check where main post is comment_post_ID
-			$clauses['where'] = str_replace( $wpdb->prefix . 'commentmeta.meta_key', '( ' . $wpdb->prefix . 'commentmeta.meta_key', $clauses['where'] );
+			$clauses['where'] = str_replace( 
+				$wpdb->prefix . 'commentmeta.meta_key', 
+				'( ' . $wpdb->prefix . 'commentmeta.meta_key', 
+				$clauses['where'] 
+			);
 			$clauses['where'] .= ' OR comment_post_ID = "' . $post->ID . '" ) ';
 		}
 
@@ -325,9 +340,11 @@ class PH_Comments {
 			if ( 
 				( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy' ) ) ) )
 				||
-				( wp_doing_ajax() && isset($_POST['action']) && $_POST['action'] == 'propertyhive_get_notes_grid' )
+				( wp_doing_ajax() && isset($_POST['action']) && ($_POST['action'] == 'propertyhive_get_notes_grid' || $_POST['action'] == 'propertyhive_merge_contact_records') )
 				||
 				( wp_doing_ajax() && isset($_GET['action']) && strpos($_GET['action'], 'propertyhive_') !== FALSE && strpos($_GET['action'], '_lightbox') !== FALSE )
+				||
+				( isset($_GET['page']) && substr($_GET['page'], 0, 3) == 'ph-' )
 			)
 			{
 				return $clauses; // Don't hide when viewing Property Hive record
