@@ -2080,7 +2080,7 @@ class PH_AJAX {
     public function merge_contact_records()
     {
         $this->json_headers();
-        
+
         if ( !isset( $_POST['contact_ids'] ) || !isset( $_POST['primary_contact_id'] ) )
         {
             $return = array('error' => 'Invalid parameters received');
@@ -2098,6 +2098,18 @@ class PH_AJAX {
             die();
         }
 
+        // Check each post ID passed through is in fact of post type 'contact'
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            if ( get_post_type((int)$child_contact_id) != 'contact' )
+            {
+                $return = array('error' => 'Contact ID ' . $child_contact_id . ' received which is not a contact');
+                echo json_encode( $return );
+                die();
+            }
+        }
+
+        // Remove primary from list
         unset($contacts_to_merge[array_search($primary_contact_id, $contacts_to_merge)]);
 
         // Merge contact_types into primary
