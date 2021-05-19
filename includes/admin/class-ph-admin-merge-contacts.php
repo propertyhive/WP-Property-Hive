@@ -116,6 +116,8 @@ class PH_Admin_Merge_Contacts {
 
                 $contact_parts = $this->get_note_records( $contact, $contact_parts );
 
+                $contact_parts = apply_filters( 'propertyhive_merge_contact_parts', $contact_parts );
+
                 echo implode( '<br>', $contact_parts );
 
                 ?>
