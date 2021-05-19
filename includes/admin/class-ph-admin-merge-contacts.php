@@ -155,7 +155,7 @@ class PH_Admin_Merge_Contacts {
                             primary_contact_id: selected_primary,
                         };
 
-                        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
+                        jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
 
                             if (response.error)
                             {
