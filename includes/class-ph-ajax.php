@@ -33,6 +33,7 @@ class PH_AJAX {
             'load_existing_features' => false,
 			'make_property_enquiry' => true,
             'create_contact_from_enquiry' => false,
+            'merge_contact_records' => false,
 
             // Dashboard components
             'get_news' => false,
@@ -2073,6 +2074,49 @@ class PH_AJAX {
 
         echo json_encode($return);
 
+        die();
+    }
+
+    public function merge_contact_records()
+    {
+        $this->json_headers();
+
+        if ( !isset( $_POST['contact_ids'] ) || !isset( $_POST['primary_contact_id'] ) )
+        {
+            $return = array('error' => 'Invalid parameters received');
+            echo json_encode( $return );
+            die();
+        }
+
+        $contacts_to_merge = explode('|', $_POST['contact_ids']);
+        $primary_contact_id = $_POST['primary_contact_id'];
+
+        if ( !is_array($contacts_to_merge) || !in_array( $primary_contact_id, $contacts_to_merge )  )
+        {
+            $return = array('error' => 'Invalid Contact IDs received');
+            echo json_encode( $return );
+            die();
+        }
+
+        // Check each post ID passed through is in fact of post type 'contact'
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            if ( get_post_type((int)$child_contact_id) != 'contact' )
+            {
+                $return = array('error' => 'Contact ID ' . $child_contact_id . ' received which is not a contact');
+                echo json_encode( $return );
+                die();
+            }
+        }
+
+        // Remove primary from list
+        unset($contacts_to_merge[array_search($primary_contact_id, $contacts_to_merge)]);
+
+        include_once( 'includes/class-ph-admin-merge-contacts.php' );
+        $ph_admin_merge_contacts = new PH_Admin_Merge_Contacts();
+        $ph_admin_merge_contacts->do_merge( $primary_contact_id, $contacts_to_merge );
+
+        echo json_encode( array('success' => true) );
         die();
     }
 

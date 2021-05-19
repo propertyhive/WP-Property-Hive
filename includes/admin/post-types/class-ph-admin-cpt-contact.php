@@ -61,6 +61,8 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 
 		// Bulk / quick edit
 		add_filter( 'bulk_actions-edit-contact', array( $this, 'remove_bulk_actions') );
+		add_filter( 'bulk_actions-edit-contact', array( $this, 'add_merge_contacts_action') );
+		add_filter( 'handle_bulk_actions-edit-contact', array( $this, 'merge_contacts_redirect'), 10, 3 );
 		/*add_action( 'bulk_edit_custom_box', array( $this, 'bulk_edit' ), 10, 2 );
 		add_action( 'quick_edit_custom_box',  array( $this, 'quick_edit' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'bulk_and_quick_edit_save_post' ), 10, 2 );
@@ -307,6 +309,25 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
         unset( $actions['edit'] );
         return $actions;
     }
+
+	/**
+	 * Add merge contacts option
+	 * @param  array $actions
+	 */
+	public function add_merge_contacts_action( $actions ) {
+		$actions['merge_contacts'] = __('Merge Selected', 'propertyhive');
+		return $actions;
+	}
+
+	public function merge_contacts_redirect( $redirect_url, $action, $post_ids ) {
+
+		if ( $action == 'merge_contacts' && count($post_ids) > 1 )
+		{
+			$redirect_url = add_query_arg( 'merge_ids', implode( '|', $post_ids ), admin_url('admin.php?page=ph-merge-duplicate-contacts') );
+		}
+		return $redirect_url;
+
+	}
 
 	/**
 	 * Make contact columns sortable
