@@ -573,6 +573,8 @@ class PH_Admin_Merge_Contacts {
 
     public function do_merge( $primary_contact_id, $contacts_to_merge )
     {
+        global $post;
+
         // Merge contact_types into primary
         $primary_contact_types = get_post_meta( $primary_contact_id, '_contact_types', true );
         if ( $primary_contact_types == '' || !is_array($primary_contact_types) )
@@ -860,6 +862,84 @@ class PH_Admin_Merge_Contacts {
         wp_reset_postdata();
 
         // Copy notes to primary
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            $post = get_post((int)$child_contact_id);
+
+            $args = array(
+                'post_id' => (int)$child_contact_id,
+                'type'      => 'propertyhive_note',
+                'meta_query' => array(
+                    array(
+                        'key' => 'related_to',
+                        'value' => '"' . (int)$child_contact_id . '"',
+                        'compare' => 'LIKE',
+                    ),
+                )
+            );
+            $notes = get_comments( $args );
+
+            foreach ( $notes as $note )
+            {
+                // This note could've been assigned to this contact, or this contact could just be related to it
+                // Need to check both
+                if ( $note->comment_post_ID == $child_contact_id )
+                {
+                    $data = array(
+                        'comment_ID' => $note->comment_ID,
+                        'comment_post_ID' => $primary_contact_id
+                    );
+                    $updated = wp_update_comment( $data );
+                }
+
+                $related_tos = get_comment_meta( $note->comment_ID, 'related_to', true );
+                if ( !empty($related_tos) )
+                {
+                    $new_related_to = array();
+                    foreach ( $related_tos as $related_to )
+                    {
+                        if ( $related_to == $child_contact_id )
+                        {
+                            $new_related_to[] = $primary_contact_id;
+                        }
+                        else
+                        {
+                            $new_related_to[] = $related_to;
+                        }
+                    }
+                    $new_related_to = array_unique($new_related_to);
+                    update_comment_meta( $note->comment_ID, 'related_to', $new_related_to );
+                }
+            }
+        }
+
+        $current_user = wp_get_current_user();
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            // Write a note to all contacts highlighting what has happened
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'contact_merged',
+                'merged_into' => (int)$primary_contact_id,
+            );
+
+            $data = array(
+                'comment_post_ID'      => (int)$child_contact_id,
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_content'      => serialize($comment),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+
+            // Move contact being merged to the bin
+            wp_trash_post( (int)$child_contact_id );
+        }
+
+        do_action( 'propertyhive_contacts_merged', $primary_contact_id, $contacts_to_merge );
     }
 }
 
