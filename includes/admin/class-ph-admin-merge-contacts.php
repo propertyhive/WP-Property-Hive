@@ -621,6 +621,7 @@ class PH_Admin_Merge_Contacts {
             $primary_applicant_profiles = 0;
         }
 
+        $hot_applicant = '';
         foreach ( $contacts_to_merge as $child_contact_id )
         {
             $child_applicant_profiles = get_post_meta( $child_contact_id, '_applicant_profiles', true );
@@ -632,16 +633,37 @@ class PH_Admin_Merge_Contacts {
                     if ( !empty($child_applicant_profile) )
                     {
                         update_post_meta( $primary_contact_id, '_applicant_profile_' . $primary_applicant_profiles, $child_applicant_profile );
+                        
                         ++$primary_applicant_profiles;
+
+                        $child_applicant_profile_match_history = get_post_meta( $child_contact_id, '_applicant_profile_' . $i . '_match_history', true );
+                        if ( !empty($child_applicant_profile_match_history) )
+                        {
+                            update_post_meta( $primary_contact_id, '_applicant_profile_' . $primary_applicant_profiles . '_match_history', $child_applicant_profile_match_history );
+                        }
+
+                        if ( isset($child_applicant_profile['grading']) && ph_clean($child_applicant_profile['grading']) == 'hot' )
+                        {
+                            $hot_applicant = 'yes';
+                        }
                     }
                 }
             }
+        }
+
+        if ( $hot_applicant == 'yes' )
+        {
+            update_post_meta( $primary_contact_id, '_hot_applicant', $hot_applicant );
         }
 
         if ( $primary_applicant_profiles > 0 )
         {
             update_post_meta( $primary_contact_id, '_applicant_profiles', $primary_applicant_profiles );
         }
+
+        // need to merge:
+        // dismissed property
+        // shortlisted properties
 
         // Move appraisal records to primary
         $args = array(
