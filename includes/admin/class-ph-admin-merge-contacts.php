@@ -910,11 +910,11 @@ class PH_Admin_Merge_Contacts {
                     {
                         if ( $related_to == $child_contact_id )
                         {
-                            $new_related_to[] = $primary_contact_id;
+                            $new_related_to[] = (string)$primary_contact_id; // convert to string to LIKE lookups work
                         }
                         else
                         {
-                            $new_related_to[] = $related_to;
+                            $new_related_to[] = (string)$related_to; // convert to string to LIKE lookups work
                         }
                     }
                     $new_related_to = array_unique($new_related_to);
