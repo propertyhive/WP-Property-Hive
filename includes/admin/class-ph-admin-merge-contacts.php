@@ -411,7 +411,7 @@ class PH_Admin_Merge_Contacts {
 
         if ( $enquiries_count > 0 )
         {
-            $contact_parts[] = $enquiries_count . ' enquiries';
+            $contact_parts[] = $enquiries_count . ' enquir' . ( $enquiries_count != 1 ? 'ies' : 'y' );
         }
         return $contact_parts;
     }
@@ -441,7 +441,7 @@ class PH_Admin_Merge_Contacts {
 
         if ( $viewings_count > 0 )
         {
-            $contact_parts[] = $viewings_count . ' viewings';
+            $contact_parts[] = $viewings_count . ' viewing' . ( $viewings_count != 1 ? 's' : '' );
         }
         return $contact_parts;
     }
@@ -471,7 +471,7 @@ class PH_Admin_Merge_Contacts {
 
         if ( $offers_count > 0 )
         {
-            $contact_parts[] = $offers_count . ' offers';
+            $contact_parts[] = $offers_count . ' offer' . ( $offers_count != 1 ? 's' : '' );
         }
         return $contact_parts;
     }
@@ -501,7 +501,7 @@ class PH_Admin_Merge_Contacts {
 
         if ( $sales_count > 0 )
         {
-            $contact_parts[] = $sales_count . ' sales';
+            $contact_parts[] = $sales_count . ' sale' . ( $sales_count != 1 ? 's' : '' );
         }
         return $contact_parts;
     }
@@ -531,7 +531,7 @@ class PH_Admin_Merge_Contacts {
 
         if ( $tenancies_count > 0 )
         {
-            $contact_parts[] = $tenancies_count . ' tenancies';
+            $contact_parts[] = $tenancies_count . ' tenanc' . ( $tenancies_count != 1 ? 'ies' : 'y' );
         }
         return $contact_parts;
     }
@@ -565,7 +565,7 @@ class PH_Admin_Merge_Contacts {
 
         if ( $notes_count > 0 )
         {
-            $contact_parts[] = $notes_count . ' notes';
+            $contact_parts[] = $notes_count . ' note' . ( $notes_count != 1 ? 's' : '' );
         }
 
         return $contact_parts;
