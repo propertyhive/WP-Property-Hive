@@ -661,6 +661,26 @@ class PH_Admin_Merge_Contacts {
             update_post_meta( $primary_contact_id, '_applicant_profiles', $primary_applicant_profiles );
         }
 
+        // Merge dismissed properties
+        $primary_dismissed_properties = get_post_meta( $primary_contact_id, '_dismissed_properties', true );
+        if ( empty($primary_dismissed_properties) )
+        {
+            $primary_dismissed_properties = array();
+        }
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            $child_dismissed_properties = get_post_meta( $child_contact_id, '_dismissed_properties', true );
+            if ( is_array($child_dismissed_properties) && !empty($child_dismissed_properties) )
+            {
+                $primary_dismissed_properties = array_merge($primary_dismissed_properties, $child_dismissed_properties);
+            }
+        }
+        if ( !empty($primary_dismissed_properties) )
+        {
+            $primary_dismissed_properties = array_unique($primary_dismissed_properties);
+            update_post_meta( $primary_contact_id, '_dismissed_properties', $primary_dismissed_properties );
+        }
+
         // need to merge:
         // dismissed property
         // shortlisted properties
