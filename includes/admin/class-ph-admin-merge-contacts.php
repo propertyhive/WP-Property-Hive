@@ -41,7 +41,7 @@ class PH_Admin_Merge_Contacts {
 
         if ( isset( $ids_to_merge ) && count( $ids_to_merge ) > 1 )
         {
-            foreach ( $ids_to_merge as $contact_id )
+            foreach ( $ids_to_merge as $i => $contact_id )
             {
                 echo "<div>";
                 $contact = new PH_Contact( $contact_id );
@@ -119,9 +119,8 @@ class PH_Admin_Merge_Contacts {
                 $contact_parts = apply_filters( 'propertyhive_merge_contact_parts', $contact_parts );
 
                 echo implode( '<br>', $contact_parts );
-
-                ?>
-                <input type="radio" id="merge_contact_<?php echo $contact_id; ?>" name="primary_merge_contact" value="<?php echo $contact_id; ?>">
+            ?>
+                <input type="radio" id="merge_contact_<?php echo $contact_id; ?>" name="primary_merge_contact" value="<?php echo $contact_id; ?>"<?php if ( $i == 0 ) { echo ' checked'; } ?>>
                 <label for="merge_contact_<?php echo $contact_id; ?>"><?php echo __( 'Primary Contact', 'propertyhive' ); ?></label><br>
                 <?php
 
@@ -544,9 +543,9 @@ class PH_Admin_Merge_Contacts {
      */
     private function get_note_records( $contact, $contact_parts )
     {
-        $notes_count = get_comments_number($contact->id);
+        //$notes_count = get_comments_number($contact->id);
 
-        /*$args = array(
+        $args = array(
             'post_id' => (int)$contact->id,
             'type'      => 'propertyhive_note',
             'meta_query' => array(
@@ -557,7 +556,9 @@ class PH_Admin_Merge_Contacts {
                 ),
             )
         );
-        $notes = get_comments( $args );*/
+        $notes = get_comments( $args );
+
+        $notes_count = count($notes);
 
         if ( $notes_count > 0 )
         {
