@@ -634,8 +634,6 @@ class PH_Admin_Merge_Contacts {
                     {
                         update_post_meta( $primary_contact_id, '_applicant_profile_' . $primary_applicant_profiles, $child_applicant_profile );
                         
-                        ++$primary_applicant_profiles;
-
                         $child_applicant_profile_match_history = get_post_meta( $child_contact_id, '_applicant_profile_' . $i . '_match_history', true );
                         if ( !empty($child_applicant_profile_match_history) )
                         {
@@ -646,6 +644,8 @@ class PH_Admin_Merge_Contacts {
                         {
                             $hot_applicant = 'yes';
                         }
+
+                        ++$primary_applicant_profiles;
                     }
                 }
             }
