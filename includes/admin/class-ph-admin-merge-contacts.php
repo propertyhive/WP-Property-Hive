@@ -426,7 +426,7 @@ class PH_Admin_Merge_Contacts {
     {
         $args = array(
             'post_type' => 'viewing',
-            'posts_per_page' => 1,
+            'nopaging' => true,
             'fields' => 'ids',
             'meta_query' => array(
                 array(
@@ -456,7 +456,7 @@ class PH_Admin_Merge_Contacts {
     {
         $args = array(
             'post_type' => 'offer',
-            'posts_per_page' => 1,
+            'nopaging' => true,
             'fields' => 'ids',
             'meta_query' => array(
                 array(
@@ -486,7 +486,7 @@ class PH_Admin_Merge_Contacts {
     {
         $args = array(
             'post_type' => 'sale',
-            'posts_per_page' => 1,
+            'nopaging' => true,
             'fields' => 'ids',
             'meta_query' => array(
                 array(
@@ -516,7 +516,7 @@ class PH_Admin_Merge_Contacts {
     {
         $args = array(
             'post_type' => 'tenancy',
-            'posts_per_page' => 1,
+            'nopaging' => true,
             'fields' => 'ids',
             'meta_query' => array(
                 array(
@@ -569,6 +569,298 @@ class PH_Admin_Merge_Contacts {
         }
 
         return $contact_parts;
+    }
+
+    public function do_merge( $primary_contact_id, $contacts_to_merge )
+    {
+        // Merge contact_types into primary
+        $primary_contact_types = get_post_meta( $primary_contact_id, '_contact_types', true );
+        if ( $primary_contact_types == '' || !is_array($primary_contact_types) )
+        {
+            $primary_contact_types = array();
+        }
+
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            $child_contact_types = get_post_meta( $child_contact_id, '_contact_types', true );
+            if ( is_array($child_contact_types) )
+            {
+                $primary_contact_types = array_merge( $primary_contact_types, $child_contact_types );
+            }
+        }
+
+        update_post_meta( $primary_contact_id, '_contact_types', array_unique( $primary_contact_types ) );
+
+        // Merge third party categories into primary
+        $primary_third_party_categories = get_post_meta( $primary_contact_id, '_third_party_categories', true );
+        if ( $primary_third_party_categories == '' || !is_array($primary_third_party_categories) )
+        {
+            $primary_third_party_categories = array();
+        }
+
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            $child_third_party_categories = get_post_meta( $child_contact_id, '_third_party_categories', true );
+            if ( is_array($child_third_party_categories) )
+            {
+                $primary_third_party_categories = array_merge( $primary_third_party_categories, $child_third_party_categories );
+            }
+        }
+
+        if ( count($primary_third_party_categories) > 0 )
+        {
+            update_post_meta( $primary_contact_id, '_third_party_categories', array_unique( $primary_third_party_categories ) );
+        }
+
+        // Move applicant profiles to primary
+        $primary_applicant_profiles = get_post_meta( $primary_contact_id, '_applicant_profiles', true );
+        if ( empty($primary_applicant_profiles) )
+        {
+            $primary_applicant_profiles = 0;
+        }
+
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            $child_applicant_profiles = get_post_meta( $child_contact_id, '_applicant_profiles', true );
+            if ( !empty($child_applicant_profiles) )
+            {
+                for ( $i = 0; $i < $child_applicant_profiles; ++$i )
+                {
+                    $child_applicant_profile = get_post_meta( $child_contact_id, '_applicant_profile_' . $i, true );
+                    if ( !empty($child_applicant_profile) )
+                    {
+                        update_post_meta( $primary_contact_id, '_applicant_profile_' . $primary_applicant_profiles, $child_applicant_profile );
+                        ++$primary_applicant_profiles;
+                    }
+                }
+            }
+        }
+
+        if ( $primary_applicant_profiles > 0 )
+        {
+            update_post_meta( $primary_contact_id, '_applicant_profiles', $primary_applicant_profiles );
+        }
+
+        // Move appraisal records to primary
+        $args = array(
+            'post_type' => 'appraisal',
+            'nopaging' => true,
+            'meta_query' => array(
+                array(
+                    'key' => '_property_owner_contact_id',
+                    'value' => $contacts_to_merge,
+                    'compare' => 'IN'
+                ),
+            )
+        );
+
+        $appraisal_query = new WP_Query($args);
+
+        if ($appraisal_query->have_posts())
+        {
+            while ($appraisal_query->have_posts())
+            {
+                $appraisal_query->the_post();
+                foreach ( $contacts_to_merge as $child_contact_id )
+                {
+                    update_post_meta( get_the_id(), '_property_owner_contact_id', $primary_contact_id, $child_contact_id );
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        foreach ( $contacts_to_merge as $child_contact_id )
+        {
+            // Move property owner records to primary
+            $args = array(
+                'post_type' => 'property',
+                'nopaging' => true,
+                'meta_query' => array(
+                    'relation' => 'OR',
+                    array(
+                        'key' => '_owner_contact_id',
+                        'value' => $child_contact_id,
+                        'compare' => '='
+                    ),
+                    array(
+                        'key' => '_owner_contact_id',
+                        'value' => ':"' . $child_contact_id . '"',
+                        'compare' => 'LIKE'
+                    ),
+                    array(
+                        'key' => '_owner_contact_id',
+                        'value' => ':' . $child_contact_id . ';',
+                        'compare' => 'LIKE'
+                    )
+                )
+            );
+            $property_query = new WP_Query($args);
+
+            if ($property_query->have_posts())
+            {
+                while ($property_query->have_posts())
+                {
+                    $property_query->the_post();
+
+                    $property_owner_ids = get_post_meta( get_the_id(), '_owner_contact_id', true );
+
+                    if ( !is_array( $property_owner_ids ) )
+                    {
+                        update_post_meta( get_the_id(), '_owner_contact_id', $primary_contact_id, $child_contact_id );
+                    }
+                    else
+                    {
+                        unset($property_owner_ids[array_search($child_contact_id, $property_owner_ids)]);
+                        $property_owner_ids[] = $primary_contact_id;
+                        update_post_meta( get_the_id(), '_owner_contact_id', $property_owner_ids );
+                    }
+                }
+            }
+            wp_reset_postdata();
+        }
+
+        // Move enquiries to primary
+        $args = array(
+            'post_type' => 'enquiry',
+            'nopaging'    => true,
+            'fields' => 'ids',
+            'meta_query' => array(
+                array(
+                    'key' => '_contact_id',
+                    'value' => $contacts_to_merge,
+                    'compare' => 'IN'
+                ),
+            ),
+        );
+        $enquiries_query = new WP_Query( $args );
+
+        if ($enquiries_query->have_posts())
+        {
+            while ($enquiries_query->have_posts())
+            {
+                $enquiries_query->the_post();
+                foreach ( $contacts_to_merge as $child_contact_id )
+                {
+                    update_post_meta( get_the_id(), '_contact_id', $primary_contact_id, $child_contact_id );
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        // Move viewings to primary
+        $args = array(
+            'post_type' => 'viewing',
+            'nopaging'    => true,
+            'fields' => 'ids',
+            'meta_query' => array(
+                array(
+                    'key' => '_applicant_contact_id',
+                    'value' => $contacts_to_merge,
+                    'compare' => 'IN'
+                ),
+            ),
+        );
+        $viewings_query = new WP_Query( $args );
+
+        if ($viewings_query->have_posts())
+        {
+            while ($viewings_query->have_posts())
+            {
+                $viewings_query->the_post();
+                foreach ( $contacts_to_merge as $child_contact_id )
+                {
+                    update_post_meta( get_the_id(), '_applicant_contact_id', $primary_contact_id, $child_contact_id );
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        // Move offers to primary
+        $args = array(
+            'post_type' => 'offer',
+            'nopaging'    => true,
+            'fields' => 'ids',
+            'meta_query' => array(
+                array(
+                    'key' => '_applicant_contact_id',
+                    'value' => $contacts_to_merge,
+                    'compare' => 'IN'
+                ),
+            ),
+        );
+        $offers_query = new WP_Query( $args );
+
+        if ($offers_query->have_posts())
+        {
+            while ($offers_query->have_posts())
+            {
+                $offers_query->the_post();
+                foreach ( $contacts_to_merge as $child_contact_id )
+                {
+                    update_post_meta( get_the_id(), '_applicant_contact_id', $primary_contact_id, $child_contact_id );
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        // Move sales to primary
+        $args = array(
+            'post_type' => 'sale',
+            'nopaging'    => true,
+            'fields' => 'ids',
+            'meta_query' => array(
+                array(
+                    'key' => '_applicant_contact_id',
+                    'value' => $contacts_to_merge,
+                    'compare' => 'IN'
+                ),
+            ),
+        );
+        $sales_query = new WP_Query( $args );
+
+        if ($sales_query->have_posts())
+        {
+            while ($sales_query->have_posts())
+            {
+                $sales_query->the_post();
+                foreach ( $contacts_to_merge as $child_contact_id )
+                {
+                    update_post_meta( get_the_id(), '_applicant_contact_id', $primary_contact_id, $child_contact_id );
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        // Move tenancies to primary
+        $args = array(
+            'post_type' => 'tenancy',
+            'nopaging'    => true,
+            'fields' => 'ids',
+            'meta_query' => array(
+                array(
+                    'key' => '_applicant_contact_id',
+                    'value' => $contacts_to_merge,
+                    'compare' => 'IN'
+                ),
+            ),
+        );
+        $tenancies_query = new WP_Query( $args );
+
+        if ($tenancies_query->have_posts())
+        {
+            while ($tenancies_query->have_posts())
+            {
+                $tenancies_query->the_post();
+                foreach ( $contacts_to_merge as $child_contact_id )
+                {
+                    update_post_meta( get_the_id(), '_applicant_contact_id', $primary_contact_id, $child_contact_id );
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        // Copy notes to primary
+
     }
 }
 
