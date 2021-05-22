@@ -26,10 +26,45 @@ class PH_Admin_Menus {
 		add_action( 'admin_menu', array( $this, 'reports_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'settings_menu' ), 50 );
 		add_action( 'admin_menu', array( $this, 'add_ons_menu' ), 60 );
+		add_action( 'admin_menu', array( $this, 'crm_only_mode_menu' ), 99 );
 
 		add_action( 'admin_head', array( $this, 'menu_highlight' ) );
 		//add_filter( 'menu_order', array( $this, 'menu_order' ) );
 		//add_filter( 'custom_menu_order', array( $this, 'custom_menu_order' ) );
+	}
+
+	public function crm_only_mode_menu()
+	{
+		global $menu, $submenu;
+
+		$current_user = wp_get_current_user();
+
+		$user_id = $current_user->ID;
+
+		$crm_only_mode = get_user_meta( $user_id, 'crm_only_mode', TRUE );
+
+		if ( $crm_only_mode == '1' )
+		{
+			// remove all top-level menu items that isn't the Dashboard
+			foreach ( $menu as $i => $menuitem )
+			{
+				if ( !isset($menuitem[2]) | ( isset($menuitem[2]) && $menuitem[2] != 'index.php' ) )
+				{
+					unset($menu[$i]);
+				}
+			}
+			if ( isset($submenu['propertyhive']) )
+			{
+				unset($submenu['propertyhive'][0]);
+				$position = 5;
+				foreach ( $submenu['propertyhive'] as $submenuitem )
+				{
+					add_menu_page( $submenuitem[3], $submenuitem[0], $submenuitem[1], $submenuitem[2] , '', PH()->plugin_url() . '/assets/images/menu-icon.png', $position );
+					$position += 5;
+				}
+				unset($submenu['propertyhive']);
+			}
+		}
 	}
 
 	/**
