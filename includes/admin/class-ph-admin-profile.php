@@ -63,7 +63,7 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 				'propertyhive_user_meta_fields',
 				array(
 					'negotiator'  => array(
-						'title'  => __( 'Property Hive Details', 'propertyhive' ),
+						'title'  => __( 'Property Hive Negotiator Details', 'propertyhive' ),
 						'fields' => array(
 							'office_id'    => array(
 								'label'       => __( 'Office', 'propertyhive' ),
