@@ -63,7 +63,7 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 				'propertyhive_user_meta_fields',
 				array(
 					'negotiator'  => array(
-						'title'  => __( 'Additional Negotiator Information', 'propertyhive' ),
+						'title'  => __( 'Property Hive Details', 'propertyhive' ),
 						'fields' => array(
 							'office_id'    => array(
 								'label'       => __( 'Office', 'propertyhive' ),
@@ -80,6 +80,11 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 								'label'       => __( 'Photo', 'propertyhive' ),
 								'description' => '',
 								'type'        => 'image',
+							),
+							'crm_only_mode'    => array(
+								'label'       => __( 'Property Hive-Only Mode', 'propertyhive' ),
+								'description' => 'Enabling this option will remove all top level WordPress menu items leaving just Property Hive options making it easier to navigate and use as a CRM',
+								'type'        => 'checkbox',
 							),
 						),
 					),
