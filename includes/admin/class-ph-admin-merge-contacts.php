@@ -300,7 +300,27 @@ class PH_Admin_Merge_Contacts {
         $third_party_categories = get_post_meta( $contact->id, '_third_party_categories', TRUE );
         if ( is_array($third_party_categories) && !empty($third_party_categories) )
         {
-            $contact_parts[] = 'Third Party Contact: ' . implode( ', ', $third_party_categories);
+            $third_party_category_names = array();
+
+            $ph_third_party_contacts = new PH_Third_Party_Contacts();
+
+            foreach ( $third_party_categories as $third_party_category )
+            {
+                if ( $third_party_category != '' && $third_party_category != 0 )
+                {
+                    $category_name = $ph_third_party_contacts->get_category( $third_party_category );
+                    if ( $category_name !== false )
+                    {
+                        $third_party_category_names[] = $category_name;
+                    }
+                }
+                else
+                {
+                    $third_party_category_names[] = 'General';
+                }
+            }
+
+            $contact_parts[] = 'Third Party Contact: ' . implode( ', ', $third_party_category_names);
         }
         return $contact_parts;
     }
