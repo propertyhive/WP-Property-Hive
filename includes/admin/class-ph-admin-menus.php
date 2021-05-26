@@ -74,7 +74,7 @@ class PH_Admin_Menus {
 	    //if ( current_user_can( 'manage_propertyhive' ) )
 	    	$menu[] = array( '', 'read', 'separator-propertyhive', '', 'wp-menu-separator propertyhive' );
 
-	    add_menu_page( __( 'Property Hive', 'propertyhive' ), __( 'Property Hive', 'propertyhive' ), 'manage_propertyhive', 'propertyhive' , array( $this, 'settings_page' ), PH()->plugin_url() . '/assets/images/menu-icon.png', '54.5' );
+	    add_menu_page( __( 'Property Hive', 'propertyhive' ), __( 'Property Hive', 'propertyhive' ), 'manage_propertyhive', 'propertyhive' , array( $this, 'settings_page' ), $this->get_menu_icon(), '54.5' );
 
 	    add_submenu_page( 'propertyhive', __( 'Properties', 'propertyhive' ), __( 'Properties', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=property'/*, array( $this, 'attributes_page' )*/ );
 	    
@@ -274,6 +274,92 @@ class PH_Admin_Menus {
 		include_once( 'class-ph-admin-merge-contacts.php' );
 		$ph_admin_merge_contacts = new PH_Admin_Merge_Contacts();
 		$ph_admin_merge_contacts->output();
+	}
+
+	private function get_menu_icon( $section = '' )
+	{
+		// extract post type
+		$explode_section = explode("?", $section, 2);
+		$tab = '';
+		if ( count($explode_section) == 2 )
+		{
+			parse_str( $explode_section[1], $array );
+			
+			if ( isset($array['post_type']) )
+			{
+				$section = $array['post_type'];
+			}
+			elseif ( isset($array['page']) )
+			{
+				$section = $array['page'];
+				if ( isset($array['tab']) )
+				{
+					$tab = $array['tab'];
+				}
+			}
+		}
+
+		$icon = PH()->plugin_url() . '/assets/images/menu-icon.png';
+		switch ( $section )
+		{
+			case "contact":
+			{
+				$icon = "dashicons-admin-users";
+				break;
+			}
+			case "property":
+			{
+				$icon = "dashicons-admin-home";
+				break;
+			}
+			case "appraisal":
+			{
+				$icon = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzgwIiBoZWlnaHQ9IjM5MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8cGF0aCBmaWxsPSIjZjBmMGYxIiBpZD0ic3ZnXzEiIGQ9Im0xOTAuMjA5MDU3LDYuMjExNDA4Yy0xMDMuNzU0LDAgLTE4OC4xNjEsODQuNDEzIC0xODguMTYxLDE4OC4xNjdzODQuNDA3LDE4OC4xNTUgMTg4LjE2MSwxODguMTU1YzEwMy43NiwwIDE4OC4xNjcsLTg0LjQwMSAxODguMTY3LC0xODguMTU1cy04NC40MDcsLTE4OC4xNjcgLTE4OC4xNjcsLTE4OC4xNjd6bTAsMzQ2LjY0MmMtODcuMzgzLDAgLTE1OC40NzYsLTcxLjA5MyAtMTU4LjQ3NiwtMTU4LjQ3NmMwLC04Ny4zOTUgNzEuMDkyLC0xNTguNDg3IDE1OC40NzYsLTE1OC40ODdjODcuMzg5LDAgMTU4LjQ4Nyw3MS4wOTMgMTU4LjQ4NywxNTguNDg3YzAuMDAxLDg3LjM4MyAtNzEuMDk4LDE1OC40NzYgLTE1OC40ODcsMTU4LjQ3NnoiLz4KICA8cGF0aCBmaWxsPSIjZjBmMGYxIiBpZD0ic3ZnXzIiIGQ9Im0yMTcuMjIxMDYsMTE1LjY4MjRjMTQuODA2LDAgMTguODY3LDEwLjczOSAyMi45MjksMjMuNTIybDEzLjkzOCwtMTcuNzA3Yy00LjY0NSwtMTguNTg3IC0xNy40MjIsLTI5LjYxMSAtNDIuOTY3LC0yOS42MTFjLTQzLjg0NSwwIC00OS4wNjYsMzEuOTMxIC00OS4wNjYsNTkuNzk0bDAsMzAuMjA1bC0yMS40OSwwbC01LjgwMywyNC4zOTFsMjUuODM1LDBjLTMuMTkzLDMyLjgxMSAtMTEuNjEyLDYzLjU3NSAtMzQuMjYxLDkwLjU4MmwxMjUuMTQ2LDBsMCwtMzAuMTk1bC03MC41NjcsMGM5LjAwMiwtMjAuNjIxIDEyLjQ5OCwtMzguNjE0IDEzLjk0OCwtNjAuMzg5bDQ4LjQ3OSwwbDUuODEsLTI0LjM5MWwtNTMuMTM0LDBsMCwtMjQuMzkxYzAsLTIyLjY0MSAxLjE2NiwtNDEuODEgMjEuMjAzLC00MS44MXoiLz4KIDwvZz4KPC9zdmc+";
+				break;
+			}
+			case "viewing":
+			{
+				$icon = "dashicons-visibility";
+				break;
+			}
+			case "enquiry":
+			{
+				$icon = "dashicons-admin-comments";
+				break;
+			}
+			case "offer":
+			case "sale":
+			{
+				$icon = "dashicons-tag";
+				break;
+			}
+			case "tenancy":
+			{
+				$icon = "dashicons-admin-network";
+				break;
+			}
+			case "key_date":
+			{
+				$icon = "dashicons-admin-network";
+				break;
+			}
+			case "ph-reports":
+			{
+				$icon = "dashicons-chart-bar";
+				break;
+			}
+			case "ph-settings":
+			{
+				$icon = "dashicons-admin-settings";
+				if ( $tab == 'addons' )
+				{
+					$icon = "dashicons-insert";
+				}
+				break;
+			}
+		}
+		$icon = apply_filters( 'propertyhive_menu_icon', $icon, $section );
+		return $icon;
 	}
 
 }
