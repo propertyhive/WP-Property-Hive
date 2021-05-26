@@ -260,18 +260,34 @@ class PH_Admin_Menus {
 	    
 		global $menu, $submenu, $parent_file, $submenu_file, $self, $post_type, $taxonomy;
 
-		$to_highlight_types = array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date' );
+		$current_user = wp_get_current_user();
 
-		if ( isset( $post_type ) ) {
-			if ( in_array( $post_type, $to_highlight_types ) ) {
-				$submenu_file = 'edit.php?post_type=' . esc_attr( $post_type );
-				$parent_file  = 'propertyhive';
+		$user_id = $current_user->ID;
+
+		$crm_only_mode = get_user_meta( $user_id, 'crm_only_mode', TRUE );
+
+		if ( $crm_only_mode == '1' )
+		{
+			if ( $post_type == 'contact' && isset($_GET['_contact_type']) && !empty(ph_clean($_GET['_contact_type'])) )
+			{
+				$parent_file = 'edit.php?post_type=contact&_contact_type=' . ph_clean($_GET['_contact_type']);
 			}
 		}
+		else
+		{
+			$to_highlight_types = array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date' );
 
-		if ( isset( $submenu['propertyhive'] ) && isset( $submenu['propertyhive'][1] ) ) {
-			$submenu['propertyhive'][0] = $submenu['propertyhive'][1];
-			unset( $submenu['propertyhive'][1] );
+			if ( isset( $post_type ) ) {
+				if ( in_array( $post_type, $to_highlight_types ) ) {
+					$submenu_file = 'edit.php?post_type=' . esc_attr( $post_type );
+					$parent_file  = 'propertyhive';
+				}
+			}
+
+			if ( isset( $submenu['propertyhive'] ) && isset( $submenu['propertyhive'][1] ) ) {
+				$submenu['propertyhive'][0] = $submenu['propertyhive'][1];
+				unset( $submenu['propertyhive'][1] );
+			}
 		}
 	}
 
