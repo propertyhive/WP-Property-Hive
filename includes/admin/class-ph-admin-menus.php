@@ -29,8 +29,6 @@ class PH_Admin_Menus {
 		add_action( 'admin_menu', array( $this, 'crm_only_mode_menu' ), 99 );
 
 		add_action( 'admin_head', array( $this, 'menu_highlight' ) );
-		//add_filter( 'menu_order', array( $this, 'menu_order' ) );
-		//add_filter( 'custom_menu_order', array( $this, 'custom_menu_order' ) );
 	}
 
 	public function crm_only_mode_menu()
@@ -227,53 +225,6 @@ class PH_Admin_Menus {
 	}
 
 	/**
-	 * Reorder the PH menu items in admin.
-	 *
-	 * @param mixed $menu_order
-	 * @return array
-	 */
-	public function menu_order( $menu_order ) {
-		
-        
-		// Initialize our custom order array
-		$propertyhive_menu_order = array();
-
-		// Get the index of our custom separator
-		$propertyhive_separator = array_search( 'separator-propertyhive', $menu_order );
-
-		// Get index of product menu
-		$propertyhive_property = array_search( 'edit.php?post_type=property', $menu_order );
-
-		// Loop through menu order and do some rearranging
-		foreach ( $menu_order as $index => $item ) :
-
-			if ( ( ( 'propertyhive' ) == $item ) ) :
-				$propertyhive_menu_order[] = 'separator-propertyhive';
-				$propertyhive_menu_order[] = $item;
-				$propertyhive_menu_order[] = 'edit.php?post_type=property';
-				unset( $menu_order[$propertyhive_separator] );
-				unset( $menu_order[$propertyhive_property] );
-			elseif ( !in_array( $item, array( 'separator-propertyhive' ) ) ) :
-				$propertyhive_menu_order[] = $item;
-			endif;
-
-		endforeach;
-
-		// Return order
-		return $propertyhive_menu_order;
-	}
-
-	/**
-	 * custom_menu_order
-	 * @return bool
-	 */
-	public function custom_menu_order() {
-		if ( ! current_user_can( 'manage_propertyhive' ) )
-			return false;
-		return true;
-	}
-
-	/**
 	 * Init the reports page
 	 */
 	public function reports_page() {
@@ -314,14 +265,6 @@ class PH_Admin_Menus {
 		include_once( 'class-ph-admin-matching-applicants.php' );
 		$ph_admin_matching_applicants = new PH_Admin_Matching_Applicants();
 		$ph_admin_matching_applicants->output();
-	}
-
-	/**
-	 * Init the status page
-	 */
-	public function status_page() {
-		$page = include( 'class-ph-admin-status.php' );
-		$page->output();
 	}
 
 	/**
