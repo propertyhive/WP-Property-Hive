@@ -33,8 +33,6 @@ class PH_Admin_Menus {
 
 	public function crm_only_mode_menu()
 	{
-		global $menu, $submenu, $wp_filter;
-
 		$current_user = wp_get_current_user();
 
 		$user_id = $current_user->ID;
@@ -43,6 +41,8 @@ class PH_Admin_Menus {
 
 		if ( $crm_only_mode == '1' )
 		{
+			global $menu, $submenu, $wp_filter;
+			
 			// remove all top-level menu items that isn't the Dashboard
 			foreach ( $menu as $i => $menuitem )
 			{
