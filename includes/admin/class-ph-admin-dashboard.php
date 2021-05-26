@@ -25,6 +25,8 @@ class PH_Admin_Dashboard {
 		if ( current_user_can( 'manage_options' ) ) {
 			add_action( 'wp_dashboard_setup', array( $this, 'init' ) );
 		}
+
+		add_action( 'wp_dashboard_setup', array( $this, 'hide_non_property_hive_widgets' ), 9999 );
 	}
 
 	/**
@@ -89,6 +91,41 @@ class PH_Admin_Dashboard {
 	public function upcoming_overdue_key_dates_widget()
 	{
 		echo '<div id="ph_dashboard_upcoming_overdue_key_dates">Loading...</div>';
+	}
+
+	public function hide_non_property_hive_widgets()
+	{
+		$current_user = wp_get_current_user();
+
+		$user_id = $current_user->ID;
+
+		$crm_only_mode = get_user_meta( $user_id, 'crm_only_mode', TRUE );
+
+		if ( $crm_only_mode == '1' )
+		{
+			global $wp_meta_boxes;
+
+			if ( isset($wp_meta_boxes['dashboard']['normal']['core']) )
+			{
+				foreach ( $wp_meta_boxes['dashboard']['normal']['core'] as $key => $widget )
+				{
+					if ( strpos($key, 'property') === false && strpos($key, 'hive') === false )
+					{
+						unset($wp_meta_boxes['dashboard']['normal']['core'][$key]);
+					}
+				}
+			}
+			if ( isset($wp_meta_boxes['dashboard']['side']['core']) )
+			{
+				foreach ( $wp_meta_boxes['dashboard']['side']['core'] as $key => $widget )
+				{
+					if ( strpos($key, 'property') === false && strpos($key, 'hive') === false )
+					{
+						unset($wp_meta_boxes['dashboard']['side']['core'][$key]);
+					}
+				}
+			}
+		}
 	}
 }
 
