@@ -33,7 +33,7 @@ class PH_Admin_Menus {
 
 	public function crm_only_mode_menu()
 	{
-		global $menu, $submenu;
+		global $menu, $submenu, $wp_filter;
 
 		$current_user = wp_get_current_user();
 
@@ -46,7 +46,11 @@ class PH_Admin_Menus {
 			// remove all top-level menu items that isn't the Dashboard
 			foreach ( $menu as $i => $menuitem )
 			{
-				if ( !isset($menuitem[2]) | ( isset($menuitem[2]) && $menuitem[2] != 'index.php' ) )
+				if ( 
+					( !isset($menuitem[2]) || ( isset($menuitem[2]) && $menuitem[2] != 'index.php' ) )
+					&&
+					apply_filters( 'propertyhive_remove_menu_item_in_crm_only_mode', true ) === true
+				)
 				{
 					unset($menu[$i]);
 				}
@@ -57,7 +61,54 @@ class PH_Admin_Menus {
 				$position = 5;
 				foreach ( $submenu['propertyhive'] as $submenuitem )
 				{
-					add_menu_page( $submenuitem[3], $submenuitem[0], $submenuitem[1], $submenuitem[2] , '', PH()->plugin_url() . '/assets/images/menu-icon.png', $position );
+					$callback = '';
+					if ( substr($submenuitem[2], 0, 3) == 'ph-' )
+					{
+						$callback = array( $this, substr($submenuitem[2], 3)  . '_page' );
+					}
+					elseif ( isset($wp_filter['property-hive_page_' . $submenuitem[2]]) )
+					{
+						// get class name from callbacks then convert it to class name
+						// i.e. convert PH_Property_Import to PHPI()
+						$class_name = '';
+						$function_name = '';
+						if ( isset($wp_filter['property-hive_page_' . $submenuitem[2]]->callbacks) )
+						{
+							foreach ( $wp_filter['property-hive_page_' . $submenuitem[2]]->callbacks as $priority => $filter_callbacks )
+							{
+								foreach ( $filter_callbacks as $oddkey => $filter_callback )
+								{
+									if ( isset($filter_callback['function']) && count($filter_callback['function']) >= 2 )
+									{
+										$class_name = get_class($filter_callback['function'][0]);
+										$explode_class_name = explode("_", $class_name);
+
+										$class_name_bits = array();
+										foreach ( $explode_class_name as $exploded_class_name_bit )
+										{
+											if ( $exploded_class_name_bit == 'PH' )
+											{
+												$class_name_bits[] = $exploded_class_name_bit;
+											}
+											else
+											{
+												$class_name_bits[] = strtoupper(substr($exploded_class_name_bit, 0, 1));
+											}
+										}
+
+										$class_name = implode("", $class_name_bits);
+										$function_name = $filter_callback['function'][1];
+									}
+								}
+							}
+						}
+
+						if ( $class_name != '' && $function_name != '' )
+						{
+							$callback = array( $class_name(), $function_name );
+						}
+					}
+					add_menu_page( $submenuitem[3], $submenuitem[0], $submenuitem[1], $submenuitem[2], $callback, $this->get_menu_icon($submenuitem[2]), $position );
 					$position += 5;
 				}
 				unset($submenu['propertyhive']);
