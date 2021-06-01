@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.7.2
-Stable tag: 1.5.10
+Stable tag: 1.5.11
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,11 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.11 - 2021-06-01 =
+* Added new 'Property Hive-Only Mode' on user profiles making it possible to hide standard WP functionality and promote Property Hive functionality making it easier for negotiators wishing to use Property Hive as their primary estate agency CRM
+* Added new 'propertyhive_floor_area_output' to modify formatted floor area output
+* Added new 'propertyhive_site_area_output' to modify formatted site area output
 
 = 1.5.10 - 2021-05-24 =
 * New merge contacts tool allowing you to merge duplicate contacts. Available by selecting the contacts you wish to merge and choosing 'Merge' from the bulk actions dropdown
