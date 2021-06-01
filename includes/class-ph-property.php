@@ -693,7 +693,7 @@ class PH_Property {
             $area .= ( isset($area_units[$this->_floor_area_units]) ) ? ' ' . $area_units[$this->_floor_area_units] : '';
         }
 
-        return $area;
+        return apply_filters( 'propertyhive_floor_area_output', $area, $this );
 
     }
 
@@ -736,7 +736,7 @@ class PH_Property {
             $area .= ( isset($area_units[$this->_site_area_units]) ) ? ' ' . $area_units[$this->_site_area_units] : '';
         }
 
-        return $area;
+        return apply_filters( 'propertyhive_site_area_output', $area, $this );
 
     }
 
