@@ -32,7 +32,7 @@ class Elementor_Property_Street_View_Widget extends \Elementor\Widget_Base {
 			'settings_section',
 			[
 				'label' => __( 'Street View Settings', 'propertyhive' ),
-				'tab' => \Elementor\Controls_Manager::TAB_SETTINGS,
+				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
 			]
 		);
 
