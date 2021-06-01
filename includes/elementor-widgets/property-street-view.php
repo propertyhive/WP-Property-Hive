@@ -39,7 +39,7 @@ class Elementor_Property_Street_View_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'height',
 			[
-				'label' => __( 'Map Height', 'propertyhive' ),
+				'label' => __( 'Height', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::TEXT,
 				'input_type' => 'number',
 				'default' => 400
