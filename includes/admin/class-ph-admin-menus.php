@@ -49,7 +49,7 @@ class PH_Admin_Menus {
 				if ( 
 					( !isset($menuitem[2]) || ( isset($menuitem[2]) && $menuitem[2] != 'index.php' ) )
 					&&
-					apply_filters( 'propertyhive_remove_menu_item_in_crm_only_mode', true ) === true
+					apply_filters( 'propertyhive_remove_menu_item_in_crm_only_mode', true, $menuitem ) === true
 				)
 				{
 					unset($menu[$i]);
