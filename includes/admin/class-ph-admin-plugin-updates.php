@@ -52,15 +52,7 @@ class PH_Plugin_Updates {
 						// Expired
 
 					}
-					elseif ( 
-						strtotime($license['expires_at']) > time() &&
-						strtotime($license['expires_at']) < (time() + 30 * 24 * 60 * 60)
-					)
-					{
-						// Expires in less than 30 days
-
-					}
-					elseif (strtotime($license['expires_at']) > time())
+					else
 					{
 						// Valid
 						$valid_license = true;
