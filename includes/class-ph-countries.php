@@ -542,28 +542,34 @@ class PH_Countries {
 				update_option( 'propertyhive_currency_exchange_rates_updated', date("Y-m-d") );
 			}
 
-			// Loop through all on market properties and update _actual_price meta value to be price in GBP
-			$args = array(
-				'post_type' => 'property',
-				'fields' => 'ids',
-				'post_status' => 'publish',
-				'meta_query' => array(
-					array(
-						'key' => '_on_market',
-						'value' => 'yes',
-					)
-				),
-				'nopaging' => true,
-			);
-			$property_query =  new WP_Query($args);
-
-			if ($property_query->have_posts())
+			// Loop through all on market properties and update _price_actual meta value to be price in GBP
+			// Only worth doing if we operate in a country other than UK
+			$countries = get_option( 'propertyhive_countries', array() );
+			if ( !is_array($countries) ) { $countries = array(); }
+			if ( count($countries) > 1 || (count($countries) == 1 && !in_array('GB', $countries) ) )
 			{
-				while ($property_query->have_posts())
-				{
-					$property_query->the_post();
+				$args = array(
+					'post_type' => 'property',
+					'fields' => 'ids',
+					'post_status' => 'publish',
+					'meta_query' => array(
+						array(
+							'key' => '_on_market',
+							'value' => 'yes',
+						)
+					),
+					'nopaging' => true,
+				);
+				$property_query =  new WP_Query($args);
 
-					$this->update_property_price_actual( get_the_ID() );
+				if ($property_query->have_posts())
+				{
+					while ($property_query->have_posts())
+					{
+						$property_query->the_post();
+
+						$this->update_property_price_actual( get_the_ID() );
+					}
 				}
 			}
 
