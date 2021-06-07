@@ -504,7 +504,7 @@ class PH_Countries {
 
 			// Get all currency exchange rates from GBP
 			// We're using the API from https://github.com/fawazahmed0/currency-api
-			$url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currdfdencies/gbp.json';
+			$url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/gbp.json';
 			$response = wp_remote_get( $url );
 
 			if ( is_array( $response ) )
