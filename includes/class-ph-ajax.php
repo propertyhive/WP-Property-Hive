@@ -1032,8 +1032,9 @@ class PH_AJAX {
 
         $property_query = new WP_Query(array(
             'post_type' => 'property',
-            'post_status' => 'any',
-            'nopaging' => true
+            'post_status' => 'publish',
+            'nopaging' => true,
+            'fields' => 'ids',
         ));
 
         if ($property_query->have_posts())
@@ -1042,12 +1043,12 @@ class PH_AJAX {
             {
                 $property_query->the_post();
 
-                $num_property_features = get_post_meta($post->ID, '_features', TRUE);
+                $num_property_features = get_post_meta(get_the_ID(), '_features', TRUE);
                 if ($num_property_features == '') { $num_property_features = 0; }
                 
                 for ($i = 0; $i < $num_property_features; ++$i)
                 {
-                    $feature = get_post_meta($post->ID, '_feature_' . $i, TRUE);
+                    $feature = get_post_meta(get_the_ID(), '_feature_' . $i, TRUE);
                     if (!in_array($feature, $return) && trim($feature) != '')
                     {
                         $return[] = $feature;

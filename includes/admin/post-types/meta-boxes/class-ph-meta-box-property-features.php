@@ -186,7 +186,11 @@ class PH_Meta_Box_Property_Features {
                             jQuery(this).autocomplete(options);
                         }
                     });
+                    ';
 
+                if ( apply_filters( 'propertyhive_features_autocomplete', true ) === true )
+                {
+                    echo '
                     // get list of previously used features
                     // Do AJAX request
                     var data = {
@@ -200,9 +204,11 @@ class PH_Meta_Box_Property_Features {
                         existing_features = response;
                       
                     });
+                    ';
+                }
 
-
-                });
+            echo '
+            });
                 
             </script>';
         }
