@@ -48,9 +48,6 @@ class PH_Countries {
 				return true;
 			}
 
-			// TO DO: Make sure currency passed in is in list of countries they operate in
-			// so we can get the exchange rate
-
 			$currency = $this->get_currency( sanitize_text_field($_GET['currency']) );
 			if ( $currency === FALSE )
 			{
@@ -505,55 +502,45 @@ class PH_Countries {
 			$exchange_rates = array();
 			$previous_exchange_rates = get_option( 'propertyhive_currency_exchange_rates' );
 
-			$default_country = get_option( 'propertyhive_default_country', 'GB' );
-			$selected_countries = get_option( 'propertyhive_countries', array( $default_country ) );
+			// Get all currency exchange rates from GBP
+			// We're using the API from https://github.com/fawazahmed0/currency-api
+			$url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currdfdencies/gbp.json';
+			$response = wp_remote_get( $url );
 
-			foreach ( $countries as $key => $value )
-			{	
-				if (!isset($exchange_rates[$value['currency_code']]) && in_array($key, $selected_countries) && $value['currency_code'] != 'GBP')
+			if ( is_array( $response ) )
+			{
+				$body = wp_remote_retrieve_body( $response );
+				$json = json_decode($body, true);
+
+				// If response is valid JSON and contains the core gbp key
+				if ( $json !== null && isset( $json['gbp'] ) )
 				{
-					// we haven't got this exchange rate
-					$from   = 'GBP'; 
-					$to     = $value['currency_code'];
+					$exchange_rates_array = $json['gbp'];
 
-					$exchangeRate = '';
-					
-					$url = 'https://finance.google.com/finance/converter?a=1&from=' . $from . '&to=' . $to;
-
-					$response = wp_remote_get( $url );
-
-					if ( is_array( $response ) )
+					foreach ( $countries as $country )
 					{
-						$body = wp_remote_retrieve_body( $response );
+						$currency_code = $country['currency_code'];
 
-						preg_match("/<span class=bld>(.*)<\/span>/", $body, $converted);
-
-						if ( isset($converted[1]) && $converted[1] != '' )
+						// If we haven't already got this currency and it's not GBP
+						if (!isset($exchange_rates[$currency_code]) && $currency_code != 'GBP')
 						{
-							$converted = preg_replace("/[^0-9.]/", "", $converted[1]);
-
-							if ( $converted != '' )
+							// If this currency is in the list we received from the API
+							if ( isset( $exchange_rates_array[strtolower( $currency_code )] ) )
 							{
-								$exchangeRate = $converted;
-								$exchange_rates[$to] = $exchangeRate;
+								$exchange_rates[$currency_code] = (string)$exchange_rates_array[strtolower( $currency_code )];
 							}
 						}
 					}
-					else
-					{
-
-					}
-
-					if ( $exchangeRate == '' && isset($previous_exchange_rates[$to]) )
-					{
-						// if for some reason we get here and don't have an exchange rate
-						$exchange_rates[$to] = $previous_exchange_rates[$to];
-					}
 				}
 			}
-			$exchange_rates['GBP'] = "1.0000";
-			update_option( 'propertyhive_currency_exchange_rates', $exchange_rates );
-			update_option( 'propertyhive_currency_exchange_rates_updated', date("Y-m-d") );
+
+			// Only update the settings if the API call was successful and we got exchange rates, or if there were none set previously
+			if ( !empty( $exchange_rates ) || empty( $previous_exchange_rates ) )
+			{
+				$exchange_rates['GBP'] = "1.0000";
+				update_option( 'propertyhive_currency_exchange_rates', $exchange_rates );
+				update_option( 'propertyhive_currency_exchange_rates_updated', date("Y-m-d") );
+			}
 
 			// Loop through all on market properties and update _actual_price meta value to be price in GBP
 			$args = array(
