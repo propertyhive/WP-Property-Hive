@@ -142,6 +142,7 @@ class PH_Shortcodes {
 			'commercial_to_rent' => '',
 			'posts_per_page'	=> 10,
 			'no_results_output' => '',
+			'pagination'        => '',
 			'show_order'        => '',
 			'show_result_count' => '',
 		), $atts, 'properties' );
@@ -410,6 +411,9 @@ class PH_Shortcodes {
 			$atts['meta_key'] = '_floor_area_from_sqft';
 		}
 
+		// Get which page we're currently viewing from the URL
+		$paged = max( 1, get_query_var( 'paged' ) );
+
 		$args = array(
 			'post_type'           => 'property',
 			'post_status'         => ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
@@ -417,6 +421,7 @@ class PH_Shortcodes {
 			'orderby'             => $atts['orderby'],
 			'order'               => $atts['order'],
 			'posts_per_page'      => $atts['posts_per_page'],
+			'paged'               => $paged,
 			'meta_query'		  => $meta_query,
 			'tax_query'		  	  => $tax_query,
 			'has_password' 		  => false,
@@ -452,7 +457,10 @@ class PH_Shortcodes {
 		{
 			$total_posts = $properties->found_posts;
 
-			propertyhive_result_count( 1, $atts['posts_per_page'], $total_posts, 1, min( $total_posts, $atts['posts_per_page'] ));
+			$first = ( $atts['posts_per_page'] * $paged ) - $atts['posts_per_page'] + 1;
+			$last = min( $total_posts, $atts['posts_per_page'] * $paged );
+
+			propertyhive_result_count( $paged, $atts['posts_per_page'], $total_posts, $first, $last);
 		}
 
 		$propertyhive_loop['columns'] = $atts['columns'];
@@ -474,6 +482,11 @@ class PH_Shortcodes {
             <?php echo $atts['no_results_output']; ?>
 
 		<?php endif;
+
+		if ( isset($atts['pagination']) && $atts['pagination'] != '' )
+		{
+			propertyhive_pagination( $properties->max_num_pages );
+		}
 
 		wp_reset_postdata();
 
@@ -502,6 +515,7 @@ class PH_Shortcodes {
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
 			'no_results_output' => '',
+			'pagination'        => '',
 			'show_order'        => '',
 			'show_result_count' => '',
 		), $atts, 'recent_properties' );
@@ -546,11 +560,15 @@ class PH_Shortcodes {
             );
 		}
 
+		// Get which page we're currently viewing from the URL
+		$paged = max( 1, get_query_var( 'paged' ) );
+
 		$args = array(
 			'post_type'				=> 'property',
 			'post_status'			=> ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
 			'ignore_sticky_posts'	=> 1,
 			'posts_per_page' 		=> $atts['per_page'],
+			'paged'					=> $paged,
 			'orderby' 				=> $atts['orderby'],
 			'order' 				=> $atts['order'],
 			'meta_query' 			=> $meta_query,
@@ -579,7 +597,10 @@ class PH_Shortcodes {
 		{
 			$total_posts = $properties->found_posts;
 
-			propertyhive_result_count( 1, $atts['per_page'], $total_posts, 1, min( $total_posts, $atts['per_page'] ));
+			$first = ( $atts['posts_per_page'] * $paged ) - $atts['posts_per_page'] + 1;
+			$last = min( $total_posts, $atts['posts_per_page'] * $paged );
+
+			propertyhive_result_count( $paged, $atts['posts_per_page'], $total_posts, $first, $last);
 		}
 
 		$propertyhive_loop['columns'] = $atts['columns'];
@@ -601,6 +622,11 @@ class PH_Shortcodes {
             <?php echo $atts['no_results_output']; ?>
 
 		<?php endif;
+
+		if ( isset($atts['pagination']) && $atts['pagination'] != '' )
+		{
+			propertyhive_pagination( $properties->max_num_pages );
+		}
 
 		wp_reset_postdata();
 
@@ -631,15 +657,20 @@ class PH_Shortcodes {
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
 			'no_results_output' => '',
+			'pagination' => '',
 			'show_order' => '',
 			'show_result_count' => '',
 		), $atts, 'featured_properties' );
+
+		// Get which page we're currently viewing from the URL
+		$paged = max( 1, get_query_var( 'paged' ) );
 
 		$args = array(
 			'post_type'				=> 'property',
 			'post_status' 			=> ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
 			'ignore_sticky_posts'	=> 1,
 			'posts_per_page' 		=> $atts['per_page'],
+			'paged'                 => $paged,
 			'orderby' 				=> $atts['orderby'],
 			'order' 				=> $atts['order'],
 			'has_password' 			=> false,
@@ -725,7 +756,10 @@ class PH_Shortcodes {
 		{
 			$total_posts = $properties->found_posts;
 
-			propertyhive_result_count( 1, $atts['per_page'], $total_posts, 1, min( $total_posts, $atts['per_page'] ));
+			$first = ( $atts['posts_per_page'] * $paged ) - $atts['posts_per_page'] + 1;
+			$last = min( $total_posts, $atts['posts_per_page'] * $paged );
+
+			propertyhive_result_count( $paged, $atts['posts_per_page'], $total_posts, $first, $last);
 		}
 
 		$propertyhive_loop['columns'] = $atts['columns'];
@@ -747,6 +781,11 @@ class PH_Shortcodes {
             <?php echo $atts['no_results_output']; ?>
 
 		<?php endif;
+
+		if ( isset($atts['pagination']) && $atts['pagination'] != '' )
+		{
+			propertyhive_pagination( $properties->max_num_pages );
+		}
 
 		wp_reset_postdata();
 
