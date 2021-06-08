@@ -301,9 +301,14 @@ class PH_Shortcodes {
 			'per_page' 		=> '12',
 			'columns' 		=> '4',
 			'department' 	=> '',
-			'office_id'		=> '',
-			'negotiator_id'		=> '',
+			'address_keyword'	=> '',
+			'country'			=> '',
 			'availability_id'	=> '',
+			'marketing_flag_id'	=> '',
+			'property_type_id'	=> '',
+			'location_id'		=> '',
+			'office_id'			=> '',
+			'negotiator_id'		=> '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
 			'no_results_output' => '',
@@ -312,45 +317,48 @@ class PH_Shortcodes {
 			'show_result_count' => '',
 		), $atts, 'recent_properties' );
 
+		$base_department = $atts['department'];
+		if ( $atts['department'] !== '' && !in_array($atts['department'], array_keys( ph_get_departments( true ) )) )
+		{
+			$base_department = ph_get_custom_department_based_on($base_department);
+		}
+
+		if ( isset($atts['office_id']) && ph_clean($atts['office_id']) != '' ) { $atts['office_id'] = explode(",", $atts['office_id']); }
+		if ( isset($atts['negotiator_id']) && ph_clean($atts['negotiator_id']) != '' ) { $atts['negotiator_id'] = explode(",", $atts['negotiator_id']); }
+
+		// Cater for taxonomy names
+		foreach ( $atts as $key => $att )
+		{
+			if ( !empty(ph_clean($att)) && taxonomy_exists(str_replace("_id", "", ph_clean($key))) )
+			{
+				$atts[str_replace("_id", "", ph_clean($key))] = explode(",", ph_clean($att));
+			}
+		}
+
+		// correct commercial property type when applicable
+		if ( isset($atts['property_type']) && $atts['property_type'] != '' )
+		{
+			// Change field to check when department is specified as commercial, or if commercial is the only active department
+			if (
+				( isset($atts['department']) && $base_department == 'commercial' ) ||
+				(
+					!isset($atts['department']) &&
+					get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
+					get_option( 'propertyhive_active_departments_lettings' ) != 'yes' &&
+					get_option( 'propertyhive_active_departments_commercial' ) == 'yes'
+				)
+			)
+			{
+				$atts['commercial_property_type'] = $atts['property_type'];
+			}
+		}
+
+		$_GET = array_merge($atts, $_GET);
+		$_REQUEST = array_merge($atts, $_REQUEST);
+
 		$meta_query = PH()->query->get_meta_query();
 
-		if ( isset($atts['department']) && $atts['department'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_department',
-				'value' => $atts['department'],
-				'compare' => '='
-			);
-		}
-
-		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_office_id',
-				'value' => explode(",", $atts['office_id']),
-				'compare' => 'IN'
-			);
-		}
-
-		if ( isset($atts['negotiator_id']) && $atts['negotiator_id'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_negotiator_id',
-				'value' => explode(",", $atts['negotiator_id']),
-				'compare' => 'IN',
-			);
-		}
-
-		$tax_query = array();
-
-		if ( isset($atts['availability_id']) && $atts['availability_id'] != '' )
-		{
-			$tax_query[] = array(
-                'taxonomy'  => 'availability',
-                'terms' => explode(",", $atts['availability_id']),
-                'compare' => 'IN',
-            );
-		}
+		$tax_query = PH()->query->get_tax_query();
 
 		// Get which page we're currently viewing from the URL
 		$paged = max( 1, get_query_var( 'paged' ) );
@@ -442,9 +450,14 @@ class PH_Shortcodes {
 			'per_page' 	=> '12',
 			'columns' 	=> '4',
 			'department' => '',
-			'office_id'	=> '',
-			'negotiator_id'		=> '',
+			'address_keyword'	=> '',
+			'country'			=> '',
 			'availability_id'	=> '',
+			'marketing_flag_id'	=> '',
+			'property_type_id'	=> '',
+			'location_id'		=> '',
+			'office_id'			=> '',
+			'negotiator_id'		=> '',
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
@@ -453,6 +466,54 @@ class PH_Shortcodes {
 			'show_order' => '',
 			'show_result_count' => '',
 		), $atts, 'featured_properties' );
+
+		$base_department = $atts['department'];
+		if ( $atts['department'] !== '' && !in_array($atts['department'], array_keys( ph_get_departments( true ) )) )
+		{
+			$base_department = ph_get_custom_department_based_on($base_department);
+		}
+
+		if ( isset($atts['office_id']) && ph_clean($atts['office_id']) != '' ) { $atts['office_id'] = explode(",", $atts['office_id']); }
+		if ( isset($atts['negotiator_id']) && ph_clean($atts['negotiator_id']) != '' ) { $atts['negotiator_id'] = explode(",", $atts['negotiator_id']); }
+
+		// Cater for taxonomy names
+		foreach ( $atts as $key => $att )
+		{
+			if ( !empty(ph_clean($att)) && taxonomy_exists(str_replace("_id", "", ph_clean($key))) )
+			{
+				$atts[str_replace("_id", "", ph_clean($key))] = explode(",", ph_clean($att));
+			}
+		}
+
+		// correct commercial property type when applicable
+		if ( isset($atts['property_type']) && $atts['property_type'] != '' )
+		{
+			// Change field to check when department is specified as commercial, or if commercial is the only active department
+			if (
+				( isset($atts['department']) && $base_department == 'commercial' ) ||
+				(
+					!isset($atts['department']) &&
+					get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
+					get_option( 'propertyhive_active_departments_lettings' ) != 'yes' &&
+					get_option( 'propertyhive_active_departments_commercial' ) == 'yes'
+				)
+			)
+			{
+				$atts['commercial_property_type'] = $atts['property_type'];
+			}
+		}
+
+		$_GET = array_merge($atts, $_GET);
+		$_REQUEST = array_merge($atts, $_REQUEST);
+
+		$meta_query = PH()->query->get_meta_query();
+
+		$meta_query[] = array(
+			'key' 		=> '_featured',
+			'value' 	=> 'yes'
+		);
+
+		$tax_query = PH()->query->get_tax_query();
 
 		// Get which page we're currently viewing from the URL
 		$paged = max( 1, get_query_var( 'paged' ) );
@@ -465,66 +526,13 @@ class PH_Shortcodes {
 			'paged'                 => $paged,
 			'orderby' 				=> $atts['orderby'],
 			'order' 				=> $atts['order'],
+			'meta_query' 			=> $meta_query,
+			'tax_query' 			=> $tax_query,
 			'has_password' 			=> false,
 		);
 
-		$meta_query = array(
-			array(
-				'key' 		=> '_on_market',
-				'value' 	=> 'yes',
-			),
-			array(
-				'key' 		=> '_featured',
-				'value' 	=> 'yes'
-			)
-		);
-
-		if ( isset($atts['department']) && $atts['department'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_department',
-				'value' => $atts['department'],
-				'compare' => '='
-			);
-		}
-
-		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_office_id',
-				'value' => explode(",", $atts['office_id']),
-				'compare' => 'IN'
-			);
-		}
-
-		if ( isset($atts['negotiator_id']) && $atts['negotiator_id'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_negotiator_id',
-				'value' => explode(",", $atts['negotiator_id']),
-				'compare' => 'IN',
-			);
-		}
-
-		$args['meta_query'] = $meta_query;
-
 		if ( ! empty( $atts['meta_key'] ) ) {
 			$args['meta_key'] = $atts['meta_key'];
-		}
-
-		$tax_query = array();
-
-		if ( isset($atts['availability_id']) && $atts['availability_id'] != '' )
-		{
-			$tax_query[] = array(
-                'taxonomy'  => 'availability',
-                'terms' => explode(",", $atts['availability_id']),
-                'compare' => 'IN',
-            );
-		}
-
-		if ( ! empty( $tax_query ) ) {
-			$args['tax_query'] = $tax_query;
 		}
 
 		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
