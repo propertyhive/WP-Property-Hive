@@ -133,7 +133,7 @@ class PH_Shortcodes {
 			'country'			=> '',
 			'availability_id'	=> '',
 			'marketing_flag'	=> '', // Deprecated. Use marketing_flag_id instead
-			'marketing_flag_id'	=> '', // Should be marketing_flag_id. Might deprecate this in the future
+			'marketing_flag_id'	=> '',
 			'property_type_id'	=> '',
 			'location_id'		=> '',
 			'office_id'			=> '',
@@ -147,220 +147,26 @@ class PH_Shortcodes {
 			'show_result_count' => '',
 		), $atts, 'properties' );
 
-		$meta_query = array(
-			array(
-				'key' 		=> '_on_market',
-				'value' 	=> 'yes',
-			)
-		);
-
-		if ( isset($atts['department']) && in_array($atts['department'], array_keys( ph_get_departments() )) )
-		{
-			$meta_query[] = array(
-				'key' => '_department',
-				'value' => $atts['department'],
-				'compare' => '='
-			);
-		}
-
-		if ( isset($atts['bedrooms']) && $atts['bedrooms'] != '' && is_numeric($atts['bedrooms']) )
-		{
-			$meta_query[] = array(
-				'key' => '_bedrooms',
-				'value' => sanitize_text_field( $atts['bedrooms'] ),
-				'compare' => '='
-			);
-		}
-
 		$base_department = $atts['department'];
 		if ( $atts['department'] !== '' && !in_array($atts['department'], array_keys( ph_get_departments( true ) )) )
 		{
 			$base_department = ph_get_custom_department_based_on($base_department);
 		}
 
-		if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
-        {
-        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+		if ( isset($atts['office_id']) && ph_clean($atts['office_id']) != '' ) { $atts['office_id'] = explode(",", $atts['office_id']); }
+		if ( isset($atts['negotiator_id']) && ph_clean($atts['negotiator_id']) != '' ) { $atts['negotiator_id'] = explode(",", $atts['negotiator_id']); }
 
-        	$minimum_price = $atts['minimum_price'];
-        	if ( $search_form_currency != 'GBP' )
-        	{
-        		// Convert $atts['minimum_price'] to GBP
-        		$ph_countries = new PH_Countries();
-
-        		$minimum_price = $ph_countries->convert_price_to_gbp( $minimum_price, $search_form_currency );
-        	}
-
-            $meta_query[] = array(
-                'key'     => '_price_actual',
-                'value'   => sanitize_text_field( floor( $minimum_price ) ),
-                'compare' => '>=',
-                'type'    => 'NUMERIC'
-            );
-        }
-
-        if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['maximum_price']) && $atts['maximum_price'] != '' )
-        {
-        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
-
-        	$maximum_price = $atts['maximum_price'];
-        	if ( $search_form_currency != 'GBP' )
-        	{
-        		// Convert $atts['maximum_price'] to GBP
-        		$ph_countries = new PH_Countries();
-
-        		$maximum_price = $ph_countries->convert_price_to_gbp( $maximum_price, $search_form_currency );
-        	}
-
-            $meta_query[] = array(
-                'key'     => '_price_actual',
-                'value'   => sanitize_text_field( ceil( $maximum_price ) ),
-                'compare' => '<=',
-                'type'    => 'NUMERIC'
-            );
-        }
-
-		if ( isset($atts['address_keyword']) && $atts['address_keyword'] != '' )
+		// Cater for taxonomy names
+		foreach ( $atts as $key => $att )
 		{
-			$atts['address_keyword'] = sanitize_text_field( trim( $atts['address_keyword'] ) );
-
-        	$address_keywords = array( $atts['address_keyword'] );
-
-        	if ( strpos( $atts['address_keyword'], ' ' ) !== FALSE )
-        	{
-        		$address_keywords[] = str_replace(" ", "-", $atts['address_keyword']);
-        	}
-        	if ( strpos( $atts['address_keyword'], '-' ) !== FALSE )
-        	{
-        		$address_keywords[] = str_replace("-", " ", $atts['address_keyword']);
-        	}
-
-			$sub_meta_query = array('relation' => 'OR');
-
-			foreach ( $address_keywords as $address_keyword )
-	      	{
-	      		$sub_meta_query[] = array(
-				    'key'     => '_reference_number',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-	      		$sub_meta_query[] = array(
-				    'key'     => '_address_street',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-      			$sub_meta_query[] = array(
-				    'key'     => '_address_two',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-				$sub_meta_query[] = array(
-				    'key'     => '_address_three',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-				$sub_meta_query[] = array(
-				    'key'     => '_address_four',
-				    'value'   => $address_keyword,
-				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-				);
-	      	}
-	      	if ( strlen($atts['address_keyword']) <= 4 )
-	      	{
-	      		$sub_meta_query[] = array(
-				    'key'     => '_address_postcode',
-				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
-				    'compare' => '='
-				);
-	      		$sub_meta_query[] = array(
-				    'key'     => '_address_postcode',
-				    'value'   => sanitize_text_field( $atts['address_keyword'] ) . '[ ]',
-				    'compare' => 'RLIKE'
-				);
-	      	}
-	      	else
-	      	{
-	      		$sub_meta_query[] = array(
-				    'key'     => '_address_postcode',
-				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
-				    'compare' => 'LIKE'
-				);
-	      	}
-
-	      	$meta_query[] = $sub_meta_query;
+			if ( !empty(ph_clean($att)) && taxonomy_exists(str_replace("_id", "", ph_clean($key))) )
+			{
+				$atts[str_replace("_id", "", ph_clean($key))] = explode(",", ph_clean($att));
+			}
 		}
 
-		if ( isset($atts['country']) && $atts['country'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_address_country',
-				'value' => sanitize_text_field( $atts['country'] ),
-				'compare' => '=',
-			);
-		}
-
-		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_office_id',
-				'value' => explode(",", $atts['office_id']),
-				'compare' => 'IN',
-			);
-		}
-
-		if ( isset($atts['negotiator_id']) && $atts['negotiator_id'] != '' )
-		{
-			$meta_query[] = array(
-				'key' => '_negotiator_id',
-				'value' => explode(",", $atts['negotiator_id']),
-				'compare' => 'IN',
-			);
-		}
-
-		if ( isset($atts['commercial_for_sale']) && $atts['commercial_for_sale'] != '' )
-		{
-			$meta_query[] = array(
-                'key'     => '_for_sale',
-                'value'   => 'yes',
-                'compare' => '=',
-            );
-		}
-
-		if ( isset($atts['commercial_to_rent']) && $atts['commercial_to_rent'] != '' )
-		{
-			$meta_query[] = array(
-                'key'     => '_to_rent',
-                'value'   => 'yes',
-                'compare' => '=',
-            );
-		}
-
-		$tax_query = array();
-
-		if ( isset($atts['availability_id']) && $atts['availability_id'] != '' )
-		{
-			$tax_query[] = array(
-                'taxonomy'  => 'availability',
-                'terms' => explode(",", $atts['availability_id']),
-                'compare' => 'IN',
-            );
-		}
-
-		// Fallback for deprecated marketing_flag
-		if ( isset($atts['marketing_flag']) && $atts['marketing_flag'] != '' )
-		{
-			$atts['marketing_flag_id'] = $atts['marketing_flag'];
-		}
-		if ( isset($atts['marketing_flag_id']) && $atts['marketing_flag_id'] != '' )
-		{
-			$tax_query[] = array(
-                'taxonomy'  => 'marketing_flag',
-                'terms' => explode(",", $atts['marketing_flag_id']),
-                'compare' => 'IN',
-            );
-		}
-
-		if ( isset($atts['property_type_id']) && $atts['property_type_id'] != '' )
+		// correct commercial property type when applicable
+		if ( isset($atts['property_type']) && $atts['property_type'] != '' )
 		{
 			// Change field to check when department is specified as commercial, or if commercial is the only active department
 			if (
@@ -373,30 +179,16 @@ class PH_Shortcodes {
 				)
 			)
 			{
-				$tax_query[] = array(
-		            'taxonomy'  => 'commercial_property_type',
-		            'terms' => explode(",", $atts['property_type_id']),
-		            'compare' => 'IN',
-		        );
-			}
-			else
-			{
-				$tax_query[] = array(
-		            'taxonomy'  => 'property_type',
-		            'terms' => explode(",", $atts['property_type_id']),
-		            'compare' => 'IN',
-		        );
+				$atts['commercial_property_type'] = $atts['property_type'];
 			}
 		}
 
-		if ( isset($atts['location_id']) && $atts['location_id'] != '' )
-		{
-			$tax_query[] = array(
-                'taxonomy'  => 'location',
-                'terms' => explode(",", $atts['location_id']),
-                'compare' => 'IN',
-            );
-		}
+		$_GET = array_merge($atts, $_GET);
+		$_REQUEST = array_merge($atts, $_REQUEST);
+
+		$meta_query = PH()->query->get_meta_query();
+
+		$tax_query = PH()->query->get_tax_query();
 
 		// Change default meta key when department is specified as commercial, or if commercial is the only active department
 		if (
