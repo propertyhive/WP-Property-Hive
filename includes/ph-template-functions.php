@@ -432,12 +432,18 @@ if ( ! function_exists( 'propertyhive_result_count' ) ) {
     function propertyhive_result_count( $paged = '', $per_page = null, $total = null, $first = null, $last = null ) {
         global $wp_query;
 
+        $paged = $paged !== '' ? $paged : max( 1, $wp_query->get( 'paged' ) );
+        $per_page = $per_page !== null ? $per_page : $wp_query->get( 'posts_per_page' );
+        $total = $total !== null ? $total : $wp_query->found_posts;
+        $first = $first !== null ? $first : ( $per_page * $paged ) - $per_page + 1;
+        $last = $last !== null ? $last : min( $total, $wp_query->get( 'posts_per_page' ) * $paged );
+
         $args = array(
-            'paged'    => $paged !== '' ? $paged : max( 1, $wp_query->get( 'paged' ) ),
-            'per_page' => $per_page !== null ? $per_page : $wp_query->get( 'posts_per_page' ),
-            'total'    => $total !== null ? $total : $wp_query->found_posts,
-            'first'    => $first !== null ? $first : ( $per_page * $paged ) - $per_page + 1,
-            'last'     => $last !== null ? $last : min( $total, $wp_query->get( 'posts_per_page' ) * $paged ),
+            'paged'    => $paged,
+            'per_page' => $per_page,
+            'total'    => $total,
+            'first'    => $first,
+            'last'     => $last,
         );
 
         ph_get_template( 'search/result-count.php', $args );
