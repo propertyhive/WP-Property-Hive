@@ -833,8 +833,16 @@ class PH_Query {
 	      		'_address_two',
 	      		'_address_three',
 	      		'_address_four',
-	      		'_address_postcode'
+	      		'_address_postcode',
 	      	);
+
+	      	// add country to list of fields to query if it looks like we're working with an overseas site
+	      	$countries = get_option( 'propertyhive_countries', array() );
+	      	if ( !is_array($countries) ) { $countries = array(); }
+	      	if ( count($countries) > 1 )
+	      	{
+	      		$address_fields_to_query[] = '_address_country';
+	      	}
 
 	      	$address_fields_to_query = apply_filters( 'propertyhive_address_fields_to_query', $address_fields_to_query );
 
@@ -842,7 +850,7 @@ class PH_Query {
 	      	{
 	      		foreach ( $address_fields_to_query as $address_field )
 	      		{
-	      			if ( $address_field == '_address_postcode' ) { continue; } // ignore postcode as that is handled differently afterwards
+	      			if ( $address_field == '_address_postcode' || $address_field == '_address_country' ) { continue; } // ignore postcode and country as they're handled differently afterwards
 
 	      			$meta_query[] = array(
 					    'key'     => $address_field,
@@ -904,6 +912,34 @@ class PH_Query {
 					);
 		      	}
 		    }
+
+		    if ( in_array('_address_country', $address_fields_to_query) )
+			{
+				$meta_query[] = array(
+				    'key'     => '_address_country',
+				    'value'   => $address_keyword,
+				    'compare' => '='
+				);
+
+				// get country code for country entered
+				$PH_Countries = new PH_Countries();
+				$countries = $PH_Countries->countries;
+				if ( is_array($countries) && !empty($countries) )
+				{
+					foreach ( $countries as $country_code => $country )
+					{
+						if ( strtolower($address_keyword) == strtolower($country['name']) )
+						{
+							$meta_query[] = array(
+							    'key'     => '_address_country',
+							    'value'   => $country_code,
+							    'compare' => '='
+							);
+							break;
+						}
+					}
+				}
+			}
       	}
 
 		return $meta_query;
