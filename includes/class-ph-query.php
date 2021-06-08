@@ -1954,11 +1954,19 @@ class PH_Query {
         
         $meta_query = array();
         
-        if ( isset( $_REQUEST['officeID'] ) && $_REQUEST['officeID'] != '' )
+        if ( isset( $_REQUEST['officeID'] ) && !empty($_REQUEST['officeID']) )
         {
     		$meta_query = array(
     		    'key'     => '_office_id',
     		    'value'   => ph_clean( (is_array($_REQUEST['officeID'])) ? $_REQUEST['officeID'] : array( $_REQUEST['officeID'] ) ),
+    		    'compare' => 'IN'
+    		);
+		}
+		if ( isset( $_REQUEST['office_id'] ) && !empty($_REQUEST['office_id']) )
+        {
+    		$meta_query = array(
+    		    'key'     => '_office_id',
+    		    'value'   => ph_clean( (is_array($_REQUEST['office_id'])) ? $_REQUEST['office_id'] : array( $_REQUEST['office_id'] ) ),
     		    'compare' => 'IN'
     		);
 		}
