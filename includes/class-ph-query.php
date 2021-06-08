@@ -1931,12 +1931,12 @@ class PH_Query {
         
         $meta_query = array();
         
-        if ( isset( $_REQUEST['negotiator_id'] ) && $_REQUEST['negotiator_id'] != '' )
+        if ( isset( $_REQUEST['negotiator_id'] ) && !empty($_REQUEST['negotiator_id']) )
         {
     		$meta_query = array(
     		    'key'     => '_negotiator_id',
-    		    'value'   => (int)$_REQUEST['negotiator_id'],
-    		    'compare' => '='
+    		    'value'   => ph_clean( (is_array($_REQUEST['negotiator_id'])) ? $_REQUEST['negotiator_id'] : array( $_REQUEST['negotiator_id'] ) ),
+    		    'compare' => 'IN'
     		);
 		}
 
