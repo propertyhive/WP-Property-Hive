@@ -23,8 +23,6 @@ class PH_Meta_Box_Enquiry_Notes {
 
         $section = 'enquiry';
 
-        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">';
-            include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
-        echo '</div>';
+        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">' . __( 'Loading', 'propertyhive' ) . '...</div>';
     }
 }

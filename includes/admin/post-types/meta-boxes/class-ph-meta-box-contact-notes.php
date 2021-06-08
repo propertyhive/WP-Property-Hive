@@ -38,7 +38,7 @@ class PH_Meta_Box_Contact_Notes {
             $i = 0;
             foreach ( $notes_filters as $class => $label )
             {
-                echo '<li><a href="" data-section="' . $section . '" data-filter-class="' . ( $class == '' ? '*' : 'note-type-' . $class ) . '">' . $label . '</a>';
+                echo '<li><a href="" data-section="' . $section . '" data-filter-class="' . ( $class == '' ? '*' : 'note-type-' . $class ) . '"' . ( $class == '' ? ' class="current"' : '' ) . '>' . $label . '</a>';
                 if ( $i < count($notes_filters) - 1 ) { echo ' |&nbsp; '; }
                 echo '</li>';
                 ++$i;
@@ -46,9 +46,7 @@ class PH_Meta_Box_Contact_Notes {
             
         echo '</ul>';
 
-        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">';
-            include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
-        echo '</div>';
+        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">' . __( 'Loading', 'propertyhive' ) . '...</div>';
 
     }
 }

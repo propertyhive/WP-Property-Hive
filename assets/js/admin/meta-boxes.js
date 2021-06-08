@@ -88,16 +88,7 @@ jQuery( function($){
         }
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
-            var data = {
-                action:         'propertyhive_get_notes_grid',
-                post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
-                section:        section,
-            };
-
-            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
-            {
-                jQuery('#propertyhive_' +  section + '_notes_container').html(response);
-            }, 'html');
+            ph_redraw_notes_grid(section);
         });
 
         return false;
@@ -126,16 +117,7 @@ jQuery( function($){
         };
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
-            var data = {
-                action:         'propertyhive_get_notes_grid',
-                post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
-                section:        section,
-            };
-
-            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
-            {
-                jQuery('#propertyhive_' +  section + '_notes_container').html(response);
-            }, 'html');
+            ph_redraw_notes_grid(section);
         }, 'json');
 
         return false;
@@ -166,18 +148,7 @@ jQuery( function($){
         };
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
-
-            var data = {
-                action:         'propertyhive_get_notes_grid',
-                post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
-                section:        section,
-            };
-
-            jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
-            {
-                jQuery('#propertyhive_' +  section + '_notes_container').html(response);
-            }, 'html');
-
+            ph_redraw_notes_grid(section);
         }, 'json');
 
         return false;
@@ -1038,6 +1009,20 @@ jQuery(document).ready(function($)
         }, 'json');
     })
 });
+
+function ph_redraw_notes_grid(section)
+{
+    var data = {
+        action:         'propertyhive_get_notes_grid',
+        post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+        section:        section,
+    };
+
+    jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+    {
+        jQuery('#propertyhive_' +  section + '_notes_container').html(response);
+    }, 'html');
+}
 
 function initialise_datepicker() {
     jQuery( ".date-picker" ).datepicker({

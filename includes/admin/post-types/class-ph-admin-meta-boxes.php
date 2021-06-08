@@ -701,7 +701,7 @@ class PH_Admin_Meta_Boxes {
         );
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
         {
-            $tabs['tab_marketing']['ajax_actions'] = array( 'get_property_marketing_statistics_meta_box^' . wp_create_nonce( 'get_property_marketing_statistics_meta_box' ) . '^reload_marketing_statistics' );
+            $tabs['tab_marketing']['ajax_actions'] = array( 'get_property_marketing_statistics_meta_box^' . wp_create_nonce( 'get_property_marketing_statistics_meta_box' ) . '^reload_marketing_statistics()' );
         }
 
         /* PROPERTY DESCRIPTIONS META BOXES */
@@ -1114,7 +1114,8 @@ class PH_Admin_Meta_Boxes {
             $tabs['tab_property_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
-                'post_type' => 'property'
+                'post_type' => 'property',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'property\')' ),
             );
 
             add_meta_box( 'propertyhive-property-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Property_Actions::output', 'property', 'side' );
@@ -1487,7 +1488,8 @@ class PH_Admin_Meta_Boxes {
             $tabs['tab_contact_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
-                'post_type' => 'contact'
+                'post_type' => 'contact',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'contact\')' ),
             );
 
             add_meta_box( 'propertyhive-contact-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Contact_Actions::output', 'contact', 'side' );
@@ -1527,7 +1529,8 @@ class PH_Admin_Meta_Boxes {
             $tabs['tab_enquiry_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
-                'post_type' => 'enquiry'
+                'post_type' => 'enquiry',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'enquiry\')' ),
             );
         }
 
@@ -1613,7 +1616,8 @@ class PH_Admin_Meta_Boxes {
             $tabs['tab_appraisal_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
-                'post_type' => 'appraisal'
+                'post_type' => 'appraisal',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'appraisal\')' ),
             );
 
             add_meta_box( 'propertyhive-appraisal-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Appraisal_Actions::output', 'appraisal', 'side' );
@@ -1701,7 +1705,8 @@ class PH_Admin_Meta_Boxes {
             $tabs['tab_viewing_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
-                'post_type' => 'viewing'
+                'post_type' => 'viewing',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'viewing\')' ),
             );
 
             add_meta_box( 'propertyhive-viewing-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Viewing_Actions::output', 'viewing', 'side' );
@@ -1795,7 +1800,8 @@ class PH_Admin_Meta_Boxes {
             $tabs['tab_offer_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
-                'post_type' => 'offer'
+                'post_type' => 'offer',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'offer\')' ),
             );
 
             add_meta_box( 'propertyhive-offer-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Offer_Actions::output', 'offer', 'side' );
@@ -1888,7 +1894,8 @@ class PH_Admin_Meta_Boxes {
             $tabs['tab_sale_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
-                'post_type' => 'sale'
+                'post_type' => 'sale',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'sale\')' ),
             );
 
             add_meta_box( 'propertyhive-sale-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Sale_Actions::output', 'sale', 'side' );
@@ -2056,7 +2063,8 @@ class PH_Admin_Meta_Boxes {
             $tabs['tab_tenancy_notes'] = array(
                 'name' => __( 'History &amp; Notes', 'propertyhive' ),
                 'metabox_ids' => $ids,
-                'post_type' => 'tenancy'
+                'post_type' => 'tenancy',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'tenancy\')' ),
             );
         }
 
@@ -2194,7 +2202,7 @@ class PH_Admin_Meta_Boxes {
 
                                     if ( ajax_action[2] ) // callback
                                     {
-                                        eval(ajax_action[2] + \'()\');
+                                        eval(ajax_action[2]);
                                     }
                                     else
                                     {
