@@ -475,8 +475,15 @@ if ( ! function_exists( 'propertyhive_pagination' ) ) {
      * @subpackage  Loop
      * @return void
      */
-    function propertyhive_pagination() {
-        ph_get_template( 'search/pagination.php' );
+    function propertyhive_pagination( $max_num_pages = '' ) {
+
+        global $wp_query;
+
+        $args = array(
+            'max_num_pages' => $max_num_pages !== '' ? $max_num_pages : $wp_query->max_num_pages,
+        );
+
+        ph_get_template( 'search/pagination.php', $args );
     }
 }
 
