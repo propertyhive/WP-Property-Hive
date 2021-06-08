@@ -143,6 +143,7 @@ class PH_Shortcodes {
 			'posts_per_page'	=> 10,
 			'no_results_output' => '',
 			'show_order'        => '',
+			'show_result_count' => '',
 		), $atts, 'properties' );
 
 		$meta_query = array(
@@ -447,6 +448,13 @@ class PH_Shortcodes {
 
 		$properties = new WP_Query( $args );
 
+		if ( isset($atts['show_result_count']) && $atts['show_result_count'] != '' )
+		{
+			$total_posts = $properties->found_posts;
+
+			propertyhive_result_count( 1, $atts['posts_per_page'], $total_posts, 1, min( $total_posts, $atts['posts_per_page'] ));
+		}
+
 		$propertyhive_loop['columns'] = $atts['columns'];
 
 		if ( $properties->have_posts() ) : ?>
@@ -495,6 +503,7 @@ class PH_Shortcodes {
 			'order' 		=> 'desc',
 			'no_results_output' => '',
 			'show_order'        => '',
+			'show_result_count' => '',
 		), $atts, 'recent_properties' );
 
 		$meta_query = PH()->query->get_meta_query();
@@ -566,6 +575,13 @@ class PH_Shortcodes {
 
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_recent_properties_query', $args, $atts ) );
 
+		if ( isset($atts['show_result_count']) && $atts['show_result_count'] != '' )
+		{
+			$total_posts = $properties->found_posts;
+
+			propertyhive_result_count( 1, $atts['per_page'], $total_posts, 1, min( $total_posts, $atts['per_page'] ));
+		}
+
 		$propertyhive_loop['columns'] = $atts['columns'];
 
 		if ( $properties->have_posts() ) : ?>
@@ -616,6 +632,7 @@ class PH_Shortcodes {
 			'meta_key' 	=> '',
 			'no_results_output' => '',
 			'show_order' => '',
+			'show_result_count' => '',
 		), $atts, 'featured_properties' );
 
 		$args = array(
@@ -703,6 +720,13 @@ class PH_Shortcodes {
 		}
 		
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_featured_properties_query', $args, $atts ) );
+
+		if ( isset($atts['show_result_count']) && $atts['show_result_count'] != '' )
+		{
+			$total_posts = $properties->found_posts;
+
+			propertyhive_result_count( 1, $atts['per_page'], $total_posts, 1, min( $total_posts, $atts['per_page'] ));
+		}
 
 		$propertyhive_loop['columns'] = $atts['columns'];
 
