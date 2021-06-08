@@ -443,9 +443,9 @@ class PH_Shortcodes {
 
 		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
 		{
-			$args = self::add_show_order_args( $atts, $args );
+			list( $args, $orderby ) = self::get_show_order_args( $atts, $args );
 
-			propertyhive_catalog_ordering();
+			propertyhive_catalog_ordering( $atts['department'], $orderby );
 		}
 
 		$args = apply_filters( 'propertyhive_properties_query', $args, $atts );
@@ -586,9 +586,9 @@ class PH_Shortcodes {
 
 		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
 		{
-			$args = self::add_show_order_args( $atts, $args );
+			list( $args, $orderby ) = self::get_show_order_args( $atts, $args );
 
-			propertyhive_catalog_ordering();
+			propertyhive_catalog_ordering( $atts['department'], $orderby );
 		}
 
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_recent_properties_query', $args, $atts ) );
@@ -745,9 +745,9 @@ class PH_Shortcodes {
 
 		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
 		{
-			$args = self::add_show_order_args( $atts, $args );
+			list( $args, $orderby ) = self::get_show_order_args( $atts, $args );
 
-			propertyhive_catalog_ordering();
+			propertyhive_catalog_ordering( $atts['department'], $orderby );
 		}
 		
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_featured_properties_query', $args, $atts ) );
@@ -1419,15 +1419,9 @@ class PH_Shortcodes {
 
 	}
 
-	private static function add_show_order_args( $atts, $args )
+	private static function get_show_order_args( $atts, $args )
 	{
-		if ( isset( $_GET['orderby'] ) )
-		{
-			$atts['orderby'] = $_GET['orderby'];
-		}
-
-		$_GET = array_merge($_GET, array_filter($atts));
-		$_REQUEST = array_merge($_REQUEST, array_filter($atts));
+		$orderby = '';
 
 		if ( isset( $_GET['orderby'] ) && $_GET['orderby'] != '' )
 		{
@@ -1446,7 +1440,33 @@ class PH_Shortcodes {
 				unset($args['meta_key']);
 			}
 		}
+		else
+		{
+			switch ( $atts['orderby'] )
+			{
+				case 'date':
+					$orderby = 'date';
+					break;
+				case 'meta_value_num':
 
-		return $args;
+					switch ( $atts['meta_key'] )
+					{
+						case '_price_actual':
+							$orderby = 'price';
+							break;
+						case '_floor_area_from_sqft':
+							$orderby = 'floor_area';
+							break;
+					}
+
+					if ( $orderby != '' && !empty($atts['order']) )
+					{
+						$orderby .= '-' . $atts['order'];
+					}
+					break;
+			}
+		}
+
+		return array( $args, $orderby );
 	}
 }

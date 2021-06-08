@@ -459,10 +459,19 @@ if ( ! function_exists( 'propertyhive_catalog_ordering' ) ) {
      * @subpackage  Loop
      * @return void
      */
-    function propertyhive_catalog_ordering() {
-        $orderby = isset( $_GET['orderby'] ) ? ph_clean( sanitize_text_field($_GET['orderby']) ) : apply_filters( 'propertyhive_default_search_results_orderby', get_option( 'propertyhive_default_search_results_orderby' ) );
+    function propertyhive_catalog_ordering( $department = '', $orderby = '' ) {
 
-        ph_get_template( 'search/orderby.php', array( 'orderby' => $orderby ) );
+        if ( $orderby === '' )
+        {
+            $orderby = isset( $_GET['orderby'] ) ? ph_clean( sanitize_text_field($_GET['orderby']) ) : apply_filters( 'propertyhive_default_search_results_orderby', get_option( 'propertyhive_default_search_results_orderby' ) );
+        }
+
+        $args = array(
+            'department' => $department !== '' ? $department : ( isset($_REQUEST['department']) ? $_REQUEST['department'] : '' ),
+            'orderby' =>  $orderby,
+        );
+
+        ph_get_template( 'search/orderby.php', $args );
     }
 }
 

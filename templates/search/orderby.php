@@ -15,8 +15,8 @@ global $propertyhive;
 <form class="propertyhive-ordering" method="get">
 	<?php
 		if (
-			( isset($_REQUEST['department']) && $_REQUEST['department'] != 'commercial' && ph_get_custom_department_based_on($_REQUEST['department']) != 'commercial' ) ||
-			( !isset($_REQUEST['department']) && get_option( 'propertyhive_primary_department' ) != 'commercial' && ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) != 'commercial' )
+			( !in_array( $department, array('', 'commercial') ) && ph_get_custom_department_based_on($department) != 'commercial' ) ||
+			( $department == '' && get_option( 'propertyhive_primary_department' ) != 'commercial' && ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) != 'commercial' )
 		)
 		{
 			$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
