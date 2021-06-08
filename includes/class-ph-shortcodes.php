@@ -142,6 +142,7 @@ class PH_Shortcodes {
 			'commercial_to_rent' => '',
 			'posts_per_page'	=> 10,
 			'no_results_output' => '',
+			'show_order'        => '',
 		), $atts, 'properties' );
 
 		$meta_query = array(
@@ -434,6 +435,13 @@ class PH_Shortcodes {
 
 		ob_start();
 
+		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
+		{
+			$args = self::add_show_order_args( $atts, $args );
+
+			propertyhive_catalog_ordering();
+		}
+
 		$args = apply_filters( 'propertyhive_properties_query', $args, $atts );
 		$args = apply_filters( 'propertyhive_shortcode_properties_query', $args, $atts );
 
@@ -486,6 +494,7 @@ class PH_Shortcodes {
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
 			'no_results_output' => '',
+			'show_order'        => '',
 		), $atts, 'recent_properties' );
 
 		$meta_query = PH()->query->get_meta_query();
@@ -548,6 +557,13 @@ class PH_Shortcodes {
 
 		ob_start();
 
+		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
+		{
+			$args = self::add_show_order_args( $atts, $args );
+
+			propertyhive_catalog_ordering();
+		}
+
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_recent_properties_query', $args, $atts ) );
 
 		$propertyhive_loop['columns'] = $atts['columns'];
@@ -599,6 +615,7 @@ class PH_Shortcodes {
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
 			'no_results_output' => '',
+			'show_order' => '',
 		), $atts, 'featured_properties' );
 
 		$args = array(
@@ -677,6 +694,13 @@ class PH_Shortcodes {
 		}
 
 		ob_start();
+
+		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
+		{
+			$args = self::add_show_order_args( $atts, $args );
+
+			propertyhive_catalog_ordering();
+		}
 		
 		$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_featured_properties_query', $args, $atts ) );
 
@@ -1330,5 +1354,36 @@ class PH_Shortcodes {
 
 		return ob_get_clean();
 
+	}
+
+	private static function add_show_order_args( $atts, $args )
+	{
+		if ( isset( $_GET['orderby'] ) )
+		{
+			$atts['orderby'] = $_GET['orderby'];
+		}
+
+		$_GET = array_merge($_GET, array_filter($atts));
+		$_REQUEST = array_merge($_REQUEST, array_filter($atts));
+
+		if ( isset( $_GET['orderby'] ) && $_GET['orderby'] != '' )
+		{
+			$PH_Query = new PH_Query();
+			$ordering_args = $PH_Query->get_search_results_ordering_args();
+
+			$args['orderby'] = $ordering_args['orderby'];
+			$args['order'] = $ordering_args['order'];
+
+			if ( isset( $ordering_args['meta_key'] ) )
+			{
+				$args['meta_key'] = $ordering_args['meta_key'];
+			}
+			else
+			{
+				unset($args['meta_key']);
+			}
+		}
+
+		return $args;
 	}
 }
