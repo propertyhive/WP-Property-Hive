@@ -597,10 +597,10 @@ class PH_Shortcodes {
 		{
 			$total_posts = $properties->found_posts;
 
-			$first = ( $atts['posts_per_page'] * $paged ) - $atts['posts_per_page'] + 1;
-			$last = min( $total_posts, $atts['posts_per_page'] * $paged );
+			$first = ( $atts['per_page'] * $paged ) - $atts['per_page'] + 1;
+			$last = min( $total_posts, $atts['per_page'] * $paged );
 
-			propertyhive_result_count( $paged, $atts['posts_per_page'], $total_posts, $first, $last);
+			propertyhive_result_count( $paged, $atts['per_page'], $total_posts, $first, $last);
 		}
 
 		$propertyhive_loop['columns'] = $atts['columns'];
@@ -756,10 +756,10 @@ class PH_Shortcodes {
 		{
 			$total_posts = $properties->found_posts;
 
-			$first = ( $atts['posts_per_page'] * $paged ) - $atts['posts_per_page'] + 1;
-			$last = min( $total_posts, $atts['posts_per_page'] * $paged );
+			$first = ( $atts['per_page'] * $paged ) - $atts['per_page'] + 1;
+			$last = min( $total_posts, $atts['per_page'] * $paged );
 
-			propertyhive_result_count( $paged, $atts['posts_per_page'], $total_posts, $first, $last);
+			propertyhive_result_count( $paged, $atts['per_page'], $total_posts, $first, $last);
 		}
 
 		$propertyhive_loop['columns'] = $atts['columns'];
