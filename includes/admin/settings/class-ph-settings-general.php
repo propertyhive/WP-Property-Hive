@@ -475,6 +475,12 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title'   => __( 'Use Legacy Styles', 'propertyhive' ),
+                'id'      => 'propertyhive_use_legacy_styles',
+                'type'    => 'checkbox',
+            ),
+
+            array(
                 'title'   => __( 'When Entering Features', 'propertyhive' ),
                 'id'      => 'propertyhive_features_type',
                 'type'    => 'radio',

@@ -30,9 +30,24 @@ class PH_Frontend_Scripts {
 	 * @return array
 	 */
 	public static function get_styles() {
+		if ( get_option( 'propertyhive_use_legacy_styles' ) == 'yes' )
+		{
+			$layout_css = 'propertyhive-layout-legacy';
+		}
+		else
+		{
+			$layout_css = 'propertyhive-layout';
+		}
+
 		return apply_filters( 'propertyhive_enqueue_styles', array(
 			'propertyhive-general' => array(
 				'src'     => str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/propertyhive.css',
+				'deps'    => '',
+				'version' => PH_VERSION,
+				'media'   => 'all'
+			),
+			'propertyhive-layout' => array(
+				'src'     => str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/' . $layout_css . '.css',
 				'deps'    => '',
 				'version' => PH_VERSION,
 				'media'   => 'all'

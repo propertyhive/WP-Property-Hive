@@ -1,0 +1,4 @@
+.propertyhive ul.properties { margin:0 0 1em; padding:0; clear:both }
+.propertyhive ul.properties li { float:left; margin:0; padding-top:1em; padding-bottom:1em; border-bottom:1px solid #CCC; }
+.propertyhive ul.properties li.first { clear:left; }
+.propertyhive ul.properties li.first.last { width:100%; }

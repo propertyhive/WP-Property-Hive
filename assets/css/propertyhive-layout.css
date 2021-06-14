@@ -1,0 +1,2 @@
+.propertyhive ul.properties { display:grid; grid-template-columns: repeat(3, auto); grid-gap: 10px; }
+.propertyhive ul.properties li { border-bottom:1px solid #CCC; }
