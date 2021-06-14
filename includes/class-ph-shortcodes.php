@@ -183,8 +183,18 @@ class PH_Shortcodes {
 			}
 		}
 
+		// If orderby has been passed in with $_GET, preserve it for use later
+		$get_orderby = isset( $_GET['orderby'] ) ? $_GET['orderby'] : '';
+
 		$_GET = array_merge($atts, $_GET);
 		$_REQUEST = array_merge($atts, $_REQUEST);
+
+		// Unset the value taken from $atts and ensure it's only set if an orderby value was passed in via $_GET
+		unset($_GET['orderby']);
+		if ( !empty( $get_orderby ) )
+		{
+			$_GET['orderby'] = $get_orderby;
+		}
 
 		$meta_query = PH()->query->get_meta_query();
 
