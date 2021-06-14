@@ -1796,14 +1796,14 @@ class PH_AJAX {
                     }
                 }
 
+                do_action('propertyhive_property_enquiry_sent', $_POST, $to);
+
                 // Send auto-responder
                 if ( get_option( 'propertyhive_enquiry_auto_responder', '' ) == 'yes' )
                 {
                     // Auto-responder enabled
                     PH()->email->send_enquiry_auto_responder( $_POST );
                 }
-
-                do_action('propertyhive_property_enquiry_sent', $_POST, $to);
             }
         }
         
