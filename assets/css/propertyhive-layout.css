@@ -1,2 +1,18 @@
-.propertyhive ul.properties { display:grid; grid-template-columns: repeat(3, auto); grid-gap: 10px; }
+.propertyhive ul.properties { display:grid; grid-gap: 10px; }
 .propertyhive ul.properties li { border-bottom:1px solid #CCC; }
+
+.propertyhive.single-column ul.properties li .thumbnail { float:left; width:20%; }
+.propertyhive.single-column ul.properties li .thumbnail img { max-width:100%; }
+.propertyhive.single-column ul.properties li .details { float:right; width:77%; }
+
+.propertyhive.multiple-columns ul.properties li .thumbnail { float:none; width:100%; }
+.propertyhive.multiple-columns ul.properties li .thumbnail img { width:100%; }
+.propertyhive.multiple-columns ul.properties li .details { float:none; width:100%; }
+
+.propertyhive.columns-2 ul.properties { grid-template-columns: repeat(2, auto); }
+.propertyhive.columns-3 ul.properties { grid-template-columns: repeat(3, auto); }
+.propertyhive.columns-4 ul.properties { grid-template-columns: repeat(4, auto); }
+.propertyhive.columns-5 ul.properties { grid-template-columns: repeat(5, auto); }
+.propertyhive.columns-6 ul.properties { grid-template-columns: repeat(6, auto); }
+.propertyhive.columns-7 ul.properties { grid-template-columns: repeat(7, auto); }
+.propertyhive.columns-8 ul.properties { grid-template-columns: repeat(8, auto); }

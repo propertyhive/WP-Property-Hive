@@ -18,10 +18,7 @@
 .property-search-form .control label {  }
 
 .propertyhive ul.properties { list-style-type:none; }
-.propertyhive ul.properties li .thumbnail { float:left; width:20%; }
 .propertyhive ul.properties li .thumbnail a { display:block; position:relative; height:100%; }
-.propertyhive ul.properties li .thumbnail img { max-width:100%; }
-.propertyhive ul.properties li .details { float:right; width:77%; }
 .propertyhive ul.properties li .details h3 { padding:0; margin:0 0 0.3rem; }
 
 .propertyhive-pagination {  }

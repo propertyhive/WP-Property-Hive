@@ -2,3 +2,7 @@
 .propertyhive ul.properties li { float:left; margin:0; padding-top:1em; padding-bottom:1em; border-bottom:1px solid #CCC; }
 .propertyhive ul.properties li.first { clear:left; }
 .propertyhive ul.properties li.first.last { width:100%; }
+
+.propertyhive ul.properties li .thumbnail { float:left; width:20%; }
+.propertyhive ul.properties li .thumbnail img { max-width:100%; }
+.propertyhive ul.properties li .details { float:right; width:77%; }

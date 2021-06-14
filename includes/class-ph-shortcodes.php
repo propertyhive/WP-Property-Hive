@@ -294,7 +294,9 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_properties_shortcode_output', '<div class="propertyhive propertyhive-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		$cols_class = ( !empty($atts['columns']) && $atts['columns'] > 1 ) ? 'multiple-columns' : 'single-column';
+
+		return apply_filters( 'propertyhive_properties_shortcode_output', '<div class="propertyhive propertyhive-properties-shortcode columns-' . $atts['columns'] . ' ' . $cols_class .'">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
