@@ -10,7 +10,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 
-<form name="ph_property_search" class="property-search-form property-search-form-<?php echo $id; ?> clear" action="<?php echo get_post_type_archive_link( 'property' ); ?>" method="get" role="form">
+<form name="ph_property_search" class="property-search-form property-search-form-<?php echo $id; ?>" action="<?php echo get_post_type_archive_link( 'property' ); ?>" method="get" role="form">
 
     <?php foreach ( $form_controls as $key => $field ) : ?>
 

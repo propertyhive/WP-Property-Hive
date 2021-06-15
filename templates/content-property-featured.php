@@ -29,7 +29,7 @@ if ( ! $property )
 ++$propertyhive_loop['loop'];
 
 // Extra post classes
-$classes = array('clear');
+$classes = array();
 if ( 0 == ( $propertyhive_loop['loop'] - 1 ) % $propertyhive_loop['columns'] || 1 == $propertyhive_loop['columns'] )
 	$classes[] = 'first';
 if ( 0 == $propertyhive_loop['loop'] % $propertyhive_loop['columns'] )

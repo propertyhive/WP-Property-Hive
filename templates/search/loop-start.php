@@ -7,4 +7,4 @@
  * @version     1.0.0
  */
 ?>
-<ul class="properties clear">
+<ul class="properties">
