@@ -305,6 +305,7 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'No Results Output', 'propertyhive' ),
 				'type' => Elementor\Controls_Manager::TEXTAREA,
+				'placeholder' => 'e.g. No Properties Found'
 			]
 		);
 
