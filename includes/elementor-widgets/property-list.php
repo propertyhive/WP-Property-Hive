@@ -128,20 +128,8 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 					'date' => __( 'Date Put On Market', 'propertyhive' ),
 					'price' => __( 'Price', 'propertyhive' ),
 					'rand' => __( 'Random', 'propertyhive' ),
-					'meta_value_num' => __( 'Meta Key Value', 'propertyhive' ),
 				],
 				'default' => 'date',
-			]
-		);
-
-		$this->add_control(
-			'meta_key',
-			[
-				'label' => __( 'Meta Key', 'propertyhive' ),
-				'type' => \Elementor\Controls_Manager::TEXT,
-				'condition' => [
-					'orderby' => 'meta_value_num',
-				],
 			]
 		);
 
