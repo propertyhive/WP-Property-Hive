@@ -60,6 +60,7 @@ class PH_Elementor {
 	public function register_widgets()
 	{
 		$widgets = array(
+			'Property List',
 			'Property Tabbed Details',
 			'Property Price',
 			'Property Images',
