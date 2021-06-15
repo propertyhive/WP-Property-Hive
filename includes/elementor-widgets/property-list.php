@@ -35,7 +35,7 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-		$this->add_responsive_control(
+		$this->add_control(
 			'columns',
 			[
 				'label' => __( 'Columns', 'propertyhive' ),
