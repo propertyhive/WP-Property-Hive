@@ -181,6 +181,133 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'country',
+			[
+				'label' => __( 'Country', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+			]
+		);
+
+		$availabilities = $this->get_terms_array( 'availability' );
+
+		$this->add_control(
+			'availability_id',
+			[
+				'label' => __( 'Availability', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT2,
+				'options' => $availabilities,
+				'multiple' => true,
+			]
+		);
+
+		$marketing_flags = $this->get_terms_array( 'marketing_flag' );
+
+		$this->add_control(
+			'marketing_flag_id',
+			[
+				'label' => __( 'Has Marketing Flag', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT2,
+				'options' => $marketing_flags,
+				'multiple' => true,
+			]
+		);
+
+		$property_types = $this->get_terms_array( 'property_type' );
+
+		$this->add_control(
+			'property_type_id',
+			[
+				'label' => __( 'Property Type', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT2,
+				'options' => $property_types,
+				'default' => array( '' ),
+				'multiple' => true,
+			]
+		);
+
+		$locations = $this->get_terms_array( 'location' );
+
+		$this->add_control(
+			'location_id',
+			[
+				'label' => __( 'Location', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT2,
+				'options' => $locations,
+				'multiple' => true,
+			]
+		);
+
+		$offices = array();
+
+		$args = array(
+			'post_type' => 'office',
+			'nopaging' => true,
+			'orderby' => 'title',
+			'order' => 'ASC'
+		);
+
+		$office_query = new WP_Query( $args );
+
+		if ( $office_query->have_posts() )
+		{
+			while ( $office_query->have_posts() )
+			{
+				$office_query->the_post();
+
+				$offices[get_the_ID()] = get_the_title();
+			}
+		}
+		wp_reset_postdata();
+
+		$this->add_control(
+			'office_id',
+			[
+				'label' => __( 'Office', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT2,
+				'options' => $offices,
+				'multiple' => true,
+			]
+		);
+
+		$args = array(
+			'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
+		);
+
+		$args = array(
+			'orderby'                 => 'display_name',
+			'order'                   => 'ASC',
+			'role__not_in'            => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') ),
+		);
+
+		$wp_users = get_users( $args );
+
+		if ( !empty( $wp_users ))
+		{
+			foreach ($wp_users as $wp_user)
+			{
+				$negotiators[$wp_user->ID] = $wp_user->display_name;
+			}
+		}
+
+		$this->add_control(
+			'negotiator_id',
+			[
+				'label' => __( 'Negotiator', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT2,
+				'options' => $negotiators,
+				'multiple' => true,
+			]
+		);
+
+		$this->add_control(
+			'no_results_output',
+			[
+				'label' => __( 'No Results Output', 'propertyhive' ),
+				'type' => Elementor\Controls_Manager::TEXTAREA,
+			]
+		);
+
 		$this->end_controls_section();
 
 		parent::_register_controls();
@@ -209,6 +336,13 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 				'show_order',
 				'show_result_count',
 				'address_keyword',
+				'country',
+				'availability_id',
+				'marketing_flag_id',
+				'property_type_id',
+				'location_id',
+				'negotiator_id',
+				'no_results_output',
 			);
 
 			$attributes = $this->add_settings_to_attributes( $settings, $attributes, $attributes_to_add );
@@ -226,10 +360,32 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 		{
 			if ( isset( $settings[$attribute] ) && !empty( $settings[$attribute] ) )
 			{
-				$attributes[$attribute] = $settings[$attribute];
+				$attribute_value = is_array( $settings[$attribute] ) ? implode( ',', $settings[$attribute]) : $settings[$attribute];
+				$attributes[$attribute] = $attribute_value;
 			}
 		}
 
 		return $attributes;
+	}
+
+	private function get_terms_array( $term_type )
+	{
+		$terms_array = array();
+
+		$args = array(
+			'hide_empty' => false,
+			'parent' => 0
+		);
+		$terms = get_terms( $term_type, $args );
+
+		if ( !empty( $terms ) && !is_wp_error( $terms ) )
+		{
+			foreach ($terms as $term)
+			{
+				$terms_array[$term->term_id] = $term->name;
+			}
+		}
+
+		return $terms_array;
 	}
 }
