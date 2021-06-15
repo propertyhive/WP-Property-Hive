@@ -313,6 +313,9 @@ class PH_Shortcodes {
 			'per_page' 		=> '12',
 			'columns' 		=> '4',
 			'department' 	=> '',
+			'minimum_price'		=> '',
+			'maximum_price'		=> '',
+			'bedrooms'			=> '',
 			'address_keyword'	=> '',
 			'country'			=> '',
 			'availability_id'	=> '',
@@ -321,8 +324,11 @@ class PH_Shortcodes {
 			'location_id'		=> '',
 			'office_id'			=> '',
 			'negotiator_id'		=> '',
+			'commercial_for_sale' => '',
+			'commercial_to_rent' => '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
+			'ids'     			=> '',
 			'no_results_output' => '',
 			'pagination'        => '',
 			'show_order'        => '',
@@ -387,6 +393,10 @@ class PH_Shortcodes {
 			'tax_query' 			=> $tax_query,
 			'has_password' 			=> false,
 		);
+
+		if ( ! empty( $atts['ids'] ) ) {
+			$args['post__in'] = array_map( 'trim', explode( ',', $atts['ids'] ) );
+		}
 
 		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
 		{
@@ -462,6 +472,9 @@ class PH_Shortcodes {
 			'per_page' 	=> '12',
 			'columns' 	=> '4',
 			'department' => '',
+			'minimum_price'		=> '',
+			'maximum_price'		=> '',
+			'bedrooms'			=> '',
 			'address_keyword'	=> '',
 			'country'			=> '',
 			'availability_id'	=> '',
@@ -470,9 +483,12 @@ class PH_Shortcodes {
 			'location_id'		=> '',
 			'office_id'			=> '',
 			'negotiator_id'		=> '',
+			'commercial_for_sale' => '',
+			'commercial_to_rent' => '',
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
+			'ids'     			=> '',
 			'no_results_output' => '',
 			'pagination' => '',
 			'show_order' => '',
@@ -542,6 +558,10 @@ class PH_Shortcodes {
 			'tax_query' 			=> $tax_query,
 			'has_password' 			=> false,
 		);
+
+		if ( ! empty( $atts['ids'] ) ) {
+			$args['post__in'] = array_map( 'trim', explode( ',', $atts['ids'] ) );
+		}
 
 		if ( ! empty( $atts['meta_key'] ) ) {
 			$args['meta_key'] = $atts['meta_key'];
