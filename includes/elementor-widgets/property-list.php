@@ -182,6 +182,58 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
+			'bedrooms',
+			[
+				'label' => __( 'Bedrooms', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::NUMBER,
+			]
+		);
+
+		$this->add_control(
+			'minimum_price',
+			[
+				'label' => __( 'Minimum Price', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'conditions' => [
+					'terms' => [
+						['name' => 'department', 'operator' => '!=', 'value' => 'commercial'],
+					],
+				],
+			]
+		);
+
+		$this->add_control(
+			'maximum_price',
+			[
+				'label' => __( 'Maximum Price', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'conditions' => [
+					'terms' => [
+						['name' => 'department', 'operator' => '!=', 'value' => 'commercial'],
+					],
+				],
+			]
+		);
+
+		$this->add_control(
+			'commercial_for_sale',
+			[
+				'label' => __( 'For Sale (Commercial)', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'condition' => [ 'department' => [ '', 'commercial' ] ],
+			]
+		);
+
+		$this->add_control(
+			'commercial_to_rent',
+			[
+				'label' => __( 'To Rent (Commercial)', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'condition' => [ 'department' => [ '', 'commercial' ] ],
+			]
+		);
+
+		$this->add_control(
 			'country',
 			[
 				'label' => __( 'Country', 'propertyhive' ),
@@ -337,6 +389,11 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 				'show_order',
 				'show_result_count',
 				'address_keyword',
+				'bedrooms',
+				'minimum_price',
+				'maximum_price',
+				'commercial_for_sale',
+				'commercial_to_let',
 				'country',
 				'availability_id',
 				'marketing_flag_id',
