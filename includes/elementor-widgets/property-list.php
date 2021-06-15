@@ -368,10 +368,22 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 				$attributes[$attribute_name] = $settings['posts_per_page'];
 			}
 
+			if ( isset( $settings['orderby'] ) && !empty( $settings['orderby'] ) )
+			{
+				if ( $settings['orderby'] == 'price' )
+				{
+					$attributes['orderby'] = 'meta_value_num';
+					$attributes['meta_key'] = '_price_actual';
+				}
+				else
+				{
+					$attributes['orderby'] = $settings['orderby'];
+				}
+			}
+
 			$attributes_to_add = array(
 				'columns',
 				'department',
-				'orderby',
 				'order',
 				'pagination',
 				'show_order',
