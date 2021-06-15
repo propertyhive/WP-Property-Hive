@@ -165,6 +165,24 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
+		$this->start_controls_section(
+			'section_additional',
+			[
+				'label' => __( 'Additional Filters', 'propertyhive' ),
+				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'address_keyword',
+			[
+				'label' => __( 'Address Keyword', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+			]
+		);
+
+		$this->end_controls_section();
+
 		parent::_register_controls();
 	}
 
@@ -190,6 +208,7 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 				'pagination',
 				'show_order',
 				'show_result_count',
+				'address_keyword',
 			);
 
 			$attributes = $this->add_settings_to_attributes( $settings, $attributes, $attributes_to_add );
