@@ -128,6 +128,7 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 					'date' => __( 'Date Put On Market', 'propertyhive' ),
 					'price' => __( 'Price', 'propertyhive' ),
 					'rand' => __( 'Random', 'propertyhive' ),
+					'floor_area' => __( 'Floor Area', 'propertyhive' ),
 				],
 				'default' => 'date',
 			]
@@ -374,6 +375,11 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 				{
 					$attributes['orderby'] = 'meta_value_num';
 					$attributes['meta_key'] = '_price_actual';
+				}
+				elseif ( $settings['orderby'] == 'floor_area' )
+				{
+					$attributes['orderby'] = 'meta_value_num';
+					$attributes['meta_key'] = '_floor_area_from_sqft';
 				}
 				else
 				{
