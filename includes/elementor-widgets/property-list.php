@@ -175,11 +175,6 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 		{
 			$attributes = array();
 
-			if ( isset( $settings['columns'] ) && !empty( $settings['columns'] ) )
-			{
-				$attributes['columns'] = $settings['columns'];
-			}
-
 			if ( isset( $settings['posts_per_page'] ) && !empty( $settings['posts_per_page'] ) )
 			{
 				$attribute_name = in_array( $settings['base_shortcode'], array( 'recent_properties', 'featured_properties' ) ) ? 'per_page' : 'posts_per_page';
@@ -187,35 +182,17 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 				$attributes[$attribute_name] = $settings['posts_per_page'];
 			}
 
-			if ( isset( $settings['department'] ) && !empty( $settings['department'] ) )
-			{
-				$attributes['department'] = $settings['department'];
-			}
+			$attributes_to_add = array(
+				'columns',
+				'department',
+				'orderby',
+				'order',
+				'pagination',
+				'show_order',
+				'show_result_count',
+			);
 
-			if ( isset( $settings['orderby'] ) && !empty( $settings['orderby'] ) )
-			{
-				$attributes['orderby'] = $settings['orderby'];
-			}
-
-			if ( isset( $settings['order'] ) && !empty( $settings['order'] ) )
-			{
-				$attributes['order'] = $settings['order'];
-			}
-
-			if ( isset( $settings['pagination'] ) && !empty( $settings['pagination'] ) )
-			{
-				$attributes['pagination'] = $settings['pagination'];
-			}
-
-			if ( isset( $settings['show_order'] ) && !empty( $settings['show_order'] ) )
-			{
-				$attributes['show_order'] = $settings['show_order'];
-			}
-
-			if ( isset( $settings['show_result_count'] ) && !empty( $settings['show_result_count'] ) )
-			{
-				$attributes['show_result_count'] = $settings['show_result_count'];
-			}
+			$attributes = $this->add_settings_to_attributes( $settings, $attributes, $attributes_to_add );
 
 			echo do_shortcode('[' . $settings['base_shortcode'] . ' ' . implode(' ', array_map(function($key) use ($attributes)
 			{
@@ -224,4 +201,16 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 		}
 	}
 
+	private function add_settings_to_attributes( $settings, $attributes, $attributes_to_add )
+	{
+		foreach( $attributes_to_add as $attribute )
+		{
+			if ( isset( $settings[$attribute] ) && !empty( $settings[$attribute] ) )
+			{
+				$attributes[$attribute] = $settings[$attribute];
+			}
+		}
+
+		return $attributes;
+	}
 }
