@@ -267,23 +267,44 @@ class PH_Shortcodes {
 
 		$propertyhive_loop['columns'] = $atts['columns'];
 
-		if ( $properties->have_posts() ) : ?>
+		// If these properties are being shown on the selected search results page, call the search results hooks
+		// Remove the added actions that are handled by the shortcode, though
+		if ( is_search_results() )
+		{
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_search_form', 10 );
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_result_count', 20 );
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_catalog_ordering', 30 );
+			do_action( 'propertyhive_before_search_results_loop' );
+		}
 
-			<?php propertyhive_property_loop_start(); ?>
+		if ( !is_search_results() || apply_filters( 'propertyhive_show_results', true ) === true  )
+		{
+			if ( $properties->have_posts() ) : ?>
 
-				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
+				<?php propertyhive_property_loop_start(); ?>
 
-					<?php ph_get_template_part( 'content', 'property' ); ?>
+					<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
 
-				<?php endwhile; // end of the loop. ?>
+						<?php ph_get_template_part( 'content', 'property' ); ?>
 
-			<?php propertyhive_property_loop_end(); ?>
+					<?php endwhile; // end of the loop. ?>
 
-		<?php else: ?>
+				<?php propertyhive_property_loop_end(); ?>
 
-            <?php echo $atts['no_results_output']; ?>
+			<?php else: ?>
 
-		<?php endif;
+				<?php echo $atts['no_results_output']; ?>
+
+			<?php endif;
+		}
+
+		// If these properties are being shown on the selected search results page, call the search results hooks
+		// Remove the added actions that are handled by the shortcode, though
+		if ( is_search_results()  )
+		{
+			remove_action( 'propertyhive_after_search_results_loop', 'propertyhive_pagination', 10 );
+			do_action( 'propertyhive_after_search_results_loop' );
+		}
 
 		if ( isset($atts['pagination']) && $atts['pagination'] != '' )
 		{
@@ -427,23 +448,44 @@ class PH_Shortcodes {
 
 		$propertyhive_loop['columns'] = $atts['columns'];
 
-		if ( $properties->have_posts() ) : ?>
+		// If these properties are being shown on the selected search results page, call the search results hooks
+		// Remove the added actions that are handled by the shortcode, though
+		if ( is_search_results() )
+		{
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_search_form', 10 );
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_result_count', 20 );
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_catalog_ordering', 30 );
+			do_action( 'propertyhive_before_search_results_loop' );
+		}
 
-			<?php propertyhive_property_loop_start(); ?>
+		if ( !is_search_results() || apply_filters( 'propertyhive_show_results', true ) === true  )
+		{
+			if ( $properties->have_posts() ) : ?>
 
-				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
+				<?php propertyhive_property_loop_start(); ?>
 
-					<?php ph_get_template_part( 'content', 'property-recent' ); ?>
+					<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
 
-				<?php endwhile; // end of the loop. ?>
+						<?php ph_get_template_part( 'content', 'property-recent' ); ?>
 
-			<?php propertyhive_property_loop_end(); ?>
+					<?php endwhile; // end of the loop. ?>
 
-		<?php else: ?>
+				<?php propertyhive_property_loop_end(); ?>
 
-            <?php echo $atts['no_results_output']; ?>
+			<?php else: ?>
 
-		<?php endif;
+				<?php echo $atts['no_results_output']; ?>
+
+			<?php endif;
+		}
+
+		// If these properties are being shown on the selected search results page, call the search results hooks
+		// Remove the added actions that are handled by the shortcode, though
+		if ( is_search_results()  )
+		{
+			remove_action( 'propertyhive_after_search_results_loop', 'propertyhive_pagination', 10 );
+			do_action( 'propertyhive_after_search_results_loop' );
+		}
 
 		if ( isset($atts['pagination']) && $atts['pagination'] != '' )
 		{
@@ -596,23 +638,44 @@ class PH_Shortcodes {
 
 		$propertyhive_loop['columns'] = $atts['columns'];
 
-		if ( $properties->have_posts() ) : ?>
+		// If these properties are being shown on the selected search results page, call the search results hooks
+		// Remove the added actions that are handled by the shortcode, though
+		if ( is_search_results() )
+		{
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_search_form', 10 );
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_result_count', 20 );
+			remove_action( 'propertyhive_before_search_results_loop', 'propertyhive_catalog_ordering', 30 );
+			do_action( 'propertyhive_before_search_results_loop' );
+		}
 
-			<?php propertyhive_property_loop_start(); ?>
+		if ( !is_search_results() || apply_filters( 'propertyhive_show_results', true ) === true  )
+		{
+			if ( $properties->have_posts() ) : ?>
 
-				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
+				<?php propertyhive_property_loop_start(); ?>
 
-					<?php ph_get_template_part( 'content', 'property-featured' ); ?>
+					<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
 
-				<?php endwhile; // end of the loop. ?>
+						<?php ph_get_template_part( 'content', 'property-featured' ); ?>
 
-			<?php propertyhive_property_loop_end(); ?>
+					<?php endwhile; // end of the loop. ?>
 
-		<?php else: ?>
+				<?php propertyhive_property_loop_end(); ?>
 
-            <?php echo $atts['no_results_output']; ?>
+			<?php else: ?>
 
-		<?php endif;
+				<?php echo $atts['no_results_output']; ?>
+
+			<?php endif;
+		}
+
+		// If these properties are being shown on the selected search results page, call the search results hooks
+		// Remove the added actions that are handled by the shortcode, though
+		if ( is_search_results()  )
+		{
+			remove_action( 'propertyhive_after_search_results_loop', 'propertyhive_pagination', 10 );
+			do_action( 'propertyhive_after_search_results_loop' );
+		}
 
 		if ( isset($atts['pagination']) && $atts['pagination'] != '' )
 		{
