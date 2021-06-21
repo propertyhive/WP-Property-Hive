@@ -1253,7 +1253,7 @@ class PH_Admin_Post_Types {
                             'value' => array('pending', 'booked'),
                             'compare' => 'IN'
                         );
-                        $upcoming_threshold = new DateTime(PH_Key_Date::UPCOMING_THRESHOLD);
+                        $upcoming_threshold = new DateTime('+ ' . apply_filters( 'propertyhive_key_date_upcoming_days', 7 ) . ' DAYS');
                         $vars['meta_query'][] = array(
                             'key' => '_date_due',
                             'value' => $upcoming_threshold->format('Y-m-d'),
