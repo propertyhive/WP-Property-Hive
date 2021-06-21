@@ -233,12 +233,12 @@ class PH_Meta_Box_Tenancy_Details {
         update_post_meta( $post_id, '_start_date', ph_clean($_POST['_start_date']) );
         update_post_meta( $post_id, '_end_date', ph_clean($_POST['_end_date']) );
 
-        $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_rent']));
+        $amount = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent']));
         update_post_meta( $post_id, '_rent', $amount );
         update_post_meta( $post_id, '_rent_frequency', ph_clean($_POST['_rent_frequency']) );
         update_post_meta( $post_id, '_currency', ph_clean($_POST['_rent_currency']) );
 
-	    $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['_deposit']));
+	    $amount = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_deposit']));
 	    update_post_meta( $post_id, '_deposit', $amount );
 
         update_post_meta( $post_id, '_notes', sanitize_textarea_field($_POST['_notes']) );
