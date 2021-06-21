@@ -8,8 +8,6 @@ if ( ! defined( 'ABSPATH' ) )
 
 class PH_Key_Date {
 
-	const UPCOMING_THRESHOLD = '+ 7 DAYS';
-
 	/** @var int */
 	public $id;
 
@@ -52,7 +50,7 @@ class PH_Key_Date {
 				{
 					case $this->date_due() < new DateTime($overdue_threshold):
 						return 'overdue';
-					case $this->date_due() <= new DateTime(PH_Key_Date::UPCOMING_THRESHOLD):
+					case $this->date_due() <= new DateTime('+ ' . apply_filters( 'propertyhive_key_date_upcoming_days', 7 ) . ' DAYS'):
 						return 'upcoming';
 					default:
 						return 'pending';
