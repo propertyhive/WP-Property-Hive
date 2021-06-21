@@ -380,6 +380,230 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'heading_address_style',
+			[
+				'label' => __( 'Address', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::HEADING,
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_control(
+			'address_colour',
+			[
+				'label' => __( 'Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details h3 a' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'address_typography',
+				'label' => __( 'Typography', 'propertyhive' ),
+				'selector' => '{{WRAPPER}} .propertyhive ul.properties li.property div.details h3 a',
+			]
+		);
+
+		$this->add_control(
+			'heading_price_style',
+			[
+				'label' => __( 'Price', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::HEADING,
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'price_typography',
+				'label' => __( 'Typography', 'propertyhive' ),
+				'selector' => '{{WRAPPER}} .propertyhive ul.properties li.property div.details .price',
+			]
+		);
+
+		$this->add_control(
+			'price_colour',
+			[
+				'label' => __( 'Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details .price' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'price_text_align',
+			[
+				'label' => __( 'Alignment', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => __( 'Left', 'propertyhive' ),
+						'icon' => 'fa fa-align-left',
+					],
+					'center' => [
+						'title' => __( 'Center', 'propertyhive' ),
+						'icon' => 'fa fa-align-center',
+					],
+					'right' => [
+						'title' => __( 'Right', 'propertyhive' ),
+						'icon' => 'fa fa-align-right',
+					],
+				],
+				'toggle' => true,
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details .price' => 'text-align: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'heading_summary_style',
+			[
+				'label' => __( 'Summary', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::HEADING,
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'summary_typography',
+				'label' => __( 'Typography', 'propertyhive' ),
+				'selector' => '{{WRAPPER}} .propertyhive ul.properties li.property div.details .summary',
+			]
+		);
+
+		$this->add_control(
+			'summary_colour',
+			[
+				'label' => __( 'Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details .summary' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'summary_text_align',
+			[
+				'label' => __( 'Alignment', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => __( 'Left', 'propertyhive' ),
+						'icon' => 'fa fa-align-left',
+					],
+					'center' => [
+						'title' => __( 'Center', 'propertyhive' ),
+						'icon' => 'fa fa-align-center',
+					],
+					'right' => [
+						'title' => __( 'Right', 'propertyhive' ),
+						'icon' => 'fa fa-align-right',
+					],
+				],
+				'toggle' => true,
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details .summary' => 'text-align: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'heading_buttons_style',
+			[
+				'label' => __( 'Buttons', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::HEADING,
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'buttons_typography',
+				'label' => __( 'Typography', 'propertyhive' ),
+				'selector' => '{{WRAPPER}} .propertyhive ul.properties li.property div.details .actions a',
+			]
+		);
+
+		$this->add_control(
+			'buttons_colour',
+			[
+				'label' => __( 'Text Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details .actions a' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'buttons_text_align',
+			[
+				'label' => __( 'Alignment', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => __( 'Left', 'propertyhive' ),
+						'icon' => 'fa fa-align-left',
+					],
+					'center' => [
+						'title' => __( 'Center', 'propertyhive' ),
+						'icon' => 'fa fa-align-center',
+					],
+					'right' => [
+						'title' => __( 'Right', 'propertyhive' ),
+						'icon' => 'fa fa-align-right',
+					],
+				],
+				'toggle' => true,
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details .actions' => 'text-align: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'buttons_background_colour',
+			[
+				'label' => __( 'Background Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details .actions a' => 'background: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'buttons_padding',
+			[
+				'label' => __( 'Link Padding', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties li.property div.details .actions a' => 'display:inline-block; padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+				'default' => [
+					'top' => 5,
+					'right' => 5,
+					'bottom' => 5,
+					'left' => 5,
+					'isLinked' => true,
+				],
+			]
+		);
+
 		$this->end_controls_section();
 	}
 
