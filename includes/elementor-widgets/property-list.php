@@ -352,7 +352,35 @@ class Elementor_Property_List_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
-		parent::_register_controls();
+		$this->start_controls_section(
+			'section_properties_style',
+			[
+				'label' => __( 'Properties', 'propertyhive' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'grid_gap',
+			[
+				'label' => __( 'Grid Gap', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SLIDER,
+				'default' => [
+					'size' => 10,
+				],
+				'range' => [
+					'px' => [
+						'min' => 0,
+						'max' => 100,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .propertyhive ul.properties' => 'grid-gap: {{SIZE}}px',
+				],
+			]
+		);
+
+		$this->end_controls_section();
 	}
 
 	protected function render() {
