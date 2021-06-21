@@ -131,6 +131,8 @@ function toggleDepartmentFields()
                         }
                     }
                 }
+
+                jQuery(this).trigger('ph:toggleSearchDepartment', [selectedDepartment]);
             }
         });
     }
