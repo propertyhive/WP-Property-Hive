@@ -66,7 +66,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 
 		if ( isset( $settings['search_form_id'] ) && !empty( $settings['search_form_id'] ) )
 		{
-			$attributes['search_form_id'] = $settings['search_form_id'];
+			$attributes['id'] = $settings['search_form_id'];
 		}
 
 		if ( isset( $settings['default_department'] ) && !empty( $settings['default_department'] ) )
