@@ -28,10 +28,10 @@ class PH_Meta_Box_Tenancy_Management {
 			'name' => '_management_type',
 			'label' => __( 'Management Type', 'propertyhive' ),
 			'desc_tip' => false,
-			'options' => array(
+			'options' => apply_filters( 'propertyhive_tenancy_management_types', array(
 				'let_only' => 'Let Only',
 				'fully_managed' => 'Fully Managed'
-			),
+			) ),
 		);
 		propertyhive_wp_select( $args );
 
