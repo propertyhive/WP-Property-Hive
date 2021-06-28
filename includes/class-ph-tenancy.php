@@ -117,7 +117,11 @@ class PH_Tenancy {
         $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
 
         $amount = $this->_rent;
-        return ( ( $amount != '' ) ? $prefix . number_format($amount, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) : '-' ) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' );
+
+        // If there are decimals on the number, display them. If not, display none
+		$decimals = (float)$amount == intval($amount) ? 0 : 2;
+
+        return ( ( $amount != '' ) ? $prefix . number_format($amount, $decimals, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) : '-' ) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' );
 
     }
 
