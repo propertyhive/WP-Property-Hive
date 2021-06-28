@@ -489,7 +489,11 @@ class PH_Property {
                         {
                             $price = $this->_price_actual * $currency['exchange_rate'];
                         }
-                        $return = ( ( $price != '' ) ? $prefix . number_format($price, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix : '-' );
+
+                        // If there are decimals on the number, display them. If not, display none
+                        $decimals = (float)$price == intval($price) ? 0 : 2;
+
+                        $return = ( ( $price != '' ) ? $prefix . number_format($price, $decimals, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix : '-' );
                         break;
                     }
                     case "residential-lettings":
@@ -506,7 +510,11 @@ class PH_Property {
                                 case "pa": { $price = ($price * 12); break; }
                             }
                         }
-                        $return = ( ( $price != '' ) ? $prefix . number_format($price, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+
+                        // If there are decimals on the number, display them. If not, display none
+                        $decimals = (float)$price == intval($price) ? 0 : 2;
+
+                        $return = ( ( $price != '' ) ? $prefix . number_format($price, $decimals, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                         break;
                     }
                 }
