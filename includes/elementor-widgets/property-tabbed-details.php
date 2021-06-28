@@ -391,6 +391,14 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 					}
 					break;
 				}
+				case "features":
+                {
+                    if ( !empty($property->get_features()) )
+                    {
+                        return true;
+                    }
+                    break;
+                }
 				default:
 				{
 					return apply_filters( 'propertyhive_elementor_tabbed_details_show_tab', true, $property, $display );
