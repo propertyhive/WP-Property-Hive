@@ -65,13 +65,13 @@ function redraw_appraisal_details_meta_box()
 
             if ( $department == 'residential-sales' || ph_get_custom_department_based_on($department) == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['_valued_price']));
+                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_valued_price']));
                 update_post_meta( $post_id, '_valued_price', $price );
                 update_post_meta( $post_id, '_valued_price_actual', $price );
             }
             elseif ( $department == 'residential-lettings' || ph_get_custom_department_based_on($department) == 'residential-lettings' )
             {
-                $rent = preg_replace("/[^0-9]/", '', ph_clean($_POST['_valued_rent']));
+                $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_valued_rent']));
                 update_post_meta( $post_id, '_valued_rent', $rent );
 
                 update_post_meta( $post_id, '_rent_frequency', ph_clean($_POST['_valued_rent_frequency']) );
