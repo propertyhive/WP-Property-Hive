@@ -467,22 +467,26 @@ class PH_Admin {
                 }
             }
 
-            // Email Cron Warning
-            $queuedEmailsExist = (bool)$wpdb->get_var("SELECT 1 FROM " . $wpdb->prefix . "ph_email_log WHERE status = '' LIMIT 1");
-            $cronIsNextScheduled = wp_next_scheduled('propertyhive_process_email_log');
-	        if ( $queuedEmailsExist && ( $cronIsNextScheduled === false || $cronIsNextScheduled < strtotime('24 hours ago') ) )
-	        {
-                echo '
-                    <div class="notice notice-error" id="ph_notice_email_cron_not_running">
-                        <p>' . __( 'The Property Hive email queue does not appear to be running', 'propertyhive' ) . '
-                        </p>
-                        <p>
-                            <a href="'. admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued') . '" class="button-primary">Go To Email Queue</a>
-                            <!--<a href="" class="button" id="ph_dismiss_notice_email_cron_not_running">Dismiss</a>-->
-                        </p>
-                    </div>
-                ';
-	        }
+            $screen = get_current_screen();
+            if ( in_array( $screen->id, array( 'dashboard' ) ) )
+            {
+                // Email Cron Warning
+                $queuedEmailsExist = (bool)$wpdb->get_var("SELECT 1 FROM " . $wpdb->prefix . "ph_email_log WHERE status = '' LIMIT 1");
+                $cronIsNextScheduled = wp_next_scheduled('propertyhive_process_email_log');
+    	        if ( $queuedEmailsExist && ( $cronIsNextScheduled === false || $cronIsNextScheduled < strtotime('24 hours ago') ) )
+    	        {
+                    echo '
+                        <div class="notice notice-error" id="ph_notice_email_cron_not_running">
+                            <p>' . __( 'The Property Hive email queue does not appear to be running', 'propertyhive' ) . '
+                            </p>
+                            <p>
+                                <a href="'. admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued') . '" class="button-primary">Go To Email Queue</a>
+                                <!--<a href="" class="button" id="ph_dismiss_notice_email_cron_not_running">Dismiss</a>-->
+                            </p>
+                        </div>
+                    ';
+    	        }
+            }
         }
 
         if ( isset($_GET['propertyhive_contacts_merged']) )
