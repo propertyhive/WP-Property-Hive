@@ -26,6 +26,9 @@ class PH_Install {
 		'1.4.68' => array(
 			'propertyhive_update_1468_on_market_change_dates',
 		),
+        '1.5.16' => array(
+            'propertyhive_update_1516_address_concatenated',
+        ),
 	);
 
 	/**
