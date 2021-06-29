@@ -1386,6 +1386,18 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
                 )", 
                 $where 
             );
+
+            $where = preg_replace(
+                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_excerpt\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "",
+                $where
+            );
+
+            $where = preg_replace(
+                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_content\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "",
+                $where
+            );
         }
         elseif ( 'contact' === $typenow ) 
         {
