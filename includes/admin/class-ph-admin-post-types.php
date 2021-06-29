@@ -30,8 +30,8 @@ class PH_Admin_Post_Types {
         // Filters
         add_action( 'restrict_manage_posts', array( $this, 'restrict_manage_posts' ) );
         add_filter( 'request', array( $this, 'request_query' ) );
-        add_filter( 'posts_join', array( $this, 'posts_join' ) );
-        add_filter( 'posts_where', array( $this, 'posts_where' ) );
+        add_filter( 'posts_join', array( $this, 'posts_join' ), 10, 2 );
+        add_filter( 'posts_where', array( $this, 'posts_where' ), 10, 2 );
 
 		// Status transitions
 		add_action( 'delete_post', array( $this, 'delete_post' ) );
@@ -1308,8 +1308,11 @@ class PH_Admin_Post_Types {
 	    return $vars;
     }
 
-    public function posts_join( $join ) {
+    public function posts_join( $join, $q ) {
         global $typenow, $wp_query, $wpdb;
+
+        if ( !$q->is_main_query() )
+            return $join;
 
         if ( !isset($_GET['s']) || ( isset($_GET['s']) && ph_clean($_GET['s']) == '' ) )
             return $join;
@@ -1372,8 +1375,11 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
         return $join;
     }
 
-    public function posts_where( $where ) {
+    public function posts_where( $where, $q ) {
         global $typenow, $wp_query, $wpdb;
+
+        if ( !$q->is_main_query() )
+            return $where;
 
         if ( !isset($_GET['s']) || ( isset($_GET['s']) && ph_clean($_GET['s']) == '' ) )
             return $where;
