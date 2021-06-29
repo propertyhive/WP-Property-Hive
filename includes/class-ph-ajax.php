@@ -1240,42 +1240,7 @@ class PH_AJAX {
                 array(
                     'relation' => 'OR',
                     array(
-                        'key' => '_address_name_number',
-                        'value' => ph_clean($_POST['keyword']),
-                        'compare' => 'LIKE'
-                    ),
-                    array(
-                        'key' => '_address_street',
-                        'value' => ph_clean($_POST['keyword']),
-                        'compare' => 'LIKE'
-                    ),
-                    array(
-                        'key' => '_address_name_number_street',
-                        'value' => ph_clean($_POST['keyword']),
-                        'compare' => 'LIKE'
-                    ),
-                    array(
-                        'key' => '_address_street',
-                        'value' => ph_clean($_POST['keyword']),
-                        'compare' => 'LIKE'
-                    ),
-                    array(
-                        'key' => '_address_two',
-                        'value' => ph_clean($_POST['keyword']),
-                        'compare' => 'LIKE'
-                    ),
-                    array(
-                        'key' => '_address_three',
-                        'value' => ph_clean($_POST['keyword']),
-                        'compare' => 'LIKE'
-                    ),
-                    array(
-                        'key' => '_address_four',
-                        'value' => ph_clean($_POST['keyword']),
-                        'compare' => 'LIKE'
-                    ),
-                    array(
-                        'key' => '_address_postcode',
+                        'key' => '_address_concatenated',
                         'value' => ph_clean($_POST['keyword']),
                         'compare' => 'LIKE'
                     ),
