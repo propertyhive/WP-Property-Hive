@@ -59,9 +59,6 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		/*add_action( 'restrict_manage_posts', array( $this, 'property_filters' ) );
 		add_filter( 'parse_query', array( $this, 'property_filters_query' ) );*/
 
-		// Enhanced search
-		add_filter( 'posts_search', array( $this, 'property_search' ) );
-
 		// Maintain hierarchy of terms
 		/*add_filter( 'wp_terms_checklist_args', array( $this, 'disable_checked_ontop' ) );*/
 
@@ -456,88 +453,6 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 			default :
 				break;
 		}
-	}
-
-    /**
-	 * Search by ID, address and reference number
-	 *
-	 * @param string $where
-	 * @return string
-	 */
-	public function property_search( $where ) {
-		global $pagenow, $wpdb, $wp;
-		
-		if ( 'edit.php' != $pagenow || ! is_search() || ! isset( $wp->query_vars['s'] ) || 'property' != $wp->query_vars['post_type'] ) {
-			return $where;
-		}
-
-		if ( trim($wp->query_vars['s']) == '' )
-		{
-			return $where;
-		}
-
-		$search_ids = array();
-		$terms      = explode( ',', $wp->query_vars['s'] );
-
-		foreach ( $terms as $term )
-		{
-			if ( is_numeric( $term ) )
-			{
-				$search_ids[] = $term;
-			}
-
-			// Attempt to get an ID by searching for address and reference number
-			$query = $wpdb->prepare( 
-				"SELECT 
-					ID 
-				FROM 
-					{$wpdb->posts} 
-				INNER JOIN {$wpdb->postmeta} AS mt1 ON {$wpdb->posts}.ID = mt1.post_id
-				WHERE 
-					(
-						(mt1.meta_key='_address_name_number' AND mt1.meta_value LIKE %s)
-						OR
-						(mt1.meta_key='_address_street' AND mt1.meta_value LIKE %s)
-						OR
-						(mt1.meta_key='_address_name_number_street' AND mt1.meta_value LIKE %s)
-						OR
-						(mt1.meta_key='_address_2' AND mt1.meta_value LIKE %s)
-						OR
-						(mt1.meta_key='_address_3' AND mt1.meta_value LIKE %s)
-						OR
-						(mt1.meta_key='_address_4' AND mt1.meta_value LIKE %s)
-						OR
-						(mt1.meta_key='_address_postcode' AND mt1.meta_value LIKE %s)
-						OR
-						(mt1.meta_key='_reference_number' AND mt1.meta_value = %s)
-					)
-				AND 
-					post_type='property'
-				GROUP BY ID
-				",
-				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
-				'%' . $wpdb->esc_like( ph_clean( $term ) ) . '%',
-				'' . $wpdb->esc_like( ph_clean( $term ) ) . ''
-			);
-			$search_posts = $wpdb->get_results( $query );
-			$search_posts = wp_list_pluck( $search_posts, 'ID' );
-
-			if ( sizeof( $search_posts ) > 0 )
-			{
-				$search_ids = array_merge( $search_ids, $search_posts );
-			}
-		}
-		$search_ids = array_filter( array_unique( array_map( 'absint', $search_ids ) ) );
-		if ( sizeof( $search_ids ) > 0 ) 
-		{
-			$where = str_replace( 'AND (((', "AND ( ({$wpdb->posts}.ID IN (" . implode( ',', $search_ids ) . ")) OR ((", $where );
-		}
-		return $where;
 	}
 
 	/**
