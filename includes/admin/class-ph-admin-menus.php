@@ -66,15 +66,15 @@ class PH_Admin_Menus {
 					{
 						$callback = array( $this, substr($submenuitem[2], 3)  . '_page' );
 					}
-					elseif ( isset($wp_filter['property-hive_page_' . $submenuitem[2]]) )
+					elseif ( isset($wp_filter[sanitize_title(__( 'Property Hive', 'propertyhive' )) . '_page_' . $submenuitem[2]]) )
 					{
 						// get class name from callbacks then convert it to class name
 						// i.e. convert PH_Property_Import to PHPI()
 						$class_name = '';
 						$function_name = '';
-						if ( isset($wp_filter['property-hive_page_' . $submenuitem[2]]->callbacks) )
+						if ( isset($wp_filter[sanitize_title(__( 'Property Hive', 'propertyhive' )) . '_page_' . $submenuitem[2]]->callbacks) )
 						{
-							foreach ( $wp_filter['property-hive_page_' . $submenuitem[2]]->callbacks as $priority => $filter_callbacks )
+							foreach ( $wp_filter[sanitize_title(__( 'Property Hive', 'propertyhive' )) . '_page_' . $submenuitem[2]]->callbacks as $priority => $filter_callbacks )
 							{
 								foreach ( $filter_callbacks as $oddkey => $filter_callback )
 								{
