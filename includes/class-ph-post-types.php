@@ -35,6 +35,8 @@ class PH_Post_types {
 
         add_action( 'save_post', array( __CLASS__, 'store_related_viewings' ), 99, 3 );
         add_action( 'updated_post_meta', array( __CLASS__, 'store_related_viewings_meta_change' ), 10, 4 );
+
+        add_action( 'propertyhive_update_address_concatenated', array( __CLASS__, 'update_address_concatenated' ) );
 	}
 
 	/**
@@ -814,24 +816,100 @@ class PH_Post_types {
             return;
         }
 
-        if ( $post->post_type !== 'property' ) {
+        if ( $post->post_type !== 'property' && $post->post_type !== 'contact' ) {
             return;
         }
 
-        $property = new PH_Property( $post_id );
+        if ( $post->post_type == 'property' )
+        {
+            $property = new PH_Property( $post_id );
 
-        // Set field of concatenated address
-        update_post_meta( $post_id, '_address_concatenated', $property->get_formatted_full_address() );
+            // Set field of concatenated address
+            update_post_meta( $post_id, '_address_concatenated', $property->get_formatted_full_address() );
 
-        // Set field of concatenated features
-        $features_concat_array = $property->get_features();
+            // Set field of concatenated features
+            $features_concat_array = $property->get_features();
 
-        $features_concat = implode('|', array_filter($features_concat_array));
-        update_post_meta($post_id, '_features_concatenated', $features_concat);
+            $features_concat = implode('|', array_filter($features_concat_array));
+            update_post_meta($post_id, '_features_concatenated', $features_concat);
 
-        // Set field of concatenated descriptions information
-        $descs_concat = $property->get_formatted_description();
-        update_post_meta($post_id, '_descriptions_concatenated', $descs_concat);
+            // Set field of concatenated descriptions information
+            $descs_concat = $property->get_formatted_description();
+            update_post_meta($post_id, '_descriptions_concatenated', $descs_concat);
+        }
+
+        if ( $post->post_type == 'contact' )
+        {
+            $contact = new PH_Contact( $post_id );
+
+            // Set field of concatenated address
+            update_post_meta( $post_id, '_address_concatenated', $contact->get_formatted_full_address() );
+        }
+    }
+
+    public static function update_address_concatenated()
+    {
+        $args = array(
+            'post_type' => 'property',
+            'fields' => 'ids',
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_address_concatenated',
+                    'compare' => 'NOT EXISTS'
+                )
+            ),
+            'nopaging' => true,
+            'orderby' => 'rand',
+            'suppress_filters' => true,
+        );
+        $property_query =  new WP_Query($args);
+
+        if ( $property_query->have_posts() )
+        {
+            while ( $property_query->have_posts() )
+            {
+                $property_query->the_post();
+
+                $property = new PH_Property( get_the_ID() );
+
+                // Set field of concatenated address
+                update_post_meta( get_the_ID(), '_address_concatenated', $property->get_formatted_full_address() );
+            }
+        }
+
+        wp_reset_postdata();
+
+        $args = array(
+            'post_type' => 'contact',
+            'fields' => 'ids',
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_address_concatenated',
+                    'compare' => 'NOT EXISTS'
+                )
+            ),
+            'nopaging' => true,
+            'orderby' => 'rand',
+            'suppress_filters' => true,
+        );
+        $contact_query =  new WP_Query($args);
+
+        if ( $contact_query->have_posts() )
+        {
+            while ( $contact_query->have_posts() )
+            {
+                $contact_query->the_post();
+
+                $contact = new PH_Contact( get_the_ID() );
+
+                // Set field of concatenated address
+                update_post_meta( get_the_ID(), '_address_concatenated', $contact->get_formatted_full_address() );
+            }
+        }
+
+        wp_reset_postdata();
     }
 
     /**
