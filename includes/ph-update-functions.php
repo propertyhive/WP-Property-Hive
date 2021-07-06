@@ -89,5 +89,33 @@ function propertyhive_update_1516_address_concatenated() {
         }
     }
 
+    $args = array(
+        'post_type' => 'contact',
+        'fields' => 'ids',
+        'post_status' => 'publish',
+        'meta_query' => array(
+            array(
+                'key' => '_address_concatenated',
+                'compare' => 'NOT EXISTS'
+            )
+        ),
+        'nopaging' => true,
+        'suppress_filters' => true,
+    );
+    $contact_query =  new WP_Query($args);
+
+    if ( $contact_query->have_posts() )
+    {
+        while ( $contact_query->have_posts() )
+        {
+            $contact_query->the_post();
+
+            $contact = new PH_Contact( get_the_ID() );
+
+            // Set field of concatenated address
+            update_post_meta( get_the_ID(), '_address_concatenated', $contact->get_formatted_full_address() );
+        }
+    }
+
     wp_reset_postdata();
 }

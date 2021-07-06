@@ -1326,17 +1326,21 @@ LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_reference_number ON
         }
         elseif ( 'contact' === $typenow ) 
         {
+            $phone_number = '';
+            if ( is_numeric(substr(ph_clean($_GET['s']), 0, 1)) )
+            {
+                $phone_number = preg_replace( "/[^0-9,]/", "", ph_clean($_GET['s']) );
+            }
+
             $join .= " 
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_company_name ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_company_name.post_id AND ph_contact_filter_meta_company_name.meta_key = '_company_name'
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_name_number ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_name_number.post_id AND ph_contact_filter_meta_name_number.meta_key = '_address_name_number'
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_street ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_street.post_id AND ph_contact_filter_meta_street.meta_key = '_address_street'
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_2 ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_2.post_id AND ph_contact_filter_meta_2.meta_key = '_address_two'
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_3 ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_3.post_id AND ph_contact_filter_meta_3.meta_key = '_address_three'
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_4 ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_4.post_id AND ph_contact_filter_meta_4.meta_key = '_address_four'
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_postcode ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_postcode.post_id AND ph_contact_filter_meta_postcode.meta_key = '_address_postcode'
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_email_address ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_email_address.post_id AND ph_contact_filter_meta_email_address.meta_key = '_email_address'
-LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_telephone_number ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_telephone_number.post_id AND ph_contact_filter_meta_telephone_number.meta_key = '_telephone_number_clean'
-";
+LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_address_concatenated ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_address_concatenated.post_id AND ph_contact_filter_meta_address_concatenated.meta_key = '_address_concatenated'
+LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_email_address ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_email_address.post_id AND ph_contact_filter_meta_email_address.meta_key = '_email_address' ";
+            
+            if ( $phone_number != '' )
+            {
+                $join .= " LEFT JOIN " . $wpdb->postmeta . " AS ph_contact_filter_meta_telephone_number ON " . $wpdb->posts . ".ID = ph_contact_filter_meta_telephone_number.post_id AND ph_contact_filter_meta_telephone_number.meta_key = '_telephone_number_clean'
+                ";
+            }
         }
         elseif ( 'appraisal' === $typenow ) 
         {
@@ -1412,24 +1416,24 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
                 "(
                     (" . $wpdb->posts . ".post_title LIKE $1) 
                     OR
-                    (ph_contact_filter_meta_company_name.meta_value LIKE $1)
-                    OR 
-                    (ph_contact_filter_meta_name_number.meta_value LIKE $1)
-                    OR 
-                    (ph_contact_filter_meta_street.meta_value LIKE $1)
-                    OR 
-                    (ph_contact_filter_meta_2.meta_value LIKE $1)
-                    OR 
-                    (ph_contact_filter_meta_3.meta_value LIKE $1)
-                    OR 
-                    (ph_contact_filter_meta_4.meta_value LIKE $1)
-                    OR 
-                    (ph_contact_filter_meta_postcode.meta_value LIKE $1)
+                    (ph_contact_filter_meta_address_concatenated.meta_value LIKE $1)
                     OR 
                     (ph_contact_filter_meta_email_address.meta_value LIKE $1)
                     " . ( $phone_number != '' ? "OR (ph_contact_filter_meta_telephone_number.meta_value LIKE '%" . $phone_number . "%')" : '' ) . "
                 )", 
                 $where 
+            );
+
+            $where = preg_replace(
+                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_excerpt\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "",
+                $where
+            );
+
+            $where = preg_replace(
+                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_content\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "",
+                $where
             );
         }
         elseif ( 'appraisal' === $typenow ) 
