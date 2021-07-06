@@ -26,9 +26,6 @@ class PH_Install {
 		'1.4.68' => array(
 			'propertyhive_update_1468_on_market_change_dates',
 		),
-        '1.5.16' => array(
-            'propertyhive_update_1516_address_concatenated',
-        ),
 	);
 
 	/**
@@ -122,6 +119,7 @@ class PH_Install {
         wp_clear_scheduled_hook( 'propertyhive_process_email_log' );
         wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
         wp_clear_scheduled_hook( 'propertyhive_check_licenses' );
+        wp_clear_scheduled_hook( 'propertyhive_update_address_concatenated' );
 	}
 
 	/**
@@ -161,6 +159,7 @@ class PH_Install {
         wp_clear_scheduled_hook( 'propertyhive_process_email_log' );
         wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
         wp_clear_scheduled_hook( 'propertyhive_check_licenses' );
+        wp_clear_scheduled_hook( 'propertyhive_update_address_concatenated' );
 
 		$ve = get_option( 'gmt_offset' ) > 0 ? '+' : '-';
 
@@ -179,6 +178,8 @@ class PH_Install {
         // Schedule for 1am as it's likely traffic will be quieter at that time
         // 1am so it doesn't run at exactly the same time as the exchange rate cron
         wp_schedule_event( strtotime( '01:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_check_licenses' );
+
+        wp_schedule_event( strtotime( '03:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_update_address_concatenated' );
 	}
 
     public function custom_cron_recurrence( $schedules ) 
