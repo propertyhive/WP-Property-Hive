@@ -67,10 +67,6 @@ function propertyhive_update_1516_address_concatenated() {
         'post_status' => 'publish',
         'meta_query' => array(
             array(
-                'key' => '_on_market',
-                'value' => 'yes'
-            ),
-            array(
                 'key' => '_address_concatenated',
                 'compare' => 'NOT EXISTS'
             )
