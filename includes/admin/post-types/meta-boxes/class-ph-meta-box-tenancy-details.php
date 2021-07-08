@@ -66,8 +66,21 @@ class PH_Meta_Box_Tenancy_Details {
             </select>
 
             <select id="_lease_type" name="_lease_type" class="select" style="width:auto">
-                <option value="assured_shorthold"' . ( ($lease_type == 'assured_shorthold' || $lease_type == '') ? ' selected' : '') . '>' . __('Assured Shorthold', 'propertyhive') . '</option>
-                <option value="assured"' . ( $lease_type == 'assured' ? ' selected' : '') . '>' . __('Assured', 'propertyhive') . '</option>
+        ';
+
+        $lease_type_options = apply_filters( 'propertyhive_tenancy_lease_types', array(
+            'assured_shorthold' => 'Assured Shorthold',
+            'assured' => 'Assured',
+        ) );
+
+        $i = 1;
+        foreach ( $lease_type_options as $lease_type_name => $lease_type_display )
+        {
+            echo '<option value="' . $lease_type_name . '"' . ( ($lease_type == $lease_type_name || ( $lease_type == '' && $i === 1 ) ) ? ' selected' : '') . '>' . __($lease_type_display, 'propertyhive') . '</option>';
+            $i++;
+        }
+
+        echo '
             </select>
             
         </p>';
