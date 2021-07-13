@@ -54,7 +54,8 @@ class PH_Meta_Box_Tenancy_Details {
         $length_units = get_post_meta( $thepostid, '_length_units', true );
         $lease_type = get_post_meta( $thepostid, '_lease_type', true );
 
-        echo '<p class="form-field lease_term_type_field">
+        $lease_term_type_html = '
+            <p class="form-field lease_term_type_field">
         
             <label for="_length">' . __('Lease Term and Type', 'propertyhive') . '</label>
 
@@ -76,14 +77,15 @@ class PH_Meta_Box_Tenancy_Details {
         $i = 1;
         foreach ( $lease_type_options as $lease_type_name => $lease_type_display )
         {
-            echo '<option value="' . $lease_type_name . '"' . ( ($lease_type == $lease_type_name || ( $lease_type == '' && $i === 1 ) ) ? ' selected' : '') . '>' . __($lease_type_display, 'propertyhive') . '</option>';
+            $lease_term_type_html .= '<option value="' . $lease_type_name . '"' . ( ($lease_type == $lease_type_name || ( $lease_type == '' && $i === 1 ) ) ? ' selected' : '') . '>' . __($lease_type_display, 'propertyhive') . '</option>';
             $i++;
         }
 
-        echo '
-            </select>
-            
-        </p>';
+        $lease_term_type_html .=  '
+                </select>
+            </p>';
+
+        echo apply_filters( 'propertyhive_tenancy_lease_term_type_html', $lease_term_type_html );
 
         $args = array(
             'id' => '_start_date', 
@@ -185,7 +187,12 @@ class PH_Meta_Box_Tenancy_Details {
             // Set end date to X weeks/months after when start date changed
             jQuery(\'#_start_date\').change(function()
             {
-                if ( jQuery(\'#_length\').val() != \'\' && jQuery(\'#_length_units\').val() != \'\' && jQuery(this).val() != \'\' && jQuery(\'#_end_date\').val() == \'\' )
+                if (
+                    jQuery(\'#_length\').val() !== undefined && jQuery(\'#_length_units\').val() !== undefined
+                    &&
+                    jQuery(\'#_length\').val() != \'\' && jQuery(\'#_length_units\').val() != \'\'
+                    &&
+                    jQuery(this).val() != \'\' && jQuery(\'#_end_date\').val() == \'\' )
                 {
                     // Only do stuff if it\'s not been set already. Don\'t want to be messing if things already entered
 
@@ -239,9 +246,20 @@ class PH_Meta_Box_Tenancy_Details {
             update_post_meta( $post_id, '_status', 'application' );
         }
 
-        update_post_meta( $post_id, '_length', (int)$_POST['_length'] );
-        update_post_meta( $post_id, '_length_units', ph_clean($_POST['_length_units']) );
-        update_post_meta( $post_id, '_lease_type', ph_clean($_POST['_lease_type']) );
+        if ( isset( $_POST['_length'] ) )
+        {
+            update_post_meta( $post_id, '_length', (int)$_POST['_length'] );
+        }
+
+        if ( isset( $_POST['_length_units'] ) )
+        {
+            update_post_meta( $post_id, '_length_units', ph_clean($_POST['_length_units']) );
+        }
+
+        if ( isset( $_POST['_lease_type'] ) )
+        {
+            update_post_meta( $post_id, '_lease_type', ph_clean($_POST['_lease_type']) );
+        }
 
         update_post_meta( $post_id, '_start_date', ph_clean($_POST['_start_date']) );
         update_post_meta( $post_id, '_end_date', ph_clean($_POST['_end_date']) );
