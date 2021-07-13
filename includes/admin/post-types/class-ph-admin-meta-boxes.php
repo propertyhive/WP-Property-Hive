@@ -304,14 +304,48 @@ class PH_Admin_Meta_Boxes {
             add_post_meta( $offer_post_id, '_status', 'pending' );
             add_post_meta( $offer_post_id, '_amount', '' );
 
+            $applicant_solicitor_contact_id = '';
             foreach( $viewing_applicant_ids as $viewing_applicant_id )
             {
                 add_post_meta( $offer_post_id, '_applicant_contact_id', $viewing_applicant_id );
+
+                // If any applicant has a solicitor assigned, select them as the offer applicant solicitor
+                if ( empty($applicant_solicitor_contact_id) )
+                {
+                    if ( !empty( get_post_meta( $viewing_applicant_id, '_contact_solicitor_contact_id', TRUE ) ) )
+                    {
+                        $applicant_solicitor_contact_id = get_post_meta( $viewing_applicant_id, '_contact_solicitor_contact_id', TRUE );
+                    }
+                }
             }
 
-            add_post_meta( $offer_post_id, '_applicant_solicitor_contact_id', '' );
+            add_post_meta( $offer_post_id, '_applicant_solicitor_contact_id', $applicant_solicitor_contact_id );
             add_post_meta( $offer_post_id, '_property_id', $viewing->property_id );
-            add_post_meta( $offer_post_id, '_property_owner_solicitor_contact_id', '' );
+
+            // If any owner has a solicitor assigned, select them as the offer owner solicitor
+            $property_owner_solicitor_contact_id = '';
+
+            $owner_contact_ids = get_post_meta($viewing->property_id, '_owner_contact_id', TRUE);
+            if ( !empty( $owner_contact_ids ) )
+            {
+                if ( !is_array($owner_contact_ids) )
+                {
+                    $owner_contact_ids = array($owner_contact_ids);
+                }
+
+                foreach( $owner_contact_ids as $owner_contact_id )
+                {
+                    if ( empty($property_owner_solicitor_contact_id) )
+                    {
+                        if ( !empty( get_post_meta( $owner_contact_id, '_contact_solicitor_contact_id', TRUE ) ) )
+                        {
+                            $property_owner_solicitor_contact_id = get_post_meta( $owner_contact_id, '_contact_solicitor_contact_id', TRUE );
+                        }
+                    }
+                }
+            }
+            add_post_meta( $offer_post_id, '_property_owner_solicitor_contact_id', $property_owner_solicitor_contact_id );
+
             add_post_meta( $offer_post_id, '_offer_date_time', date("Y-m-d H:i:s") );
 
             update_post_meta( (int)$_GET['post'], '_offer_id', $offer_post_id );
