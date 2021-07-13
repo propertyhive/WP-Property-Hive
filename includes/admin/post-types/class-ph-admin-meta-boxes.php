@@ -63,9 +63,10 @@ class PH_Admin_Meta_Boxes {
         }
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Correspondence_Address::save', 10, 2 );
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Contact_Details::save', 15, 2 );
+        add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Solicitor::save', 20, 2 );
         if ( !isset($_POST['_contact_type_new']) )
         {
-            add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Relationships::save', 20, 2 );
+            add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Relationships::save', 25, 2 );
         }
         
         // Save Enquiry Meta Boxes
@@ -252,6 +253,14 @@ class PH_Admin_Meta_Boxes {
 
     public function check_remove_solicitor()
     {
+        if ( isset($_GET['remove_contact_solicitor']) && isset($_GET['post']) )
+        {
+            if ( get_post_type((int)$_GET['post']) != 'contact' )
+                return;
+
+            update_post_meta( (int)$_GET['post'], '_contact_solicitor_contact_id', '' );
+        }
+
         if ( isset($_GET['remove_property_owner_solicitor']) && isset($_GET['post']) )
         {
             if ( get_post_type((int)$_GET['post']) != 'offer' && get_post_type((int)$_GET['post']) != 'sale' )
@@ -1148,6 +1157,14 @@ class PH_Admin_Meta_Boxes {
             'id' => 'propertyhive-contact-contact-details',
             'title' => __( 'Contact Details', 'propertyhive' ),
             'callback' => 'PH_Meta_Box_Contact_Contact_Details::output',
+            'screen' => 'contact',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-contact-solicitor',
+            'title' => __( 'Contact Solicitor Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Contact_Solicitor::output',
             'screen' => 'contact',
             'context' => 'normal',
             'priority' => 'high'
