@@ -1541,6 +1541,19 @@ class PH_AJAX {
                 }
             }
         }
+
+        if ( 
+            get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) != '' &&
+            ( 
+                !isset( $_POST['disclaimer'] ) || 
+                ( 
+                    isset( $_POST['disclaimer'] ) && empty( $_POST['disclaimer'] ) 
+                ) 
+            )
+        )
+        {
+            $errors[] = __( 'Missing required field', 'propertyhive' ) . ': disclaimer';
+        }
         
         if ( !empty($errors) )
         {
