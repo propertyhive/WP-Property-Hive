@@ -101,7 +101,7 @@ jQuery( function ( $ ) {
 
             if ( ajax_action[2] ) // callback
             {
-                eval(ajax_action[2] + '()');
+                eval(ajax_action[2]);
             }
             else
             {
