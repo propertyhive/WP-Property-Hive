@@ -96,6 +96,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			$columns                = array();
 			$columns['cb']          = '<input type="checkbox" />';
 			$columns['description'] = __( 'Description', 'propertyhive' );
+			$columns['notes']       = __( 'Notes', 'propertyhive' );
 			$columns['property']    = __( 'Property', 'propertyhive' );
 			$columns['tenants']     = __( 'Tenants', 'propertyhive' );
 			$columns['date_due']    = __( 'Date Due', 'propertyhive' );
@@ -154,6 +155,10 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 					}
 					echo '</div>';
 
+					break;
+
+				case 'notes' :
+					echo '<div class="cell-main-content">' . ( !empty($key_date->notes()) ? nl2br( $key_date->notes() ) : '-' ) . '</div>';
 					break;
 
 				case 'property' :
