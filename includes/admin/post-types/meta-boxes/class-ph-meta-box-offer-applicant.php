@@ -266,6 +266,31 @@ class PH_Meta_Box_Offer_Applicant {
                 $('#offer_applicant_search').val('');
 
                 offer_update_selected_applicants();
+
+                // If the Applicant Solicitor select meta box exists on the page and no solicitor has been selected yet
+                if (typeof jQuery('#offer_selected_applicant_solicitors').html() !== 'undefined' && jQuery('#offer_selected_applicant_solicitors').html() == '')
+                {
+                    // Check if the selected applicant has a solicitor assigned to them and select them as applicant solicitor if so
+                    var data = {
+                        action: 'propertyhive_get_contact_solicitor',
+                        post_id: $(this).attr('href'),
+                    };
+                    $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+                    {
+                        if (response != '')
+                        {
+                            var solicitor_data = jQuery.parseJSON( response );
+
+                            jQuery('#offer_selected_applicant_solicitors').html('<ul></ul>');
+
+                            jQuery('#offer_selected_applicant_solicitors ul').append('<li><a href="' + solicitor_data['id'] + '" class="offer-remove-applicant-solicitor" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + solicitor_data['name'] + '</li>');
+
+                            jQuery('#_applicant_solicitor_contact_ids').val(solicitor_data['id']);
+
+                            jQuery('#offer_selected_applicant_solicitors').show();
+                        }
+                    });
+                }
             });
 
             $('body').on('click', 'a.offer-remove-applicant', function(e)
