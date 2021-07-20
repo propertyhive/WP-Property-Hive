@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.7.2
-Stable tag: 1.5.16
+Tested up to: 5.8
+Stable tag: 1.5.17
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.17 - 2021-07-20 =
+* Ensured enquiry form fails if disclaimer tickbox not ticked
+* Added ability to record a solicitor on a contact record. This will be used as the default solicitor then on any offers generated going forward
+* Improved support for tenancies with no end date, ensuring filters work and labels are correct
+* Added ability to store notes/details against a management key date
+* Added filter 'propertyhive_show_tenancy_lease_length' to hide lease length. Not applicable for example in Scotland with private residential tenancies where they don't have a fixed length
+* Added filter 'propertyhive_tenancy_lease_types' to alter the tenancy lease types
+* Declared compatibility for WordPress 5.8
 
 = 1.5.16 - 2021-07-06 =
 * Store a concatenated address for properties and contacts and use that in backend searches, instead of doing 6 individual query JOINs on each individual address field. Should reduce search query times by 75%+, especially on larger datasets
