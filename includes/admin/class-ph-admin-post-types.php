@@ -1193,7 +1193,7 @@ class PH_Admin_Post_Types {
                 switch ( $_GET['_status'] )
                 {
                     case 'pending' :
-                        $vars['meta_query'][] = array (
+                        $vars['meta_query'][] = array(
                             'key' => '_start_date',
                             'value' => date('Y-m-d'),
                             'type'  => 'date',
@@ -1202,22 +1202,40 @@ class PH_Admin_Post_Types {
                         break;
 
                     case 'current' :
-                        $vars['meta_query'][] = array (
-                            'key' => '_start_date',
-                            'value' => date('Y-m-d'),
-                            'type'  => 'date',
-                            'compare' => '<=',
-                        );
-                        $vars['meta_query'][] = array (
-                            'key' => '_end_date',
-                            'value' => date('Y-m-d'),
-                            'type'  => 'date',
-                            'compare' => '>=',
+                        $vars['meta_query'][] = array(
+                            'relation' => 'OR',
+                            array(
+                                array(
+                                    'key' => '_start_date',
+                                    'value' => date('Y-m-d'),
+                                    'type'  => 'date',
+                                    'compare' => '<=',
+                                ),
+                                array(
+                                    'key' => '_end_date',
+                                    'value' => date('Y-m-d'),
+                                    'type'  => 'date',
+                                    'compare' => '>=',
+                                )
+                            ),
+                            array(
+                                array(
+                                    'key' => '_start_date',
+                                    'value' => date('Y-m-d'),
+                                    'type'  => 'date',
+                                    'compare' => '<=',
+                                ),
+                                array(
+                                    'key' => '_end_date',
+                                    'value' => '',
+                                    'compare' => '=',
+                                )
+                            )
                         );
                         break;
 
                     case 'finished':
-                        $vars['meta_query'][] = array (
+                        $vars['meta_query'][] = array(
                             'key' => '_end_date',
                             'value' => date('Y-m-d'),
                             'type'  => 'date',

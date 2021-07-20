@@ -24,16 +24,34 @@
             case 'current':
             {
                 $meta_query[] = array(
-                    'key' => '_start_date',
-                    'value' => date('Y-m-d'),
-                    'type' => 'date',
-                    'compare' => '<=',
-                );
-                $meta_query[] = array(
-                    'key' => '_end_date',
-                    'value' => date('Y-m-d'),
-                    'type' => 'date',
-                    'compare' => '>',
+                    'relation' => 'OR',
+                    array(
+                        array(
+                            'key' => '_start_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '<=',
+                        ),
+                        array(
+                            'key' => '_end_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '>=',
+                        )
+                    ),
+                    array(
+                        array(
+                            'key' => '_start_date',
+                            'value' => date('Y-m-d'),
+                            'type'  => 'date',
+                            'compare' => '<=',
+                        ),
+                        array(
+                            'key' => '_end_date',
+                            'value' => '',
+                            'compare' => '=',
+                        )
+                    )
                 );
                 break;
             }
