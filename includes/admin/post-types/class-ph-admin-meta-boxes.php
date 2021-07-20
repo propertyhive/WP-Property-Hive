@@ -63,9 +63,10 @@ class PH_Admin_Meta_Boxes {
         }
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Correspondence_Address::save', 10, 2 );
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Contact_Details::save', 15, 2 );
+        add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Solicitor::save', 20, 2 );
         if ( !isset($_POST['_contact_type_new']) )
         {
-            add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Relationships::save', 20, 2 );
+            add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Relationships::save', 25, 2 );
         }
         
         // Save Enquiry Meta Boxes
@@ -252,6 +253,14 @@ class PH_Admin_Meta_Boxes {
 
     public function check_remove_solicitor()
     {
+        if ( isset($_GET['remove_contact_solicitor']) && isset($_GET['post']) )
+        {
+            if ( get_post_type((int)$_GET['post']) != 'contact' )
+                return;
+
+            update_post_meta( (int)$_GET['post'], '_contact_solicitor_contact_id', '' );
+        }
+
         if ( isset($_GET['remove_property_owner_solicitor']) && isset($_GET['post']) )
         {
             if ( get_post_type((int)$_GET['post']) != 'offer' && get_post_type((int)$_GET['post']) != 'sale' )
@@ -295,14 +304,48 @@ class PH_Admin_Meta_Boxes {
             add_post_meta( $offer_post_id, '_status', 'pending' );
             add_post_meta( $offer_post_id, '_amount', '' );
 
+            $applicant_solicitor_contact_id = '';
             foreach( $viewing_applicant_ids as $viewing_applicant_id )
             {
                 add_post_meta( $offer_post_id, '_applicant_contact_id', $viewing_applicant_id );
+
+                // If any applicant has a solicitor assigned, select them as the offer applicant solicitor
+                if ( empty($applicant_solicitor_contact_id) )
+                {
+                    if ( !empty( get_post_meta( $viewing_applicant_id, '_contact_solicitor_contact_id', TRUE ) ) )
+                    {
+                        $applicant_solicitor_contact_id = get_post_meta( $viewing_applicant_id, '_contact_solicitor_contact_id', TRUE );
+                    }
+                }
             }
 
-            add_post_meta( $offer_post_id, '_applicant_solicitor_contact_id', '' );
+            add_post_meta( $offer_post_id, '_applicant_solicitor_contact_id', $applicant_solicitor_contact_id );
             add_post_meta( $offer_post_id, '_property_id', $viewing->property_id );
-            add_post_meta( $offer_post_id, '_property_owner_solicitor_contact_id', '' );
+
+            // If any owner has a solicitor assigned, select them as the offer owner solicitor
+            $property_owner_solicitor_contact_id = '';
+
+            $owner_contact_ids = get_post_meta($viewing->property_id, '_owner_contact_id', TRUE);
+            if ( !empty( $owner_contact_ids ) )
+            {
+                if ( !is_array($owner_contact_ids) )
+                {
+                    $owner_contact_ids = array($owner_contact_ids);
+                }
+
+                foreach( $owner_contact_ids as $owner_contact_id )
+                {
+                    if ( empty($property_owner_solicitor_contact_id) )
+                    {
+                        if ( !empty( get_post_meta( $owner_contact_id, '_contact_solicitor_contact_id', TRUE ) ) )
+                        {
+                            $property_owner_solicitor_contact_id = get_post_meta( $owner_contact_id, '_contact_solicitor_contact_id', TRUE );
+                        }
+                    }
+                }
+            }
+            add_post_meta( $offer_post_id, '_property_owner_solicitor_contact_id', $property_owner_solicitor_contact_id );
+
             add_post_meta( $offer_post_id, '_offer_date_time', date("Y-m-d H:i:s") );
 
             update_post_meta( (int)$_GET['post'], '_offer_id', $offer_post_id );
@@ -1148,6 +1191,14 @@ class PH_Admin_Meta_Boxes {
             'id' => 'propertyhive-contact-contact-details',
             'title' => __( 'Contact Details', 'propertyhive' ),
             'callback' => 'PH_Meta_Box_Contact_Contact_Details::output',
+            'screen' => 'contact',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-contact-solicitor',
+            'title' => __( 'Contact Solicitor Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Contact_Solicitor::output',
             'screen' => 'contact',
             'context' => 'normal',
             'priority' => 'high'
