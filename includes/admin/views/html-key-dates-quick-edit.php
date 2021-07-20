@@ -1,4 +1,4 @@
-<td colspan="4">
+<td colspan="5">
     <div class="propertyhive_meta_box">
         <div class="options_group">
             <p class="form-field">
@@ -85,6 +85,10 @@
                     }
                     ?>
                 </select>
+            </p>
+            <p class="form-field">
+                <label for="date_notes_quick_edit">Notes</label>
+                <textarea id="date_notes_quick_edit" class="short"><?php echo ( isset( $_POST['notes'] ) && $_POST['notes'] != '-' ) ? stripslashes( $_POST['notes'] ) : ''; ?></textarea>
             </p>
             <?php
             if ( isset($recurrence_rules[$_POST['type']]) && isset( $recurrence_rules[$_POST['type']]['recurrence_rule'] ) )

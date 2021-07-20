@@ -142,6 +142,9 @@
             <th scope="col" id="description" class="manage-column column-description">
                 Description
             </th>
+            <th scope="col" id="notes" class="manage-column column-notes">
+                Notes
+            </th>
             <th scope="col" id="tenants" class="manage-column column-tenants">
                 Tenants
             </th>
@@ -176,6 +179,10 @@
                                 <a href="" id="<?php echo $key_date_post->ID; ?>" class="submitdelete meta-box-delete">Delete</a>
                             </span>
                         </div>
+                    </td>
+                    <td class="notes column-notes" data-colname="Notes">
+                        <div class="cell-main-content"><?php echo !empty($key_date->notes()) ? nl2br( $key_date->notes() ) : '-'; ?></div>
+                        <div class="hidden hidden-key-date-notes"><?php echo $key_date->notes(); ?></div>
                     </td>
                     <td class="tenants column-tenants" data-colname="Tenants">
                         <div class="cell-main-content">
@@ -215,7 +222,7 @@
         {
             ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="4">No key dates found</td>
+                <td class="colspanchange" colspan="5">No key dates found</td>
             </tr>
             <?php
         }
@@ -227,6 +234,9 @@
         <tr>
             <th scope="col" class="manage-column column-description">
                 Description
+            </th>
+            <th scope="col" class="manage-column column-notes">
+                Notes
             </th>
             <th scope="col" class="manage-column column-tenants">
                 Tenants
@@ -291,6 +301,10 @@
                 }
                 ?>
             </select>
+        </p>
+        <p class="form-field _add_key_notes_field">
+            <label for="_add_key_date_notes"><?php echo __('Notes', 'propertyhive'); ?></label>
+            <textarea id="_add_key_date_notes" name="_add_key_date_notes" class="short"></textarea>
         </p>
         <p>
             <a href="#" class="add_key_date button"><?php _e( 'Add Key Date', 'propertyhive' ); ?></a>
