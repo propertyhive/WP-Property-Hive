@@ -39,7 +39,10 @@ class PH_Meta_Box_Tenancy_Details {
 			{
 				echo __( 'Pending', 'propertyhive' );
 			}
-			elseif ( $start_date && strtotime( $start_date ) <= time() && time() < strtotime( $end_date ) )
+			elseif ( 
+                $start_date && strtotime( $start_date ) <= time() && 
+                ( time() <= strtotime( $end_date ) || $end_date == '' )
+            )
 			{
 				echo __( 'Current', 'propertyhive' );
 			}

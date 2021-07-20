@@ -137,7 +137,10 @@ class PH_Tenancy {
         {
             return __( 'Pending', 'propertyhive' );
         }
-        elseif ( $this->_start_date && strtotime( $this->_start_date ) <= time() && time() < strtotime( $this->_end_date ) )
+        elseif ( 
+            $this->_start_date && strtotime( $this->_start_date ) <= time() && 
+            ( time() <= strtotime( $this->_end_date ) || $this->_end_date == '' )
+        )
         {
             return __( 'Current', 'propertyhive' );
         }
