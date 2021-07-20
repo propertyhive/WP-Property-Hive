@@ -48,6 +48,7 @@ class PH_AJAX {
             // Contact actions
             'create_contact_login' => false,
             'get_contact_tenancies_grid' => false,
+            'get_contact_solicitor' => false,
 
             // Appraisal actions
             'get_appraisal_details_meta_box' => false,
@@ -4963,6 +4964,59 @@ class PH_AJAX {
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-contact-tenancies-meta-box.php' );
+
+        // Quit out
+        die();
+    }
+
+    public function get_contact_solicitor()
+    {
+        switch( get_post_type($_POST['post_id']) )
+        {
+            case 'contact':
+            {
+                $contact_post_ids = array( $_POST['post_id'] );
+                break;
+            }
+            case 'property':
+            {
+                $owner_contact_ids = get_post_meta($_POST['post_id'], '_owner_contact_id', TRUE);
+                if ( !empty( $owner_contact_ids ) )
+                {
+                    if ( !is_array($owner_contact_ids) )
+                    {
+                        $owner_contact_ids = array($owner_contact_ids);
+                    }
+
+                    $contact_post_ids = $owner_contact_ids;
+                }
+                break;
+            }
+        }
+
+        if ( isset( $contact_post_ids ) )
+        {
+            foreach ( $contact_post_ids as $contact_post_id )
+            {
+                $solicitor_contact_id = get_post_meta( $contact_post_id, '_contact_solicitor_contact_id', TRUE );
+                if ( !empty($solicitor_contact_id) )
+                {
+                    $solicitor_name = get_the_title($solicitor_contact_id);
+
+                    $solicitor_company_name = get_post_meta( $solicitor_contact_id, '_company_name', TRUE );
+                    if ( !empty($solicitor_company_name) && $solicitor_company_name != $solicitor_name )
+                    {
+                        $solicitor_name .= ' (' . $solicitor_company_name . ')';
+                    }
+
+                    echo json_encode( array(
+                        'id' => $solicitor_contact_id,
+                        'name' => $solicitor_name,
+                    ) );
+                    break;
+                }
+            }
+        }
 
         // Quit out
         die();

@@ -165,6 +165,31 @@ jQuery(document).ready(function($)
         $('#offer_property_search').val('');
 
         offer_update_selected_properties();
+
+        // If the Owner Solicitor select meta box exists on the page and no solicitor has been selected yet
+        if (typeof jQuery('#offer_selected_property_owner_solicitors').html() !== 'undefined' && jQuery('#offer_selected_property_owner_solicitors').html() == '')
+        {
+            // Find the first solicitor assigned to any of the property owners and assign them as Owner Solicitor if found
+            var data = {
+                action: 'propertyhive_get_contact_solicitor',
+                post_id: $(this).attr('href'),
+            };
+            $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                if (response != '')
+                {
+                    var solicitor_data = jQuery.parseJSON( response );
+
+                    jQuery('#offer_selected_property_owner_solicitors').html('<ul></ul>');
+
+                    jQuery('#offer_selected_property_owner_solicitors ul').append('<li><a href="' + solicitor_data['id'] + '" class="offer-remove-property_owner-solicitor" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + solicitor_data['name'] + '</li>');
+
+                    jQuery('#_property_owner_solicitor_contact_ids').val(solicitor_data['id']);
+
+                    jQuery('#offer_selected_property_owner_solicitors').show();
+                }
+            });
+        }
     });
 
     $('body').on('click', 'a.offer-remove-property', function(e)
