@@ -57,18 +57,32 @@ class PH_Meta_Box_Tenancy_Details {
         $length_units = get_post_meta( $thepostid, '_length_units', true );
         $lease_type = get_post_meta( $thepostid, '_lease_type', true );
 
-        $lease_term_type_html = '
-            <p class="form-field lease_term_type_field">
-        
-            <label for="_length">' . __('Lease Term and Type', 'propertyhive') . '</label>
+        $show_lease_length =  apply_filters( 'propertyhive_show_tenancy_lease_length', true );
 
-            <input type="number" class="" name="_length" id="_length" value="' . get_post_meta( $post->ID, '_length', true ) . '" placeholder="" style="width:70px">
+        if ( $show_lease_length === true)
+        {
+            $lease_term_type_html = '
+                <p class="form-field lease_term_type_field">
             
-            <select id="_length_units" name="_length_units" class="select" style="width:auto">
-                <option value="week"' . ( $length_units == 'week' ? ' selected' : '') . '>' . __('Weeks', 'propertyhive') . '</option>
-                <option value="month"' . ( ($length_units == 'month' || $length_units == '') ? ' selected' : '') . '>' . __('Months', 'propertyhive') . '</option>
-            </select>
+                <label for="_length">' . __('Lease Term and Type', 'propertyhive') . '</label>
 
+                <input type="number" class="" name="_length" id="_length" value="' . get_post_meta( $post->ID, '_length', true ) . '" placeholder="" style="width:70px">
+                
+                <select id="_length_units" name="_length_units" class="select" style="width:auto">
+                    <option value="week"' . ( $length_units == 'week' ? ' selected' : '') . '>' . __('Weeks', 'propertyhive') . '</option>
+                    <option value="month"' . ( ($length_units == 'month' || $length_units == '') ? ' selected' : '') . '>' . __('Months', 'propertyhive') . '</option>
+                </select>';
+        }
+        else
+        {
+            $lease_term_type_html = '
+                <p class="form-field lease_term_type_field">
+            
+                <label for="_lease_type">' . __('Lease Type', 'propertyhive') . '</label>
+            ';
+        }
+
+        $lease_term_type_html .= '
             <select id="_lease_type" name="_lease_type" class="select" style="width:auto">
         ';
 
@@ -88,7 +102,7 @@ class PH_Meta_Box_Tenancy_Details {
                 </select>
             </p>';
 
-        echo apply_filters( 'propertyhive_tenancy_lease_term_type_html', $lease_term_type_html );
+        echo $lease_term_type_html;
 
         $args = array(
             'id' => '_start_date', 
