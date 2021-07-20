@@ -228,6 +228,7 @@ jQuery( function($){
             key_date_due:         $('#_add_key_date_due').val(),
             key_date_hours:       $('#_add_key_date_due_hours').val(),
             key_date_minutes:     $('#_add_key_date_due_minutes').val(),
+            key_date_notes:       $('#_add_key_date_notes').val(),
         };
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
@@ -293,6 +294,7 @@ jQuery( function($){
                 description: $('.post-' + post_id + ' .description .cell-main-content').text(),
                 status: $('.post-' + post_id + ' .status .cell-main-content').text(),
                 due_date_time: $('.post-' + post_id + ' .date_due .cell-main-content').text(),
+                notes: $('.post-' + post_id + ' .notes .hidden-key-date-notes').text(),
                 type: $('.post-' + post_id + ' .hidden-date-type-id').text(),
             };
 
@@ -415,6 +417,7 @@ jQuery( function($){
             status: quick_edit_row.find('#key_date_status').val(),
             due_date_time: quick_edit_row.find('#date_due_quick_edit').val() + ' ' + quick_edit_row.find('#date_due_hours_quick_edit').val() + ':' + quick_edit_row.find('#date_due_minutes_quick_edit').val(),
             type: quick_edit_row.find('#date_type').val(),
+            notes: quick_edit_row.find('#date_notes_quick_edit').val(),
         };
 
         if (quick_edit_row.find('#book_next_key_date').length !== 0)

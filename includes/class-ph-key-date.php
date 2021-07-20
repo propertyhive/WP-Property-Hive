@@ -23,6 +23,10 @@ class PH_Key_Date {
 		return $this->description;
 	}
 
+	public function notes() {
+		return $this->_key_date_notes;
+	}
+
 	public function property() {
 		return new PH_Property(get_post($this->_property_id));
 	}

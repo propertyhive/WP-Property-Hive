@@ -4738,6 +4738,7 @@ class PH_AJAX {
             $date_description = wp_kses_post( trim( stripslashes( $_POST['key_date_description'] ) ) );
             $date_type_id = ph_clean( stripslashes( $_POST['key_date_type'] ) );
             $date_due = ph_clean($_POST['key_date_due']) . ' ' . ph_clean($_POST['key_date_hours']) . ':' . ph_clean($_POST['key_date_minutes']);
+            $date_notes = sanitize_textarea_field($_POST['key_date_notes']);
 
             $parent_post_type = get_post_type( $parent_post_id );
 
@@ -4764,6 +4765,7 @@ class PH_AJAX {
             add_post_meta( $key_date_post_id, '_date_due', $date_due );
             add_post_meta( $key_date_post_id, '_key_date_status', 'pending' );
             add_post_meta( $key_date_post_id, '_key_date_type_id', $date_type_id );
+            add_post_meta( $key_date_post_id, '_key_date_notes', $date_notes );
 
             switch ( $parent_post_type )
             {
@@ -4882,6 +4884,7 @@ class PH_AJAX {
         update_post_meta( $key_date_post_id, '_date_due', $_POST['due_date_time'] );
         update_post_meta( $key_date_post_id, '_key_date_status', $_POST['status'] );
         update_post_meta( $key_date_post_id, '_key_date_type_id', $_POST['type'] );
+        update_post_meta( $key_date_post_id, '_key_date_notes', sanitize_textarea_field($_POST['notes'] ));
 
         if ( isset($_POST['next_key_date']) )
         {
