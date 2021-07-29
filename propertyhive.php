@@ -123,10 +123,23 @@ if ( ! class_exists( 'PropertyHive' ) )
             add_action( 'init', array( 'PH_Shortcodes', 'init' ) );
             add_action( 'rest_api_init', array( $this, 'rest_api_includes' ) );
             add_action( 'after_setup_theme', array( $this, 'setup_environment' ) );
+            add_action( 'wp', array( $this, 'set_cache_constants' ) );
             add_action( 'wp_update_comment_count', array( $this, 'exclude_notes_from_comment_count' ) );
     
             // Loaded action
             do_action( 'propertyhive_loaded' );
+        }
+
+        public function set_cache_constants()
+        {
+            $page_ids = array_filter( array( ph_get_page_id( 'my_account' ) ) );
+
+            if ( !empty($page_ids) && is_page( $page_ids ) ) 
+            {
+                if ( !defined('DONOTCACHEPAGE') ) { define('DONOTCACHEPAGE', TRUE); }
+                if ( !defined('DONOTCACHEOBJECT') ) { define('DONOTCACHEOBJECT', TRUE); }
+                if ( !defined('DONOTCACHEDB') ) { define('DONOTCACHEDB', TRUE); }
+            }
         }
 
         public function setup_custom_departments( $departments )
