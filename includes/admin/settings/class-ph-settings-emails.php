@@ -507,11 +507,17 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	 * Save settings.
 	 */
 	public function save() {
+		$previous_auto_property_match = get_option( 'propertyhive_auto_property_match', '' );
+
 		PH_Admin_Settings::save_fields( $this->get_settings() );
 
 		if ( isset($_POST['propertyhive_auto_property_match']) && $_POST['propertyhive_auto_property_match'] == '1' )
 		{
-			update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
+			if ( $previous_auto_property_match != 'yes' )
+			{
+				// it's been activated
+				update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
+			}
 
 			wp_schedule_event( time(), 'hourly', 'propertyhive_auto_email_match' ); //  Skew it by 30 minutes to reduce conflict with email log processing
 		}
