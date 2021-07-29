@@ -9,7 +9,23 @@
 		<?php
 			if ( !empty($applicants) )
 			{
-               // var_dump($applicants);
+                $select_all_actions = array(
+                    'email' => __( 'Email', 'propertyhive' ),
+                    'not_interested' => __( 'Not Suitable', 'propertyhive' )
+                );
+
+                $select_all_actions = apply_filters( 'propertyhive_matching_select_all_actions', $select_all_actions );
+        ?>
+        <div class="select-actions" style="padding-bottom:15px">
+            <span style="display:inline-block; vertical-align:middle;"><?php echo __( 'Select', 'propertyhive' ); ?>:</span> <?php
+                foreach ( $select_all_actions as $key => $value )
+                {
+                    echo '<a href="javascript:;" class="button" id="select_all_' . esc_attr(sanitize_title($key)) . '" style="display:inline-block; vertical-align:middle;">All - ' . $value . '</a> ';
+                }
+            ?>
+            <a href="javascript:;" class="button" id="select_none" style="display:inline-block; vertical-align:middle;">None</a>
+        </div>
+        <?php
                 echo '<table width="100%">';
 
                 $columns = array(
@@ -252,26 +268,43 @@
 
 <script>
 
-	jQuery('body').on('change', 'input[name=\'not_interested_contact_applicant_profile_id[]\']', function()
+    jQuery(document).ready(function()
     {
-        var applicant_contact_profile_id = jQuery(this).val();
-        var applicant_contact_profile_id_split = applicant_contact_profile_id.split('|');
-
-        jQuery('input[name=\'email_contact_applicant_profile_id[]\'][value=\'' + applicant_contact_profile_id + '\']').attr('checked', false);
-
-        opacity = 0.4;
-        if ( !jQuery(this).is(':checked') )
+    	jQuery('body').on('change', 'input[name=\'not_interested_contact_applicant_profile_id[]\']', function()
         {
-        	opacity = 1;
-        }
-        jQuery('#matching_contact_' + applicant_contact_profile_id_split[0] + '_applicant_profile_' + applicant_contact_profile_id_split[1]).animate({
-            opacity: opacity
-        },
-        {
-            duration: 250
+            var applicant_contact_profile_id = jQuery(this).val();
+            var applicant_contact_profile_id_split = applicant_contact_profile_id.split('|');
+
+            jQuery('input[name=\'email_contact_applicant_profile_id[]\'][value=\'' + applicant_contact_profile_id + '\']').attr('checked', false);
+
+            opacity = 0.4;
+            if ( !jQuery(this).is(':checked') )
+            {
+            	opacity = 1;
+            }
+            jQuery('#matching_contact_' + applicant_contact_profile_id_split[0] + '_applicant_profile_' + applicant_contact_profile_id_split[1]).animate({
+                opacity: opacity
+            },
+            {
+                duration: 250
+            });
+
+            return false;
         });
 
-        return false;
+        jQuery('.select-actions a').click(function(e)
+        {
+            e.preventDefault();
+
+            var id = jQuery(this).attr('id').replace("select_all_", "");
+
+            jQuery('input[name$=\'_contact_applicant_profile_id[]\']').prop('checked', false);
+
+            if ( id != 'select_none' )
+            {
+                jQuery('input[name=\'' + id + '_contact_applicant_profile_id[]\']').prop('checked', 'checked');
+            }
+        });
     });
 
 </script>
