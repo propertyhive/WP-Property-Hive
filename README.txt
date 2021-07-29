@@ -92,6 +92,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 = 1.5.18 - 2021-07-29 =
 * Corrected potential issue with auto-matching whereby date that auto match was enabled (which has an effect on which properties are returned) would be updated when updating settings, even if already enabled
+* Added Select All / None options to match screens
 * Output date and time in settings that auto match was enabled
 * Added management type filter to tenancy list
 * Ensured DONOTCACHE constants are set on My Account page with scope to add more
