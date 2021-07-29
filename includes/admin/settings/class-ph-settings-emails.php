@@ -204,12 +204,14 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	            'desc'	=> '<p>' . __( 'By default, all on market properties will come back in matches when sending properties to applicants. If you wish to only send properties with a certain status you can choose this here. For example, maybe you don\'t want Sold STC properties to be sent. Hold ctrl/cmd whilst clicking to select multiple.', 'propertyhive' ) . '</p>',
 	        );
 
+	        $time_offset = (int) get_option('gmt_offset') * 60 * 60;
+
 	        $settings[] = array(
 	            'title'   => __( 'Automatically Send Matching Properties To Applicants', 'propertyhive' ),
 	            'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent emailed properties as they\'re added.<br><br>
 	            	- This will only apply to properties added from the moment this option is activated.<br>
 	            	- When enabled, this can disabled on a per-applicant basis by going into their record<br>
-	            	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ),
+	            	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ) . ( ( get_option( 'propertyhive_auto_property_match', '' ) == 'yes' && get_option( 'propertyhive_auto_property_match_enabled_date', '' ) != '' ) ? '<br><br>Enabled on ' . date("jS F Y H:i", strtotime(get_option( 'propertyhive_auto_property_match_enabled_date', '' )) + $time_offset) : '' ),
 	            'id'      => 'propertyhive_auto_property_match',
 	            'type'    => 'checkbox',
 	            'default' => '',
