@@ -886,6 +886,7 @@ class PH_Admin_Post_Types {
         $output = '';
 
         $output .= $this->tenancy_status_filter();
+        $output .= $this->tenancy_management_type_filter();
 
         echo apply_filters( 'propertyhive_tenancy_filters', $output );
     }
@@ -914,6 +915,36 @@ class PH_Admin_Post_Types {
             $output .= '<option value="finished"';
             $output .= selected( 'finished', $selected_status, false );
             $output .= '> ' . __( 'Finished', 'propertyhive' ) . '</option>';
+
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show an tenancy management type filter box
+     */
+    public function tenancy_management_type_filter() {
+        global $wp_query;
+
+        $management_types = apply_filters( 'propertyhive_tenancy_management_types', array(
+            'let_only' => 'Let Only',
+            'fully_managed' => 'Fully Managed'
+        ) );
+
+        $selected_management_type = isset( $_GET['_management_type'] ) && in_array( $_GET['_management_type'], array_keys($management_types) ) ? $_GET['_management_type'] : '';
+
+        // Status filtering
+        $output  = '<select name="_management_type" id="dropdown_tenancy_management_type">';
+
+            $output .= '<option value="">' . __( 'All Management Types', 'propertyhive' ) . '</option>';
+
+            foreach ( $management_types as $key => $value )
+            {
+                $output .= '<option value="' . $key . '"';
+                $output .= selected( $key, $selected_management_type, false );
+                $output .= '>' . __( $value, 'propertyhive' ) . '</option>';
+            }
 
         $output .= '</select>';
 
@@ -1243,6 +1274,13 @@ class PH_Admin_Post_Types {
                         );
                         break;
                 }
+            }
+
+            if ( ! empty( $_GET['_management_type'] ) ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_management_type',
+                    'value' => sanitize_text_field( $_GET['_management_type'] ),
+                );
             }
         }
         elseif ( 'key_date' === $typenow )
