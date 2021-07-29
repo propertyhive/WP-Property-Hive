@@ -695,7 +695,7 @@ class PH_Admin_Post_Types {
         // Status filtering
         $output  = '<select name="_status" id="dropdown_appraisal_status">';
             
-            $output .= '<option value="">All Statuses</option>';
+            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
 
             $output .= '<option value="pending"';
             $output .= selected( 'pending', $selected_status, false );
@@ -900,9 +900,9 @@ class PH_Admin_Post_Types {
         $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'current', 'finished') ) ? $_GET['_status'] : '';
 
         // Status filtering
-        $output  = '<select name="_status" id="dropdown_sale_status">';
+        $output  = '<select name="_status" id="dropdown_tenancy_status">';
 
-            $output .= '<option value="">All Statuses</option>';
+            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
 
             $output .= '<option value="pending"';
             $output .= selected( 'pending', $selected_status, false );
@@ -993,9 +993,9 @@ class PH_Admin_Post_Types {
 
 		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'booked', 'complete', 'pending') ) ? $_GET['status'] : '';
 
-		$output  = '<select name="status" id="dropdown_sale_status">';
+		$output  = '<select name="status" id="dropdown_key_date_status">';
 
-		$output .= '<option value="">All Statuses</option>';
+		$output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
 
 		$output .= '<option value="upcoming_and_overdue"';
 		$output .= selected( 'upcoming_and_overdue', $selected_status, false );
