@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Rank Math SEO Compatibility
  *
- * @class 		PH_Yoast_SEO
+ * @class 		PH_Rank_Math
  * @version		1.0.0
  * @package		PropertyHive/Classes/
  * @category	Class
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PH_Rank_Math {
 
-	/** @var PH_Rest_Api The single instance of the class */
+	/** @var PH_Rank_Math The single instance of the class */
 	protected static $_instance = null;
 
 	/**

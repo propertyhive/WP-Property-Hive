@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PH_Yoast_SEO {
 
-	/** @var PH_Rest_Api The single instance of the class */
+	/** @var PH_Yoast_SEO The single instance of the class */
 	protected static $_instance = null;
 
 	/**
