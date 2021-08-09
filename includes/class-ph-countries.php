@@ -229,6 +229,12 @@ class PH_Countries {
 				'currency_symbol' => 'د.م.',
 				'currency_prefix' => false
 			),
+			'NZ' => array(
+				'name' => 'New Zealand',
+				'currency_code' => 'NZD',
+				'currency_symbol' => '$',
+				'currency_prefix' => true
+			),
 			'NO' => array(
 				'name' => 'Norway',
 				'currency_code' => 'NOK',
