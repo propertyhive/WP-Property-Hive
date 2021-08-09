@@ -437,6 +437,6 @@
                 jQuery('input[name=\'' + id + '_property_id[]\']').prop('checked', 'checked');
             }
         });
-    })
+    });
 
 </script>
