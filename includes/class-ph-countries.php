@@ -187,6 +187,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'GR' => array(
+				'name' => 'Greece',
+				'currency_code' => 'EUR',
+				'currency_symbol' => '&euro;',
+				'currency_prefix' => false
+			),
 			'IE' => array(
 				'name' => 'Ireland',
 				'currency_code' => 'EUR',
@@ -276,6 +282,12 @@ class PH_Countries {
 				'currency_code' => 'SEK',
 				'currency_symbol' => 'kr',
 				'currency_prefix' => false
+			),
+			'CH' => array(
+				'name' => 'Switzerland',
+				'currency_code' => 'CHF',
+				'currency_symbol' => 'CHF',
+				'currency_prefix' => true
 			),
 			'TR' => array(
 				'name' => 'Turkey',
