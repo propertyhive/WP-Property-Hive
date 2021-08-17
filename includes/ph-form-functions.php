@@ -1444,7 +1444,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
 
-            $output .= '<input type="text"
+            $output .= '<input type="text" autocomplete="off"
                 name="' . esc_attr( $key ) . '"
                 id="' . esc_attr( $key ) . '"
                 value="' . esc_attr( $field['value'] ) . '"
