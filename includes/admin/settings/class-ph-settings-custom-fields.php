@@ -135,6 +135,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             add_action( 'propertyhive_admin_field_custom_fields_property_feature', array( $this, 'custom_fields_property_feature_setting' ) );
         }
 
+        $sections = apply_filters( 'propertyhive_admin_field_custom_fields_sections', $sections );
+
         return $sections;
     }
     
