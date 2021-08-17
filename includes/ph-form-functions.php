@@ -1415,6 +1415,47 @@ function ph_form_field( $key, $field )
             <div class="g-recaptcha" data-sitekey="' . $field['site_key'] . '"></div>';
             break;
         }
+        case "daterange":
+        {
+            wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
+            wp_enqueue_script( 'daterangepicker.js', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js' );
+            wp_enqueue_style( 'daterangepicker.css', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css' );
+
+            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
+            $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
+
+            $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
+            $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+
+            $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
+            $field['style'] = isset( $field['style'] ) ? $field['style'] : '';
+            $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
+            $field['placeholder'] = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
+
+            if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
+            {
+                $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
+            }
+
+            $output .= $field['before'];
+
+            if ($field['show_label'])
+            {
+                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+            }
+
+            $output .= '<input type="text"
+                name="' . esc_attr( $key ) . '"
+                id="' . esc_attr( $key ) . '"
+                value="' . esc_attr( $field['value'] ) . '"
+                style="' . esc_attr( $field['style'] ) . '"
+                class="' . esc_attr( $field['class'] ) . '"
+                placeholder="' . esc_attr(  $field['placeholder'] ) . '"
+            />';
+            $output .= $field['after'];
+
+            break;
+        }
         default:
         {
             if ( taxonomy_exists($field['type']) )
