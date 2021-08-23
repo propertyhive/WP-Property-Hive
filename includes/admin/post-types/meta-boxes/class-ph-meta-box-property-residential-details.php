@@ -59,48 +59,10 @@ class PH_Meta_Box_Property_Residential_Details {
         ) );
         
         // Property Type
-        $options = array( '' => '' );
-        $args = array(
-            'hide_empty' => false,
-            'parent' => 0
-        );
-        $terms = get_terms( 'property_type', $args );
-        
-        $selected_value = '';
-        if ( !empty( $terms ) && !is_wp_error( $terms ) )
-        {
-            foreach ($terms as $term)
-            {
-                $options[$term->term_id] = $term->name;
-                
-                $args = array(
-                    'hide_empty' => false,
-                    'parent' => $term->term_id
-                );
-                $subterms = get_terms( 'property_type', $args );
-                
-                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
-                {
-                    foreach ($subterms as $term)
-                    {
-                        $options[$term->term_id] = '- ' . $term->name;
-                    }
-                }
-            }
-
-            $term_list = wp_get_post_terms($post->ID, 'property_type', array("fields" => "ids"));
-            
-            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
-            {
-                $selected_value = $term_list[0];
-            }
-        }
-
-?>
+        ?>
         <p class="form-field property_type_id_field"><label for="property_type_id"><?php _e( 'Property Type', 'propertyhive' ); ?></label>
         <select id="property_type_id" name="property_type_id[]" multiple="multiple" data-placeholder="<?php _e( 'Select property type(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
             <?php
-                $options = array( '' => '' );
                 $args = array(
                     'hide_empty' => false,
                     'parent' => 0
