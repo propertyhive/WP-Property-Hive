@@ -227,9 +227,16 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     
                     case "property-feature": { $settings = $this->get_custom_fields_property_feature_setting(); break; }
                     case "property-feature-delete": { $settings = $this->get_custom_fields_delete($current_id, 'property_feature', __( 'Property Feature', 'propertyhive' )); break; }
-                    
 
-                    default: { echo 'UNKNOWN CUSTOM FIELD'; }
+                    default:
+                    {
+                        $settings = apply_filters( 'propertyhive_custom_fields_section_settings', array(), $current_section );
+
+                        if ( empty($settings) )
+                        {
+                            echo 'UNKNOWN CUSTOM FIELD';
+                        }
+                    }
                 }
                 
                 PH_Admin_Settings::output_fields( $settings );
@@ -2924,7 +2931,15 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
                         break;
                     }
-                    default: { echo 'UNKNOWN CUSTOM FIELD'; }
+                    default:
+                    {
+                        $section_found = apply_filters( 'propertyhive_custom_fields_save_section', false, $current_section, $current_id );
+
+                        if ( !($section_found) )
+                        {
+                            echo 'UNKNOWN CUSTOM FIELD';
+                        }
+                    }
                 }
             }
             else
