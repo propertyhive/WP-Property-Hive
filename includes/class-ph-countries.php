@@ -23,6 +23,7 @@ class PH_Countries {
 
 		add_action( 'propertyhive_update_currency_exchange_rates', array( $this, 'ph_update_currency_exchange_rates' ) );
 
+		add_filter( 'propertyhive_search_form_fields_after', array( $this, 'ensure_currency_value_set' ) );
 	}
 
 	/**
@@ -34,6 +35,27 @@ class PH_Countries {
 		if ( 'countries' == $key ) {
 			return $this->get_countries();
 		}
+	}
+
+	public function ensure_currency_value_set( $form_controls )
+	{
+		if ( isset($form_controls['currency']) )
+		{
+			if ( isset($_GET['currency']) && $_GET['currency'] != '' )
+			{
+
+			}
+			elseif ( isset($_COOKIE['propertyhive_currency']) && $_COOKIE['propertyhive_currency'] != '' )
+			{
+				$currency = unserialize(html_entity_decode($_COOKIE['propertyhive_currency']));
+				if ( isset($currency['currency_code']) && array_key_exists(ph_clean($currency['currency_code']), $form_controls['currency']['options']) )
+				{
+					$form_controls['currency']['value'] = $currency['currency_code'];
+				}
+			}
+		}
+
+		return $form_controls;
 	}
 
 	public function ph_check_currency_change()
@@ -94,6 +116,7 @@ class PH_Countries {
 				$currency_prefix = apply_filters( 'propertyhive_currency_prefix', $country['currency_prefix'], $currency_code);
 				
 				return array(
+					'currency_code' => $currency_code,
 					'currency_symbol' => $currency_symbol,
 					'currency_prefix' => $currency_prefix
 				);
