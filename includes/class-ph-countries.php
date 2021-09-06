@@ -288,6 +288,12 @@ class PH_Countries {
 				'currency_symbol' => '₽',
 				'currency_prefix' => true
 			),
+			'VC' => array(
+				'name' => 'Saint Vincent and the Grenadines',
+				'currency_code' => 'XCD',
+				'currency_symbol' => '$',
+				'currency_prefix' => true
+			),
 			'ZA' => array(
 				'name' => 'South Africa',
 				'currency_code' => 'ZAR',
