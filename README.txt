@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.8
-Stable tag: 1.5.19
+Stable tag: 1.5.20
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,12 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.20 - 2021-09-07 =
+* Added assigned properties counts onto the custom field grids
+* Added India, Pakistan and Saint Vincent and the Grenadines as countries
+* Added support for adding custom icons for availabilities when using Map Search add on
+* Default currency field in search form if existing cookie set and being used
 
 = 1.5.19 - 2021-08-17 =
 * Added New Zealand, Greece and Switzerland to list of supported countries
