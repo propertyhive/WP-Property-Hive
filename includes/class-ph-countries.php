@@ -216,6 +216,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'IN' => array(
+				'name' => 'India',
+				'currency_code' => 'INR',
+				'currency_symbol' => '₹',
+				'currency_prefix' => true
+			),
 			'IE' => array(
 				'name' => 'Ireland',
 				'currency_code' => 'EUR',
@@ -268,6 +274,12 @@ class PH_Countries {
 				'name' => 'Norway',
 				'currency_code' => 'NOK',
 				'currency_symbol' => 'kr',
+				'currency_prefix' => false
+			),
+			'PK' => array(
+				'name' => 'Pakistan',
+				'currency_code' => 'PKR',
+				'currency_symbol' => 'Rs',
 				'currency_prefix' => false
 			),
 			'PT' => array(
