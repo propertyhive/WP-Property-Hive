@@ -306,6 +306,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php _e( 'ID', 'propertyhive' ); ?></th>
+                            <?php do_action( 'propertyhive_custom_field_availability_table_before_header_column' ); ?>
                             <th class="type"><?php _e( 'Availability', 'propertyhive' ); ?></th>
                             <th class="department"><?php _e( 'Applies To', 'propertyhive' ); ?></th>
                             <th class="assigned_count"><?php _e( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' ); ?></th>
@@ -328,6 +329,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         <tr>
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo $term->term_id; ?>"></td>
                             <td class="id"><?php echo $term->term_id; ?></td>
+                            <?php do_action( 'propertyhive_custom_field_availability_table_before_row_column', $term->term_id ); ?>
                             <td class="type"><?php echo $term->name; ?></td>
                             <td class="department"><?php
                                 $this_availability_departments = array();
