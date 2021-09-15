@@ -841,7 +841,7 @@ class PH_Property {
                 }
                 if ($this->{'_room_dimensions_' . $i} != '')
                 {  
-                    $return .= ' <strong class="dimension">(' . $this->{'_room_dimensions_' . $i} . ')</strong>';
+                    $return .= ' <span class="dimension">' . $this->{'_room_dimensions_' . $i} . '</span>';
                 }
                 if ($this->{'_room_name_' . $i} != '' || $this->{'_room_dimensions_' . $i} != '')
                 {
