@@ -17,6 +17,8 @@ class PH_Elementor {
 
 		add_action( 'elementor/elements/categories_registered', array( $this, 'add_elementor_widget_category' ) );
 
+		add_filter( 'elementor/image_size/get_attachment_image_html', array( $this, 'portfolio_use_property_image_url'), 10, 4 );
+
 		add_action( 'elementor/preview/enqueue_scripts', array( 'PH_Frontend_Scripts', 'load_scripts' ) );
 		add_action( 'elementor/preview/enqueue_scripts', array( $this, 'load_elementor_scripts' ) );
 
@@ -124,6 +126,39 @@ class PH_Elementor {
 		return $post_types;
 	}
 
+	public function portfolio_use_property_image_url( $html, $settings, $image_size_key, $image_key )
+	{
+		global $post;
+
+		if ( $settings['posts_post_type'] != 'property' )
+		{
+			return $html;
+		}
+
+		// We're viewing a property
+
+		if ( get_option('propertyhive_images_stored_as', '') != 'urls' )
+		{
+			return $html;
+		}
+
+		// Images are stored as URLs
+
+		$images = get_post_meta( $post->ID, '_photo_urls', TRUE );
+
+		if ( empty($images) )
+		{
+			return $html;
+		}
+
+		$image_src = $images[0]['url'];
+
+		$image_class = ! empty( $settings['hover_animation'] ) ? 'elementor-animation-' . $settings['hover_animation'] : '';
+		$image_class_html = ! empty( $image_class ) ? ' class="' . $image_class . '"' : '';
+
+		$html = sprintf( '<img src="%s" title="" alt=""%s />', esc_attr( $image_src ), $image_class_html );
+		return $html;
+	}
 }
 
 new PH_Elementor();
