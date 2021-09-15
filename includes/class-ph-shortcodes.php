@@ -272,9 +272,12 @@ class PH_Shortcodes {
 				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
 				    'compare' => '='
 				);
+				// Run regex match where given keyword is at the start of the postcode ^
+				// followed by one or zero letters (for WC2E-style postcodes) [a-zA-Z]?
+				// then a single space [ ]
 	      		$sub_meta_query[] = array(
 				    'key'     => '_address_postcode',
-				    'value'   => sanitize_text_field( $atts['address_keyword'] ) . '[ ]',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ) . '[a-zA-Z]?[ ]',
 				    'compare' => 'RLIKE'
 				);
 	      	}

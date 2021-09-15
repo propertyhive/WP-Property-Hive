@@ -527,9 +527,12 @@ class PH_Admin_Matching_Properties {
                                 'value'   => ph_clean( $applicant_profile['location_text'] ),
                                 'compare' => '='
                             );
+                            // Run regex match where given keyword is at the start of the postcode ^
+                            // followed by one or zero letters (for WC2E-style postcodes) [a-zA-Z]?
+                            // then a single space [ ]
                             $location_query[] = array(
                                 'key'     => '_address_postcode',
-                                'value'   => '^' . ph_clean( $applicant_profile['location_text'] ) . '[ ]',
+                                'value'   => '^' . ph_clean( $applicant_profile['location_text'] ) . '[a-zA-Z]?[ ]',
                                 'compare' => 'RLIKE'
                             );
                         }

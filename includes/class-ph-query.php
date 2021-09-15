@@ -2043,9 +2043,12 @@ class PH_Query {
 					    'value'   => ph_clean( $_REQUEST['keyword'] ),
 					    'compare' => '='
 					);
+					// Run regex match where given keyword is at the start of the postcode ^
+					// followed by one or zero letters (for WC2E-style postcodes) [a-zA-Z]?
+					// then a single space [ ]
 		      		$meta_query[] = array(
 					    'key'     => '_address_postcode',
-					    'value'   => '^' . ph_clean( $_REQUEST['keyword'] ) . '[ ]',
+					    'value'   => '^' . ph_clean( $_REQUEST['keyword'] ) . '[a-zA-Z]?[ ]',
 					    'compare' => 'RLIKE'
 					);
 		      	}
