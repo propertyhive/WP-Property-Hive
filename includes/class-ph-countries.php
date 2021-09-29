@@ -601,6 +601,8 @@ class PH_Countries {
 				update_option( 'propertyhive_currency_exchange_rates_updated', date("Y-m-d") );
 			}
 
+			do_action('propertyhive_exchange_rates_updated', $exchange_rates);
+
 			// Loop through all on market properties and update _price_actual meta value to be price in GBP
 			$args = array(
 				'post_type' => 'property',
