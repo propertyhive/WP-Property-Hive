@@ -130,7 +130,7 @@ class PH_Elementor {
 	{
 		global $post;
 
-		if ( $settings['posts_post_type'] != 'property' )
+		if ( !isset($settings['posts_post_type']) || ( isset($settings['posts_post_type']) && $settings['posts_post_type'] != 'property' ) )
 		{
 			return $html;
 		}
