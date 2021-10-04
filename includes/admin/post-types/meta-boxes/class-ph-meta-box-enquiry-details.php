@@ -277,9 +277,9 @@ function viewing_update_selected_properties()
             $enquiry_contact_type = !empty($property_post_id) ? 'Applicant' : 'Contact';
             $enquiry_contact_id = get_post_meta( $enquiry_post_id, '_contact_id', true );
 
-            if ( !empty($enquiry_contact_id) || ( $name !== false && $email !== false ) )
+            if ( !empty($enquiry_contact_id) || ( $name !== false || $email !== false ) )
             {
-                if( empty($enquiry_contact_id) )
+                if( empty($enquiry_contact_id) && !empty($email) )
                 {
                     // Check email address doesn't exist already as a contact
                     $args = array(
