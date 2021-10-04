@@ -1857,9 +1857,9 @@ class PH_AJAX {
             }
         }
 
-        if ( $name === false || $email === false )
+        if ( $name === false && $email === false )
         {
-            die( json_encode( array('error' => 'Name or email address not found') ) );
+            die( json_encode( array('error' => 'Name and email address not found') ) );
         }
 
         $postdata = array(
