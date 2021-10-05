@@ -1108,6 +1108,18 @@ class PH_AJAX {
                 echo '<label>' . __('Email Address', 'propertyhive') . '</label>';
                 echo ( ( get_post_meta($contact_id, '_email_address', TRUE) != '' ) ? get_post_meta($contact_id, '_email_address', TRUE) : '-' );
             echo '</p>';
+
+            $contact_solicitor_contact_id = get_post_meta( $contact_id, '_contact_solicitor_contact_id', true );
+
+            if ( !empty($contact_solicitor_contact_id) )
+            {
+                $solicitor_contact = new PH_Contact($contact_solicitor_contact_id);
+
+                echo '<p class="form-field">';
+                    echo '<label>' . __('Solicitor', 'propertyhive') . '</label>';
+                    echo '<a href="' . get_edit_post_link($contact_solicitor_contact_id, '') . '">' . get_the_title($contact_solicitor_contact_id) . ( $solicitor_contact->company_name != '' && $solicitor_contact->company_name != get_the_title($contact_solicitor_contact_id) ? ' (' . $solicitor_contact->company_name . ')' : '' ) . '</a>';
+                echo '</p>';
+            }
         }
         else
         {
