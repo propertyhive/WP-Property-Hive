@@ -219,7 +219,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
                 break;
             case 'applicant' :
                 
-                $the_sale->get_applicants( false, true, false );
+                echo $the_sale->get_applicants( false, true, false );
                 
                 break;
             case 'amount' :
