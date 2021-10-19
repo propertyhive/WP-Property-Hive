@@ -72,6 +72,23 @@ class PH_Emails {
 		add_action( 'propertyhive_applicant_registered', array( $this, 'send_applicant_registration_alert' ), 10, 2 );
 
 		add_action( 'admin_init', array( $this, 'run_custom_email_cron' ), 10, 1 );
+
+		add_action( 'init', array( $this, 'check_email_queue_is_scheduled'), 99 );
+	}
+
+	public function check_email_queue_is_scheduled()
+	{
+		$schedule = wp_get_schedule( 'propertyhive_process_email_log' );
+
+        if ( $schedule === FALSE )
+        {
+            // Hmm... cron job not found. Let's set it up
+            $timestamp = wp_next_scheduled( 'propertyhive_process_email_log' );
+            wp_unschedule_event($timestamp, 'propertyhive_process_email_log' );
+            wp_clear_scheduled_hook('propertyhive_process_email_log');
+            
+            wp_schedule_event( time(), 'every_fifteen_minutes', 'propertyhive_process_email_log' );
+        }
 	}
 
 	public function run_custom_email_cron()
