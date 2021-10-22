@@ -805,7 +805,7 @@ class PH_Shortcodes {
 	 */
 	public static function similar_properties( $atts ) {
 
-		global $property;
+		global $property, $propertyhive_loop;
 
 		$atts = shortcode_atts( array(
 			'per_page'					=> '2',
