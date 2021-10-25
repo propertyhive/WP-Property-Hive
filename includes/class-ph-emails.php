@@ -616,7 +616,7 @@ class PH_Emails {
 					$lower_price = $price - ($price / 10);
 					$higher_price = $price + ($price / 10);
 
-					// Get two similar properties
+					// Get three similar properties
 					$args = array(
 						'post_type' => 'property',
 						'post_status' => 'publish',
@@ -658,6 +658,19 @@ class PH_Emails {
 					);
 
 					$args['meta_query'] = $meta_query;
+
+					$property_match_statuses = get_option( 'propertyhive_property_match_statuses', '' );
+					if ( $property_match_statuses != '' && is_array($property_match_statuses) && !empty($property_match_statuses) )
+					{
+						$args['tax_query'] = array(
+							array(
+								'taxonomy' => 'availability',
+								'field'    => 'term_id',
+								'terms'    => $property_match_statuses,
+								'operator' => 'IN',
+							)
+						);
+					}
 
 					$properties_query = new WP_Query( apply_filters( 'propertyhive_auto_responder_similar_properties_query', $args, $property_id ) );
 

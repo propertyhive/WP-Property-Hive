@@ -201,7 +201,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	            'type'    => 'multiselect',
 	            'css'     => 'min-width:300px; height:110px;',
 	            'options' => $options,
-	            'desc'	=> '<p>' . __( 'By default, all on market properties will come back in matches when sending properties to applicants. If you wish to only send properties with a certain status you can choose this here. For example, maybe you don\'t want Sold STC properties to be sent. Hold ctrl/cmd whilst clicking to select multiple.', 'propertyhive' ) . '</p>',
+	            'desc'	=> '<p>' . __( 'By default, all on market properties will come back in matches when sending properties to applicants. If you wish to only send properties with a certain status you can choose this here. For example, maybe you don\'t want Sold STC properties to be sent. Hold ctrl/cmd whilst clicking to select multiple.<br>This will also affect the Similar Properties included in the Auto Responder above, if applicable.', 'propertyhive' ) . '</p>',
 	        );
 
 	        $time_offset = (int) get_option('gmt_offset') * 60 * 60;
