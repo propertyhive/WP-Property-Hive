@@ -77,7 +77,7 @@ jQuery( function($){
         var data = {
             action:         'propertyhive_add_note',
             post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
-            note:           $('#propertyhive_' +  section + '_notes_container textarea#add_note').val(),
+            note:           $('#propertyhive_' +  section + '_notes_container textarea#add_note').val().replace(/\\/g, ''),
             note_type:      'propertyhive_note',
             security:       propertyhive_admin_meta_boxes.add_note_nonce,
         };
