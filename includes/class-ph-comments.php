@@ -218,7 +218,7 @@ class PH_Comments {
 
 	public static function check_price_change( $meta_id, $object_id, $meta_key, $meta_value )
 	{
-		if ( get_post_type($object_id) == 'property' && ( $meta_key == '_price' || $meta_key == '_rent' ) )
+		if ( get_post_type($object_id) == 'property' && ( $meta_key == '_price' || $meta_key == '_rent' ) && apply_filters( 'propertyhive_add_property_price_change_note', true ) === true )
 		{
 			$original_value = get_post_meta( $object_id, $meta_key, TRUE );
 
@@ -253,7 +253,7 @@ class PH_Comments {
 
 	public static function check_on_market_add( $object_id, $meta_key, $meta_value )
 	{
-		if ( get_post_type($object_id) == 'property' && $meta_key == '_on_market' )
+		if ( get_post_type($object_id) == 'property' && $meta_key == '_on_market' && apply_filters( 'propertyhive_add_property_on_market_change_note', true ) === true )
 		{
 			if ( $meta_value == 'yes' )
 			{
@@ -286,7 +286,7 @@ class PH_Comments {
 
 	public static function check_on_market_update( $meta_id, $object_id, $meta_key, $meta_value )
 	{
-		if ( get_post_type($object_id) == 'property' && $meta_key == '_on_market' )
+		if ( get_post_type($object_id) == 'property' && $meta_key == '_on_market' && apply_filters( 'propertyhive_add_property_on_market_change_note', true ) === true  )
 		{
 			$original_value = get_post_meta( $object_id, $meta_key, TRUE );
 
