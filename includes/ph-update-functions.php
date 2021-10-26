@@ -52,3 +52,12 @@ function propertyhive_update_1468_on_market_change_dates() {
 
     wp_reset_postdata();
 }
+
+/**
+ * Update on_market_change_dates for 1.4.68
+ *
+ * @return void
+ */
+function propertyhive_update_200_set_legacy_styles_option() {
+    update_option('propertyhive_use_legacy_styles', 'yes');
+}
