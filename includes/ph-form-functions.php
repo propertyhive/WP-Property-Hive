@@ -1078,7 +1078,7 @@ function ph_form_field( $key, $field )
             }
             else
             {
-                if ( !is_post_type_archive('property') && isset($post->ID) )
+                if ( !is_post_type_archive('property') && !is_singular('property') && isset($post->ID) )
                 {
                     $value = get_post_meta( $post->ID, '_' . $key, true );
                     if ( $value != '' )
