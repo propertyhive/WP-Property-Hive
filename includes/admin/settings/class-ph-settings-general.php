@@ -832,6 +832,26 @@ class PH_Settings_General extends PH_Settings_Page {
                 }
             }
 
+            // When search results page is set and using non-legacy styles, if there is no content in the search results page, add the properties and search form shortcodes
+            if ( isset($_POST['propertyhive_search_results_page_id']) && $_POST['propertyhive_search_results_page_id'] != '' && get_option( 'propertyhive_use_legacy_styles', 'no' ) == 'no' )
+            {
+                $search_results_page = get_post($_POST['propertyhive_search_results_page_id']);
+
+                $search_results_page_content = apply_filters('the_content', $search_results_page->post_content);
+
+                if ( $search_results_page_content == '' )
+                {
+                    $shortcode_content = '<!-- wp:shortcode -->[property_search_form]<!-- /wp:shortcode -->';
+
+                    $shortcode_content .= '<!-- wp:shortcode -->[properties]<!-- /wp:shortcode -->';
+
+                    wp_update_post( array(
+                        'ID' => $_POST['propertyhive_search_results_page_id'],
+                        'post_content' => $shortcode_content,
+                    ) );
+                }
+            }
+
 			flush_rewrite_rules();
 		}
 	}
