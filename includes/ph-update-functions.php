@@ -60,4 +60,6 @@ function propertyhive_update_1468_on_market_change_dates() {
  */
 function propertyhive_update_200_set_legacy_styles_option() {
     update_option('propertyhive_use_legacy_styles', 'yes');
+
+    flush_rewrite_rules();
 }
