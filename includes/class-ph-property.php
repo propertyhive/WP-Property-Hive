@@ -488,7 +488,7 @@ class PH_Property {
 
                         if ( isset($currency['exchange_rate']) && $price != '' )
                         {
-                            // Round this after calculation to avoid issues with floating point numbers
+                            // Round this after calculation as we only want to check the first two decimal places
                             $price = round($this->_price_actual * $currency['exchange_rate'], 2);
                         }
 
@@ -503,7 +503,7 @@ class PH_Property {
                         $price = $this->_rent;
                         if ( isset($currency['exchange_rate']) && $price != '' )
                         {
-                            // Round this after calculation to avoid issues with floating point numbers
+                            // Round this after calculation as we only want to check the first two decimal places
                             $price = round($this->_price_actual * $currency['exchange_rate'], 2);
                             switch ( $this->_rent_frequency )
                             {
