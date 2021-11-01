@@ -112,6 +112,18 @@ if ( !empty($notes) )
 						}
 						break;
 					}
+					case "removed_from_tenancy":
+					{
+						if (isset($comment_content['tenancy_id']))
+						{
+							$note_body = 'Removed from <a href="' . get_edit_post_link($comment_content['tenancy_id']) . '">tenancy</a>';
+						}
+						else
+						{
+							$note_body = '<a href="' . get_edit_post_link($comment_content['contact_id']) . '">' . get_the_title($comment_content['contact_id']) . '</a> removed from tenancy';
+						}
+						break;
+					}
 					default:
 					{
 						$note_body = $comment_content['action'];
