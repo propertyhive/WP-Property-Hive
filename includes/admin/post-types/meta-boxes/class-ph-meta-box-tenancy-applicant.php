@@ -75,7 +75,7 @@ class PH_Meta_Box_Tenancy_Applicant {
                 $fields = apply_filters( 'propertyhive_tenancy_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
                 $div_style = $i > 0 ? 'style="border-top:1px solid #ddd"' : '';
-                echo "<div " . $div_style . ">";
+                echo "<div id=\"existing-owner-details-" . $applicant_contact_id . "\" " . $div_style . ">";
                 foreach ( $fields as $key => $field )
                 {
                     echo '<p class="form-field ' . esc_attr($key) . '" >
@@ -85,6 +85,16 @@ class PH_Meta_Box_Tenancy_Applicant {
                         ' . $field['value'] . '
 
                     </p>';
+                }
+
+                if ( count($applicant_contact_ids) > 1 )
+                {
+                ?>
+                    <p class="form-field">
+                        <label></label>
+                        <a href="" class="button" id="remove-tenancy-tenant-<?php echo $applicant_contact_id; ?>"><?php echo __('Remove Tenant', 'propertyhive'); ?></a>
+                    </p>
+                <?php
                 }
                 echo "</div>";
                 ++$i;
@@ -276,6 +286,30 @@ jQuery(document).ready(function($)
 
         tenancy_update_selected_applicants();
     });
+
+    $('body').on('click', 'a[id^="remove-tenancy-tenant-"]', function()
+    {
+        var applicant_contact_id = jQuery(this).attr('id');
+        applicant_contact_id = applicant_contact_id.replace('remove-tenancy-tenant-', '');
+
+        // Remove this ID from hidden field
+        var existing_tenant_ids = jQuery('#_applicant_contact_ids').val().split('|');
+        var new_tenant_ids = new Array();
+        if ( existing_tenant_ids.length > 0 )
+        {
+            for ( var i in existing_tenant_ids )
+            {
+                if ( existing_tenant_ids[i] != applicant_contact_id )
+                {
+                    new_tenant_ids.push(existing_tenant_ids[i]);
+                }
+            }
+        }
+        jQuery('#_applicant_contact_ids').val( new_tenant_ids.join('|') );
+
+        jQuery('#existing-owner-details-' + applicant_contact_id).fadeOut('fast');
+        return false;
+    });
 });
 
 function tenancy_update_selected_applicants()
@@ -321,7 +355,30 @@ function tenancy_update_selected_applicants()
 
         $tenancy_notes_to_write = array();
 
-        $existing_applicants = get_post_meta($post->ID, '_applicant_contact_id');
+        $existing_applicants = get_post_meta($post_id, '_applicant_contact_id');
+        if ( !is_array($existing_applicants) )
+        {
+            $existing_applicants = array($existing_applicants);
+        }
+
+        $applicant_contact_ids = array_unique(explode("|", ( isset($_POST['_applicant_contact_ids'])) ? $_POST['_applicant_contact_ids'] : [] ));
+
+        $applicants_to_remove = array_diff($existing_applicants, $applicant_contact_ids);
+        foreach ( $applicants_to_remove as $applicant_contact_id )
+        {
+            delete_post_meta( $post_id, '_applicant_contact_id', ph_clean($applicant_contact_id) );
+
+            $tenancy_notes_to_write[] = array(
+                'comment_post_ID' => $post_id,
+                'note_action' => 'removed_from_tenancy',
+                'applicant_contact_id' => $applicant_contact_id,
+            );
+
+            $tenancy_notes_to_write[] = array(
+                'comment_post_ID' => $applicant_contact_id,
+                'note_action' => 'removed_from_tenancy',
+            );
+        }
 
         if ( isset($_POST['_tenancy_applicant_create_new']) && !empty($_POST['_tenancy_applicant_create_new']) )
         {
@@ -373,7 +430,7 @@ function tenancy_update_selected_applicants()
                     add_post_meta( $post_id, '_applicant_contact_id', $contact_post_id );
 
                     $tenancy_notes_to_write[] = array(
-                        'contact_post_id' => $contact_post_id,
+                        'comment_post_ID' => $contact_post_id,
                         'note_action' => empty($existing_applicants) ? 'tenancy_booked' : 'added_to_tenancy',
                     );
                 }
@@ -381,15 +438,8 @@ function tenancy_update_selected_applicants()
         }
         else
         {
-            if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
+            if ( !empty($applicant_contact_ids) )
             {
-                $applicant_contact_ids = array_unique(explode("|", $_POST['_applicant_contact_ids']));
-
-                if ( !is_array($existing_applicants) )
-                {
-                    $existing_applicants = array($existing_applicants);
-                }
-
                 $applicants_to_add = array_diff($applicant_contact_ids, $existing_applicants);
 
                 // make the contact an applicant if not already
@@ -409,7 +459,7 @@ function tenancy_update_selected_applicants()
                     }
 
                     $tenancy_notes_to_write[] = array(
-                        'contact_post_id' => $applicant_contact_id,
+                        'comment_post_ID' => $applicant_contact_id,
                         'note_action' => empty($existing_applicants) ? 'tenancy_booked' : 'added_to_tenancy',
                     );
                 }
@@ -426,15 +476,23 @@ function tenancy_update_selected_applicants()
                 $comment = array(
                     'note_type' => 'action',
                     'action' => $tenancy_note['note_action'],
-                    'tenancy_id' => $post_id,
                 );
                 if ( isset($_POST['_property_id']) && !empty($_POST['_property_id']) )
                 {
                     $comment['property_id'] = (int)$_POST['_property_id'];
                 }
 
+                if ( isset($tenancy_note['applicant_contact_id']) )
+                {
+                    $comment['contact_id'] = $tenancy_note['applicant_contact_id'];
+                }
+                else
+                {
+                    $comment['tenancy_id'] = $post_id;
+                }
+
                 $data = array(
-                    'comment_post_ID'      => $tenancy_note['contact_post_id'],
+                    'comment_post_ID'      => $tenancy_note['comment_post_ID'],
                     'comment_author'       => $current_user->display_name,
                     'comment_author_email' => 'propertyhive@noreply.com',
                     'comment_author_url'   => '',
