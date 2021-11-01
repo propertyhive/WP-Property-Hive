@@ -485,9 +485,11 @@ class PH_Property {
                     case "residential-sales":
                     {
                         $price = $this->_price;
+
                         if ( isset($currency['exchange_rate']) && $price != '' )
                         {
-                            $price = $this->_price_actual * $currency['exchange_rate'];
+                            // Round this after calculation to avoid issues with floating point numbers
+                            $price = round($this->_price_actual * $currency['exchange_rate'], 2);
                         }
 
                         // If there are decimals on the number, display them. If not, display none
@@ -501,7 +503,8 @@ class PH_Property {
                         $price = $this->_rent;
                         if ( isset($currency['exchange_rate']) && $price != '' )
                         {
-                            $price = $this->_price_actual * $currency['exchange_rate'];
+                            // Round this after calculation to avoid issues with floating point numbers
+                            $price = round($this->_price_actual * $currency['exchange_rate'], 2);
                             switch ( $this->_rent_frequency )
                             {
                                 case "pd": { $price = ($price * 365) / 52; break; }
