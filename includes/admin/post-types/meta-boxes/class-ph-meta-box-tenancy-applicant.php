@@ -361,7 +361,7 @@ function tenancy_update_selected_applicants()
             $existing_applicants = array($existing_applicants);
         }
 
-        $applicant_contact_ids = array_unique(explode("|", ( isset($_POST['_applicant_contact_ids'])) ? $_POST['_applicant_contact_ids'] : [] ));
+        $applicant_contact_ids = !empty($_POST['_applicant_contact_ids']) ? array_unique(explode("|", $_POST['_applicant_contact_ids'])) : [];
 
         $applicants_to_remove = array_diff($existing_applicants, $applicant_contact_ids);
         foreach ( $applicants_to_remove as $applicant_contact_id )
