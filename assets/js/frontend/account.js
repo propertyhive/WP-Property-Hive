@@ -147,7 +147,7 @@ jQuery(document).ready(function($)
                 
                 is_submitting = false;
 
-                if ( typeof grecaptcha != 'undefined' )
+                if ( typeof grecaptcha != 'undefined' && $( "div.g-recaptcha" ).length > 0 )
                 {
                     grecaptcha.reset();
                 }

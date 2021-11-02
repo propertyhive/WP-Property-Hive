@@ -208,6 +208,54 @@ class PH_AJAX {
         return $list_string;
     }
 
+    private function check_recaptcha_form_response($errors, $key, $control)
+    {
+        $secret = isset( $control['secret'] ) ? $control['secret'] : '';
+        $response = isset( $_POST['g-recaptcha-response'] ) ? ph_clean($_POST['g-recaptcha-response']) : '';
+
+        $response = wp_remote_post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            array(
+                'method' => 'POST',
+                'body' => array( 'secret' => $secret, 'response' => $response ),
+            )
+        );
+        if ( is_wp_error( $response ) )
+        {
+            $errors[] = $response->get_error_message();
+        }
+        else
+        {
+            $response = json_decode($response['body'], TRUE);
+            if ( $response === FALSE )
+            {
+                $errors[] = 'Error decoding response from reCAPTCHA check';
+            }
+            else
+            {
+                if (
+                    isset($response['success']) && $response['success'] == true
+                    &&
+                    (
+                        // If we're using Recaptcha V3, check the score
+                        // 1.0 is very likely a good interaction, 0.0 is very likely a bot
+                        $key == 'recaptcha'
+                        ||
+                        ( isset($response['score']) && $response['score'] >= 0.5 )
+                    )
+                )
+                {
+
+                }
+                else
+                {
+                    $errors[] = 'Failed reCAPTCHA validation';
+                }
+            }
+        }
+        return $errors;
+    }
+
     public function create_contact_login()
     {
         check_ajax_referer( 'create-login', 'security' );
@@ -440,41 +488,9 @@ class PH_AJAX {
                     wp_reset_postdata();
                 }
             }
-            if ( $key == 'recaptcha' )
+            if ( in_array( $key, array('recaptcha', 'recaptcha-v3') ) )
             {
-                $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                $response = isset( $_POST['g-recaptcha-response'] ) ? ph_clean($_POST['g-recaptcha-response']) : '';
-
-                $response = wp_remote_post( 
-                    'https://www.google.com/recaptcha/api/siteverify',
-                    array(
-                        'method' => 'POST',
-                        'body' => array( 'secret' => $secret, 'response' => $response ),
-                    )
-                );
-                if ( is_wp_error( $response ) ) 
-                {
-                    $errors[] = $response->get_error_message();
-                }
-                else
-                {
-                    $response = json_decode($response['body'], TRUE);
-                    if ( $response === FALSE )
-                    {
-                        $errors[] = __( 'Error decoding response from reCAPTCHA check', 'propertyhive' );
-                    }
-                    else
-                    {
-                        if ( isset($response['success']) && $response['success'] == true )
-                        {
-
-                        }
-                        else
-                        {
-                            $errors[] = __( 'Failed reCAPTCHA validation', 'propertyhive' );
-                        }
-                    }
-                }
+                $errors = $this->check_recaptcha_form_response($errors, $key, $control);
             }
         }
 
@@ -1517,41 +1533,9 @@ class PH_AJAX {
             {
                 $errors[] = __( 'Invalid email address provided', 'propertyhive' ) . ': ' . $key;
             }
-            if ( $key == 'recaptcha' )
+            if ( in_array( $key, array('recaptcha', 'recaptcha-v3') ) )
             {
-                $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                $response = isset( $_POST['g-recaptcha-response'] ) ? ph_clean($_POST['g-recaptcha-response']) : '';
-
-                $response = wp_remote_post( 
-                    'https://www.google.com/recaptcha/api/siteverify',
-                    array(
-                        'method' => 'POST',
-                        'body' => array( 'secret' => $secret, 'response' => $response ),
-                    )
-                );
-                if ( is_wp_error( $response ) ) 
-                {
-                    $errors[] = $response->get_error_message();
-                }
-                else
-                {
-                    $response = json_decode($response['body'], TRUE);
-                    if ( $response === FALSE )
-                    {
-                        $errors[] = 'Error decoding response from reCAPTCHA check';
-                    }
-                    else
-                    {
-                        if ( isset($response['success']) && $response['success'] == true )
-                        {
-
-                        }
-                        else
-                        {
-                            $errors[] = 'Failed reCAPTCHA validation';
-                        }
-                    }
-                }
+                $errors = $this->check_recaptcha_form_response($errors, $key, $control);
             }
         }
 
