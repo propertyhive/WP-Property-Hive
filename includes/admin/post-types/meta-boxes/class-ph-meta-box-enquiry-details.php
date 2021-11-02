@@ -234,7 +234,7 @@ function viewing_update_selected_properties()
 
             foreach ($enquiry_meta as $key => $value)
             {
-                if ( ! in_array( $key, $ignore_keys ) && ( substr( $key, 0, 1 ) != '_' || $key == '_property_id' ) && strpos($key, 'recaptcha') === FALSE )
+                if ( ! in_array( $key, $ignore_keys ) && ( substr( $key, 0, 1 ) != '_' || $key == '_property_id' ) && strpos($key, 'captcha') === FALSE )
                 {
                     if ( $key == '_property_id' || $key == 'property_id' )
                     {
