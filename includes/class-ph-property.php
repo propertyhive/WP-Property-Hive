@@ -501,7 +501,7 @@ class PH_Property {
                     case "residential-lettings":
                     {
                         $price = $this->_rent;
-                        if ( isset($currency['exchange_rate']) && $price != '' )
+                        if ( $currency['currency_code'] != $this->currency && isset($currency['exchange_rate']) && $price != '' )
                         {
                             // Round this after calculation as we only want to check the first two decimal places
                             $price = round($this->_price_actual * $currency['exchange_rate'], 2);
