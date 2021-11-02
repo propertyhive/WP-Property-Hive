@@ -35,6 +35,7 @@ jQuery( function($){
                 }
                 else
                 {
+                    console.log(response);
                     if (response.reason == 'validation')
                     {
                         form_obj.find('#enquiryValidation').fadeIn();
@@ -49,7 +50,7 @@ jQuery( function($){
 
                 is_submitting = false;
 
-                if ( typeof grecaptcha != 'undefined' )
+                if ( typeof grecaptcha != 'undefined' && $( "div.g-recaptcha" ).length > 0 )
                 {
                     grecaptcha.reset();
                 }

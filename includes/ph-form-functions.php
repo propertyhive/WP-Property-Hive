@@ -1415,6 +1415,26 @@ function ph_form_field( $key, $field )
             <div class="g-recaptcha" data-sitekey="' . $field['site_key'] . '"></div>';
             break;
         }
+        case "recaptcha-v3":
+        {
+            $field['site_key'] = isset( $field['site_key'] ) ? $field['site_key'] : '';
+
+            $output .= '
+                <script src="https://www.google.com/recaptcha/api.js?render=' . $field['site_key'] . '"></script>
+                <script>
+                    grecaptcha.ready(function() {
+                        grecaptcha.execute("' . $field['site_key'] . '", {action:\'validate_captcha\'})
+                                .then(function(token) {
+                            // add token value to form
+                            document.getElementById("g-recaptcha-response").value = token;
+                        });
+                    });
+                </script>
+                <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+                <input type="hidden" name="action" value="validate_captcha">
+            ';
+            break;
+        }
         case "daterange":
         {
             wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
