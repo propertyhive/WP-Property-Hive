@@ -492,6 +492,44 @@ class PH_AJAX {
             {
                 $errors = $this->check_recaptcha_form_response($errors, $key, $control);
             }
+
+            if ( $key == 'hCaptcha' )
+            {
+                $secret = isset( $control['secret'] ) ? $control['secret'] : '';
+                $response = isset( $_POST['h-captcha-response'] ) ? ph_clean($_POST['h-captcha-response']) : '';
+
+                $response = wp_remote_post(
+                    'https://hcaptcha.com/siteverify',
+                    array(
+                        'method' => 'POST',
+                        'body' => array( 'secret' => $secret, 'response' => $response ),
+                    )
+                );
+
+                if ( is_wp_error( $response ) )
+                {
+                    $errors[] = $response->get_error_message();
+                }
+                else
+                {
+                    $response = json_decode($response['body'], TRUE);
+                    if ( $response === FALSE )
+                    {
+                        $errors[] = 'Error decoding response from hCaptcha check';
+                    }
+                    else
+                    {
+                        if ( isset($response['success']) && $response['success'] == true )
+                        {
+
+                        }
+                        else
+                        {
+                            $errors[] = 'Failed hCaptcha validation';
+                        }
+                    }
+                }
+            }
         }
 
         // Check password and password2 match
@@ -1536,6 +1574,43 @@ class PH_AJAX {
             if ( in_array( $key, array('recaptcha', 'recaptcha-v3') ) )
             {
                 $errors = $this->check_recaptcha_form_response($errors, $key, $control);
+            }
+            if ( $key == 'hCaptcha' )
+            {
+                $secret = isset( $control['secret'] ) ? $control['secret'] : '';
+                $response = isset( $_POST['h-captcha-response'] ) ? ph_clean($_POST['h-captcha-response']) : '';
+
+                $response = wp_remote_post(
+                    'https://hcaptcha.com/siteverify',
+                    array(
+                        'method' => 'POST',
+                        'body' => array( 'secret' => $secret, 'response' => $response ),
+                    )
+                );
+
+                if ( is_wp_error( $response ) )
+                {
+                    $errors[] = $response->get_error_message();
+                }
+                else
+                {
+                    $response = json_decode($response['body'], TRUE);
+                    if ( $response === FALSE )
+                    {
+                        $errors[] = 'Error decoding response from hCaptcha check';
+                    }
+                    else
+                    {
+                        if ( isset($response['success']) && $response['success'] == true )
+                        {
+
+                        }
+                        else
+                        {
+                            $errors[] = 'Failed hCaptcha validation';
+                        }
+                    }
+                }
             }
         }
 

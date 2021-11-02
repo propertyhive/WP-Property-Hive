@@ -1437,6 +1437,14 @@ function ph_form_field( $key, $field )
             ';
             break;
         }
+        case "hCaptcha":
+        {
+            $field['site_key'] = isset( $field['site_key'] ) ? $field['site_key'] : '';
+
+            $output .= '<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+            <div class="h-captcha" data-sitekey="' . $field['site_key'] . '"></div>';
+            break;
+        }
         case "daterange":
         {
             wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
