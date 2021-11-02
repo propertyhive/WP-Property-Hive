@@ -1426,7 +1426,9 @@ function ph_form_field( $key, $field )
                         grecaptcha.execute("' . $field['site_key'] . '", {action:\'validate_captcha\'})
                                 .then(function(token) {
                             // add token value to form
-                            document.getElementById("g-recaptcha-response").value = token;
+                            document.querySelectorAll("#g-recaptcha-response").forEach(
+                                elem => (elem.value = token)
+                            );
                         });
                     });
                 </script>
