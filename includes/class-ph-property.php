@@ -488,8 +488,8 @@ class PH_Property {
 
                         if ( $currency['currency_code'] != $this->currency && isset($currency['exchange_rate']) && $price != '' )
                         {
-                            // Round this after calculation as we only want to check the first two decimal places
-                            $price = round($this->_price_actual * $currency['exchange_rate'], 2);
+                            // Round this after calculation
+                            $price = round($this->_price_actual * $currency['exchange_rate'], 0);
                         }
 
                         // If there are decimals on the number, display them. If not, display none
