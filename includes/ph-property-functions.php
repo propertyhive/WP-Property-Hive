@@ -206,7 +206,7 @@ function get_property_map( $args = array() )
 		            }
 		        }
 		    }
-		    do_action( 'propertyhive_property_map_actions' );
+		    do_action( 'propertyhive_property_map_actions', $property, $args, $id_suffix );
 		?>
 
 		L.marker([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>]<?php echo $icon_code; ?>).addTo(property_map<?php echo $id_suffix; ?>);
@@ -252,7 +252,7 @@ function get_property_map( $args = array() )
   				}
   			}
 
-  			do_action( 'propertyhive_property_map_options' );
+  			do_action( 'propertyhive_property_map_options', $property, $args, $id_suffix );
   		?>
 		property_map<?php echo $id_suffix; ?> = new google.maps.Map(document.getElementById("property_map_canvas<?php echo $id_suffix; ?>"), map_options);
 				
