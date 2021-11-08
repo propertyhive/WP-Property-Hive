@@ -22,9 +22,9 @@ class PH_Meta_Box_Property_Marketing_Statistics {
         
         echo '<div class="date-range">';
 
-            echo '<input type="text" name="statistics_date_from" id="statistics_date_from" class="date-picker" value="' . date("Y-m-d", strtotime('7 days ago')) . '">';
+            echo '<input type="date" class="small" name="statistics_date_from" id="statistics_date_from" value="' . date("Y-m-d", strtotime('7 days ago')) . '" placeholder="">';
             echo ' - ';
-            echo '<input type="text" name="statistics_date_to" id="statistics_date_to" class="date-picker" value="' . date("Y-m-d") . '">';
+            echo '<input type="date" class="small" name="statistics_date_to" id="statistics_date_to" value="' . date("Y-m-d") . '" placeholder="">';
 
         echo '</div>';
 

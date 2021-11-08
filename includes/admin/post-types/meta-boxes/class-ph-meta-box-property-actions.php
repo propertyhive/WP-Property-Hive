@@ -99,9 +99,9 @@ class PH_Meta_Box_Property_Actions {
 	    		<div class="form-field">
 
 		            <label for="_viewing_start_date">' . __( 'Viewing Date/Time', 'propertyhive' ) . '</label>
-		            
-	            	<input type="text" id="_viewing_start_date" name="_viewing_start_date" class="date-picker" style="width:50%" placeholder="yyyy-mm-dd" value="' . date("Y-m-d") . '">
-	            	<select id="_viewing_start_time_hours" name="_viewing_start_time_hours" class="select short" style="max-width:22%">';
+
+	            	<input type="date" class="small" name="_viewing_start_date" id="_viewing_start_date" value="' . date("Y-m-d") . '" placeholder="" style="width:55%">
+					<select id="_viewing_start_time_hours" name="_viewing_start_time_hours" class="select short" style="max-width:20%">';
 	            	for ( $i = 0; $i <= 23; ++$i )
 	            	{
 	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
@@ -109,7 +109,7 @@ class PH_Meta_Box_Property_Actions {
 	            		if ( $j == date("H") ) { echo ' selected'; }
 	            		echo '>' . $j . '</option>';
 	            	}
-	            	echo '</select><select id="_viewing_start_time_minutes" name="_viewing_start_time_minutes" class="select short" style="max-width:22%">';
+	            	echo '</select><select id="_viewing_start_time_minutes" name="_viewing_start_time_minutes" class="select short" style="max-width:20%">';
 	            	for ( $i = 0; $i <= 59; $i+=5 )
 	            	{
 	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
@@ -174,9 +174,9 @@ class PH_Meta_Box_Property_Actions {
 	    		<div class="form-field">
 
 		            <label for="_offer_date">' . __( 'Offer Date/Time', 'propertyhive' ) . '</label>
-		            
-	            	<input type="text" id="_offer_date" name="_offer_date" class="date-picker" style="width:50%" placeholder="yyyy-mm-dd" value="' . date("Y-m-d") . '">
-	            	<select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="max-width:22%">';
+
+	            	<input type="date" class="small" name="_offer_date" id="_offer_date" value="' . date("Y-m-d") . '" placeholder="" style="width:55%">
+					<select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="max-width:20%">';
 	            	for ( $i = 0; $i <= 23; ++$i )
 	            	{
 	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
@@ -184,7 +184,7 @@ class PH_Meta_Box_Property_Actions {
 	            		if ( $j == date("H") ) { echo ' selected'; }
 	            		echo '>' . $j . '</option>';
 	            	}
-	            	echo '</select><select id="_offer_time_minutes" name="_offer_time_minutes" class="select short" style="max-width:22%">';
+	            	echo '</select><select id="_offer_time_minutes" name="_offer_time_minutes" class="select short" style="max-width:20%">';
 	            	for ( $i = 0; $i <= 59; $i+=5 )
 	            	{
 	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);

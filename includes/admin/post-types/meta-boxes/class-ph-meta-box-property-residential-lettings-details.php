@@ -138,17 +138,14 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         propertyhive_wp_select( $args );
         
         // Available Date
-        propertyhive_wp_text_input( array( 
-            'id' => '_available_date', 
-            'label' => __( 'Available Date', 'propertyhive' ), 
+        $args = array(
+            'id' => '_available_date',
+            'label' => __( 'Available Date', 'propertyhive' ),
             'desc_tip' => false,
-            'class' => 'short date-picker',
-            'placeholder' => 'YYYY-MM-DD',
-            'custom_attributes' => array(
-                'maxlength' => 10,
-                'pattern' => "[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])"
-            )
-        ) );
+            'class' => 'small',
+            'type' => 'date'
+        );
+        propertyhive_wp_text_input( $args );
         
         do_action('propertyhive_property_residential_lettings_details_fields');
 	    
