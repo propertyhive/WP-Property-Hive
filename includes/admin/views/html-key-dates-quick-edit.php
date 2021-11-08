@@ -32,7 +32,7 @@
                 $due_date_time = isset( $_POST['due_date_time'] ) ? strtotime($_POST['due_date_time']) : '';
                 ?>
                 <label for="date_due_quick_edit">Due Date</label>
-                <input type="text" id="date_due_quick_edit" name="date_due_quick_edit" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="<?php echo date('Y-m-d', $due_date_time); ?>">
+                <input type="date" class="small" name="date_due_quick_edit" id="date_due_quick_edit" value="<?php echo date('Y-m-d', $due_date_time); ?>" placeholder="">
 
                 <select id="date_due_hours_quick_edit" name="date_due_hours_quick_edit" class="select short" style="width:55px">';
                     <?php
@@ -139,7 +139,7 @@
                     ?>
                     <p id="next_key_date_field" class="form-field hidden">
                         <label for="next_key_date">&nbsp;</label>
-                        <input type="text" id="next_key_date" name="next_key_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="<?php echo $next_key_date; ?>">
+                        <input type="date" class="small" name="next_key_date" id="next_key_date" value="<?php echo $next_key_date; ?>" placeholder="">
 
                         <select id="next_key_date_hours" name="next_key_date_hours" class="select short" style="width:55px">';
                             <?php

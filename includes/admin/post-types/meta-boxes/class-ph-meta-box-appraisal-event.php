@@ -40,8 +40,8 @@ class PH_Meta_Box_Appraisal_Event {
         echo '<p class="form-field event_start_time_field">
         
             <label for="_start_date">' . __('Appraisal Date / Time', 'propertyhive') . '</label>
-            
-            <input type="text" id="_start_date" name="_start_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="' . date("Y-m-d", strtotime($start_date_time)) . '">
+
+            <input type="date" class="small" name="_start_date" id="_start_date" value="' . date("Y-m-d", strtotime($start_date_time)) . '" placeholder="">
             <select id="_start_time_hours" name="_start_time_hours" class="select short" style="width:55px">';
         
         if ( $start_date_time == '' )

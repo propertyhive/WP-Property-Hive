@@ -32,7 +32,7 @@ echo '<div class="propertyhive_meta_box">';
     }
     else
     {
-        echo '<input type="text" id="_start_date" name="_start_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="' . date("Y-m-d", strtotime($start_date_time)) . '">
+        echo '<input type="date" class="small" name="_start_date" id="_start_date" value="' . date("Y-m-d", strtotime($start_date_time)) . '" placeholder="">
             <select id="_start_time_hours" name="_start_time_hours" class="select short" style="width:55px">';
         
         if ( $start_date_time == '' )

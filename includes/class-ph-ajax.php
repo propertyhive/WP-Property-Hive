@@ -4301,7 +4301,7 @@ class PH_AJAX {
     
             <label for="_offer_date">' . __('Offer Date / Time', 'propertyhive') . '</label>
             
-            <input type="text" id="_offer_date" name="_offer_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="' . date("Y-m-d", strtotime($offer_date_time)) . '">
+            <input type="date" class="small" name="_offer_date" id="_offer_date" value="' . date("Y-m-d", strtotime($offer_date_time)) . '" placeholder="">
             <select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="width:55px">';
         
         if ( empty($offer_date_time) )
@@ -4596,8 +4596,8 @@ class PH_AJAX {
         echo '<p class="form-field sale_date_field">
     
             <label for="_sale_date">' . __('Sale Date', 'propertyhive') . '</label>
-            
-            <input type="text" id="_sale_date" name="_sale_date" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="' . date("Y-m-d", strtotime($sale_date_time)) . '">
+
+            <input type="date" class="small" name="_sale_date" id="_sale_date" value="' . date("Y-m-d", strtotime($sale_date_time)) . '" placeholder="">
             
         </p>';
 

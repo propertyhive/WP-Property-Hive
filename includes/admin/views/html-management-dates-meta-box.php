@@ -280,7 +280,7 @@
         </p>
         <p class="form-field _add_key_date_due_field">
             <label for="_add_key_date_due"><?php echo __('Date Due', 'propertyhive'); ?></label>
-            <input type="text" id="_add_key_date_due" name="_add_key_date_due" class="date-picker short" placeholder="yyyy-mm-dd" style="width:120px;" value="<?php echo date("Y-m-d"); ?>">
+            <input type="date" class="small" name="_add_key_date_due" id="_add_key_date_due" value="<?php echo date("Y-m-d"); ?>" placeholder="">
 
             <select id="_add_key_date_due_hours" name="_add_key_date_due_hours" class="select short" style="width:55px">';
                 <?php
