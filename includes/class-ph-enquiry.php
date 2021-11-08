@@ -137,4 +137,67 @@ class PH_Enquiry {
             return get_the_title( $this->_office_id );
         }
     }
+
+    /**
+     * Get the associated properties
+     *
+     * @access public
+     * @return array
+     */
+    public function get_properties()
+    {
+        $property_ids = get_post_meta($this->id, 'property_id');
+        if ( count($property_ids) > 0 )
+        {
+            return $property_ids;
+        }
+        else
+        {
+            return get_post_meta($this->id, '_property_id');
+        }
+    }
+
+    /**
+     * Get the text for use in the Properties column of the enquiry list
+     *
+     * @access public
+     * @return array
+     */
+    public function get_list_property_display_text( $property_id )
+    {
+        $property = new PH_Property((int)$property_id);
+
+        if ( !isset($property->id) || empty($property->id) )
+        {
+            return 'Property not found';
+        }
+
+        $display_parts = array();
+
+        $display_parts[] = '<a href="' . get_edit_post_link( $property_id ) . '">' . $property->get_formatted_full_address() . '</a>';
+
+        $display_parts[] = $property->get_formatted_price();
+
+        $property_status = '';
+
+        $term_list = wp_get_post_terms($property_id, 'availability', array("fields" => "names"));
+
+        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+        {
+            $property_status =  $term_list[0] . ' - ';
+        }
+
+        if (isset($property->_on_market) && $property->_on_market == 'yes')
+        {
+            $property_status .= __( 'On The Market', 'propertyhive' );
+        }
+        else
+        {
+            $property_status .= __( 'Not On The Market', 'propertyhive' );
+        }
+
+        $display_parts[] = $property_status;
+
+        return implode( '<br>', array_filter($display_parts) );
+    }
 }
