@@ -475,6 +475,18 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title'   => __( 'Off Market Property Behaviour', 'propertyhive' ),
+                'id'      => 'propertyhive_off_market_behaviour',
+                'type'    => 'select',
+                'default' => '',
+                'css'     => 'min-width:300px;',
+                'options' => array(
+                    '' => __( 'Display not-on-market template', 'propertyhive' ),
+                    'redirect' => __( 'Redirect to property search', 'propertyhive' ),
+                ),
+            ),
+
+            array(
                 'title'   => __( 'When Entering Features', 'propertyhive' ),
                 'id'      => 'propertyhive_features_type',
                 'type'    => 'radio',
