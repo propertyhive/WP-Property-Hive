@@ -215,7 +215,73 @@ class PH_Meta_Box_Property_Epcs {
                         
                         jQuery(\'body\').on(\'click\', \'#property_epcs_grid .attachment-edit a\', function()
                         {
-                            
+                            event.preventDefault();
+
+                            var container = jQuery(this).parent().parent().parent();
+                            var epc_id = container.attr(\'id\');
+                            epc_id = epc_id.replace(\'epc_\', \'\');
+
+                            // Create the media frame.
+                            file_frame = wp.media.frames.file_frame = wp.media({
+                                title: jQuery( this ).data( \'uploader_title\' ),
+                                button: {
+                                text: \'Update EPC\',
+                                },
+                                multiple: false
+                            });
+
+                            // open
+                            file_frame.on(\'open\',function() {
+
+                                var selection = file_frame.state().get(\'selection\');
+                                var ids = epc_id;
+                                if (ids) {
+                                    idsArray = ids.split(',');
+                                    idsArray.forEach(function(id) {
+                                        attachment = wp.media.attachment(id);
+                                        attachment.fetch();
+                                        selection.add( attachment ? [ attachment ] : [] );
+                                    });
+                                }
+                            });
+
+                            // When an EPC is selected, run a callback.
+                            file_frame.on( \'select\', function() {
+                                var selection = file_frame.state().get(\'selection\');
+
+                                selection.map( function( attachment ) {
+
+                                    attachment = attachment.toJSON();
+
+                                    if (attachment.id != epc_id)
+                                    {
+                                        // Replace EPC
+                                        var attachment_ids = jQuery(\'#epc_attachment_ids\').val();
+                                        attachment_ids = attachment_ids.split(\',\');
+
+                                        for (var i in attachment_ids)
+                                        {
+                                            if (attachment_ids[i] == epc_id)
+                                            {
+                                                attachment_ids[i] = attachment.id;
+                                            }
+                                        }
+                                        jQuery(\'#epc_attachment_ids\').val(attachment_ids);
+
+                                        // Add EPC to media grid
+                                        var mediaHTML = \'\';
+                                        mediaHTML += \'<li id="epc_\' + attachment.id + \'">\';
+                                        mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>\';
+                                        mediaHTML += \'<img src="\' + attachment.url + \'" alt=""></li>\';
+
+                                        jQuery(\'#property_epcs_grid ul li#epc_\' + epc_id).after(mediaHTML);
+                                        jQuery(\'#property_epcs_grid ul li#epc_\' + epc_id).remove();
+                                    }
+                                });
+                            });
+
+                            // Finally, open the modal
+                            file_frame.open();
                         });
                         
                         jQuery(\'body\').on(\'click\', \'.ph_upload_epc_button\', function( event ){
