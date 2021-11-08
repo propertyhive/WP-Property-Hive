@@ -512,6 +512,23 @@ if ( ! function_exists( 'propertyhive_template_not_on_market' ) ) {
     }
 }
 
+if ( get_option('propertyhive_off_market_behaviour', '') == 'redirect' )
+{
+    function ph_redirect_off_market_properties()
+    {
+        // If we're viewing an off market property, redirect to the search form
+        if (is_singular('property'))
+        {
+            if ( get_post_meta(get_the_ID(), '_on_market', TRUE) === '' )
+            {
+                wp_redirect(get_post_type_archive_link('property'), 301);
+                exit;
+            }
+        }
+    }
+    add_action( 'template_redirect', 'ph_redirect_off_market_properties', 5 );
+}
+
 if ( ! function_exists( 'propertyhive_show_property_images' ) ) {
 
     /**
