@@ -240,6 +240,8 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
         $columns['status'] = __( 'Status', 'propertyhive' );
 
         $columns['source'] = __( 'Source', 'propertyhive' );
+
+        $columns['properties'] = __( 'Properties', 'propertyhive' );
         
         $columns['negotiator'] = __( 'Negotiator', 'propertyhive' );
         
@@ -281,6 +283,23 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 $sources = apply_filters( 'propertyhive_enquiry_sources', $sources );
 
                 echo ( ( isset($sources[$the_enquiry->source]) ) ? $sources[$the_enquiry->source] : $the_enquiry->source );
+                break;
+            case 'properties' :
+                $property_ids = $the_enquiry->get_properties();
+
+                if ( count($property_ids) > 0 )
+                {
+                    $properties_text_array = array();
+                    foreach($property_ids as $property_id)
+                    {
+                        $properties_text_array[] = $the_enquiry->get_list_property_display_text( $property_id );
+                    }
+                    echo implode(  '<br>', array_filter($properties_text_array) );
+                }
+                else
+                {
+                    echo '-';
+                }
                 break;
             case 'negotiator' :
                 if ($the_enquiry->_negotiator_id == '' || $the_enquiry->_negotiator_id == 0)
