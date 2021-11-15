@@ -1885,6 +1885,8 @@ class PH_AJAX {
         $name = false;
         $email = false;
         $telephone = false;
+        $address = false;
+        $postcode = false;
         $property_id = false;
 
         foreach ($enquiry_meta as $key => $value)
@@ -1921,6 +1923,14 @@ class PH_AJAX {
                 {
                     $telephone .= ',' . $value[0];
                 }
+            }
+            elseif ( strtolower($key) == 'address' && $value[0] != '' )
+            {
+                $address = $value[0];
+            }
+            elseif ( strtolower($key) == 'postcode' && $value[0] != '' )
+            {
+                $postcode = $value[0];
             }
             elseif ( !$property_id && strpos(strtolower($key), 'property_id') !== false && $value[0] != '' )
             {
@@ -1961,6 +1971,33 @@ class PH_AJAX {
         }
 
         if ( $email !== FALSE ) { update_post_meta( $contact_post_id, '_email_address', ph_clean( $email ) ); }
+
+        if ( $address !== FALSE )
+        {
+            if ( strpos(strtolower($address), ',') !== false )
+            {
+                // Split name/number and street by the first comma
+                $address_parts = explode(',', $address, 2);
+                update_post_meta( $contact_post_id, '_address_name_number', ph_clean( trim($address_parts[0]) ) );
+                update_post_meta( $contact_post_id, '_address_street', ph_clean( trim($address_parts[1]) ) );
+            }
+            else
+            {
+                $address_parts = explode(' ', $address, 2);
+                // If first "word" starts with a number (123, 1A etc), put it in name/number
+                if ( is_numeric(substr($address_parts[0], 0, 1)) )
+                {
+                    update_post_meta( $contact_post_id, '_address_name_number', ph_clean( trim($address_parts[0]) ) );
+                    update_post_meta( $contact_post_id, '_address_street', ph_clean( trim($address_parts[1]) ) );
+                }
+                else
+                {
+                    update_post_meta( $contact_post_id, '_address_name_number', ph_clean( $address ) );
+                }
+            }
+        }
+
+        if ( $postcode !== FALSE ) { update_post_meta( $contact_post_id, '_address_postcode', ph_clean( $postcode ) ); }
 
         // Enquiry is related to a property, so create an applicant record for the contact
         if ( $property_id !== false && get_post_type( $property_id ) == 'property' )
