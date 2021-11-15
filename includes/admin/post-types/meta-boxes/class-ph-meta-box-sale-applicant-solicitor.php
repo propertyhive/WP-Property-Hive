@@ -150,7 +150,7 @@ jQuery(document).ready(function($)
         e.preventDefault();
 
         sale_selected_applicant_solicitors = []; // reset to only allow one applicant for now
-        sale_selected_applicant_solicitors[$(this).attr('href')] = ({ post_title: $(this).attr('data-applicant-name') });
+        sale_selected_applicant_solicitors[$(this).attr('href')] = ({ post_title: $(this).attr('data-applicant-solicitor-name') });
 
         $('#sale_search_applicant_solicitor_results').html('');
         $('#sale_search_applicant_solicitor_results').hide();
