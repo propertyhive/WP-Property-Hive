@@ -2111,9 +2111,12 @@ class PH_Query {
             {
                 if ( taxonomy_exists($key) && isset( $_REQUEST[$key] ) && !empty($_REQUEST[$key]) && $this->taxonomy_allowed_for_department( $key ) )
                 {
+                    $operator = $key == 'property_feature' ? 'AND' : 'IN';
+
                     $tax_query[] = array(
                         'taxonomy'  => $key,
-                        'terms' => ph_clean( (is_array($value)) ? $value : array( $value ) )
+                        'terms' => ph_clean( (is_array($value)) ? $value : array( $value ) ),
+                        'operator' => $operator,
                     );
                 }
             }
