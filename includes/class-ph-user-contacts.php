@@ -136,12 +136,29 @@ class PH_User_Contacts {
 
 		if ( $contact->email_address != '' )
 		{
+			$display_name = get_the_title( $post_id );
+
 			// No associated user. Need to create one
 			$userdata = array(
 			    'user_login'  	=> $contact->email_address,
 			    'user_email'  	=> $contact->email_address,
-			    'display_name' 	=> get_the_title( $post_id ),
+			    'display_name' 	=> $display_name,
 			);
+
+			if ( !empty($display_name) )
+			{
+				$name_parts = explode( ' ', $display_name );
+
+				if ( count($name_parts) > 1 )
+				{
+					$userdata['last_name'] = array_pop($name_parts);
+					$userdata['first_name'] = implode(' ', $name_parts);
+				}
+				else
+				{
+					$userdata['last_name'] = $display_name;
+				}
+			}
 
 			if ( $contact->user_id == '' )
 			{

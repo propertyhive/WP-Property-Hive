@@ -278,15 +278,32 @@ class PH_AJAX {
 
         $contact = new PH_Contact((int)$_POST['contact_id']);
 
+        $display_name = get_the_title((int)$_POST['contact_id']);
+
          // Create user
         $userdata = array(
-            'display_name' => get_the_title((int)$_POST['contact_id']),
+            'display_name' => $display_name,
             'user_login' => sanitize_email($contact->email_address),
             'user_email' => sanitize_email($contact->email_address),
             'user_pass'  => $_POST['password'],
             'role' => 'property_hive_contact',
             'show_admin_bar_front' => 'false',
         );
+
+        if ( !empty($display_name) )
+        {
+            $name_parts = explode( ' ', $display_name );
+
+            if ( count($name_parts) > 1 )
+            {
+                $userdata['last_name'] = array_pop($name_parts);
+                $userdata['first_name'] = implode(' ', $name_parts);
+            }
+            else
+            {
+                $userdata['last_name'] = $display_name;
+            }
+        }
 
         $user_id = wp_insert_user( $userdata );
 
@@ -708,15 +725,32 @@ class PH_AJAX {
             
             if ( get_option( 'propertyhive_applicant_users', '' ) == 'yes' )
             {
+                $display_name = ph_clean($_POST['name']);
+
                 // Create user
                 $userdata = array(
-                    'display_name' => ph_clean($_POST['name']),
+                    'display_name' => $display_name,
                     'user_login' => sanitize_email($_POST['email_address']),
                     'user_email' => sanitize_email($_POST['email_address']),
                     'user_pass'  => ph_clean($_POST['password']),
                     'role' => 'property_hive_contact',
                     'show_admin_bar_front' => 'false',
                 );
+
+                if ( !empty($display_name) )
+                {
+                    $name_parts = explode( ' ', $display_name );
+
+                    if ( count($name_parts) > 1 )
+                    {
+                        $userdata['last_name'] = array_pop($name_parts);
+                        $userdata['first_name'] = implode(' ', $name_parts);
+                    }
+                    else
+                    {
+                        $userdata['last_name'] = $display_name;
+                    }
+                }
 
                 $user_id = wp_insert_user( $userdata );
 
