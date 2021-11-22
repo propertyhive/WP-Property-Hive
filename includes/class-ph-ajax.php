@@ -1299,7 +1299,7 @@ class PH_AJAX {
             $args = array(
                 'post_type' => 'property',
                 'nopaging' => true,
-                'post_status' => array( 'publish' ),
+                'post_status' => array( 'publish', 'draft' ),
                 'fields' => 'ids'
             );
 
@@ -1352,10 +1352,16 @@ class PH_AJAX {
                         }
                         $owner_name = get_the_title($owner_id);
                     }
+
+                    $post_title = $property->get_formatted_full_address();
+                    if ( get_post_status() == 'draft' )
+                    {
+                        $post_title .= ' - Draft';
+                    }
                     
                     $return[] = array(
                         'ID' => get_the_ID(),
-                        'post_title' => $property->get_formatted_full_address(),
+                        'post_title' => $post_title,
                         'owner_id' => $owner_id,
                         'owner_name' => $owner_name
                     );

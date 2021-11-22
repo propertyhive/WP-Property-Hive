@@ -852,7 +852,7 @@ class PH_Post_types {
         $args = array(
             'post_type' => 'property',
             'fields' => 'ids',
-            'post_status' => 'publish',
+            'post_status' => array( 'publish', 'draft'),
             'meta_query' => array(
                 array(
                     'key' => '_address_concatenated',
