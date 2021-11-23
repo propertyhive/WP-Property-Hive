@@ -836,6 +836,11 @@ class PH_Query {
 	      		'_address_postcode',
 	      	);
 
+			if ( strpos( $_REQUEST['address_keyword'], ', ' ) !== FALSE )
+			{
+				$address_fields_to_query[] = '_address_concatenated';
+			}
+
 	      	// add country to list of fields to query if it looks like we're working with an overseas site
 	      	$countries = get_option( 'propertyhive_countries', array() );
 	      	if ( !is_array($countries) ) { $countries = array(); }
@@ -850,7 +855,7 @@ class PH_Query {
 	      	{
 	      		foreach ( $address_fields_to_query as $address_field )
 	      		{
-	      			if ( $address_field == '_address_postcode' || $address_field == '_address_country' ) { continue; } // ignore postcode and country as they're handled differently afterwards
+	      			if ( in_array( $address_field, array('_address_postcode', '_address_country', '_address_concatenated') ) ) { continue; } // ignore postcode and country as they're handled differently afterwards
 
 	      			$meta_query[] = array(
 					    'key'     => $address_field,
@@ -942,6 +947,15 @@ class PH_Query {
 						}
 					}
 				}
+			}
+
+			if ( in_array('_address_concatenated', $address_fields_to_query) )
+			{
+				$meta_query[] = array(
+					'key'     => '_address_concatenated',
+					'value'   => $_REQUEST['address_keyword'],
+					'compare' => 'LIKE'
+				);
 			}
       	}
 
