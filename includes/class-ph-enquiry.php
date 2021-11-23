@@ -169,7 +169,7 @@ class PH_Enquiry {
 
         if ( !isset($property->id) || empty($property->id) )
         {
-            return 'Property not found';
+            return __( 'Property not found', 'propertyhive' );
         }
 
         $display_parts = array();
