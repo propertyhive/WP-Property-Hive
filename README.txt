@@ -98,7 +98,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Return draft properties in backend during AJAX property searches (i.e. when booking a viewing) with " - Draft" appended
 * Added a quick 'Update' shortcut link on applicant requirements record to update match price range when max price is updated
 * Date fields changed throughout to use HTML date field type instead of jQuery datepicker plugin. This should mean formatting of dates are relevant to locale
-* When a user login is created from a contact, ensure first and last names are filled on the WordPress user record. Not used anywhere by Property Hive but fo the benefit of any third party plugins using the user details
+* When a user login is created from a contact, ensure first and last names are filled on the WordPress user record. Not used anywhere by Property Hive but for the benefit of any third party plugins using the user details
 * Corrected undefined error when selecting applicant solicitor on a sale record
 * Corrected edit functionality for EPCs and Brochures in media section on property record
 * Declared compatibility for WordPress 5.8.2
@@ -129,7 +129,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Corrected issue with applicant not showing on sales list
 
 = 1.5.21 - 2021-09-29 =
-* Broader support for London postcodes. Searching for WC2 for example will include properties in WC2E, whilst still excluding proeprties in WC22
+* Broader support for London postcodes. Searching for WC2 for example will include properties in WC2E, whilst still excluding properties in WC22
 * Added filter to enable Elementor Portfolio widget to work when images are stored as URLs
 * Changed how dimensions appear in output full descriptions with removal of brackets and bold formatting. A lot of the time we saw it where dimensions had the imperial/metric equivalent in brackets which resulted in double brackets
 * Added new action 'propertyhive_exchange_rates_updated' when currency exchanges rates are updated
