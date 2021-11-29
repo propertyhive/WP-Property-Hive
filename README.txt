@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.8.1
-Stable tag: 1.5.24
+Tested up to: 5.8.2
+Stable tag: 1.5.25
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,19 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 
 == Changelog ==
 
+= 1.5.25 - 2021-11-23 =
+* Added a new column to list of enquiries in backend displaying the properties an enquiry is in relation to
+* Added a new setting under 'Settings > General > Miscellaneous' to specify what happens should an off market property URL be accessed: Still show the property details or do a 301 redirect back to the search results page
+* When converting an applicant from an enquiry ensure the address is copied across if present, such as enquiries received from Rightmove
+* Enhanced searching by address keyword on frontend by catering for comma-delimited search terms (i.e. High Street, Basildon)
+* Return draft properties in backend during AJAX property searches (i.e. when booking a viewing) with " - Draft" appended
+* Added a quick 'Update' shortcut link on applicant requirements record to update match price range when max price is updated
+* Date fields changed throughout to use HTML date field type instead of jQuery datepicker plugin. This should mean formatting of dates are relevant to locale
+* When a user login is created from a contact, ensure first and last names are filled on the WordPress user record. Not used anywhere by Property Hive but for the benefit of any third party plugins using the user details
+* Corrected undefined error when selecting applicant solicitor on a sale record
+* Corrected edit functionality for EPCs and Brochures in media section on property record
+* Declared compatibility for WordPress 5.8.2
+
 = 1.5.24 - 2021-11-03 =
 * Added ability to include Recaptcha V3 on enquiry and registration forms
 * Added ability to include hCaptcha on enquiry and registration forms
@@ -116,7 +129,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Corrected issue with applicant not showing on sales list
 
 = 1.5.21 - 2021-09-29 =
-* Broader support for London postcodes. Searching for WC2 for example will include properties in WC2E, whilst still excluding proeprties in WC22
+* Broader support for London postcodes. Searching for WC2 for example will include properties in WC2E, whilst still excluding properties in WC22
 * Added filter to enable Elementor Portfolio widget to work when images are stored as URLs
 * Changed how dimensions appear in output full descriptions with removal of brackets and bold formatting. A lot of the time we saw it where dimensions had the imperial/metric equivalent in brackets which resulted in double brackets
 * Added new action 'propertyhive_exchange_rates_updated' when currency exchanges rates are updated

@@ -421,6 +421,8 @@ class PH_Meta_Box_Contact_Relationships {
                                 <input type="text" class="" name="_applicant_match_price_range_lower_' . $key . '" id="_applicant_match_price_range_lower_' . $key . '" value="' . ph_display_price_field( $match_price_range_lower ) . '" style="width:20%; max-width:150px;">
                                 <span style="float:left; margin:0 5px;">to</span>
                                 <input type="text" class="" name="_applicant_match_price_range_higher_' . $key . '" id="_applicant_match_price_range_higher_' . $key . '" value="' . ph_display_price_field( $match_price_range_higher ) . '" style="width:20%; max-width:150px;">
+                                &nbsp;
+                                <a href="" id="match_price_range_shortcut_' . $key . '" style="display:none">' . __( 'Update', 'propertyhive' ) . '</a>
                                 
                             </p>';
 
@@ -430,6 +432,29 @@ class PH_Meta_Box_Contact_Relationships {
 
                                 jQuery(document).ready(function()
                                 {
+                                    jQuery(\'#match_price_range_shortcut_' . $key . '\').click(function(e)
+                                    {
+                                        e.preventDefault();
+
+                                        if ( jQuery(\'#_applicant_maximum_price_' . $key . '\').val().replace(/\D/g, \'\') != \'\' )
+                                        {
+                                            var max_price = jQuery(\'#_applicant_maximum_price_' . $key . '\').val().replace(/\D/g, \'\');
+
+                                            max_price = parseInt(max_price) - parseInt( max_price * ( ' . $percentage_lower . ' / 100 ) );
+
+                                            jQuery(\'#_applicant_match_price_range_lower_' . $key . '\').val(max_price);
+                                        }
+
+                                        if ( jQuery(\'#_applicant_maximum_price_' . $key . '\').val().replace(/\D/g, \'\') != \'\' )
+                                        {
+                                            var max_price = jQuery(\'#_applicant_maximum_price_' . $key . '\').val().replace(/\D/g, \'\');
+
+                                            max_price = parseInt(max_price) + parseInt( max_price * ( ' . $percentage_higher . ' / 100 ) );
+
+                                            jQuery(\'#_applicant_match_price_range_higher_' . $key . '\').val(max_price);
+                                        }
+                                    });
+
                                     jQuery(\'#_applicant_maximum_price_' . $key . '\').change(function()
                                     {
                                         if ( previous_max_price_' . $key . ' == \'\' )
@@ -452,6 +477,8 @@ class PH_Meta_Box_Contact_Relationships {
                                                 jQuery(\'#_applicant_match_price_range_higher_' . $key . '\').val(max_price);
                                             }
                                         }
+
+                                        jQuery(\'#match_price_range_shortcut_' . $key . '\').css(\'display\', \'inline\');
 
                                         previous_max_price_' . $key . ' = jQuery(this).val();
                                     });

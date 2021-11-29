@@ -475,14 +475,14 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
-                'title'   => __( 'Off Market Property Behaviour', 'propertyhive' ),
+                'title'   => __( 'When An Off Market Property URL Is Viewed', 'propertyhive' ),
                 'id'      => 'propertyhive_off_market_behaviour',
                 'type'    => 'select',
                 'default' => '',
                 'css'     => 'min-width:300px;',
                 'options' => array(
-                    '' => __( 'Display not-on-market template', 'propertyhive' ),
-                    'redirect' => __( 'Redirect to property search', 'propertyhive' ),
+                    '' => __( 'Still show the property details', 'propertyhive' ),
+                    'redirect' => __( 'Do a 301 redirect to the search results page', 'propertyhive' ),
                 ),
             ),
 
