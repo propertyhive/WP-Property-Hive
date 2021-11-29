@@ -1972,7 +1972,7 @@ class PH_AJAX {
             {
                 $postcode = $value[0];
             }
-            elseif ( !$property_id && strpos(strtolower($key), 'property_id') !== false && $value[0] != '' )
+            elseif ( !$property_id && strpos(strtolower($key), 'property_id') !== false && !empty($value[0]) )
             {
                 $property_id = (int)$value[0];
             }
@@ -2040,7 +2040,7 @@ class PH_AJAX {
         if ( $postcode !== FALSE ) { update_post_meta( $contact_post_id, '_address_postcode', ph_clean( $postcode ) ); }
 
         // Enquiry is related to a property, so create an applicant record for the contact
-        if ( $property_id !== false && get_post_type( $property_id ) == 'property' )
+        if ( !empty( $property_id ) && get_post_type( $property_id ) == 'property' )
         {
             update_post_meta( $contact_post_id, '_applicant_profiles', '1' );
 
