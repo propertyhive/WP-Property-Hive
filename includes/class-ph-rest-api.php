@@ -90,6 +90,7 @@ class PH_Rest_Api {
 			'department',
 			'latitude',
 			'longitude',
+			'price_actual',
 			'price',
 			'price_formatted',
 			'currency',
