@@ -146,14 +146,14 @@ class PH_Enquiry {
      */
     public function get_properties()
     {
-        $property_ids = get_post_meta($this->id, 'property_id');
+        $property_ids = array_filter( get_post_meta($this->id, 'property_id') );
         if ( count($property_ids) > 0 )
         {
             return $property_ids;
         }
         else
         {
-            return get_post_meta($this->id, '_property_id');
+            return array_filter( get_post_meta($this->id, '_property_id') );
         }
     }
 

@@ -241,13 +241,15 @@ function viewing_update_selected_properties()
                         $property_links = array();
                         foreach ( $value as $sub_value)
                         {
-                            $property_links[] = '<a href="' . get_edit_post_link( $sub_value ) . '">' . get_the_title( $sub_value ) . '</a>';
+                            if ( !empty($sub_value) )
+                            {
+                                $property_links[] = '<a href="' . get_edit_post_link( $sub_value ) . '">' . get_the_title( $sub_value ) . '</a>';
+                                $property_post_id = $sub_value;
+                            }
                         }
                         $value = implode('<br>', $property_links);
 
                         $key = 'property';
-
-                        $property_post_id = $sub_value;
                     }
                     else
                     {
