@@ -519,7 +519,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 				update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
 			}
 
-			wp_schedule_event( time(), 'hourly', 'propertyhive_auto_email_match' ); //  Skew it by 30 minutes to reduce conflict with email log processing
+			wp_schedule_event( apply_filters( 'propertyhive_auto_email_match_cron_timestamp', strtotime( '02:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ) ), 'daily', 'propertyhive_auto_email_match' );
 		}
 		else
 		{
