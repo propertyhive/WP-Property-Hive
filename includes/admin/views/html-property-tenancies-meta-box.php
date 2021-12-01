@@ -79,6 +79,15 @@
     );
     $tenancies_query = new WP_Query( $args );
     $tenancies_count = $tenancies_query->found_posts;
+
+    $columns = array(
+        'dates' => __( 'Start / End Dates', 'propertyhive' ),
+        'tenants' =>  __( 'Tenants(s)', 'propertyhive' ),
+        'rent' => __( 'Rent', 'propertyhive' ),
+        'status' => __( 'Status', 'propertyhive' ),
+    );
+
+    $columns = apply_filters( 'propertyhive_property_tenancies_columns', $columns );
 ?>
 
 <div class="tablenav top">
@@ -99,10 +108,14 @@
 <table class="wp-list-table widefat fixed striped posts">
     <thead>
         <tr>
-            <th scope="col" id='dates' class='manage-column column-dates'>Start / End Dates</th>
-            <th scope="col" id='applicant' class='manage-column column-applicant'>Tenants</th>
-            <th scope="col" id='rent' class='manage-column column-rent'>Rent</th>
-            <th scope="col" id='status' class='manage-column column-status'>Status</th>
+        <?php
+            foreach ( $columns as $column_key => $column )
+            {
+                ?>
+                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo $column; ?></th>
+                <?php
+            }
+        ?>
         </tr>
     </thead>
     <tbody id="the-list">
@@ -115,17 +128,37 @@
                 $the_tenancy = new PH_Tenancy( get_the_ID() );
 
                 $edit_link = get_edit_post_link( get_the_ID() );
+
+                $column_data = array(
+                    'dates' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '">
+                        Start Date: ' . ( $the_tenancy->_start_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_start_date ) ) : '-' ) . '<br>
+                        End Date: ' . ( $the_tenancy->_end_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_end_date ) ) : '-' ) . '
+                    </a>',
+                    'tenants' => $the_tenancy->get_tenants( true, true ),
+                    'rent' => $the_tenancy->get_formatted_rent(),
+                    'status' => $the_tenancy->get_status(),
+                );
+
+                $row_classes = array( 'status-' . $the_tenancy->get_status() );
+                $row_classes = apply_filters( 'propertyhive_property_tenancies_row_classes', $row_classes, get_the_ID(), $the_tenancy );
+                $row_classes = is_array($row_classes) ? array_map( 'sanitize_html_class', array_map( 'strtolower', $row_classes ) ) : array();
                 ?>
-                    <tr>
-                        <td class='dates column-dates' data-colname="Start / End Dates">
-                            <a href="<?php echo esc_url( $edit_link ); ?>">
-                                Start Date: <?php echo $the_tenancy->_start_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_start_date ) ) : '-'; ?><br>
-                                End Date: <?php echo $the_tenancy->_end_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_end_date ) ) : '-'; ?>
-                            </a>
-                        </td>
-                        <td class='applicant column-applicant' data-colname="Tenants"><?php echo $the_tenancy->get_tenants( true, true ); ?></td>
-                        <td class='rent column-rent' data-colname="Rent"><?php echo $the_tenancy->get_formatted_rent(); ?></td>
-                        <td class='status column-status' data-colname="Status"><?php echo $the_tenancy->get_status(); ?></td>
+                    <tr class="<?php echo implode(" ", $row_classes); ?>" >
+                    <?php
+                        foreach ( $columns as $column_key => $column )
+                        {
+                            echo '<td class="' . esc_attr($column_key) . ' column-' . esc_attr($column_key) . '" data-colname="' . esc_attr($column) . '">';
+
+                            if ( isset( $column_data[$column_key] ) )
+                            {
+                                echo $column_data[$column_key];
+                            }
+
+                            do_action( 'propertyhive_property_tenancies_custom_column', $column_key );
+
+                            echo '</td>';
+                        }
+                    ?>
                     </tr>
                 <?php
             }

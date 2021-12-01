@@ -62,7 +62,7 @@
             foreach ( $columns as $column_key => $column )
             {
                 ?>
-                <th scope="col" id='<?php echo $column_key; ?>' class='manage-column column-<?php echo $column_key; ?>'><?php echo $column; ?></th>
+                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo $column; ?></th>
                 <?php
             }
         ?>
@@ -80,17 +80,25 @@
                 $edit_link = get_edit_post_link( get_the_ID() );
 
                 $column_data = array(
-                    'date_time' => '<a href="' . $edit_link . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '" class="viewing-lightbox" data-viewing-id="' . get_the_ID() . '">' . date("H:i jS F Y", strtotime($the_viewing->_start_date_time)) . '</a>',
+                    'date_time' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '" class="viewing-lightbox" data-viewing-id="' . get_the_ID() . '">' . date("H:i jS F Y", strtotime($the_viewing->_start_date_time)) . '</a>',
                     'applicants' =>  $the_viewing->get_applicants( true, true ),
                     'negotiators' => $the_viewing->get_negotiators(),
                     'status' => $the_viewing->get_status(),
                 );
+
+                $row_classes = array( 'status-' . $the_viewing->_status );
+                if ( $the_viewing->_status == 'carried_out' )
+                {
+                    $row_classes[] = 'applicant-feedback-status-' . $the_viewing->_feedback_status;
+                }
+                $row_classes = apply_filters( 'propertyhive_property_viewings_row_classes', $row_classes, get_the_ID(), $the_viewing );
+                $row_classes = is_array($row_classes) ? array_map( 'sanitize_html_class', array_map( 'strtolower', $row_classes ) ) : array();
                 ?>
-                    <tr class="status-<?php echo $the_viewing->_status; ?>" >
+                    <tr class="<?php echo implode(" ", $row_classes); ?>" >
                     <?php
                         foreach ( $columns as $column_key => $column )
                         {
-                            echo '<td class="' . $column_key . ' column-' . $column_key . '" data-colname="' . $column . '">';
+                            echo '<td class="' . esc_attr($column_key) . ' column-' . esc_attr($column_key) . '" data-colname="' . esc_attr($column) . '">';
 
                             if ( isset( $column_data[$column_key] ) )
                             {

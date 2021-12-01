@@ -65,7 +65,7 @@
             foreach ( $columns as $column_key => $column )
             {
                 ?>
-                <th scope="col" id='<?php echo $column_key; ?>' class='manage-column column-<?php echo $column_key; ?>'><?php echo $column; ?></th>
+                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo $column; ?></th>
                 <?php
             }
         ?>
@@ -83,17 +83,21 @@
                 $edit_link = get_edit_post_link( get_the_ID() );
 
                 $column_data = array(
-                    'date' => '<a href="' . $edit_link . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . date("jS F Y", strtotime($the_offer->_offer_date_time)) . '</a>',
+                    'date' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '">' . date("jS F Y", strtotime($the_offer->_offer_date_time)) . '</a>',
                     'applicant' => $the_offer->get_applicants( true, true ),
                     'amount' => $the_offer->get_formatted_amount(),
                     'status' => __( ucwords(str_replace("_", " ", $the_offer->_status)), 'propertyhive' ),
                 );
+
+                $row_classes = array( 'status-' . $the_offer->_status );
+                $row_classes = apply_filters( 'propertyhive_property_offers_row_classes', $row_classes, get_the_ID(), $the_offer );
+                $row_classes = is_array($row_classes) ? array_map( 'sanitize_html_class', array_map( 'strtolower', $row_classes ) ) : array();
                 ?>
-                    <tr class="status-<?php echo $the_offer->_status; ?>" >
+                    <tr class="<?php echo implode(" ", $row_classes); ?>" >
                     <?php
                         foreach ( $columns as $column_key => $column )
                         {
-                            echo '<td class="' . $column_key . ' column-' . $column_key . '" data-colname="' . $column . '">';
+                            echo '<td class="' . esc_attr($column_key) . ' column-' . esc_attr($column_key) . '" data-colname="' . esc_attr($column) . '">';
 
                             if ( isset( $column_data[$column_key] ) )
                             {
