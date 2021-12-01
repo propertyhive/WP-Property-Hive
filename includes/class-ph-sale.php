@@ -133,23 +133,24 @@ class PH_Sale {
                 }
                 if ( $additional_contact_details )
                 {
-                    $contact_details = '';
+                    $contact_details = array();
                     $telephone_number = get_post_meta( $applicant_contact_id, '_telephone_number', true );
                     if( !empty($telephone_number) )
                     {
-                        $contact_details = 'T: ' . $telephone_number;
+                        $contact_details[] = 'T: ' . $telephone_number;
                     }
 
                     $email_address = get_post_meta( $applicant_contact_id, '_email_address', true );
                     if( !empty($email_address) )
                     {
-                        $contact_details .= ( $contact_details != '' ) ? '<br>' : '';
-                        $contact_details .= 'E: ' . $email_address;
+                        $contact_details[] = 'E: ' . $email_address;
                     }
 
-                    if ( $contact_details != '' )
+                    $contact_details = apply_filters( 'propertyhive_sale_applicant_contact_details', $contact_details, $applicant_contact_id );
+
+                    if ( !empty($contact_details) )
                     {
-                        $applicant_name .= '<div class="row-actions' . ($contact_details_visible ? ' visible' : '') . '">' . $contact_details . '</div>';
+                        $applicant_name .= '<div class="row-actions' . ($contact_details_visible ? ' visible' : '') . '">' . implode( "<br>", $contact_details ) . '</div>';
                     }
                 }
                 $applicants[] = $applicant_name;

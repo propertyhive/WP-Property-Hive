@@ -199,27 +199,28 @@ class PH_Viewing {
                 if ( $add_hyperlinks )
                 {
                     $edit_link = get_edit_post_link( $applicant_contact_id );
-                    $applicant_name = '<a href="' . $edit_link . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . $applicant_name . '</a>';
+                    $applicant_name = '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '">' . $applicant_name . '</a>';
                 }
                 if ( $additional_contact_details )
                 {
-                    $contact_details = '';
+                    $contact_details = array();
                     $telephone_number = get_post_meta( $applicant_contact_id, '_telephone_number', true );
                     if( !empty($telephone_number) )
                     {
-                        $contact_details = 'T: ' . $telephone_number;
+                        $contact_details[] = 'T: ' . $telephone_number;
                     }
 
                     $email_address = get_post_meta( $applicant_contact_id, '_email_address', true );
                     if( !empty($email_address) )
                     {
-                        $contact_details .= ( $contact_details != '' ) ? '<br>' : '';
-                        $contact_details .= 'E: ' . $email_address;
+                        $contact_details[] = 'E: ' . $email_address;
                     }
 
-                    if ( $contact_details != '' )
+                    $contact_details = apply_filters( 'propertyhive_viewing_applicant_contact_details', $contact_details, $applicant_contact_id );
+
+                    if ( !empty($contact_details) )
                     {
-                        $applicant_name .= '<div class="row-actions visible">' . $contact_details . '</div>';
+                        $applicant_name .= '<div class="row-actions visible">' . implode( "<br>", $contact_details ) . '</div>';
                     }
                 }
                 $applicant_contacts[] = $applicant_name;
