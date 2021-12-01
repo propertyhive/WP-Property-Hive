@@ -1537,7 +1537,7 @@ function ph_form_field( $key, $field )
                 {
                     foreach ($terms as $term)
                     {
-                        $options[$term->term_id] = $term->name;
+                        $options[$term->term_id] = __( $term->name, 'propertyhive' );
 
                         if ( 
                             !isset($field['parent_terms_only'])
@@ -1558,7 +1558,7 @@ function ph_form_field( $key, $field )
                             {
                                 foreach ($subterms as $term)
                                 {
-                                    $options[$term->term_id] = '- ' . $term->name;
+                                    $options[$term->term_id] = '- ' . __( $term->name, 'propertyhive' );
 
                                     $args = array(
                                         'hide_empty' => false,
@@ -1570,7 +1570,7 @@ function ph_form_field( $key, $field )
                                     {
                                         foreach ($subsubterms as $term)
                                         {
-                                            $options[$term->term_id] = '- ' . $term->name;
+                                            $options[$term->term_id] = '- ' . __( $term->name, 'propertyhive' );
                                         }
                                     }
                                 }
