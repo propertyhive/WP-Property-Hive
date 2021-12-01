@@ -115,7 +115,7 @@ class PH_Enquiry {
             }
             else
             {
-                return '<em>Unknown user</em>';
+                return '<em>' . __( 'Unknown user', 'propertyhive' ) . '</em>';
             }
         }
     }
@@ -174,7 +174,7 @@ class PH_Enquiry {
 
         $display_parts = array();
 
-        $display_parts[] = '<a href="' . get_edit_post_link( $property_id ) . '">' . $property->get_formatted_full_address() . '</a>';
+        $display_parts[] = '<a href="' . esc_url(get_edit_post_link( $property_id )) . '">' . $property->get_formatted_full_address() . '</a>';
 
         $display_parts[] = $property->get_formatted_price();
 
