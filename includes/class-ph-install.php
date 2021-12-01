@@ -172,7 +172,7 @@ class PH_Install {
 
         if ( $auto_property_match_enabled == 'yes' )
         {
-            wp_schedule_event( strtotime( '02:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_auto_email_match' );
+            wp_schedule_event( apply_filters( 'propertyhive_auto_email_match_cron_timestamp', strtotime( '02:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ) ), 'daily', 'propertyhive_auto_email_match' );
         }
 
         // Schedule for 1am as it's likely traffic will be quieter at that time
