@@ -219,69 +219,79 @@ class PH_Meta_Box_Property_Residential_Details {
      */
     public static function save( $post_id, $post ) {
         global $wpdb;
+
+        $department = get_post_meta($post_id, '_department', TRUE);
         
-        $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bedrooms']));
-        update_post_meta( $post_id, '_bedrooms', $rooms );
-
-        $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bathrooms']));
-        update_post_meta( $post_id, '_bathrooms', $rooms );
-
-        $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_reception_rooms']));
-        update_post_meta( $post_id, '_reception_rooms', $rooms );
-        
-        $property_types = array();
-        if ( isset( $_POST['property_type_id'] ) && !empty( $_POST['property_type_id'] ) )
+        if ( 
+            $department == 'residential-lettings' || 
+            ph_get_custom_department_based_on( $department ) == 'residential-lettings' ||
+            $department == 'residential-sales' || 
+            ph_get_custom_department_based_on( $department ) == 'residential-sales'
+        )
         {
-            foreach ( $_POST['property_type_id'] as $property_type_id )
+            $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bedrooms']));
+            update_post_meta( $post_id, '_bedrooms', $rooms );
+
+            $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bathrooms']));
+            update_post_meta( $post_id, '_bathrooms', $rooms );
+
+            $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_reception_rooms']));
+            update_post_meta( $post_id, '_reception_rooms', $rooms );
+            
+            $property_types = array();
+            if ( isset( $_POST['property_type_id'] ) && !empty( $_POST['property_type_id'] ) )
             {
-                $property_types[] = (int)$property_type_id;
+                foreach ( $_POST['property_type_id'] as $property_type_id )
+                {
+                    $property_types[] = (int)$property_type_id;
+                }
             }
-        }
-        if ( !empty($property_types) )
-        {
-            wp_set_post_terms( $post_id, $property_types, 'property_type' );
-        }
-        else
-        {
-            // Setting to blank
-            wp_delete_object_term_relationships( $post_id, 'property_type' );
-        }
-
-        $parkings = array();
-        if ( isset( $_POST['parking_ids'] ) && !empty( $_POST['parking_ids'] ) )
-        {
-            foreach ( $_POST['parking_ids'] as $parking_id )
+            if ( !empty($property_types) )
             {
-                $parkings[] = (int)$parking_id;
+                wp_set_post_terms( $post_id, $property_types, 'property_type' );
             }
-        }
-        if ( !empty($parkings) )
-        {
-            wp_set_post_terms( $post_id, $parkings, 'parking' );
-        }
-        else
-        {
-            wp_delete_object_term_relationships( $post_id, 'parking' );
-        }
-        
-        $outside_spaces = array();
-        if ( isset( $_POST['outside_space_ids'] ) && !empty( $_POST['outside_space_ids'] ) )
-        {
-            foreach ( $_POST['outside_space_ids'] as $outside_space_id )
+            else
             {
-                $outside_spaces[] = (int)$outside_space_id;
+                // Setting to blank
+                wp_delete_object_term_relationships( $post_id, 'property_type' );
             }
-        }
-        if ( !empty($outside_spaces) )
-        {
-            wp_set_post_terms( $post_id, $outside_spaces, 'outside_space' );
-        }
-        else
-        {
-            wp_delete_object_term_relationships( $post_id, 'outside_space' );
-        }
 
-        do_action( 'propertyhive_save_property_residential_details', $post_id );
+            $parkings = array();
+            if ( isset( $_POST['parking_ids'] ) && !empty( $_POST['parking_ids'] ) )
+            {
+                foreach ( $_POST['parking_ids'] as $parking_id )
+                {
+                    $parkings[] = (int)$parking_id;
+                }
+            }
+            if ( !empty($parkings) )
+            {
+                wp_set_post_terms( $post_id, $parkings, 'parking' );
+            }
+            else
+            {
+                wp_delete_object_term_relationships( $post_id, 'parking' );
+            }
+            
+            $outside_spaces = array();
+            if ( isset( $_POST['outside_space_ids'] ) && !empty( $_POST['outside_space_ids'] ) )
+            {
+                foreach ( $_POST['outside_space_ids'] as $outside_space_id )
+                {
+                    $outside_spaces[] = (int)$outside_space_id;
+                }
+            }
+            if ( !empty($outside_spaces) )
+            {
+                wp_set_post_terms( $post_id, $outside_spaces, 'outside_space' );
+            }
+            else
+            {
+                wp_delete_object_term_relationships( $post_id, 'outside_space' );
+            }
+
+            do_action( 'propertyhive_save_property_residential_details', $post_id );
+        }
     }
 
 }
