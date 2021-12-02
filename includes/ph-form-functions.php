@@ -1497,6 +1497,7 @@ function ph_form_field( $key, $field )
                 $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
                 $field['blank_option'] = isset( $field['blank_option'] ) ? $field['blank_option'] : __( 'No preference', 'propertyhive' );
                 $field['parent_terms_only'] = isset( $field['parent_terms_only'] ) ? $field['parent_terms_only'] : false;
+                $field['hide_empty'] = isset( $field['hide_empty'] ) ? $field['hide_empty'] : false;
                 $field['multiselect'] = isset( $field['multiselect'] ) ? $field['multiselect'] : false;
 
                 if ( $field['multiselect'] )
@@ -1527,7 +1528,7 @@ function ph_form_field( $key, $field )
 
                 $options = array( '' => $field['blank_option'] );
                 $args = array(
-                    'hide_empty' => false,
+                    'hide_empty' => $field['hide_empty'],
                     'parent' => 0
                 );
                 $terms = get_terms( $field['type'], $args );
@@ -1537,6 +1538,32 @@ function ph_form_field( $key, $field )
                 {
                     foreach ($terms as $term)
                     {
+                        if ( isset($field['hide_empty']) && $field['hide_empty'] === true )
+                        {
+                            $empty_check_args = array(
+                                'post_type' => 'property',
+                                'meta_query' => array(
+                                    array(
+                                        'key' => '_on_market',
+                                        'value' => 'yes',
+                                    ),
+                                ),
+                                'tax_query' => array(
+                                    array(
+                                        'taxonomy' => $field['type'],
+                                        'field' => 'term_id',
+                                        'terms' => $term->term_id,
+                                    ),
+                                ),
+                            );
+                            $empty_check_query = new WP_Query( $empty_check_args );
+
+                            if ( !$empty_check_query->have_posts() )
+                            {
+                                continue;
+                            }
+                        }
+
                         $options[$term->term_id] = __( $term->name, 'propertyhive' );
 
                         if ( 
@@ -1549,7 +1576,7 @@ function ph_form_field( $key, $field )
                         )
                         {
                             $args = array(
-                                'hide_empty' => false,
+                                'hide_empty' => $field['hide_empty'],
                                 'parent' => $term->term_id
                             );
                             $subterms = get_terms( $field['type'], $args );
@@ -1558,10 +1585,36 @@ function ph_form_field( $key, $field )
                             {
                                 foreach ($subterms as $term)
                                 {
+                                    if ( isset($field['hide_empty']) && $field['hide_empty'] === true )
+                                    {
+                                        $empty_check_args = array(
+                                            'post_type' => 'property',
+                                            'meta_query' => array(
+                                                array(
+                                                    'key' => '_on_market',
+                                                    'value' => 'yes',
+                                                ),
+                                            ),
+                                            'tax_query' => array(
+                                                array(
+                                                    'taxonomy' => $field['type'],
+                                                    'field' => 'term_id',
+                                                    'terms' => $term->term_id,
+                                                ),
+                                            ),
+                                        );
+                                        $empty_check_query = new WP_Query( $empty_check_args );
+
+                                        if ( !$empty_check_query->have_posts() )
+                                        {
+                                            continue;
+                                        }
+                                    }
+
                                     $options[$term->term_id] = '- ' . __( $term->name, 'propertyhive' );
 
                                     $args = array(
-                                        'hide_empty' => false,
+                                        'hide_empty' => $field['hide_empty'],
                                         'parent' => $term->term_id
                                     );
                                     $subsubterms = get_terms( $field['type'], $args );
@@ -1570,6 +1623,32 @@ function ph_form_field( $key, $field )
                                     {
                                         foreach ($subsubterms as $term)
                                         {
+                                            if ( isset($field['hide_empty']) && $field['hide_empty'] === true )
+                                            {
+                                                $empty_check_args = array(
+                                                    'post_type' => 'property',
+                                                    'meta_query' => array(
+                                                        array(
+                                                            'key' => '_on_market',
+                                                            'value' => 'yes',
+                                                        ),
+                                                    ),
+                                                    'tax_query' => array(
+                                                        array(
+                                                            'taxonomy' => $field['type'],
+                                                            'field' => 'term_id',
+                                                            'terms' => $term->term_id,
+                                                        ),
+                                                    ),
+                                                );
+                                                $empty_check_query = new WP_Query( $empty_check_args );
+
+                                                if ( !$empty_check_query->have_posts() )
+                                                {
+                                                    continue;
+                                                }
+                                            }
+
                                             $options[$term->term_id] = '- ' . __( $term->name, 'propertyhive' );
                                         }
                                     }
