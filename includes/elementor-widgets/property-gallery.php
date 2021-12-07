@@ -58,7 +58,18 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             ]
         );
 
-        // Add in layouts option
+        $this->add_control(
+            'gallery_layout',
+            [
+                'label' => __( 'Layout', 'propertyhive' ),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => [
+                    'six_image' => __( 'Six Images', 'propertyhive' ),
+                    'one_large_four_small' => __( 'One Large Image, Four Small', 'propertyhive' ),
+                ],
+                'default' => 'six_image',
+            ]
+        );
 
         $this->end_controls_section();
     }
