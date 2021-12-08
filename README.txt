@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.8.2
-Stable tag: 1.5.25
+Stable tag: 1.5.26
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,16 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.26 - 2021-12-08 =
+* Added support for property type and location dropdowns in search form hiding empty terms if enabled in recent Template Assistant add on update
+* Added filters (e.g. 'propertyhive_viewing_applicant_contact_details') to customise applicant contact details output in grids
+* Added filter 'propertyhive_auto_email_match_cron_timestamp' to change auto match cron time. Defaults to 2am
+* Added filters (e.g. 'propertyhive_contact_viewings_row_classes') to amend classes output on rows of grids on property and contact records
+* Improved sanitisation of data output in grids on property and contact records
+* Run taxonomies output in search form dropdowns through __() so they can be translated accordingly
+* Added price_actual to list of fields returned in REST API to aid use by international agents
+* Residential details meta box only saved when relevant department ticked to ensure compatibility with Rooms add on and upcoming bedrooms fix
 
 = 1.5.25 - 2021-11-23 =
 * Added a new column to list of enquiries in backend displaying the properties an enquiry is in relation to
