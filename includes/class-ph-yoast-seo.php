@@ -26,6 +26,24 @@ class PH_Yoast_SEO {
 		add_filter( 'wpseo_metabox_prio', array( __CLASS__, 'yoast_meta_box_to_bottom') );
 		add_filter( 'manage_edit-property_columns', array( __CLASS__, 'yoast_remove_columns') );
 		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'sitemap_exclude_off_market') );
+		add_filter( 'wpseo_schema_webpage_type', array( __CLASS__, 'yoast_schema_webpage_type') );
+	}
+
+	public static function yoast_schema_webpage_type( $type )
+	{
+		global $post;
+
+		if ( isset($post->post_type) && $post->post_type == 'property' )
+		{
+			if ( !is_array($type) )
+			{
+				$type = array($type);
+			}
+			$type[] = 'RealEstateListing';
+			$type = array_filter( array_values( array_unique( $type ) ) );
+		}
+
+		return $type;
 	}
 
 	public static function sitemap_exclude_taxonomy( $value, $taxonomy ) {
