@@ -825,15 +825,21 @@ class PH_Post_types {
             $property = new PH_Property( $post_id );
 
             // Set field of concatenated address
+            self::remove_all_duplicated_post_meta( $post_id, '_address_concatenated' );
+
             update_post_meta( $post_id, '_address_concatenated', $property->get_formatted_full_address() );
 
             // Set field of concatenated features
+            self::remove_all_duplicated_post_meta( $post_id, '_features_concatenated' );
+
             $features_concat_array = $property->get_features();
 
             $features_concat = implode('|', array_filter($features_concat_array));
             update_post_meta($post_id, '_features_concatenated', $features_concat);
 
             // Set field of concatenated descriptions information
+            self::remove_all_duplicated_post_meta( $post_id, '_descriptions_concatenated' );
+
             $descs_concat = $property->get_formatted_description();
             update_post_meta($post_id, '_descriptions_concatenated', $descs_concat);
         }
@@ -843,7 +849,18 @@ class PH_Post_types {
             $contact = new PH_Contact( $post_id );
 
             // Set field of concatenated address
+            self::remove_all_duplicated_post_meta( $post_id, '_address_concatenated' );
+
             update_post_meta( $post_id, '_address_concatenated', $contact->get_formatted_full_address() );
+        }
+    }
+
+    private static function remove_all_duplicated_post_meta( $post_id, $meta_key )
+    {
+        $current_meta_array = get_post_meta( $post_id, $meta_key );
+        if ( is_array($current_meta_array) && count($current_meta_array) > 1 )
+        {
+            delete_post_meta( $post_id, $meta_key );
         }
     }
 
