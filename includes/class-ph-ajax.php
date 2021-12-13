@@ -70,6 +70,7 @@ class PH_AJAX {
             'get_viewing_lightbox' => false,
             'viewing_carried_out' => false,
             'viewing_cancelled' => false,
+            'viewing_no_show' => false,
             'viewing_email_applicant_booking_confirmation' => false,
             'viewing_email_owner_booking_confirmation' => false,
             'viewing_interested_feedback' => false,
@@ -3715,6 +3716,32 @@ class PH_AJAX {
         wp_send_json_error();
     }
 
+    public function viewing_no_show()
+    {
+        check_ajax_referer( 'viewing-actions', 'security' );
+
+        $post_id = (int)$_POST['viewing_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'pending' )
+        {
+            update_post_meta( $post_id, '_status', 'no_show' );
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_applicant_no_show',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
     public function viewing_cancelled()
     {
         check_ajax_referer( 'viewing-actions', 'security' );
@@ -4017,7 +4044,7 @@ class PH_AJAX {
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
-        if ( $status == 'carried_out' || $status == 'cancelled' )
+        if ( in_array( $status, array('carried_out', 'cancelled', 'no_show') ) )
         {
             update_post_meta( $post_id, '_status', 'pending' );
             update_post_meta( $post_id, '_feedback_status', '' );

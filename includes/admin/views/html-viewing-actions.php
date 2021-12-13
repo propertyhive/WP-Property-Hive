@@ -71,6 +71,11 @@ if ( $status == 'pending' )
             class="button viewing-action"
             style="width:100%; margin-bottom:7px; text-align:center" 
         >' . __('Viewing Cancelled', 'propertyhive') . '</a>';
+    $actions[] = '<a
+            href="#action_panel_viewing_no_show"
+            class="button viewing-action"
+            style="width:100%; margin-bottom:7px; text-align:center"
+        >' . __('Applicant No Show', 'propertyhive') . '</a>';
 
     $show_cancelled_meta_boxes = true;
 }
@@ -180,7 +185,7 @@ if ( $status == 'offer_made' )
     }
 }
 
-if ( ( $status == 'carried_out' && $feedback_status == '' ) || $status == 'cancelled' )
+if ( ( $status == 'carried_out' && $feedback_status == '' ) || in_array( $status, array('cancelled', 'no_show') ) )
 {
     $actions[] = '<a 
             href="#action_panel_viewing_revert_pending" 

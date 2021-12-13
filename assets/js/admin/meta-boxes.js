@@ -845,6 +845,20 @@ jQuery(document).ready(function($)
                 viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };
+            jQuery.post( ajaxurl, data, function(response)
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_no_show' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_no_show',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
             jQuery.post( ajaxurl, data, function(response) 
             {
                 redraw_viewing_actions();

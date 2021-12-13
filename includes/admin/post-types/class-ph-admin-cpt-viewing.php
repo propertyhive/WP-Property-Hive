@@ -71,7 +71,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 			// There is either a previous or next viewing for this applicant/property combination
 			if (
-				$viewing->_status != 'cancelled'
+				!in_array( $viewing->_status, array('cancelled', 'no_show') )
 				&&
 				is_array($related_viewings)
 				&&
