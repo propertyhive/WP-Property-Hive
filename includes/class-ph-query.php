@@ -674,6 +674,7 @@ class PH_Query {
 
 		$meta_query[] = $this->on_market_meta_query();
         $meta_query[] = $this->department_meta_query($q);
+        $meta_query[] = $this->date_added_meta_query();
         $meta_query[] = $this->address_keyword_meta_query();
         $meta_query[] = $this->country_meta_query();
         $meta_query[] = $this->minimum_price_meta_query();
@@ -784,6 +785,29 @@ class PH_Query {
             }
         }
         
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle date added
+     *
+     * @access public
+     * @return array
+     */
+    public function date_added_meta_query( ) {
+
+        $meta_query = array();
+
+        if ( isset( $_REQUEST['date_added'] ) && $_REQUEST['date_added'] != '' && is_numeric($_REQUEST['date_added']) )
+        {
+            $meta_query = array(
+                'key'     => '_on_market_change_date',
+                'value'   => date('Y-m-d H:i:s', strtotime('-' . $_REQUEST['date_added'] . ' days')),
+                'compare' => '>=',
+                'type'    => 'DATETIME',
+            );
+        }
+
         return $meta_query;
     }
 
