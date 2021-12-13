@@ -117,8 +117,8 @@ class PH_Viewing {
             ),
             array(
                 'key' => '_status',
-                'value' => 'cancelled',
-                'compare' => '!='
+                'value' => array('cancelled', 'no_show'),
+                'compare' => 'NOT IN',
             ),
         );
         foreach ( $applicant_contact_ids as $applicant_contact_id )

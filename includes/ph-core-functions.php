@@ -223,6 +223,7 @@ function ph_get_viewing_statuses()
         'feedback_passed_on'     => '- ' . __( 'Feedback Passed On', 'propertyhive' ),
         'feedback_not_passed_on' => '- ' . __( 'Feedback Not Passed On', 'propertyhive' ),
         'cancelled'              => __( 'Cancelled', 'propertyhive' ),
+        'no_show'                => __( 'No Show', 'propertyhive' ),
     );
 
     return $viewing_statuses;

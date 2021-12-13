@@ -749,7 +749,7 @@ class PH_Admin_Post_Types {
     public function viewing_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'confirmed', 'unconfirmed', 'carried_out', 'feedback_passed_on', 'feedback_not_passed_on', 'cancelled' ) ) ? $_GET['_status'] : '';
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'confirmed', 'unconfirmed', 'carried_out', 'feedback_passed_on', 'feedback_not_passed_on', 'cancelled', 'no_show' ) ) ? $_GET['_status'] : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_viewing_status">';
