@@ -1495,7 +1495,7 @@ function ph_form_field( $key, $field )
                 $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
                 $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : true;
                 $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
-                $field['blank_option'] = isset( $field['blank_option'] ) ? $field['blank_option'] : __( 'No preference', 'propertyhive' );
+                $field['blank_option'] = isset( $field['blank_option'] ) ? __( $field['blank_option'], 'propertyhive' ) : __( 'No preference', 'propertyhive' );
                 $field['parent_terms_only'] = isset( $field['parent_terms_only'] ) ? $field['parent_terms_only'] : false;
                 $field['hide_empty'] = isset( $field['hide_empty'] ) ? $field['hide_empty'] : false;
                 $field['multiselect'] = isset( $field['multiselect'] ) ? $field['multiselect'] : false;
