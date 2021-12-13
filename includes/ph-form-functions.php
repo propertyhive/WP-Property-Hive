@@ -167,6 +167,21 @@ function ph_get_search_form_fields()
         'value' => $default_value
     );
 
+    $date_added_days = array(
+        '' => __( 'No preference', 'propertyhive' ),
+        '1' => 'Last 24 Hours',
+        '3' => 'Last 3 Days',
+        '7' => 'Last 7 Days',
+        '14' => 'Last 14 Days',
+    );
+
+    $fields['date_added'] = array(
+        'type' => 'select',
+        'show_label' => true,
+        'label' => __( 'Date Added', 'propertyhive' ),
+        'options' => $date_added_days
+    );
+
     if ( $sales_department_active || $lettings_department_active )
     {
         if ( $sales_department_active )
