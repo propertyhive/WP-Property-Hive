@@ -249,6 +249,11 @@ class PH_Meta_Box_Property_Rooms {
             $allowed_html = array(
                 'p' => array(),
                 'br' => array(),
+                'i' => array(),
+                'em' => array(),
+                'u' => array(),
+                'strong' => array(),
+                'b' => array(),
             );
             update_post_meta($post_id, '_room_description_' . $i, wp_kses($_POST['_room_description'][$i], $allowed_html));
         }
