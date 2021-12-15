@@ -67,7 +67,7 @@ class PH_Meta_Box_Property_Rooms {
                             
                             // Room Description
                             propertyhive_wp_textarea_input( array( 
-                                'id' => '',
+                                'id' => '_room_description_' . $i,
                                 'name' => '_room_description[]', 
                                 'label' => __( 'Room Description', 'propertyhive' ), 
                                 'desc_tip' => false,
@@ -120,7 +120,7 @@ class PH_Meta_Box_Property_Rooms {
                         
                         // Room Description
                         propertyhive_wp_textarea_input( array( 
-                            'id' => '',
+                            'id' => '_room_description_id',
                             'name' => '_room_description[]', 
                             'label' => __( 'Room Description', 'propertyhive' ), 
                             'desc_tip' => false,
@@ -164,10 +164,19 @@ class PH_Meta_Box_Property_Rooms {
                 
                 jQuery(\'.add_property_room\').click(function()
                 {
+                    var new_room_id = jQuery(\'textarea[name=\\\'_room_description[]\\\']\').length;
+
                     var room_template = jQuery(\'#property_room_template\').html();
-                    
+                    room_template = room_template.replace("_id", "_" + new_room_id);
+                    room_template = room_template.replace("_id", "_" + new_room_id);
+                    room_template = room_template.replace("_id", "_" + new_room_id);
+                    room_template = room_template.replace("_id", "_" + new_room_id);
+                    room_template = room_template.replace("_id", "_" + new_room_id);
+
                     jQuery(\'#property_rooms\').append(room_template);
-                    
+                    ';
+                    if ( apply_filters('propertyhive_disable_description_editor', false) !== true ) { echo 'ph_init_description_editors();'; }
+                    echo '
                     return false;
                 });
                 
