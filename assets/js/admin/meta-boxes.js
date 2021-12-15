@@ -1,12 +1,76 @@
 var ph_lightbox_open = false; // Used to determine if a details lightbox is open and therefore which post ID (stored in ph_lightbox_post_id) to pass through to AJAX requests
 var ph_lightbox_post_id;
 
+function ph_init_description_editors()
+{
+    if (propertyhive_admin_meta_boxes.disable_description_editor == true)
+    {
+        return;
+    }
+
+    jQuery('textarea[name=\'_description[]\']').each(function()
+    {
+        var this_id = jQuery(this).attr('id');
+        this_id = this_id.replace("_description_", "");
+
+        if ( this_id != 'id' ) // ignore template room
+        {
+            wp.editor.remove("_description_" + this_id);
+            wp.editor.initialize(
+                "_description_" + this_id,
+                {
+                    'tinymce' : {
+                        'toolbar1': 'bold,italic,underline,undo,redo',
+                    },
+                    mediaButtons: false,
+                    quicktags: false
+                }
+            );
+        }
+    });
+
+    jQuery('textarea[name=\'_room_description[]\']').each(function()
+    {
+        var this_id = jQuery(this).attr('id');
+        this_id = this_id.replace("_room_description_", "");
+
+        if ( this_id != 'id' ) // ignore template room
+        {
+            wp.editor.remove("_room_description_" + this_id);
+            wp.editor.initialize(
+                "_room_description_" + this_id,
+                {
+                    'tinymce' : {
+                        'toolbar1': 'bold,italic,underline,undo,redo',
+                    },
+                    mediaButtons: false,
+                    quicktags: false
+                }
+            );
+        }
+    });
+}
+
 jQuery( function($){
     
+    ph_init_description_editors();
+
     $('.propertyhive_meta_box #property_rooms').sortable({
          opacity: 0.8,
          revert: true,
-         handle: 'h3'
+         handle: 'h3',
+         update: function( event, ui ) {
+            ph_init_description_editors();
+         }
+     });
+
+    $('.propertyhive_meta_box #property_descriptions').sortable({
+         opacity: 0.8,
+         revert: true,
+         handle: 'h3',
+         update: function( event, ui ) {
+            ph_init_description_editors();
+         }
      });
      
      $('.propertyhive_meta_box #property_features').sortable({

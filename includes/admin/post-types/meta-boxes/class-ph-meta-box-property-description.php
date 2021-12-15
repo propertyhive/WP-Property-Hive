@@ -56,7 +56,7 @@ class PH_Meta_Box_Property_Description {
 
                             // Description
                             propertyhive_wp_textarea_input( array( 
-                                'id' => '',
+                                'id' => '_description_' . $i,
                                 'name' => '_description[]', 
                                 'label' => __( 'Description', 'propertyhive' ), 
                                 'desc_tip' => false,
@@ -98,7 +98,7 @@ class PH_Meta_Box_Property_Description {
                         
                         // Description
                         propertyhive_wp_textarea_input( array( 
-                            'id' => '',
+                            'id' => '_description_id',
                             'name' => '_description[]', 
                             'label' => __( 'Description', 'propertyhive' ), 
                             'desc_tip' => false,
@@ -130,6 +130,9 @@ class PH_Meta_Box_Property_Description {
             var custom_departments = ' . json_encode(ph_get_custom_departments()) . ';
             jQuery(document).ready(function()
             {
+                ';
+                if ( apply_filters('propertyhive_disable_description_editor', false) !== true ) { echo 'ph_init_description_editors();'; }
+                echo '
                 jQuery(\'#property_descriptions\').on(\'keyup\', \'input[name=\\\'_description_name[]\\\']\', function()
                 {
                     var description_name = jQuery(this).val();
@@ -142,10 +145,19 @@ class PH_Meta_Box_Property_Description {
                 
                 jQuery(\'.add_property_description\').click(function()
                 {
+                    var new_description_id = jQuery(\'textarea[name=\\\'_description[]\\\']\').length;
+
                     var description_template = jQuery(\'#property_description_template\').html();
+                    description_template = description_template.replace("_id", "_" + new_description_id);
+                    description_template = description_template.replace("_id", "_" + new_description_id);
+                    description_template = description_template.replace("_id", "_" + new_description_id);
+                    description_template = description_template.replace("_id", "_" + new_description_id);
+                    description_template = description_template.replace("_id", "_" + new_description_id);
                     
                     jQuery(\'#property_descriptions\').append(description_template);
-                    
+                    ';
+                    if ( apply_filters('propertyhive_disable_description_editor', false) !== true ) { echo 'ph_init_description_editors();'; }
+                    echo '
                     return false;
                 });
                 
@@ -225,6 +237,11 @@ class PH_Meta_Box_Property_Description {
             $allowed_html = array(
                 'p' => array(),
                 'br' => array(),
+                'i' => array(),
+                'em' => array(),
+                'u' => array(),
+                'strong' => array(),
+                'b' => array(),
             );
             update_post_meta($post_id, '_description_' . $i, wp_kses($_POST['_description'][$i], $allowed_html));
         }
