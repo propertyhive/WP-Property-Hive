@@ -246,7 +246,7 @@ class PH_Admin_Assets {
                 'delete_note_nonce'             => wp_create_nonce("delete-note"),
                 'viewing_details_meta_nonce'    => wp_create_nonce( 'viewing-details-meta-box' ),
                 'viewing_actions_nonce'         => wp_create_nonce( 'viewing-actions' ),
-                'disable_description_editor'    => apply_filters('propertyhive_disable_description_editor', false),
+                'enable_description_editor'    => apply_filters('propertyhive_enable_description_editor', false),
             );
             wp_localize_script( 'propertyhive_admin_meta_boxes', 'propertyhive_admin_meta_boxes', $params );
 

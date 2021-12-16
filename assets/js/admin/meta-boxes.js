@@ -3,7 +3,7 @@ var ph_lightbox_post_id;
 
 function ph_init_description_editors()
 {
-    if (propertyhive_admin_meta_boxes.disable_description_editor == true)
+    if (propertyhive_admin_meta_boxes.enable_description_editor != true)
     {
         return;
     }
