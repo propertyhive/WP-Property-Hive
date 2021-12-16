@@ -130,9 +130,6 @@ class PH_Meta_Box_Property_Description {
             var custom_departments = ' . json_encode(ph_get_custom_departments()) . ';
             jQuery(document).ready(function()
             {
-                ';
-                if ( apply_filters('propertyhive_disable_description_editor', false) !== true ) { echo 'ph_init_description_editors();'; }
-                echo '
                 jQuery(\'#property_descriptions\').on(\'keyup\', \'input[name=\\\'_description_name[]\\\']\', function()
                 {
                     var description_name = jQuery(this).val();
@@ -156,7 +153,7 @@ class PH_Meta_Box_Property_Description {
                     
                     jQuery(\'#property_descriptions\').append(description_template);
                     ';
-                    if ( apply_filters('propertyhive_disable_description_editor', false) !== true ) { echo 'ph_init_description_editors();'; }
+                    if ( apply_filters('propertyhive_enable_description_editor', false) === true ) { echo 'ph_init_description_editors();'; }
                     echo '
                     return false;
                 });

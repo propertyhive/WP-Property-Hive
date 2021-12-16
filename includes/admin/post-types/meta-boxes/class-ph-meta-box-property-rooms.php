@@ -175,7 +175,7 @@ class PH_Meta_Box_Property_Rooms {
 
                     jQuery(\'#property_rooms\').append(room_template);
                     ';
-                    if ( apply_filters('propertyhive_disable_description_editor', false) !== true ) { echo 'ph_init_description_editors();'; }
+                    if ( apply_filters('propertyhive_enable_description_editor', false) === true ) { echo 'ph_init_description_editors();'; }
                     echo '
                     return false;
                 });
