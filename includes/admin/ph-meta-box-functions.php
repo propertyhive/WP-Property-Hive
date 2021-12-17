@@ -21,6 +21,9 @@ function propertyhive_wp_text_input( $field ) {
 	global $thepostid, $post, $propertyhive;
 
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_text_field', $field, $thepostid );
+
 	$field['placeholder']   = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
 	$field['class']         = isset( $field['class'] ) ? $field['class'] : 'short';
 	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
@@ -75,6 +78,9 @@ function propertyhive_wp_photo_upload( $field ) {
 	global $thepostid, $post, $propertyhive;
 
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_photo_upload_field', $field, $thepostid );
+
 	$field['id']  			= isset( $field['id'] ) ? $field['id'] : '';
 	$field['button_label']  = isset( $field['button_label'] ) ? $field['button_label'] : __('Select Photo', 'propertyhive');
 	$field['class']         = isset( $field['class'] ) ? $field['class'] : 'short';
@@ -193,6 +199,9 @@ function propertyhive_wp_file_upload( $field ) {
 	global $thepostid, $post, $propertyhive;
 
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_file_upload_field', $field, $thepostid );
+
 	$field['id']  			= isset( $field['id'] ) ? $field['id'] : '';
 	$field['button_label']  = isset( $field['button_label'] ) ? $field['button_label'] : __('Select Photo', 'propertyhive');
 	$field['class']         = isset( $field['class'] ) ? $field['class'] : 'short';
@@ -312,6 +321,9 @@ function propertyhive_wp_hidden_input( $field ) {
 	global $thepostid, $post;
 
 	$thepostid = empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_hidden_field', $field, $thepostid );
+
 	$field['value'] = isset( $field['value'] ) ? $field['value'] : get_post_meta( $thepostid, $field['id'], true );
 
 	echo '<input type="hidden" name="' . esc_attr( $field['id'] ) . '" id="' . esc_attr( $field['id'] ) . '" value="' . esc_attr( $field['value'] ) .  '" /> ';
@@ -328,6 +340,9 @@ function propertyhive_wp_textarea_input( $field ) {
 	global $thepostid, $post, $propertyhive;
 
 	$thepostid 				= empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_textarea_field', $field, $thepostid );
+
 	$field['placeholder'] 	= isset( $field['placeholder'] ) ? $field['placeholder'] : '';
 	$field['class'] 		= isset( $field['class'] ) ? $field['class'] : 'short';
 	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
@@ -366,6 +381,9 @@ function propertyhive_wp_checkbox( $field ) {
 	global $thepostid, $post;
 
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_checkbox_field', $field, $thepostid );
+
 	$field['class']         = isset( $field['class'] ) ? $field['class'] : 'checkbox';
 	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
 	$field['value']         = isset( $field['value'] ) ? $field['value'] : get_post_meta( $thepostid, $field['id'], true );
@@ -390,6 +408,9 @@ function propertyhive_wp_checkboxes( $field ) {
 	global $thepostid, $post;
 
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_checkboxes_field', $field, $thepostid );
+
 	$field['class']         = isset( $field['class'] ) ? $field['class'] : 'checkbox';
 	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
 	$field['name']          = isset( $field['name'] ) ? $field['name'] : $field['id'];
@@ -419,6 +440,9 @@ function propertyhive_wp_select( $field ) {
 	global $thepostid, $post, $propertyhive;
 
 	$thepostid 				= empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_select_field', $field, $thepostid );
+
 	$field['class'] 		= isset( $field['class'] ) ? $field['class'] : 'select short';
 	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
 	$field['value'] 		= isset( $field['value'] ) ? $field['value'] : get_post_meta( $thepostid, $field['id'], true );
@@ -457,6 +481,9 @@ function propertyhive_wp_select_optgroups( $field ) {
 	global $thepostid, $post, $propertyhive;
 
 	$thepostid 				= empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_select_optgroups_field', $field, $thepostid );
+
 	$field['class'] 		= isset( $field['class'] ) ? $field['class'] : 'select short';
 	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
 	$field['value'] 		= isset( $field['value'] ) ? $field['value'] : get_post_meta( $thepostid, $field['id'], true );
@@ -504,6 +531,9 @@ function propertyhive_wp_radio( $field ) {
 	global $thepostid, $post, $propertyhive;
 
 	$thepostid 				= empty( $thepostid ) ? $post->ID : $thepostid;
+
+	$field = apply_filters( 'propertyhive_meta_box_wp_radio_field', $field, $thepostid );
+	
 	$field['class'] 		= isset( $field['class'] ) ? $field['class'] : 'select short';
 	$field['wrapper_class'] = isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '';
 	$field['value'] 		= isset( $field['value'] ) ? $field['value'] : get_post_meta( $thepostid, $field['id'], true );
