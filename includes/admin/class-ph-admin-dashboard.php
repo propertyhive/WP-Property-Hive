@@ -21,10 +21,8 @@ class PH_Admin_Dashboard {
 	 * Hook in tabs.
 	 */
 	public function __construct() {
-		// Only hook in admin parts if the user has admin access
-		if ( current_user_can( 'manage_options' ) ) {
-			add_action( 'wp_dashboard_setup', array( $this, 'init' ) );
-		}
+		
+		add_action( 'wp_dashboard_setup', array( $this, 'init' ) );
 
 		add_action( 'wp_dashboard_setup', array( $this, 'hide_non_property_hive_widgets' ), 9999 );
 	}
@@ -33,7 +31,11 @@ class PH_Admin_Dashboard {
 	 * Init dashboard widgets.
 	 */
 	public function init() {
-		wp_add_dashboard_widget( 'propertyhive_dashboard_news', __( 'Property Hive News', 'propertyhive' ), array( $this, 'news_widget' ) );
+		
+		if ( current_user_can( 'manage_options' ) ) 
+		{
+			wp_add_dashboard_widget( 'propertyhive_dashboard_news', __( 'Property Hive News', 'propertyhive' ), array( $this, 'news_widget' ) );
+		}
 
 		if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
         {
