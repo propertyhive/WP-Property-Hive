@@ -66,6 +66,7 @@ class PH_Elementor {
 			'Property Price',
 			'Property Images',
 			'Property Image',
+			'Property Gallery',
 			'Property Features',
 			'Property Summary Description',
 			'Property Full Description',
