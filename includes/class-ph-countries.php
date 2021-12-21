@@ -558,35 +558,45 @@ class PH_Countries {
 		{
 			$countries = $this->countries;
 
-			$exchange_rates = array();
+			// Filter 'propertyhive_new_currency_exchange_rates' allows someone to use their own currency API
+			// Return should be in format:
+			// array(
+			//		'EUR' => x,
+			// 		'USD' => x,
+			//		... etc
+			// )
+			$exchange_rates = apply_filters( 'propertyhive_new_currency_exchange_rates', array() ); 
 			$previous_exchange_rates = get_option( 'propertyhive_currency_exchange_rates' );
 
-			// Get all currency exchange rates from GBP
-			// We're using the API from https://github.com/fawazahmed0/currency-api
-			$url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/gbp.json';
-			$response = wp_remote_get( $url );
-
-			if ( is_array( $response ) )
+			if ( empty($exchange_rates) )
 			{
-				$body = wp_remote_retrieve_body( $response );
-				$json = json_decode($body, true);
+				// Get all currency exchange rates from GBP
+				// We're using the API from https://github.com/fawazahmed0/currency-api
+				$url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/gbp.json';
+				$response = wp_remote_get( $url );
 
-				// If response is valid JSON and contains the core gbp key
-				if ( $json !== null && isset( $json['gbp'] ) )
+				if ( is_array( $response ) )
 				{
-					$exchange_rates_array = $json['gbp'];
+					$body = wp_remote_retrieve_body( $response );
+					$json = json_decode($body, true);
 
-					foreach ( $countries as $country )
+					// If response is valid JSON and contains the core gbp key
+					if ( $json !== null && isset( $json['gbp'] ) )
 					{
-						$currency_code = $country['currency_code'];
+						$exchange_rates_array = $json['gbp'];
 
-						// If we haven't already got this currency and it's not GBP
-						if (!isset($exchange_rates[$currency_code]) && $currency_code != 'GBP')
+						foreach ( $countries as $country )
 						{
-							// If this currency is in the list we received from the API
-							if ( isset( $exchange_rates_array[strtolower( $currency_code )] ) )
+							$currency_code = $country['currency_code'];
+
+							// If we haven't already got this currency and it's not GBP
+							if (!isset($exchange_rates[$currency_code]) && $currency_code != 'GBP')
 							{
-								$exchange_rates[$currency_code] = (string)$exchange_rates_array[strtolower( $currency_code )];
+								// If this currency is in the list we received from the API
+								if ( isset( $exchange_rates_array[strtolower( $currency_code )] ) )
+								{
+									$exchange_rates[$currency_code] = (string)$exchange_rates_array[strtolower( $currency_code )];
+								}
 							}
 						}
 					}
