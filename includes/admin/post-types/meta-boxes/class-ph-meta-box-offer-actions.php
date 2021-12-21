@@ -67,6 +67,20 @@ jQuery(document).ready(function($)
 			return;
 		}
 
+		if ( this_href == '#action_panel_offer_withdrawn' )
+		{
+			var data = {
+		        action:         'propertyhive_offer_withdrawn',
+		        offer_id:    	<?php echo $post->ID; ?>,
+		        security:       '<?php echo wp_create_nonce( 'offer-actions' ); ?>',
+		    };
+			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+		    {
+		    	redraw_offer_actions();
+		    }, 'json');
+			return;
+		}
+
 		if ( this_href == '#action_panel_offer_revert_pending' )
 		{
 			var data = {

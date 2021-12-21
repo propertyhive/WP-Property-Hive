@@ -90,6 +90,7 @@ class PH_AJAX {
             'get_property_offers_meta_box' => false,
             'offer_accepted' => false,
             'offer_declined' => false,
+            'offer_withdrawn' => false,
             'offer_revert_pending' => false,
             'get_contact_offers_meta_box' => false,
             
@@ -4495,6 +4496,11 @@ class PH_AJAX {
                     class="button button-danger offer-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . wp_kses_post( __('Decline Offer', 'propertyhive') ) . '</a>';
+            $actions[] = '<a 
+                    href="#action_panel_offer_withdrawn" 
+                    class="button offer-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . wp_kses_post( __('Withdraw Offer', 'propertyhive') ) . '</a>';
         }
 
         if ( $status == 'accepted' )
@@ -4521,10 +4527,15 @@ class PH_AJAX {
                         class="button button-success"
                         style="width:100%; margin-bottom:7px; text-align:center" 
                     >' . wp_kses_post( __('Create Sale', 'propertyhive') ) . '</a>';
+                $actions[] = '<a 
+                    href="#action_panel_offer_withdrawn" 
+                    class="button offer-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . wp_kses_post( __('Withdraw Offer', 'propertyhive') ) . '</a>';
             }
         }
 
-        if ( $status == 'accepted' || $status == 'declined' )
+        if ( $status == 'accepted' || $status == 'declined' || $status == 'withdrawn' )
         {
             $actions[] = '<a 
                     href="#action_panel_offer_revert_pending" 
@@ -4603,6 +4614,32 @@ class PH_AJAX {
         wp_send_json_error();
     }
 
+    public function offer_withdrawn()
+    {
+        check_ajax_referer( 'offer-actions', 'security' );
+
+        $post_id = (int)$_POST['offer_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'pending' || $status == 'accepted' )
+        {
+            update_post_meta( $post_id, '_status', 'withdrawn' );
+
+            // Add note/comment to offer
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'offer_withdrawn',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
     public function offer_revert_pending()
     {
         check_ajax_referer( 'offer-actions', 'security' );
@@ -4611,7 +4648,7 @@ class PH_AJAX {
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
-        if ( $status == 'accepted' || $status == 'declined' )
+        if ( $status == 'accepted' || $status == 'declined' || $status == 'withdrawn' )
         {
             update_post_meta( $post_id, '_status', 'pending' );
 
