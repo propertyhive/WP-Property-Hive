@@ -38,6 +38,7 @@ jQuery(function() {
             'Any Time' : [moment().endOf('month'), moment().startOf('month')],
             'Today': [moment(), moment()],
             'Tomorrow': [moment().add(1, 'days'), moment().add(1, 'days')],
+            'Yesterday': [moment().subtract(1, 'days'), moment()]
             'Last 7 Days': [moment().subtract(6, 'days'), moment()]
         },
     }, update_date_range_filter);
