@@ -344,7 +344,7 @@ class PH_Emails {
 			)
 		);
 
-		if ( is_wp_version_compatible( '5.1' ) )
+		if ( version_compare( get_bloginfo( 'version' ), '5.1', '>=' ) )
 		{
 			// If WP version contains compare_key, check contact has at least one applicant profile with Send Matching Properties checked
 			$meta_query[] = array(
