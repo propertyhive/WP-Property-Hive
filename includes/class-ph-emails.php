@@ -336,17 +336,30 @@ class PH_Emails {
 		include_once( dirname(__FILE__) . '/admin/class-ph-admin-matching-properties.php' );
 		$ph_admin_matching_properties = new PH_Admin_Matching_Properties();
 
+		$meta_query = array(
+			array(
+				'key' => '_contact_types',
+				'value' => 'applicant',
+				'compare' => 'LIKE'
+			)
+		);
+
+		if ( is_wp_version_compatible( '5.1' ) )
+		{
+			// If WP version contains compare_key, check contact has at least one applicant profile with Send Matching Properties checked
+			$meta_query[] = array(
+				'key' => '_applicant_profile_',
+				'compare_key' => 'LIKE',
+				'value' => 'send_matching_properties";s:3:"yes"',
+				'compare' => 'LIKE',
+			);
+		}
+
 		// Get all contacts that have a type of applicant
 		$args = array(
 			'post_type' => 'contact',
 			'nopaging' => true,
-			'meta_query' => array(
-				array(
-					'key' => '_contact_types',
-					'value' => 'applicant',
-					'compare' => 'LIKE'
-				)
-			),
+			'meta_query' => $meta_query,
 			'fields' => 'ids'
 		);
 
