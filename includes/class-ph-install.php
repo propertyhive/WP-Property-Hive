@@ -646,6 +646,15 @@ Should you need to cancel or amend this viewing please do not hesitate to contac
 
 " . get_bloginfo('name'), '', 'no' );
 
+        add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', 'Appraisal Booked On [property_address]', '', 'no' );
+        add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', "Dear [owner_dear],
+
+This is confirmation that an appraisal has been booked for your property, [property_address], for [appraisal_time] on [appraisal_date].
+
+Should you need to cancel or amend this appraisal, please do not hesitate to contact us.
+
+" . get_bloginfo('name'), '', 'no' );
+
 	}
 
 	/**

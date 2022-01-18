@@ -239,10 +239,10 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	            'css'         => 'min-width:300px; height:110px;',
 	        );
 
-	        $settings[] = array( 'type' => 'sectionend', 'id' => 'viewing_booking_confirmation_email_options' );
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'applicant_viewing_booking_confirmation_email_options' );
 
 	        // Owner
-	        $settings[] = array( 'title' => __( 'Owner/Landlord Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_viewing_booking_confirmation_email_options' );
+	        $settings[] = array( 'title' => __( 'Owner/Landlord Viewing Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'owner_viewing_booking_confirmation_email_options' );
 
 	        $settings[] = array(
 	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
@@ -258,7 +258,29 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	            'css'         => 'min-width:300px; height:110px;',
 	        );
 
-	        $settings[] = array( 'type' => 'sectionend', 'id' => 'viewing_booking_confirmation_email_options' );
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'owner_viewing_booking_confirmation_email_options' );
+	    }
+
+	    if ( get_option('propertyhive_module_disabled_appraisals', '') != 'yes' )
+	    {
+	        // Owner
+	        $settings[] = array( 'title' => __( 'Owner/Landlord Appraisal Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'owner_appraisal_booking_confirmation_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_appraisal_owner_booking_confirmation_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_appraisal_owner_booking_confirmation_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'owner_appraisal_booking_confirmation_email_options' );
 	    }
 
 		$settings = apply_filters( 'propertyhive_email_settings', $settings );
