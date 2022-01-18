@@ -58,6 +58,7 @@ class PH_AJAX {
             'appraisal_won' => false,
             'appraisal_lost_reason' => false,
             'appraisal_instructed' => false,
+            'appraisal_email_owner_booking_confirmation' => false,
             'appraisal_revert_pending' => false,
             'appraisal_revert_carried_out' => false,
             'appraisal_revert_won' => false,
@@ -2716,6 +2717,25 @@ class PH_AJAX {
 
         if ( $status == 'pending' )
         {
+            $owner_booking_confirmation_sent_at = get_post_meta( $post_id, '_owner_booking_confirmation_sent_at', TRUE );
+
+            $appraisal_department = get_post_meta( $post_id, '_department', TRUE );
+            $owner_contact_id = get_post_meta( $post_id, '_property_owner_contact_id', TRUE );
+            $owner_or_landlord = ( $appraisal_department == 'residential-lettings' ? 'Landlord' : 'Owner' );
+
+            if ( !empty($owner_contact_id) )
+            {
+                $actions[] = '<a
+                        href="#action_panel_appraisal_email_owner_booking_confirmation"
+                        class="button appraisal-action"
+                        style="width:100%; margin-bottom:7px; text-align:center"
+                    >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+
+                $actions[] = '<div id="appraisal_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+
+                $actions[] = '<hr>';
+            }
+
             /*$actions[] = '<a 
                     href="" 
                     class="button"
@@ -3291,6 +3311,76 @@ class PH_AJAX {
 
                 wp_send_json_success();
             }
+        }
+
+        wp_send_json_error();
+    }
+
+    public function appraisal_email_owner_booking_confirmation()
+    {
+        check_ajax_referer( 'appraisal-actions', 'security' );
+
+        $post_id = (int)$_POST['appraisal_id'];
+
+        $appraisal = new PH_Appraisal($post_id);
+
+        $owner_contact_id = $appraisal->property_owner_contact_id;
+
+        if ( !is_array($owner_contact_id) ) { $owner_contact_id = array($owner_contact_id); }
+
+        if ( !empty($owner_contact_id) )
+        {
+            $owner_emails = array();
+            $owner_names = array();
+            $owner_dears = array();
+
+            foreach ($owner_contact_id as $owner_id)
+            {
+                $owner_contact = new PH_Contact($owner_id);
+
+                $owner_email = sanitize_email( $owner_contact->email_address );
+                $owner_name = $owner_contact->post_title;
+                $owner_dear = $owner_contact->dear();
+
+                if( ! empty($owner_email) ) array_push($owner_emails, $owner_email);
+                if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
+                if( ! empty($owner_dear) ) array_push($owner_dears, $owner_dear);
+            }
+
+            $owner_names_string = $this->get_list_string($owner_names);
+            $owner_dears_string = $this->get_list_string($owner_dears);
+
+            $to = implode(",", $owner_emails);
+
+            $subject = get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', '' );
+            $body = get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', '' );
+
+            $appraisal_date_timestamp = strtotime($appraisal->start_date_time);
+
+            $subject = str_replace('[property_address]', $appraisal->get_formatted_full_address(), $subject);
+            $subject = str_replace('[owner_name]', $owner_names_string, $subject);
+            $subject = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $subject);
+            $subject = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $subject);
+
+            $body = str_replace('[property_address]', $appraisal->get_formatted_full_address(), $body);
+            $body = str_replace('[owner_name]', $owner_names_string, $body);
+            $body = str_replace('[owner_dear]', $owner_dears_string, $body);
+            $body = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $body);
+            $body = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $body);
+
+            $body = apply_filters( 'appraisal_owner_booking_confirmation_email_body', $body, $post_id );
+
+            $from = get_bloginfo('admin_email');
+
+            $headers = array();
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            wp_mail($to, $subject, $body, $headers);
+
+            update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+
+            wp_send_json_success();
         }
 
         wp_send_json_error();
