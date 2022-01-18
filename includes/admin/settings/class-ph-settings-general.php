@@ -594,7 +594,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     'files' => __( 'Media Files', 'propertyhive' ),
                     'urls' => __( 'URLs', 'propertyhive' ),
                 ),
-                'desc'  => __( '', 'propertyhive' )
+                'desc'  => ''
             ),
 
             array(
@@ -606,7 +606,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     'files' => __( 'Media Files', 'propertyhive' ),
                     'urls' => __( 'URLs', 'propertyhive' ),
                 ),
-                'desc'  => __( '', 'propertyhive' )
+                'desc'  => ''
             ),
 
             array(
@@ -618,7 +618,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     'files' => __( 'Media Files', 'propertyhive' ),
                     'urls' => __( 'URLs', 'propertyhive' ),
                 ),
-                'desc'  => __( '', 'propertyhive' )
+                'desc'  => ''
             ),
 
             array(
@@ -630,7 +630,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     'files' => __( 'Media Files', 'propertyhive' ),
                     'urls' => __( 'URLs', 'propertyhive' ),
                 ),
-                'desc'  => __( '', 'propertyhive' )
+                'desc'  => ''
             ),
 
             array( 'type' => 'sectionend', 'id' => 'media_storage_options'),
