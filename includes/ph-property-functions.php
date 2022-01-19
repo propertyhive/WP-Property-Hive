@@ -435,7 +435,7 @@ add_filter( 'get_post_metadata', function ( $value, $post_id, $meta_key, $single
 
 		$is_recursing = false;
 
-		if ( $value == '' ) // If we haven't already get a thumbnail ID (i.e. in the case where someone has added theme support)
+		if ( empty($value) ) // If we haven't already get a thumbnail ID (i.e. in the case where someone has added theme support)
 		{
 			$photos = get_post_meta( $post_id, '_photos', TRUE );
 	        if ( is_array($photos) && !empty($photos) )
