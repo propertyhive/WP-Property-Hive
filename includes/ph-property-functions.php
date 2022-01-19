@@ -452,3 +452,27 @@ add_filter( 'get_post_metadata', function ( $value, $post_id, $meta_key, $single
 	}
 	return $value;
 }, 10, 4);
+
+add_filter( 'wpseo_add_opengraph_images', function ( $object ) 
+{
+	if ( get_option('propertyhive_images_stored_as', '') != 'urls' )
+	{
+		return $object;
+	}
+
+	global $post;
+
+	if ( isset($post->post_type) && $post->post_type == 'property' )
+	{
+		$property = new PH_Property($post->ID);
+		$photos = $property->_photo_urls;
+
+	    if (isset($photos) && is_array($photos) && !empty($photos) && isset($photos[0]) && isset($photos[0]['url']))
+	    {
+	        $secondary_image = array( 'url' => $photos[0]['url']/*, 'height' => 768, 'width' => 1024*/ );
+			$object->add_image( $secondary_image );
+	    }
+	}
+
+	return $object;
+});
