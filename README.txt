@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.8.2
-Stable tag: 1.5.29
+Tested up to: 5.8.3
+Stable tag: 1.5.30
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.30 - 2022-01-23 =
+* Added owner confirmation emails to appraisals
+* Ensure og:image tag is included when using Yoast and images are being stored as URLs
+* In the auto match cron, only get applicants with Send Matching Properties ticked in initial query
+* Added 'Yesterday' as option to date range filter in backend on viewings, offers etc
+* Added filter 'propertyhive_query_search_form_currency' to override currency being used in search queries
+* PHP8 compatility fix regarding obtaining featured property image
+* Ensured 'Property Hive-Only Mode' checkbox description is ran through __()
 
 = 1.5.29 - 2021-12-21 =
 * Added new Elementor Gallery widget with two layouts to choose from
