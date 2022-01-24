@@ -320,9 +320,10 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 }
                 break;
             case 'office' :
-                if ( !empty($the_enquiry->_office_id) )
+                $office_id = $the_enquiry->_office_id;
+                if ( !empty($office_id) )
                 {
-                    echo get_the_title( $the_enquiry->_office_id );
+                    echo get_the_title( $office_id );
                 }
                 else
                 {
