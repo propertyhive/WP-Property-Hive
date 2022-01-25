@@ -455,6 +455,12 @@ class PH_Emails {
 								}
 							}
 
+							$max_results = apply_filters( 'propertyhive_auto_match_maximum_results', FALSE);
+							if ( $max_results !== FALSE )
+							{
+								$new_matching_properties = array_slice($new_matching_properties, 0, (int)$max_results);
+							}
+
 							if ( !empty($new_matching_properties) )
 							{
 								$subject = str_replace("[property_count]", count($new_matching_properties) . ' propert' . ( ( count($new_matching_properties) != 1 ) ? 'ies' : 'y' ), $default_subject);
