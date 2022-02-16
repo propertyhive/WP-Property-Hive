@@ -119,6 +119,9 @@ class PH_Shortcodes {
 	 * @return string
 	 */
 	public static function properties( $atts ) {
+
+		global $propertyhive_loop;
+
 		$atts = shortcode_atts( array(
 			'columns' 			=> '2',
 			'orderby' 			=> 'meta_value_num',
