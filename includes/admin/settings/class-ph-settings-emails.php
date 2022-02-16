@@ -541,8 +541,21 @@ class PH_Settings_Emails extends PH_Settings_Page {
 				update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
 			}
 
+			$recurrence = apply_filters( 'propertyhive_auto_email_match_cron_recurrence', 'daily' );
+			if ( $recurrence != 'hourly' )
+			{
+				$timestamp = strtotime( '02:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' );
+			}
+			else
+			{
+				$timestamp = strtotime( '+1 hours' );
+			}
 			$ve = get_option( 'gmt_offset' ) > 0 ? '+' : '-';
-			wp_schedule_event( apply_filters( 'propertyhive_auto_email_match_cron_timestamp', strtotime( '02:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ) ), 'daily', 'propertyhive_auto_email_match' );
+			wp_schedule_event( 
+				apply_filters( 'propertyhive_auto_email_match_cron_timestamp', $timestamp ), 
+				$recurrence, 
+				'propertyhive_auto_email_match' 
+			);
 		}
 		else
 		{
