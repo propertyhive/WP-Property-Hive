@@ -208,7 +208,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
 	        $settings[] = array(
 	            'title'   => __( 'Automatically Send Matching Properties To Applicants', 'propertyhive' ),
-	            'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent emailed properties as they\'re added.<br><br>
+	            'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent properties.<br><br>
 	            	- This will only apply to properties added from the moment this option is activated.<br>
 	            	- When enabled, this can disabled on a per-applicant basis by going into their record<br>
 	            	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ) . ( ( get_option( 'propertyhive_auto_property_match', '' ) == 'yes' && get_option( 'propertyhive_auto_property_match_enabled_date', '' ) != '' ) ? '<br><br>Enabled on ' . date("jS F Y H:i", strtotime(get_option( 'propertyhive_auto_property_match_enabled_date', '' )) + $time_offset) : '' ),
