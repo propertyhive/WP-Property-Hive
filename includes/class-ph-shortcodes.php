@@ -814,6 +814,7 @@ class PH_Shortcodes {
 			'order'						=> 'asc',
 			'price_percentage_bounds'	=> 10,
 			'bedroom_bounds'			=> 0,
+			'matching_address_field'	=> '', // only return fields with matching address field. Options: address_two, address_three, address_four, location
 			'property_id'				=> '',
 			'availability_id'	=> '',
 			'no_results_output' => '',
@@ -904,6 +905,16 @@ class PH_Shortcodes {
 				);
 			}
 
+			if ( isset($atts['matching_address_field']) && in_array($atts['matching_address_field'], array( 'address_two', 'address_three', 'address_four' )) )
+			{
+				$address_field = get_post_meta( $atts['property_id'], '_' . $atts['matching_address_field'], true );
+
+				$meta_query[] = array(
+					'key' 		=> '_' . $atts['matching_address_field'],
+					'value' 	=> $address_field,
+				);
+			}
+
 			$args['meta_query'] = $meta_query;
 
 			$tax_query = array();
@@ -915,6 +926,20 @@ class PH_Shortcodes {
 	                'terms' => explode(",", $atts['availability_id']),
 	                'compare' => 'IN',
 	            );
+			}
+
+			if ( isset($atts['matching_address_field']) && $atts['matching_address_field'] == 'location' )
+			{
+				$term_list = wp_get_post_terms($atts['property_id'], 'location', array("fields" => "ids"));
+            
+	            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+	            {
+	            	$tax_query[] = array(
+		                'taxonomy'  => 'location',
+		                'terms' => $term_list,
+		                'compare' => 'IN',
+		            );
+	            }
 			}
 
 			if ( ! empty( $tax_query ) ) {
