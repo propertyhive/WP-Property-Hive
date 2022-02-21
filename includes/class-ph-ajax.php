@@ -3370,7 +3370,11 @@ class PH_AJAX {
 
             $body = apply_filters( 'appraisal_owner_booking_confirmation_email_body', $body, $post_id );
 
-            $from = get_bloginfo('admin_email');
+            $from = get_option('propertyhive_email_from_address', '');
+            if ( $from == '' )
+            {
+                $from = get_bloginfo('admin_email');
+            }
 
             $headers = array();
             $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
@@ -3917,7 +3921,11 @@ class PH_AJAX {
             $from = $property->office_email_address;
             if ( sanitize_email($from) == '' )
             {
-                $from = get_bloginfo('admin_email');
+                $from = get_option('propertyhive_email_from_address', '');
+                if ( $from == '' )
+                {
+                    $from = get_bloginfo('admin_email');
+                }
             }
 
             $headers = array();
@@ -4002,7 +4010,11 @@ class PH_AJAX {
             $from = $property->office_email_address;
             if ( sanitize_email($from) == '' )
             {
-                $from = get_bloginfo('admin_email');
+                $from = get_option('propertyhive_email_from_address', '');
+                if ( $from == '' )
+                {
+                    $from = get_bloginfo('admin_email');
+                }
             }
 
             $headers = array();
