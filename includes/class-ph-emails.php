@@ -508,6 +508,8 @@ class PH_Emails {
 									$highest_office_email_address = get_option('admin_email');
 								}
 
+								$highest_office_email_address = apply_filters( 'propertyhive_auto_match_from_email_address', $highest_office_email_address );
+
 								$ph_admin_matching_properties->send_emails(
 									$contact_id,
 									$i,
