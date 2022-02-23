@@ -3883,10 +3883,17 @@ class PH_AJAX {
         $to = array();
         foreach ($applicant_contact_ids as $applicant_contact_id)
         {
-            $to[] = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+            $applicant_email_address = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+            $explode_applicant_email_address = explode( ",", $applicant_email_address );
+            foreach ( $explode_applicant_email_address as $email_address )
+            {
+                $to[] = sanitize_email($email_address);
+            }
         }
 
-        if ( sanitize_email(implode($to)) != '' )
+        $to = array_filter($to);
+
+        if ( !empty(implode($to)) )
         {
             $subject = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
             $body = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
@@ -3964,13 +3971,18 @@ class PH_AJAX {
             {
                 $owner_contact = new PH_Contact($owner_id);
 
-                $owner_email = sanitize_email( $owner_contact->email_address );
                 $owner_name = $owner_contact->post_title;
                 $owner_dear = $owner_contact->dear();
 
-                if( ! empty($owner_email) ) array_push($owner_emails, $owner_email);
                 if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
                 if( ! empty($owner_dear) ) array_push($owner_dears, $owner_dear);
+
+                $owner_email = $owner_contact->email_address;
+                $explode_owner_email = explode( ",", $owner_email );
+                foreach ( $explode_owner_email as $email_address )
+                {
+                    $owner_emails[] = sanitize_email($email_address);
+                }
             }
 
             $owner_names_string = $this->get_list_string($owner_names);
