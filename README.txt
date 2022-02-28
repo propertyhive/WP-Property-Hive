@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.8.3
-Stable tag: 1.5.30
+Tested up to: 5.9.1
+Stable tag: 1.5.31
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,19 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.31 - 2022-02-28 =
+* Added new [similar_properties] attribute 'matching_address_field' to specify only properties in same location are returned. Possible values include: address_two, address_three, address_four and location
+* Added new filter 'propertyhive_auto_email_match_cron_recurrence' to change auto match recurrence. Possible options are hourly, twicedaily or daily
+* Added new filter 'propertyhive_auto_match_maximum_results' to allow limiting number of auto-match results
+* Added new filter 'propertyhive_auto_match_from_email_address' to change auto match from email address. By default it will use the email address of the office that has the most properties contained within the mailout
+* Changed appraisal confirmation emails to use 'From' address specified in email settings area, instead of admin email address
+* Corrected 'columns' attribute not impacting template CSS classes in [properties] shortcode
+* Corrected auto-match tooltip so it doesn't sound like they're sent instantly
+* Corrected office name not showing in main enquiries list
+* Corrected recent 'Yesterday' date filter addition
+* Corrected viewing confirmation emails breaking when owner or applicant has a comma-delimited email address entered
+* Declared compatibility for WordPress 5.9.1
 
 = 1.5.30 - 2022-01-23 =
 * Added owner confirmation emails to appraisals
