@@ -3247,6 +3247,8 @@ class PH_AJAX {
                 wp_set_object_terms( $property_post_id, wp_get_object_terms( $post_id, 'parking', array("fields" => "ids") ), 'parking' );
                 wp_set_object_terms( $property_post_id, wp_get_object_terms( $post_id, 'outside_space', array("fields" => "ids") ), 'outside_space' );
 
+                update_post_meta( $property_post_id, '_council_tax_band', get_post_meta( $post_id, '_council_tax_band', TRUE ) );
+
                 $owner_contact_ids = get_post_meta( $post_id, '_property_owner_contact_id', TRUE );
                 if ( !is_array($owner_contact_ids) )
                 {

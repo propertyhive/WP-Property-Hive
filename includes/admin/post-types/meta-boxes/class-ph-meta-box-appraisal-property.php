@@ -45,6 +45,8 @@ class PH_Meta_Box_Appraisal_Property {
 
             echo '<p class="form-field"><label for="">Outside Space</label>' . $appraisal->outside_space . '</p>';
 
+            echo '<p class="form-field"><label for="">Council Tax Band</label>' . $appraisal->council_tax_band . '</p>';
+
             echo '<p class="form-field"><label for="">Additional Information</label>' . $appraisal->additional_property_information . '</p>';
         }
         else
@@ -393,6 +395,35 @@ class PH_Meta_Box_Appraisal_Property {
             ?>
         </select>
 <?php
+        $tax_band_options = apply_filters( 'propertyhive_property_residential_tax_bands',
+            array(
+                '' => '',
+                'A' => 'A',
+                'B' => 'B',
+                'C' => 'C',
+                'D' => 'D',
+                'E' => 'E',
+                'F' => 'F',
+                'G' => 'G',
+                'H' => 'H',
+                'I' => 'I',
+            )
+        );
+
+        $args = array(
+            'id' => '_council_tax_band',
+            'label' => __( 'Council Tax Band', 'propertyhive' ),
+            'desc_tip' => false,
+            'options' => $tax_band_options
+        );
+
+        $selected_tax_band = get_post_meta( $post->ID, '_council_tax_band', true );
+        if ( !empty($selected_tax_band) )
+        {
+            $args['value'] = $selected_tax_band;
+        }
+        propertyhive_wp_select( $args );
+
             $args = array( 
                 'id' => '_additional_property_information', 
                 'label' => __( 'Additional Information', 'propertyhive' ), 
@@ -523,6 +554,11 @@ class PH_Meta_Box_Appraisal_Property {
             else
             {
                 wp_delete_object_term_relationships( $post_id, 'outside_space' );
+            }
+
+            if ( isset( $_POST['_council_tax_band'] ) )
+            {
+                update_post_meta( $post_id, '_council_tax_band', $_POST['_council_tax_band'] );
             }
 
             update_post_meta( $post_id, '_additional_property_information', sanitize_textarea_field($_POST['_additional_property_information']) );
