@@ -202,7 +202,34 @@ class PH_Meta_Box_Property_Residential_Details {
             ?>
         </select>
 <?php
-    
+        $tax_band_options = apply_filters( 'propertyhive_property_residential_tax_bands',
+            array(
+                '' => '',
+                'A' => 'A',
+                'B' => 'B',
+                'C' => 'C',
+                'D' => 'D',
+                'E' => 'E',
+                'F' => 'F',
+                'G' => 'G',
+                'H' => 'H',
+                'I' => 'I',
+            )
+        );
+        $args = array(
+            'id' => '_council_tax_band',
+            'label' => __( 'Council Tax Band', 'propertyhive' ),
+            'desc_tip' => false,
+            'options' => $tax_band_options
+        );
+
+        $selected_tax_band = get_post_meta( $post->ID, '_council_tax_band', true );
+        if ( !empty($selected_tax_band) )
+        {
+            $args['value'] = $selected_tax_band;
+        }
+        propertyhive_wp_select( $args );
+
         do_action('propertyhive_property_residential_details_fields');
 	   
         echo '</div>';
@@ -288,6 +315,11 @@ class PH_Meta_Box_Property_Residential_Details {
             else
             {
                 wp_delete_object_term_relationships( $post_id, 'outside_space' );
+            }
+
+            if ( isset( $_POST['_council_tax_band'] ) )
+            {
+                update_post_meta( $post_id, '_council_tax_band', $_POST['_council_tax_band'] );
             }
 
             do_action( 'propertyhive_save_property_residential_details', $post_id );

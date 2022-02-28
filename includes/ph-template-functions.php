@@ -793,6 +793,14 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
                     'value' => $property->outside_space
                 );
             }
+
+            if ( $property->council_tax_band != '' )
+            {
+                $meta['council-tax-band'] = array(
+                    'label' => __('Council Tax Band', 'propertyhive'),
+                    'value' => $property->council_tax_band
+                );
+            }
         }
 
         if ( $property->department == 'residential-sales' || ph_get_custom_department_based_on( $property->department ) == 'residential-sales' ) 
