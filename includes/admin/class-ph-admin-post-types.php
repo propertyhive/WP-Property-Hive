@@ -991,7 +991,7 @@ class PH_Admin_Post_Types {
 
 	public function key_date_status_filter() {
 
-		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'booked', 'complete', 'pending') ) ? $_GET['status'] : '';
+		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending') ) ? $_GET['status'] : '';
 
 		$output  = '<select name="status" id="dropdown_key_date_status">';
 
@@ -1000,6 +1000,10 @@ class PH_Admin_Post_Types {
 		$output .= '<option value="upcoming_and_overdue"';
 		$output .= selected( 'upcoming_and_overdue', $selected_status, false );
 		$output .= '>' . __( 'Upcoming & Overdue', 'propertyhive' ) . '</option>';
+
+        $output .= '<option value="overdue"';
+        $output .= selected( 'overdue', $selected_status, false );
+        $output .= '>' . __( 'Overdue', 'propertyhive' ) . '</option>';
 
 		$output .= '<option value="booked"';
 		$output .= selected( 'booked', $selected_status, false );
@@ -1301,6 +1305,19 @@ class PH_Admin_Post_Types {
                         $vars['meta_query'][] = array(
                             'key' => '_key_date_status',
                             'value' => 'pending',
+                        );
+                        break;
+                    case 'overdue':
+                        $vars['meta_query'][] = array(
+                            'key' => '_key_date_status',
+                            'value' => array('pending', 'booked'),
+                            'compare' => 'IN'
+                        );
+                        $vars['meta_query'][] = array(
+                            'key' => '_date_due',
+                            'value' => date("Y-m-d"),
+                            'type' => 'date',
+                            'compare' => '<',
                         );
                         break;
                     case 'upcoming_and_overdue':
