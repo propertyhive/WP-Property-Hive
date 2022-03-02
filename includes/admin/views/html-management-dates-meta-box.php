@@ -55,7 +55,8 @@
             {
                 $meta_query[] = array(
                     'key' => '_key_date_status',
-                    'value' => 'pending',
+                    'value' => array('pending', 'booked'),
+                    'compare' => 'IN'
                 );
 
                 $upcoming_threshold = new DateTime('+ ' . apply_filters( 'propertyhive_key_date_upcoming_days', 7 ) . ' DAYS');
@@ -64,6 +65,22 @@
                     'value' => $upcoming_threshold->format('Y-m-d'),
                     'type' => 'date',
                     'compare' => '<=',
+                );
+                break;
+            }
+            case 'overdue':
+            {
+                $meta_query[] = array(
+                    'key' => '_key_date_status',
+                    'value' => array('pending', 'booked'),
+                    'compare' => 'IN'
+                );
+
+                $meta_query[] = array(
+                    'key' => '_date_due',
+                    'value' => date('Y-m-d'),
+                    'type' => 'date',
+                    'compare' => '<',
                 );
                 break;
             }
@@ -118,6 +135,7 @@
     <select name="status" id="_date_status_filter">
         <option value="">All Statuses</option>
         <option value="upcoming_and_overdue" <?php echo ( isset($selected_status) && $selected_status == 'upcoming_and_overdue' ) ? 'selected' : ''; ?>>Upcoming & Overdue</option>
+        <option value="overdue" <?php echo ( isset($selected_status) && $selected_status == 'overdue' ) ? 'selected' : ''; ?>> Overdue</option>
         <option value="booked" <?php echo ( isset($selected_status) && $selected_status == 'booked' ) ? 'selected' : ''; ?>> Booked</option>
         <option value="complete" <?php echo ( isset($selected_status) && $selected_status == 'complete' ) ? 'selected' : ''; ?>> Complete</option>
         <option value="pending" <?php echo ( isset($selected_status) && $selected_status == 'pending' ) ? 'selected' : ''; ?>> Pending</option>
