@@ -574,16 +574,21 @@ class PH_Admin_Post_Types {
     public function enquiry_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'open', 'closed' ) ) ? $_GET['_status'] : '';
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'all', 'open', 'closed' ) ) ? $_GET['_status'] : '';
 
         // Status filtering
-        $output  = '<select name="_status" id="dropdown_enquiry_status">';
+        $output  = '<select name="_status" id="dropdown_enquiry_status">
+            <option value="all"' . selected( 'all', $selected_status, false ) . '>All</option>';
 
             $enquiry_statuses = ph_get_enquiry_statuses();
 
             foreach ( $enquiry_statuses as $status => $display_status )
             {
                 $output .= '<option value="' . $status . '"';
+                if ( $status == $selected_status || ( $status == 'open' && ( !isset($_GET['_status']) || empty($_GET['_status']) ) ) )
+                {
+                    $output .= ' selected';
+                }
                 $output .= selected( $status, $selected_status, false );
                 $output .= '>' . $display_status . '</option>';
             }
@@ -1115,11 +1120,22 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'enquiry' === $typenow )
         {
-            if ( ! empty( $_GET['_status'] ) ) {
+            if ( ! empty( $_GET['_status'] ) && ph_clean($_GET['_status']) != 'all' ) {
+
                 $vars['meta_query'][] = array(
                     'key' => '_status',
                     'value' => sanitize_text_field( $_GET['_status'] ),
                 );
+            }
+            else
+            {
+                if ( empty( $_GET['_status'] ) )
+                {
+                    $vars['meta_query'][] = array(
+                        'key' => '_status',
+                        'value' => 'open',
+                    );
+                }
             }
             if ( ! empty( $_GET['_source'] ) ) {
                 $vars['meta_query'][] = array(
