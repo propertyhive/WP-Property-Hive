@@ -767,7 +767,7 @@ class PH_Admin_Meta_Boxes {
         );
         $meta_boxes[15] = array(
             'id' => 'propertyhive-property-rooms',
-            'title' => __( 'Property Rooms', 'propertyhive' ),
+            'title' => __( 'Property Descriptions', 'propertyhive' ),
             'callback' => 'PH_Meta_Box_Property_Rooms::output',
             'screen' => 'property',
             'context' => 'normal',
