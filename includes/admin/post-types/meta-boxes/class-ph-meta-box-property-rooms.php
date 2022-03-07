@@ -69,7 +69,7 @@ class PH_Meta_Box_Property_Rooms {
                             propertyhive_wp_textarea_input( array( 
                                 'id' => '_room_description_' . $i,
                                 'name' => '_room_description[]', 
-                                'label' => __( 'Room Description', 'propertyhive' ), 
+                                'label' => __( 'Description', 'propertyhive' ),
                                 'desc_tip' => false,
                                 'class' => '',
                                 'value' => get_post_meta($post->ID, '_room_description_' . $i, TRUE),
@@ -122,7 +122,7 @@ class PH_Meta_Box_Property_Rooms {
                         propertyhive_wp_textarea_input( array( 
                             'id' => '_room_description_id',
                             'name' => '_room_description[]', 
-                            'label' => __( 'Room Description', 'propertyhive' ), 
+                            'label' => __( 'Description', 'propertyhive' ),
                             'desc_tip' => false,
                             'class' => '',
                             'value' => '',
@@ -138,7 +138,7 @@ class PH_Meta_Box_Property_Rooms {
                 
                 echo '<p class="form-field">
                     <label for="">&nbsp;</label>
-                    <a href="#" class="button button-primary add_property_room"><span class="fa fa-plus"></span> Add Room</a>
+                    <a href="#" class="button button-primary add_property_room"><span class="fa fa-plus"></span> Add Description</a>
                 </p>';
                 
                 do_action('propertyhive_property_rooms_fields');
