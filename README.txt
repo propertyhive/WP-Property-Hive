@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.9.1
-Stable tag: 1.5.31
+Stable tag: 1.5.32
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,13 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.32 - 2022-03-10 =
+* Added council tax band to properties and appraisals to comply with upcoming rule changes
+* Added 'All' filter to enquiries grid and ensure main enquiry list defaults to show only open enquiries
+* Added 'link' button to TinyMCE toolbar when full WYSIWYG editor enabled for full descriptions
+* Added 'Overdue' filter to management key dates lists
+* Renamed 'Property Rooms' to 'Property Descriptions' for clarity on where full descriptions should be entered
 
 = 1.5.31 - 2022-02-28 =
 * Added new [similar_properties] attribute 'matching_address_field' to specify only properties in same location are returned. Possible values include: address_two, address_three, address_four and location
