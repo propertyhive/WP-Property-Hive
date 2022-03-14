@@ -107,6 +107,10 @@
         'post_type' => 'key_date',
         'nopaging' => true,
         'meta_query' => $meta_query,
+        'orderby' => 'meta_value',
+        'meta_key' => '_date_due',
+        'order' => 'ASC',
+
     ));
 ?>
 
