@@ -329,7 +329,7 @@
             <textarea id="_add_key_date_notes" name="_add_key_date_notes" class="short"></textarea>
         </p>
         <p>
-            <a href="#" class="add_key_date button"><?php _e( 'Add Key Date', 'propertyhive' ); ?></a>
+            <a href="#" class="add_key_date button button-primary"><?php _e( 'Add Key Date', 'propertyhive' ); ?></a>
         </p>
     </div>
 </div>
