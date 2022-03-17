@@ -240,6 +240,12 @@ class PH_Countries {
 				'currency_symbol' => '&yen;',
 				'currency_prefix' => true
 			),
+			'KE' => array(
+				'name' => 'Kenya',
+				'currency_code' => 'KES',
+				'currency_symbol' => 'KSh ',
+				'currency_prefix' => true
+			),
 			'LU' => array(
 				'name' => 'Luxembourg',
 				'currency_code' => 'EUR',
