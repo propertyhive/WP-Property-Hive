@@ -2203,7 +2203,7 @@ class PH_Admin_Meta_Boxes {
         if ( 
             in_array(
                 get_post_type($post->ID), 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'application', 'tenancy') )
             )
         )
         {
@@ -2245,7 +2245,7 @@ class PH_Admin_Meta_Boxes {
             !empty($tabs) && 
             in_array(
                 $post->post_type, 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'application', 'tenancy') )
             )
         )
         {
@@ -2451,7 +2451,7 @@ class PH_Admin_Meta_Boxes {
 		if ( 
             ! in_array( 
                 $post->post_type, 
-                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy') )
+                apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'application', 'tenancy') )
             ) 
         ) {
 			return;
