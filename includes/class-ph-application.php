@@ -133,22 +133,7 @@ class PH_Application {
      */
     public function get_status()
     {
-        return '';
-        // if ( $this->_start_date && strtotime( $this->_start_date ) > time() )
-        // {
-        //     return __( 'Pending', 'propertyhive' );
-        // }
-        // elseif ( 
-        //     $this->_start_date && strtotime( $this->_start_date ) <= time() && 
-        //     ( time() <= strtotime( $this->_end_date ) || $this->_end_date == '' )
-        // )
-        // {
-        //     return __( 'Current', 'propertyhive' );
-        // }
-        // elseif ( $this->_end_date && strtotime( $this->_end_date ) < time() )
-        // {
-        //     return __( 'Finished', 'propertyhive' );
-        // }
+        return __( ucwords(str_replace("_", " ", $this->_status)), 'propertyhive' );;
     }
 
     /**

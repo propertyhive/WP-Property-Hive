@@ -100,6 +100,11 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_sale_meta', 'PH_Meta_Box_Sale_Applicant_Solicitor::save', 15, 2 );
         add_action( 'propertyhive_process_sale_meta', 'PH_Meta_Box_Sale_Property_Owner_Solicitor::save', 20, 2 );
 
+        // Save Application Meta Boxes
+        add_action( 'propertyhive_process_application_meta', 'PH_Meta_Box_Application_Details::save', 10, 2 );
+        add_action( 'propertyhive_process_application_meta', 'PH_Meta_Box_Application_Applicant::save', 15, 2 );
+        add_action( 'propertyhive_process_application_meta', 'PH_Meta_Box_Application_Property::save', 20, 2 );
+
         // Save Tenancy Meta Boxes
         add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Details::save', 10, 2 );
         add_action( 'propertyhive_process_tenancy_meta', 'PH_Meta_Box_Tenancy_Applicant::save', 15, 2 );
