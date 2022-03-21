@@ -33,6 +33,7 @@ function ph_get_screen_ids() {
         'offer',
         'edit-sale',
         'sale',
+        'application',
         'tenancy',
         'edit-key_date',
         'dashboard_page_ph-installed',
