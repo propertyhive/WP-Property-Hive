@@ -530,6 +530,40 @@ class PH_Post_types {
             )
         );
 
+        register_post_type( "application",
+            apply_filters( 'propertyhive_register_post_type_application',
+                array(
+                    'labels' => array(
+                        'name'                  => __( 'Applications', 'propertyhive' ),
+                        'singular_name'         => __( 'Application', 'propertyhive' ),
+                        'menu_name'             => _x( 'Applications', 'Admin menu name', 'propertyhive' ),
+                        'add_new'               => __( 'Add Application', 'propertyhive' ),
+                        'add_new_item'          => __( 'Add New Application', 'propertyhive' ),
+                        'edit'                  => __( 'Edit', 'propertyhive' ),
+                        'edit_item'             => __( 'Edit Application', 'propertyhive' ),
+                        'new_item'              => __( 'New Application', 'propertyhive' ),
+                        'view'                  => __( 'View Application', 'propertyhive' ),
+                        'view_item'             => __( 'View Application', 'propertyhive' ),
+                        'search_items'          => __( 'Search Applications', 'propertyhive' ),
+                        'not_found'             => __( 'No applications found', 'propertyhive' ),
+                        'not_found_in_trash'    => __( 'No applications found in trash', 'propertyhive' ),
+                        'parent'                => __( 'Parent Application', 'propertyhive' )
+                    ),
+                    'public'                => false,
+                    'show_ui'               => true,
+                    'capability_type'       => 'post',
+                    'map_meta_cap'          => true,
+                    'publicly_queryable'    => false,
+                    'exclude_from_search'   => true,
+                    'hierarchical'          => false, // Hierarchical causes memory issues - WP loads all records!
+                    'query_var'             => true,
+                    'supports'              => false,
+                    'show_in_nav_menus'     => false,
+                    'show_in_menu'          => false
+                )
+            )
+        );
+
         register_post_type( "tenancy",
             apply_filters( 'propertyhive_register_post_type_tenancy',
                 array(
