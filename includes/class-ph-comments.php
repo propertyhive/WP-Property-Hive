@@ -338,7 +338,7 @@ class PH_Comments {
 			$screen = get_current_screen();
 
 			if ( 
-				( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy' ) ) ) )
+				( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'application', 'tenancy' ) ) ) )
 				||
 				( wp_doing_ajax() && isset($_POST['action']) && ($_POST['action'] == 'propertyhive_get_notes_grid' || $_POST['action'] == 'propertyhive_merge_contact_records') )
 				||

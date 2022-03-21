@@ -1952,6 +1952,83 @@ class PH_Admin_Meta_Boxes {
             add_meta_box( 'propertyhive-sale-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Sale_Actions::output', 'sale', 'side' );
         }
 
+        // APPLICATION
+        if (!isset($tabs)) $tabs = array();
+
+        /* APPLICATION SUMMARY META BOXES */
+        $meta_boxes = array();
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-application-details',
+            'title' => __( 'Application Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Application_Details::output',
+            'screen' => 'application',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-application-property',
+            'title' => __( 'Property', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Application_Property::output',
+            'screen' => 'application',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[15] = array(
+            'id' => 'propertyhive-application-applicant',
+            'title' => __( 'Tenants', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Application_Applicant::output',
+            'screen' => 'application',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_application_summary_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+
+        $tabs['tab_application_summary'] = array(
+            'name' => __( 'Summary', 'propertyhive' ),
+            'metabox_ids' => $ids,
+            'post_type' => 'application'
+        );
+
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'application' )
+        {
+            /* HISTORY & NOTES META BOXES */
+            $meta_boxes = array();
+            $meta_boxes[5] = array(
+                'id' => 'propertyhive-application-history-notes',
+                'title' => __( 'Application History &amp; Notes', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Application_Notes::output',
+                'screen' => 'application',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+
+            $meta_boxes = apply_filters( 'propertyhive_application_notes_meta_boxes', $meta_boxes );
+            ksort($meta_boxes);
+
+            $ids = array();
+            foreach ($meta_boxes as $meta_box)
+            {
+                add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+                $ids[] = $meta_box['id'];
+            }
+
+            $tabs['tab_application_notes'] = array(
+                'name' => __( 'History &amp; Notes', 'propertyhive' ),
+                'metabox_ids' => $ids,
+                'post_type' => 'application',
+                'ajax_actions' => array( '^^ph_redraw_notes_grid(\'application\')' ),
+            );
+        }
+
         // TENANCY
         if (!isset($tabs)) $tabs = array();
 
