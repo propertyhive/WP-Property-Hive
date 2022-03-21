@@ -181,34 +181,42 @@ class PH_Admin_Menus {
 	        add_submenu_page( 'propertyhive', __( 'Sales', 'propertyhive' ), __( 'Sales', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=sale'/*, array( $this, 'attributes_page' )*/ );
 	    }
 
-	    if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' && get_option('propertyhive_module_disabled_tenancies', '') != 'yes' )
+	    if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
 	    {
-	        add_submenu_page( 'propertyhive', __( 'Tenancies', 'propertyhive' ), __( 'Tenancies', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=tenancy'/*, array( $this, 'attributes_page' )*/ );
+			if (get_option('propertyhive_module_disabled_applications', '') != 'yes')
+			{
+				add_submenu_page( 'propertyhive', __( 'Applications', 'propertyhive' ), __( 'Applications', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=application'/*, array( $this, 'attributes_page' )*/ );
+			}
 
-            $count = '';
-            $args = array(
-                'post_type' => 'key_date',
-                'nopaging' => true,
-                'fields' => 'ids',
-                'meta_query' => array(
-                    array(
-                        'key' => '_key_date_status',
-                        'value' => 'pending'
-                    ),
-                    array(
-                        'key' => '_date_due',
-                        'value' => date('Y-m-d'),
-                        'type' => 'date',
-                        'compare' => '<=',
-                    ),
-                ),
-            );
-            $key_date_query = new WP_Query( $args );
-            if ( $key_date_query->have_posts() )
-            {
-                $count = ' <span class="update-plugins count-' . $key_date_query->found_posts . '"><span class="plugin-count">' . $key_date_query->found_posts . '</span></span>';
-            }
-            add_submenu_page( 'propertyhive', __( 'Management', 'propertyhive' ), __( 'Management', 'propertyhive' ) . $count, 'manage_propertyhive', 'edit.php?post_type=key_date&orderby=date_due&order=asc&status=upcoming_and_overdue&filter_action=Filter' );
+			if (get_option('propertyhive_module_disabled_tenancies', '') != 'yes')
+			{
+				add_submenu_page( 'propertyhive', __( 'Tenancies', 'propertyhive' ), __( 'Tenancies', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=tenancy'/*, array( $this, 'attributes_page' )*/ );
+
+				$count = '';
+				$args = array(
+					'post_type' => 'key_date',
+					'nopaging' => true,
+					'fields' => 'ids',
+					'meta_query' => array(
+						array(
+							'key' => '_key_date_status',
+							'value' => 'pending'
+						),
+						array(
+							'key' => '_date_due',
+							'value' => date('Y-m-d'),
+							'type' => 'date',
+							'compare' => '<=',
+						),
+					),
+				);
+				$key_date_query = new WP_Query( $args );
+				if ( $key_date_query->have_posts() )
+				{
+					$count = ' <span class="update-plugins count-' . $key_date_query->found_posts . '"><span class="plugin-count">' . $key_date_query->found_posts . '</span></span>';
+				}
+				add_submenu_page( 'propertyhive', __( 'Management', 'propertyhive' ), __( 'Management', 'propertyhive' ) . $count, 'manage_propertyhive', 'edit.php?post_type=key_date&orderby=date_due&order=asc&status=upcoming_and_overdue&filter_action=Filter' );
+			}
 	    }
 
     	if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
@@ -275,7 +283,7 @@ class PH_Admin_Menus {
 		}
 		else
 		{
-			$to_highlight_types = array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date' );
+			$to_highlight_types = array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'application', 'tenancy', 'key_date' );
 
 			if ( isset( $post_type ) ) {
 				if ( in_array( $post_type, $to_highlight_types ) ) {
@@ -400,6 +408,7 @@ class PH_Admin_Menus {
 				$icon = "dashicons-tag";
 				break;
 			}
+			case "application":
 			case "tenancy":
 			{
 				$icon = "dashicons-admin-network";
