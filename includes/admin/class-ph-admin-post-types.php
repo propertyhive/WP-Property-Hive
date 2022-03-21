@@ -56,6 +56,7 @@ class PH_Admin_Post_Types {
         include( 'post-types/class-ph-admin-cpt-viewing.php' );
         include( 'post-types/class-ph-admin-cpt-offer.php' );
         include( 'post-types/class-ph-admin-cpt-sale.php' );
+        include( 'post-types/class-ph-admin-cpt-application.php' );
         include( 'post-types/class-ph-admin-cpt-tenancy.php' );
         include( 'post-types/class-ph-admin-cpt-key-date.php' );
 	}
@@ -137,7 +138,7 @@ class PH_Admin_Post_Types {
     public function remove_month_filter() {
         global $typenow;
         
-        if ( in_array($typenow, array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date')) )
+        if ( in_array($typenow, array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'application', 'tenancy', 'key_date')) )
         {
             add_filter('months_dropdown_results', '__return_empty_array');
         }
@@ -184,6 +185,9 @@ class PH_Admin_Post_Types {
                 break;
             case 'sale' :
                 $this->sale_filters();
+                break;
+            case 'application' :
+                $this->application_filters();
                 break;
             case 'tenancy' :
                 $this->tenancy_filters();
@@ -883,7 +887,50 @@ class PH_Admin_Post_Types {
     }
 
     /**
-     * Show an tenancy filter box
+     * Show an application filter box
+     */
+    public function application_filters() {
+        global $wp_query;
+
+        $output = '';
+
+        $output .= $this->application_status_filter();
+
+        echo apply_filters( 'propertyhive_application_filters', $output );
+    }
+
+    /**
+     * Show an application status filter box
+     */
+    public function application_status_filter() {
+        global $wp_query;
+
+        //$selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'current', 'finished') ) ? $_GET['_status'] : '';
+
+        // Status filtering
+        $output  = '<select name="_status" id="dropdown_application_status">';
+
+            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
+
+            // $output .= '<option value="pending"';
+            // $output .= selected( 'pending', $selected_status, false );
+            // $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+
+            // $output .= '<option value="current"';
+            // $output .= selected( 'current', $selected_status, false );
+            // $output .= '> ' . __( 'Current', 'propertyhive' ) . '</option>';
+
+            // $output .= '<option value="finished"';
+            // $output .= selected( 'finished', $selected_status, false );
+            // $output .= '> ' . __( 'Finished', 'propertyhive' ) . '</option>';
+
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show a tenancy filter box
      */
     public function tenancy_filters() {
         global $wp_query;
@@ -1237,6 +1284,10 @@ class PH_Admin_Post_Types {
 
             $vars = $this->filter_by_date_range($vars, '_sale_date_time');
         }
+        elseif ( 'application' === $typenow )
+        {
+
+        }
         elseif ( 'tenancy' === $typenow )
         {
             if ( ! empty( $_GET['_status'] ) )
@@ -1442,7 +1493,7 @@ LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_4 ON " . $wpdb->po
 LEFT JOIN " . $wpdb->postmeta . " AS ph_appraisal_filter_meta_postcode ON " . $wpdb->posts . ".ID = ph_appraisal_filter_meta_postcode.post_id AND ph_appraisal_filter_meta_postcode.meta_key = '_address_postcode'
 ";
         }
-        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow || 'tenancy' === $typenow ) 
+        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow || 'application' === $typenow || 'tenancy' === $typenow )
         {
             $join .= " 
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta ON " . $wpdb->posts . ".ID = ph_property_filter_meta.post_id AND ph_property_filter_meta.meta_key = '_property_id'
@@ -1547,7 +1598,7 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
                 $where 
             );
         }
-        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow || 'tenancy' === $typenow ) 
+        elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow || 'application' === $typenow || 'tenancy' === $typenow )
         {
             $where = preg_replace(
                 "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
