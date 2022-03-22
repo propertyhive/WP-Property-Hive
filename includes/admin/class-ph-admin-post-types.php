@@ -905,24 +905,30 @@ class PH_Admin_Post_Types {
     public function application_status_filter() {
         global $wp_query;
 
-        //$selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'current', 'finished') ) ? $_GET['_status'] : '';
+        $application_statuses = array(
+            'offer_pending'          => 'Offer Pending',
+            'offer_accepted'         => 'Offer Accepted',
+            'offer_declined'         => 'Offer Declined',
+            'withdrawn'              => 'Withdrawn',
+            'awaiting_references'    => 'Awaiting References',
+            'referencing_successful' => 'Referencing Successful',
+            'referencing_failed'     => 'Referencing Failed',
+            'tenancy_created'        => 'Tenancy Created',
+        );
+
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array_keys($application_statuses) ) ? $_GET['_status'] : '';
 
         // Status filtering
         $output  = '<select name="_status" id="dropdown_application_status">';
 
             $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
 
-            // $output .= '<option value="pending"';
-            // $output .= selected( 'pending', $selected_status, false );
-            // $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
-
-            // $output .= '<option value="current"';
-            // $output .= selected( 'current', $selected_status, false );
-            // $output .= '> ' . __( 'Current', 'propertyhive' ) . '</option>';
-
-            // $output .= '<option value="finished"';
-            // $output .= selected( 'finished', $selected_status, false );
-            // $output .= '> ' . __( 'Finished', 'propertyhive' ) . '</option>';
+            foreach( $application_statuses as $status => $pretty_status )
+            {
+                $output .= '<option value="' . $status . '"';
+                $output .= selected( $status, $selected_status, false );
+                $output .= '>' . __( $pretty_status, 'propertyhive' ) . '</option>';
+            }
 
         $output .= '</select>';
 
