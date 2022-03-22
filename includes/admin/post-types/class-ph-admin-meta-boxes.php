@@ -2032,6 +2032,8 @@ class PH_Admin_Meta_Boxes {
                 'post_type' => 'application',
                 'ajax_actions' => array( '^^ph_redraw_notes_grid(\'application\')' ),
             );
+
+            add_meta_box( 'propertyhive-application-actions', __( 'Actions', 'propertyhive' ), 'PH_Meta_Box_Application_Actions::output', 'application', 'side' );
         }
 
         // TENANCY

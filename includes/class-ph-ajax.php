@@ -110,6 +110,13 @@ class PH_AJAX {
             'get_property_enquiries_meta_box' => false,
             'get_contact_enquiries_meta_box' => false,
 
+            // Application actions
+            'get_application_actions' => false,
+            'application_accepted' => false,
+            'application_declined' => false,
+            'application_withdrawn' => false,
+            'application_revert_pending' => false,
+
             // Tenancy actions
             'add_key_date' => false,
             'get_management_dates_grid' => false,
@@ -5092,6 +5099,171 @@ class PH_AJAX {
 
         // Quit out
         die();
+    }
+
+    // Application related functions
+    public function get_application_actions()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="propertyhive_application_actions_meta_box">
+
+        <div class="options_group" style="padding-top:8px;">';
+
+        $actions = array();
+
+        if ( $status == 'offer_pending' )
+        {
+            $actions[] = '<a
+                    href="#action_panel_application_accepted"
+                    class="button button-success application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Landlord Offer Accepted', 'propertyhive') ) . '</a>';
+            $actions[] = '<a
+                    href="#action_panel_application_declined"
+                    class="button button-danger application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Landlord Offer Declined', 'propertyhive') ) . '</a>';
+            $actions[] = '<a
+                    href="#action_panel_application_withdrawn"
+                    class="button application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Withdraw Application', 'propertyhive') ) . '</a>';
+        }
+
+        if ( in_array($status, array('offer_accepted', 'offer_declined', 'withdrawn')) )
+        {
+            $actions[] = '<a
+                    href="#action_panel_application_revert_pending"
+                    class="button application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Revert To Pending', 'propertyhive') ) . '</a>';
+        }
+
+        $actions = apply_filters( 'propertyhive_admin_application_actions', $actions, $post_id );
+
+        if ( !empty($actions) )
+        {
+            echo implode("", $actions);
+        }
+        else
+        {
+            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+        }
+
+        echo '</div>
+
+        </div>';
+
+        die();
+    }
+
+    public function application_accepted()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'offer_pending' )
+        {
+            update_post_meta( $post_id, '_status', 'offer_accepted' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'application_accepted',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_declined()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'offer_pending' )
+        {
+            update_post_meta( $post_id, '_status', 'offer_declined' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'application_declined',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_withdrawn()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( in_array( $status, array('offer_pending', 'offer_accepted', 'awaiting_references', 'referencing_successful', 'referencing_failed') ) )
+        {
+            update_post_meta( $post_id, '_status', 'withdrawn' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'application_withdrawn',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_revert_pending()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'offer_accepted' || $status == 'offer_declined' || $status == 'withdrawn' )
+        {
+            update_post_meta( $post_id, '_status', 'offer_pending' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'application_revert_pending',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
     }
 
     /**

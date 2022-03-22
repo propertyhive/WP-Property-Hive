@@ -34,7 +34,7 @@ class PH_Meta_Box_Application_Details {
         
             <label for="">' . __( 'Status', 'propertyhive' ) . '</label>
 
-            ' . __( ucwords(str_replace("_", " ", $status)), 'propertyhive' ) . '
+            <span id="application_details_status_span">' . __( ucwords(str_replace("_", " ", $status)), 'propertyhive' ) . '</span>
 
 			</p>';
 		}
