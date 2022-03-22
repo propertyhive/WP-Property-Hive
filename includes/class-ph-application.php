@@ -116,7 +116,7 @@ class PH_Application {
         $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
         $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
 
-        $amount = $this->_rent;
+        $amount = $this->_offered_rent;
 
         // If there are decimals on the number, display them. If not, display none
 		$decimals = (float)$amount == intval($amount) ? 0 : 2;
