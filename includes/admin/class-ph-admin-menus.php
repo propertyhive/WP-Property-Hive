@@ -29,6 +29,22 @@ class PH_Admin_Menus {
 		add_action( 'admin_menu', array( $this, 'crm_only_mode_menu' ), 99 );
 
 		add_action( 'admin_head', array( $this, 'menu_highlight' ) );
+
+		add_action( 'admin_bar_menu', array( $this, 'remove_from_admin_bar' ), 999);
+	}
+
+	public function remove_from_admin_bar( $wp_admin_bar )
+	{
+		$current_user = wp_get_current_user();
+
+		$user_id = $current_user->ID;
+
+		$crm_only_mode = get_user_meta( $user_id, 'crm_only_mode', TRUE );
+
+		if ( $crm_only_mode == '1' )
+		{
+			$wp_admin_bar->remove_node('new-content');
+		}
 	}
 
 	public function crm_only_mode_menu()
