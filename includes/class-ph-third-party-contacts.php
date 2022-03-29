@@ -20,7 +20,7 @@ class PH_Third_Party_Contacts {
 	private $categories;
 
 	public function __construct() {
-		$this->categories = array(
+		$this->categories = apply_filters( 'propertyhive_third_party_contact_categories', array(
 			'1' => __( 'Accountant', 'propertyhive' ),
 			'2' => __( 'Architect', 'propertyhive' ),
 			'3' => __( 'Board Contractor', 'propertyhive' ),
@@ -35,7 +35,7 @@ class PH_Third_Party_Contacts {
 			'12' => __( 'Solicitor', 'propertyhive' ),
 			'13' => __( 'Surveyor', 'propertyhive' ),
 			'14' => __( 'Other', 'propertyhive' ),
-		);
+		) );
 	}
 
 	/**
