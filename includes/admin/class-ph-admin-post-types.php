@@ -906,14 +906,15 @@ class PH_Admin_Post_Types {
         global $wp_query;
 
         $application_statuses = array(
-            'offer_pending'          => 'Offer Pending',
-            'offer_accepted'         => 'Offer Accepted',
-            'offer_declined'         => 'Offer Declined',
-            'withdrawn'              => 'Withdrawn',
-            'awaiting_references'    => 'Awaiting References',
-            'referencing_successful' => 'Referencing Successful',
-            'referencing_failed'     => 'Referencing Failed',
-            'tenancy_created'        => 'Tenancy Created',
+            'offer_pending'            => 'Offer Pending',
+            'offer_accepted'           => 'Offer Accepted',
+            'offer_declined'           => 'Offer Declined',
+            'withdrawn'                => 'Withdrawn',
+            'awaiting_references'      => 'Awaiting References',
+            'references_not_required'  => 'References Not Required',
+            'referencing_successful'   => 'Referencing Successful',
+            'referencing_unsuccessful' => 'Referencing Unsuccessful',
+            'tenancy_created'          => 'Tenancy Created',
         );
 
         $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array_keys($application_statuses) ) ? $_GET['_status'] : '';
