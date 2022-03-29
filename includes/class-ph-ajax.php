@@ -1839,6 +1839,8 @@ class PH_AJAX {
             else
             {
                 $return['success'] = true;
+
+                $enquiry_post_id = '';
                 
                 if ( get_option( 'propertyhive_store_property_enquiries', 'yes' ) == 'yes' )
                 {
@@ -1889,7 +1891,7 @@ class PH_AJAX {
                     }
                 }
 
-                do_action('propertyhive_property_enquiry_sent', $_POST, $to);
+                do_action('propertyhive_property_enquiry_sent', $_POST, $to, $enquiry_post_id);
 
                 // Send auto-responder
                 if ( get_option( 'propertyhive_enquiry_auto_responder', '' ) == 'yes' )
