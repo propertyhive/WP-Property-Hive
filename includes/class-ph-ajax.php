@@ -115,7 +115,14 @@ class PH_AJAX {
             'application_accepted' => false,
             'application_declined' => false,
             'application_withdrawn' => false,
+            'application_references_requested' => false,
+            'application_references_not_required' => false,
+            'application_referencing_successful' => false,
+            'application_referencing_unsuccessful' => false,
+            'application_create_tenancy' => false,
             'application_revert_pending' => false,
+            'application_revert_offer_accepted' => false,
+            'application_revert_awaiting_references' => false,
 
             // Tenancy actions
             'add_key_date' => false,
@@ -5128,11 +5135,69 @@ class PH_AJAX {
                     class="button button-danger application-action"
                     style="width:100%; margin-bottom:7px; text-align:center"
                 >' . wp_kses_post( __('Landlord Offer Declined', 'propertyhive') ) . '</a>';
+        }
+
+        if ( $status == 'offer_accepted' )
+        {
+            $actions[] = '<a
+                    href="#action_panel_application_references_requested"
+                    class="button application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Mark as Awaiting References', 'propertyhive') ) . '</a>';
+            $actions[] = '<a
+                    href="#action_panel_application_references_not_required"
+                    class="button application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('References Not Required', 'propertyhive') ) . '</a>';
+        }
+
+        if ( in_array($status, array('offer_pending', 'offer_accepted')) )
+        {
             $actions[] = '<a
                     href="#action_panel_application_withdrawn"
                     class="button application-action"
                     style="width:100%; margin-bottom:7px; text-align:center"
                 >' . wp_kses_post( __('Withdraw Application', 'propertyhive') ) . '</a>';
+        }
+
+        if ( $status == 'awaiting_references' )
+        {
+            $actions[] = '<a
+                    href="#action_panel_application_referencing_successful"
+                    class="button button-success application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Referencing Successful', 'propertyhive') ) . '</a>';
+            $actions[] = '<a
+                    href="#action_panel_application_referencing_unsuccessful"
+                    class="button button-danger application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Referencing Unsuccessful', 'propertyhive') ) . '</a>';
+        }
+
+        if ( in_array($status, array('referencing_successful', 'referencing_unsuccessful')) )
+        {
+             $tenancy_id = get_post_meta( $post_id, '_tenancy_id', TRUE );
+             if( $tenancy_id != '' && get_post_status($tenancy_id) != 'publish' )
+             {
+                 $tenancy_id = '';
+             }
+
+             if( $tenancy_id != '' )
+             {
+                 $actions[] = '<a
+                         href="' . get_edit_post_link( $tenancy_id, '' ) . '"
+                         class="button"
+                         style="width:100%; margin-bottom:7px; text-align:center"
+                     >' . wp_kses_post( __('View Tenancy', 'propertyhive') ) . '</a>';
+             }
+             else
+             {
+                $actions[] = '<a
+                        href="#action_panel_application_create_tenancy"
+                        class="button button-success application-action"
+                        style="width:100%; margin-bottom:7px; text-align:center"
+                    >' . wp_kses_post( __('Create Tenancy', 'propertyhive') ) . '</a>';
+             }
         }
 
         if ( in_array($status, array('offer_accepted', 'offer_declined', 'withdrawn')) )
@@ -5142,6 +5207,24 @@ class PH_AJAX {
                     class="button application-action"
                     style="width:100%; margin-bottom:7px; text-align:center"
                 >' . wp_kses_post( __('Revert To Pending', 'propertyhive') ) . '</a>';
+        }
+
+        if ( in_array($status, array('awaiting_references')) )
+        {
+            $actions[] = '<a
+                    href="#action_panel_application_revert_offer_accepted"
+                    class="button application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Revert To Offer Accepted', 'propertyhive') ) . '</a>';
+        }
+
+        if ( in_array($status, array('referencing_successful', 'referencing_unsuccessful')) )
+        {
+            $actions[] = '<a
+                    href="#action_panel_application_revert_awaiting_references"
+                    class="button application-action"
+                    style="width:100%; margin-bottom:7px; text-align:center"
+                >' . wp_kses_post( __('Revert To Awaiting References', 'propertyhive') ) . '</a>';
         }
 
         $actions = apply_filters( 'propertyhive_admin_application_actions', $actions, $post_id );
@@ -5177,6 +5260,7 @@ class PH_AJAX {
             // Add note/comment to application
             $comment = array(
                 'note_type' => 'action',
+                'comment_post_ID' => $post_id,
                 'action' => 'application_accepted',
             );
 
@@ -5203,6 +5287,7 @@ class PH_AJAX {
             // Add note/comment to application
             $comment = array(
                 'note_type' => 'action',
+                'comment_post_ID' => $post_id,
                 'action' => 'application_declined',
             );
 
@@ -5222,19 +5307,153 @@ class PH_AJAX {
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
-        if ( in_array( $status, array('offer_pending', 'offer_accepted', 'awaiting_references', 'referencing_successful', 'referencing_failed') ) )
+        if ( in_array( $status, array('offer_pending', 'offer_accepted') ) )
         {
             update_post_meta( $post_id, '_status', 'withdrawn' );
 
             // Add note/comment to application
             $comment = array(
                 'note_type' => 'action',
+                'comment_post_ID' => $post_id,
                 'action' => 'application_withdrawn',
             );
 
             PH_Comments::insert_note( $post_id, $comment );
 
             wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_references_requested()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( in_array( $status, array('offer_accepted') ) )
+        {
+            update_post_meta( $post_id, '_status', 'awaiting_references' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'comment_post_ID' => $post_id,
+                'action' => 'application_references_requested',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_references_not_required()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( in_array( $status, array('offer_accepted') ) )
+        {
+            update_post_meta( $post_id, '_status', 'references_not_required' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'comment_post_ID' => $post_id,
+                'action' => 'application_references_not_required',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_referencing_successful()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( in_array( $status, array('awaiting_references') ) )
+        {
+            update_post_meta( $post_id, '_status', 'referencing_successful' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'comment_post_ID' => $post_id,
+                'action' => 'application_referencing_successful',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_referencing_unsuccessful()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( in_array( $status, array('awaiting_references') ) )
+        {
+            update_post_meta( $post_id, '_status', 'referencing_unsuccessful' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'comment_post_ID' => $post_id,
+                'action' => 'application_referencing_unsuccessful',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_create_tenancy()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( in_array( $status, array('referencing_successful', 'referencing_unsuccessful') ) )
+        {
+            // TODO: Create tenancy
+            
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'comment_post_ID' => $post_id,
+                'action' => 'application_tenancy_created',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
         }
 
         wp_send_json_error();
@@ -5255,7 +5474,62 @@ class PH_AJAX {
             // Add note/comment to application
             $comment = array(
                 'note_type' => 'action',
+                'comment_post_ID' => $post_id,
                 'action' => 'application_revert_pending',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_revert_offer_accepted()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( $status == 'awaiting_references' )
+        {
+            update_post_meta( $post_id, '_status', 'offer_accepted' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'comment_post_ID' => $post_id,
+                'action' => 'application_revert_offer_accepted',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function application_revert_awaiting_references()
+    {
+        check_ajax_referer( 'application-actions', 'security' );
+
+        $post_id = (int)$_POST['application_id'];
+
+        $status = get_post_meta( $post_id, '_status', TRUE );
+
+        if ( in_array( $status, array('referencing_successful', 'referencing_unsuccessful') ) )
+        {
+            update_post_meta( $post_id, '_status', 'awaiting_references' );
+
+            // Add note/comment to application
+            $comment = array(
+                'note_type' => 'action',
+                'comment_post_ID' => $post_id,
+                'action' => 'application_revert_awaiting_references',
             );
 
             PH_Comments::insert_note( $post_id, $comment );

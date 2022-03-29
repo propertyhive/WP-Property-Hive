@@ -85,6 +85,84 @@ jQuery(document).ready(function($)
             return;
         }
 
+        if ( this_href == '#action_panel_application_references_requested' )
+        {
+            var data = {
+                action:         'propertyhive_application_references_requested',
+                application_id:    	<?php echo $post->ID; ?>,
+                security:       '<?php echo wp_create_nonce( 'application-actions' ); ?>',
+            };
+            jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                redraw_application_actions();
+
+                $('#application_details_status_span').text('Awaiting References');
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_application_references_not_required' )
+        {
+            var data = {
+                action:         'propertyhive_application_references_not_required',
+                application_id:    	<?php echo $post->ID; ?>,
+                security:       '<?php echo wp_create_nonce( 'application-actions' ); ?>',
+            };
+            jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                redraw_application_actions();
+
+                $('#application_details_status_span').text('References Not Required');
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_application_referencing_successful' )
+        {
+            var data = {
+                action:         'propertyhive_application_referencing_successful',
+                application_id:    	<?php echo $post->ID; ?>,
+                security:       '<?php echo wp_create_nonce( 'application-actions' ); ?>',
+            };
+            jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                redraw_application_actions();
+
+                $('#application_details_status_span').text('Referencing Successful');
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_application_referencing_unsuccessful' )
+        {
+            var data = {
+                action:         'propertyhive_application_referencing_unsuccessful',
+                application_id:    	<?php echo $post->ID; ?>,
+                security:       '<?php echo wp_create_nonce( 'application-actions' ); ?>',
+            };
+            jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                redraw_application_actions();
+
+                $('#application_details_status_span').text('Referencing Unsuccessful');
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_application_create_tenancy' )
+        {
+            var data = {
+                action:         'propertyhive_application_create_tenancy',
+                application_id:    	<?php echo $post->ID; ?>,
+                security:       '<?php echo wp_create_nonce( 'application-actions' ); ?>',
+            };
+            jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                redraw_application_actions();
+            }, 'json');
+            return;
+        }
+
         if ( this_href == '#action_panel_application_revert_pending' )
         {
             var data = {
@@ -97,6 +175,38 @@ jQuery(document).ready(function($)
                 redraw_application_actions();
 
                 $('#application_details_status_span').text('Offer Pending');
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_application_revert_offer_accepted' )
+        {
+            var data = {
+                action:         'propertyhive_application_revert_offer_accepted',
+                application_id: <?php echo $post->ID; ?>,
+                security:       '<?php echo wp_create_nonce( 'application-actions' ); ?>',
+            };
+            jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                redraw_application_actions();
+
+                $('#application_details_status_span').text('Offer Accepted');
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_application_revert_awaiting_references' )
+        {
+            var data = {
+                action:         'propertyhive_application_revert_awaiting_references',
+                application_id: <?php echo $post->ID; ?>,
+                security:       '<?php echo wp_create_nonce( 'application-actions' ); ?>',
+            };
+            jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                redraw_application_actions();
+
+                $('#application_details_status_span').text('Awaiting References');
             }, 'json');
             return;
         }
