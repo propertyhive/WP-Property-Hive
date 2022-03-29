@@ -554,6 +554,8 @@ class PH_Countries {
 				}
 			}
 		}
+
+		do_action('propertyhive_property_price_actual_updated', $postID);
 	}
 
 	public function ph_update_currency_exchange_rates()
