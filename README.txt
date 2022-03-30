@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.9.1
-Stable tag: 1.5.32
+Tested up to: 5.9.2
+Stable tag: 1.5.33
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,16 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.33 - 2022-03-30 =
+* Ordered Tenancy Key Dates grid in descending date order
+* Changed 'Add Key Date' button on tenancy key date grid to primary button colour
+* Removed 'New' from top admin bar when Property Hive Only mode enabled
+* Added Kenya to list of supported countries
+* Added 'propertyhive_third_party_contact_categories' filter to customise third party categories
+* Added 'propertyhive_property_price_actual_updated' action when price actual is updated
+* Added enquiry post ID as parameter passed into 'propertyhive_property_enquiry_sent' action
+* Declared compatibility for WordPress 5.9.2
 
 = 1.5.32 - 2022-03-10 =
 * Added council tax band to properties and appraisals to comply with upcoming rule changes
