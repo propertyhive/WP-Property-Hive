@@ -850,7 +850,11 @@ class PH_Property {
                 {
                     $return .= '<br>';
                 }
-                $return .= str_replace("\r\n", "", nl2br($this->{'_room_description_' . $i})) . '</p>';
+                $description = $this->{'_room_description_' . $i};
+                $description = str_replace("<p>", "", $description);
+                $description = str_replace("</p>", "<br><br>", $description);
+                $description = preg_replace('/<br>$/', '', $description); // remove any <br> tags from end of description
+                $return .= str_replace("\r\n", "", nl2br($description)) . '</p>';
             }
         }
 
