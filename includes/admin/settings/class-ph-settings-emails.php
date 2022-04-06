@@ -541,6 +541,10 @@ class PH_Settings_Emails extends PH_Settings_Page {
 				update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
 			}
 
+			$timestamp = wp_next_scheduled( 'propertyhive_auto_email_match' );
+            wp_unschedule_event($timestamp, 'propertyhive_auto_email_match' );
+            wp_clear_scheduled_hook('propertyhive_auto_email_match');
+
 			$recurrence = apply_filters( 'propertyhive_auto_email_match_cron_recurrence', 'daily' );
 			if ( $recurrence != 'hourly' )
 			{
