@@ -117,6 +117,8 @@ class PH_Admin_Merge_Contacts {
 
                 $contact_parts = $this->get_sale_records( $contact, $contact_parts );
 
+                $contact_parts = $this->get_application_records( $contact, $contact_parts );
+
                 $contact_parts = $this->get_tenancy_records( $contact, $contact_parts );
 
                 $contact_parts = $this->get_note_records( $contact, $contact_parts );
@@ -540,6 +542,36 @@ class PH_Admin_Merge_Contacts {
     }
 
     /**
+     * Adds count of any application records to the list of contact parts
+     *
+     * @access private
+     * @return array
+     */
+    private function get_application_records( $contact, $contact_parts )
+    {
+        $args = array(
+            'post_type' => 'application',
+            'posts_per_page' => 1,
+            'fields' => 'ids',
+            'meta_query' => array(
+                array(
+                    'key' => '_applicant_contact_id',
+                    'value' => $contact->id
+                )
+            )
+        );
+        $applications_query = new WP_Query( $args );
+        $applications_count = $applications_query->found_posts;
+        wp_reset_postdata();
+
+        if ( $applications_count > 0 )
+        {
+            $contact_parts[] = $applications_count . ' application' . ( $applications_count != 1 ? 's' : '' );
+        }
+        return $contact_parts;
+    }
+
+    /**
      * Adds count of any tenancy records to the list of contact parts
      *
      * @access private
@@ -896,6 +928,34 @@ class PH_Admin_Merge_Contacts {
             while ($sales_query->have_posts())
             {
                 $sales_query->the_post();
+                foreach ( $contacts_to_merge as $child_contact_id )
+                {
+                    update_post_meta( get_the_id(), '_applicant_contact_id', $primary_contact_id, $child_contact_id );
+                }
+            }
+        }
+        wp_reset_postdata();
+
+        // Move applications to primary
+        $args = array(
+            'post_type' => 'application',
+            'nopaging'    => true,
+            'fields' => 'ids',
+            'meta_query' => array(
+                array(
+                    'key' => '_applicant_contact_id',
+                    'value' => $contacts_to_merge,
+                    'compare' => 'IN'
+                ),
+            ),
+        );
+        $applications_query = new WP_Query( $args );
+
+        if ($applications_query->have_posts())
+        {
+            while ($applications_query->have_posts())
+            {
+                $applications_query->the_post();
                 foreach ( $contacts_to_merge as $child_contact_id )
                 {
                     update_post_meta( get_the_id(), '_applicant_contact_id', $primary_contact_id, $child_contact_id );
