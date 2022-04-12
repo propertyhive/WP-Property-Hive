@@ -119,7 +119,6 @@ class PH_AJAX {
             'application_references_not_required' => false,
             'application_referencing_successful' => false,
             'application_referencing_unsuccessful' => false,
-            'application_create_tenancy' => false,
             'application_revert_pending' => false,
             'application_revert_offer_accepted' => false,
             'application_revert_awaiting_references' => false,
@@ -5193,8 +5192,8 @@ class PH_AJAX {
              else
              {
                 $actions[] = '<a
-                        href="#action_panel_application_create_tenancy"
-                        class="button button-success application-action"
+                        href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_application_tenancy' ) . '"
+                        class="button button-success"
                         style="width:100%; margin-bottom:7px; text-align:center"
                     >' . wp_kses_post( __('Create Tenancy', 'propertyhive') ) . '</a>';
              }
@@ -5429,31 +5428,6 @@ class PH_AJAX {
             PH_Comments::insert_note( $post_id, $comment );
 
             wp_send_json_success();
-        }
-
-        wp_send_json_error();
-    }
-
-    public function application_create_tenancy()
-    {
-        check_ajax_referer( 'application-actions', 'security' );
-
-        $post_id = (int)$_POST['application_id'];
-
-        $status = get_post_meta( $post_id, '_status', TRUE );
-
-        if ( in_array( $status, array('referencing_successful', 'referencing_unsuccessful') ) )
-        {
-            // TODO: Create tenancy
-            
-            // Add note/comment to application
-            $comment = array(
-                'note_type' => 'action',
-                'comment_post_ID' => $post_id,
-                'action' => 'application_tenancy_created',
-            );
-
-            PH_Comments::insert_note( $post_id, $comment );
         }
 
         wp_send_json_error();

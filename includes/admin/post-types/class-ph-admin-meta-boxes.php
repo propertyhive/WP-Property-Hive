@@ -124,6 +124,7 @@ class PH_Admin_Meta_Boxes {
         $this->check_remove_solicitor();
         $this->check_create_offer();
         $this->check_create_sale();
+        $this->check_create_application_tenancy();
         $this->check_create_tenancy();
 	}
 
@@ -446,6 +447,71 @@ class PH_Admin_Meta_Boxes {
             exit();
         }
 
+    }
+
+    public function check_create_application_tenancy() {
+        if ( isset( $_GET['create_application_tenancy'] ) && isset( $_GET['post'] ) ) {
+            if ( get_post_type( (int) $_GET['post'] ) != 'application' ) {
+                return;
+            }
+
+            $application = new PH_Application( (int) $_GET['post'] );
+
+            $tenancy_post = array(
+                'post_title'     => '',
+                'post_content'   => '',
+                'post_type'      => 'tenancy',
+                'post_status'    => 'publish',
+                'comment_status' => 'closed',
+                'ping_status'    => 'closed',
+            );
+
+            // Insert the post into the database
+            $tenancy_post_id = wp_insert_post( $tenancy_post );
+
+            add_post_meta( $tenancy_post_id, '_applicant_contact_id', $application->applicant_contact_id );
+
+            add_post_meta( $tenancy_post_id, '_property_id', $application->property_id );
+
+            add_post_meta( $tenancy_post_id, '_start_date', $application->start_date );
+            add_post_meta( $tenancy_post_id, '_end_date', $application->end_date );
+
+            add_post_meta( $tenancy_post_id, '_length', $application->length );
+            add_post_meta( $tenancy_post_id, '_length_units', $application->length_units );
+            add_post_meta( $tenancy_post_id, '_lease_type', $application->lease_type );
+
+            add_post_meta( $tenancy_post_id, '_rent', $application->offered_rent );
+            add_post_meta( $tenancy_post_id, '_rent_frequency', $application->rent_frequency );
+            add_post_meta( $tenancy_post_id, '_currency', $application->currency );
+
+            add_post_meta( $tenancy_post_id, '_deposit', $application->deposit );
+
+            update_post_meta( (int) $_GET['post'], '_tenancy_id', $tenancy_post_id );
+
+            $current_user = wp_get_current_user();
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action'    => 'application_tenancy_created',
+            );
+
+            $data = array(
+                'comment_post_ID'      => (int) $_GET['post'],
+                'comment_author'       => $current_user->display_name,
+                'comment_author_email' => 'propertyhive@noreply.com',
+                'comment_author_url'   => '',
+                'comment_date'         => date( "Y-m-d H:i:s" ),
+                'comment_content'      => serialize( $comment ),
+                'comment_approved'     => 1,
+                'comment_type'         => 'propertyhive_note',
+            );
+            $comment_id = wp_insert_comment( $data );
+
+            // Do redirect
+            wp_redirect( admin_url( 'post.php?post=' . $tenancy_post_id . '&action=edit' ) );
+            exit();
+        }
     }
 
     public function check_create_tenancy() {
