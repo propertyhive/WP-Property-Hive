@@ -3993,13 +3993,18 @@ class PH_AJAX {
             $owner_dears_string = $this->get_list_string($owner_dears);
 
             $applicant_names = array();
+            $applicant_dears = array();
             foreach ($applicant_contact_ids as $applicant_contact_id)
             {
-                $applicant_names[] = get_the_title($applicant_contact_id);
+                $applicant_contact = new PH_Contact($applicant_contact_id);
+                $applicant_names[] = $applicant_contact->post_title;
+                $applicant_dears[] = $applicant_contact->dear();
             }
             $applicant_names = array_filter($applicant_names);
+            $applicant_dears = array_filter($applicant_dears);
 
             $applicant_names_string = $this->get_list_string($applicant_names);
+            $applicant_dears_string = $this->get_list_string($applicant_dears);
 
             $property = new PH_Property((int)$property_id);
 
@@ -4018,6 +4023,7 @@ class PH_AJAX {
             $body = str_replace('[owner_name]', $owner_names_string, $body);
             $body = str_replace('[owner_dear]', $owner_dears_string, $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
+            $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
