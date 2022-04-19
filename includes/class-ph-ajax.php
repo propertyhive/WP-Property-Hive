@@ -1597,7 +1597,7 @@ class PH_AJAX {
             
             $form_controls = ph_get_property_enquiry_form_fields();
 
-            $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
+            $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls, (int)$_POST['property_id'] );
         }
         
         foreach ( $form_controls as $key => $control )

@@ -331,7 +331,7 @@ function propertyhive_enquiry_form( $property_id = '' )
     
     $form_controls = ph_get_property_enquiry_form_fields( $property_id );
 
-    $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls );
+    $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls, $property_id );
 
     $form_controls['property_id'] = array(
         'type' => 'hidden',
