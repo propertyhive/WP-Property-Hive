@@ -132,6 +132,7 @@ class PH_Shortcodes {
 			'minimum_price'		=> '',
 			'maximum_price'		=> '',
 			'bedrooms'			=> '',
+			'minimum_bedrooms'	=> '',
 			'address_keyword'	=> '',
 			'country'			=> '',
 			'availability_id'	=> '',
@@ -172,6 +173,15 @@ class PH_Shortcodes {
 				'key' => '_bedrooms',
 				'value' => sanitize_text_field( $atts['bedrooms'] ),
 				'compare' => '='
+			);
+		}
+
+		if ( isset($atts['minimum_bedrooms']) && $atts['minimum_bedrooms'] != '' && is_numeric($atts['minimum_bedrooms']) )
+		{
+			$meta_query[] = array(
+				'key' => '_bedrooms',
+				'value' => sanitize_text_field( $atts['minimum_bedrooms'] ),
+				'compare' => '>='
 			);
 		}
 
