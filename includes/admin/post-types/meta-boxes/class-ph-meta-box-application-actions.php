@@ -149,20 +149,6 @@ jQuery(document).ready(function($)
             return;
         }
 
-        if ( this_href == '#action_panel_application_create_tenancy' )
-        {
-            var data = {
-                action:         'propertyhive_application_create_tenancy',
-                application_id:    	<?php echo $post->ID; ?>,
-                security:       '<?php echo wp_create_nonce( 'application-actions' ); ?>',
-            };
-            jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
-            {
-                redraw_application_actions();
-            }, 'json');
-            return;
-        }
-
         if ( this_href == '#action_panel_application_revert_pending' )
         {
             var data = {
