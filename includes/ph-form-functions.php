@@ -1649,7 +1649,7 @@ function ph_form_field( $key, $field )
                                                 }
                                             }
 
-                                            $options[$term->term_id] = '- ' . __( $term->name, 'propertyhive' );
+                                            $options[$term->term_id] = '- - ' . __( $term->name, 'propertyhive' );
                                         }
                                     }
                                 }
