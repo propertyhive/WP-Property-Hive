@@ -109,7 +109,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
         {
             $settings['padding'] = 0; // hardcode to 0 for now. Make an option going forward.
 ?>
-        <style>
+        <style type="text/css">
             
             /* Clear floats after image containers */
             .ph-elementor-gallery::after {
@@ -216,7 +216,6 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
 
                 ++$image_number;
             }
-            echo '</div>';
 
             while ( count($images) > ($image_number) )
             {
