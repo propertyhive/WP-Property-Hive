@@ -848,6 +848,8 @@ class PH_Query {
 			{
 				$address_keywords[] = str_ireplace("st ", "st. ", ph_clean($_REQUEST['address_keyword']));
 			}
+			
+			$address_keywords = apply_filters( 'propertyhive_address_keywords_to_query', $address_keywords );
 
 	      	$meta_query = array('relation' => 'OR');
 
