@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 5.9.2
-Stable tag: 1.5.33
+Tested up to: 5.9.3
+Stable tag: 1.5.34
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,17 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.34 - 2022-05-17 =
+* Added new cascading location dropdown feature whereby choosing a top level parent location would pre-fill next location dropdown with child locations. Can be enabled using Template Assistant add on.
+* Added new Elementor Reference Number widget
+* Added new filter 'propertyhive_address_keywords_to_query' so address keywords passed to query can be customised
+* Added 'minimum_bedrooms' attribute to [properties] shortcode
+* Passed property ID(s) through as new argument to existing 'propertyhive_property_enquiry_form_fields' filter
+* Replaced [applicant_dear] tag in owner viewing confirmation emails
+* Ensured existing auto match email cron is cleared before scheduling it again when settings are saved
+* Corrected issue with Elementor Gallery widget breaking styling of property details page
+* Declared compatibility for WordPress 5.9.3
 
 = 1.5.33 - 2022-03-30 =
 * Ordered Tenancy Key Dates grid in descending date order
