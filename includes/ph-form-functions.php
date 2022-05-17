@@ -1499,41 +1499,26 @@ function ph_form_field( $key, $field )
                 $field['parent_terms_only'] = isset( $field['parent_terms_only'] ) ? $field['parent_terms_only'] : false;
                 $field['hide_empty'] = isset( $field['hide_empty'] ) ? $field['hide_empty'] : false;
                 $field['multiselect'] = isset( $field['multiselect'] ) ? $field['multiselect'] : false;
+                $field['dynamic_population'] = ( isset( $field['dynamic_population'] ) && $field['type'] == 'location' && $field['parent_terms_only'] === false && $field['multiselect'] === false ) ? $field['dynamic_population'] : false; // only applies to location
 
                 if ( $field['multiselect'] )
                 {
                     wp_enqueue_script( 'multiselect' );
                 }
-
-                $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
-                if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
-                {
-                    $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
-                }
-
-                $output .= $field['before'];
-
-                if ($field['show_label'])
-                {
-                    $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
-                }
-
-                $output .= '<select
-                    name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
-                    id="' . esc_attr( $key ) . '"
-                    class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
-                    ' . ( $field['multiselect'] ? ' multiple="multiple"' : '' ) . '
-                    data-blank-option="' . esc_attr($field['blank_option']) . '"
-                 >';
-
-                $options = array( '' => $field['blank_option'] );
+                
+                $options = array( 
+                    '' => array(
+                        'label' => $field['blank_option'],
+                        'parent' => 0
+                    )
+                );
                 $args = array(
                     'hide_empty' => $field['hide_empty'],
                     'parent' => 0
                 );
                 $terms = get_terms( $field['type'], $args );
 
-                $selected_value = '';
+                $levels_of_taxonomy = 1;
                 if ( !empty( $terms ) && !is_wp_error( $terms ) )
                 {
                     foreach ($terms as $term)
@@ -1564,7 +1549,13 @@ function ph_form_field( $key, $field )
                             }
                         }
 
-                        $options[$term->term_id] = __( $term->name, 'propertyhive' );
+                        $options[(int)$term->term_id] = array(
+                            'label' => __( $term->name, 'propertyhive' ),
+                            'parent' => 0
+                        );
+
+                        if ($field['dynamic_population']) 
+                            $levels_of_taxonomy = max(1, $levels_of_taxonomy);
 
                         if ( 
                             !isset($field['parent_terms_only'])
@@ -1577,13 +1568,13 @@ function ph_form_field( $key, $field )
                         {
                             $args = array(
                                 'hide_empty' => $field['hide_empty'],
-                                'parent' => $term->term_id
+                                'parent' => $term->term_id,
                             );
                             $subterms = get_terms( $field['type'], $args );
 
                             if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                             {
-                                foreach ($subterms as $term)
+                                foreach ($subterms as $subterm)
                                 {
                                     if ( isset($field['hide_empty']) && $field['hide_empty'] === true )
                                     {
@@ -1599,7 +1590,7 @@ function ph_form_field( $key, $field )
                                                 array(
                                                     'taxonomy' => $field['type'],
                                                     'field' => 'term_id',
-                                                    'terms' => $term->term_id,
+                                                    'terms' => $subterm->term_id,
                                                 ),
                                             ),
                                         );
@@ -1611,17 +1602,23 @@ function ph_form_field( $key, $field )
                                         }
                                     }
 
-                                    $options[$term->term_id] = '- ' . __( $term->name, 'propertyhive' );
+                                    $options[(int)$subterm->term_id] = array(
+                                        'label' => ( !$field['dynamic_population'] ? '- ' : '' ) . __( $subterm->name, 'propertyhive' ),
+                                        'parent' => (int)$term->term_id,
+                                    );
+
+                                    if ($field['dynamic_population']) 
+                                        $levels_of_taxonomy = max(2, $levels_of_taxonomy);
 
                                     $args = array(
                                         'hide_empty' => $field['hide_empty'],
-                                        'parent' => $term->term_id
+                                        'parent' => (int)$subterm->term_id
                                     );
                                     $subsubterms = get_terms( $field['type'], $args );
 
                                     if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                                     {
-                                        foreach ($subsubterms as $term)
+                                        foreach ($subsubterms as $subsubterm)
                                         {
                                             if ( isset($field['hide_empty']) && $field['hide_empty'] === true )
                                             {
@@ -1637,7 +1634,7 @@ function ph_form_field( $key, $field )
                                                         array(
                                                             'taxonomy' => $field['type'],
                                                             'field' => 'term_id',
-                                                            'terms' => $term->term_id,
+                                                            'terms' => $subsubterm->term_id,
                                                         ),
                                                     ),
                                                 );
@@ -1649,7 +1646,13 @@ function ph_form_field( $key, $field )
                                                 }
                                             }
 
-                                            $options[$term->term_id] = '- - ' . __( $term->name, 'propertyhive' );
+                                            $options[(int)$subsubterm->term_id] = array(
+                                                'label' => ( !$field['dynamic_population'] ? '- - ' : '' ) . __( $subsubterm->name, 'propertyhive' ),
+                                                'parent' => (int)$subterm->term_id,
+                                            );
+
+                                            if ($field['dynamic_population']) 
+                                                $levels_of_taxonomy = max(3, $levels_of_taxonomy);
                                         }
                                     }
                                 }
@@ -1658,41 +1661,86 @@ function ph_form_field( $key, $field )
                     }
                 }
 
-                foreach ( $options as $option_key => $value )
+                if ( $field['dynamic_population'] )
                 {
-                    if ( $field['multiselect'] && $option_key == '' )
-                    {
-                        // Skip because we don't want a blank option in the multiselect. Instead use $value as the placeholder
-                        continue;
-                    }
-
-                    $output .= '<option
-                        value="' . esc_attr( $option_key ) . '"';
-                    if ( !$field['multiselect'] )
-                    {
-                        $output .= selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false );
-                    }
-                    else
-                    {
-                        if ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($option_key, $_REQUEST[$key]) )
-                        {
-                            $output .= ' selected';
-                        }
-                    }
-                    $output .= '>' . esc_html( $value ) . '</option>';
+                    wp_localize_script( 'propertyhive_dynamic_population', 'propertyhive_dynamic_population_params', array(
+                        'options' => $options,
+                        'levels_of_taxonomy' => $levels_of_taxonomy,
+                        'value' => isset($_GET[$field['type']]) ? ph_clean($_GET[$field['type']]) : '',
+                        'other_values' => ( isset($_GET['other_' . $field['type']]) && is_array($_GET['other_' . $field['type']]) && !empty($_GET['other_' . $field['type']]) ) ? ph_clean(array_filter($_GET['other_' . $field['type']])) : array(),
+                        'taxonomy' => $field['type'],
+                    ) );
+                    wp_enqueue_script( 'propertyhive_dynamic_population' );
                 }
 
-                $output .= '</select>';
-
-                $output .= $field['after'];
-
-                if ( $field['type'] == 'availability' )
+                $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
+                if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
                 {
-                    $availability_departments = get_option( 'propertyhive_availability_departments', array() );
-                    if ( !is_array($availability_departments) ) { $availability_departments = array(); }
+                    $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
+                }
 
-                    if ( !empty($availability_departments) )
+                for ( $level_i = 1; $level_i <= $levels_of_taxonomy; ++$level_i )
+                {
+                    $output .= $field['before'];
+
+                    if ($field['show_label'])
                     {
+                        $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+                    }
+
+                    $output .= '<select
+                        name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
+                        id="' . esc_attr( $key ) . '"
+                        class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
+                        ' . ( $field['multiselect'] ? ' multiple="multiple"' : '' ) . 
+                        ( $field['dynamic_population'] ? ' data-dynamic-population-level="' . $level_i . '"' : '' ) .
+                        ( ( $field['dynamic_population'] && $level_i > 1 ) ? ' disabled' : '' ) . '
+                        data-blank-option="' . esc_attr($field['blank_option']) . '"
+                    >';
+
+                    if ( $level_i == 1 )
+                    {
+                        foreach ( $options as $option_key => $value )
+                        {
+                            if ( $field['multiselect'] && $option_key == '' )
+                            {
+                                // Skip because we don't want a blank option in the multiselect. Instead use $value as the placeholder
+                                continue;
+                            }
+
+                            if ( $field['dynamic_population'] && $value['parent'] != '0' )
+                            {
+                                continue;
+                            }
+
+                            $output .= '<option
+                                value="' . esc_attr( $option_key ) . '"';
+                            if ( !$field['multiselect'] )
+                            {
+                                $output .= selected( esc_attr( $field['value'] ), esc_attr( $option_key ), false );
+                            }
+                            else
+                            {
+                                if ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($option_key, $_REQUEST[$key]) )
+                                {
+                                    $output .= ' selected';
+                                }
+                            }
+                            $output .= '>' . esc_html( $value['label'] ) . '</option>';
+                        }
+                    }
+
+                    $output .= '</select>';
+
+                    $output .= $field['after'];
+
+                    if ( $field['type'] == 'availability' )
+                    {
+                        $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+                        if ( !is_array($availability_departments) ) { $availability_departments = array(); }
+
+                        if ( !empty($availability_departments) )
+                        {
 ?>
 <script>
 var selected_availability = '<?php echo ( isset($_REQUEST[$key]) && $_REQUEST[$key] != '' ? (int)$_REQUEST[$key] : '' ); ?>';
@@ -1701,6 +1749,7 @@ var availabilities = <?php echo json_encode($options); ?>;
 var availabilities_order = <?php echo json_encode(array_keys($options)); ?>;
 </script>
 <?php
+                        }
                     }
                 }
             }

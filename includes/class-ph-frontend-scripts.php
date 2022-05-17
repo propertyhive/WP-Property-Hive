@@ -83,6 +83,8 @@ class PH_Frontend_Scripts {
         wp_register_script( 'multiselect', $assets_path . 'js/multiselect/jquery.multiselect' . /*$suffix .*/ '.js', array('jquery'), '2.4.18', true );
         wp_enqueue_style( 'multiselect', $assets_path . 'css/jquery.multiselect.css', array(), '2.4.18' );
         
+        wp_register_script( 'propertyhive_dynamic_population', $assets_path . 'js/frontend/dynamic-population' . /*$suffix .*/ '.js', array('jquery'), '1.0.0', true );
+
 		// CSS Styles
 		$enqueue_styles = self::get_styles();
 
