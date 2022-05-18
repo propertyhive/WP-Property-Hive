@@ -124,41 +124,116 @@ class PH_Meta_Box_Property_Coordinates {
                             location_filter = jQuery(\'#_address_postcode\').val().split(" ");
                             location_filter = location_filter[0];
                         }
-                        if (jQuery(\'#_address_four\').val() != \'\')
-                        {
-                            address = jQuery(\'#_address_four\').val() + \', \' + address;
-                        }
-                        if (jQuery(\'#_address_three\').val() != \'\')
-                        {
-                            address = jQuery(\'#_address_three\').val() + \', \' + address;
-                        }
-                        if (jQuery(\'#_address_two\').val() != \'\')
-                        {
-                            address = jQuery(\'#_address_two\').val() + \', \' + address;
-                        }
-                        if (jQuery(\'#_address_street\').val() != \'\')
-                        {
-                            address = jQuery(\'#_address_street\').val() + \', \' + address;
-                        }
-                        if (jQuery(\'#_address_name_number\').val() != \'\')
-                        {
-                            address = jQuery(\'#_address_name_number\').val() + \' \' + address;
-                        }
-                        if (jQuery(\'#_address_country\').val() != \'\')
-                        {
-                            address = address + \', \' + jQuery(\'#_address_country\').val();
-                        }
-
-                        var geocoding_data = { \'address\': address };
-                        if ( location_filter != \'\' )
-                        {   
-                            // Removed as for some reason it was generating a lot of ZERO_RESULTS_FOUND errors
-                            /*geocoding_data.componentRestrictions = {
-                                postalCode : location_filter
-                            }*/
-                        }
                         
-                        geocoder.geocode( geocoding_data, geocode_callback );
+                        ';
+
+                        if ( get_option('propertyhive_geocoding_provider') == 'osm' )
+                        {
+                            echo '
+                            if (jQuery(\'#_address_street\').val() != \'\')
+                            {
+                                address = jQuery(\'#_address_street\').val() + \', \' + address;
+                            }
+                            if (jQuery(\'#_address_name_number\').val() != \'\')
+                            {
+                                address = jQuery(\'#_address_name_number\').val() + \' \' + address;
+                            }
+
+                            var data = {
+                                \'action\': \'propertyhive_osm_geocoding_request\',
+                                \'address\': address,
+                                \'country\': jQuery(\'#_address_country\').val(),
+                                \'security\': \'' . wp_create_nonce( 'osm_geocoding_request' ) . '\'
+                            };
+
+                            jQuery.post( ajaxurl, data, function(response) {
+                                
+                                if ( response.error != \'\' )
+                                {
+                                    console.log(data);
+                                    console.log(response);
+                                    alert(response.error);
+                                }
+                                else
+                                {
+                                    map.setZoom(16);
+                            
+                                    jQuery(\'#_latitude\').val(response.lat);
+                                    jQuery(\'#_longitude\').val(response.lng);
+                            ';
+
+                            if ( get_option('propertyhive_maps_provider') == 'osm' )
+                            {    
+                                echo '
+                                    if ( marker != null )
+                                    {
+                                        marker.remove();
+                                    }
+
+                                    marker = L.marker([response.lat, response.lng], { draggable:true }).addTo(map).on(\'moveend\', marker_move_end);
+
+                                    map.panTo([response.lat, response.lng]);
+
+                                    jQuery(\'#help-marker-not-set\').fadeOut(\'fast\', function()
+                                    {
+                                        jQuery(\'#help-marker-set\').fadeIn();
+                                    });
+                                ';
+                            }
+                            else
+                            {
+                                echo '
+                                    map.panTo(new google.maps.LatLng(response.lat, response.lng));
+                                    
+                                    marker = ph_create_marker(response.lat, response.lng);
+                                ';
+                            }
+                            echo '
+                                }
+                            }, \'json\');
+                            ';
+                        }
+                        else
+                        {
+                            echo '
+                            if (jQuery(\'#_address_four\').val() != \'\')
+                            {
+                                address = jQuery(\'#_address_four\').val() + \', \' + address;
+                            }
+                            if (jQuery(\'#_address_three\').val() != \'\')
+                            {
+                                address = jQuery(\'#_address_three\').val() + \', \' + address;
+                            }
+                            if (jQuery(\'#_address_two\').val() != \'\')
+                            {
+                                address = jQuery(\'#_address_two\').val() + \', \' + address;
+                            }
+                            if (jQuery(\'#_address_street\').val() != \'\')
+                            {
+                                address = jQuery(\'#_address_street\').val() + \', \' + address;
+                            }
+                            if (jQuery(\'#_address_name_number\').val() != \'\')
+                            {
+                                address = jQuery(\'#_address_name_number\').val() + \' \' + address;
+                            }
+                            if (jQuery(\'#_address_country\').val() != \'\')
+                            {
+                                address = address + \', \' + jQuery(\'#_address_country\').val();
+                            }
+
+                            var geocoding_data = { \'address\': address };
+                            if ( location_filter != \'\' )
+                            {   
+                                // Removed as for some reason it was generating a lot of ZERO_RESULTS_FOUND errors
+                                /*geocoding_data.componentRestrictions = {
+                                    postalCode : location_filter
+                                }*/
+                            }
+                            
+                            geocoder.geocode( geocoding_data, geocode_callback );
+                            ';
+                        }
+                    echo '
                     }
                 }
 
