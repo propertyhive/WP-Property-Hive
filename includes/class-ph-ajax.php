@@ -42,6 +42,7 @@ class PH_AJAX {
             'get_upcoming_overdue_key_dates' => false,
 
             // Property actions
+            'osm_geocoding_request'  => false,
             'get_property_marketing_statistics_meta_box' => false,
             'get_property_tenancies_grid' => false,
 
@@ -2547,6 +2548,47 @@ class PH_AJAX {
         wp_reset_postdata();
 
         echo json_encode($return);
+
+        die();
+    }
+
+    public function osm_geocoding_request()
+    {
+        check_ajax_referer( 'osm_geocoding_request', 'security' );
+
+        $this->json_headers();
+
+        $lat = '';
+        $lng = '';
+        $error = '';
+
+        $request_url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=" . strtolower(ph_clean($_POST['country'])) . "&addressdetails=1&q=" . urlencode(ph_clean($_POST['address']));
+        
+        $response = wp_remote_get($request_url);
+
+        if ( !is_wp_error( $response ))
+        {
+            if ( is_array( $response ) )
+            {
+                $body = wp_remote_retrieve_body( $response );
+                $json = json_decode($body, true);
+
+                if ( !empty($json) && isset($json[0]['lat']) && isset($json[0]['lon']) )
+                {
+                    $lat = $json[0]['lat'];
+                    $lng = $json[0]['lon'];
+                }
+                else
+                {
+                    $error = 'No co-ordinates returned for the address provided: ' . ph_clean($_POST['address']);
+                }
+            }
+        }
+        else
+        {
+            $error = $response->get_error_message();
+        }
+        echo json_encode(array('error' => $error, 'lat' => $lat, 'lng' => $lng));
 
         die();
     }
