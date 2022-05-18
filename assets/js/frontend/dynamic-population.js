@@ -2,7 +2,7 @@ jQuery(document).ready(function()
 {
 	ph_populate_subsequent_dropdowns(true);
 
-	jQuery('.property-search-form select[data-dynamic-population-level]').change(function()
+	jQuery('select[data-dynamic-population-level]').change(function()
 	{
 		ph_populate_subsequent_dropdowns(false);
 	});
@@ -10,7 +10,7 @@ jQuery(document).ready(function()
 
 function ph_populate_subsequent_dropdowns(init)
 {
-	jQuery('.property-search-form').each(function()
+	jQuery('form').each(function()
 	{
 		jQuery(this).find('input[type=\'hidden\'][name=\'other_' + propertyhive_dynamic_population_params.taxonomy + '[]\']').remove();
 		jQuery(this).find('select[data-dynamic-population-level]').attr('name', 'other_' + propertyhive_dynamic_population_params.taxonomy + '[]');
