@@ -396,7 +396,7 @@ class PH_Settings_General extends PH_Settings_Page {
             array(
                 'id'      => 'propertyhive_osm_html',
                 'type'    => 'html',
-                'html'  => '<p>' . __( 'When geocoding with OSM we will only pass the postcode so co-ordinates returned might not always be exactly relative to the house name/number.', 'propertyhive' ) . '</p>'
+                'html'  => '<p>' . __( 'Note: OSM is an open source project maintained by volunteers and the geocoding results returned are reliant on the data sets available. If you find some addresses/search terms don\'t return results this is likely the issue, as opposed to it being an issue with Property Hive.', 'propertyhive' ) . '</p>'
             ),
         );
 
