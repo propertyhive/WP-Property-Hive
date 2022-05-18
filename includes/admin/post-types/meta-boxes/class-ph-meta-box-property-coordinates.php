@@ -130,15 +130,6 @@ class PH_Meta_Box_Property_Coordinates {
                         if ( get_option('propertyhive_geocoding_provider') == 'osm' )
                         {
                             echo '
-                            if (jQuery(\'#_address_street\').val() != \'\')
-                            {
-                                address = jQuery(\'#_address_street\').val() + \', \' + address;
-                            }
-                            if (jQuery(\'#_address_name_number\').val() != \'\')
-                            {
-                                address = jQuery(\'#_address_name_number\').val() + \' \' + address;
-                            }
-
                             var data = {
                                 \'action\': \'propertyhive_osm_geocoding_request\',
                                 \'address\': address,
