@@ -393,6 +393,11 @@ class PH_Settings_General extends PH_Settings_Page {
                 ),
             ),
 
+            array(
+                'id'      => 'propertyhive_osm_html',
+                'type'    => 'html',
+                'html'  => '<p>' . __( 'When geocoding with OSM we will only pass the postcode so co-ordinates returned might not always be exactly relative to the house name/number.', 'propertyhive' ) . '</p>'
+            ),
         );
 
         if ( apply_filters( 'propertyhive_use_google_maps_geocoding_api_key', false) === true )
