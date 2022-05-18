@@ -770,41 +770,14 @@ function ph_get_applicant_requirements_form_fields($applicant_profile = false)
         );
         $terms = get_terms( 'location', $args );
 
-        $options = array();
-
-        $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
-            $options = array( '' => __( 'All Locations', 'propertyhive' ) );
-
-            foreach ($terms as $term)
-            {
-                $options[$term->term_id] = $term->name;
-
-                $args = array(
-                    'hide_empty' => false,
-                    'parent' => $term->term_id
-                );
-                $subterms = get_terms( 'location', $args );
-
-                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
-                {
-                    foreach ($subterms as $term)
-                    {
-                        $options[$term->term_id] = '- ' . $term->name;
-                    }
-                }
-            }
-        }
-
-        if ( !empty($options) )
-        {
             $fields['location'] = array(
-                'type' => 'select',
+                'type' => 'location',
                 'label' => __( 'Location', 'propertyhive' ),
+                'blank_option' => __( 'All Locations', 'propertyhive' ),
                 'required' => false,
                 'multiselect' => true,
-                'options' => $options,
             );
 
             if ( is_user_logged_in() && isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
@@ -1722,6 +1695,10 @@ function ph_form_field( $key, $field )
                             else
                             {
                                 if ( isset($_REQUEST[$key]) && is_array($_REQUEST[$key]) && in_array($option_key, $_REQUEST[$key]) )
+                                {
+                                    $output .= ' selected';
+                                }
+                                elseif ( is_array($field['value']) && in_array($option_key, $field['value']) )
                                 {
                                     $output .= ' selected';
                                 }
