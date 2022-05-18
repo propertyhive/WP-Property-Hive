@@ -242,10 +242,12 @@ function ph_toggle_geocoding_provider_options()
     if ( jQuery('[name=\'propertyhive_geocoding_provider\']:checked').val() == 'osm' )
     {
         jQuery('#row_propertyhive_google_maps_geocoding_api_key').hide();
+        jQuery('#row_propertyhive_osm_html').show();
     }
     else
     {
         jQuery('#row_propertyhive_google_maps_geocoding_api_key').show();
+        jQuery('#row_propertyhive_osm_html').hide();
     }
 }
 
