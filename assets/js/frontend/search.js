@@ -106,7 +106,7 @@ function toggleDepartmentFields()
                         for ( var i in availabilities_order )
                         {
                             var availability_id = availabilities_order[i];
-                            var availability_text = availabilities[availabilities_order[i]];
+                            var availability_text = availabilities[availabilities_order[i]].label;
 
                             var this_availability_departments = [];
                             var availability_departments_exist = true;
