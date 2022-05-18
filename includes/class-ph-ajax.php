@@ -42,6 +42,7 @@ class PH_AJAX {
             'get_upcoming_overdue_key_dates' => false,
 
             // Property actions
+            'osm_geocoding_request'  => false,
             'get_property_marketing_statistics_meta_box' => false,
             'get_property_tenancies_grid' => false,
 
@@ -2551,6 +2552,47 @@ class PH_AJAX {
         die();
     }
 
+    public function osm_geocoding_request()
+    {
+        check_ajax_referer( 'osm_geocoding_request', 'security' );
+
+        $this->json_headers();
+
+        $lat = '';
+        $lng = '';
+        $error = '';
+
+        $request_url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=" . strtolower(ph_clean($_POST['country'])) . "&addressdetails=1&q=" . urlencode(ph_clean($_POST['address']));
+        
+        $response = wp_remote_get($request_url);
+
+        if ( !is_wp_error( $response ))
+        {
+            if ( is_array( $response ) )
+            {
+                $body = wp_remote_retrieve_body( $response );
+                $json = json_decode($body, true);
+
+                if ( !empty($json) && isset($json[0]['lat']) && isset($json[0]['lon']) )
+                {
+                    $lat = $json[0]['lat'];
+                    $lng = $json[0]['lon'];
+                }
+                else
+                {
+                    $error = 'No co-ordinates returned for the address provided: ' . ph_clean($_POST['address']);
+                }
+            }
+        }
+        else
+        {
+            $error = $response->get_error_message();
+        }
+        echo json_encode(array('error' => $error, 'lat' => $lat, 'lng' => $lng));
+
+        die();
+    }
+
     public function get_property_marketing_statistics_meta_box()
     {
         check_ajax_referer( 'get_property_marketing_statistics_meta_box', 'security' );
@@ -3174,34 +3216,60 @@ class PH_AJAX {
                     if ( get_post_meta( $post_id, '_address_postcode', TRUE ) ) { $address_to_geocode[] = get_post_meta( $post_id, '_address_postcode', TRUE ); }
 
                     $country = get_option( 'propertyhive_default_country', 'GB' );
-                    $request_url = "https://maps.googleapis.com/maps/api/geocode/xml?address=" . urlencode( implode( ", ", $address_to_geocode ) ) . "&sensor=false&region=gb"; // the request URL you'll send to google to get back your XML feed
-                    
-                    $api_key = get_option('propertyhive_google_maps_api_key', '');
-                    if ( $api_key != '' ) { $request_url .= "&key=" . $api_key; }
 
-                    $response = wp_remote_get($request_url);
-
-                    if ( is_array( $response ) && !is_wp_error( $response ) ) 
+                    if ( get_option('propertyhive_geocoding_provider') == 'osm' )
                     {
-                        $header = $response['headers']; // array of http header lines
-                        $body = $response['body']; // use the content
-
-                        $xml = simplexml_load_string($body);
-
-                        if ( $xml !== FALSE )
+                        $request_url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=" . strtolower($country) . "&addressdetails=1&q=" . urlencode(implode( ", ", $address_to_geocode ));
+                        $response = wp_remote_get($request_url);
+                        if ( is_array( $response ) )
                         {
-                            $status = $xml->status; // Get the request status as google's api can return several responses
+                            $body = wp_remote_retrieve_body( $response );
+                            $json = json_decode($body, true);
 
-                            if ($status == "OK") 
+                            if ( !empty($json) && isset($json[0]['lat']) && isset($json[0]['lon']) )
                             {
-                                //request returned completed time to get lat / lng for storage
-                                $lat = (string)$xml->result->geometry->location->lat;
-                                $lng = (string)$xml->result->geometry->location->lng;
-                                
+                                $lat = $json[0]['lat'];
+                                $lng = $json[0]['lon'];
+
                                 if ($lat != '' && $lng != '')
                                 {
-                                    update_post_meta( $post_id, '_latitude', $lat );
-                                    update_post_meta( $post_id, '_longitude', $lng );
+                                    update_post_meta( $property_post_id, '_latitude', $lat );
+                                    update_post_meta( $property_post_id, '_longitude', $lng );
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        $request_url = "https://maps.googleapis.com/maps/api/geocode/xml?address=" . urlencode( implode( ", ", $address_to_geocode ) ) . "&sensor=false&region=" . strtolower($country); // the request URL you'll send to google to get back your XML feed
+
+                        $api_key = get_option('propertyhive_google_maps_api_key', '');
+                        if ( $api_key != '' ) { $request_url .= "&key=" . $api_key; }
+
+                        $response = wp_remote_get($request_url);
+
+                        if ( is_array( $response ) && !is_wp_error( $response ) )
+                        {
+                            $header = $response['headers']; // array of http header lines
+                            $body = $response['body']; // use the content
+
+                            $xml = simplexml_load_string($body);
+
+                            if ( $xml !== FALSE )
+                            {
+                                $status = $xml->status; // Get the request status as google's api can return several responses
+
+                                if ($status == "OK")
+                                {
+                                    //request returned completed time to get lat / lng for storage
+                                    $lat = (string)$xml->result->geometry->location->lat;
+                                    $lng = (string)$xml->result->geometry->location->lng;
+
+                                    if ($lat != '' && $lng != '')
+                                    {
+                                        update_post_meta( $property_post_id, '_latitude', $lat );
+                                        update_post_meta( $property_post_id, '_longitude', $lng );
+                                    }
                                 }
                             }
                         }
