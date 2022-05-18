@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 5.9.3
-Stable tag: 1.5.34
+Stable tag: 1.5.35
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,10 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.35 - 2022-05-18 =
+* Added option to use OSM/Nominatim as geocoding service
+* Corrected issue with availability search dropdown labels after latest update
 
 = 1.5.34 - 2022-05-17 =
 * Added new cascading location dropdown feature whereby choosing a top level parent location would pre-fill next location dropdown with child locations. Can be enabled using Template Assistant add on.
