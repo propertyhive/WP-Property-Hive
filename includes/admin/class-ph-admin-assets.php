@@ -164,6 +164,10 @@ class PH_Admin_Assets {
         );
         wp_localize_script( 'propertyhive_admin_recently_viewed', 'propertyhive_admin_recently_viewed', $params );
 
+        wp_localize_script( 'multiselect', 'propertyhive_multiselect_params', apply_filters( 'propertyhive_multiselect_params', array(
+            'search'    => false,
+        ) ) );
+
         // PropertyHive admin pages
         if ( in_array( $screen->id, array( 'dashboard' ) ) )
         {
