@@ -72,6 +72,11 @@ if ( !empty($notes) )
 						$note_body = $comment_content['action'] . '<br>From: ' . $comment_content['original_value'] . '<br>To: ' . $comment_content['new_value'];
 						break;
 					}
+					case "property_availability_change":
+					{
+						$note_body = $comment_content['action'] . '<br>From: ' . $comment_content['original_value'] . '<br>To: ' . $comment_content['new_value'];
+						break;
+					}
 					case "viewing_booked":
 					{
 						$note_body = '<a href="' . get_edit_post_link($comment_content['viewing_id']) . '">Viewing</a> booked';

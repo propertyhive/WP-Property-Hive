@@ -37,7 +37,80 @@ class PH_Comments {
 		add_action( 'update_post_meta', array( __CLASS__, 'check_on_market_update' ), 10, 4 );
 
 		add_action( 'update_post_meta', array( __CLASS__, 'check_price_change' ), 10, 4 );
+
+		add_action( 'set_object_terms', array( __CLASS__, 'check_property_status_update' ), 10, 6 );
 	}
+
+	public function check_property_status_update( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids )
+    {
+        if ( $taxonomy == 'availability' && apply_filters( 'propertyhive_add_property_availability_change_note', true ) === true )
+        {
+            if (
+                get_post_type($object_id) == 'property' &&
+                get_post_status($object_id) == 'publish' &&
+                $tt_ids != $old_tt_ids
+            )
+            {
+                $all_availability_terms = get_terms( 'availability', array( 'hide_empty' => 0 ) );
+
+                $old_availability_id = '';
+                $old_availability_name = '';
+                if ( is_array($old_tt_ids) && !empty($old_tt_ids) )
+                {
+                    $old_availability_id = (int)$old_tt_ids[0];
+
+                    foreach( $all_availability_terms as $term )
+                    {
+                        $tt_id = (int)$term->term_taxonomy_id;
+                        if( $tt_id == $old_availability_id )
+                        {
+                            $old_availability_name = $term->name;
+                        }
+                    }
+                }
+
+                $new_availability_id = '';
+                $new_availability_name = '';
+                if ( is_array($tt_ids) && !empty($tt_ids) )
+                {
+                    $new_availability_id = (int)$tt_ids[0];
+
+                    foreach( $all_availability_terms as $term )
+                    {
+                        $tt_id = (int)$term->term_taxonomy_id;
+                        if( $tt_id == $new_availability_id )
+                        {
+                            $new_availability_name = $term->name;
+                        }
+                    }
+                }
+
+                $current_user = wp_get_current_user();
+
+	            // Add note/comment to property
+	            $comment = array(
+	                'note_type' => 'action',
+	                'action' => 'property_availability_change',
+	                'original_value' => $old_availability_name,
+	                'new_value' => $new_availability_name
+	            );
+
+	            $data = array(
+	                'comment_post_ID'      => (int)$object_id,
+	                'comment_author'       => $current_user->display_name,
+	                'comment_author_email' => 'propertyhive@noreply.com',
+	                'comment_author_url'   => '',
+	                'comment_date'         => date("Y-m-d H:i:s"),
+	                'comment_content'      => serialize($comment),
+	                'comment_approved'     => 1,
+	                'comment_type'         => 'propertyhive_note',
+	            );
+	            $comment_id = wp_insert_comment( $data );
+
+	            update_post_meta( $object_id, '_availability_change_date', date("Y-m-d H:i:s") );
+            }
+        }
+    }
 
 	public static function related_to_or_post_id( $clauses )
 	{
