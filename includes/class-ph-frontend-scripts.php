@@ -126,6 +126,12 @@ class PH_Frontend_Scripts {
 				'requirements_nonce'	=> wp_create_nonce( "ph_requirements" ),
 			) ) );
 		}
+
+		if ( wp_script_is( 'multiselect' ) ) {
+			wp_localize_script( 'multiselect', 'propertyhive_multiselect_params', apply_filters( 'propertyhive_multiselect_params', array(
+				'search'	=> false,
+			) ) );
+		}
 	}
 
 	/**

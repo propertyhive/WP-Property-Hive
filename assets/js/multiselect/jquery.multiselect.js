@@ -32,7 +32,7 @@
 (function($){
     var defaults = {
         columns: 1,     // how many columns should be use to show options
-        search : false, // include option search box
+        search : propertyhive_multiselect_params.search, // include option search box
 
         // search filter options
         searchOptions : {
