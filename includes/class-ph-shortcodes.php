@@ -666,6 +666,7 @@ class PH_Shortcodes {
 			'per_page' 	=> '12',
 			'columns' 	=> '4',
 			'department' => '',
+			'address_keyword'	=> '',
 			'office_id'	=> '',
 			'negotiator_id'		=> '',
 			'availability_id'	=> '',
@@ -710,6 +711,79 @@ class PH_Shortcodes {
 				'value' => $atts['department'],
 				'compare' => '='
 			);
+		}
+
+		if ( isset($atts['address_keyword']) && $atts['address_keyword'] != '' )
+		{
+			$atts['address_keyword'] = sanitize_text_field( trim( $atts['address_keyword'] ) );
+
+        	$address_keywords = array( $atts['address_keyword'] );
+
+        	if ( strpos( $atts['address_keyword'], ' ' ) !== FALSE )
+        	{
+        		$address_keywords[] = str_replace(" ", "-", $atts['address_keyword']);
+        	}
+        	if ( strpos( $atts['address_keyword'], '-' ) !== FALSE )
+        	{
+        		$address_keywords[] = str_replace("-", " ", $atts['address_keyword']);
+        	}
+
+			$sub_meta_query = array('relation' => 'OR');
+
+			foreach ( $address_keywords as $address_keyword )
+	      	{
+	      		$sub_meta_query[] = array(
+				    'key'     => '_reference_number',
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_street',
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+      			$sub_meta_query[] = array(
+				    'key'     => '_address_two',
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+				$sub_meta_query[] = array(
+				    'key'     => '_address_three',
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+				$sub_meta_query[] = array(
+				    'key'     => '_address_four',
+				    'value'   => $address_keyword,
+				    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+				);
+	      	}
+	      	if ( strlen($atts['address_keyword']) <= 4 )
+	      	{
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => '='
+				);
+				// Run regex match where given keyword is at the start of the postcode ^
+				// followed by one or zero letters (for WC2E-style postcodes) [a-zA-Z]?
+				// then a single space [ ]
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ) . '[a-zA-Z]?[ ]',
+				    'compare' => 'RLIKE'
+				);
+	      	}
+	      	else
+	      	{
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['address_keyword'] ),
+				    'compare' => 'LIKE'
+				);
+	      	}
+
+	      	$meta_query[] = $sub_meta_query;
 		}
 
 		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
