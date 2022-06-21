@@ -80,6 +80,7 @@ class PH_Elementor {
 			'Property Reference Number',
 			'Property Floor Area',
 			'Property Tenure',
+			'Property Council Tax Band',
 			'Property Map',
 			'Property Street View',
 			'Property Floorplans',
