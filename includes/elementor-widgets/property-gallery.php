@@ -208,7 +208,9 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
 
                     if ( $image_number == ($max_images - 1) )
                     {
-                        echo '<div class="more-images-container"><div class="more-images"><a href="javascript:;" onclick="openGallery();">See all ' . count($images) . ' images</a></div></div>';
+                        echo '<div class="more-images-container"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
+                        printf( __( 'See all %d images', 'propertyhive' ), count($images) );
+                        echo '</a></div></div>';
                     }
                 }
 
