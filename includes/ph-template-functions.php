@@ -811,6 +811,57 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
                     'label' => __('Tenure', 'propertyhive'),
                     'value' => $property->tenure
                 );
+
+                if ( $property->tenure == apply_filters('propertyhive_leasehold_tenure_name', 'Leasehold') )
+                {
+                    if ( $property->leasehold_years_remaining != '' )
+                    {
+                        $meta['leasehold-years-remaining'] = array(
+                            'label' => __('Leasehold Remaining', 'propertyhive'),
+                            'value' => $property->leasehold_years_remaining . ' ' . __( 'years', 'propertyhive' )
+                        );
+                    }
+
+                    if ( $property->ground_rent != '' )
+                    {
+                        $meta['ground-rent'] = array(
+                            'label' => __('Ground Rent', 'propertyhive'),
+                            'value' => '&pound;' . number_format($property->ground_rent, 2)
+                        );
+                    }
+
+                    if ( $property->ground_rent_review_years != '' )
+                    {
+                        $meta['ground-rent-review-years'] = array(
+                            'label' => __('Ground Rent Review Period', 'propertyhive'),
+                            'value' => $property->ground_rent_review_years . ' ' . __( 'years', 'propertyhive' )
+                        );
+                    }
+
+                    if ( $property->service_charge != '' )
+                    {
+                        $meta['service-charge'] = array(
+                            'label' => __('Service Charge', 'propertyhive'),
+                            'value' => '&pound;' . number_format($property->service_charge, 2)
+                        );
+                    }
+
+                    if ( $property->service_charge_review_years != '' )
+                    {
+                        $meta['service-charge-review-years'] = array(
+                            'label' => __('Service Charge Review Period', 'propertyhive'),
+                            'value' => $property->service_charge_review_years . ' ' . __( 'years', 'propertyhive' )
+                        );
+                    }
+
+                    if ( $property->shared_ownership == 'yes' )
+                    {
+                        $meta['shared-ownership'] = array(
+                            'label' => __('Shared Ownership', 'propertyhive'),
+                            'value' => $property->shared_ownership . ( $property->shared_ownership_percentage != '' ? ' (' . $property->shared_ownership_percentage . '%)' : '' )
+                        );
+                    }
+                }
             }
         }
 
