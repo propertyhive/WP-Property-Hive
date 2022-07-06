@@ -41,7 +41,7 @@ class PH_Comments {
 		add_action( 'set_object_terms', array( __CLASS__, 'check_property_status_update' ), 10, 6 );
 	}
 
-	public function check_property_status_update( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids )
+	public static function check_property_status_update( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids )
     {
         if ( $taxonomy == 'availability' && apply_filters( 'propertyhive_add_property_availability_change_note', true ) === true )
         {
