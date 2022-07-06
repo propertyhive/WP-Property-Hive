@@ -784,6 +784,30 @@ jQuery( function($){
             }
         });
     });
+
+    $('#tenure_id').change(function()
+    {
+        if ( $(this).find('option:selected').text() == 'Leasehold' )
+        {
+            $('#leasehold_information').show();
+        }
+        else
+        {
+            $('#leasehold_information').hide();
+        }
+    });
+
+    $('#_shared_ownership').change(function()
+    {
+        if ( $(this).is(':checked') )
+        {
+            $('#shared_ownership_information').show();
+        }
+        else
+        {
+            $('#shared_ownership_information').hide();
+        }
+    });
 });
 
 function ph_open_details_lightbox(post_id, section)

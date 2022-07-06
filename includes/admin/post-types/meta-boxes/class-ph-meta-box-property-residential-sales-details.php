@@ -159,6 +159,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         $terms = get_terms( 'tenure', $args );
         
         $selected_value = '';
+        $selected_name = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
             foreach ($terms as $term)
@@ -166,11 +167,12 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
                 $options[$term->term_id] = $term->name;
             }
 
-            $term_list = wp_get_post_terms($post->ID, 'tenure', array("fields" => "ids"));
+            $term_list = wp_get_post_terms($post->ID, 'tenure', array("fields" => "all"));
             
             if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
             {
-                $selected_value = $term_list[0];
+                $selected_value = $term_list[0]->term_id;
+                $selected_name = $term_list[0]->name;
             }
         }
         
@@ -185,13 +187,73 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             $args['value'] = $selected_value;
         }
         propertyhive_wp_select( $args );
+
+        echo '<div id="leasehold_information"';
+        if ( $selected_name != apply_filters('propertyhive_leasehold_tenure_name', 'Leasehold') ) { echo ' style="display:none"'; }
+        echo '>';
+
+        propertyhive_wp_text_input( array( 
+            'id' => '_leasehold_years_remaining', 
+            'label' => __( 'Lease Years Remaining', 'propertyhive' ), 
+            'desc_tip' => false,
+            'type' => 'number'
+        ) );
+
+        propertyhive_wp_text_input( array( 
+            'id' => '_ground_rent', 
+            'label' => __( 'Ground Rent Per Year (&pound;)', 'propertyhive' ), 
+            'desc_tip' => false,
+            //'class' => '',
+            'value' => ph_display_price_field( get_post_meta( $post->ID, '_ground_rent', true ) ),
+        ) );
+
+        propertyhive_wp_text_input( array( 
+            'id' => '_ground_rent_review_years', 
+            'label' => __( 'Ground Rent Review Period (Years)', 'propertyhive' ), 
+            'desc_tip' => false,
+            'type' => 'number'
+        ) );
+
+        propertyhive_wp_text_input( array( 
+            'id' => '_service_charge', 
+            'label' => __( 'Service Charge Per Year (&pound;)', 'propertyhive' ), 
+            'desc_tip' => false,
+            //'class' => '',
+            'value' => ph_display_price_field( get_post_meta( $post->ID, '_service_charge', true ) ),
+        ) );
+
+        propertyhive_wp_text_input( array( 
+            'id' => '_service_charge_review_years', 
+            'label' => __( 'Service Charge Review Period (Years)', 'propertyhive' ), 
+            'desc_tip' => false,
+            'type' => 'number'
+        ) );
+
+        propertyhive_wp_checkbox( array( 
+            'id' => '_shared_ownership', 
+            'label' => __( 'Shared Ownership', 'propertyhive' ), 
+            'desc_tip' => false,
+            'value' => get_post_meta( $post->ID, '_shared_ownership', true )
+        ) );
+
+        echo '<div id="shared_ownership_information"';
+        if ( get_post_meta( $post->ID, '_shared_ownership', true ) != 'yes' ) { echo ' style="display:none"'; }
+        echo '>';
+        propertyhive_wp_text_input( array( 
+            'id' => '_shared_ownership_percentage', 
+            'label' => __( 'Shared Ownership Percentage', 'propertyhive' ) .  ' (%)', 
+            'desc_tip' => false,
+            'type' => 'number'
+        ) );
+        echo '</div>';
+
+        echo '</div>';
         
         do_action('propertyhive_property_residential_sales_details_fields');
         
         echo '</div>';
         
         echo '</div>';
-        
     }
 
     /**
@@ -245,6 +307,25 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
                 // Setting to blank
                 wp_delete_object_term_relationships( $post_id, 'tenure' );
             }
+
+            update_post_meta( $post_id, '_leasehold_years_remaining', (int)$_POST['_leasehold_years_remaining'] );
+
+            $ground_rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_ground_rent']));
+            update_post_meta( $post_id, '_ground_rent', $ground_rent );
+
+            $ground_rent_review_years = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_ground_rent_review_years']));
+            update_post_meta( $post_id, '_ground_rent_review_years', $ground_rent_review_years );
+
+            $service_charge = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_service_charge']));
+            update_post_meta( $post_id, '_service_charge', $service_charge );
+
+            $service_charge_review_years = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_service_charge_review_years']));
+            update_post_meta( $post_id, '_service_charge_review_years', $service_charge_review_years );
+
+            update_post_meta( $post_id, '_shared_ownership', ( isset($_POST['_shared_ownership']) ? ph_clean($_POST['_shared_ownership']) : '' ) );
+
+            $shared_ownership_percentage = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_shared_ownership_percentage']));
+            update_post_meta( $post_id, '_shared_ownership_percentage', $shared_ownership_percentage );
 
             do_action( 'propertyhive_save_property_residential_sales_details', $post_id );
         }
