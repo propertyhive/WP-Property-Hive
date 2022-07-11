@@ -336,6 +336,12 @@ class PH_Countries {
 				'currency_symbol' => 'CHF',
 				'currency_prefix' => true
 			),
+			'TH' => array(
+				'name' => 'Thailand',
+				'currency_code' => 'THB',
+				'currency_symbol' => '฿',
+				'currency_prefix' => true
+			),
 			'TR' => array(
 				'name' => 'Turkey',
 				'currency_code' => 'TRY',
