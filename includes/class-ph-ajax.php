@@ -1034,6 +1034,19 @@ class PH_AJAX {
 
                 // Not used yet but could be if introducing currencies in the future.
                 $applicant_profile['max_price_actual'] = $price;
+
+                $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
+                $percentage_higher = get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' );
+
+                if ( $percentage_lower != '' && $percentage_higher != '' && $_POST['maximum_price'] != '' && $_POST['maximum_price'] != 0 )
+                {
+                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
+                    $applicant_profile['match_price_range_lower'] = $price - ( $price * ( $percentage_lower / 100 ) );
+                    $applicant_profile['match_price_range_lower_actual'] = $price - ( $price * ( $percentage_lower / 100 ) );
+                    
+                    $applicant_profile['match_price_range_higher'] = $price + ( $price * ( $percentage_higher / 100 ) );
+                    $applicant_profile['match_price_range_higher_actual'] = $price + ( $price * ( $percentage_higher / 100 ) );
+                }
             }
             elseif ( $base_department == 'residential-lettings' )
             {
