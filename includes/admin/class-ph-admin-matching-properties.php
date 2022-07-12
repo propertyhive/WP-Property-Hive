@@ -359,7 +359,7 @@ class PH_Admin_Matching_Properties {
                         );
                     }
                 }
-                else
+                elseif ( isset($applicant_profile['max_price_actual']) && !empty($applicant_profile['max_price_actual']) )
                 {
                     $meta_query[] = array(
                         'key' => '_price_actual',
