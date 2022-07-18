@@ -161,10 +161,8 @@ class PH_Install {
         wp_clear_scheduled_hook( 'propertyhive_check_licenses' );
         wp_clear_scheduled_hook( 'propertyhive_update_address_concatenated' );
 
-		$ve = get_option( 'gmt_offset' ) > 0 ? '+' : '-';
-
 		// Schedule for midnight as it's likely traffic will be quieter at that time
-		wp_schedule_event( strtotime( '00:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_update_currency_exchange_rates' );
+		wp_schedule_event( strtotime( 'tomorrow' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ), 'daily', 'propertyhive_update_currency_exchange_rates' );
         
         wp_schedule_event( time(), 'every_fifteen_minutes', 'propertyhive_process_email_log' );
 
@@ -175,13 +173,12 @@ class PH_Install {
             $recurrence = apply_filters( 'propertyhive_auto_email_match_cron_recurrence', 'daily' );
             if ( $recurrence != 'hourly' )
             {
-                $timestamp = strtotime( '02:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' );
+                $timestamp = strtotime( 'tomorrow +2hours') - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
             }
             else
             {
                 $timestamp = strtotime( '+1 hours' );
             }
-            $ve = get_option( 'gmt_offset' ) > 0 ? '+' : '-';
             wp_schedule_event( 
                 apply_filters( 'propertyhive_auto_email_match_cron_timestamp', $timestamp ), 
                 $recurrence, 
@@ -191,9 +188,9 @@ class PH_Install {
 
         // Schedule for 1am as it's likely traffic will be quieter at that time
         // 1am so it doesn't run at exactly the same time as the exchange rate cron
-        wp_schedule_event( strtotime( '01:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_check_licenses' );
+        wp_schedule_event( strtotime( 'tomorrow +1hours' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ), 'daily', 'propertyhive_check_licenses' );
 
-        wp_schedule_event( strtotime( '03:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' ), 'daily', 'propertyhive_update_address_concatenated' );
+        wp_schedule_event( strtotime( 'tomorrow +3hours' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ), 'daily', 'propertyhive_update_address_concatenated' );
 	}
 
     public function custom_cron_recurrence( $schedules ) 

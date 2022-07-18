@@ -548,13 +548,12 @@ class PH_Settings_Emails extends PH_Settings_Page {
 			$recurrence = apply_filters( 'propertyhive_auto_email_match_cron_recurrence', 'daily' );
 			if ( $recurrence != 'hourly' )
 			{
-				$timestamp = strtotime( '02:00 tomorrow ' . $ve . get_option( 'gmt_offset' ) . ' HOURS' );
+				$timestamp = strtotime( 'tomorrow +2hours' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 			}
 			else
 			{
 				$timestamp = strtotime( '+1 hours' );
 			}
-			$ve = get_option( 'gmt_offset' ) > 0 ? '+' : '-';
 			wp_schedule_event( 
 				apply_filters( 'propertyhive_auto_email_match_cron_timestamp', $timestamp ), 
 				$recurrence, 
