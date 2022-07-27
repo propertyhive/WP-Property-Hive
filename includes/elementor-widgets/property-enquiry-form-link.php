@@ -31,7 +31,7 @@ class Elementor_Property_Enquiry_Form_Link_Widget extends \Elementor\Widget_Base
 		$this->start_controls_section(
 			'style_section',
 			[
-				'label' => __( 'Link', 'propertyhive' ),
+				'label' => __( 'Enquiry Form Link', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
 			]
 		);
