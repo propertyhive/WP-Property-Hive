@@ -102,27 +102,41 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
 <?php
 		}
 
-		$floorplan_attachment_ids = $property->get_floorplan_attachment_ids();
+		if ( get_option('propertyhive_floorplans_stored_as', '') == 'urls' )
+        {
+            $floorplan_urls = $property->_floorplan_urls;
+            if ( is_array($floorplan_urls) && !empty( $floorplan_urls ) )
+            {
+                foreach ($floorplan_urls as $floorplan)
+                {
+                	echo '<a href="' . $floorplan['url'] . '" data-fancybox="floorplans" rel="nofollow"><img src="' . $floorplan['url'] . '" alt=""></a>';
+                }
+            }
+        }
+        else
+       	{
+			$floorplan_attachment_ids = $property->get_floorplan_attachment_ids();
 
-		if ( !empty($floorplan_attachment_ids) )
-		{
-			echo '<div class="floorplans">';
+			if ( !empty($floorplan_attachment_ids) )
+			{
+				echo '<div class="floorplans">';
 
-				echo '<h4>' . __( 'Floorplans', 'propertyhive' ) . '</h4>';
+					echo '<h4>' . __( 'Floorplans', 'propertyhive' ) . '</h4>';
 
-				foreach ( $floorplan_attachment_ids as $attachment_id )
-				{
-					if ( wp_attachment_is_image($attachment_id) )
-                    {
-						echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
-					}
-					else
+					foreach ( $floorplan_attachment_ids as $attachment_id )
 					{
-						echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View Floorplan', 'propertyhive' ) . '</a>';
+						if ( wp_attachment_is_image($attachment_id) )
+	                    {
+							echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
+						}
+						else
+						{
+							echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View Floorplan', 'propertyhive' ) . '</a>';
+						}
 					}
-				}
 
-			echo '</div>';
+				echo '</div>';
+			}
 		}
 
 	}

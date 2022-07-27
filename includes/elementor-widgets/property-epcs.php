@@ -102,27 +102,41 @@ class Elementor_Property_EPCs_Widget extends \Elementor\Widget_Base {
 <?php
 		}
 
-        $epc_attachment_ids = $property->get_epc_attachment_ids();
+		if ( get_option('propertyhive_epcs_stored_as', '') == 'urls' )
+        {
+            $epc_urls = $property->_epc_urls;
+            if ( is_array($epc_urls) && !empty( $epc_urls ) )
+            {
+                foreach ($epc_urls as $epc)
+                {
+                	echo '<a href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow"><img src="' . $epc['url'] . '" alt=""></a>';
+                }
+            }
+        }
+        else
+       	{
+	        $epc_attachment_ids = $property->get_epc_attachment_ids();
 
-		if ( !empty($epc_attachment_ids) )
-		{
-			echo '<div class="epcs">';
+			if ( !empty($epc_attachment_ids) )
+			{
+				echo '<div class="epcs">';
 
-				echo '<h4>' . __( 'EPCs', 'propertyhive' ) . '</h4>';
+					echo '<h4>' . __( 'EPCs', 'propertyhive' ) . '</h4>';
 
-				foreach ( $epc_attachment_ids as $attachment_id )
-				{
-					if ( wp_attachment_is_image($attachment_id) )
-                    {
-						echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="epc" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
-					}
-					else
+					foreach ( $epc_attachment_ids as $attachment_id )
 					{
-						echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View EPC', 'propertyhive' ) . '</a>';
+						if ( wp_attachment_is_image($attachment_id) )
+	                    {
+							echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="epc" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
+						}
+						else
+						{
+							echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View EPC', 'propertyhive' ) . '</a>';
+						}
 					}
-				}
 
-			echo '</div>';
+				echo '</div>';
+			}
 		}
 
 	}
