@@ -526,14 +526,17 @@ class PH_Countries {
 					$rent_units = get_post_meta( $postID, '_rent_units', true );
 
 					$price = get_post_meta( $postID, '_rent_from', true );
-		            switch ($rent_units)
-		            {
-		            	case "pd": { $price = ($price * 365) / 12; break; }
-		                case "pw": { $price = ($price * 52) / 12; break; }
-		                case "pcm": { $price = $price; break; }
-		                case "pq": { $price = ($price * 4) / 12; break; }
-		                case "pa": { $price = ($price / 12); break; }
-		            }
+					if ( is_numeric($price) )
+					{
+			            switch ($rent_units)
+			            {
+			            	case "pd": { $price = ($price * 365) / 12; break; }
+			                case "pw": { $price = ($price * 52) / 12; break; }
+			                case "pcm": { $price = $price; break; }
+			                case "pq": { $price = ($price * 4) / 12; break; }
+			                case "pa": { $price = ($price / 12); break; }
+			            }
+			        }
 
 		            $converted_price = $this->convert_price_to_gbp( $price, $currency );
 
@@ -545,14 +548,17 @@ class PH_Countries {
 					}
 
 		            $price = get_post_meta( $postID, '_rent_to', true );
-		            switch ($rent_units)
-		            {
-		            	case "pd": { $price = ($price * 365) / 12; break; }
-		                case "pw": { $price = ($price * 52) / 12; break; }
-		                case "pcm": { $price = $price; break; }
-		                case "pq": { $price = ($price * 4) / 12; break; }
-		                case "pa": { $price = ($price / 12); break; }
-		            }
+		            if ( is_numeric($price) )
+					{
+			            switch ($rent_units)
+			            {
+			            	case "pd": { $price = ($price * 365) / 12; break; }
+			                case "pw": { $price = ($price * 52) / 12; break; }
+			                case "pcm": { $price = $price; break; }
+			                case "pq": { $price = ($price * 4) / 12; break; }
+			                case "pa": { $price = ($price / 12); break; }
+			            }
+			        }
 
 		            $converted_price = $this->convert_price_to_gbp( $price, $currency );
 
