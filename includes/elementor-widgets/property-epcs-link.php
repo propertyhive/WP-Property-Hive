@@ -146,8 +146,24 @@ class Elementor_Property_EPCs_Link_Widget extends \Elementor\Widget_Base {
 				$i = 0;
 				foreach ( $epc_urls as $epc )
 				{
-					echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow">' . ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
-					++$i;
+					$image_extensions = array( 'jpg', 'jpeg', 'png', 'gif', 'bmp' );
+					$image = false;
+					foreach ( $image_extensions as $image_extension )
+					{
+						if ( strpos(strtolower($epc['url']), '.' . $image_extension) )
+						{
+							$image = true;
+						}
+					}
+					if ( $image )
+					{
+						echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow">' . ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
+						++$i;
+					}
+					else
+					{
+						echo '<a href="' . $epc['url'] . '" rel="nofollow" target="_blank">' . ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
+					}
 				}
 			}
         }
