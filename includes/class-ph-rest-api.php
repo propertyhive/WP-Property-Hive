@@ -59,6 +59,7 @@ class PH_Rest_Api {
 	public function __construct() {
 		add_filter( 'rest_property_query', array( $this, 'modify_rest_property_query' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_property_fields' ), 99 );
+		add_action( 'rest_api_init', array( $this, 'register_rest_api_office_fields' ), 99 );
 	}
 
 	public function modify_rest_property_query($args, $request)
@@ -313,6 +314,56 @@ class PH_Rest_Api {
 				        }
 
 				        $return = apply_filters( 'propertyhive_rest_api_property_field_callback', $return, $field_name, $property );
+				        return $return;
+		            },
+		            'update_callback' => null,
+		            'schema' => null,
+		        )
+		    );
+		}
+	}
+
+	public function register_rest_api_office_fields()
+	{
+		$field_array = array(
+			'primary',
+			'office_address_1',
+			'office_address_2',
+			'office_address_3',
+			'office_address_4',
+			'office_address_postcode',
+			'latitude',
+			'longitude',
+		);
+
+		$departments = ph_get_departments();
+
+        foreach ( $departments as $key => $value )
+        {
+        	$field_array[] = 'office_telephone_number_' . str_replace("residential-", "", $key);
+        	$field_array[] = 'office_email_address_' . str_replace("residential-", "", $key);
+        }
+
+		$field_array = apply_filters( 'propertyhive_rest_api_office_fields', $field_array );
+
+		foreach ( $field_array as $field )
+		{
+			register_rest_field( 'office',
+		        $field,
+		        array(
+		            'get_callback'  => function( $object, $field_name, $request )
+		            {
+		            	$return = '';
+
+		            	switch ($field_name)
+		            	{
+		            		default:
+		            		{
+		            			$return = get_post_meta( $object[ 'id' ], '_' . $field_name, TRUE );
+				            }
+				        }
+
+				        $return = apply_filters( 'propertyhive_rest_api_office_field_callback', $return, $field_name, $object[ 'id' ] );
 				        return $return;
 		            },
 		            'update_callback' => null,
