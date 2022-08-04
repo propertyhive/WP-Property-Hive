@@ -20,6 +20,15 @@ class PH_Meta_Box_Contact_Actions {
         global $wpdb, $thepostid;
 
         $actions = array();
+
+        if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
+        {
+        	$actions[] = '<a 
+                href="' . admin_url( 'post-new.php' ) . '?post_type=enquiry&name=' . urlencode(get_the_title($post->ID)) . '&email=' . urlencode(get_post_meta($post->ID, '_email_address', TRUE)) . '&telephone=' .  urlencode(get_post_meta($post->ID, '_telephone_number', TRUE)) . '"
+                class="button"
+                style="width:100%; margin-bottom:7px; text-align:center" 
+            >' . __('Record Enquiry', 'propertyhive') . '</a>';
+        }
         
         $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
         if ( is_array($contact_types) && in_array('applicant', $contact_types) )
