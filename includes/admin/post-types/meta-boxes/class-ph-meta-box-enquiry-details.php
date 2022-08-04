@@ -37,7 +37,8 @@ class PH_Meta_Box_Enquiry_Details {
                 'id' => 'name', 
                 'label' => __( 'Name', 'propertyhive' ), 
                 'desc_tip' => false,
-                'type' => 'text'
+                'type' => 'text',
+                'value' => ( isset($_GET['name']) ? $_GET['name'] : '' )
             );
             propertyhive_wp_text_input( $args );
 
@@ -45,7 +46,8 @@ class PH_Meta_Box_Enquiry_Details {
                 'id' => 'email', 
                 'label' => __( 'Email Address', 'propertyhive' ), 
                 'desc_tip' => false,
-                'type' => 'email'
+                'type' => 'email',
+                'value' => ( isset($_GET['email']) ? $_GET['email'] : '' )
             );
             propertyhive_wp_text_input( $args );
 
@@ -53,7 +55,8 @@ class PH_Meta_Box_Enquiry_Details {
                 'id' => 'telephone', 
                 'label' => __( 'Telephone', 'propertyhive' ), 
                 'desc_tip' => false,
-                'type' => 'text'
+                'type' => 'text',
+                'value' => ( isset($_GET['telephone']) ? $_GET['telephone'] : '' )
             );
             propertyhive_wp_text_input( $args );
 
