@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 6.0
-Stable tag: 1.5.36
+Tested up to: 6.0.1
+Stable tag: 1.5.37
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,16 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.37 - 2022-08-11 =
+* Added ability to create enquiry from contact record with new 'Record Enquiry' action
+* Enabled offices to be obtained via REST API
+* Catered for EPC not being an image when stored as URL in EPC Link widget
+* Added support for floorplans and EPCs stored as URLs in Elementor widgets
+* Tweaks to timestamps used when scheduling events
+* Ensured price is ignored when matching properties with no match range or price set
+* Prevent PHP warning if no commercial price entered whilst working out price_actual
+* Added Thailand to list of supported countries
 
 = 1.5.36 - 2022-07-06 =
 * Added new fields to leasehold properties to comply with National Trading Standards recent Material Information changes
