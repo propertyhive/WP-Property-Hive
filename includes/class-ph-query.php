@@ -1005,6 +1005,15 @@ class PH_Query {
                 'value'   => ph_clean( $_REQUEST['country'] )
             );
         }
+
+        if ( isset( $_REQUEST['country_not'] ) && $_REQUEST['country_not'] != '' )
+        {
+            $meta_query = array(
+                'key'     => '_address_country',
+                'value'   => ph_clean( $_REQUEST['country_not'] ),
+                'compare' => '!='
+            );
+        }
         
         return $meta_query;
     }
