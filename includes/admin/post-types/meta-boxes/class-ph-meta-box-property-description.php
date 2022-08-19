@@ -239,6 +239,11 @@ class PH_Meta_Box_Property_Description {
                 'u' => array(),
                 'strong' => array(),
                 'b' => array(),
+                'a' => array(
+                    'href' => array(),
+                    'target' => array(),
+                    'title' => array()
+                ),
             );
             update_post_meta($post_id, '_description_' . $i, wp_kses($_POST['_description'][$i], $allowed_html));
         }
