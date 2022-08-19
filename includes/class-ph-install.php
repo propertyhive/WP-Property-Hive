@@ -320,7 +320,7 @@ class PH_Install {
                     'child_of_previous' => true
                 ),
                 array(
-                    'name' => 'End of Terrace House',
+                    'name' => 'End of Terrace Bungalow',
                     'child_of_previous' => true
                 ),
                 // FLATS
