@@ -269,11 +269,15 @@ class PH_Meta_Box_Contact_Actions {
 
     	</div>';
 
+    	do_action( 'propertyhive_admin_contact_action_options', $post->ID );
+    	do_action( 'propertyhive_admin_post_action_options', $post->ID );
+
 	    echo '<div class="propertyhive_meta_box" id="propertyhive_contact_actions_meta_box">';
 	        
 		    echo '<div class="options_group" style="padding-top:8px;">';
 
 		    	$actions = apply_filters( 'propertyhive_admin_contact_actions', $actions, $post->ID );
+		    	$actions = apply_filters( 'propertyhive_admin_post_actions', $actions, $post->ID );
 
 		        if ( !empty($actions) )
 		        {

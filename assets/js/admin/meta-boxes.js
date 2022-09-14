@@ -910,6 +910,9 @@ function redraw_viewing_actions()
         jQuery.post( ajaxurl, data, function(response) 
         {
             jQuery('#propertyhive_viewing_actions_meta_box_container').html(response);
+
+            jQuery(document).trigger('ph:adminViewingActionsRedrawn');
+            jQuery(document).trigger('ph:adminPostActionsRedrawn', ['viewing']);
         }, 'html');
     }
 

@@ -77,6 +77,7 @@ class PH_Meta_Box_Property_Actions {
 				}
 
 			    $actions = apply_filters( 'propertyhive_admin_property_actions', $actions, $post->ID );
+			    $actions = apply_filters( 'propertyhive_admin_post_actions', $actions, $post->ID );
 
 		        if ( !empty($actions) )
 		        {
@@ -250,7 +251,8 @@ class PH_Meta_Box_Property_Actions {
 
     	</div>';
 
-
+    	do_action( 'propertyhive_admin_property_action_options', $post->ID );
+    	do_action( 'propertyhive_admin_post_action_options', $post->ID );
 
 ?>
 <script>

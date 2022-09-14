@@ -116,6 +116,9 @@ function redraw_sale_actions()
     jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
     {
     	jQuery('#propertyhive_sale_actions_meta_box_container').html(response);
+
+    	jQuery(document).trigger('ph:adminSaleActionsRedrawn');
+    	jQuery(document).trigger('ph:adminPostActionsRedrawn', ['sale']);
     }, 'html');
 
     redraw_sale_details_meta_box();

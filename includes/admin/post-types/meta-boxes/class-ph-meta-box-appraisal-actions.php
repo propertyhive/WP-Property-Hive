@@ -212,6 +212,9 @@ function redraw_appraisal_actions()
     jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
     {
     	jQuery('#propertyhive_appraisal_actions_meta_box_container').html(response);
+
+    	jQuery(document).trigger('ph:adminAppraisalActionsRedrawn');
+    	jQuery(document).trigger('ph:adminPostActionsRedrawn', ['appraisal']);
     }, 'html');
 
     redraw_appraisal_details_meta_box();
