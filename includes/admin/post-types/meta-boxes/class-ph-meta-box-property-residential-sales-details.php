@@ -308,7 +308,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
                 wp_delete_object_term_relationships( $post_id, 'tenure' );
             }
 
-            update_post_meta( $post_id, '_leasehold_years_remaining', (int)$_POST['_leasehold_years_remaining'] );
+            update_post_meta( $post_id, '_leasehold_years_remaining', ( !empty($_POST['_leasehold_years_remaining']) ? (int)$_POST['_leasehold_years_remaining'] : '' ) );
 
             $ground_rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_ground_rent']));
             update_post_meta( $post_id, '_ground_rent', $ground_rent );
