@@ -195,6 +195,7 @@ if ( ( $status == 'carried_out' && $feedback_status == '' ) || in_array( $status
 }
 
 $actions = apply_filters( 'propertyhive_admin_viewing_actions', $actions, $post_id );
+$actions = apply_filters( 'propertyhive_admin_post_actions', $actions, $post_id );
 
 if ( !empty($actions) )
 {
@@ -208,6 +209,22 @@ else
 echo '</div>
 
 </div>';
+
+// Success action panel
+echo '<div id="action_panel_success" class="propertyhive_meta_box propertyhive_meta_box_actions" style="display:none;">
+             
+    <div class="options_group" style="padding-top:8px;">
+
+        <div id="success_actions"></div>
+
+        <a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+
+    </div>
+
+</div>';
+
+do_action( 'propertyhive_admin_viewing_action_options', $post_id );
+do_action( 'propertyhive_admin_post_action_options', $post_id );
 
 if ( $show_cancelled_meta_boxes )
 {

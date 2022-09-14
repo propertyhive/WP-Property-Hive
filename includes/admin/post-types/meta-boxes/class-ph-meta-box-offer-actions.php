@@ -130,6 +130,9 @@ function redraw_offer_actions()
     jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
     {
     	jQuery('#propertyhive_offer_actions_meta_box_container').html(response);
+
+    	jQuery(document).trigger('ph:adminOfferActionsRedrawn');
+    	jQuery(document).trigger('ph:adminPostActionsRedrawn', ['offer']);
     }, 'html');
 
     redraw_offer_details_meta_box();

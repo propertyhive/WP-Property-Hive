@@ -152,6 +152,10 @@ if ( !empty($notes) )
 				$note_body = 'Status changed from ' . $comment_content['previous_status'] . ' to ' . $comment_content['new_status'];
 				break;
 			}
+			default:
+			{
+				$note_body = apply_filters( 'propertyhive_note_body', $note_body, $note );
+			}
 		}
 		$note_content = array(
 			'id' => $note->comment_ID,
