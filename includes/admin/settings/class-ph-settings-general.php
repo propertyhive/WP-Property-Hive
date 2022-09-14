@@ -650,6 +650,18 @@ class PH_Settings_General extends PH_Settings_Page {
 
             array( 'type' => 'sectionend', 'id' => 'media_storage_options'),
 
+            array( 'title' => __( 'Improve Property Hive', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'stat_tracking_options' ),
+
+            array(
+                'title'   => __( 'Usage Data Sharing', 'propertyhive' ),
+                'id'      => 'propertyhive_data_sharing',
+                'type'    => 'checkbox',
+                'value'   => ( get_option('propertyhive_data_sharing', FALSE) === FALSE ? 'yes' : get_option('propertyhive_data_sharing', '') ),
+                'desc'  => __( 'Help improve Property Hive by periodically sending us non-sensitive plugin data. Untick this option to opt-out. <a href="https://docs.wp-property-hive.com/user-guide/share-usage-data/" target="_blank">Learn more</a>', 'propertyhive' )
+            ),
+
+            array( 'type' => 'sectionend', 'id' => 'stat_tracking_options'),
+
 		) ); // End general misc settings
 	}
 

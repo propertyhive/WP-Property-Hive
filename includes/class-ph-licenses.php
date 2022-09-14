@@ -76,50 +76,71 @@ class PH_Licenses {
 
 		update_option( 'propertyhive_last_license_check', time() );
 
-		// Start be removing what we already know about the license
+		// Start by removing what we already know about the license
 		update_option( 'propertyhive_license_key_details', '', 'no' );
 
 		$data = array();
 
-		// Retrieve current theme info
-		$theme_data = wp_get_theme();
-		$theme      = $theme_data->Name . ' ' . $theme_data->Version;
-
-		$data['php_version'] = phpversion();
-		$data['ph_version'] = PH_VERSION;
-		$data['wp_version']  = get_bloginfo( 'version' );
-		$data['server']      = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
-
-		$data['install_date'] = get_option('propertyhive_install_timestamp', '');
-		if ( $data['install_date'] != '' && $data['install_date'] != 0 )
-		{
-			$data['install_date'] = date("jS F Y", $data['install_date']);
-		}
-
-		$data['multisite']   = is_multisite();
-		$data['url']         = home_url();
-		$data['theme']       = $theme;
-		$data['email']       = get_bloginfo( 'admin_email' );
 		$data['license_key'] = get_option( 'propertyhive_license_key', '' );
+		$data['url']         = home_url();
 
-		// Retrieve current plugin information
-		if( ! function_exists( 'get_plugins' ) ) {
-			include ABSPATH . '/wp-admin/includes/plugin.php';
-		}
+		if ( get_option( 'propertyhive_data_sharing' ) != 'no' )
+		{
+			// Not opted-out
 
-		$plugins        = array_keys( get_plugins() );
-		$active_plugins = get_option( 'active_plugins', array() );
+			// Retrieve current theme info
+			$theme_data = wp_get_theme();
+			$theme      = $theme_data->Name . ' ' . $theme_data->Version;
 
-		foreach ( $plugins as $key => $plugin ) {
-			if ( in_array( $plugin, $active_plugins ) ) {
-				// Remove active plugins from list so we can show active and inactive separately
-				unset( $plugins[ $key ] );
+			$data['php_version'] = phpversion();
+			$data['ph_version'] = PH_VERSION;
+			$data['wp_version']  = get_bloginfo( 'version' );
+			$data['server']      = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
+
+			$data['install_date'] = get_option('propertyhive_install_timestamp', '');
+			if ( $data['install_date'] != '' && $data['install_date'] != 0 )
+			{
+				$data['install_date'] = date("jS F Y", $data['install_date']);
 			}
-		}
 
-		$data['active_plugins']   = $active_plugins;
-		$data['inactive_plugins'] = $plugins;
-		$data['locale']           = get_locale();
+			$data['multisite']   = is_multisite();
+			$data['theme']       = $theme;
+			$data['email']       = get_bloginfo( 'admin_email' );
+
+			// Retrieve current plugin information
+			if( ! function_exists( 'get_plugins' ) ) {
+				include ABSPATH . '/wp-admin/includes/plugin.php';
+			}
+
+			$plugins        = array_keys( get_plugins() );
+			$active_plugins = get_option( 'active_plugins', array() );
+
+			foreach ( $plugins as $key => $plugin ) {
+				if ( in_array( $plugin, $active_plugins ) ) {
+					// Remove active plugins from list so we can show active and inactive separately
+					unset( $plugins[ $key ] );
+				}
+			}
+
+			$data['active_plugins']   = $active_plugins;
+			$data['inactive_plugins'] = $plugins;
+			$data['locale']           = get_locale();
+
+			$property_import = get_option( 'propertyhive_property_import', array() );
+			if ( !is_array($property_import) )
+			{
+				$property_import = array();
+			}
+			$formats = array();
+            foreach ( $property_import as $import_id => $options )
+            {
+            	if ( $options['running'] == '1' )
+            	{
+            		$formats[] = $options['format'];
+            	}
+			}
+			$data['property_import_formats'] = $formats;
+		}
 
 		$request = wp_remote_post( 'http://license.wp-property-hive.com/check-license.php', array(
 			'method'      => 'POST',
