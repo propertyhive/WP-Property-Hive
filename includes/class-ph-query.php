@@ -433,7 +433,7 @@ class PH_Query {
 		//$post__in   = array_unique( apply_filters( 'loop_shop_post_in', array() ) );
 
 		// Ordering query vars
-		$q->set( 'orderby', $ordering['orderby'] );
+		$q->set( 'orderby', $ordering['orderby'] . ' post_title' );
 		$q->set( 'order', $ordering['order'] );
 		if ( isset( $ordering['meta_key'] ) )
 			$q->set( 'meta_key', $ordering['meta_key'] );
