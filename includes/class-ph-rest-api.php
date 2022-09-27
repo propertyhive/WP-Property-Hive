@@ -60,6 +60,19 @@ class PH_Rest_Api {
 		add_filter( 'rest_property_query', array( $this, 'modify_rest_property_query' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_property_fields' ), 99 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_office_fields' ), 99 );
+		add_filter( 'rest_property_collection_params', array( $this, 'modify_rest_order_by' ), 10, 1 );
+	}
+
+	public function modify_rest_order_by($params)
+	{
+		$fields = ["price-asc", "price-desc"];
+
+		foreach ( $fields as $key => $value ) 
+		{
+			$params['orderby']['enum'][] = $value;
+		}
+
+		return $params;
 	}
 
 	public function modify_rest_property_query($args, $request)
@@ -79,6 +92,12 @@ class PH_Rest_Api {
 
         // Date query
 		$args['date_query'] = $PH_Query->get_date_query();
+
+		$ordering   = $PH_Query->get_search_results_ordering_args();
+		$args['orderby'] = $ordering['orderby'] . ' post_title';
+		$args['order'] = $ordering['order'];
+		if ( isset( $ordering['meta_key'] ) )
+			$args['meta_key'] = $ordering['meta_key'];
 
 		$args = apply_filters( 'propertyhive_rest_api_query_args', $args );
 		
