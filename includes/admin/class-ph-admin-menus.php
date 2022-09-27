@@ -202,28 +202,32 @@ class PH_Admin_Menus {
 	        add_submenu_page( 'propertyhive', __( 'Tenancies', 'propertyhive' ), __( 'Tenancies', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=tenancy'/*, array( $this, 'attributes_page' )*/ );
 
             $count = '';
-            $args = array(
-                'post_type' => 'key_date',
-                'nopaging' => true,
-                'fields' => 'ids',
-                'meta_query' => array(
-                    array(
-                        'key' => '_key_date_status',
-                        'value' => 'pending'
-                    ),
-                    array(
-                        'key' => '_date_due',
-                        'value' => date('Y-m-d'),
-                        'type' => 'date',
-                        'compare' => '<=',
-                    ),
-                ),
-            );
-            $key_date_query = new WP_Query( $args );
-            if ( $key_date_query->have_posts() )
-            {
-                $count = ' <span class="update-plugins count-' . $key_date_query->found_posts . '"><span class="plugin-count">' . $key_date_query->found_posts . '</span></span>';
-            }
+            if ( apply_filters( 'propertyhive_show_admin_menu_key_date_count', TRUE ) === TRUE )
+	    	{
+	            $args = array(
+	                'post_type' => 'key_date',
+	                'nopaging' => true,
+	                'fields' => 'ids',
+	                'meta_query' => array(
+	                    array(
+	                        'key' => '_key_date_status',
+	                        'value' => 'pending'
+	                    ),
+	                    array(
+	                        'key' => '_date_due',
+	                        'value' => date('Y-m-d'),
+	                        'type' => 'date',
+	                        'compare' => '<=',
+	                    ),
+	                ),
+	            );
+	            $args = apply_filters( 'propertyhive_admin_menu_key_date_count_args', $args );
+	            $key_date_query = new WP_Query( $args );
+	            if ( $key_date_query->have_posts() )
+	            {
+	                $count = ' <span class="update-plugins count-' . $key_date_query->found_posts . '"><span class="plugin-count">' . $key_date_query->found_posts . '</span></span>';
+	            }
+	        }
             add_submenu_page( 'propertyhive', __( 'Management', 'propertyhive' ), __( 'Management', 'propertyhive' ) . $count, 'manage_propertyhive', 'edit.php?post_type=key_date&orderby=date_due&order=asc&status=upcoming_and_overdue&filter_action=Filter' );
 	    }
 
