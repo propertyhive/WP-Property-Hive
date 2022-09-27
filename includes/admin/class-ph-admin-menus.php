@@ -172,6 +172,7 @@ class PH_Admin_Menus {
 		    			),
 		    		),
 		    	);
+		    	$args = apply_filters( 'propertyhive_admin_menu_enquiry_count_args', $args );
 		    	$enquiry_query = new WP_Query( $args );
 		    	if ( $enquiry_query->have_posts() )
 		    	{
