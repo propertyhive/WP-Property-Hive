@@ -135,6 +135,7 @@ class PH_Shortcodes {
 			'minimum_bedrooms'	=> '',
 			'address_keyword'	=> '',
 			'country'			=> '',
+			'country_not'		=> '',
 			'availability_id'	=> '',
 			'marketing_flag'	=> '', // Deprecated. Use marketing_flag_id instead
 			'marketing_flag_id'	=> '', // Should be marketing_flag_id. Might deprecate this in the future
@@ -312,6 +313,15 @@ class PH_Shortcodes {
 				'key' => '_address_country',
 				'value' => sanitize_text_field( $atts['country'] ),
 				'compare' => '=',
+			);
+		}
+
+		if ( isset($atts['country_not']) && $atts['country_not'] != '' )
+		{
+			$meta_query[] = array(
+				'key' => '_address_country',
+				'value' => sanitize_text_field( $atts['country_not'] ),
+				'compare' => '!=',
 			);
 		}
 
