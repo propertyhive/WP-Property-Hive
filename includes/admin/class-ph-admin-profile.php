@@ -59,37 +59,43 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 			}
 			wp_reset_postdata();
 
-			$show_fields = apply_filters(
-				'propertyhive_user_meta_fields',
-				array(
-					'negotiator'  => array(
-						'title'  => __( 'Property Hive Negotiator Details', 'propertyhive' ),
-						'fields' => array(
-							'office_id'    => array(
-								'label'       => __( 'Office', 'propertyhive' ),
-								'description' => '',
-								'type'        => 'select',
-								'options'     => array( '' => __( 'Select an office', 'property' ) ) + $offices,
-							),
-							'telephone_number'    => array(
-								'label'       => __( 'Telephone Number', 'propertyhive' ),
-								'description' => '',
-								'type'        => 'text',
-							),
-							'photo_attachment_id'    => array(
-								'label'       => __( 'Photo', 'propertyhive' ),
-								'description' => '',
-								'type'        => 'image',
-							),
-							'crm_only_mode'    => array(
-								'label'       => __( 'Property Hive-Only Mode', 'propertyhive' ),
-								'description' => __( 'Enabling this option will remove all top level WordPress menu items leaving just Property Hive options making it easier to navigate and use as a CRM', 'propertyhive' ),
-								'type'        => 'checkbox',
-							),
-						),
-					),
-				)
+			$fields = array(
+				'office_id'    => array(
+					'label'       => __( 'Office', 'propertyhive' ),
+					'description' => '',
+					'type'        => 'select',
+					'options'     => array( '' => __( 'Select an office', 'property' ) ) + $offices,
+				),
+				'telephone_number'    => array(
+					'label'       => __( 'Telephone Number', 'propertyhive' ),
+					'description' => '',
+					'type'        => 'text',
+				),
+				'photo_attachment_id'    => array(
+					'label'       => __( 'Photo', 'propertyhive' ),
+					'description' => '',
+					'type'        => 'image',
+				),
 			);
+
+			$user = wp_get_current_user();
+			$roles = (array)$user->roles;
+
+			$fields['crm_only_mode'] = array(
+				'label'       => __( 'Property Hive-Only Mode', 'propertyhive' ),
+				'description' => __( 'Enabling this option will remove all top level WordPress menu items leaving just Property Hive options making it easier to navigate and use as a CRM', 'propertyhive' ),
+				'type'        => in_array('administrator', $roles) ? 'checkbox' : 'hidden',
+			);
+
+			$show_fields = array(
+				'negotiator'  => array(
+					'title'  => __( 'Property Hive Negotiator Details', 'propertyhive' ),
+					'fields' => $fields,
+				),
+			);
+
+			$show_fields = apply_filters( 'propertyhive_user_meta_fields', $show_fields );
+
 			return $show_fields;
 		}
 
@@ -118,6 +124,16 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 				<h2><?php echo $fieldset['title']; ?></h2>
 				<table class="form-table" id="<?php echo esc_attr( 'fieldset-' . $fieldset_key ); ?>">
 					<?php foreach ( $fieldset['fields'] as $key => $field ) : ?>
+						<?php
+							if ( ! empty( $field['type'] ) && 'hidden' === $field['type'] )
+							{
+						?>
+							<input type="hidden" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $this->get_user_meta( $user->ID, $key ) ); ?>" />
+						<?php
+							}
+							else
+							{
+						?>
 						<tr>
 							<th>
 								<label for="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $field['label'] ); ?></label>
@@ -186,12 +202,15 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 						                    });
 										});
                     				</script>
-								<?php else: ?>
+                    			<?php else: ?>
 									<input type="text" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $this->get_user_meta( $user->ID, $key ) ); ?>" class="<?php echo ( ! empty( $field['class'] ) ? esc_attr( $field['class'] ) : 'regular-text' ); ?>" />
 								<?php endif; ?>
 								<p class="description"><?php echo wp_kses_post( $field['description'] ); ?></p>
 							</td>
 						</tr>
+						<?php
+							}
+						?>
 					<?php endforeach; ?>
 				</table>
 				<?php
