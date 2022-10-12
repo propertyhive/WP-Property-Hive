@@ -472,6 +472,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 'options' => array(
                     '=' => __( 'Match Keyword Exactly', 'propertyhive' ),
                     'LIKE' => __( 'Perform Loose Search', 'propertyhive' ),
+                    'polygon' => __( 'Search Within Polygon', 'propertyhive' ),
                 ),
                 'desc_tip'  => __( 'Applicable if you allow users to search by entering a location. If \'Match Keyword Exactly\' is selected a search for \'Walton\' would not return properties in \'Walton On Thames\', but would prevent properties in \'Lincolnshire\' appearing when searching for \'Lincoln\'. \'Perform Loose Search\' would do the opposite.', 'propertyhive' )
             ),

@@ -42,6 +42,9 @@ class PH_Query {
 	/** @public array Stores post IDs matching layered nav, so price filter can find max price in view */
 	public $layered_nav_property_ids = array();
 
+	/** @public array Stores post IDs matching layered nav, so price filter can find max price in view */
+	public $address_keyword_polygon_points = array();
+
 	/**
 	 * Constructor for the query class. Hooks in methods.
 	 *
@@ -815,7 +818,6 @@ class PH_Query {
 	 * Returns a meta query to handle searching for a keyword in the address
 	 *
 	 * @access public
-	 * @param string $compare (default: 'IN')
 	 * @return array
 	 */
 	public function address_keyword_meta_query( ) {
@@ -827,165 +829,208 @@ class PH_Query {
         	$_REQUEST['address_keyword'] = ph_clean( wp_unslash( $_REQUEST['address_keyword'] ) );
 
         	// Remove country code from end (i.e. ', UK')
-        	$_REQUEST['address_keyword'] = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $_REQUEST['address_keyword']);
+	        $_REQUEST['address_keyword'] = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $_REQUEST['address_keyword']);
 
-        	$address_keywords = array( $_REQUEST['address_keyword'] );
-
-        	if ( strpos( $_REQUEST['address_keyword'], ' ' ) !== FALSE )
+        	$do_address_search = true;
+        	if ( get_option( 'propertyhive_address_keyword_compare', '=' ) == 'polygon' )
         	{
-        		$address_keywords[] = str_replace(" ", "-", ph_clean($_REQUEST['address_keyword']));
+        		$address_keyword_polygon = new PH_Address_Keyword_Polygon();
+        		$polygon_coordinates = $address_keyword_polygon->get_address_keyword_polygon_coordinates( $_REQUEST['address_keyword'] . ', UK' );
+        		
+        		if ( $polygon_coordinates !== FALSE )
+        		{
+        			$this->address_keyword_polygon_points = $polygon_coordinates;
+	        		add_filter( 'posts_where' , array( $this, 'where_properties_in_polygon' ), 1, 2 );
+	        		$do_address_search = false;
+        		}
         	}
-        	if ( strpos( $_REQUEST['address_keyword'], '-' ) !== FALSE )
+
+        	if ( $do_address_search )
         	{
-        		$address_keywords[] = str_replace("-", " ", ph_clean($_REQUEST['address_keyword']));
-        	}
+	        	$address_keywords = array( $_REQUEST['address_keyword'] );
 
-			if ( strpos( $_REQUEST['address_keyword'], '.' ) !== FALSE )
-			{
-				$address_keywords[] = str_replace(".", "", ph_clean($_REQUEST['address_keyword']));
-			}
-			if ( stripos( $_REQUEST['address_keyword'], 'st ' ) !== FALSE )
-			{
-				$address_keywords[] = str_ireplace("st ", "st. ", ph_clean($_REQUEST['address_keyword']));
-			}
-			
-			$address_keywords = apply_filters( 'propertyhive_address_keywords_to_query', $address_keywords );
+	        	if ( strpos( $_REQUEST['address_keyword'], ' ' ) !== FALSE )
+	        	{
+	        		$address_keywords[] = str_replace(" ", "-", ph_clean($_REQUEST['address_keyword']));
+	        	}
+	        	if ( strpos( $_REQUEST['address_keyword'], '-' ) !== FALSE )
+	        	{
+	        		$address_keywords[] = str_replace("-", " ", ph_clean($_REQUEST['address_keyword']));
+	        	}
 
-	      	$meta_query = array('relation' => 'OR');
+				if ( strpos( $_REQUEST['address_keyword'], '.' ) !== FALSE )
+				{
+					$address_keywords[] = str_replace(".", "", ph_clean($_REQUEST['address_keyword']));
+				}
+				if ( stripos( $_REQUEST['address_keyword'], 'st ' ) !== FALSE )
+				{
+					$address_keywords[] = str_ireplace("st ", "st. ", ph_clean($_REQUEST['address_keyword']));
+				}
+				
+				$address_keywords = apply_filters( 'propertyhive_address_keywords_to_query', $address_keywords );
 
-	      	$address_fields_to_query = array(
-	      		'_reference_number',
-	      		'_address_street',
-	      		'_address_two',
-	      		'_address_three',
-	      		'_address_four',
-	      		'_address_postcode',
-	      	);
+		      	$meta_query = array('relation' => 'OR');
 
-			if ( strpos( $_REQUEST['address_keyword'], ', ' ) !== FALSE )
-			{
-				$address_fields_to_query[] = '_address_concatenated';
-			}
+		      	$address_fields_to_query = array(
+		      		'_reference_number',
+		      		'_address_street',
+		      		'_address_two',
+		      		'_address_three',
+		      		'_address_four',
+		      		'_address_postcode',
+		      	);
 
-	      	// add country to list of fields to query if it looks like we're working with an overseas site
-	      	$countries = get_option( 'propertyhive_countries', array() );
-	      	if ( !is_array($countries) ) { $countries = array(); }
-	      	if ( count($countries) > 1 )
-	      	{
-	      		$address_fields_to_query[] = '_address_country';
-	      	}
+				if ( strpos( $_REQUEST['address_keyword'], ', ' ) !== FALSE )
+				{
+					$address_fields_to_query[] = '_address_concatenated';
+				}
 
-	      	$address_fields_to_query = apply_filters( 'propertyhive_address_fields_to_query', $address_fields_to_query );
-
-	      	foreach ( $address_keywords as $address_keyword )
-	      	{
-	      		foreach ( $address_fields_to_query as $address_field )
-	      		{
-	      			if ( in_array( $address_field, array('_address_postcode', '_address_country', '_address_concatenated') ) ) { continue; } // ignore postcode and country as they're handled differently afterwards
-
-	      			$meta_query[] = array(
-					    'key'     => $address_field,
-					    'value'   => $address_keyword,
-					    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
-					);
-	      		}
-			}
-			if ( in_array('_address_postcode', $address_fields_to_query) )
-			{
-		      	if ( strlen($_REQUEST['address_keyword']) <= 4 )
+		      	// add country to list of fields to query if it looks like we're working with an overseas site
+		      	$countries = get_option( 'propertyhive_countries', array() );
+		      	if ( !is_array($countries) ) { $countries = array(); }
+		      	if ( count($countries) > 1 )
 		      	{
-		      		$meta_query[] = array(
-					    'key'     => '_address_postcode',
-					    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
+		      		$address_fields_to_query[] = '_address_country';
+		      	}
+
+		      	$address_fields_to_query = apply_filters( 'propertyhive_address_fields_to_query', $address_fields_to_query );
+
+		      	foreach ( $address_keywords as $address_keyword )
+		      	{
+		      		foreach ( $address_fields_to_query as $address_field )
+		      		{
+		      			if ( in_array( $address_field, array('_address_postcode', '_address_country', '_address_concatenated') ) ) { continue; } // ignore postcode and country as they're handled differently afterwards
+
+		      			$meta_query[] = array(
+						    'key'     => $address_field,
+						    'value'   => $address_keyword,
+						    'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+						);
+		      		}
+				}
+				if ( in_array('_address_postcode', $address_fields_to_query) )
+				{
+			      	if ( strlen($_REQUEST['address_keyword']) <= 4 )
+			      	{
+			      		$meta_query[] = array(
+						    'key'     => '_address_postcode',
+						    'value'   => ph_clean( $_REQUEST['address_keyword'] ),
+						    'compare' => '='
+						);
+						// Run regex match where given keyword is at the start of the postcode ^
+						// followed by one or zero letters (for WC2E-style postcodes) [a-zA-Z]?
+						// then a single space [ ]
+			      		$meta_query[] = array(
+						    'key'     => '_address_postcode',
+						    'value'   => '^' . ph_clean( $_REQUEST['address_keyword'] ) . '[a-zA-Z]?[ ]',
+						    'compare' => 'RLIKE'
+						);
+			      	}
+			      	else
+			      	{
+			      		$postcode = ph_clean( $_REQUEST['address_keyword'] );
+
+			      		if ( preg_match('#^(GIR ?0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]([0-9ABEHMNPRV-Y])?)|[0-9][A-HJKPS-UW])[0-9][ABD-HJLNP-UW-Z]{2})$#i', $postcode) )
+			      		{
+	       					// UK postcode found with no space
+
+			      			if ( strlen($postcode) == 5 )
+			      			{
+			      				$first_part = substr($postcode, 0, 2);
+			      				$last_part = substr($postcode, 2, 3);
+
+			      				$postcode = $first_part . ' ' . $last_part;
+			      			}
+			      			elseif ( strlen($postcode) == 6 )
+			      			{
+			      				$first_part = substr($postcode, 0, 3);
+			      				$last_part = substr($postcode, 3, 3);
+
+			      				$postcode = $first_part . ' ' . $last_part;
+			      			}
+			      			elseif ( strlen($postcode) == 7 )
+			      			{
+			      				$first_part = substr($postcode, 0, 4);
+			      				$last_part = substr($postcode, 4, 3);
+
+			      				$postcode = $first_part . ' ' . $last_part;
+			      			}
+			      		}
+
+			      		$meta_query[] = array(
+						    'key'     => '_address_postcode',
+						    'value'   => ph_clean( $postcode ),
+						    'compare' => 'LIKE'
+						);
+			      	}
+			    }
+
+			    if ( in_array('_address_country', $address_fields_to_query) )
+				{
+					$meta_query[] = array(
+					    'key'     => '_address_country',
+					    'value'   => $address_keyword,
 					    'compare' => '='
 					);
-					// Run regex match where given keyword is at the start of the postcode ^
-					// followed by one or zero letters (for WC2E-style postcodes) [a-zA-Z]?
-					// then a single space [ ]
-		      		$meta_query[] = array(
-					    'key'     => '_address_postcode',
-					    'value'   => '^' . ph_clean( $_REQUEST['address_keyword'] ) . '[a-zA-Z]?[ ]',
-					    'compare' => 'RLIKE'
-					);
-		      	}
-		      	else
-		      	{
-		      		$postcode = ph_clean( $_REQUEST['address_keyword'] );
 
-		      		if ( preg_match('#^(GIR ?0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]([0-9ABEHMNPRV-Y])?)|[0-9][A-HJKPS-UW])[0-9][ABD-HJLNP-UW-Z]{2})$#i', $postcode) )
-		      		{
-       					// UK postcode found with no space
-
-		      			if ( strlen($postcode) == 5 )
-		      			{
-		      				$first_part = substr($postcode, 0, 2);
-		      				$last_part = substr($postcode, 2, 3);
-
-		      				$postcode = $first_part . ' ' . $last_part;
-		      			}
-		      			elseif ( strlen($postcode) == 6 )
-		      			{
-		      				$first_part = substr($postcode, 0, 3);
-		      				$last_part = substr($postcode, 3, 3);
-
-		      				$postcode = $first_part . ' ' . $last_part;
-		      			}
-		      			elseif ( strlen($postcode) == 7 )
-		      			{
-		      				$first_part = substr($postcode, 0, 4);
-		      				$last_part = substr($postcode, 4, 3);
-
-		      				$postcode = $first_part . ' ' . $last_part;
-		      			}
-		      		}
-
-		      		$meta_query[] = array(
-					    'key'     => '_address_postcode',
-					    'value'   => ph_clean( $postcode ),
-					    'compare' => 'LIKE'
-					);
-		      	}
-		    }
-
-		    if ( in_array('_address_country', $address_fields_to_query) )
-			{
-				$meta_query[] = array(
-				    'key'     => '_address_country',
-				    'value'   => $address_keyword,
-				    'compare' => '='
-				);
-
-				// get country code for country entered
-				$PH_Countries = new PH_Countries();
-				$countries = $PH_Countries->countries;
-				if ( is_array($countries) && !empty($countries) )
-				{
-					foreach ( $countries as $country_code => $country )
+					// get country code for country entered
+					$PH_Countries = new PH_Countries();
+					$countries = $PH_Countries->countries;
+					if ( is_array($countries) && !empty($countries) )
 					{
-						if ( strtolower($address_keyword) == strtolower($country['name']) )
+						foreach ( $countries as $country_code => $country )
 						{
-							$meta_query[] = array(
-							    'key'     => '_address_country',
-							    'value'   => $country_code,
-							    'compare' => '='
-							);
-							break;
+							if ( strtolower($address_keyword) == strtolower($country['name']) )
+							{
+								$meta_query[] = array(
+								    'key'     => '_address_country',
+								    'value'   => $country_code,
+								    'compare' => '='
+								);
+								break;
+							}
 						}
 					}
 				}
-			}
 
-			if ( in_array('_address_concatenated', $address_fields_to_query) )
-			{
-				$meta_query[] = array(
-					'key'     => '_address_concatenated',
-					'value'   => $_REQUEST['address_keyword'],
-					'compare' => 'LIKE'
-				);
+				if ( in_array('_address_concatenated', $address_fields_to_query) )
+				{
+					$meta_query[] = array(
+						'key'     => '_address_concatenated',
+						'value'   => $_REQUEST['address_keyword'],
+						'compare' => 'LIKE'
+					);
+				}
 			}
       	}
 
 		return $meta_query;
+	}
+
+	public function where_properties_in_polygon( $where, $query )
+	{
+		global $wpdb;
+
+		if ( !empty($this->address_keyword_polygon_points) )
+		{
+			$where .= " AND 
+			ST_CONTAINS(
+			    ST_GEOMFROMTEXT('POLYGON((" . implode(", ", $this->address_keyword_polygon_points) . "))'), 
+			    ST_GEOMFROMTEXT(
+			        CONCAT(
+			            'POINT(', 
+			            COALESCE((SELECT meta_value FROM $wpdb->postmeta WHERE $wpdb->postmeta.meta_key='_latitude' AND $wpdb->postmeta.meta_value != '' AND $wpdb->postmeta.meta_value != 0 AND $wpdb->postmeta.post_id = $wpdb->posts.ID LIMIT 1), '0'),
+			            ' ',
+			            COALESCE((SELECT meta_value FROM $wpdb->postmeta WHERE $wpdb->postmeta.meta_key='_longitude' AND $wpdb->postmeta.meta_value != '' AND $wpdb->postmeta.meta_value != 0 AND $wpdb->postmeta.post_id = $wpdb->posts.ID LIMIT 1), '0'),
+			            ')'
+			        )
+			    )
+			)";
+		}
+
+		remove_filter( 'posts_where' , array( $this, 'where_properties_in_polygon' ), 1, 2 );
+
+		return $where;
 	}
 
 	/**

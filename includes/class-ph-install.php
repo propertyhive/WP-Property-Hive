@@ -711,6 +711,12 @@ Should you need to cancel or amend this appraisal, please do not hesitate to con
             PRIMARY KEY  (email_id)
         ) $collate;";
 
+        $tables .= "
+        CREATE TABLE {$wpdb->prefix}ph_address_keyword_polygon (
+            address_keyword varchar(255) NOT NULL,
+            polygon_coordinates longtext NOT NULL
+        ) $collate;";
+
         dbDelta( $tables );
 	}
 
