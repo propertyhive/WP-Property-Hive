@@ -505,6 +505,12 @@ class PH_Admin_Matching_Properties {
 
                     $address_fields_to_query = apply_filters( 'propertyhive_address_fields_to_query', $address_fields_to_query );
 
+                    $address_keyword_compare = get_option( 'propertyhive_address_keyword_compare', '=' );
+                    if ( $address_keyword_compare == 'polygon' )
+                    {
+                        $address_keyword_compare = apply_filters('propertyhive_property_match_address_keyword_compare', '=');
+                    }
+
                     foreach ( $address_keywords as $address_keyword )
                     {
                         foreach ( $address_fields_to_query as $address_field )
@@ -514,7 +520,7 @@ class PH_Admin_Matching_Properties {
                             $location_query[] = array(
                                 'key'     => $address_field,
                                 'value'   => $address_keyword,
-                                'compare' => get_option( 'propertyhive_address_keyword_compare', '=' )
+                                'compare' => $address_keyword_compare
                             );
                         }
                     }
