@@ -229,6 +229,12 @@ function propertyhive_is_location_in_address( $property, $location )
     );
     $location_address_fields = apply_filters( 'propertyhive_address_fields_to_query', $location_address_fields );
 
+    $address_keyword_compare = get_option( 'propertyhive_address_keyword_compare', '=' );
+    if ( $address_keyword_compare == 'polygon' )
+    {
+        $address_keyword_compare = apply_filters('propertyhive_property_match_address_keyword_compare', '=');
+    }
+
     foreach ( $address_keywords as $address_keyword )
     {
         foreach ( $location_address_fields as $address_field )
@@ -236,9 +242,9 @@ function propertyhive_is_location_in_address( $property, $location )
             if ( $address_field == '_address_postcode' ) { continue; } // ignore postcode as that is handled differently afterwards
 
             if (
-                ( get_option( 'propertyhive_address_keyword_compare', '=' ) == '=' && strcasecmp($address_keyword, $property->{$address_field}) == 0 )
+                ( $address_keyword_compare == '=' && strcasecmp($address_keyword, $property->{$address_field}) == 0 )
                 ||
-                ( get_option( 'propertyhive_address_keyword_compare', '=' ) == 'LIKE' && stripos($property->{$address_field}, $address_keyword) !== false )
+                ( $address_keyword_compare == 'LIKE' && stripos($property->{$address_field}, $address_keyword) !== false )
             )
             {
                 return true;
