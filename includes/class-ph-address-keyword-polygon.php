@@ -98,7 +98,10 @@ class PH_Address_Keyword_Polygon {
             {
                 foreach ( $json as $json_result )
                 {
-                    if ( isset($json_result['geojson']['type']) && $json_result['geojson']['type'] == 'Polygon' )
+                    if ( 
+                        isset($json_result['class']) && in_array($json_result['class'], array( 'boundary' )) && 
+                        isset($json_result['geojson']['type']) && $json_result['geojson']['type'] == 'Polygon'
+                    )
                     {
                         $polygon_coordinates = array();
                         foreach ( $json_result['geojson']['coordinates'][0] as $coordinate )
