@@ -472,8 +472,9 @@ class PH_Settings_General extends PH_Settings_Page {
                 'options' => array(
                     '=' => __( 'Match Keyword Exactly', 'propertyhive' ),
                     'LIKE' => __( 'Perform Loose Search', 'propertyhive' ),
+                    'polygon' => __( 'Search Within Location Perimeter', 'propertyhive' ),
                 ),
-                'desc_tip'  => __( 'Applicable if you allow users to search by entering a location. If \'Match Keyword Exactly\' is selected a search for \'Walton\' would not return properties in \'Walton On Thames\', but would prevent properties in \'Lincolnshire\' appearing when searching for \'Lincoln\'. \'Perform Loose Search\' would do the opposite.', 'propertyhive' )
+                'desc_tip'  => __( 'Applicable if you allow users to search by entering a location. If \'Match Keyword Exactly\' is selected a search for \'Walton\' would not return properties in \'Walton On Thames\', but would prevent properties in \'Lincolnshire\' appearing when searching for \'Lincoln\'. \'Perform Loose Search\' would do the opposite. \'Search Within Location Perimeter\' will make an API request to Nominatim to get the perimeter of the entered location and will search within the returned polygon.', 'propertyhive' )
             ),
 
             array(

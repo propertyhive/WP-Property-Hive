@@ -268,7 +268,12 @@ if ( ! class_exists( 'PropertyHive' ) )
     
             include_once( 'includes/class-ph-post-types.php' );                     // Registers post types
             include_once( 'includes/class-ph-countries.php' );                     // Manages interaction with countries and currency
-
+            
+            if ( get_option( 'propertyhive_address_keyword_compare', '=' ) == 'polygon' )
+            {
+                include_once( 'includes/class-ph-address-keyword-polygon.php' ); // Manages getting and caching polygons associated with search terms
+            }
+        
             include_once( 'includes/class-ph-user-contacts.php' );          // Handles keeping contacts and users in sync
 
             include_once( 'includes/class-ph-elementor.php' );              // Elementor
