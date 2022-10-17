@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 6.0.2
-Stable tag: 1.5.38
+Stable tag: 1.5.39
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,16 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.39 - 2022-10-17 =
+* Added a new 'Search within location perimeter' option under 'Property Hive > Settings > General > Misc'. Searching for address keyword will then only return properties within the boundary of that location. Boundaries obtained from the Nominatim API
+* Added 'country_not' attribute to [properties] shortcode
+* Ensure 'Property Hive-only mode' checkbox only appears for administrators on user profiles
+* Added ordering capabilities to the properties returned by the REST API can be ordered by price by passing in 'price-asc' and 'price-desc' as the 'orderby' parameter
+* Added new filter 'propertyhive_show_admin_menu_key_date_count' to determine if overdue key date count should show in menu
+* Added new filter 'propertyhive_admin_menu_key_date_count_args' so the query arguments used when determining overdue key date count in menu can be customised
+* Added new filter 'propertyhive_admin_menu_enquiry_count_args' so the query arguments used when determining enquiries count in menu can be customised
+* Corrected issue with properties appearing twice when properties with the same price spanned multiple pages. Change included adding a secondary order
 
 = 1.5.38 - 2022-09-14 =
 * Added ability to exclude properties from search results by country with new 'country_not' parameter
