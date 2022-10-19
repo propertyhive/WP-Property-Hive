@@ -732,6 +732,7 @@ class PH_Emails {
 					$body = str_replace( "[similar_properties]", $similar_html, $body );
 				}
 
+				$body = apply_filters( 'propertyhive_enquiry_auto_responder_body', $body, $property_id );
 	        	$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $body ) ) );
 
 				wp_mail( $to, $subject, $body, $headers );
