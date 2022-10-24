@@ -122,6 +122,7 @@ class PH_AJAX {
             'validate_save_contact' => false,
             'applicant_registration' => true,
             'login' => true,
+            'lost_password' => true,
             'save_account_details' => true,
             'save_account_requirements' => true,
 
@@ -393,6 +394,75 @@ class PH_AJAX {
             
             wp_reset_postdata();
         }
+
+        $this->json_headers();
+        echo json_encode( $return );
+        
+        // Quit out
+        die();
+    }
+
+    /**
+     * Lost password
+     */
+    public function lost_password()
+    {
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        if ( check_ajax_referer( 'ph_lost_password', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        $email_address = sanitize_email($_POST['email_address']);
+
+        $user_data = get_user_by( 'email', $email_address );
+
+        // check email address exists
+        if ( !$user_data )
+        {
+            $return['errors'][] = 'Email address not found';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        // Send reset email
+        $to = $email_address;
+        $subject = __( 'Password Reset Request for', 'propertyhive' ) . ' ' . get_bloginfo('name');
+        $body = __( 'Someone has requested a new password for an account on', 'propertyhive' ) . ' ' . get_bloginfo('name') . ".\n\n";
+        $body .= __( 'If you didn\'t make this request you can ignore this email. If you\'d like to proceed please follow the link below', 'propertyhive' ) . ":\n\n";
+        $body .= add_query_arg( array(
+            'key' => get_password_reset_key( $user_data ),
+            'id' => $user_data->ID,
+        ), get_permalink( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) ) );
+
+
+        $from = get_option('propertyhive_email_from_address', '');
+        if ( $from == '' )
+        {
+            $from = get_bloginfo('admin_email');
+        }
+
+        $headers = array();
+        $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
+        $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+        wp_mail( $to, $subject, $body, $headers );
+        
+        $return['success'] = true;
 
         $this->json_headers();
         echo json_encode( $return );
