@@ -256,6 +256,47 @@ jQuery(document).ready(function($)
 		$(this).parent().addClass('active');
 	});
 
+    $('a.ph-forgot-password').on('click', function(e)
+    {
+        e.preventDefault();
+
+        $('form[name=\'ph_login_form\']').fadeOut(100, function()
+        {
+            $('form[name=\'ph_lost_password_form\']').fadeIn(250);
+        });
+    });
+
+    $('body').on('submit', 'form[name=\'ph_lost_password_form\']', function()
+    {
+        if (!is_submitting)
+        {
+            is_submitting = true;
+            
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_lost_password', 'security': propertyhive_account_params.lost_password_nonce });
+            
+            var form_obj = $(this);
+
+            form_obj.find('#lostPasswordError').hide();
+            form_obj.find('#lostPasswordSuccess').hide();
+
+            $.post( propertyhive_account_params.ajax_url, data, function(response)
+            {
+                if (response.success == true)
+                {
+                    form_obj.find('#lostPasswordSuccess').fadeIn();
+                }
+                else
+                {
+                    form_obj.find('#lostPasswordError').fadeIn();
+                }
+                
+                is_submitting = false;
+                
+            });
+        }
+
+        return false;
+    });
 });
 
 jQuery(window).on('load', function() {
