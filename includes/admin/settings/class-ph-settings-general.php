@@ -563,6 +563,15 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title' => __( 'Applicant Reset Password Page', 'propertyhive' ),
+                'id'        => 'propertyhive_applicant_reset_password_page_id',
+                'type'      => 'single_select_page',
+                'default'   => '',
+                'css'       => 'min-width:300px;',
+                'desc'  => __( 'This page should contain the [propertyhive_reset_password_form] shortcode', 'propertyhive' ),
+            ),
+
+            array(
                 'title' => __( 'Applicant Registration Page', 'propertyhive' ),
                 'id'        => 'propertyhive_applicant_registration_page_id',
                 'type'      => 'single_select_page',
