@@ -42,6 +42,12 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <input type="submit" value="<?php _e( 'Login', 'propertyhive' ); ?>">
 
+    <?php if ( !empty( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) ) ) { ?>
+    <div class="ph-forgot-password-link"><a href="" class="ph-forgot-password"><?php echo __( 'Forgot your password?', 'propertyhive' ); ?></a></div>
+    <?php } ?>
+
     <?php do_action( 'propertyhive_login_form_end' ); ?>
 
 </form>
+
+<?php ph_get_template( 'account/lost-password-form.php' ); ?>

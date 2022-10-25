@@ -122,6 +122,8 @@ class PH_AJAX {
             'validate_save_contact' => false,
             'applicant_registration' => true,
             'login' => true,
+            'lost_password' => true,
+            'reset_password' => true,
             'save_account_details' => true,
             'save_account_requirements' => true,
 
@@ -393,6 +395,148 @@ class PH_AJAX {
             
             wp_reset_postdata();
         }
+
+        $this->json_headers();
+        echo json_encode( $return );
+        
+        // Quit out
+        die();
+    }
+
+    /**
+     * Lost password
+     */
+    public function lost_password()
+    {
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        if ( check_ajax_referer( 'ph_lost_password', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        $email_address = sanitize_email($_POST['email_address']);
+
+        $user_data = get_user_by( 'email', $email_address );
+
+        // check email address exists
+        if ( !$user_data )
+        {
+            $return['errors'][] = 'Email address not found';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        // Send reset email
+        $to = $email_address;
+        $subject = __( 'Password Reset Request for', 'propertyhive' ) . ' ' . get_bloginfo('name');
+        $body = __( 'Someone has requested a new password for an account on', 'propertyhive' ) . ' ' . get_bloginfo('name') . ".\n\n";
+        $body .= __( 'If you didn\'t make this request you can ignore this email. If you\'d like to proceed please follow the link below', 'propertyhive' ) . ":\n\n";
+        $body .= add_query_arg( array(
+            'key' => get_password_reset_key( $user_data ),
+            'id' => $user_data->ID,
+        ), get_permalink( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) ) );
+
+
+        $from = get_option('propertyhive_email_from_address', '');
+        if ( $from == '' )
+        {
+            $from = get_bloginfo('admin_email');
+        }
+
+        $headers = array();
+        $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
+        $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+        wp_mail( $to, $subject, $body, $headers );
+        
+        $return['success'] = true;
+
+        $this->json_headers();
+        echo json_encode( $return );
+        
+        // Quit out
+        die();
+    }
+
+    /**
+     * Reset password
+     */
+    public function reset_password()
+    {
+        $return = array(
+            'success' => false,
+            'errors' => array(),
+        );
+
+        if ( check_ajax_referer( 'ph_reset_password', 'security', false ) === FALSE )
+        {
+            $return['errors'][] = 'Invalid nonce';
+
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        // check key and user login again
+        $user = check_password_reset_key( ph_clean($_POST['reset_key']), ph_clean($_POST['reset_login']) );
+
+        // check passwords match and are strong enough
+        if ( $user instanceof WP_User ) 
+        {
+            $password_1 = ph_clean($_POST['password_1']);
+            $password_2 = ph_clean($_POST['password_2']);
+
+            if ( empty( $password_1 ) ) 
+            {
+                $return['errors'][] = __( 'Please enter your password.', 'propertyhive' );
+            }
+
+            if ( $password_1 !== $password_2 ) 
+            {
+                $return['errors'][] = __( 'Passwords do not match.', 'propertyhive' );
+            }
+
+            // Check password strength?
+        }
+        else
+        {
+            $return['errors'][] = __( 'This key is invalid or has already been used. Please reset your password again if needed..', 'propertyhive' );
+        }
+
+        if ( !empty($return['errors']) )
+        {
+            $this->json_headers();
+            echo json_encode( $return );
+            
+            // Quit out
+            die();
+        }
+
+        // do actual reset
+        $errors = new WP_Error();
+        do_action( 'validate_password_reset', $errors, $user );
+
+        do_action( 'password_reset', $user, $password_1 );
+
+        wp_set_password( $password_1, $user->ID );
+        
+        $return['success'] = true;
 
         $this->json_headers();
         echo json_encode( $return );
