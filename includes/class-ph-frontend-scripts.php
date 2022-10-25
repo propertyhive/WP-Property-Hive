@@ -122,6 +122,7 @@ class PH_Frontend_Scripts {
 				'custom_departments'	=> ph_get_custom_departments(),
 				'login_nonce'	  		=> wp_create_nonce( "ph_login" ),
 				'lost_password_nonce'	=> wp_create_nonce( "ph_lost_password" ),
+				'reset_password_nonce'	=> wp_create_nonce( "ph_reset_password" ),
 				'register_nonce'	  	=> wp_create_nonce( "ph_register" ),
 				'details_nonce'	  		=> wp_create_nonce( "ph_details" ),
 				'requirements_nonce'	=> wp_create_nonce( "ph_requirements" ),

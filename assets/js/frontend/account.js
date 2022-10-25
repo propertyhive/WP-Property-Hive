@@ -297,6 +297,45 @@ jQuery(document).ready(function($)
 
         return false;
     });
+
+    $('body').on('submit', 'form[name=\'ph_reset_password_form\']', function()
+    {
+        if (!is_submitting)
+        {
+            is_submitting = true;
+            
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_reset_password', 'security': propertyhive_account_params.reset_password_nonce });
+            
+            var form_obj = $(this);
+
+            form_obj.find('#resetPasswordError').hide();
+            form_obj.find('#resetPasswordSuccess').hide();
+
+            $.post( propertyhive_account_params.ajax_url, data, function(response)
+            {
+                if (response.success == true)
+                {
+                    form_obj.find('#resetPasswordSuccess').fadeIn();
+                }
+                else
+                {
+                    if ( response.errors.length > 0 )
+                    {
+                        for ( var i in response.errors )
+                        {
+                            form_obj.find('#resetPasswordError').html(response.errors[i]);
+                        }
+                    }
+                    form_obj.find('#resetPasswordError').fadeIn();
+                }
+                
+                is_submitting = false;
+                
+            });
+        }
+
+        return false;
+    });
 });
 
 jQuery(window).on('load', function() {
