@@ -1,5 +1,6 @@
 var ph_lightbox_open = false; // Used to determine if a details lightbox is open and therefore which post ID (stored in ph_lightbox_post_id) to pass through to AJAX requests
 var ph_lightbox_post_id;
+var ph_viewing_negotiators_changed = false;
 
 function ph_init_description_editors()
 {
@@ -728,6 +729,11 @@ jQuery( function($){
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
 
+    $(".post-type-viewing #_negotiator_ids").on('change', function()
+    {
+        ph_viewing_negotiators_changed = true;
+    });
+
     $( document ).on('click', '.viewing-lightbox', function(e)
     {
         e.preventDefault();
@@ -975,6 +981,26 @@ jQuery(document).ready(function($)
         {
             var data = {
                 action:         'propertyhive_viewing_email_owner_booking_confirmation',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_email_attending_negotiator_booking_confirmation' )
+        {
+            if ( ph_viewing_negotiators_changed )
+            {
+                alert("The negotiators have changed since the viewing was last saved. Please save the viewing then try again");
+                return;
+            }
+
+            var data = {
+                action:         'propertyhive_viewing_email_attending_negotiator_booking_confirmation',
                 viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
                 security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
             };

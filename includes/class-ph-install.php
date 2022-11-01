@@ -657,6 +657,17 @@ Should you need to cancel or amend this viewing please do not hesitate to contac
 
 " . get_bloginfo('name'), '', 'no' );
 
+        add_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', 'Viewing Booked On [property_address]', '', 'no' );
+        add_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', "This is confirmation you've been assigned to attend a viewing at property, [property_address], for [viewing_time] on [viewing_date].
+
+Applicant Details:
+[applicant_details]
+
+Owner Details:
+[owner_details]
+
+" . get_bloginfo('name'), '', 'no' );
+
         add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', 'Appraisal Booked On [property_address]', '', 'no' );
         add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', "Dear [owner_dear],
 

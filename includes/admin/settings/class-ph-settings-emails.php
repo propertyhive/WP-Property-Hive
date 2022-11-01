@@ -259,6 +259,25 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	        );
 
 	        $settings[] = array( 'type' => 'sectionend', 'id' => 'owner_viewing_booking_confirmation_email_options' );
+
+	        // Attending Negotiator
+	        $settings[] = array( 'title' => __( 'Attending Negotiator Viewing Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'attending_negotiator_viewing_booking_confirmation_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'attending_negotiator_viewing_booking_confirmation_email_options' );
 	    }
 
 	    if ( get_option('propertyhive_module_disabled_appraisals', '') != 'yes' )
