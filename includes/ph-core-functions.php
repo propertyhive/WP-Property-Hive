@@ -220,6 +220,7 @@ function ph_get_viewing_statuses()
         'confirmed'              => '- ' . __( 'Confirmed', 'propertyhive' ),
         'unconfirmed'            => '- ' . __( 'Awaiting Confirmation', 'propertyhive' ),
         'carried_out'            => __( 'Carried Out', 'propertyhive' ),
+        'awaiting_feedback'     => '- ' . __( 'Awaiting Feedback', 'propertyhive' ),
         'feedback_passed_on'     => '- ' . __( 'Feedback Passed On', 'propertyhive' ),
         'feedback_not_passed_on' => '- ' . __( 'Feedback Not Passed On', 'propertyhive' ),
         'cancelled'              => __( 'Cancelled', 'propertyhive' ),
@@ -261,6 +262,18 @@ function add_viewing_status_meta_query( $meta_query, $selected_status )
                     'key' => '_all_confirmed',
                     'compare' => 'NOT EXISTS',
                 )
+            );
+            break;
+        }
+        case "awaiting_feedback":
+        {
+            $meta_query[] = array(
+                'key' => '_status',
+                'value' => 'carried_out',
+            );
+            $meta_query[] = array(
+                'key' => '_feedback_status',
+                'value' => '',
             );
             break;
         }
