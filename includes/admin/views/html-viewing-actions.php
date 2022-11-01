@@ -32,6 +32,7 @@ if ( $status == 'pending' )
     {
         $applicant_booking_confirmation_sent_at = get_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', TRUE );
         $owner_booking_confirmation_sent_at = get_post_meta( $post_id, '_owner_booking_confirmation_sent_at', TRUE );
+        $attending_negotiator_booking_confirmation_sent_at = get_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', TRUE );
         
         //Applicant
         $actions[] = '<a 
@@ -56,6 +57,19 @@ if ( $status == 'pending' )
                 >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
             
             $actions[] = '<div id="viewing_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+        }
+
+        // Attending Negotiators
+        $attending_negotiators = get_post_meta( $property_id, '_negotiator_id' );
+        if ( !empty($attending_negotiators) )
+        {
+            $actions[] = '<a 
+                    href="#action_panel_viewing_email_attending_negotiator_booking_confirmation" 
+                    class="button viewing-action"
+                    style="width:100%; margin-bottom:7px; text-align:center" 
+                >' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? __('Email Negotiator Booking Confirmation', 'propertyhive') : __('Re-Email Negotiator Booking Confirmation', 'propertyhive') ) . '</a>';
+
+            $actions[] = '<div id="viewing_attending_negotiator_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $attending_negotiator_booking_confirmation_sent_at != '' ) ? 'Previously sent to attending negotiators on <span title="' . $attending_negotiator_booking_confirmation_sent_at . '">' . date("jS F", strtotime($attending_negotiator_booking_confirmation_sent_at)) : '' ) . '</span></div>';
         }
 
         $actions[] = '<hr>';

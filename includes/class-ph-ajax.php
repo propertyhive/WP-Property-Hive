@@ -75,6 +75,7 @@ class PH_AJAX {
             'viewing_no_show' => false,
             'viewing_email_applicant_booking_confirmation' => false,
             'viewing_email_owner_booking_confirmation' => false,
+            'viewing_email_attending_negotiator_booking_confirmation' => false,
             'viewing_interested_feedback' => false,
             'viewing_not_interested_feedback' => false,
             'viewing_feedback_not_required' => false,
@@ -4234,17 +4235,20 @@ class PH_AJAX {
             $owner_names_string = $this->get_list_string($owner_names);
             $owner_dears_string = $this->get_list_string($owner_dears);
 
-            $applicant_names = array();
-            $applicant_dears = array();
-            foreach ($applicant_contact_ids as $applicant_contact_id)
+            if ( !empty($applicant_contact_ids) ) 
             {
-                $applicant_contact = new PH_Contact($applicant_contact_id);
-                $applicant_names[] = $applicant_contact->post_title;
-                $applicant_dears[] = $applicant_contact->dear();
+                $applicant_names = array();
+                $applicant_dears = array();
+                foreach ($applicant_contact_ids as $applicant_contact_id)
+                {
+                    $applicant_contact = new PH_Contact($applicant_contact_id);
+                    $applicant_names[] = $applicant_contact->post_title;
+                    $applicant_dears[] = $applicant_contact->dear();
+                }
+                $applicant_names = array_filter($applicant_names);
+                $applicant_dears = array_filter($applicant_dears);
             }
-            $applicant_names = array_filter($applicant_names);
-            $applicant_dears = array_filter($applicant_dears);
-
+            
             $applicant_names_string = $this->get_list_string($applicant_names);
             $applicant_dears_string = $this->get_list_string($applicant_dears);
 
@@ -4288,6 +4292,132 @@ class PH_AJAX {
             wp_mail($to, $subject, $body, $headers);
 
             update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+
+            wp_send_json_success();
+        }
+
+        wp_send_json_error();
+    }
+
+    public function viewing_email_attending_negotiator_booking_confirmation()
+    {
+        check_ajax_referer( 'viewing-actions', 'security' );
+
+        $post_id = (int)$_POST['viewing_id'];
+        $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+
+        $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+
+        $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
+        $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
+ 
+        if ( !empty($negotiator_ids) ) {
+
+            $tos = array();
+            foreach ($negotiator_ids as $negotiator_id) 
+            {
+                $user_info = get_userdata((int)$negotiator_id);
+                $tos[] = sanitize_email($user_info->user_email);
+            }
+            $to = implode(",", $tos);
+
+            $owner_emails = array();
+            $owner_names = array();
+            $owner_dears = array();
+            $owner_details = array();
+            
+            if ( !empty($owner_contact_ids) ) 
+            {
+                foreach ($owner_contact_ids as $owner_id) 
+                {
+                    $owner_contact = new PH_Contact($owner_id);
+
+                    $owner_name = $owner_contact->post_title;
+                    $owner_dear = $owner_contact->dear();
+
+                    if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
+                    if( ! empty($owner_dear) ) array_push($owner_dears, $owner_dear);
+
+                    $owner_email = $owner_contact->email_address;
+                    $explode_owner_email = explode( ",", $owner_email );
+                    foreach ( $explode_owner_email as $email_address )
+                    {
+                        $owner_emails[] = sanitize_email($email_address);
+                    }
+
+                    $owner_details[] = $owner_contact->post_title . "\nT: " . $owner_contact->telephone_number . "\nE: " . $owner_contact->email_address;
+                }
+            }
+
+            $owner_details = implode("\n\n", $owner_details);
+
+            $owner_names_string = $this->get_list_string($owner_names);
+            $owner_dears_string = $this->get_list_string($owner_dears);
+
+            $applicant_names = array();
+            $applicant_dears = array();
+            $applicant_details = array();
+
+            if ( !empty($applicant_contact_ids) ) 
+            {
+                foreach ($applicant_contact_ids as $applicant_contact_id)
+                {
+                    $applicant_contact = new PH_Contact($applicant_contact_id);
+                    $applicant_names[] = $applicant_contact->post_title;
+                    $applicant_dears[] = $applicant_contact->dear();
+
+                    $applicant_details[] = $applicant_contact->post_title . "\nT: " . $applicant_contact->telephone_number . "\nE: " . $applicant_contact->email_address;
+                }
+            }
+
+            $applicant_details = implode("\n\n", $applicant_details);
+
+            $applicant_names = array_filter($applicant_names);
+            $applicant_dears = array_filter($applicant_dears);
+
+            $applicant_names_string = $this->get_list_string($applicant_names);
+            $applicant_dears_string = $this->get_list_string($applicant_dears);
+
+            $property = new PH_Property((int)$property_id);
+
+            $subject = get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', '' );
+            $body = get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', '' );
+
+            $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
+            $subject = str_replace('[owner_name]', $owner_names_string, $subject);
+            $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
+            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+
+            $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
+            $body = str_replace('[owner_name]', $owner_names_string, $body);
+            $body = str_replace('[owner_dear]', $owner_dears_string, $body);
+            $body = str_replace('[owner_details]', $owner_details, $body);
+            $body = str_replace('[applicant_name]', $applicant_names_string, $body);
+            $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
+            $body = str_replace('[applicant_details]', $applicant_details, $body);
+            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+
+            $body = apply_filters( 'viewing_attending_negotiator_booking_confirmation_email_body', $body, $post_id, $property_id );
+
+            $from = $property->office_email_address;
+            if ( sanitize_email($from) == '' )
+            {
+                $from = get_option('propertyhive_email_from_address', '');
+                if ( $from == '' )
+                {
+                    $from = get_bloginfo('admin_email');
+                }
+            }
+
+            $headers = array();
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            wp_mail($to, $subject, $body, $headers);
+
+            update_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
             wp_send_json_success();
         }
