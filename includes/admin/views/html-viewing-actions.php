@@ -35,41 +35,50 @@ if ( $status == 'pending' )
         $attending_negotiator_booking_confirmation_sent_at = get_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', TRUE );
         
         //Applicant
-        $actions[] = '<a 
-                href="#action_panel_viewing_email_applicant_booking_confirmation" 
-                class="button viewing-action"
-                style="width:100%; margin-bottom:7px; text-align:center" 
-            >' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Re-Email Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
-
-        $actions[] = '<div id="viewing_applicant_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $applicant_booking_confirmation_sent_at != '' ) ? 'Previously sent to applicant on <span title="' . $applicant_booking_confirmation_sent_at . '">' . date("jS F", strtotime($applicant_booking_confirmation_sent_at)) : '' ) . '</span></div>';
-
-        // Owner/Landlord
-        $property_department = get_post_meta( $property_id, '_department', TRUE );
-        $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
-        $owner_or_landlord = ( $property_department == 'residential-lettings' ? 'Landlord' : 'Owner' );
-
-        if ( is_array($owner_contact_ids) && count($owner_contact_ids) > 0) {
-
+        if ( apply_filters( 'propertyhive_show_viewing_email_applicant_booking_confirmation', true ) === true )
+        {
             $actions[] = '<a 
-                    href="#action_panel_viewing_email_owner_booking_confirmation" 
+                    href="#action_panel_viewing_email_applicant_booking_confirmation" 
                     class="button viewing-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
-            
-            $actions[] = '<div id="viewing_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+                >' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Re-Email Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
+
+            $actions[] = '<div id="viewing_applicant_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $applicant_booking_confirmation_sent_at != '' ) ? 'Previously sent to applicant on <span title="' . $applicant_booking_confirmation_sent_at . '">' . date("jS F", strtotime($applicant_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+        }
+
+        // Owner/Landlord
+        if ( apply_filters( 'propertyhive_show_viewing_email_owner_booking_confirmation', true ) === true )
+        {
+            $property_department = get_post_meta( $property_id, '_department', TRUE );
+            $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
+            $owner_or_landlord = ( $property_department == 'residential-lettings' ? 'Landlord' : 'Owner' );
+
+            if ( is_array($owner_contact_ids) && count($owner_contact_ids) > 0) {
+
+                $actions[] = '<a 
+                        href="#action_panel_viewing_email_owner_booking_confirmation" 
+                        class="button viewing-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+                
+                $actions[] = '<div id="viewing_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+            }
         }
 
         // Attending Negotiators
-        $attending_negotiators = get_post_meta( $property_id, '_negotiator_id' );
-        if ( !empty($attending_negotiators) )
+        if ( apply_filters( 'propertyhive_show_viewing_email_attending_negotiator_booking_confirmation', true ) === true )
         {
-            $actions[] = '<a 
-                    href="#action_panel_viewing_email_attending_negotiator_booking_confirmation" 
-                    class="button viewing-action"
-                    style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? __('Email Negotiator Booking Confirmation', 'propertyhive') : __('Re-Email Negotiator Booking Confirmation', 'propertyhive') ) . '</a>';
+            $attending_negotiators = get_post_meta( $property_id, '_negotiator_id' );
+            if ( !empty($attending_negotiators) )
+            {
+                $actions[] = '<a 
+                        href="#action_panel_viewing_email_attending_negotiator_booking_confirmation" 
+                        class="button viewing-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? __('Email Negotiator Booking Confirmation', 'propertyhive') : __('Re-Email Negotiator Booking Confirmation', 'propertyhive') ) . '</a>';
 
-            $actions[] = '<div id="viewing_attending_negotiator_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $attending_negotiator_booking_confirmation_sent_at != '' ) ? 'Previously sent to attending negotiators on <span title="' . $attending_negotiator_booking_confirmation_sent_at . '">' . date("jS F", strtotime($attending_negotiator_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+                $actions[] = '<div id="viewing_attending_negotiator_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $attending_negotiator_booking_confirmation_sent_at != '' ) ? 'Previously sent to attending negotiators on <span title="' . $attending_negotiator_booking_confirmation_sent_at . '">' . date("jS F", strtotime($attending_negotiator_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+            }
         }
 
         $actions[] = '<hr>';
