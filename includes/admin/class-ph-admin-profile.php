@@ -128,7 +128,7 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 							if ( ! empty( $field['type'] ) && 'hidden' === $field['type'] )
 							{
 						?>
-							<input type="hidden" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $this->get_user_meta( $user->ID, $key ) ); ?>" />
+							<input type="hidden" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $this->get_user_meta( $user->ID, $key ) != '' ? $this->get_user_meta( $user->ID, $key ) : ( isset( $field['default'] ) ? $field['default'] : '' ) ); ?>" />
 						<?php
 							}
 							else
@@ -150,6 +150,8 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 									</select>
 								<?php elseif ( ! empty( $field['type'] ) && 'checkbox' === $field['type'] ) : ?>
 									<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="1" class="<?php echo esc_attr( $field['class'] ); ?>" <?php checked( (int) get_user_meta( $user->ID, $key, true ), 1, true ); ?> />
+								<?php elseif ( ! empty( $field['type'] ) && 'color' === $field['type'] ) : ?>
+									<input type="color" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $this->get_user_meta( $user->ID, $key ) != '' ? $this->get_user_meta( $user->ID, $key ) : ( isset( $field['default'] ) ? $field['default'] : '' ) ); ?>" class="<?php echo esc_attr( $field['class'] ); ?>" />
 								<?php elseif ( ! empty( $field['type'] ) && 'button' === $field['type'] ) : ?>
 									<button type="button" id="<?php echo esc_attr( $key ); ?>" class="button <?php echo esc_attr( $field['class'] ); ?>"><?php echo esc_html( $field['text'] ); ?></button>
 								<?php elseif ( ! empty( $field['type'] ) && 'image' === $field['type'] ) : ?>
