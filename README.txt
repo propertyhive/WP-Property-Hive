@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 6.0.2
-Stable tag: 1.5.39
+Tested up to: 6.1
+Stable tag: 1.5.40
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.40 - 2022-11-07 =
+* Added ability to email viewing confirmations to attending negotiators
+* Added filters 'propertyhive_show_viewing_email_applicant_booking_confirmation', 'propertyhive_show_viewing_email_owner_booking_confirmation' and 'propertyhive_show_viewing_email_attending_negotiator_booking_confirmation' so email viewing confirmation actions can be hidden
+* Added 'Awaiting Feedback' status filter to viewing lists
+* Added forgot password functionality to [propertyhive_login_form] shortcode. Includes new option under 'Property Hive > Settings > General > Misc' whereby you can set reset password page
+* Added filter 'propertyhive_enquiry_auto_responder_body' to property enquiry autoresponder body
+* Added ability to add field of type 'color' to user profile. Done to support Calendar add on update whereby you can now specify that events are coloured based on attending/assigned users and not event type
+* Declared compatibility for WordPress 6.1
 
 = 1.5.39 - 2022-10-17 =
 * Added a new 'Search within location perimeter' option under 'Property Hive > Settings > General > Misc'. Searching for address keyword will then only return properties within the boundary of that location. Boundaries obtained from the Nominatim API
