@@ -120,6 +120,9 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			switch ( $column ) {
 
 				case 'description' :
+
+					$post_type_object = get_post_type_object( $post->post_type );
+
 					echo '<div class="cell-main-content">';
 					$opening_link_tag = false;
 					if ( !empty($key_date->tenancy_id) ) 
@@ -144,6 +147,23 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 						esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $key_date->description() ) ),
 						__( 'Quick&nbsp;Edit' )
 					);
+
+					if ( current_user_can( $post_type_object->cap->delete_post, $post->ID ) ) 
+					{
+						if ( 'trash' == $post->post_status ) 
+						{
+							$actions['untrash'] = '<a title="' . esc_attr( __( 'Restore this item from the Trash', 'propertyhive' ) ) . '" href="' . wp_nonce_url( admin_url( sprintf( $post_type_object->_edit_link . '&amp;action=untrash', $post->ID ) ), 'untrash-post_' . $post->ID ) . '">' . __( 'Restore', 'propertyhive' ) . '</a>';
+						}
+						elseif ( EMPTY_TRASH_DAYS )
+						{
+							$actions['trash'] = '<a class="submitdelete" title="' . esc_attr( __( 'Move this item to the Trash', 'propertyhive' ) ) . '" href="' . get_delete_post_link( $post->ID ) . '">' . __( 'Trash', 'propertyhive' ) . '</a>';
+						}
+						if ( 'trash' == $post->post_status || ! EMPTY_TRASH_DAYS )
+						{
+							$actions['delete'] = '<a class="submitdelete" title="' . esc_attr( __( 'Delete this item permanently', 'propertyhive' ) ) . '" href="' . get_delete_post_link( $post->ID, '', true ) . '">' . __( 'Delete Permanently', 'propertyhive' ) . '</a>';
+						}
+					}
+
 					$i = 0;
 					$action_count = sizeof($actions);
 
