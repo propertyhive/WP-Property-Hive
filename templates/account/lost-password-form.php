@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-if ( empty( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) ) ) { exit; }
+if ( !empty( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) ) ) {
 ?>
 
 <form name="ph_lost_password_form" class="propertyhive-form lost-password-form" action="" method="post" style="display:none">
@@ -45,3 +45,4 @@ if ( empty( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) ) 
     <?php do_action( 'propertyhive_lost_password_form_end' ); ?>
 
 </form>
+<?php } ?>
