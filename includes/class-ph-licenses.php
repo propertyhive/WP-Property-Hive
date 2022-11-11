@@ -140,6 +140,34 @@ class PH_Licenses {
             	}
 			}
 			$data['property_import_formats'] = $formats;
+
+			// get counts
+			$post_types = array('office', 'property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
+			foreach ( $post_types as $post_type )
+			{
+				$args = array(
+					'post_type' => $post_type,
+					'fields' => 'ids',
+					'nopaging' => TRUE,
+					'post_status' => 'publish'
+				);
+				if ( $post_type == 'property' )
+				{
+					$args['meta_query'] = array(
+						array(
+							'key' => '_on_market',
+							'value' => 'yes'
+						)
+					);
+				}
+
+				$post_query = new WP_Query( $args );
+
+				$data['post_type_count_' . $post_type] = $post_query->found_posts;
+
+				wp_reset_postdata();
+			}
+
 		}
 
 		$request = wp_remote_post( 'http://license.wp-property-hive.com/check-license.php', array(
