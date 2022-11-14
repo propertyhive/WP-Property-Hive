@@ -558,6 +558,46 @@ class PH_Admin_Meta_Boxes {
 
         /* PROPERTY SUMMARY META BOXES */
         $meta_boxes = array();
+
+        /*$pinned_notes_args = array();
+        $pinned_notes = array();
+        if ( $pagenow != 'post-new.php' && in_array( 
+            $post->post_type, 
+            apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy') )
+        ) )
+        {
+            $pinned_notes_args = array(
+                'post_id' => (int)$post->ID,
+                'type' => 'propertyhive_note',
+                'fields' => 'ids',
+                'search' => '"pinned";s:1:"1"',
+                'meta_query' => array(
+                    array(
+                        'key' => 'related_to',
+                        'value' => '"' . (int)$post->ID . '"',
+                        'compare' => 'LIKE',
+                    ),
+                )
+            );
+
+            $pinned_notes = get_comments( $pinned_notes_args );
+        }*/
+
+        /*if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-property-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Pinned_Notes::output',
+                    'screen' => 'property',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                    'ajax_actions' => array( '^^ph_redraw_pinned_notes_grid(\'property\')' ),
+                );
+            }
+        }*/
         $meta_boxes[5] = array(
             'id' => 'propertyhive-property-address',
             'title' => __( 'Property Address', 'propertyhive' ),
@@ -609,6 +649,10 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'property'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            $tabs['tab_summary']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'property\')' );
+        }
         
         /* PROPERTY DETAILS META BOXES */
         $meta_boxes = array();

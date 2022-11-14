@@ -26,6 +26,7 @@ class PH_AJAX {
 			'delete_note' => false,
 			'toggle_note_pinned' => false,
 			'get_notes_grid' => false,
+            'get_pinned_notes_grid' => false,
 			'search_contacts' => false,
             'search_properties' => false,
             'search_negotiators' => false,
@@ -1728,6 +1729,19 @@ class PH_AJAX {
 
         $section = $_POST['section'];
         include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
+
+        // Quit out
+        die();
+    }
+
+    public function get_pinned_notes_grid() {
+
+        global $wpdb, $post;
+        
+        /*$post = get_post((int)$_POST['post_id']);
+
+        $section = $_POST['section'];
+        include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );*/
 
         // Quit out
         die();
