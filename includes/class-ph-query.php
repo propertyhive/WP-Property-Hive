@@ -844,7 +844,7 @@ class PH_Query {
 
         	if ( $do_address_search )
         	{
-	        	$_REQUEST['address_keyword'] = is_array($_REQUEST['address_keyword']) ? $_REQUEST['address_keyword'] : array( $_REQUEST['address_keyword'] );
+	        	$address_keywords_to_query = is_array($_REQUEST['address_keyword']) ? $_REQUEST['address_keyword'] : array( $_REQUEST['address_keyword'] );
 
 	        	$address_fields_to_query = array(
 		      		'_reference_number',
@@ -857,9 +857,9 @@ class PH_Query {
 
 		      	$address_keywords = array();
 
-	        	if ( !empty($_REQUEST['address_keyword']) )
+	        	if ( !empty($address_keywords_to_query) )
 	        	{
-		        	foreach ( $_REQUEST['address_keyword'] as $address_keyword )
+		        	foreach ( $address_keywords_to_query as $address_keyword )
 		        	{
 		        		// Remove country code from end (i.e. ', UK')
 	        			$address_keyword = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $address_keyword);
