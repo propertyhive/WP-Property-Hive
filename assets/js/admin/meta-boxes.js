@@ -183,6 +183,7 @@ jQuery( function($){
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             ph_redraw_notes_grid(section);
+            ph_redraw_pinned_notes_grid(section);
         }, 'json');
 
         return false;
@@ -214,6 +215,7 @@ jQuery( function($){
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             ph_redraw_notes_grid(section);
+            ph_redraw_pinned_notes_grid(section);
         }, 'json');
 
         return false;
@@ -1155,6 +1157,21 @@ function ph_redraw_notes_grid(section)
     jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
     {
         jQuery('#propertyhive_' +  section + '_notes_container').html(response);
+    }, 'html');
+}
+
+function ph_redraw_pinned_notes_grid(section)
+{
+    var data = {
+        action:         'propertyhive_get_pinned_notes_grid',
+        post_id:        propertyhive_admin_meta_boxes.post_id,
+        pinned:         1,
+        section:        section,
+    };
+
+    jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+    {
+        jQuery('#propertyhive_' +  section + '_pinned_notes_container').html(response);
     }, 'html');
 }
 

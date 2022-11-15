@@ -558,6 +558,45 @@ class PH_Admin_Meta_Boxes {
 
         /* PROPERTY SUMMARY META BOXES */
         $meta_boxes = array();
+
+        $pinned_notes_args = array();
+        $pinned_notes = array();
+        if ( $pagenow != 'post-new.php' && isset($post->post_type) && in_array( 
+            $post->post_type, 
+            apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy') )
+        ) )
+        {
+            $pinned_notes_args = array(
+                'post_id' => (int)$post->ID,
+                'type' => 'propertyhive_note',
+                'fields' => 'ids',
+                'search' => '"pinned";s:1:"1"',
+                'meta_query' => array(
+                    array(
+                        'key' => 'related_to',
+                        'value' => '"' . (int)$post->ID . '"',
+                        'compare' => 'LIKE',
+                    ),
+                )
+            );
+
+            $pinned_notes = get_comments( $pinned_notes_args );
+        }
+
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-property-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Property_Pinned_Notes::output',
+                    'screen' => 'property',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                );
+            }
+        }
         $meta_boxes[5] = array(
             'id' => 'propertyhive-property-address',
             'title' => __( 'Property Address', 'propertyhive' ),
@@ -609,6 +648,10 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'property'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'property' )
+        {
+            $tabs['tab_summary']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'property\')' );
+        }
         
         /* PROPERTY DETAILS META BOXES */
         $meta_boxes = array();
@@ -1165,11 +1208,27 @@ class PH_Admin_Meta_Boxes {
         }
 
         // CONTACT
+        if (!isset($tabs)) $tabs = array();
+
         $meta_boxes = array();
 
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'contact' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-contact-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Contact_Pinned_Notes::output',
+                    'screen' => 'contact',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                );
+            }
+        }
         if ( $pagenow == 'post-new.php' && get_post_type($post->ID) == 'contact' )
         {
-            $meta_boxes[1] = array(
+            $meta_boxes[2] = array(
                 'id' => 'propertyhive-contact-new-relationship',
                 'title' => __( 'Contact Type', 'propertyhive' ),
                 'callback' => 'PH_Meta_Box_Contact_New_Relationship::output',
@@ -1219,6 +1278,10 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'contact'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'contact' )
+        {
+            $tabs['tab_contact_details']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'contact\')' );
+        }
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'contact' )
         {
@@ -1547,13 +1610,60 @@ class PH_Admin_Meta_Boxes {
         } 
 
         // ENQUIRY
-        add_meta_box( 'propertyhive-enquiry-record-details', __( 'Record Details', 'propertyhive' ), 'PH_Meta_Box_Enquiry_Record_details::output', 'enquiry', 'normal', 'high' );
-        add_meta_box( 'propertyhive-enquiry-details', __( 'Enquiry Details', 'propertyhive' ), 'PH_Meta_Box_Enquiry_details::output', 'enquiry', 'normal', 'high' );
+        if (!isset($tabs)) $tabs = array();
+
+        $meta_boxes = array();
+
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'enquiry' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-enquiry-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Enquiry_Pinned_Notes::output',
+                    'screen' => 'enquiry',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                );
+            }
+        }
+        $meta_boxes[5] = array(
+            'id' => 'propertyhive-enquiry-record-details',
+            'title' => __( 'Record Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Enquiry_Record_details::output',
+            'screen' => 'enquiry',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[10] = array(
+            'id' => 'propertyhive-enquiry-details',
+            'title' => __( 'Enquiry Details', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Enquiry_details::output',
+            'screen' => 'enquiry',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+
+        $meta_boxes = apply_filters( 'propertyhive_enquiry_details_meta_boxes', $meta_boxes );
+        ksort($meta_boxes);
+
+        $ids = array();
+        foreach ($meta_boxes as $meta_box)
+        {
+            add_meta_box( $meta_box['id'], $meta_box['title'], $meta_box['callback'], $meta_box['screen'], $meta_box['context'], $meta_box['priority'] );
+            $ids[] = $meta_box['id'];
+        }
+
         $tabs['tab_enquiry_details'] = array(
             'name' => __( 'Details', 'propertyhive' ),
-            'metabox_ids' => array('propertyhive-enquiry-record-details', 'propertyhive-enquiry-details'),
+            'metabox_ids' => $ids,
             'post_type' => 'enquiry'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'enquiry' )
+        {
+            $tabs['tab_enquiry_details']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'enquiry\')' );
+        }
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'enquiry' )
         {
@@ -1590,6 +1700,20 @@ class PH_Admin_Meta_Boxes {
 
         /* APPRAISAL SUMMARY META BOXES */
         $meta_boxes = array();
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'appraisal' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-appraisal-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Appraisal_Pinned_Notes::output',
+                    'screen' => 'appraisal',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                );
+            }
+        }
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'appraisal' )
         {
             $meta_boxes[5] = array(
@@ -1641,6 +1765,10 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'appraisal'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'appraisal' )
+        {
+            $tabs['tab_appraisal_summary']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'appraisal\')' );
+        }
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'appraisal' )
         {
@@ -1679,6 +1807,20 @@ class PH_Admin_Meta_Boxes {
 
         /* VIEWING SUMMARY META BOXES */
         $meta_boxes = array();
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'viewing' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-viewing-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Viewing_Pinned_Notes::output',
+                    'screen' => 'viewing',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                );
+            }
+        }
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'viewing' )
         {
             $meta_boxes[5] = array(
@@ -1730,6 +1872,10 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'viewing'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'viewing' )
+        {
+            $tabs['tab_viewing_summary']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'viewing\')' );
+        }
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'viewing' )
         {
@@ -1768,6 +1914,20 @@ class PH_Admin_Meta_Boxes {
 
         /* OFFER SUMMARY META BOXES */
         $meta_boxes = array();
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'offer' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-offer-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Offer_Pinned_Notes::output',
+                    'screen' => 'offer',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                );
+            }
+        }
         $meta_boxes[5] = array(
             'id' => 'propertyhive-offer-details',
             'title' => __( 'Offer Details', 'propertyhive' ),
@@ -1825,6 +1985,10 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'offer'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'offer' )
+        {
+            $tabs['tab_offer_summary']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'offer\')' );
+        }
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'offer' )
         {
@@ -1863,6 +2027,20 @@ class PH_Admin_Meta_Boxes {
 
         /* SALE SUMMARY META BOXES */
         $meta_boxes = array();
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'sale' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-sale-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Sale_Pinned_Notes::output',
+                    'screen' => 'sale',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                );
+            }
+        }
         $meta_boxes[5] = array(
             'id' => 'propertyhive-sale-details',
             'title' => __( 'Sale Details', 'propertyhive' ),
@@ -1919,6 +2097,10 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'sale'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'sale' )
+        {
+            $tabs['tab_sale_summary']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'sale\')' );
+        }
 
         if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'sale' )
         {
@@ -1957,6 +2139,20 @@ class PH_Admin_Meta_Boxes {
 
         /* TENANCY SUMMARY META BOXES */
         $meta_boxes = array();
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'tenancy' )
+        {
+            if ( !empty($pinned_notes) )
+            {
+                $meta_boxes[1] = array(
+                    'id' => 'propertyhive-tenancy-pinned-notes',
+                    'title' => __( 'Pinned Notes', 'propertyhive' ),
+                    'callback' => 'PH_Meta_Box_Tenancy_Pinned_Notes::output',
+                    'screen' => 'tenancy',
+                    'context' => 'normal',
+                    'priority' => 'high',
+                );
+            }
+        }
         $meta_boxes[5] = array(
             'id' => 'propertyhive-tenancy-details',
             'title' => __( 'Tenancy Details', 'propertyhive' ),
@@ -1997,6 +2193,10 @@ class PH_Admin_Meta_Boxes {
             'metabox_ids' => $ids,
             'post_type' => 'tenancy'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'tenancy' )
+        {
+            $tabs['tab_tenancy_summary']['ajax_actions'] = array( '^^ph_redraw_pinned_notes_grid(\'tenancy\')' );
+        }
 
         /* TENANCY DEPOSIT SCHEME META BOXES */
         $meta_boxes = array();
@@ -2288,7 +2488,44 @@ class PH_Admin_Meta_Boxes {
                             {
                                 hash = window.location.hash.replace(/%7C/g, \'|#\');
                             }
-                            jQuery("#propertyhive_metabox_tabs a[href=\'" + hash + "\']").trigger(\'click\');
+                            jQuery("#propertyhive_metabox_tabs a[href*=\'" + hash + "\']").trigger(\'click\');
+                        }
+                    });
+
+                    jQuery(window).on(\'load\', function()
+                    {
+                        if (window.location.hash == \'\')
+                        {
+                            if ( jQuery(\'#propertyhive_metabox_tabs a\').eq(0).attr(\'data-ajax-actions\') && jQuery(\'#propertyhive_metabox_tabs a\').eq(0).attr(\'data-ajax-actions\') != \'\' )
+                            {
+                                var ajax_actions = jQuery(\'#propertyhive_metabox_tabs a\').eq(0).attr(\'data-ajax-actions\').split(\'|\');
+
+                                for ( var i in ajax_actions )
+                                {
+                                    var ajax_action = ajax_actions[i].split(\'^\');
+
+                                    jQuery(\'#\' + ajax_action[0].replace(\'get_\', \'propertyhive_\')).html(\'Loading...\');
+
+                                    if ( ajax_action[2] ) // callback
+                                    {
+                                        eval(ajax_action[2]);
+                                    }
+                                    else
+                                    {
+                                        var data = {
+                                            action: \'propertyhive_\' + ajax_action[0],
+                                            post_id: ' . $post->ID . ',
+                                            security: ajax_action[1]
+                                        }
+
+                                        jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) 
+                                        {
+                                            jQuery(\'#\' + ajax_action[0].replace(\'get_\', \'propertyhive_\')).html(response);
+                                            activateTipTip();
+                                        }, \'html\');
+                                    }
+                                }
+                            }
                         }
                     });
                     
