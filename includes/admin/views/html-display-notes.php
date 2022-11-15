@@ -12,6 +12,11 @@ $args = array(
 	)
 );
 
+if ( isset($_POST['pinned']) && (int)$_POST['pinned'] == 1 )
+{
+	$args['search'] = '"pinned";s:1:"1"';
+}
+
 $notes = get_comments( $args );
 
 $pinned_notes = array();
@@ -256,10 +261,10 @@ if ($section != 'enquiry')
 		}
 	}
 	?>
-	<li id="no_notes" style="text-align:center;<?php echo (!empty($note_output)) ? 'display:none;' : '';  ?>"><?php echo __( 'There are no notes to display', 'propertyhive' ); ?></li>
+	<li id="no_notes" style="text-align:center;<?php echo (!empty($note_output)) ? 'display:none;' : '';  ?>"><?php if ( isset($_POST['pinned']) && (int)$_POST['pinned'] == 1 ) { echo __( 'There are no pinned notes to display', 'propertyhive' ); }else{ echo __( 'There are no notes to display', 'propertyhive' ); } ?></li>
 </ul>
 
-
+<?php if ( !isset($_POST['pinned']) ) { ?>
 <div class="add_note">
 	<h4><?php _e( 'Add Note', 'propertyhive' ); ?></h4>
 	<p>
@@ -271,3 +276,4 @@ if ($section != 'enquiry')
 		<a href="#" class="add_note button" data-section="<?php echo $section; ?>"><?php _e( 'Add', 'propertyhive' ); ?></a>
 	</p>
 </div>
+<?php } ?>
