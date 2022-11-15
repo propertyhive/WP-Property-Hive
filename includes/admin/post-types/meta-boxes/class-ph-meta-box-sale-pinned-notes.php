@@ -11,9 +11,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * PH_Meta_Box_Pinned_Notes
+ * PH_Meta_Box_Sale_Pinned_Notes
  */
-class PH_Meta_Box_Pinned_Notes {
+class PH_Meta_Box_Sale_Pinned_Notes {
 
     /**
      * Output the metabox
@@ -21,8 +21,8 @@ class PH_Meta_Box_Pinned_Notes {
     public static function output( $post ) {
         global $wpdb, $propertyhive, $post;
 
-       // $section = get_post_type($post->ID);
+        $section = 'sale';
 
-        //echo '<div class="propertyhive-pinned-notes-container" id="propertyhive_pinned_notes_container">' . __( 'Loading', 'propertyhive' ) . '...</div>';
+        echo '<div class="propertyhive-pinned-notes-container" id="propertyhive_' . $section . '_pinned_notes_container">' . __( 'Loading', 'propertyhive' ) . '...</div>';
     }
 }
