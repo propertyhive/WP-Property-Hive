@@ -374,13 +374,16 @@ class PH_Property {
             }
             else
             {
-                $price = '';
-
                 // Price Details
-                $price .= $this->get_formatted_commercial_price();
+                $price = $this->get_formatted_commercial_price();
+
+                if ( $price != '' ) { $price = '<span class="commercial-price">' . $price . '</span>'; }
 
                 // Rent Details
                 $rent = $this->get_formatted_commercial_rent();
+
+                if ( $rent != '' ) { $rent = '<span class="commercial-rent">' . $rent . '</span>'; }
+
                 if ( $price != '' && $rent != '' )
                 {
                     $price .= '<br>';
