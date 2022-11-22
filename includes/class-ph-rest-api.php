@@ -195,6 +195,9 @@ class PH_Rest_Api {
 										{
 											$images_array[] = array(
 												'url' => $image_url['url'],
+												'large' => $image_url['url'],
+												'medium' => $image_url['url'],
+												'thumbnail' => $image_url['url'],
 											);
 										}
 									}
@@ -207,8 +210,15 @@ class PH_Rest_Api {
 										$image_url = wp_get_attachment_url($image_id);
 										if ($image_url !== false)
 										{
+											$large_image = wp_get_attachment_image_src( $image_id, 'large' );
+											$medium_image = wp_get_attachment_image_src( $image_id, 'medium' );
+											$thumbnail_image = wp_get_attachment_image_src( $image_id, 'thumbnail' );
+
 											$images_array[] = array(
 												'url' => $image_url,
+												'large' => ( $large_image !== FALSE ? $large_image[0] : $image_url ),
+												'medium' => ( $medium_image !== FALSE ? $medium_image[0] : $image_url ),
+												'thumbnail' => ( $thumbnail_image !== FALSE ? $thumbnail_image[0] : $image_url ),
 											);
 										}
 									}
@@ -230,6 +240,9 @@ class PH_Rest_Api {
 										{
 											$floorplans_array[] = array(
 												'url' => $floorplan_url['url'],
+												'large' => $floorplan_url['url'],
+												'medium' => $floorplan_url['url'],
+												'thumbnail' => $floorplan_url['url'],
 											);
 										}
 									}
@@ -242,8 +255,15 @@ class PH_Rest_Api {
 										$floorplan_url = wp_get_attachment_url($floorplan_id);
 										if ($floorplan_url !== false)
 										{
+											$large_image = wp_get_attachment_image_src( $floorplan_id, 'large' );
+											$medium_image = wp_get_attachment_image_src( $floorplan_id, 'medium' );
+											$thumbnail_image = wp_get_attachment_image_src( $floorplan_id, 'thumbnail' );
+
 											$floorplans_array[] = array(
 												'url' => $floorplan_url,
+												'large' => ( $large_image !== FALSE ? $large_image[0] : $floorplan_url ),
+												'medium' => ( $medium_image !== FALSE ? $medium_image[0] : $floorplan_url ),
+												'thumbnail' => ( $thumbnail_image !== FALSE ? $thumbnail_image[0] : $floorplan_url ),
 											);
 										}
 									}
