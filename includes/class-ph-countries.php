@@ -210,6 +210,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'GI' => array(
+				'name' => 'Gibraltar',
+				'currency_code' => 'GBP',
+				'currency_symbol' => '&pound;',
+				'currency_prefix' => true
+			),
 			'GR' => array(
 				'name' => 'Greece',
 				'currency_code' => 'EUR',
