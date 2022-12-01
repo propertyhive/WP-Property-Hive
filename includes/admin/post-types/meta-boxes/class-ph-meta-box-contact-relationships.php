@@ -487,6 +487,8 @@ class PH_Meta_Box_Contact_Relationships {
                             </script>';
                         }
 
+                        do_action('propertyhive_contact_applicant_requirements_residential_sales_details_fields', $thepostid, $key);
+
                         echo '</div>';
 
                         echo '<div class="propertyhive-applicant-residential-lettings-details-' . $key . '">';
@@ -535,6 +537,8 @@ class PH_Meta_Box_Contact_Relationships {
                             </select>
                             
                         </p>';
+
+                        do_action('propertyhive_contact_applicant_requirements_residential_lettings_details_fields', $thepostid, $key);
 
                         echo '</div>';
 
@@ -609,6 +613,8 @@ class PH_Meta_Box_Contact_Relationships {
                             ?>
                         </select></p>
                     <?php
+
+                            do_action('propertyhive_contact_applicant_requirements_residential_details_fields', $thepostid, $key);
 
                         echo '</div>'; // end 'propertyhive-applicant-residential-details-' . $key
 
@@ -742,6 +748,8 @@ class PH_Meta_Box_Contact_Relationships {
                             ?>
                         </select></p>
                     <?php
+
+                            do_action('propertyhive_contact_applicant_requirements_commercial_details_fields', $thepostid, $key);
 
                         echo '</div>'; // end 'propertyhive-applicant-commercial-details-' . $key
 
