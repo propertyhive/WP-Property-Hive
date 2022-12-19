@@ -9,6 +9,7 @@ class PH_Elementor {
 	public function __construct()
 	{
 		add_action( 'plugins_loaded', array( $this, 'setup_propertyhive_elementor_functionality' ) );
+		add_action( 'elementor/query/onmarketpropertyquery', array( $this, 'elementor_query_on_market_only' ) );
 	}
 
 	public function setup_propertyhive_elementor_functionality()
@@ -27,6 +28,14 @@ class PH_Elementor {
 		    // Widgets
 		    add_action( 'init', array( $this, 'register_widgets' ) );
 		}
+	}
+
+	public function elementor_query_on_market_only( $query )
+	{
+		PH()->query->property_query( $query );
+
+		// Set the custom post type 
+		$query->set( 'post_type', [ 'property' ] );
 	}
 
 	public function load_elementor_scripts()
