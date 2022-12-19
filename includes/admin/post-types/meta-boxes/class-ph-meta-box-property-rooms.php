@@ -72,7 +72,7 @@ class PH_Meta_Box_Property_Rooms {
                                 'label' => __( 'Description', 'propertyhive' ),
                                 'desc_tip' => false,
                                 'class' => '',
-                                'value' => get_post_meta($post->ID, '_room_description_' . $i, TRUE),
+                                'value' => html_entity_decode(get_post_meta($post->ID, '_room_description_' . $i, TRUE)),
                                 'custom_attributes' => array(
                                     'style' => 'width:100%;'
                                 )
