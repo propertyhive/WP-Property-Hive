@@ -3645,6 +3645,8 @@ class PH_AJAX {
             $body = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $body);
             $body = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $body);
 
+            $body = html_entity_decode($body);
+
             $body = apply_filters( 'appraisal_owner_booking_confirmation_email_body', $body, $post_id );
 
             $from = get_option('propertyhive_email_from_address', '');
@@ -4200,6 +4202,8 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
 
+            $body = html_entity_decode($body);
+
             $body = apply_filters( 'viewing_applicant_booking_confirmation_email_body', $body, $post_id, $property_id );
 
             $from = $property->office_email_address;
@@ -4302,6 +4306,8 @@ class PH_AJAX {
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+
+            $body = html_entity_decode($body);
 
             $body = apply_filters( 'viewing_owner_booking_confirmation_email_body', $body, $post_id, $property_id );
 
@@ -4428,6 +4434,8 @@ class PH_AJAX {
             $body = str_replace('[applicant_details]', $applicant_details, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+
+            $body = html_entity_decode($body);
 
             $body = apply_filters( 'viewing_attending_negotiator_booking_confirmation_email_body', $body, $post_id, $property_id );
 
