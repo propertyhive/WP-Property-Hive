@@ -3385,6 +3385,22 @@ class PH_AJAX {
 
                 $department = get_post_meta( $post_id, '_department', TRUE );
 
+                $reference_number = '';
+                if ( get_option( 'propertyhive_auto_incremental_reference_numbers' ) == 'yes' )
+                {
+                    $next = get_option( 'propertyhive_auto_incremental_next', '' );
+                    if ( $next == '' || (int)$next == 0 )
+                    {
+                        $next = 1;
+                    }
+                    $reference_number = $next;
+
+                    $next_auto_increment = $next + 1;
+
+                    update_option( 'propertyhive_auto_incremental_next', $next_auto_increment );
+                }
+                update_post_meta( $property_post_id, '_reference_number', $reference_number );
+
                 update_post_meta( $property_post_id, '_address_name_number', get_post_meta( $post_id, '_address_name_number', TRUE ) );
                 update_post_meta( $property_post_id, '_address_street', get_post_meta( $post_id, '_address_street', TRUE ) );
                 update_post_meta( $property_post_id, '_address_two', get_post_meta( $post_id, '_address_two', TRUE ) );
