@@ -168,6 +168,12 @@ class PH_Countries {
 				'currency_symbol' => '$',
 				'currency_prefix' => true
 			),
+			'CO' => array(
+				'name' => 'Colombia',
+				'currency_code' => 'COP',
+				'currency_symbol' => '$',
+				'currency_prefix' => true
+			),
 			'HR' => array(
 				'name' => 'Croatia',
 				'currency_code' => 'HRK',
