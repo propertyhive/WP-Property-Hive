@@ -95,6 +95,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Run confirmation emails through html_entity_decode
 * HTML decode description textarea values
 * Use auto-incrementing reference number when instructing appraisal
+* Added Colombia as country
 
 = 1.5.44 - 2022-12-06 =
 * Added spans around output commercial price and rent so they can be styled
