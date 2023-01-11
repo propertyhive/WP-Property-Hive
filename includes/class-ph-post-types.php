@@ -950,6 +950,10 @@ class PH_Post_types {
             return;
         }
 
+        if ( get_option('propertyhive_module_disabled_viewings', '') == 'yes' ) {
+            return;
+        }
+
         $viewing_ids = array();
 
         switch ( $post->post_type )
