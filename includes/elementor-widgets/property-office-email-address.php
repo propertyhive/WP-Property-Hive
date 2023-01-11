@@ -26,7 +26,7 @@ class Elementor_Property_Office_Email_Address_Widget extends \Elementor\Widget_B
 		return [ 'property hive', 'propertyhive', 'property', 'office' ];
 	}
 
-	protected function _register_controls() {
+	protected function register_controls() {
 
 		$this->start_controls_section(
 			'style_section',

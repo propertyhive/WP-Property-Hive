@@ -26,7 +26,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		return [ 'property hive', 'propertyhive', 'property', 'tab', 'tabs', 'tabbed' ];
 	}
 
-	protected function _register_controls() {
+	protected function register_controls() {
 
 		$this->start_controls_section(
 			'section_tabs',

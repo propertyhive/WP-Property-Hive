@@ -26,7 +26,7 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 		return [ 'property hive', 'propertyhive', 'property', 'virtual tour' ];
 	}
 
-	protected function _register_controls() {
+	protected function register_controls() {
 
 		$this->start_controls_section(
 			'style_section',

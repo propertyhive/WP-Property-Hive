@@ -122,7 +122,7 @@ class PH_Elementor {
 			{
 				require_once( $widget_dir . "/" . sanitize_title($widget) . ".php" );
 				$class_name = '\Elementor_' . str_replace(" ", "_", $widget) . '_Widget';
-				\Elementor\Plugin::instance()->widgets_manager->register_widget_type( new $class_name() );
+				\Elementor\Plugin::instance()->widgets_manager->register( new $class_name() );
 			}
 		}
 	}

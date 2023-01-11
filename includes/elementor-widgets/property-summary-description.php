@@ -26,7 +26,7 @@ class Elementor_Property_Summary_Description_Widget extends \Elementor\Widget_Ba
 		return [ 'property hive', 'propertyhive', 'property', 'summary', 'description', 'excerpt' ];
 	}
 
-	protected function _register_controls() {
+	protected function register_controls() {
 
 		$this->start_controls_section(
 			'style_section',

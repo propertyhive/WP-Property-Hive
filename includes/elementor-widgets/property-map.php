@@ -26,7 +26,7 @@ class Elementor_Property_Map_Widget extends \Elementor\Widget_Base {
 		return [ 'property hive', 'propertyhive', 'property', 'map', 'location', 'google map' ];
 	}
 
-	protected function _register_controls() {
+	protected function register_controls() {
 
 		$this->start_controls_section(
 			'settings_section',

@@ -26,7 +26,7 @@ class Elementor_Property_Features_Widget extends \Elementor\Widget_Base {
 		return [ 'property hive', 'propertyhive', 'property', 'features', 'key', 'bullet' ];
 	}
 
-	protected function _register_controls() {
+	protected function register_controls() {
 
 		$this->start_controls_section(
 			'style_section',
