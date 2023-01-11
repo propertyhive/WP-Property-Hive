@@ -26,7 +26,7 @@ class Elementor_Property_Office_Telephone_Number_Widget extends \Elementor\Widge
 		return [ 'property hive', 'propertyhive', 'property', 'office' ];
 	}
 
-	protected function _register_controls() {
+	protected function register_controls() {
 
 		$this->start_controls_section(
 			'style_section',

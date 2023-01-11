@@ -26,7 +26,7 @@ class Elementor_Property_Negotiator_Email_Address_Widget extends \Elementor\Widg
 		return [ 'property hive', 'propertyhive', 'property', 'negotiator' ];
 	}
 
-	protected function _register_controls() {
+	protected function register_controls() {
 
 		$this->start_controls_section(
 			'style_section',
