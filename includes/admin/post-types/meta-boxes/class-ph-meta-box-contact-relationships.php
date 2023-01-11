@@ -1090,12 +1090,15 @@ class PH_Meta_Box_Contact_Relationships {
                     $applicant_profile['rent_frequency'] = ph_clean($_POST['_applicant_rent_frequency_' . $i]);
 
                     $price_actual = $rent; // Used for ordering properties. Stored in pcm
-                    switch ($_POST['_applicant_rent_frequency_' . $i])
+                    if ( !empty($rent) )
                     {
-                        case "pw": { $price_actual = ($rent * 52) / 12; break; }
-                        case "pcm": { $price_actual = $rent; break; }
-                        case "pq": { $price_actual = ($rent * 4) / 52; break; }
-                        case "pa": { $price_actual = ($rent / 52); break; }
+                        switch ($_POST['_applicant_rent_frequency_' . $i])
+                        {
+                            case "pw": { $price_actual = ($rent * 52) / 12; break; }
+                            case "pcm": { $price_actual = $rent; break; }
+                            case "pq": { $price_actual = ($rent * 4) / 52; break; }
+                            case "pa": { $price_actual = ($rent / 52); break; }
+                        }
                     }
                     $applicant_profile['max_price_actual'] = $price_actual;
                 }
