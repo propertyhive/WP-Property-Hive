@@ -68,7 +68,14 @@ class PH_Admin_Assets {
             in_array( $screen->id, array( 'property', 'contact' ) ) 
         )
 	    {
-		    wp_enqueue_style( 'propertyhive_fancybox_css', PH()->plugin_url() . '/assets/css/jquery.fancybox.css', array(), '3.5.7' );
+            if ( apply_filters( 'propertyhive_fancybox_version', 4 ) == 3 )
+            {
+    		    wp_enqueue_style( 'propertyhive_fancybox_css', PH()->plugin_url() . '/assets/css/jquery.fancybox.css', array(), '3.5.7' );
+            }
+            else
+            {
+                wp_enqueue_style( 'propertyhive_fancybox_css', PH()->plugin_url() . '/assets/css/fancybox.css', array(), '4.0.31' );
+            }
 	    }
 
         /*if ( in_array( $screen->id, array( 'dashboard' ) ) ) {
@@ -196,7 +203,14 @@ class PH_Admin_Assets {
             in_array( $screen->id, array( 'property', 'contact' ) ) 
         )
         {
-		    wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/jquery.fancybox.js', array('jquery'), '3.5.7' );
+            if ( apply_filters( 'propertyhive_fancybox_version', 4 ) == 3 )
+            {
+                wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/jquery.fancybox.js', array('jquery'), '3.5.7' );
+            }
+            else
+            {
+                wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/fancybox.umd.js', array( 'jquery' ), '4.0.31' );
+        }
 	    }
 
         if ( in_array( $screen->id, array( 'property' ) ) )

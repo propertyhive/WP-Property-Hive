@@ -57,8 +57,16 @@ class PH_Frontend_Scripts {
 		// Register any scripts for later use, or used as dependencies
 		wp_register_script( 'jquery-cookie', $assets_path . 'js/jquery-cookie/jquery.cookie' . $suffix . '.js', array( 'jquery' ), '1.3.1', true );
 
-		wp_register_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.5.7', true );
-		wp_register_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css', array(), '3.5.7' );
+		if ( apply_filters( 'propertyhive_fancybox_version', 4 ) == 3 )
+		{
+			wp_register_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.5.7', true );
+			wp_register_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css', array(), '3.5.7' );
+		}
+		else
+		{
+			wp_register_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/fancybox.umd.js', array( 'jquery' ), '4.0.31', true );
+			wp_register_style( 'propertyhive_fancybox_css', $assets_path . 'css/fancybox' . $suffix . '.css', array(), '4.0.31' );
+		}
 
 		wp_register_script( 'tiny_slider', $assets_path . 'js/tiny-slider/tiny-slider.js', array( 'jquery' ), '2.9.4', true );
 		wp_register_script( 'propertyhive_carousel', $assets_path . 'js/frontend/carousel.js', array( 'jquery' ), PH_VERSION, true );

@@ -773,7 +773,14 @@ jQuery( function($){
     {
         e.preventDefault();
 
-        $.fancybox.close();
+        if ( typeof Fancybox !== 'undefined' ) 
+        {
+            Fancybox.close();
+        }
+        else
+        {
+            $.fancybox.close();
+        }
     });
 
     $( document ).on('click', '.propertyhive-lightbox-buttons a.button-prev', function(e)
@@ -851,58 +858,125 @@ function ph_open_details_lightbox(post_id, section)
 {
     ph_lightbox_post_id = post_id;
 
-    jQuery.fancybox.close();
+    if ( typeof Fancybox !== 'undefined' ) 
+    {
+        Fancybox.close();
+    }
+    else
+    {
+        jQuery.fancybox.close();
+    }
 
-    jQuery.fancybox.open({
-        src  : ajaxurl + '?action=propertyhive_get_' + section + '_lightbox&post_id=' + ph_lightbox_post_id,
-        type : 'ajax',
-        beforeLoad: function()
+    if ( typeof Fancybox !== 'undefined' ) 
+    {
+        Fancybox.show([{
+            src  : ajaxurl + '?action=propertyhive_get_' + section + '_lightbox&post_id=' + ph_lightbox_post_id,
+            type : 'ajax'
+        }],
         {
-            ph_lightbox_open = true;
-        },
-        afterShow: function()
-        {
-            // hide/show next/prev buttons
-            var found_current = false;
-            var previous_exist = false;
-            var next_exist = false;
-            jQuery('a[data-' + section + '-id]').each(function()
-            {
-                var post_id = jQuery(this).attr('data-' + section + '-id');
-
-                if ( found_current )
+            on: {
+                reveal: function()
                 {
-                    next_exist = true;
-                }
-
-                if ( post_id == ph_lightbox_post_id )
+                    ph_lightbox_open = true;
+                },
+                done: function()
                 {
-                    // this is the lightbox being viewed
-                    found_current = true;
-                }
-                else
-                {
-                    if ( !found_current )
+                    // hide/show next/prev buttons
+                    var found_current = false;
+                    var previous_exist = false;
+                    var next_exist = false;
+                    jQuery('a[data-' + section + '-id]').each(function()
                     {
-                        previous_exist = true;
-                    }
-                }
-            });
+                        var post_id = jQuery(this).attr('data-' + section + '-id');
 
-            if ( previous_exist )
-            {
-                jQuery('.propertyhive-lightbox-buttons a.button-prev').show();
+                        if ( found_current )
+                        {
+                            next_exist = true;
+                        }
+
+                        if ( post_id == ph_lightbox_post_id )
+                        {
+                            // this is the lightbox being viewed
+                            found_current = true;
+                        }
+                        else
+                        {
+                            if ( !found_current )
+                            {
+                                previous_exist = true;
+                            }
+                        }
+                    });
+
+                    if ( previous_exist )
+                    {
+                        jQuery('.propertyhive-lightbox-buttons a.button-prev').show();
+                    }
+                    if ( next_exist )
+                    {
+                        jQuery('.propertyhive-lightbox-buttons a.button-next').show();
+                    }
+                },
+                destroy: function()
+                {
+                    ph_lightbox_open = false;
+                }
             }
-            if ( next_exist )
+        });
+    }
+    else
+    {
+        jQuery.fancybox.open({
+            src  : ajaxurl + '?action=propertyhive_get_' + section + '_lightbox&post_id=' + ph_lightbox_post_id,
+            type : 'ajax',
+            beforeLoad: function()
             {
-                jQuery('.propertyhive-lightbox-buttons a.button-next').show();
+                ph_lightbox_open = true;
+            },
+            afterShow: function()
+            {
+                // hide/show next/prev buttons
+                var found_current = false;
+                var previous_exist = false;
+                var next_exist = false;
+                jQuery('a[data-' + section + '-id]').each(function()
+                {
+                    var post_id = jQuery(this).attr('data-' + section + '-id');
+
+                    if ( found_current )
+                    {
+                        next_exist = true;
+                    }
+
+                    if ( post_id == ph_lightbox_post_id )
+                    {
+                        // this is the lightbox being viewed
+                        found_current = true;
+                    }
+                    else
+                    {
+                        if ( !found_current )
+                        {
+                            previous_exist = true;
+                        }
+                    }
+                });
+
+                if ( previous_exist )
+                {
+                    jQuery('.propertyhive-lightbox-buttons a.button-prev').show();
+                }
+                if ( next_exist )
+                {
+                    jQuery('.propertyhive-lightbox-buttons a.button-next').show();
+                }
+            },
+            beforeClose: function()
+            {
+                ph_lightbox_open = false;
             }
-        },
-        beforeClose: function()
-        {
-            ph_lightbox_open = false;
-        }
-    });
+        });
+    }
 }
 
 // VIEWINGS //
