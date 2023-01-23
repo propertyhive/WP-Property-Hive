@@ -149,7 +149,7 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 										<?php endforeach; ?>
 									</select>
 								<?php elseif ( ! empty( $field['type'] ) && 'checkbox' === $field['type'] ) : ?>
-									<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="1" class="<?php echo esc_attr( $field['class'] ); ?>" <?php checked( (int) get_user_meta( $user->ID, $key, true ), 1, true ); ?> />
+									<input type="checkbox" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="1" class="<?php echo isset($field['class']) ? esc_attr( $field['class'] ) : ''; ?>" <?php checked( (int) get_user_meta( $user->ID, $key, true ), 1, true ); ?> />
 								<?php elseif ( ! empty( $field['type'] ) && 'color' === $field['type'] ) : ?>
 									<input type="color" name="<?php echo esc_attr( $key ); ?>" id="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $this->get_user_meta( $user->ID, $key ) != '' ? $this->get_user_meta( $user->ID, $key ) : ( isset( $field['default'] ) ? $field['default'] : '' ) ); ?>" class="<?php echo esc_attr( $field['class'] ); ?>" />
 								<?php elseif ( ! empty( $field['type'] ) && 'button' === $field['type'] ) : ?>
