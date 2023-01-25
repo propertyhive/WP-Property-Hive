@@ -60,6 +60,13 @@ class PH_Frontend_Scripts {
 		wp_register_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.5.7', true );
 		wp_register_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css', array(), '3.5.7' );
 
+		//wp_register_script( 'propertyhive_slick', $assets_path . 'js/slick/slick.min.js', array( 'jquery' ), '1.8.1', true );
+		//wp_register_style( 'propertyhive_slick_css', $assets_path . 'js/slick/slick.css', array(), '1.8.1' );
+		wp_register_style( 'owl_carousel_css', $assets_path . 'js/owlcarousel/assets/owl.carousel.min.css', array(), '2.3.4' );
+		wp_register_style( 'owl_carousel_theme_css', $assets_path . 'js/owlcarousel/assets/owl.theme.default.min.css', array(), '2.3.4' );
+		wp_register_script( 'owl_carousel', $assets_path . 'js/owlcarousel/owl.carousel.min.js', array( 'jquery' ), '2.3.4', true );
+		wp_register_script( 'propertyhive_carousel', $assets_path . 'js/frontend/carousel.js', array( 'jquery' ), PH_VERSION, true );
+
 		if ( get_option('propertyhive_lettings_fees_display_search_results', '') == 'yes' )
 		{
 			wp_enqueue_script( 'propertyhive_fancybox' );

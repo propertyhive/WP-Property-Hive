@@ -151,7 +151,18 @@ class PH_Shortcodes {
 			'pagination'        => '',
 			'show_order'        => '',
 			'show_result_count' => '',
+			'carousel' 			=> '',
 		), $atts, 'properties' );
+
+		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+		{
+			//wp_enqueue_script( 'propertyhive_slick' );
+			//wp_enqueue_style( 'propertyhive_slick_css' );
+			wp_enqueue_style( 'owl_carousel_css' );
+			wp_enqueue_style( 'owl_carousel_theme_css' );
+			wp_enqueue_script( 'owl_carousel' );
+			wp_enqueue_script( 'propertyhive_carousel' );
+		}
 
 		$meta_query = array(
 			array(
@@ -500,6 +511,8 @@ class PH_Shortcodes {
 
 		if ( $properties->have_posts() ) : ?>
 
+			<?php if ( isset($atts['carousel']) && !empty($atts['carousel']) ) { ?><div class="propertyhive-carousel"><?php } ?>
+
 			<?php propertyhive_property_loop_start(); ?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -509,6 +522,8 @@ class PH_Shortcodes {
 				<?php endwhile; // end of the loop. ?>
 
 			<?php propertyhive_property_loop_end(); ?>
+
+			<?php if ( isset($atts['carousel']) && !empty($atts['carousel']) ) { ?></div><?php } ?>
 
 		<?php else: ?>
 
