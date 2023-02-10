@@ -1475,7 +1475,7 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
                     OR
                     (ph_property_filter_meta_address_concatenated.meta_value LIKE $1)
                     OR 
-                    (ph_property_filter_meta_reference_number.meta_value = '" . esc_sql($_GET['s']) . "')
+                    (ph_property_filter_meta_reference_number.meta_value LIKE '" . esc_sql($_GET['s']) . "%')
                 )", 
                 $where 
             );
