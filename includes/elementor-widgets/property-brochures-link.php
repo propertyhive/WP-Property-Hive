@@ -36,6 +36,15 @@ class Elementor_Property_Brochures_Link_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'label',
+			[
+				'label' => __( 'Label', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::TEXT,
+				'default' => __( 'Brochure', 'propertyhive' ),
+			]
+		);
+
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			[
@@ -136,6 +145,8 @@ class Elementor_Property_Brochures_Link_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
+		$label = isset($settings['label']) && !empty($settings['label']) ? $settings['label'] : __( 'Brochure', 'propertyhive' );
+
 		if ( get_option('propertyhive_brochures_stored_as', '') == 'urls' )
         {
         	$brochure_urls = $property->brochure_urls;
@@ -145,7 +156,7 @@ class Elementor_Property_Brochures_Link_Widget extends \Elementor\Widget_Base {
 			{
 				foreach ( $brochure_urls as $brochure )
 				{
-					echo '<a href="' . $brochure['url'] . '" target="_blank" rel="nofollow">' . __( 'Brochure', 'propertyhive' ) . '</a>';
+					echo '<a href="' . $brochure['url'] . '" target="_blank" rel="nofollow">' . $label . '</a>';
 				}
 			}
         }
@@ -157,7 +168,7 @@ class Elementor_Property_Brochures_Link_Widget extends \Elementor\Widget_Base {
 			{
 				foreach ( $brochure_attachment_ids as $attachment_id )
 				{
-					echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'Brochure', 'propertyhive' ) . '</a>';
+					echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . $label . '</a>';
 				}
 			}
 		}
