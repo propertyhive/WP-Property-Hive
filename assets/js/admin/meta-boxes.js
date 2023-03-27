@@ -727,6 +727,32 @@ jQuery( function($){
 
         return false;
     });
+
+    $('.postbox').on( 'click', 'a[name=\'export_action\'][id^=\'export-\']', function(e) 
+    {
+        e.preventDefault();
+
+        var record_ids = [];
+
+        $(this).parent().parent().parent().find('a[data-viewing-id]').each(function()
+        {
+            record_ids.push( parseInt($(this).attr('data-viewing-id')) );
+        });
+        $(this).parent().parent().parent().find('a[data-offer-id]').each(function()
+        {
+            record_ids.push( parseInt($(this).attr('data-offer-id')) );
+        });
+        $(this).parent().parent().parent().find('a[data-sale-id]').each(function()
+        {
+            record_ids.push( parseInt($(this).attr('data-sale-id')) );
+        });
+
+        var new_location = window.location.href;
+        new_location = new_location.split("#");
+        new_location = new_location[0];
+
+        window.location.href = new_location + '&sub_grid=' + $(this).attr('id').replace("export-", "") + '&record_ids=' + record_ids.join("|")
+    });
     
     // Multiselect
     $(".propertyhive_meta_box select.multiselect").chosen();
