@@ -52,7 +52,7 @@ class PH_Post_types {
 		//$permalinks = get_option( 'propertyhive_permalinks' );
 
         register_taxonomy( 'availability',
-            'property',
+            apply_filters( 'propertyhive_taxonomy_objects_availability', array( 'property' ) ),
             array(
                 'label'                 => __( 'Availabilities', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -65,20 +65,23 @@ class PH_Post_types {
         );
 
 		register_taxonomy( 'property_type',
-	        array( 'property', 'appraisal' ),
-	        array(
-                'label'                 => __( 'Property Types', 'propertyhive' ),
-	            'hierarchical' 			=> true,
-	            'show_ui' 				=> false,
-	            'show_in_nav_menus' 	=> false,
-	            'query_var' 			=> is_admin(),
-	            'rewrite'				=> false,
-	            'public'                => true
-	        )
+	        apply_filters( 'propertyhive_taxonomy_objects_property_type', array( 'property', 'appraisal' ) ),
+            apply_filters(
+                'propertyhive_taxonomy_args_property_type',
+    	        array(
+                    'label'                 => __( 'Property Types', 'propertyhive' ),
+    	            'hierarchical' 			=> true,
+    	            'show_ui' 				=> false,
+    	            'show_in_nav_menus' 	=> false,
+    	            'query_var' 			=> is_admin(),
+    	            'rewrite'				=> false,
+    	            'public'                => true
+    	        )
+            )
 	    );
 
         register_taxonomy( 'commercial_property_type',
-            array( 'property', 'appraisal' ),
+            apply_filters( 'propertyhive_taxonomy_objects_commercial_property_type', array( 'property', 'appraisal' ) ),
             array(
                 'label'                 => __( 'Commercial Property Types', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -91,7 +94,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'location',
-            'property',
+            apply_filters( 'propertyhive_taxonomy_objects_location', array( 'property' ) ),
             array(
                 'label'                 => __( 'Locations', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -104,7 +107,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'parking',
-            array( 'property', 'appraisal' ),
+            apply_filters( 'propertyhive_taxonomy_objects_parking', array( 'property', 'appraisal' ) ),
             array(
                 'label'                 => __( 'Parking', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -117,7 +120,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'outside_space',
-            array( 'property', 'appraisal' ),
+            apply_filters( 'propertyhive_taxonomy_objects_outside_space', array( 'property', 'appraisal' ) ),
             array(
                 'label'                 => __( 'Outside Spaces', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -130,7 +133,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'price_qualifier',
-            'property',
+            apply_filters( 'propertyhive_taxonomy_objects_price_qualifier', array( 'property' ) ),
             array(
                 'label'                 => __( 'Price Qualifiers', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -143,7 +146,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'tenure',
-            'property',
+            apply_filters( 'propertyhive_taxonomy_objects_tenure', array( 'property' ) ),
             array(
                 'label'                 => __( 'Tenures', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -156,7 +159,7 @@ class PH_Post_types {
         );
 
         register_taxonomy( 'commercial_tenure',
-            'property',
+            apply_filters( 'propertyhive_taxonomy_objects_commercial_tenure', array( 'property' ) ),
             array(
                 'label'                 => __( 'Commercial Tenures', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -169,7 +172,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'sale_by',
-            'property',
+            apply_filters( 'propertyhive_taxonomy_objects_sale_by', array( 'property' ) ),
             array(
                 'label'                 => __( 'Sale By', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -182,7 +185,7 @@ class PH_Post_types {
         );
         
         register_taxonomy( 'furnished',
-            array( 'property', 'appraisal' ),
+            apply_filters( 'propertyhive_taxonomy_objects_furnished', array( 'property', 'appraisal' ) ),
             array(
                 'label'                 => __( 'Furnished', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -195,7 +198,7 @@ class PH_Post_types {
         );
 
         register_taxonomy( 'marketing_flag',
-            'property',
+            apply_filters( 'propertyhive_taxonomy_objects_marketing_flag', array( 'property' ) ),
             array(
                 'label'                 => __( 'Marketing Flags', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -208,7 +211,7 @@ class PH_Post_types {
         );
 
         register_taxonomy( 'property_feature',
-            'property',
+            apply_filters( 'propertyhive_taxonomy_objects_property_feature', array( 'property' ) ),
             array(
                 'label'                 => __( 'Property Features', 'propertyhive' ),
                 'hierarchical'          => true,
@@ -221,7 +224,7 @@ class PH_Post_types {
         );
 
 		register_taxonomy( 'management_key_date_type',
-			'key_date',
+			apply_filters( 'propertyhive_taxonomy_objects_management_key_date_type', array( 'key_date' ) ),
 			array(
 				'label'                 => __( 'Management Dates', 'propertyhive' ),
 				'hierarchical'          => true,
