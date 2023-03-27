@@ -151,7 +151,15 @@ class PH_Shortcodes {
 			'pagination'        => '',
 			'show_order'        => '',
 			'show_result_count' => '',
+			'carousel' 			=> '',
 		), $atts, 'properties' );
+
+		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+		{
+			wp_enqueue_style( 'tiny_slider_css' );
+			wp_enqueue_script( 'tiny_slider' );
+			wp_enqueue_script( 'propertyhive_carousel' );
+		}
 
 		$meta_query = array(
 			array(
@@ -500,7 +508,13 @@ class PH_Shortcodes {
 
 		if ( $properties->have_posts() ) : ?>
 
-			<?php propertyhive_property_loop_start(); ?>
+			<?php 
+				ob_start();
+				propertyhive_property_loop_start(); 
+				$loop_start = ob_get_clean();
+				$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				echo $loop_start;
+			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
 
@@ -551,7 +565,15 @@ class PH_Shortcodes {
 			'pagination'        => '',
 			'show_order'        => '',
 			'show_result_count' => '',
+			'carousel' 			=> '',
 		), $atts, 'recent_properties' );
+
+		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+		{
+			wp_enqueue_style( 'tiny_slider_css' );
+			wp_enqueue_script( 'tiny_slider' );
+			wp_enqueue_script( 'propertyhive_carousel' );
+		}
 
 		$meta_query = PH()->query->get_meta_query();
 
@@ -640,7 +662,13 @@ class PH_Shortcodes {
 
 		if ( $properties->have_posts() ) : ?>
 
-			<?php propertyhive_property_loop_start(); ?>
+			<?php 
+				ob_start();
+				propertyhive_property_loop_start(); 
+				$loop_start = ob_get_clean();
+				$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				echo $loop_start;
+			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
 
@@ -694,7 +722,15 @@ class PH_Shortcodes {
 			'pagination' => '',
 			'show_order' => '',
 			'show_result_count' => '',
+			'carousel' 			=> '',
 		), $atts, 'featured_properties' );
+
+		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+		{
+			wp_enqueue_style( 'tiny_slider_css' );
+			wp_enqueue_script( 'tiny_slider' );
+			wp_enqueue_script( 'propertyhive_carousel' );
+		}
 
 		// Get which page we're currently viewing from the URL
 		$paged = max( 1, get_query_var( 'paged' ) );
@@ -879,7 +915,13 @@ class PH_Shortcodes {
 
 		if ( $properties->have_posts() ) : ?>
 
-			<?php propertyhive_property_loop_start(); ?>
+			<?php 
+				ob_start();
+				propertyhive_property_loop_start(); 
+				$loop_start = ob_get_clean();
+				$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				echo $loop_start;
+			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
 
@@ -928,7 +970,15 @@ class PH_Shortcodes {
 			'property_id'				=> '',
 			'availability_id'	=> '',
 			'no_results_output' => '',
+			'carousel' 			=> '',
 		), $atts, 'similar_properties' );
+
+		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+		{
+			wp_enqueue_style( 'tiny_slider_css' );
+			wp_enqueue_script( 'tiny_slider' );
+			wp_enqueue_script( 'propertyhive_carousel' );
+		}
 
 		if ( $atts['property_id'] == '' && isset($property->id) )
 		{
@@ -1070,7 +1120,13 @@ class PH_Shortcodes {
 
 			if ( $properties->have_posts() ) : ?>
 
-				<?php propertyhive_property_loop_start(); ?>
+				<?php 
+					ob_start();
+					propertyhive_property_loop_start(); 
+					$loop_start = ob_get_clean();
+					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+					echo $loop_start;
+				?>
 
 					<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
 
