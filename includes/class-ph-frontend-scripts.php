@@ -138,21 +138,6 @@ class PH_Frontend_Scripts {
 				'search'	=> false,
 			) ) );
 		}
-
-		if ( wp_script_is( 'propertyhive_carousel' ) ) {
-			wp_localize_script( 'propertyhive_carousel', 'propertyhive_carousel_params', apply_filters( 'propertyhive_carousel_params', array(
-				'items' => 1,
-				'controlsPosition' => 'bottom',
-				'gutter' => 20,
-				'mouseDrag' => true,
-				'controlsText' => array("Prev", "Next"),
-				'responsive' => array(
-					640 => array(
-						'items' => 3
-					)
-				)
-			) ) );
-		}
 	}
 
 	/**
