@@ -60,6 +60,10 @@ class PH_Frontend_Scripts {
 		wp_register_script( 'propertyhive_fancybox', $assets_path . 'js/fancybox/jquery.fancybox' . $suffix . '.js', array( 'jquery' ), '3.5.7', true );
 		wp_register_style( 'propertyhive_fancybox_css', $assets_path . 'css/jquery.fancybox' . $suffix . '.css', array(), '3.5.7' );
 
+		wp_register_script( 'tiny_slider', $assets_path . 'js/tiny-slider/tiny-slider.js', array( 'jquery' ), '2.9.4', true );
+		wp_register_script( 'propertyhive_carousel', $assets_path . 'js/frontend/carousel.js', array( 'jquery' ), PH_VERSION, true );
+		wp_register_style( 'tiny_slider_css', $assets_path . 'js/tiny-slider/tiny-slider.css', array(), '2.9.4' );
+
 		if ( get_option('propertyhive_lettings_fees_display_search_results', '') == 'yes' )
 		{
 			wp_enqueue_script( 'propertyhive_fancybox' );
@@ -132,6 +136,21 @@ class PH_Frontend_Scripts {
 		if ( wp_script_is( 'multiselect' ) ) {
 			wp_localize_script( 'multiselect', 'propertyhive_multiselect_params', apply_filters( 'propertyhive_multiselect_params', array(
 				'search'	=> false,
+			) ) );
+		}
+
+		if ( wp_script_is( 'propertyhive_carousel' ) ) {
+			wp_localize_script( 'propertyhive_carousel', 'propertyhive_carousel_params', apply_filters( 'propertyhive_carousel_params', array(
+				'items' => 1,
+				'controlsPosition' => 'bottom',
+				'gutter' => 20,
+				'mouseDrag' => true,
+				'controlsText' => array("Prev", "Next"),
+				'responsive' => array(
+					640 => array(
+						'items' => 3
+					)
+				)
 			) ) );
 		}
 	}
