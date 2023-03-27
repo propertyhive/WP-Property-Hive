@@ -156,6 +156,22 @@ class PH_Shortcodes {
 
 		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
 		{
+			$params = array(
+				'items' => 1,
+				'controlsPosition' => 'bottom',
+				'gutter' => 20,
+				'mouseDrag' => true,
+				'controlsText' => array("Prev", "Next"),
+				'responsive' => array(
+					640 => array(
+						'items' => $atts['columns']
+					)
+				)
+			);
+			$params = apply_filters( 'propertyhive_carousel_params', $params );
+			$params = apply_filters( 'propertyhive_properties_carousel_params', $params );
+			wp_localize_script( 'propertyhive_carousel', 'propertyhive_carousel_params', $params );
+
 			wp_enqueue_style( 'tiny_slider_css' );
 			wp_enqueue_script( 'tiny_slider' );
 			wp_enqueue_script( 'propertyhive_carousel' );
@@ -570,6 +586,22 @@ class PH_Shortcodes {
 
 		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
 		{
+			$params = array(
+				'items' => 1,
+				'controlsPosition' => 'bottom',
+				'gutter' => 20,
+				'mouseDrag' => true,
+				'controlsText' => array("Prev", "Next"),
+				'responsive' => array(
+					640 => array(
+						'items' => $atts['columns']
+					)
+				)
+			);
+			$params = apply_filters( 'propertyhive_carousel_params', $params );
+			$params = apply_filters( 'propertyhive_recent_properties_carousel_params', $params );
+			wp_localize_script( 'propertyhive_carousel', 'propertyhive_carousel_params', $params );
+
 			wp_enqueue_style( 'tiny_slider_css' );
 			wp_enqueue_script( 'tiny_slider' );
 			wp_enqueue_script( 'propertyhive_carousel' );
@@ -727,6 +759,22 @@ class PH_Shortcodes {
 
 		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
 		{
+			$params = array(
+				'items' => 1,
+				'controlsPosition' => 'bottom',
+				'gutter' => 20,
+				'mouseDrag' => true,
+				'controlsText' => array("Prev", "Next"),
+				'responsive' => array(
+					640 => array(
+						'items' => $atts['columns']
+					)
+				)
+			);
+			$params = apply_filters( 'propertyhive_carousel_params', $params );
+			$params = apply_filters( 'propertyhive_featured_properties_carousel_params', $params );
+			wp_localize_script( 'propertyhive_carousel', 'propertyhive_carousel_params', $params );
+
 			wp_enqueue_style( 'tiny_slider_css' );
 			wp_enqueue_script( 'tiny_slider' );
 			wp_enqueue_script( 'propertyhive_carousel' );
@@ -975,6 +1023,22 @@ class PH_Shortcodes {
 
 		if ( isset($atts['carousel']) && !empty($atts['carousel']) )
 		{
+			$params = array(
+				'items' => 1,
+				'controlsPosition' => 'bottom',
+				'gutter' => 20,
+				'mouseDrag' => true,
+				'controlsText' => array("Prev", "Next"),
+				'responsive' => array(
+					640 => array(
+						'items' => $atts['columns']
+					)
+				)
+			);
+			$params = apply_filters( 'propertyhive_carousel_params', $params );
+			$params = apply_filters( 'propertyhive_similar_properties_carousel_params', $params );
+			wp_localize_script( 'propertyhive_carousel', 'propertyhive_carousel_params', $params );
+			
 			wp_enqueue_style( 'tiny_slider_css' );
 			wp_enqueue_script( 'tiny_slider' );
 			wp_enqueue_script( 'propertyhive_carousel' );
