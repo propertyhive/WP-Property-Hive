@@ -52,6 +52,7 @@
             ?>
         </select>
         <input type="button" name="filter_action" id="filter-property-sales-grid" class="button" value="Filter">
+        <a href="" name="export_action" id="export-property-sales-grid" class="button">Export</a>
     </div>
     <div class='tablenav-pages one-page'>
         <span class="displaying-num"><?php echo $sales_count; ?> item<?php echo $sales_count != 1 ? 's' : ''; ?></span>
@@ -83,7 +84,7 @@
                 $edit_link = get_edit_post_link( get_the_ID() );
 
                 $column_data = array(
-                    'date' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '">' . date("jS F Y", strtotime($the_sale->_sale_date_time)) . '</a>',
+                    'date' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '" data-sale-id="' . get_the_ID() . '">' . date("jS F Y", strtotime($the_sale->_sale_date_time)) . '</a>',
                     'applicant' => $the_sale->get_applicants( true, true ),
                     'amount' => $the_sale->get_formatted_amount(),
                     'status' => __( ucwords(str_replace("_", " ", $the_sale->_status)), 'propertyhive' ),
