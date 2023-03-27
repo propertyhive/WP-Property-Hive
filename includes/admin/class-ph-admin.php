@@ -32,6 +32,7 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'preview_emails' ) );
         add_action( 'admin_init', array( $this, 'record_recently_viewed' ) );
         add_action( 'admin_init', array( $this, 'export_applicant_list' ) );
+        add_action( 'admin_init', array( $this, 'export_sub_grid' ) );
         add_action( 'admin_init', array( $this, 'check_hide_demo_data_tab' ) );
     }
 
@@ -41,6 +42,215 @@ class PH_Admin {
         {
             update_option( 'propertyhive_hide_demo_data_tab', 'yes' );
             wp_redirect( admin_url('admin.php?page=ph-settings') );
+            die();
+        }
+    }
+
+    public function export_sub_grid()
+    {
+        if ( 
+            isset($_GET['sub_grid']) && !empty(ph_clean($_GET['sub_grid']))
+        ) 
+        {
+            ob_start();
+
+            $df = fopen("php://output", 'w');
+
+            $columns = array( 'id' => __( 'ID', 'propertyhive' ) );
+
+            if ( strpos(ph_clean($_GET['sub_grid']), 'viewings') )
+            {
+                $columns['datetime'] = __( 'Date/Time', 'propertyhive' );
+                $columns['property'] = __( 'Property', 'propertyhive' );
+                //$columns['owner'] = __( 'Owner/Landlord', 'propertyhive' );
+                $columns['applicant'] = __( 'Applicant(s)', 'propertyhive' );
+                $columns['negotiator'] = __( 'Attending Negotiator(s)', 'propertyhive' );
+                $columns['status'] = __( 'Status', 'propertyhive' );
+                $columns['feedback'] = __( 'Feedback', 'propertyhive' );
+            }
+            elseif ( strpos(ph_clean($_GET['sub_grid']), 'offers') )
+            {
+                $columns['datetime'] = __( 'Date/Time', 'propertyhive' );
+                $columns['property'] = __( 'Property', 'propertyhive' );
+                //$columns['owner'] = __( 'Owner/Landlord', 'propertyhive' );
+                $columns['applicant'] = __( 'Applicant(s)', 'propertyhive' );
+                $columns['status'] = __( 'Status', 'propertyhive' );
+                $columns['amount'] = __( 'Offer Amount', 'propertyhive' );
+            }
+            elseif ( strpos(ph_clean($_GET['sub_grid']), 'sales') )
+            {
+                $columns['date'] = __( 'Date', 'propertyhive' );
+                $columns['property'] = __( 'Property', 'propertyhive' );
+                //$columns['owner'] = __( 'Owner/Landlord', 'propertyhive' );
+                $columns['applicant'] = __( 'Applicant(s)', 'propertyhive' );
+                $columns['status'] = __( 'Status', 'propertyhive' );
+                $columns['amount'] = __( 'Sale Amount', 'propertyhive' );
+            }
+
+            fputcsv($df, $columns);
+
+            if ( isset($_GET['record_ids']) && !empty(ph_clean($_GET['record_ids'])) )
+            {
+                $record_ids = explode("|", ph_clean($_GET['record_ids']));
+
+                if ( !empty($record_ids) )
+                {
+                    if ( strpos(ph_clean($_GET['sub_grid']), 'viewings') )
+                    {
+                        $args = array(
+                            'post_type' => 'viewing',
+                            'nopaging' => TRUE,
+                            'fields' => 'ids',
+                            'post__in' => $record_ids,
+                            'order' => 'ASC',
+                            'orderby' => 'meta_value',
+                            'meta_key' => '_start_date_time',
+                        );
+
+                        $records_query = new WP_Query( $args );
+
+                        if ( $records_query->have_posts() )
+                        {
+                            while ( $records_query->have_posts() )
+                            {
+                                $records_query->the_post();
+
+                                $viewing = new PH_Viewing( get_the_ID() );
+
+                                $property_id = (int)$viewing->_property_id;
+                                $property_address = '';
+                                if ( !empty($property_id) )
+                                {
+                                    $property = new PH_Property( $property_id );
+                                    $property_address = $property->get_formatted_full_address();
+                                }
+
+                                $columns = array(
+                                    get_the_ID(),
+                                    date("H:i jS F Y", strtotime($viewing->_start_date_time)),
+                                    $property_address,
+                                    str_replace("<br>", "\n", $viewing->get_applicants()),
+                                    $viewing->get_negotiators(),
+                                    str_replace("<br>", "\n", $viewing->get_status()),
+                                    $viewing->_feedback
+                                );
+
+                                fputcsv($df, $columns);
+                            }
+                        }
+                    }
+                    elseif ( strpos(ph_clean($_GET['sub_grid']), 'offers') )
+                    {
+                        $args = array(
+                            'post_type' => 'offer',
+                            'nopaging' => TRUE,
+                            'fields' => 'ids',
+                            'post__in' => $record_ids,
+                            'order' => 'ASC',
+                            'orderby' => 'meta_value',
+                            'meta_key' => '_offer_date_time',
+                        );
+
+                        $records_query = new WP_Query( $args );
+
+                        if ( $records_query->have_posts() )
+                        {
+                            while ( $records_query->have_posts() )
+                            {
+                                $records_query->the_post();
+
+                                $offer = new PH_Offer( get_the_ID() );
+
+                                $property_id = (int)$offer->_property_id;
+                                $property_address = '';
+                                if ( !empty($property_id) )
+                                {
+                                    $property = new PH_Property( $property_id );
+                                    $property_address = $property->get_formatted_full_address();
+                                }
+
+                                $columns = array(
+                                    get_the_ID(),
+                                    date("H:i jS F Y", strtotime($offer->_offer_date_time)),
+                                    $property_address,
+                                    str_replace("<br>", "\n", $offer->get_applicants()),
+                                    $offer->_status,
+                                    html_entity_decode($offer->get_formatted_amount())
+                                );
+
+                                fputcsv($df, $columns);
+                            }
+                        }
+                    }
+                    elseif ( strpos(ph_clean($_GET['sub_grid']), 'sales') )
+                    {
+                        $args = array(
+                            'post_type' => 'sale',
+                            'nopaging' => TRUE,
+                            'fields' => 'ids',
+                            'post__in' => $record_ids,
+                            'order' => 'ASC',
+                            'orderby' => 'meta_value',
+                            'meta_key' => '_sale_date_time',
+                        );
+
+                        $records_query = new WP_Query( $args );
+
+                        if ( $records_query->have_posts() )
+                        {
+                            while ( $records_query->have_posts() )
+                            {
+                                $records_query->the_post();
+
+                                $sale = new PH_Sale( get_the_ID() );
+
+                                $property_id = (int)$sale->_property_id;
+                                $property_address = '';
+                                if ( !empty($property_id) )
+                                {
+                                    $property = new PH_Property( $property_id );
+                                    $property_address = $property->get_formatted_full_address();
+                                }
+
+                                $columns = array(
+                                    get_the_ID(),
+                                    date("jS F Y", strtotime($sale->_sale_date_time)),
+                                    $property_address,
+                                    str_replace("<br>", "\n", $sale->get_applicants()),
+                                    $sale->_status,
+                                    html_entity_decode($sale->get_formatted_amount())
+                                );
+
+                                fputcsv($df, $columns);
+                            }
+                        }
+                    }
+                }
+            }
+
+            fclose($df);
+
+            $output = ob_get_clean();
+
+            $filename = sanitize_title(ph_clean($_GET['sub_grid'])) . '-' . date("YmdHis") . '.csv';
+
+            // disable caching
+            $now = gmdate("D, d M Y H:i:s");
+            header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+            header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+            header("Last-Modified: {$now} GMT");
+
+            // force download  
+            header("Content-Type: application/force-download");
+            header("Content-Type: application/octet-stream");
+            header("Content-Type: application/download");
+
+            // disposition / encoding on response body
+            header("Content-Disposition: attachment;filename={$filename}");
+            header("Content-Transfer-Encoding: binary");
+
+            echo $output;
+
             die();
         }
     }

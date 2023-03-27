@@ -564,6 +564,7 @@ class PH_Admin_Post_Types {
         $output .= $this->enquiry_status_filter();
         $output .= $this->enquiry_source_filter();
         $output .= $this->enquiry_office_filter();
+        $output .= $this->enquiry_negotiator_filter();
 
         echo apply_filters( 'propertyhive_enquiry_filters', $output );
     }
@@ -672,6 +673,20 @@ class PH_Admin_Post_Types {
         $output .= '</select>';
 
         return $output;
+    }
+
+    /**
+     * Show an enquiry negotiator filter box
+     */
+    public function enquiry_negotiator_filter() {
+        return wp_dropdown_users(array(
+            'name' => '_negotiator_id', 
+            'id' => 'dropdown_enquiry_negotiator_id',
+            'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
+            'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int) $_GET['_negotiator_id'],
+            'echo' => false,
+            'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
+        ));
     }
 
     /**
@@ -1146,7 +1161,13 @@ class PH_Admin_Post_Types {
             if ( ! empty( $_GET['_office_id'] ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_office_id',
-                    'value' => sanitize_text_field( $_GET['_office_id'] ),
+                    'value' => (int)$_GET['_office_id'],
+                );
+            }
+            if ( ! empty( $_GET['_negotiator_id'] ) ) {
+                $vars['meta_query'][] = array(
+                    'key' => '_negotiator_id',
+                    'value' => (int)$_GET['_negotiator_id'],
                 );
             }
         }
