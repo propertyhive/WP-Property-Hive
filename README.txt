@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 6.1.1
-Stable tag: 1.5.45
+Stable tag: 1.5.46
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,18 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.46 - 2023-03-27 =
+* Added ability to output properties in carousel format. To achieve this pass carousel="yes" through to any property-related shortcode
+* Added ability to export viewings, offers and sales sub grids on a property and contact record. This will export them as a CSV
+* Added negotiator filter to admin enquiry list
+* Added ability to change Elementor brochure link widget label
+* Added 'propertyhive_search_form_action' filter so search form action can be customised
+* Searching by reference number in the backend property list now does a flexible search
+* Tweaked Vimeo fancybox regex to support format https://vimeo.com/123/ABC
+* Ensured viewings related 'save_post' hook is only executed if the viewings module is enabled
+* Elementor compatibility fixes removing use of deprecated functions
+* Corrected PHP warning when saving applicant with no rent entered
 
 = 1.5.45 - 2023-01-09 =
 * Added custom query 'onmarketpropertyquery' for Elementor loops so properties can be bought in using the new Elementor Pro Loop Builder feature
