@@ -464,6 +464,8 @@ class PH_AJAX {
         $headers[] = 'Reply-To: ' . sanitize_email($from);
         $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
+        $headers = apply_filters( 'propertyhive_lost_password_email_headers', $headers );
+
         wp_mail( $to, $subject, $body, $headers );
         
         $return['success'] = true;
@@ -3661,6 +3663,8 @@ class PH_AJAX {
             $headers[] = 'Reply-To: ' . sanitize_email($from);
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
+            $headers = apply_filters( 'propertyhive_appraisal_owner_booking_confirmation_email_headers', $headers );
+
             wp_mail($to, $subject, $body, $headers);
 
             update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
@@ -4223,6 +4227,8 @@ class PH_AJAX {
             $headers[] = 'Reply-To: ' . sanitize_email($from);
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
+            $headers = apply_filters( 'propertyhive_viewing_applicant_booking_confirmation_email_headers', $headers );
+
             wp_mail($to, $subject, $body, $headers);
 
             update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
@@ -4328,6 +4334,8 @@ class PH_AJAX {
             $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
             $headers[] = 'Reply-To: ' . sanitize_email($from);
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            $headers = apply_filters( 'propertyhive_viewing_owner_booking_confirmation_email_headers', $headers );
 
             wp_mail($to, $subject, $body, $headers);
 
@@ -4456,6 +4464,8 @@ class PH_AJAX {
             $headers = array();
             $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            $headers = apply_filters( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_headers', $headers );
 
             wp_mail($to, $subject, $body, $headers);
 
