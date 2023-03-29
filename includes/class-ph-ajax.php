@@ -460,7 +460,8 @@ class PH_AJAX {
         }
 
         $headers = array();
-        $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
+        $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
+        $headers[] = 'Reply-To: ' . sanitize_email($from);
         $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
         wp_mail( $to, $subject, $body, $headers );
@@ -3656,7 +3657,8 @@ class PH_AJAX {
             }
 
             $headers = array();
-            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
+            $headers[] = 'Reply-To: ' . sanitize_email($from);
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
             wp_mail($to, $subject, $body, $headers);
@@ -4217,7 +4219,8 @@ class PH_AJAX {
             }
 
             $headers = array();
-            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
+            $headers[] = 'Reply-To: ' . sanitize_email($from);
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
             wp_mail($to, $subject, $body, $headers);
@@ -4322,7 +4325,8 @@ class PH_AJAX {
             }
 
             $headers = array();
-            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . $from . '>';
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
+            $headers[] = 'Reply-To: ' . sanitize_email($from);
             $headers[] = 'Content-Type: text/plain; charset=UTF-8';
 
             wp_mail($to, $subject, $body, $headers);
