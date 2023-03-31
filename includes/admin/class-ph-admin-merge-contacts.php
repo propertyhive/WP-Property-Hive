@@ -36,9 +36,9 @@ class PH_Admin_Merge_Contacts {
 
         <?php
 
-        if ( isset( $_GET['merge_ids'] )  && $_GET['merge_ids'] != '' )
+        if ( isset( $_GET['merge_ids'] ) && $_GET['merge_ids'] != '' )
         {
-            $ids_to_merge = explode( '|', $_GET['merge_ids'] );
+            $ids_to_merge = explode( '|', ph_clean( $_GET['merge_ids']) );
         }
 
         if ( isset( $ids_to_merge ) && count( $ids_to_merge ) > 1 )
@@ -46,7 +46,7 @@ class PH_Admin_Merge_Contacts {
             foreach ( $ids_to_merge as $i => $contact_id )
             {
                 echo '<div style="border:1px solid #CCC; padding:25px; background:#FFF; position:relative">';
-                $contact = new PH_Contact( $contact_id );
+                $contact = new PH_Contact( (int)$contact_id );
 
                 // Initialise array to hold information about each contact
                 $contact_parts = array( '<h3 style="margin:0">' . ( trim($contact->post_title) != '' ? $contact->post_title : '(' . __('Unnamed Contact', 'propertyhive' ) . ')' ) . '</h3>' ) ;
@@ -127,7 +127,7 @@ class PH_Admin_Merge_Contacts {
             ?>
             <label style="position:absolute; right:25px; top:25px;">
                 <?php echo __( 'Use as Primary Contact', 'propertyhive' ); ?>
-                <input type="radio" name="primary_merge_contact" value="<?php echo $contact_id; ?>"<?php if ( $i == 0 ) { echo ' checked'; } ?>>
+                <input type="radio" name="primary_merge_contact" value="<?php echo (int)$contact_id; ?>"<?php if ( $i == 0 ) { echo ' checked'; } ?>>
             </label>
                 <?php
 
@@ -161,7 +161,7 @@ class PH_Admin_Merge_Contacts {
 
                         var data = {
                             action:             'propertyhive_merge_contact_records',
-                            contact_ids :       '<?php echo $_GET['merge_ids']; ?>',
+                            contact_ids :       '<?php echo ph_clean($_GET['merge_ids']); ?>',
                             primary_contact_id: selected_primary,
                         };
 
