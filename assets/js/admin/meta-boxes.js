@@ -821,14 +821,17 @@ jQuery( function($){
 
     $('#tenure_id').change(function()
     {
-        if ( $(this).find('option:selected').text() == 'Leasehold' )
-        {
-            $('#leasehold_information').show();
-        }
-        else
-        {
-            $('#leasehold_information').hide();
-        }
+        $('#leasehold_information').hide();
+
+        var selected_tenure = $(this).find('option:selected').text();
+
+        $.each(propertyhive_admin_meta_boxes.leasehold_tenures, function(index, value) 
+        { 
+            if ( selected_tenure != '' && value.toLowerCase() === selected_tenure.toLowerCase() ) 
+            {
+                $('#leasehold_information').show();
+            }
+        });
     });
 
     $('#_shared_ownership').change(function()

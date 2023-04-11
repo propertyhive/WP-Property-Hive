@@ -189,7 +189,10 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         propertyhive_wp_select( $args );
 
         echo '<div id="leasehold_information"';
-        if ( $selected_name != apply_filters('propertyhive_leasehold_tenure_name', 'Leasehold') ) { echo ' style="display:none"'; }
+        if ( !in_array( strtolower($selected_name), apply_filters('propertyhive_leasehold_tenure_names', array( 'leasehold', 'share of freehold' ) ) ) )
+        { 
+            echo ' style="display:none"'; 
+        }
         echo '>';
 
         propertyhive_wp_text_input( array( 
