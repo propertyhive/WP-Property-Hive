@@ -251,6 +251,7 @@ class PH_Admin_Assets {
                 'viewing_details_meta_nonce'    => wp_create_nonce( 'viewing-details-meta-box' ),
                 'viewing_actions_nonce'         => wp_create_nonce( 'viewing-actions' ),
                 'enable_description_editor'    => apply_filters('propertyhive_enable_description_editor', false),
+                'leasehold_tenures'             => apply_filters('propertyhive_leasehold_tenure_names', array( 'leasehold', 'share of freehold' ) ),
             );
             wp_localize_script( 'propertyhive_admin_meta_boxes', 'propertyhive_admin_meta_boxes', $params );
 

@@ -812,7 +812,7 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
                     'value' => $property->tenure
                 );
 
-                if ( $property->tenure == apply_filters('propertyhive_leasehold_tenure_name', 'Leasehold') )
+                if ( in_array( strtolower($property->tenure), apply_filters('propertyhive_leasehold_tenure_names', array( 'leasehold', 'share of freehold' ) ) ) )
                 {
                     if ( $property->leasehold_years_remaining != '' )
                     {
