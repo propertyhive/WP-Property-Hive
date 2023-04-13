@@ -5089,8 +5089,9 @@ class PH_AJAX {
             {
                 $actions[] = '<a 
                         href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' ) . '" 
-                        class="button button-success"
+                        class="button button-success button-create-sale"
                         style="width:100%; margin-bottom:7px; text-align:center" 
+                        onclick="setTimeout(function() { jQuery(\'.button-create-sale\').attr(\'href\', \'#\'); jQuery(\'.button-create-sale\').attr(\'disabled\', \'disabled\'); jQuery(\'.button-create-sale\').html(\'Creating...\'); }, 50);"
                     >' . wp_kses_post( __('Create Sale', 'propertyhive') ) . '</a>';
                 $actions[] = '<a 
                     href="#action_panel_offer_withdrawn" 
