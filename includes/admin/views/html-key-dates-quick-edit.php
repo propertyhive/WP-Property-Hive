@@ -3,7 +3,7 @@
         <div class="options_group">
             <p class="form-field">
                 <label for="date_description">Description</label>
-                <input type="text" id="date_description" class="short" value="<?php echo isset( $_POST['description'] ) ? $_POST['description'] : ''; ?>">
+                <input type="text" id="date_description" class="short" value="<?php echo isset( $_POST['description'] ) ? ph_clean($_POST['description']) : ''; ?>">
             </p>
             <p class="form-field">
                 <label for="key_date_status">Status</label>
@@ -104,7 +104,7 @@
                 {
                     ?>
                     <p id="next_key_date_checkbox" class="form-field hidden">
-                        <label for="book_next_key_date"><?php echo __('Book Next ' . ( isset( $_POST['description'] ) ? $_POST['description'] : 'Key Date' ) . '?', 'propertyhive'); ?></label>
+                        <label for="book_next_key_date"><?php echo __('Book Next ' . ( isset( $_POST['description'] ) ? ph_clean($_POST['description']) : 'Key Date' ) . '?', 'propertyhive'); ?></label>
                         <input type="checkbox" id="book_next_key_date" >
                     </p>
                     <?php

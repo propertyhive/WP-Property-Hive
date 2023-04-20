@@ -2786,10 +2786,10 @@ class PH_AJAX {
                 $view_statistics = array();
             }
 
-            $date_from = isset($_POST['statistics_date_from']) ? $_POST['statistics_date_from'] : date("Y-m-d", strtotime('7 days ago'));
+            $date_from = isset($_POST['statistics_date_from']) ? ph_clean($_POST['statistics_date_from']) : date("Y-m-d", strtotime('7 days ago'));
             $date_from = strtotime($date_from);
 
-            $date_to = isset($_POST['statistics_date_to']) ? $_POST['statistics_date_to'] : date("Y-m-d");
+            $date_to = isset($_POST['statistics_date_to']) ? ph_clean($_POST['statistics_date_to']) : date("Y-m-d");
             $date_to = strtotime($date_to);
 
             $view_statistics_output = array();
