@@ -420,7 +420,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							<input type="hidden" name="page" value="ph-settings">
 							<input type="hidden" name="tab" value="email">
 							<input type="hidden" name="section" value="log">
-							<input type="hidden" name="status" value="<?php echo ( ( isset($_GET['status']) ) ? $_GET['status'] : '' ); ?>">
+							<input type="hidden" name="status" value="<?php echo ( ( isset($_GET['status']) ) ? ph_clean($_GET['status']) : '' ); ?>">
 							<select name="date_from" id="dropdown_date_from">
 								<option value="<?php echo date("Y-m-d", strtotime("-7 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-7 days")) ) { echo ' selected'; } ?>>Last 7 Days</option>
 								<option value="<?php echo date("Y-m-d", strtotime("-14 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-14 days")) ) { echo ' selected'; } ?>>Last 14 Days</option>
@@ -467,7 +467,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 								1=1 ";
 						if ( isset($_GET['status']) )
 						{
-							switch ( $_GET['status'] )
+							switch ( ph_clean($_GET['status']) )
 							{
 								case "queued": { $query .= " AND status = '' "; break; }
 								case "failed": { $query .= " AND status IN ('fail1', 'fail2') "; break; }
