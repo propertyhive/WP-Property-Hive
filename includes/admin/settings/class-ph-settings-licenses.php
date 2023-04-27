@@ -24,11 +24,14 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 */
 	public function __construct() {
 		$this->id    = 'licensekey';
-		$this->label = __( 'License Key', 'propertyhive' );
+		$this->label = __( 'Licenses', 'propertyhive' );
 
 		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
+		add_action( 'propertyhive_sections_' . $this->id, array( $this, 'output_sections' ) );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
 		add_action( 'propertyhive_settings_save_' . $this->id, array( $this, 'save' ) );
+
+		add_action( 'propertyhive_admin_field_add_ons_requiring_authorisation', array( $this, 'add_ons_requiring_authorisation' ) );
 	}
 
 	/**
@@ -40,6 +43,23 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		$sections = array(
 			'' => __( 'License Key', 'propertyhive' ),
 		);
+
+		$add_on_authorisation = get_option( 'propertyhive_add_on_authorisation', null );
+		if ( !empty($add_on_authorisation) )
+		{
+			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+			foreach ( $add_on_authorisation as $add_on => $auth_data )
+			{
+				// check plugin is active
+				if ( is_plugin_active( 'propertyhive-' . $add_on . '/propertyhive-' . $add_on . '.php' ) )
+				{
+					$sections['addonauth'] = __( 'Add On Authorisation', 'propertyhive' );
+					break;
+				}
+			}
+		}
+
 		return apply_filters( 'propertyhive_get_sections_' . $this->id, $sections );
 	}
 
@@ -54,7 +74,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
 		$output = '';
 		$input_border_color = '';
-		$renew_link = '<a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
+		$renew_link = '<a href="https://wp-property-hive.com/license-key/" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
 		$valid_license = false;
 
 		if ( is_array($license) && empty($license) && get_option( 'propertyhive_license_key', '' ) != '' )
@@ -97,7 +117,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
 					<p>Licenses are valid for 12 months from the date of purchase and exist on a per-site-basis. Should a license key not exist, your website will still function as it does now. However support will be limited and potentially slower than usual and you won’t receive updates to any purchased add ons.</p>
 
-					' . ( (!$valid_license) ? '<br><p><a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" class="button button-primary" target="_blank">Purchase License Key</a></p>' : '' ), 'propertyhive' ),
+					' . ( (!$valid_license) ? '<br><p><a href="https://wp-property-hive.com/license-key/" class="button button-primary" target="_blank">Purchase License Key</a></p>' : '' ), 'propertyhive' ),
 			),
 
 			array(
@@ -116,13 +136,68 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	}
 
 	/**
+	 * Get add on auth settings array.
+	 *
+	 * @return array
+	 */
+	public function get_licenses_add_on_authorisation_settings() {
+
+		$settings = apply_filters( 'propertyhive_add_on_authorisation_settings', array(
+
+			array( 'title' => __( 'Add On Authorisation', 'propertyhive' ), 'type' => 'title', 'id' => 'add_on_authorisation_options' ),
+
+			array(
+	            'type' => 'add_ons_requiring_authorisation',
+	        ),
+
+			array( 'type' => 'sectionend', 'id' => 'add_on_authorisation_options' ),
+
+		) );
+
+		return apply_filters( 'propertyhive_get_settings_' . $this->id, $settings );
+	}
+
+	public function add_ons_requiring_authorisation()
+	{
+		// get list of add ons 
+		$add_on_authorisation = get_option( 'propertyhive_add_on_authorisation', null );
+
+		if ( !empty($add_on_authorisation) )
+		{
+			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+			foreach ( $add_on_authorisation as $add_on => $auth_data )
+			{
+				// check plugin is active
+				if ( is_plugin_active( 'propertyhive-' . $add_on . '/propertyhive-' . $add_on . '.php' ) )
+				{
+					echo $add_on;
+					var_dump($auth_data);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Output the settings.
 	 */
 	public function output() {
-		global $current_section;
+		global $current_section, $hide_save_button;
 
-		$settings = $this->get_settings();
-		PH_Admin_Settings::output_fields( $settings );
+        if ( $current_section ) 
+        {
+        	switch ($current_section)
+            {
+            	case "addonauth": { $hide_save_button = true; $settings = $this->get_licenses_add_on_authorisation_settings(); break; }
+                default: { die("Unknown setting section"); }
+            }
+        }
+        else
+        {
+        	$settings = $this->get_settings(); 
+        }
+
+        PH_Admin_Settings::output_fields( $settings );
 	}
 
 	/**
