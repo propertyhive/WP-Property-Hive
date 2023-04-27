@@ -677,6 +677,46 @@ class PH_Admin {
                 }
             }
 
+            if ( 
+                !isset($_GET['page'])
+                ||
+                (
+                    isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed' && sanitize_title($_GET['page']) != 'ph-settings'
+                )
+            )
+            {
+                $show_notice = false;
+
+                $add_on_authorisation = get_option( 'propertyhive_add_on_authorisation', null );
+                if ( !empty($add_on_authorisation) )
+                {
+                    include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+                    foreach ( $add_on_authorisation as $add_on => $auth_data )
+                    {
+                        // check plugin is active
+                        if ( is_plugin_active( 'propertyhive-' . $add_on . '/propertyhive-' . $add_on . '.php' ) )
+                        {
+                            $show_notice = true;
+                            break;
+                        }
+                    }
+                }
+
+                if ( $show_notice )
+                {
+                    echo "<div class=\"notice notice-info\" id=\"ph_notice_unauthorised_add_ons\">
+                        <p>
+                            " . __( 'You have Property Hive add ons active that aren\'t yet authorised for this domain', 'propertyhive' ) . "
+                        </p>
+                        <p>
+                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=licensekey&section=addonauth') . "\" class=\"button-primary\">Go To Add On Authorisation Settings</a>
+                        </p>
+                        
+                    </div>";
+                }
+            }
+
             $screen = get_current_screen();
             if ( in_array( $screen->id, array( 'dashboard' ) ) )
             {
