@@ -659,7 +659,10 @@ class PH_Admin {
                 }
                 else
                 {
-                    
+                    if ( isset($license['expires_at']) && strtotime($license['expires_at']) < time() )
+                    {
+                        $output = __( 'Your Property Hive license key has expired.', 'propertyhive' );
+                    }
                 }
 
                 if ( $output != '' )
