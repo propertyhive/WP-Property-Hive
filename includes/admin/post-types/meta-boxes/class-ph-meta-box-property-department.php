@@ -146,13 +146,16 @@ class PH_Meta_Box_Property_Department {
             ';
         }
 
+        $departments_with_residential_details = apply_filters( 'propertyhive_departments_with_residential_details', array( 'residential-sales', 'residential-lettings' ) );
+
         echo '
                 var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
+                var departments_with_residential_details = ' . json_encode($departments_with_residential_details) . ';
                  
                 jQuery(\'#propertyhive-property-\' + selectedDepartment + \'-details\').show();
                 if ( ph_custom_departments[selectedDepartment] ) { jQuery(\'#propertyhive-property-\' + ph_custom_departments[selectedDepartment].based_on + \'-details\').show(); }
 
-                if ( selectedDepartment.indexOf(\'residential\') != -1 || ( ph_custom_departments[selectedDepartment] && ph_custom_departments[selectedDepartment].based_on.indexOf(\'residential\') != -1 ) )
+                if ( jQuery.inArray( selectedDepartment, departments_with_residential_details ) != -1 || ( ph_custom_departments[selectedDepartment] && jQuery.inArray( ph_custom_departments[selectedDepartment].based_on, departments_with_residential_details ) != -1 ) )
                 {
                     jQuery(\'#propertyhive-property-residential-details\').show();
                 }

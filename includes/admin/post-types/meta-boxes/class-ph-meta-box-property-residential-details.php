@@ -248,12 +248,12 @@ class PH_Meta_Box_Property_Residential_Details {
         global $wpdb;
 
         $department = get_post_meta($post_id, '_department', TRUE);
+
+        $departments_with_residential_details = apply_filters( 'propertyhive_departments_with_residential_details', array( 'residential-sales', 'residential-lettings' ) );
         
         if ( 
-            $department == 'residential-lettings' || 
-            ph_get_custom_department_based_on( $department ) == 'residential-lettings' ||
-            $department == 'residential-sales' || 
-            ph_get_custom_department_based_on( $department ) == 'residential-sales'
+            in_array( $department, $departments_with_residential_details ) || 
+            in_array( ph_get_custom_department_based_on( $department ), $departments_with_residential_details )
         )
         {
             $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bedrooms']));
