@@ -355,7 +355,19 @@ class PH_Rest_Api {
 				        $return = apply_filters( 'propertyhive_rest_api_property_field_callback', $return, $field_name, $property );
 				        return $return;
 		            },
-		            'update_callback' => null,
+		            'update_callback' => function ( $value, $object, $field_name ) 
+		            {
+		            	if ( taxonomy_exists($field_name) )
+		            	{
+		            		wp_set_post_terms( $object->ID, $value, $field_name );
+		            	}
+		            	else
+		            	{
+							update_post_meta( $object->ID, '_' . $field_name, $value );
+						}
+
+						do_action( 'propertyhive_rest_api_property_field_update_callback', $value, $object, $field_name );
+					},
 		            'schema' => null,
 		        )
 		    );
