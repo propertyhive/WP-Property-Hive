@@ -874,7 +874,6 @@ class PH_Query {
 			        	{
 			        		$address_keywords[] = str_replace("-", " ", ph_clean($address_keyword));
 			        	}
-
 						if ( strpos( $address_keyword, '.' ) !== FALSE )
 						{
 							$address_keywords[] = str_replace(".", "", ph_clean($address_keyword));
@@ -882,6 +881,10 @@ class PH_Query {
 						if ( stripos( $address_keyword, 'st ' ) !== FALSE )
 						{
 							$address_keywords[] = str_ireplace("st ", "st. ", ph_clean($address_keyword));
+						}
+						if ( strpos( $address_keyword, '\'' ) !== FALSE )
+						{
+							$address_keywords[] = str_replace("'", "", ph_clean($address_keyword));
 						}
 
 						if ( strpos( $address_keyword, ', ' ) !== FALSE )
