@@ -90,6 +90,6 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			echo '</style>';
 		}*/
 
-		echo do_shortcode('[property_search_form]');
+		echo do_shortcode('[property_search_form id="' . ( ( isset($settings['id']) && !empty($settings['id']) ) ? $settings['id'] : 'default' ) . '"]');
 	}
 }
