@@ -116,6 +116,7 @@ class PH_Elementor {
 	public function register_widgets()
 	{
 		$widgets = array(
+			'Property Search Form',
 			'Property Tabbed Details',
 			'Property Price',
 			'Property Images',
@@ -155,6 +156,8 @@ class PH_Elementor {
 			'Property Negotiator Email Address',
 			'Property Negotiator Photo',
 			'Back To Search',
+			'Property Search Result Count',
+			'Property Search Order',
 		);
 
 		$widgets = apply_filters( 'propertyhive_elementor_widgets', $widgets );
