@@ -10,6 +10,27 @@ class PH_Elementor {
 	{
 		add_action( 'plugins_loaded', array( $this, 'setup_propertyhive_elementor_functionality' ) );
 		add_action( 'elementor/query/onmarketpropertyquery', array( $this, 'elementor_query_on_market_only' ) );
+		add_filter( 'elementor/query/query_args', array( $this, 'elementor_query_args' ), 10, 2 );
+	}
+
+	public function elementor_query_args( $query_vars, $widget )
+	{
+		// Check to see if this is the right Widget.
+		$settings = $widget->get_data( 'settings' );
+
+		if ( isset($settings['post_query_query_id']) && $settings['post_query_query_id'] == 'onmarketpropertyquery' )
+		{
+			$ordering = PH()->query->get_search_results_ordering_args();
+
+			$query_vars['orderby'] = $ordering['orderby'] . ' post_title';
+			$query_vars['order'] = $ordering['order'];
+			if ( isset( $ordering['meta_key'] ) )
+			{
+				$query_vars['meta_key'] = $ordering['meta_key'];
+			}
+		}
+
+		return $query_vars;
 	}
 
 	public function setup_propertyhive_elementor_functionality()
@@ -36,6 +57,30 @@ class PH_Elementor {
 
 		// Set the custom post type 
 		$query->set( 'post_type', [ 'property' ] );
+
+		// ensure a department is set as not set by default from property_query
+		$meta_query = $query->get('meta_query');
+
+		$new_meta_query = $meta_query;
+		$department_found = false;
+		foreach ( $meta_query as $key => $value )
+		{
+			if ( isset($value['key']) && $value['key'] == '_department' )
+			{
+				$department_found = true;
+				break;
+			}
+		}
+
+		if ( !$department_found )
+		{
+			$new_meta_query[] = array(
+				'key' => '_department',
+				'value' => get_option( 'propertyhive_primary_department', 'residential-sales' )
+			);
+		}
+
+		$query->set( 'meta_query', $new_meta_query );
 	}
 
 	public function load_elementor_scripts()
