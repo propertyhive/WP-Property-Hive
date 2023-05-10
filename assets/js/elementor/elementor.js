@@ -14,4 +14,9 @@ jQuery( window ).on( 'elementor/frontend/init', function()
 	{
          initialize_property_street_view();
     });
+
+    elementorFrontend.hooks.addAction( 'frontend/element_ready/property-search-form.default', function($scope, jQuery)
+    {
+         toggleDepartmentFields();
+    });
 });
