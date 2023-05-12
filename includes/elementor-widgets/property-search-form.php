@@ -29,10 +29,10 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 	protected function register_controls() {
 
 		$this->start_controls_section(
-			'style_section',
+			'section_content',
 			[
 				'label' => __( 'Search Form', 'propertyhive' ),
-				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
 			]
 		);
 
@@ -43,35 +43,15 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		}
 
 		$this->add_control(
-			'id',
+			'form_id',
 			[
 				'type' => \Elementor\Controls_Manager::TEXT,
-				'label' => esc_html__( 'Form ID', 'textdomain' ),
-				'placeholder' => esc_html__( 'e.g. default', 'textdomain' ),
+				'label' => esc_html__( 'Form ID', 'propertyhive' ),
+				'placeholder' => esc_html__( 'e.g. default', 'propertyhive' ),
 				'default' => 'default',
 				'description' => $description
 			]
 		);
-
-		/*$this->add_control(
-			'display',
-			[
-				'label' => __( 'Display As', 'plugin-domain' ),
-				'type' => \Elementor\Controls_Manager::CHOOSE,
-				'options' => [
-					'list' => [
-						'title' => __( 'List', 'plugin-domain' ),
-						'icon' => 'fa fa-list',
-					],
-					'buttons' => [
-						'title' => __( 'Buttons', 'plugin-domain' ),
-						'icon' => 'fa fa-ellipsis-h',
-					],
-				],
-				'default' => 'list',
-				'toggle' => false,
-			]
-		);*/
 
 		$this->end_controls_section();
 
@@ -81,15 +61,6 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 
 		$settings = $this->get_settings_for_display();
 
-		/*if ( isset($settings['display']) && $settings['display'] == 'buttons' )
-		{
-			echo '<style type="text/css">';
-			echo '.property_actions ul { list-style-type:none; margin:0; padding:0; }';
-			echo '.property_actions ul li { display:inline-block; }';
-			echo '.property_actions ul li a { display:block; }';
-			echo '</style>';
-		}*/
-
-		echo do_shortcode('[property_search_form id="' . ( ( isset($settings['id']) && !empty($settings['id']) ) ? $settings['id'] : 'default' ) . '"]');
+		echo do_shortcode('[property_search_form id="' . ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) . '"]');
 	}
 }
