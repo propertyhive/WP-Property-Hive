@@ -169,8 +169,8 @@
                 }
             }
             ?>
-            <button type="button" id="<?php echo $_POST['date_post_id']; ?>" class="button button-primary save-quick-edit">Update</button>&nbsp;
-            <button type="button" id="<?php echo $_POST['date_post_id']; ?>" class="button cancel-quick-edit">Cancel</button>
+            <button type="button" id="<?php echo (int)$_POST['date_post_id']; ?>" class="button button-primary save-quick-edit">Update</button>&nbsp;
+            <button type="button" id="<?php echo (int)$_POST['date_post_id']; ?>" class="button cancel-quick-edit">Cancel</button>
         </div>
     </div>
 </td>
