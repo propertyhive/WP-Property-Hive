@@ -127,6 +127,21 @@ class Elementor_Property_Bedrooms_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'icon_color',
+			[
+				'label' => __( 'Icon Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'scheme' => [
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-widget-bedrooms i' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
 		$this->end_controls_section();
 
 	}

@@ -126,6 +126,21 @@ class Elementor_Property_Tenure_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'icon_color',
+			[
+				'label' => __( 'Icon Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'scheme' => [
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-widget-tenure i' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
 		$this->end_controls_section();
 
 	}
