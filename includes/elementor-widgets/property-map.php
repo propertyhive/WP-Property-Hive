@@ -15,7 +15,7 @@ class Elementor_Property_Map_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-map-marked-alt';
+		return 'eicon-google-maps';
 	}
 
 	public function get_categories() {

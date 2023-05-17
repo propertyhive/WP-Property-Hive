@@ -15,7 +15,7 @@ class Elementor_Property_Negotiator_Email_Address_Widget extends \Elementor\Widg
 	}
 
 	public function get_icon() {
-		return 'fa fa-user';
+		return 'eicon-person';
 	}
 
 	public function get_categories() {

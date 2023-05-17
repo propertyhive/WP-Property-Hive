@@ -15,7 +15,7 @@ class Elementor_Property_Negotiator_Photo_Widget extends \Elementor\Widget_Base 
 	}
 
 	public function get_icon() {
-		return 'fa fa-user';
+		return 'eicon-person';
 	}
 
 	public function get_categories() {

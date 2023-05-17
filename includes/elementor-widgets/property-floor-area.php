@@ -15,7 +15,7 @@ class Elementor_Property_Floor_Area_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fas fa-ruler-combined';
+		return 'eicon-meta-data';
 	}
 
 	public function get_categories() {
@@ -107,15 +107,15 @@ class Elementor_Property_Floor_Area_Widget extends \Elementor\Widget_Base {
 				'options' => [
 					'left' => [
 						'title' => __( 'Left', 'propertyhive' ),
-						'icon' => 'fa fa-align-left',
+						'icon' => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => __( 'Center', 'propertyhive' ),
-						'icon' => 'fa fa-align-center',
+						'icon' => 'eicon-text-align-center',
 					],
 					'right' => [
 						'title' => __( 'Right', 'propertyhive' ),
-						'icon' => 'fa fa-align-right',
+						'icon' => 'eicon-text-align-right',
 					],
 				],
 				'default' => 'left',

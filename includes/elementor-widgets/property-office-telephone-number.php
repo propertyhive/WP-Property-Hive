@@ -15,7 +15,7 @@ class Elementor_Property_Office_Telephone_Number_Widget extends \Elementor\Widge
 	}
 
 	public function get_icon() {
-		return 'fa fa-building';
+		return 'eicon-info';
 	}
 
 	public function get_categories() {

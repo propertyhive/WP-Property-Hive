@@ -15,7 +15,7 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-hand-pointer';
+		return 'eicon-button';
 	}
 
 	public function get_categories() {
@@ -44,11 +44,11 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 				'options' => [
 					'list' => [
 						'title' => __( 'List', 'plugin-domain' ),
-						'icon' => 'fa fa-list',
+						'icon' => 'eicon-editor-list-ul',
 					],
 					'buttons' => [
 						'title' => __( 'Buttons', 'plugin-domain' ),
-						'icon' => 'fa fa-ellipsis-h',
+						'icon' => 'eicon-button',
 					],
 				],
 				'default' => 'list',

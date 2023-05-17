@@ -15,7 +15,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-magnifying-glass';
+		return 'eicon-search';
 	}
 
 	public function get_categories() {

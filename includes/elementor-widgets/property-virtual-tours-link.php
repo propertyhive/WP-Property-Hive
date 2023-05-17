@@ -15,7 +15,7 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
 	}
 
 	public function get_icon() {
-		return 'fa fa-video';
+		return 'eicon-video-camera';
 	}
 
 	public function get_categories() {
@@ -69,15 +69,15 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
 				'options' => [
 					'left' => [
 						'title' => __( 'Left', 'propertyhive' ),
-						'icon' => 'fa fa-align-left',
+						'icon' => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => __( 'Center', 'propertyhive' ),
-						'icon' => 'fa fa-align-center',
+						'icon' => 'eicon-text-align-center',
 					],
 					'right' => [
 						'title' => __( 'Right', 'propertyhive' ),
-						'icon' => 'fa fa-align-right',
+						'icon' => 'eicon-text-align-right',
 					],
 				],
 				'default' => 'center',

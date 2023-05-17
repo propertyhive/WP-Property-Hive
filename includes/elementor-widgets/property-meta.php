@@ -15,7 +15,7 @@ class Elementor_Property_Meta_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-list';
+		return 'eicon-bullet-list';
 	}
 
 	public function get_categories() {

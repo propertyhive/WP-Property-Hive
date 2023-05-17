@@ -15,7 +15,7 @@ class Elementor_Property_Enquiry_Form_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-keyboard';
+		return 'eicon-form-horizontal';
 	}
 
 	public function get_categories() {

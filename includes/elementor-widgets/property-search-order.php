@@ -15,7 +15,7 @@ class Elementor_Property_Search_Order_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-arrow-up-1-9';
+		return 'eicon-sort-amount-desc';
 	}
 
 	public function get_categories() {

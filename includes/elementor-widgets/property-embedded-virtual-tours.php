@@ -15,7 +15,7 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 	}
 
 	public function get_icon() {
-		return 'fas fa-video';
+		return 'eicon-video-camera';
 	}
 
 	public function get_categories() {
