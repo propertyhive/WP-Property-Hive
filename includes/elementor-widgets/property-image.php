@@ -15,7 +15,7 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-image';
+		return 'eicon-image';
 	}
 
 	public function get_categories() {

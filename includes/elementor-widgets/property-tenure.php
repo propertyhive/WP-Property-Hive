@@ -15,7 +15,7 @@ class Elementor_Property_Tenure_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fas fa-info';
+		return 'eicon-meta-data';
 	}
 
 	public function get_categories() {
@@ -64,6 +64,33 @@ class Elementor_Property_Tenure_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'text_align',
+			[
+				'label' => __( 'Alignment', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => __( 'Left', 'propertyhive' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => __( 'Center', 'propertyhive' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => __( 'Right', 'propertyhive' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'left',
+				'toggle' => true,
+				'selectors' => [
+					'{{WRAPPER}} .elementor-widget-tenure' => 'text-align: {{VALUE}}',
+				],
+			]
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -95,33 +122,6 @@ class Elementor_Property_Tenure_Widget extends \Elementor\Widget_Base {
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-widget-tenure' => 'color: {{VALUE}}',
-				],
-			]
-		);
-
-		$this->add_control(
-			'text_align',
-			[
-				'label' => __( 'Alignment', 'propertyhive' ),
-				'type' => \Elementor\Controls_Manager::CHOOSE,
-				'options' => [
-					'left' => [
-						'title' => __( 'Left', 'propertyhive' ),
-						'icon' => 'fa fa-align-left',
-					],
-					'center' => [
-						'title' => __( 'Center', 'propertyhive' ),
-						'icon' => 'fa fa-align-center',
-					],
-					'right' => [
-						'title' => __( 'Right', 'propertyhive' ),
-						'icon' => 'fa fa-align-right',
-					],
-				],
-				'default' => 'left',
-				'toggle' => true,
-				'selectors' => [
-					'{{WRAPPER}} .elementor-widget-tenure' => 'text-align: {{VALUE}}',
 				],
 			]
 		);

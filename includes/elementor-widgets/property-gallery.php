@@ -15,7 +15,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
     }
 
     public function get_icon() {
-        return 'fa fa-images';
+        return 'eicon-gallery-grid';
     }
 
     public function get_categories() {

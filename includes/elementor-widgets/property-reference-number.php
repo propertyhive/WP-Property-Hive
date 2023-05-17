@@ -15,7 +15,7 @@ class Elementor_Property_Reference_Number_Widget extends \Elementor\Widget_Base 
 	}
 
 	public function get_icon() {
-		return 'fa fa-i-cursor';
+		return 'eicon-meta-data';
 	}
 
 	public function get_categories() {

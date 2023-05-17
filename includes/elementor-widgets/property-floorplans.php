@@ -15,7 +15,7 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-border-all';
+		return 'eicon-document-file';
 	}
 
 	public function get_categories() {

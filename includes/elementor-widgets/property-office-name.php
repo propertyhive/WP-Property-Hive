@@ -15,7 +15,7 @@ class Elementor_Property_Office_Name_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-building';
+		return 'eicon-info';
 	}
 
 	public function get_categories() {

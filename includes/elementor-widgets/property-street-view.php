@@ -15,7 +15,7 @@ class Elementor_Property_Street_View_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-street-view';
+		return 'eicon-google-maps';
 	}
 
 	public function get_categories() {

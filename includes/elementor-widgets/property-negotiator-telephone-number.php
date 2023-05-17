@@ -15,7 +15,7 @@ class Elementor_Property_Negotiator_Telephone_Number_Widget extends \Elementor\W
 	}
 
 	public function get_icon() {
-		return 'fa fa-user';
+		return 'eicon-person';
 	}
 
 	public function get_categories() {

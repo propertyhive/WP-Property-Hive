@@ -15,7 +15,7 @@ class Elementor_Property_Bedrooms_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fa fa-bed';
+		return 'eicon-meta-data';
 	}
 
 	public function get_categories() {
@@ -62,6 +62,33 @@ class Elementor_Property_Bedrooms_Widget extends \Elementor\Widget_Base {
 				'label' => __( 'After', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::TEXT,
 				'default' => __( 'Bedrooms', 'propertyhive' ),
+			]
+		);
+
+		$this->add_control(
+			'text_align',
+			[
+				'label' => __( 'Alignment', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => __( 'Left', 'propertyhive' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => __( 'Center', 'propertyhive' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => __( 'Right', 'propertyhive' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'left',
+				'toggle' => true,
+				'selectors' => [
+					'{{WRAPPER}} .elementor-widget-bedrooms' => 'text-align: {{VALUE}}',
+				],
 			]
 		);
 

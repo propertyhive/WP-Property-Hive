@@ -15,7 +15,7 @@ class Elementor_Property_Summary_Description_Widget extends \Elementor\Widget_Ba
 	}
 
 	public function get_icon() {
-		return 'fa fa-paragraph';
+		return 'eicon-text';
 	}
 
 	public function get_categories() {

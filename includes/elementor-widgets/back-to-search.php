@@ -15,7 +15,7 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_icon() {
-		return 'fas fa-arrow-left';
+		return 'eicon-arrow-left';
 	}
 
 	public function get_categories() {
@@ -62,7 +62,7 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Label', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::TEXT,
-				'default' => __( 'Back To Search', 'plugin-domain' ),
+				'default' => __( 'Back To Search', 'propertyhive' ),
 			]
 		);
 
@@ -99,15 +99,15 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 				'options' => [
 					'left' => [
 						'title' => __( 'Left', 'propertyhive' ),
-						'icon' => 'fa fa-align-left',
+						'icon' => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => __( 'Center', 'propertyhive' ),
-						'icon' => 'fa fa-align-center',
+						'icon' => 'eicon-text-align-center',
 					],
 					'right' => [
 						'title' => __( 'Right', 'propertyhive' ),
-						'icon' => 'fa fa-align-right',
+						'icon' => 'eicon-text-align-right',
 					],
 				],
 				'default' => 'left',
