@@ -74,24 +74,27 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
+		$image_number = 1;
 		if ( isset($settings['image_number']) && $settings['image_number'] != '' && is_numeric($settings['image_number']) )
 		{
-			if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
-            {
-            	$photos = $property->photos;
-            	if ( isset($photos[$settings['image_number']-1]) )
-            	{
-            		echo '<img src="' . $photos[$settings['image_number']-1]['url'] . '" alt="">';
-            	}
-            }
-            else
-            {
-				$gallery_attachment_ids = $property->get_gallery_attachment_ids();
+			$image_number = (int)$settings['image_number'];
+		}
 
-				if ( isset($gallery_attachment_ids[$settings['image_number']-1]) )
-				{
-					echo wp_get_attachment_image( $gallery_attachment_ids[$settings['image_number']-1], $settings['image_size'] );
-				}
+		if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
+        {
+        	$photos = $property->_photo_urls;
+        	if ( isset($photos[$image_number-1]) )
+        	{
+        		echo '<img src="' . $photos[$image_number-1]['url'] . '" alt="">';
+        	}
+        }
+        else
+        {
+			$gallery_attachment_ids = $property->get_gallery_attachment_ids();
+
+			if ( isset($gallery_attachment_ids[$image_number-1]) )
+			{
+				echo wp_get_attachment_image( $gallery_attachment_ids[$image_number-1], $settings['image_size'] );
 			}
 		}
 	}
