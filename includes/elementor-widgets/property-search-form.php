@@ -55,6 +55,123 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
+		$this->start_controls_section(
+			'label_style_section',
+			[
+				'label' => __( 'Labels', 'propertyhive' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'label_typography',
+				'label' => __( 'Label Typography', 'propertyhive' ),
+				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'selector' => '{{WRAPPER}} .property-search-form label',
+			]
+		);
+
+		$this->add_control(
+			'label_color',
+			[
+				'label' => __( 'Label Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'scheme' => [
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form label' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'label_padding',
+			[
+				'label' => __( 'Label Padding', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form label' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'label_margin',
+			[
+				'label' => __( 'Label Margin', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form label' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'button_style_section',
+			[
+				'label' => __( 'Search Button', 'propertyhive' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'button_typography',
+				'label' => __( 'Button Typography', 'propertyhive' ),
+				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'selector' => '{{WRAPPER}} .property-search-form input[type=\'submit\']',
+			]
+		);
+
+		$this->add_control(
+			'button_color',
+			[
+				'label' => __( 'Button Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'scheme' => [
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form input[type=\'submit\']' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'button_padding',
+			[
+				'label' => __( 'Button Padding', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form input[type=\'submit\']' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'button_margin',
+			[
+				'label' => __( 'Button Margin', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form input[type=\'submit\']' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->end_controls_section();
 	}
 
 	protected function render() {
