@@ -147,6 +147,15 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_group_control(
+			\Elementor\Group_Control_Background::get_type(),
+			[
+				'name' => 'button_background',
+				'types' => [ 'classic', 'gradient' ],
+				'selector' => '{{WRAPPER}} .property-search-form input[type=\'submit\']',
+			]
+		);
+
 		$this->add_control(
 			'button_padding',
 			[
