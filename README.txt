@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 6.2
-Stable tag: 1.5.49
+Tested up to: 6.2.2
+Stable tag: 1.5.50
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,15 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.50 - 2023-05-22 =
+* Added more styling options to Elementor Search Form widget
+* Added new icon colour setting to Elementor widgets where applicable to give icon a different colour to the text
+* Added align options to multiple Elementor widgets
+* Corrected missing Elementor icons throughout all widgets
+* Ensure carousel is initialised in Elementor editor when using a property shortcode with carousel attribute applied
+* Corrected issue with Elementor Image widget not pulling in photo when images are set to be stored as URLs
+* Declared compatibility for WordPress 6.2.2
 
 = 1.5.49 - 2023-05-16 =
 * Added improved support for building search results pages using Elementor and the Elementor Pro Loop Builder. Use query ID 'onmarketpropertyquery'
