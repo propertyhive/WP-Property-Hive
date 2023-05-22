@@ -89,6 +89,23 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
+			'label_width',
+			[
+				'label' => esc_html__( 'Label Width', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => '',
+				'options' => [
+					'' => esc_html__( 'Default', 'propertyhive' ),
+					'block' => esc_html__( 'Full Width (100%)', 'propertyhive' ),
+					'inline' => esc_html__( 'Inline (auto)', 'propertyhive' ),
+				],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form label' => 'display: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
 			'label_padding',
 			[
 				'label' => __( 'Label Padding', 'propertyhive' ),
