@@ -108,6 +108,12 @@ class PH_Rest_Api {
 	{
 		$field_array = array(
 			'department',
+			'address_street',
+			'address_two',
+			'address_three',
+			'address_four',
+			'address_postcode',
+			'address_country',
 			'latitude',
 			'longitude',
 			'price_actual',
