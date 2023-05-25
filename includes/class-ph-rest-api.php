@@ -369,7 +369,207 @@ class PH_Rest_Api {
 		            	}
 		            	else
 		            	{
-							update_post_meta( $object->ID, '_' . $field_name, $value );
+		            		switch ( $field_name )
+		            		{
+		            			case "price":
+		            			{
+		            				$property = new PH_Property($object->ID);
+
+		            				$price = '';
+		            				if ( $value != '' )
+		            				{
+		            					$price = preg_replace("/[^0-9.]/", '', $value);
+		            				}
+
+		            				if ( isset($property->_department) && $property->_department == 'residential-lettings' )
+		            				{
+		            					update_post_meta( $object->ID, '_rent', $price );
+		            				}
+		            				else
+		            				{
+		            					update_post_meta( $object->ID, '_price', $price );
+		            				}
+
+		            				if ( $price != '' )
+		            				{
+			            				// Store price in common currency (GBP) used for ordering
+							            $ph_countries = new PH_Countries();
+							            $ph_countries->update_property_price_actual( $object->ID );
+							        }
+
+		            				break;
+		            			}
+		            			case "features":
+		            			{
+		            				if ( is_array($value) && !empty($value) )
+		            				{
+		            					update_post_meta( $object->ID, '_features', count($value) );
+
+		            					$i = 0;
+		            					foreach ( $value as $feature )
+		            					{
+		            						update_post_meta( $object->ID, '_feature_' . $i, $feature );
+		            						
+		            						++$i;
+		            					}
+		            				}
+		            				break;
+		            			}
+		            			case "images":
+		            			case "floorplans":
+		            			case "brochures":
+		            			case "epcs":
+		            			{
+		            				if ( !function_exists('media_handle_upload') ) {
+										require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+										require_once(ABSPATH . "wp-admin" . '/includes/file.php');
+										require_once(ABSPATH . "wp-admin" . '/includes/media.php');
+									}
+
+		            				$hive_field_name = trim($field_name, 's');
+		            				if ( $hive_field_name == 'image' ) { $hive_field_name = 'photo'; }
+
+		            				if ( is_array($value) && !empty($value) )
+		            				{
+		            					if ( get_option('propertyhive_' . $field_name . '_stored_as', '') == 'urls' )
+										{
+											$media_items = array();
+											foreach ( $value as $media_item )
+											{
+												if ( 
+													isset($media_item['url']) &&
+													(
+														substr( strtolower($media_item['url']), 0, 2 ) == '//' || 
+														substr( strtolower($media_item['url']), 0, 4 ) == 'http'
+													)
+												)
+												{
+													$media_items[] = array(
+														'url' => $media_item['url'],
+													);
+												}
+											}
+											update_post_meta( $object->ID, '_' . $hive_field_name . '_urls', $media_items );
+										}
+										else
+										{
+											$media_ids = array();
+											$previous_media_ids = get_post_meta( $object->ID, '_' . $hive_field_name . 's', TRUE );
+											foreach ( $value as $media_item )
+											{
+												if ( 
+													isset($media_item['url']) &&
+													(
+														substr( strtolower($media_item['url']), 0, 2 ) == '//' || 
+														substr( strtolower($media_item['url']), 0, 4 ) == 'http'
+													)
+												)
+												{
+													// This is a URL
+													$url = $media_item['url'];
+													$description = '';
+
+													$filename = basename( $url );
+
+													// Check, based on the URL, whether we have previously imported this media
+													$imported_previously = false;
+													$imported_previously_id = '';
+													if ( is_array($previous_media_ids) && !empty($previous_media_ids) )
+													{
+														foreach ( $previous_media_ids as $previous_media_id )
+														{
+															if ( 
+																get_post_meta( $previous_media_id, '_imported_url', TRUE ) == $url
+															)
+															{
+																$imported_previously = true;
+																$imported_previously_id = $previous_media_id;
+																break;
+															}
+														}
+													}
+													
+													if ($imported_previously)
+													{
+														$media_ids[] = $imported_previously_id;
+													}
+													else
+													{
+													    $tmp = download_url( $url );
+													    $file_array = array(
+													        'name' => basename( $url ),
+													        'tmp_name' => $tmp
+													    );
+
+													    // Check for download errors
+													    if ( is_wp_error( $tmp ) ) 
+													    {
+													        // ERROR: $tmp->get_error_message();
+													    }
+													    else
+													    {
+														    $id = media_handle_sideload( $file_array, $object->ID, $description, array('post_title' => $filename) );
+
+														    // Check for handle sideload errors.
+														    if ( is_wp_error( $id ) ) 
+														    {
+														        @unlink( $file_array['tmp_name'] );
+														        
+														        // ERROR: $id->get_error_message();
+														    }
+														    else
+														    {
+														    	$media_ids[] = $id;
+
+														    	update_post_meta( $id, '_imported_url', $url);
+														    }
+														}
+													}
+												}
+											}
+											update_post_meta( $object->ID, '_' . $hive_field_name . 's', $media_ids );
+
+											// Loop through $previous_media_ids, check each one exists in $media_ids, and if it doesn't then delete
+											if ( is_array($previous_media_ids) && !empty($previous_media_ids) )
+											{
+												foreach ( $previous_media_ids as $previous_media_id )
+												{
+													if ( !in_array($previous_media_id, $media_ids) )
+													{
+														if ( wp_delete_attachment( $previous_media_id, TRUE ) !== FALSE )
+														{
+
+														}
+													}
+												}
+											}
+										}
+		            				}
+
+		            				break;
+		            			}
+		            			case "virtual_tours":
+		            			{
+		            				if ( is_array($value) && !empty($value) )
+		            				{
+		            					update_post_meta( $object->ID, '_virtual_tours', count($value) );
+
+		            					$i = 0;
+		            					foreach ( $value as $virtual_tour )
+		            					{
+		            						update_post_meta( $object->ID, '_virtual_tour_' . $i, ( isset($virtual_tour['url']) ? $virtual_tour['url'] : '' ) );
+		            						update_post_meta( $object->ID, '_virtual_tour_label_' . $i, ( isset($virtual_tour['label']) ? $virtual_tour['label'] : '' ) );
+
+		            						++$i;
+		            					}
+		            				}
+		            				break;
+		            			}
+		            			default:
+		            			{
+		            				update_post_meta( $object->ID, '_' . $field_name, $value );
+		            			}
+		            		}
 						}
 
 						do_action( 'propertyhive_rest_api_property_field_update_callback', $value, $object, $field_name );
