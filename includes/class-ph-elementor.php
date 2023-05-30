@@ -128,6 +128,7 @@ class PH_Elementor {
 			'Property Actions',
 			'Property Meta',
 			'Property Availability',
+			'Property Let Available From',
 			'Property Type',
 			'Property Bedrooms',
 			'Property Bathrooms',
