@@ -3630,6 +3630,28 @@ class PH_AJAX {
             $owner_names_string = $this->get_list_string($owner_names);
             $owner_dears_string = $this->get_list_string($owner_dears);
 
+            $negotiator_names = array();
+            $negotiator_names_string = '';
+            $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+            if ( !empty($negotiator_ids) )
+            {
+                foreach ( $negotiator_ids as $negotiator_id )
+                {
+                    $negotiator = get_user_by( 'id', $negotiator_id );
+                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    {
+                        $negotiator_names[] = $negotiator->display_name;
+                    }
+                }
+            }
+            if ( !empty($negotiator_names) )
+            {
+                $last  = array_slice($negotiator_names, -1);
+                $first = join(', ', array_slice($negotiator_names, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_names_string = join(' and ', $both);
+            }
+
             $to = implode(",", $owner_emails);
 
             $subject = get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', '' );
@@ -3641,12 +3663,14 @@ class PH_AJAX {
             $subject = str_replace('[owner_name]', $owner_names_string, $subject);
             $subject = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $subject);
             $subject = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $subject);
+            $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
 
             $body = str_replace('[property_address]', $appraisal->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', $owner_names_string, $body);
             $body = str_replace('[owner_dear]', $owner_dears_string, $body);
             $body = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $body);
             $body = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $body);
+            $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -4197,16 +4221,40 @@ class PH_AJAX {
             $applicant_names_string = $this->get_list_string($applicant_names);
             $applicant_dears_string = $this->get_list_string($applicant_dears);
 
+            $negotiator_names = array();
+            $negotiator_names_string = '';
+            $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+            if ( !empty($negotiator_ids) )
+            {
+                foreach ( $negotiator_ids as $negotiator_id )
+                {
+                    $negotiator = get_user_by( 'id', $negotiator_id );
+                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    {
+                        $negotiator_names[] = $negotiator->display_name;
+                    }
+                }
+            }
+            if ( !empty($negotiator_names) )
+            {
+                $last  = array_slice($negotiator_names, -1);
+                $first = join(', ', array_slice($negotiator_names, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_names_string = join(' and ', $both);
+            }
+
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -4295,6 +4343,28 @@ class PH_AJAX {
             $applicant_names_string = $this->get_list_string($applicant_names);
             $applicant_dears_string = $this->get_list_string($applicant_dears);
 
+            $negotiator_names = array();
+            $negotiator_names_string = '';
+            $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+            if ( !empty($negotiator_ids) )
+            {
+                foreach ( $negotiator_ids as $negotiator_id )
+                {
+                    $negotiator = get_user_by( 'id', $negotiator_id );
+                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    {
+                        $negotiator_names[] = $negotiator->display_name;
+                    }
+                }
+            }
+            if ( !empty($negotiator_names) )
+            {
+                $last  = array_slice($negotiator_names, -1);
+                $first = join(', ', array_slice($negotiator_names, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_names_string = join(' and ', $both);
+            }
+
             $property = new PH_Property((int)$property_id);
 
             $to = implode(",", $owner_emails);
@@ -4307,6 +4377,7 @@ class PH_AJAX {
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', $owner_names_string, $body);
@@ -4315,6 +4386,7 @@ class PH_AJAX {
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -4426,6 +4498,28 @@ class PH_AJAX {
             $applicant_names_string = $this->get_list_string($applicant_names);
             $applicant_dears_string = $this->get_list_string($applicant_dears);
 
+            $negotiator_names = array();
+            $negotiator_names_string = '';
+            $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+            if ( !empty($negotiator_ids) )
+            {
+                foreach ( $negotiator_ids as $negotiator_id )
+                {
+                    $negotiator = get_user_by( 'id', $negotiator_id );
+                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    {
+                        $negotiator_names[] = $negotiator->display_name;
+                    }
+                }
+            }
+            if ( !empty($negotiator_names) )
+            {
+                $last  = array_slice($negotiator_names, -1);
+                $first = join(', ', array_slice($negotiator_names, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_names_string = join(' and ', $both);
+            }
+
             $property = new PH_Property((int)$property_id);
 
             $subject = get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', '' );
@@ -4436,6 +4530,7 @@ class PH_AJAX {
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', $owner_names_string, $body);
@@ -4446,6 +4541,7 @@ class PH_AJAX {
             $body = str_replace('[applicant_details]', $applicant_details, $body);
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
 
             $body = html_entity_decode($body);
 
