@@ -12,7 +12,12 @@
 		<td>
 			<h2><a href="<?php echo get_the_permalink( $property->id ); ?>"><?php echo get_the_title( $property->id ); ?></a></h2>
 			<p>
-				<strong><?php echo $property->get_formatted_price(); ?></strong> | <?php 
+				<strong><?php echo $property->get_formatted_price(); ?></strong><?php
+					if ( $property->price_qualifier != '' )
+			        {
+			        	echo ' <span class="price-qualifier">' . $property->price_qualifier . '</span>';
+			       	}
+				?> | <?php 
 					if ( $property->department != 'commercial' && ph_get_custom_department_based_on( $property->department ) != 'commercial' )
 					{
 						echo $property->bedrooms . ' bed ';
