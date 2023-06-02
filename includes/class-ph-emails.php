@@ -705,43 +705,11 @@ class PH_Emails {
 
 							$property = new PH_Property( get_the_ID() );
 
-							$similar_html .= '<table width="100%" cellpadding="5" cellspacing="0">';
-							$similar_html .= '<tr>';
-							$similar_html .= '<td width="20%" valign="top">';
-							$image = $property->get_main_photo_src();
-							if ( $image !== false )
-							{
-								$similar_html .= '<a href="' . get_permalink() . '"><img src="' . $image . '" alt="' . get_the_title() . '"></a>';
-							}
-							$similar_html .= '</td>';
-							$similar_html .= '<td valign="top" class="text">';
-							$similar_html .= '<p style="margin-bottom:8px !important;"><strong><a href="' . get_permalink() . '">' . get_the_title() . '</a></strong></p>';
-							$similar_html .= '<p style="margin-bottom:8px !important; font-size:14px;"><strong>' . $property->get_formatted_price() . '</strong>';
-							if ( $property->price_qualifier != '' )
-					        {
-					        	$similar_html .= ' <span class="price-qualifier">' . $property->price_qualifier . '</span>';
-					       	}
-							$similar_html .= '</p>';
-							$similar_html .= '<p style="margin-bottom:8px !important; font-size:14px;">';
-							if ( $property->department != 'commercial' && ph_get_custom_department_based_on( $property->department ) != 'commercial' )
-							{
-								$similar_html .= $property->bedrooms . ' bed ';
-							}
-							else
-							{
-								$similar_html .= $property->get_formatted_floor_area() . ' | ';
-							}
-							$similar_html .= $property->property_type . ' ' . $property->availability;
-							$similar_html .= '</p>';
-							if ( strip_tags($property->post_excerpt) != '' )
-							{
-								$similar_html .= '<p style="margin-bottom:0 !important; font-size:14px;">' . substr(strip_tags($property->post_excerpt), 0, 300);
-								if ( strlen(strip_tags($property->post_excerpt)) > 300 ) { $similar_html .= '...'; } 
-								$similar_html .= '</p>';
-							}
-							$similar_html .= '</td>';
-							$similar_html .= '</tr>';
-							$similar_html .= '</table><br>';
+							ob_start();
+
+							ph_get_template( 'emails/enquiry-autoresponder-similar-property.php', array( 'property' => $property ) );
+
+							$similar_html .= ob_get_clean();
 						}
 					}
 					$body = str_replace( "[similar_properties]", $similar_html, $body );
