@@ -716,8 +716,23 @@ class PH_Emails {
 							$similar_html .= '</td>';
 							$similar_html .= '<td valign="top" class="text">';
 							$similar_html .= '<p style="margin-bottom:8px !important;"><strong><a href="' . get_permalink() . '">' . get_the_title() . '</a></strong></p>';
-							$similar_html .= '<p style="margin-bottom:8px !important; font-size:14px;"><strong>' . $property->get_formatted_price() . '</strong></p>';
-							$similar_html .= '<p style="margin-bottom:8px !important; font-size:14px;">' . $property->bedrooms . ' bed ' . $property->property_type . ' ' . $property->availability . '</p>';
+							$similar_html .= '<p style="margin-bottom:8px !important; font-size:14px;"><strong>' . $property->get_formatted_price() . '</strong>';
+							if ( $property->price_qualifier != '' )
+					        {
+					        	$similar_html .= ' <span class="price-qualifier">' . $property->price_qualifier . '</span>';
+					       	}
+							$similar_html .= '</p>';
+							$similar_html .= '<p style="margin-bottom:8px !important; font-size:14px;">';
+							if ( $property->department != 'commercial' && ph_get_custom_department_based_on( $property->department ) != 'commercial' )
+							{
+								$similar_html .= $property->bedrooms . ' bed ';
+							}
+							else
+							{
+								$similar_html .= $property->get_formatted_floor_area() . ' | ';
+							}
+							$similar_html .= $property->property_type . ' ' . $property->availability;
+							$similar_html .= '</p>';
 							if ( strip_tags($property->post_excerpt) != '' )
 							{
 								$similar_html .= '<p style="margin-bottom:0 !important; font-size:14px;">' . substr(strip_tags($property->post_excerpt), 0, 300);
