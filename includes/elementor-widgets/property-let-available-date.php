@@ -4,7 +4,7 @@
  *
  * @since 1.0.0
  */
-class Elementor_Property_LetAvailableDate_Widget extends \Elementor\Widget_Base {
+class Elementor_Property_Let_Available_Date_Widget extends \Elementor\Widget_Base {
 
 	public function get_name() {
 		return 'property-let-available-date';
@@ -15,7 +15,7 @@ class Elementor_Property_LetAvailableDate_Widget extends \Elementor\Widget_Base 
 	}
 
 	public function get_icon() {
-		return 'fa-calendar';
+		return 'eicon-calendar';
 	}
 
 	public function get_categories() {
@@ -31,7 +31,7 @@ class Elementor_Property_LetAvailableDate_Widget extends \Elementor\Widget_Base 
 		$this->start_controls_section(
 			'content_section',
 			[
-				'label' => __( 'Let Available From', 'propertyhive' ),
+				'label' => __( 'Available Date', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
 			]
 		);
@@ -42,7 +42,7 @@ class Elementor_Property_LetAvailableDate_Widget extends \Elementor\Widget_Base 
 				'label' => __( 'Icon', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::ICONS,
 				'default' => [
-					'value' => 'fa-calendar',
+					'value' => 'fas fa-calendar',
 					'library' => 'solid',
 				],
 			]
@@ -53,6 +53,7 @@ class Elementor_Property_LetAvailableDate_Widget extends \Elementor\Widget_Base 
 			[
 				'label' => __( 'Before', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::TEXT,
+				'default' => __( 'Available From', 'propertyhive' ),
 			]
 		);
 
@@ -61,7 +62,6 @@ class Elementor_Property_LetAvailableDate_Widget extends \Elementor\Widget_Base 
 			[
 				'label' => __( 'After', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::TEXT,
-				'default' => __( 'Let Available From', 'propertyhive' ),
 			]
 		);
 
@@ -70,7 +70,7 @@ class Elementor_Property_LetAvailableDate_Widget extends \Elementor\Widget_Base 
 		$this->start_controls_section(
 			'style_section',
 			[
-				'label' => __( 'Let Available From', 'propertyhive' ),
+				'label' => __( 'Available Date', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
 			]
 		);
@@ -141,25 +141,32 @@ class Elementor_Property_LetAvailableDate_Widget extends \Elementor\Widget_Base 
 			return;
 		}
 
-		if ( $property->available_date != '' )
+		if ( $property->department != 'residential-lettings' && ph_get_custom_department_based_on( $property->department ) != 'residential-lettings' )
 		{
-	        echo '<div class="elementor-widget-let-available-date">';
-	        if ( isset($settings['icon']) && !empty($settings['icon']) )
-	        {
-	        	\Elementor\Icons_Manager::render_icon( $settings['icon'], [ 'aria-hidden' => 'true' ] );
-	        	echo ' ';
-	        }
-	        if ( isset($settings['before']) && !empty($settings['before']) )
-	        {
-	        	echo $settings['before'] . ' ';
-	        }
-	        echo $property->available_date;
-	        if ( isset($settings['after']) && !empty($settings['after']) )
-	        {
-	        	echo ' ' . $settings['after'];
-	        }
-	        echo '</div>';
-	    }
+			return;
+		}
+
+		if ( $property->available_date == '' )
+		{
+			return;
+		}
+
+        echo '<div class="elementor-widget-let-available-date">';
+        if ( isset($settings['icon']) && !empty($settings['icon']) )
+        {
+        	\Elementor\Icons_Manager::render_icon( $settings['icon'], [ 'aria-hidden' => 'true' ] );
+        	echo ' ';
+        }
+        if ( isset($settings['before']) && !empty($settings['before']) )
+        {
+        	echo $settings['before'] . ' ';
+        }
+        echo $property->get_available_date();
+        if ( isset($settings['after']) && !empty($settings['after']) )
+        {
+        	echo ' ' . $settings['after'];
+        }
+        echo '</div>';
 
 	}
 
