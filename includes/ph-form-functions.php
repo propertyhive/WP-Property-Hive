@@ -1514,6 +1514,9 @@ function ph_form_field( $key, $field )
                                     ),
                                 ),
                             );
+
+                            $empty_check_args = apply_filters( 'propertyhive_taxonomy_hide_empty_args', $empty_check_args, $field, $term->term_id );
+
                             $empty_check_query = new WP_Query( $empty_check_args );
 
                             if ( !$empty_check_query->have_posts() )
