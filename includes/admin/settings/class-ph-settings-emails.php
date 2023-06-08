@@ -302,6 +302,21 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	        $settings[] = array( 'type' => 'sectionend', 'id' => 'owner_appraisal_booking_confirmation_email_options' );
 	    }
 
+	    if ( get_option('propertyhive_module_disabled_appraisals', '') != 'yes' || get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
+	    {
+	    	// Owner
+	        $settings[] = array( 'title' => __( 'Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'booking_confirmation_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Customise Confirmation Emails Before Sending', 'propertyhive' ),
+	            'id'      => 'propertyhive_customise_confirmation_emails',
+	            'type'    => 'checkbox',
+	            'desc' 	  => 'With this ticked you\'ll be able to customise the email subject and body of any notifications before they get sent. This can be useful for adding any appraisal/viewing-specific details to the confirmation. If left unticked, the default subject and body set above will be used.'
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'booking_confirmation_email_options' );
+	    }
+
 		$settings = apply_filters( 'propertyhive_email_settings', $settings );
 
 		return apply_filters( 'propertyhive_get_settings_' . $this->id, $settings );
