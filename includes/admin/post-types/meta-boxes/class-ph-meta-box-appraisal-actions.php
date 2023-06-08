@@ -112,6 +112,25 @@ jQuery(document).ready(function($)
 		redraw_appraisal_actions();
 	});
 
+	$('#propertyhive_appraisal_actions_meta_box_container').on('click', 'a.owner-booking-confirmation-action-submit', function(e)
+	{
+		e.preventDefault();
+
+		$(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:         'propertyhive_appraisal_email_owner_booking_confirmation',
+            appraisal_id:    	<?php echo $post->ID; ?>,
+            subject:        $('#_owner_confirmation_email_subject').val(),
+            body:           $('#_owner_confirmation_email_body').val(),
+            security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+        };
+        jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        {
+            redraw_appraisal_actions();
+        }, 'json');
+	});
+
 	$('#propertyhive_appraisal_actions_meta_box_container').on('click', 'a.cancelled-reason-action-submit', function(e)
 	{
 		e.preventDefault();

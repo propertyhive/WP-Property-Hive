@@ -11,6 +11,7 @@ echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="prope
 
 $show_cancelled_meta_boxes = false;
 $show_feedback_meta_boxes = false;
+$show_customise_confirmation_meta_boxes = false;
 
 $actions = array();
 
@@ -37,11 +38,24 @@ if ( $status == 'pending' )
         //Applicant
         if ( apply_filters( 'propertyhive_show_viewing_email_applicant_booking_confirmation', true ) === true )
         {
-            $actions[] = '<a 
-                    href="#action_panel_viewing_email_applicant_booking_confirmation" 
-                    class="button viewing-action"
-                    style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Re-Email Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
+            if ( get_option( 'propertyhive_customise_confirmation_emails', '' ) == 'yes' )
+            {
+                $actions[] = '<a 
+                        href="#action_panel_viewing_email_applicant_booking_confirmation_customise" 
+                        class="button viewing-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Re-Email Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
+
+                $show_customise_confirmation_meta_boxes = true;
+            }
+            else
+            {
+                $actions[] = '<a 
+                        href="#action_panel_viewing_email_applicant_booking_confirmation" 
+                        class="button viewing-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? __('Email Applicant Booking Confirmation', 'propertyhive') : __('Re-Email Applicant Booking Confirmation', 'propertyhive') ) . '</a>';
+            }
 
             $actions[] = '<div id="viewing_applicant_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $applicant_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $applicant_booking_confirmation_sent_at != '' ) ? 'Previously sent to applicant on <span title="' . $applicant_booking_confirmation_sent_at . '">' . date("jS F", strtotime($applicant_booking_confirmation_sent_at)) : '' ) . '</span></div>';
         }
@@ -55,12 +69,24 @@ if ( $status == 'pending' )
 
             if ( is_array($owner_contact_ids) && count($owner_contact_ids) > 0) {
 
-                $actions[] = '<a 
-                        href="#action_panel_viewing_email_owner_booking_confirmation" 
-                        class="button viewing-action"
-                        style="width:100%; margin-bottom:7px; text-align:center" 
-                    >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
-                
+                if ( get_option( 'propertyhive_customise_confirmation_emails', '' ) == 'yes' )
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_owner_booking_confirmation_customise" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+
+                    $show_customise_confirmation_meta_boxes = true;
+                }
+                else
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_owner_booking_confirmation" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+                }
                 $actions[] = '<div id="viewing_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
             }
         }
@@ -71,11 +97,24 @@ if ( $status == 'pending' )
             $attending_negotiators = get_post_meta( $property_id, '_negotiator_id' );
             if ( !empty($attending_negotiators) )
             {
-                $actions[] = '<a 
-                        href="#action_panel_viewing_email_attending_negotiator_booking_confirmation" 
-                        class="button viewing-action"
-                        style="width:100%; margin-bottom:7px; text-align:center" 
-                    >' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? __('Email Negotiator Booking Confirmation', 'propertyhive') : __('Re-Email Negotiator Booking Confirmation', 'propertyhive') ) . '</a>';
+                if ( get_option( 'propertyhive_customise_confirmation_emails', '' ) == 'yes' )
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_attending_negotiator_booking_confirmation_customise" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? __('Email Negotiator Booking Confirmation', 'propertyhive') : __('Re-Email Negotiator Booking Confirmation', 'propertyhive') ) . '</a>';
+
+                    $show_customise_confirmation_meta_boxes = true;
+                }
+                else
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_attending_negotiator_booking_confirmation" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? __('Email Negotiator Booking Confirmation', 'propertyhive') : __('Re-Email Negotiator Booking Confirmation', 'propertyhive') ) . '</a>';
+                }
 
                 $actions[] = '<div id="viewing_attending_negotiator_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $attending_negotiator_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $attending_negotiator_booking_confirmation_sent_at != '' ) ? 'Previously sent to attending negotiators on <span title="' . $attending_negotiator_booking_confirmation_sent_at . '">' . date("jS F", strtotime($attending_negotiator_booking_confirmation_sent_at)) : '' ) . '</span></div>';
             }
@@ -248,6 +287,99 @@ echo '<div id="action_panel_success" class="propertyhive_meta_box propertyhive_m
 
 do_action( 'propertyhive_admin_viewing_action_options', $post_id );
 do_action( 'propertyhive_admin_post_action_options', $post_id );
+
+if ( $show_customise_confirmation_meta_boxes )
+{
+    $subject = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', '' );
+    $body = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
+
+    echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_email_owner_booking_confirmation_customise" style="display:none;">
+
+        <div class="options_group" style="padding-top:8px;">
+
+            <div class="form-field">
+
+                <label for="_owner_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                
+                <input id="_owner_confirmation_email_subject" name="_owner_confirmation_email_subject" style="width:100%;" value="' . $subject . '">
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_owner_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                
+                <textarea id="_owner_confirmation_email_body" name="_owner_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+
+            </div>
+
+            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+            <a class="button button-primary owner-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
+
+        </div>
+
+    </div>';
+
+    $subject = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
+    $body = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
+
+    echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_email_applicant_booking_confirmation_customise" style="display:none;">
+
+        <div class="options_group" style="padding-top:8px;">
+
+            <div class="form-field">
+
+                <label for="_applicant_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                
+                <input id="_applicant_confirmation_email_subject" name="_applicant_confirmation_email_subject" style="width:100%;" value="' . $subject . '">
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_applicant_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                
+                <textarea id="_applicant_confirmation_email_body" name="_applicant_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+
+            </div>
+
+            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+            <a class="button button-primary applicant-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
+
+        </div>
+
+    </div>';
+
+    $subject = get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', '' );
+    $body = get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', '' );
+
+    echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_email_attending_negotiator_booking_confirmation_customise" style="display:none;">
+
+        <div class="options_group" style="padding-top:8px;">
+
+            <div class="form-field">
+
+                <label for="_attending_negotiator_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                
+                <input id="_attending_negotiator_confirmation_email_subject" name="_attending_negotiator_confirmation_email_subject" style="width:100%;" value="' . $subject . '">
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_attending_negotiator_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                
+                <textarea id="_attending_negotiator_confirmation_email_body" name="_attending_negotiator_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+
+            </div>
+
+            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+            <a class="button button-primary attending-negotiator-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
+
+        </div>
+
+    </div>';
+}
 
 if ( $show_cancelled_meta_boxes )
 {

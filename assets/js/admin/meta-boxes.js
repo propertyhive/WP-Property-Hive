@@ -1114,6 +1114,66 @@ jQuery(document).ready(function($)
         redraw_viewing_actions();
     });
 
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.owner-booking-confirmation-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:         'propertyhive_viewing_email_owner_booking_confirmation',
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            subject:        $('#_owner_confirmation_email_subject').val(),
+            body:           $('#_owner_confirmation_email_body').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+        return;
+    });
+
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.applicant-booking-confirmation-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:         'propertyhive_viewing_email_applicant_booking_confirmation',
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            subject:        $('#_applicant_confirmation_email_subject').val(),
+            body:           $('#_applicant_confirmation_email_body').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+        return;
+    });
+
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.attending-negotiator-booking-confirmation-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        $(this).attr('disabled', 'disabled');
+
+        var data = {
+            action:         'propertyhive_viewing_email_attending_negotiator_booking_confirmation',
+            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+            subject:        $('#_attending_negotiator_confirmation_email_subject').val(),
+            body:           $('#_attending_negotiator_confirmation_email_body').val(),
+            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+        };
+        jQuery.post( ajaxurl, data, function(response) 
+        {
+            redraw_viewing_actions();
+        }, 'json');
+        return;
+    });
+
     $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.cancelled-reason-action-submit', function(e)
     {
         e.preventDefault();

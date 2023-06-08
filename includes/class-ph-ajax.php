@@ -2931,6 +2931,7 @@ class PH_AJAX {
         $show_carried_out_meta_boxes = false;
         $show_instructed_meta_boxes = false;
         $show_lost_meta_boxes = false;
+        $show_customise_confirmation_meta_boxes = false;
 
         $actions = array();
 
@@ -2944,11 +2945,24 @@ class PH_AJAX {
 
             if ( !empty($owner_contact_id) )
             {
-                $actions[] = '<a
-                        href="#action_panel_appraisal_email_owner_booking_confirmation"
-                        class="button appraisal-action"
-                        style="width:100%; margin-bottom:7px; text-align:center"
-                    >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+                if ( get_option( 'propertyhive_customise_confirmation_emails', '' ) == 'yes' )
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_appraisal_email_owner_booking_confirmation_customise" 
+                            class="button appraisal-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+
+                    $show_customise_confirmation_meta_boxes = true;
+                }
+                else
+                {
+                    $actions[] = '<a
+                            href="#action_panel_appraisal_email_owner_booking_confirmation"
+                            class="button appraisal-action"
+                            style="width:100%; margin-bottom:7px; text-align:center"
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+                }
 
                 $actions[] = '<div id="appraisal_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
 
@@ -3077,6 +3091,39 @@ class PH_AJAX {
 
         do_action( 'propertyhive_admin_appraisal_action_options', $post_id );
         do_action( 'propertyhive_admin_post_action_options', $post_id );
+
+        if ( $show_customise_confirmation_meta_boxes )
+        {
+            $subject = get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', '' );
+            $body = get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', '' );
+
+            echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_appraisal_email_owner_booking_confirmation_customise" style="display:none;">
+
+                <div class="options_group" style="padding-top:8px;">
+
+                    <div class="form-field">
+
+                        <label for="_owner_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                        
+                        <input id="_owner_confirmation_email_subject" name="_owner_confirmation_email_subject" style="width:100%;" value="' . $subject . '">
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label for="_owner_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                        
+                        <textarea id="_owner_confirmation_email_body" name="_owner_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+
+                    </div>
+
+                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+                    <a class="button button-primary owner-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
+
+                </div>
+
+            </div>';
+        }
 
         if ( $show_cancelled_meta_boxes )
         {
@@ -3654,8 +3701,8 @@ class PH_AJAX {
 
             $to = implode(",", $owner_emails);
 
-            $subject = get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', '' );
-            $body = get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', '' );
+            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', '' );
+            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', '' );
 
             $appraisal_date_timestamp = strtotime($appraisal->start_date_time);
 
@@ -4204,8 +4251,8 @@ class PH_AJAX {
 
         if ( !empty(implode($to)) )
         {
-            $subject = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
-            $body = get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
+            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
+            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
 
             $applicant_names = array();
             $applicant_dears = array();
@@ -4369,8 +4416,8 @@ class PH_AJAX {
 
             $to = implode(",", $owner_emails);
 
-            $subject = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', '' );
-            $body = get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
+            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', '' );
+            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', $owner_names_string, $subject);
@@ -4522,8 +4569,8 @@ class PH_AJAX {
 
             $property = new PH_Property((int)$property_id);
 
-            $subject = get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', '' );
-            $body = get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', '' );
+            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', '' );
+            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', $owner_names_string, $subject);
