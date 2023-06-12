@@ -572,6 +572,7 @@ class PH_Shortcodes {
 			'per_page' 		=> '12',
 			'columns' 		=> '4',
 			'department' 	=> '',
+			'minimum_price'		=> '',
 			'office_id'		=> '',
 			'negotiator_id'		=> '',
 			'availability_id'	=> '',
@@ -617,6 +618,33 @@ class PH_Shortcodes {
 				'compare' => '='
 			);
 		}
+
+		$base_department = $atts['department'];
+		if ( $atts['department'] !== '' && !in_array($atts['department'], array_keys( ph_get_departments( true ) )) )
+		{
+			$base_department = ph_get_custom_department_based_on($base_department);
+		}
+
+		if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
+        {
+        	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
+
+        	$minimum_price = $atts['minimum_price'];
+        	if ( $search_form_currency != 'GBP' )
+        	{
+        		// Convert $atts['minimum_price'] to GBP
+        		$ph_countries = new PH_Countries();
+
+        		$minimum_price = $ph_countries->convert_price_to_gbp( $minimum_price, $search_form_currency );
+        	}
+
+            $meta_query[] = array(
+                'key'     => '_price_actual',
+                'value'   => sanitize_text_field( floor( $minimum_price ) ),
+                'compare' => '>=',
+                'type'    => 'NUMERIC'
+            );
+        }
 
 		if ( isset($atts['office_id']) && $atts['office_id'] != '' )
 		{
