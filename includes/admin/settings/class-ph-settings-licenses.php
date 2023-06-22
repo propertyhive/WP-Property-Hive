@@ -71,7 +71,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		{
 			if ( isset($license['expires_at']) && $license['expires_at'] != '' )
 			{
-				if ( strtotime($license['expires_at']) <= time() )
+				if ( (strtotime($license['expires_at']) + 86400) <= time() )
 				{
 					// Expired
 					$output = '<span style="color:#900">' . __( 'License expired on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. ' . $renew_link . '</span>';
