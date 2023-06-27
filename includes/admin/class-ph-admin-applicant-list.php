@@ -208,6 +208,11 @@ class PH_Admin_Applicant_List {
                 </select>
 			</p>
 
+            <p class="form-field">
+                <label>Include Applicants with 'Send Matching Properties' Unticked</label>
+                <input type="checkbox" name="include_non_send_matching_properties" value="yes"<?php if ( isset($_POST['include_non_send_matching_properties']) && sanitize_text_field($_POST['include_non_send_matching_properties']) == 'yes' ) { echo ' checked'; } ?>>
+            </p>
+
             <?php do_action('propertyhive_applicant_list_additional_fields'); ?>
 
             <p class="form-field">
@@ -600,9 +605,12 @@ jQuery(window).resize(function() {
 
                     $match = true;
 
-                    if ( !isset($profile['send_matching_properties']) || ( isset($profile['send_matching_properties']) && $profile['send_matching_properties'] != 'yes' ) )
+                    if ( !isset($_POST['include_non_send_matching_properties']) )
                     {
-                        $match = false;
+                        if ( !isset($profile['send_matching_properties']) || ( isset($profile['send_matching_properties']) && $profile['send_matching_properties'] != 'yes' ) )
+                        {
+                            $match = false;
+                        }
                     }
 
                     if ( isset($_POST['department']) )
@@ -849,7 +857,7 @@ jQuery(window).resize(function() {
                 'email_address' => $result['email_address'],
                 'telephone_number' => $result['telephone_number'],
                 'address' => $result['address'],
-                'department' => __( ucwords(str_replace("-", " ", $result['profile']['department'])), 'propertyhive' ),
+                'department' => ( isset($result['profile']['department']) ? __( ucwords(str_replace("-", " ", $result['profile']['department'])), 'propertyhive' ) : '-' ),
             );
 
             if ( isset($department) )
@@ -858,18 +866,18 @@ jQuery(window).resize(function() {
                 {
                     case "residential-sales":
                     {
-                        $columns['maximum_price'] = $result['profile']['max_price'];
+                        $columns['maximum_price'] = ( isset($result['profile']['max_price']) ? $result['profile']['max_price'] : '' );
                         break;
                     }
                     case "residential-lettings":
                     {
-                        $columns['maximum_rent'] = $result['profile']['max_price_actual'];
+                        $columns['maximum_rent'] = ( isset($result['profile']['max_price_actual']) ? $result['profile']['max_price_actual'] : '' );
                         break;
                     }
                 }
                 if ( $department == 'residential-sales' || $department == 'residential-lettings' )
                 {
-                    $columns['minimum_bedrooms'] = $result['profile']['min_beds'];
+                    $columns['minimum_bedrooms'] = ( isset($result['profile']['min_beds']) ? $result['profile']['min_beds'] : '' );
 
                     $output_types = array();
                     if ( isset($result['profile']['property_types']) && is_array($result['profile']['property_types']) && !empty($result['profile']['property_types']) )
@@ -924,7 +932,7 @@ jQuery(window).resize(function() {
         header("Content-Transfer-Encoding: binary");
 
         $results = $this->generate_results();
-
+        
         echo $this->array_2_csv($results);        
 
         die();
