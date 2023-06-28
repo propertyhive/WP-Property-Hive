@@ -1081,25 +1081,6 @@ class PH_Shortcodes {
 		{
 			$department = get_post_meta( $atts['property_id'], '_department', true );
 
-			$price = get_post_meta( $atts['property_id'], '_price_actual', true );
-			$lower_price = $price;
-			$higher_price = $price;
-			$atts['price_percentage_bounds'] = str_replace("%", "", $atts['price_percentage_bounds']);
-			if ( isset($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] != '' && is_numeric($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] > 0 )
-			{
-				$lower_price = $price - ($price * $atts['price_percentage_bounds'] / 100);
-				$higher_price = $price + ($price * $atts['price_percentage_bounds'] / 100);
-			}
-
-			$bedrooms = get_post_meta( $atts['property_id'], '_bedrooms', true );
-			$lower_bedrooms = $bedrooms;
-			$higher_bedrooms = $bedrooms;
-			if ( isset($atts['bedroom_bounds']) && $atts['bedroom_bounds'] != '' && is_numeric($atts['bedroom_bounds']) && $atts['bedroom_bounds'] > 0 )
-			{
-				$lower_bedrooms = $bedrooms - $atts['bedroom_bounds'];
-				$higher_bedrooms = $bedrooms + $atts['bedroom_bounds'];
-			}
-
 			$args = array(
 				'post_type'				=> 'property',
 				'post__not_in' 			=> array($atts['property_id']),
@@ -1123,38 +1104,217 @@ class PH_Shortcodes {
 				'value' 	=> 'yes',
 			);
 
-			if ( isset($atts['bedroom_bounds']) && is_numeric($atts['bedroom_bounds']) )
+			if ( $department != 'commercial' && ph_get_custom_department_based_on( $department ) != 'commercial' )
 			{
-				$meta_query[] = array(
-					'key' 		=> '_bedrooms',
-					'value' 	=> $lower_bedrooms,
-					'compare'   => '>=',
-					'type'      => 'NUMERIC'
-				);
+				// residential
+				$bedrooms = get_post_meta( $atts['property_id'], '_bedrooms', true );
+				$lower_bedrooms = $bedrooms;
+				$higher_bedrooms = $bedrooms;
+				if ( !empty($bedrooms) && isset($atts['bedroom_bounds']) && $atts['bedroom_bounds'] != '' && is_numeric($atts['bedroom_bounds']) && $atts['bedroom_bounds'] > 0 )
+				{
+					$lower_bedrooms = $bedrooms - (int)$atts['bedroom_bounds'];
+					$higher_bedrooms = $bedrooms + (int)$atts['bedroom_bounds'];
+				}
 
-				$meta_query[] = array(
-					'key' 		=> '_bedrooms',
-					'value' 	=> $higher_bedrooms,
-					'compare'   => '<=',
-					'type'      => 'NUMERIC'
-				);
+				if ( isset($atts['bedroom_bounds']) && is_numeric($atts['bedroom_bounds']) )
+				{
+					$meta_query[] = array(
+						'key' 		=> '_bedrooms',
+						'value' 	=> $lower_bedrooms,
+						'compare'   => '>=',
+						'type'      => 'NUMERIC'
+					);
+
+					$meta_query[] = array(
+						'key' 		=> '_bedrooms',
+						'value' 	=> $higher_bedrooms,
+						'compare'   => '<=',
+						'type'      => 'NUMERIC'
+					);
+				}
+
+				$price = get_post_meta( $atts['property_id'], '_price_actual', true );
+				$lower_price = $price;
+				$higher_price = $price;
+				$atts['price_percentage_bounds'] = str_replace("%", "", $atts['price_percentage_bounds']);
+				if ( !empty($price) && isset($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] != '' && is_numeric($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] > 0 )
+				{
+					$lower_price = $price - ($price * (int)$atts['price_percentage_bounds'] / 100);
+					$higher_price = $price + ($price * (int)$atts['price_percentage_bounds'] / 100);
+				}
+
+				if ( isset($atts['price_percentage_bounds']) && is_numeric($atts['price_percentage_bounds']) )
+				{
+					$meta_query[] = array(
+						'key' 		=> '_price_actual',
+						'value' 	=> $lower_price,
+						'compare'   => '>=',
+						'type'      => 'NUMERIC'
+					);
+
+					$meta_query[] = array(
+						'key' 		=> '_price_actual',
+						'value' 	=> $higher_price,
+						'compare'   => '<=',
+						'type'      => 'NUMERIC'
+					);
+				}
 			}
-
-			if ( isset($atts['price_percentage_bounds']) && is_numeric($atts['price_percentage_bounds']) )
+			else
 			{
-				$meta_query[] = array(
-					'key' 		=> '_price_actual',
-					'value' 	=> $lower_price,
-					'compare'   => '>=',
-					'type'      => 'NUMERIC'
-				);
+				// commercial
+				$for_sale = get_post_meta( $atts['property_id'], '_for_sale', true );
+				$to_rent = get_post_meta( $atts['property_id'], '_to_rent', true );
 
-				$meta_query[] = array(
-					'key' 		=> '_price_actual',
-					'value' 	=> $higher_price,
-					'compare'   => '<=',
-					'type'      => 'NUMERIC'
-				);
+				if ( $for_sale == 'yes' || $to_rent == 'yes' )
+				{	
+					$sub_meta_query = array('relation' => 'OR');
+
+					if ( $for_sale == 'yes' )
+					{
+						$prices_sub_query = array('relation' => 'OR');
+
+						$price_from = get_post_meta( $atts['property_id'], '_price_from_actual', true );
+						$price_to = get_post_meta( $atts['property_id'], '_price_to_actual', true );
+
+						if ( !empty($price_from) || !empty($price_to) )
+						{
+							if ( empty($price_from) )
+							{
+								$price_from = $price_to;
+							}
+							if ( empty($price_to) )
+							{
+								$price_to = $price_from;
+							}
+
+							$lower_price_from = $price_from;
+							$higher_price_from = $price_from;
+							if ( isset($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] != '' && is_numeric($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] > 0 )
+							{
+								$lower_price_from = $price_from - ($price_from * (int)$atts['price_percentage_bounds'] / 100);
+								$higher_price_from = $price_from + ($price_from * (int)$atts['price_percentage_bounds'] / 100);
+							}
+
+							$lower_price_to = $price_to;
+							$higher_price_to = $price_to;
+							if ( isset($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] != '' && is_numeric($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] > 0 )
+							{
+								$lower_price_to = $price_to - ($price_to * (int)$atts['price_percentage_bounds'] / 100);
+								$higher_price_to = $price_to + ($price_to * (int)$atts['price_percentage_bounds'] / 100);
+							}
+
+							// where price from and price to not blank and price from -15%
+							$price_sub_query = array();
+
+							$price_sub_query[] = array(
+								'key' => '_price_from_actual',
+						        'value'   => array( '', 0 ),
+						        'compare' => 'NOT IN'
+							);
+							$price_sub_query[] = array(
+								'key' => '_price_to_actual',
+						        'value'   => array( '', 0 ),
+						        'compare' => 'NOT IN'
+							);
+							$price_sub_query[] = array(
+								'key' 		=> '_price_to_actual',
+								'value' 	=> $lower_price_from,
+								'compare'   => '>=',
+								'type'      => 'NUMERIC'
+							);
+							$price_sub_query[] = array(
+								'key' 		=> '_price_from_actual',
+								'value' 	=> $higher_price_to,
+								'compare'   => '<=',
+								'type'      => 'NUMERIC'
+							);
+
+							$prices_sub_query[] = $price_sub_query;
+						}
+
+						$sub_meta_query[] = array(
+							array(
+								'key' 		=> '_for_sale',
+								'value' 	=> $for_sale,
+							),
+							$prices_sub_query
+						);
+					}
+					elseif ( $to_rent == 'yes' )
+					{
+						$prices_sub_query = array('relation' => 'OR');
+
+						$price_from = get_post_meta( $atts['property_id'], '_rent_from_actual', true );
+						$price_to = get_post_meta( $atts['property_id'], '_rent_to_actual', true );
+
+						if ( !empty($price_from) || !empty($price_to) )
+						{
+							if ( empty($price_from) )
+							{
+								$price_from = $price_to;
+							}
+							if ( empty($price_to) )
+							{
+								$price_to = $price_from;
+							}
+
+							$lower_price_from = $price_from;
+							$higher_price_from = $price_from;
+							if ( isset($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] != '' && is_numeric($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] > 0 )
+							{
+								$lower_price_from = $price_from - ($price_from * (int)$atts['price_percentage_bounds'] / 100);
+								$higher_price_from = $price_from + ($price_from * (int)$atts['price_percentage_bounds'] / 100);
+							}
+
+							$lower_price_to = $price_to;
+							$higher_price_to = $price_to;
+							if ( isset($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] != '' && is_numeric($atts['price_percentage_bounds']) && $atts['price_percentage_bounds'] > 0 )
+							{
+								$lower_price_to = $price_to - ($price_to * (int)$atts['price_percentage_bounds'] / 100);
+								$higher_price_to = $price_to + ($price_to * (int)$atts['price_percentage_bounds'] / 100);
+							}
+
+							// where price from and price to not blank and price from -15%
+							$price_sub_query = array();
+
+							$price_sub_query[] = array(
+								'key' => '_rent_from_actual',
+						        'value'   => array( '', 0 ),
+						        'compare' => 'NOT IN'
+							);
+							$price_sub_query[] = array(
+								'key' => '_rent_to_actual',
+						        'value'   => array( '', 0 ),
+						        'compare' => 'NOT IN'
+							);
+							$price_sub_query[] = array(
+								'key' 		=> '_rent_to_actual',
+								'value' 	=> $lower_price_from,
+								'compare'   => '>=',
+								'type'      => 'NUMERIC'
+							);
+							$price_sub_query[] = array(
+								'key' 		=> '_rent_from_actual',
+								'value' 	=> $higher_price_to,
+								'compare'   => '<=',
+								'type'      => 'NUMERIC'
+							);
+
+							$prices_sub_query[] = $price_sub_query;
+						}
+
+						$sub_meta_query[] = array(
+							array(
+								'key' 		=> '_to_rent',
+								'value' 	=> $to_rent,
+							),
+							$prices_sub_query
+						);
+					}
+
+					$meta_query[] = $sub_meta_query;
+				}
 			}
 
 			if ( isset($atts['matching_address_field']) && in_array($atts['matching_address_field'], array( 'address_two', 'address_three', 'address_four' )) )
