@@ -511,12 +511,20 @@ class PH_Countries {
 					}
 
 					$price = get_post_meta( $postID, '_price_from', true );
+					if ( $price == '' )
+					{
+						$price = get_post_meta( $postID, '_price_to', true );
+					}
 
 					$converted_price = $this->convert_price_to_gbp( $price, $currency );
 
 					update_post_meta( $postID, '_price_from_actual', $converted_price );
 
 					$price = get_post_meta( $postID, '_price_to', true );
+					if ( $price == '' )
+					{
+						$price = get_post_meta( $postID, '_price_from', true );
+					}
 
 					$converted_price = $this->convert_price_to_gbp( $price, $currency );
 
@@ -538,6 +546,10 @@ class PH_Countries {
 					$rent_units = get_post_meta( $postID, '_rent_units', true );
 
 					$price = get_post_meta( $postID, '_rent_from', true );
+					if ( $price == '' )
+					{
+						$price = get_post_meta( $postID, '_rent_to', true );
+					}
 					if ( is_numeric($price) )
 					{
 			            switch ($rent_units)
@@ -560,6 +572,10 @@ class PH_Countries {
 					}
 
 		            $price = get_post_meta( $postID, '_rent_to', true );
+		            if ( $price == '' )
+					{
+						$price = get_post_meta( $postID, '_rent_from', true );
+					}
 		            if ( is_numeric($price) )
 					{
 			            switch ($rent_units)
