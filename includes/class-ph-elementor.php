@@ -10,6 +10,9 @@ class PH_Elementor {
 	{
 		add_action( 'plugins_loaded', array( $this, 'setup_propertyhive_elementor_functionality' ) );
 		add_action( 'elementor/query/onmarketpropertyquery', array( $this, 'elementor_query_on_market_only' ) );
+		add_action( 'elementor/query/onmarketsalespropertyquery', array( $this, 'elementor_query_on_market_sales_only' ) );
+		add_action( 'elementor/query/onmarketlettingspropertyquery', array( $this, 'elementor_query_on_market_lettings_only' ) );
+		add_action( 'elementor/query/onmarketcommercialpropertyquery', array( $this, 'elementor_query_on_market_commercial_only' ) );
 		add_filter( 'elementor/query/query_args', array( $this, 'elementor_query_args' ), 10, 2 );
 	}
 
@@ -81,6 +84,81 @@ class PH_Elementor {
 		}
 
 		$query->set( 'meta_query', $new_meta_query );
+	}
+
+	public function elementor_query_on_market_sales_only( $query )
+	{
+		PH()->query->property_query( $query );
+
+		// Set the custom post type 
+		$query->set( 'post_type', [ 'property' ] );
+
+		// ensure a department is set as not set by default from property_query
+		$new_meta_query = $this->remove_department_from_query( $query );
+
+		$new_meta_query[] = array(
+			'key' => '_department',
+			'value' => 'residential-sales'
+		);
+
+		$query->set( 'meta_query', $new_meta_query );
+	}
+
+	public function elementor_query_on_market_lettings_only( $query )
+	{
+		PH()->query->property_query( $query );
+
+		// Set the custom post type 
+		$query->set( 'post_type', [ 'property' ] );
+
+		// ensure a department is set as not set by default from property_query
+		$new_meta_query = $this->remove_department_from_query( $query );
+
+		$new_meta_query[] = array(
+			'key' => '_department',
+			'value' => 'residential-lettings'
+		);
+
+		$query->set( 'meta_query', $new_meta_query );
+	}
+
+	public function elementor_query_on_market_commercial_only( $query )
+	{
+		PH()->query->property_query( $query );
+
+		// Set the custom post type 
+		$query->set( 'post_type', [ 'property' ] );
+
+		// ensure a department is set as not set by default from property_query
+		$new_meta_query = $this->remove_department_from_query( $query );
+
+		$new_meta_query[] = array(
+			'key' => '_department',
+			'value' => 'commercial'
+		);
+
+		$query->set( 'meta_query', $new_meta_query );
+	}
+
+	private function remove_department_from_query( $query )
+	{
+		$new_meta_query = array();
+
+		$meta_query = $query->get('meta_query');
+
+		foreach ( $meta_query as $key => $value )
+		{
+			if ( isset($value['key']) && $value['key'] == '_department' )
+			{
+				// remove department
+			}
+			else
+			{
+				$new_meta_query[$key] = $value;
+			}
+		}
+
+		return $new_meta_query;
 	}
 
 	public function load_elementor_scripts()
