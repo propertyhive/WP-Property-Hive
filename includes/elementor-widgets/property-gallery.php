@@ -151,12 +151,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                 }
             }
             <?php } ?>
-            @media (max-width: 767px) {
-                .gallery-column {
-                    width: 100%;
-                }
-            }
-
+            
             .gallery-column > a { display:block; height:100%; padding-top:75%; background:center center no-repeat; background-size:cover; }
 
             .more-images-container {
@@ -165,6 +160,9 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                 left:<?php echo (int)$settings['padding']; ?>px;
                 right:<?php echo (int)$settings['padding']; ?>px;
                 bottom:<?php echo (int)$settings['padding']; ?>px;
+            }
+            .more-images-container.mobile {
+                display:none;
             }
             .more-images {
                 display: table;
@@ -183,12 +181,37 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                 text-align:center;
                 height: 100%;
             }
+
+            @media (max-width: 767px) {
+                .gallery-column {
+                    width: 100%;
+                }
+                .gallery-column:nth-child(3),
+                .gallery-column:nth-child(4),
+                .gallery-column:nth-child(5),
+                .gallery-column:nth-child(6) { display:none }
+
+                .more-images-container.desktop {
+                    display:none;
+                }
+                .more-images-container.mobile {
+                    display:block;
+                }
+            }
+
         </style>
 
         <script>
             function openGallery()
             {
-                jQuery('a#more-images-link').trigger('click');
+                if ( jQuery(window).width() <= 767 )
+                {
+                    jQuery('a#more-images-link-mobile').trigger('click');
+                }
+                else
+                {
+                    jQuery('a#more-images-link').trigger('click');
+                }
                 return false;
             }
         </script>
@@ -203,12 +226,19 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                 if ( isset($images[$image_number]) )
                 {
                     $id_text = $image_number == ($max_images - 1) ? 'id="more-images-link"' : '';
+                    $id_text_mobile = $image_number == 1 ? 'id="more-images-link-mobile"' : '';
 
-                    echo '<a ' . $id_text . ' href="' . $images[$image_number]['url'] . '" data-fancybox="elementor-gallery" style="background-image:url(' . $images[$image_number]['url'] . ')"></a>';
+                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . $images[$image_number]['url'] . '" data-fancybox="elementor-gallery" style="background-image:url(' . $images[$image_number]['url'] . ')"></a>';
 
+                    if ( $image_number == 1 )
+                    {
+                        echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
+                        printf( __( 'See all %d images', 'propertyhive' ), count($images) );
+                        echo '</a></div></div>';
+                    }
                     if ( $image_number == ($max_images - 1) )
                     {
-                        echo '<div class="more-images-container"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
+                        echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
                         printf( __( 'See all %d images', 'propertyhive' ), count($images) );
                         echo '</a></div></div>';
                     }
