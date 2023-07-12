@@ -27,6 +27,7 @@ class PH_Post_types {
 
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_media' ), 5 );
         add_action( 'before_delete_post', array( __CLASS__, 'delete_property_children' ), 5 );
+        add_action( 'before_delete_post', array( __CLASS__, 'delete_property_enquiries' ), 5 );
         add_action( 'before_delete_post', array( __CLASS__, 'delete_contact_user' ), 5 );
 
         add_action( 'delete_user', array( $this, 'delete_contact_user_link' ) );
@@ -746,6 +747,43 @@ class PH_Post_types {
                     $properties_query->the_post();
 
                     wp_delete_post( get_the_ID(), true );
+                }
+            }
+            wp_reset_postdata();
+        }
+    }
+
+    public static function delete_property_enquiries( $post_id )
+    {
+        if ( apply_filters( 'propertyhive_delete_enquiries_on_property_delete', false ) === true && get_post_type($post_id) == 'property' )
+        {
+            // get all children
+            $args = array(
+                'post_type' => 'enquiry',
+                'nopaging' => true,
+                'post_status' => array('publish', 'pending', 'private', 'draft', 'auto-draft', 'future', 'trash'),
+                'meta_query' => array(
+                    'relation' => 'OR',
+                    array(
+                        'key' => '_property_id',
+                        'value' => $post_id
+                    ),
+                    array(
+                        'key' => 'property_id',
+                        'value' => $post_id
+                    )
+                )
+            );
+
+            $enquiries_query = new WP_Query($args);
+
+            if ( $enquiries_query->have_posts() )
+            {
+                while( $enquiries_query->have_posts() )
+                {
+                    $enquiries_query->the_post();
+
+                    wp_delete_post( get_the_ID() );
                 }
             }
             wp_reset_postdata();
