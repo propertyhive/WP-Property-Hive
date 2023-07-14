@@ -4,7 +4,7 @@ Tags: property, real estate, estate agents, estate agent, property management, p
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
 Tested up to: 6.2.2
-Stable tag: 1.5.51
+Stable tag: 1.5.52
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,16 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.52 - 2023-07-14 =
+* New 'Map Link' Elementor widget allowing you to add a link/button to a map of the property location. Includes an option to choose how the map opens (in new tab, embedded in lightbox or iframe in lightbox)
+* Allow choosing of default department in Elementor Search Form widget
+* Improved the responsiveness of the Elementor 'Gallery' widget to work and look better on mobile. Now only shows 2 images with link to show more instead of a long list of 6 images
+* Similar properties to work on commercial properties and not throw an error in PHP8 when price of the property in question is empty
+* Added ability to record offers and sales on commercial sales properties
+* Added 'minimum_price' attribute to [recent_properties] shortcode
+* Added the ability to delete enquiries when a property is deleted through use of a new filter 'propertyhive_delete_enquiries_on_property_delete'
+* Take into account current day when deciding if license key has expired
 
 = 1.5.51 - 2023-06-08 =
 * Added new "Let Available From" Elementor widget
