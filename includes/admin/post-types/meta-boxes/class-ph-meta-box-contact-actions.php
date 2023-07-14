@@ -66,7 +66,14 @@ class PH_Meta_Box_Contact_Actions {
 
 	                        if ( 
 	                        	isset($applicant_profile['department']) && 
-	                        	( $applicant_profile['department'] == 'residential-sales' || ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' )
+	                        	(
+	                        		( $applicant_profile['department'] == 'residential-sales' || ph_get_custom_department_based_on($applicant_profile['department']) == 'residential-sales' ) ||
+	                        		( 
+	                        			( $applicant_profile['department'] == 'commercial' || ph_get_custom_department_based_on($applicant_profile['department']) == 'commercial' )
+	                        			&&
+	                        			( isset($applicant_profile['available_as']) && in_array('sale', $applicant_profile['available_as']) )
+	                        		)
+	                        	)
 	                        )
 	                        {
 	                            $show_offers = true;
