@@ -1521,10 +1521,43 @@ class PH_AJAX {
 
             if ( isset($_POST['department']) && $_POST['department'] != '' )
             {
-                $meta_query[] = array(
-                    'key' => '_department',
-                    'value' => ph_clean($_POST['department']),
+                $departments_query = array(
+                    'relation' => 'OR',
                 );
+
+                $explode_departments = explode("|", ph_clean($_POST['department']));
+                $new_departments = array();
+                foreach ( $explode_departments as $department )
+                {
+                    $explode_department = explode("~", $department);
+
+                    $new_departments[] = $explode_department[0];
+
+                    $departments_sub_query = array();
+
+                    $departments_sub_query[] = array(
+                        'key' => '_department',
+                        'value' => $explode_department[0],
+                    );
+
+                    if ( $explode_department[0] == 'commercial' && isset($explode_department[1]) )
+                    {
+                        switch ($explode_department[1])
+                        {
+                            case "forsale":
+                            {
+                                $departments_sub_query[] = array(
+                                    'key' => '_for_sale',
+                                    'value' => 'yes',
+                                );
+                                break;
+                            }
+                        }
+                    }
+
+                    $departments_query[] = $departments_sub_query;
+                }
+                $meta_query[] = $departments_query;
             }
             
             if ( !empty($meta_query) )
