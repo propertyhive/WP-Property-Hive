@@ -1,21 +1,21 @@
 <?php
 /**
- * Elementor Property Maps Link Widget.
+ * Elementor Property Map Link Widget.
  *
  * @since 1.0.0
  */
-class Elementor_Property_Maps_Link_Widget extends \Elementor\Widget_Base {
+class Elementor_Property_Map_Link_Widget extends \Elementor\Widget_Base {
 
 	public function get_name() {
-		return 'property-maps-link';
+		return 'property-map-link';
 	}
 
 	public function get_title() {
-		return __( 'Maps Link', 'propertyhive' );
+		return __( 'Map Link', 'propertyhive' );
 	}
 
 	public function get_icon() {
-		return 'eicon-document-file';
+		return 'eicon-google-maps';
 	}
 
 	public function get_categories() {
@@ -31,8 +31,22 @@ class Elementor_Property_Maps_Link_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'style_section',
 			[
-				'label' => __( 'Maps Link Settings', 'propertyhive' ),
+				'label' => __( 'Map Link Settings', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'map_link_type',
+			[
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'label' => esc_html__( 'Link Type', 'propertyhive' ),
+				'options' => [
+					'_blank' => 'Open map in new window',
+					'embedded' => 'Open embedded map in lightbox',
+					'iframe' => 'Open iframe map in lightbox',
+				],
+				'default' => '_blank',
 			]
 		);
 
@@ -135,12 +149,41 @@ class Elementor_Property_Maps_Link_Widget extends \Elementor\Widget_Base {
 		if ( !isset($property->id) ) {
 			return;
 		}
-		echo '<a href = "#map_lightbox" data-fancybox> View Map </a>';
+
+		if ( $property->latitude == '' || $property->longitude == '' || $property->latitude == '0' || $property->longitude == '0' )
+		{
+			return;
+		}
+
+		$link_type = ( isset($settings['map_link_type']) && !empty($settings['map_link_type']) ) ? $settings['map_link_type'] : '_blank';
+
+		switch ($link_type)
+		{
+			case "_blank":
+			{
+				echo '<a href="https://www.google.com/maps/?q=' . $property->latitude . ',' . $property->longitude . '&ll=' . $property->latitude . ',' . $property->longitude . '" target="_blank">' . __( 'View Map', 'propertyhive' ) . '</a>';
+				break;
+			}
+			case "embedded":
+			{
+				echo '<a href="#map_lightbox" data-fancybox>' . __( 'View Map', 'propertyhive' ) . '</a>';
 		
-	echo '<div id="map_lightbox" style="display:none; width:90%; max-width:600px;">';
-   	 echo do_shortcode('[property_map]');
-    	echo '</div>';
-
-
+				echo '<div id="map_lightbox" style="display:none; width:90%; max-width:800px;">';
+		   	 		echo do_shortcode('[property_map]');
+		    	echo '</div>';
+				break;
+			}
+			case "iframe":
+			{
+				echo '<a 
+				    href="#" 
+				    data-fancybox 
+				    data-type="iframe" 
+				    data-src="https://maps.google.com/?output=embed&amp;f=q&amp;q=' . $property->latitude . ',' . $property->longitude . '&amp;ll=' . $property->latitude . ',' . $property->longitude . '&amp;layer=t&amp;hq=&amp;t=m&amp;z=15"
+				>' . __( 'View Map', 'propertyhive' ) . '</a>';
+				break;
+			}
+		}
+		
 	}
 }
