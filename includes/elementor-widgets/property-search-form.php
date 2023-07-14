@@ -53,6 +53,27 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$departments = ph_get_departments();
+
+        $department_options = array();
+
+        foreach ( $departments as $key => $value )
+        {
+            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
+            {
+                $department_options[$key] = $value;
+            }
+        }
+		$this->add_control(
+			'default_department',
+			[
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'label' => esc_html__( 'Default Department', 'propertyhive' ),
+				'options' => $department_options,
+				'default' => get_option( 'propertyhive_primary_department' ),
+			]
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -204,6 +225,6 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 
 		$settings = $this->get_settings_for_display();
 
-		echo do_shortcode('[property_search_form id="' . ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) . '"]');
+		echo do_shortcode('[property_search_form id="' . ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) . '"' . ( ( isset($settings['default_department']) && !empty($settings['default_department']) ) ? ' default_department="' . $settings['default_department'] . '"' : '' ) . ']');
 	}
 }
