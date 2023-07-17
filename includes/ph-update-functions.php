@@ -52,3 +52,25 @@ function propertyhive_update_1468_on_market_change_dates() {
 
     wp_reset_postdata();
 }
+
+/**
+ * Record the fact we've updated to version 2 from an older version and which add ons were installed at the time of update
+ *
+ * @return void
+ */
+function propertyhive_update_200_pre_pro_record_installed_plugins() 
+{
+    $installed_plugins = array();
+
+    $features = get_ph_pro_features();
+
+    foreach ( $features as $feature )
+    {
+        if ( is_dir( WP_PLUGIN_DIR . '/' . $feature['slug'] ) )
+        {
+            $installed_plugins[] = $feature['slug'];
+        }
+    }
+
+    update_option( 'propertyhive_pre_pro_add_ons', $installed_plugins );
+}
