@@ -60,6 +60,22 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'output_ratio',
+			[
+				'label' => __( 'Image Ratio', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'options' => [
+					'' => __( 'Uploaded Ratio', 'propertyhive' ),
+					'3:2' => __( '3:2', 'propertyhive' ),
+					'4:3' => __( '4:3', 'propertyhive' ),
+					'16:9' => __( '16:9', 'propertyhive' ),
+					'1:1' => __( 'Square', 'propertyhive' ),
+				],
+				'default' => ''
+			]
+		);
+
 		$this->end_controls_section();
 
 	}
@@ -80,21 +96,56 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 			$image_number = (int)$settings['image_number'];
 		}
 
-		if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
-        {
-        	$photos = $property->_photo_urls;
-        	if ( isset($photos[$image_number-1]) )
-        	{
-        		echo '<img src="' . $photos[$image_number-1]['url'] . '" alt="">';
-        	}
-        }
-        else
-        {
-			$gallery_attachment_ids = $property->get_gallery_attachment_ids();
+		$output_ratio = isset($settings['output_ratio']) ? $settings['output_ratio'] : '';
 
-			if ( isset($gallery_attachment_ids[$image_number-1]) )
-			{
-				echo wp_get_attachment_image( $gallery_attachment_ids[$image_number-1], $settings['image_size'] );
+		if ( $output_ratio != '' )
+		{
+			// output div with image as background
+			$url = '';
+			if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
+	        {
+	        	$photos = $property->_photo_urls;
+	        	if ( isset($photos[$image_number-1]) )
+	        	{
+	        		$url = $photos[$image_number-1]['url'];
+	        	}
+	        }
+	        else
+	        {
+				$gallery_attachment_ids = $property->get_gallery_attachment_ids();
+
+				if ( isset($gallery_attachment_ids[$image_number-1]) )
+				{
+					$url = wp_get_attachment_image_src( $gallery_attachment_ids[$image_number-1], $settings['image_size'] );
+					$url = $url[0];
+				}
+			}
+
+			// convert ratio to percentage
+	        $numbers = explode(':', $output_ratio);
+	        $percent = ( ( (int)$numbers[1] / (int)$numbers[0] ) * 100 ) . '%';
+
+	        echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover; padding-bottom:' . $percent . '">';
+		}
+		else
+		{
+			// output <img>
+			if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
+	        {
+	        	$photos = $property->_photo_urls;
+	        	if ( isset($photos[$image_number-1]) )
+	        	{
+	        		echo '<img src="' . $photos[$image_number-1]['url'] . '" alt="">';
+	        	}
+	        }
+	        else
+	        {
+				$gallery_attachment_ids = $property->get_gallery_attachment_ids();
+
+				if ( isset($gallery_attachment_ids[$image_number-1]) )
+				{
+					echo wp_get_attachment_image( $gallery_attachment_ids[$image_number-1], $settings['image_size'] );
+				}
 			}
 		}
 	}
