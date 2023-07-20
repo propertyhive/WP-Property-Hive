@@ -223,6 +223,74 @@ jQuery( function($){
         ph_toggle_auto_incremental_reference_number_options();
     });
     ph_toggle_auto_incremental_reference_number_options();
+
+    jQuery('.pro-feature-settings input[name=\'active_plugins[]\']').change(function()
+    {
+        var parent_el = jQuery(this);
+        var is_checked = parent_el.is(':checked');
+
+        var slug = parent_el.val();
+
+        jQuery(this).parent().next('.loading').show();
+        jQuery(this).parent().hide();
+
+        if ( is_checked )
+        {
+            // need to install/activate plugin
+            jQuery.ajax({
+                url : ajaxurl,
+                method: 'POST',
+                data : {
+                    action: "propertyhive_activate_pro_feature", 
+                    slug : slug, 
+                    _ajax_nonce: propertyhive_admin_settings.ajax_nonce
+                },
+                dataType : "json",
+                success: function(response) 
+                {
+                    if ( response.success === true )
+                    {
+                        window.location.href = propertyhive_admin_settings.license_key_settings_url + '&successmessage=1';
+                    }
+                    else
+                    {
+                        parent_el.prop('checked', false);
+                        parent_el.parent().next('.loading').hide();
+                        parent_el.parent().show();
+                        alert(response.data.errorMessage);
+                    }
+                }
+            });
+        }
+        else
+        {
+            // need to deactivate plugin
+            jQuery.ajax({
+                url : ajaxurl,
+                method: 'POST',
+                data : {
+                    action: "propertyhive_deactivate_pro_feature", 
+                    slug : slug, 
+                    _ajax_nonce: propertyhive_admin_settings.ajax_nonce
+                },
+                dataType : "json",
+                success: function(response) 
+                {
+                    if ( response.success === true )
+                    {
+                        window.location.href = propertyhive_admin_settings.license_key_settings_url + '&successmessage=2';
+                    }
+                    else
+                    {
+                        parent_el.prop('checked', 'checked');
+                        parent_el.parent().next('.loading').hide();
+                        parent_el.parent().show();
+                        alert(response.data.errorMessage);
+                    }
+                }
+            });
+        }
+    });
 });
 
 function ph_toggle_maps_provider_options()

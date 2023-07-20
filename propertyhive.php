@@ -281,6 +281,8 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/class-ph-yoast-seo.php' );              // Yoast SEO
             include_once( 'includes/class-ph-rank-math.php' );              // Rank Math
             include_once( 'includes/class-ph-duplicate-post.php' );         // Duplicate Post
+
+            include_once( 'includes/ph-pro-feature-functions.php' );        // Pro Features
             
             $this->query = new PH_Query();
             $this->email = new PH_Emails();

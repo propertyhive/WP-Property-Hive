@@ -278,6 +278,8 @@ class PH_Admin_Assets {
                 'default_country_not_in_selected'           => __( 'The default country hasn\'t been selected as a country you operate in', 'propertyhive' ),
                 'admin_url'                                 => admin_url(),
                 'taxonomy_section'                          => ( ( isset($_GET['section']) ) ? sanitize_text_field($_GET['section']) : '' ),
+                'ajax_nonce'                                => wp_create_nonce("updates"),
+                'license_key_settings_url'                  => admin_url('admin.php?page=ph-settings&tab=licensekey'),
             );
             wp_localize_script( 'propertyhive_admin_settings', 'propertyhive_admin_settings', $params );
         }
