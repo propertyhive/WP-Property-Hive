@@ -129,12 +129,17 @@ class PH_AJAX {
             'save_account_details' => true,
             'save_account_requirements' => true,
 
+            // Dismissing notices
             'dismiss_notice_leave_review' => false,
             'dismiss_notice_demo_data' => false,
             'dismiss_notice_missing_search_results' => false,
             'dismiss_notice_missing_google_maps_api_key' => false,
             'dismiss_notice_invalid_expired_license_key' => false,
             'dismiss_notice_email_cron_not_running' => false,
+
+            // PRO features activate/deactivate
+            'activate_pro_feature' => false,
+            'deactivate_pro_feature' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -6030,6 +6035,117 @@ class PH_AJAX {
 
         // Quit out
         die();
+    }
+
+    public function activate_pro_feature()
+    {
+        // check plugin status
+        $slug = ph_clean($_POST['slug']);
+
+        $feature = get_ph_pro_feature( $slug );
+
+        if ( $feature === false )
+        {
+            $return = array(
+                'errorMessage' => 'Feature not found'
+            );
+            wp_send_json_error($return);
+        }
+
+        if ( is_plugin_active( $feature['plugin'] ) )
+        {
+            $return = array(
+                'errorMessage' => 'Plugin already active'
+            );
+            wp_send_json_error($return);
+        }
+
+        // check it's not a pro feature if they don't have pro enabled
+        if ( isset($feature['pro']) && $feature['pro'] === true )
+        {
+            $valid_license_key = false;
+
+            // check it's not a plugin that was installed pre version 2
+            $pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', array() );
+            if ( empty($pre_pro_add_ons) ) { $pre_pro_add_ons = array(); }
+            foreach ($pre_pro_add_ons as $pre_pro_add_on)
+            {
+                if ( $pre_pro_add_on['slug'] == $slug )
+                {
+                    // Yep. It was installed already and should be allowed to be activated
+                    $valid_license_key = true;
+                }
+            }
+
+            if ( $valid_license_key === false )
+            {
+                // check license key valid
+                
+            }
+
+            if ( $valid_license_key === false )
+            {
+                $return = array(
+                    'errorMessage' => 'Trying to activate a PRO feature but no valid PRO license key entered'
+                );
+                wp_send_json_error($return);
+            }
+        }
+
+        if ( is_dir(WP_PLUGIN_DIR . '/' . $slug) )
+        {
+            // folder already exists. just activate it
+            $activated = activate_plugin( $feature['plugin'] );
+            if ( is_wp_error( $activated ) ) 
+            {
+                $return = array(
+                    'errorMessage' => $activated->get_error_message()
+                );
+                wp_send_json_error($return);
+            }
+
+            wp_send_json_success();
+        }
+
+        wp_ajax_install_plugin();
+
+        wp_send_json_success();
+    }
+
+    public function deactivate_pro_feature()
+    {
+        if ( !wp_verify_nonce( $_POST['_ajax_nonce'], "updates" ) ) 
+        {
+            $return = array(
+                'errorMessage' => 'Invalid nonce provided'
+            );
+            wp_send_json_error($return);
+        } 
+
+        if ( ! current_user_can( 'install_plugins' ) ) 
+        {
+            $return = array(
+                'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.' )
+            );
+            wp_send_json_error( $status );
+        }
+
+        // check plugin is active
+        $slug = ph_clean($_POST['slug']);
+
+        $feature = get_ph_pro_feature( $slug );
+
+        if ( !is_plugin_active( $feature['plugin'] ) )
+        {
+            $return = array(
+                'errorMessage' => 'Plugin not active'
+            );
+            wp_send_json_error($return);
+        }
+
+        deactivate_plugins( array($feature['plugin']) );
+
+        wp_send_json_success();
     }
 }
 
