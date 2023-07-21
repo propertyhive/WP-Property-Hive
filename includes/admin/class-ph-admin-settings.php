@@ -31,6 +31,7 @@ class PH_Admin_Settings {
 			include_once( 'settings/class-ph-settings-page.php' );
 
 			$settings[] = include( 'settings/class-ph-settings-general.php' );
+			$settings[] = include( 'settings/class-ph-settings-features.php' );
             $settings[] = include( 'settings/class-ph-settings-offices.php' );
             $settings[] = include( 'settings/class-ph-settings-custom-fields.php' );
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
