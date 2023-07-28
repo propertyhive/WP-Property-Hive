@@ -1,4 +1,8 @@
+var initial_save_changes_value = '';
+
 jQuery( function($){
+
+    initial_save_changes_value = (jQuery('p.submit button.button-primary').length > 0) ? jQuery('p.submit button.button-primary').text() : '';
 
     $('a#add_department').click(function(e)
     {
@@ -291,7 +295,45 @@ jQuery( function($){
             });
         }
     });
+
+    if ( jQuery('[name=\'propertyhive_license_type\']').length > 0 )
+    {
+        ph_toggle_license_key_settings();
+
+        jQuery('[name=\'propertyhive_license_type\']').change(function()
+        {
+            ph_toggle_license_key_settings();
+        });
+    }
 });
+
+function ph_toggle_license_key_settings()
+{
+    if ( jQuery('[name=\'propertyhive_license_type\']:checked').val() == 'old' )
+    {
+        jQuery('#row_pro_license_key_info').hide();
+        jQuery('#row_propertyhive_pro_license_key').hide();
+        jQuery('#row_license_key_info').show();
+        jQuery('#row_propertyhive_license_key').show();
+        jQuery('p.submit button.button-primary').text(initial_save_changes_value);
+    }
+    else
+    {
+        jQuery('#row_pro_license_key_info').show();
+        jQuery('#row_propertyhive_pro_license_key').show();
+        jQuery('#row_license_key_info').hide();
+        jQuery('#row_propertyhive_license_key').hide();
+
+        if ( propertyhive_admin_settings.valid_pro_license_key )
+        {
+            jQuery('p.submit button.button-primary').text('Deactivate key');
+        }
+        else
+        {
+            jQuery('p.submit button.button-primary').text('Activate key');
+        }
+    }
+}
 
 function ph_toggle_maps_provider_options()
 {
