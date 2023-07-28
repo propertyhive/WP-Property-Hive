@@ -137,8 +137,8 @@ class PH_Admin_Settings {
 		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( $_REQUEST['section'] );
 
 	    // Save settings if data has been posted
-	    if ( ! empty( $_POST ) )
-	    	self::save();
+	    //if ( ! empty( $_POST ) )
+	    //	self::save();
 
 	    // Add any posted messages
 	    if ( ! empty( $_GET['ph_error'] ) )

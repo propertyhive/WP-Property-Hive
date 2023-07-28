@@ -31,6 +31,32 @@ class PH_Admin_Menus {
 		add_action( 'admin_head', array( $this, 'menu_highlight' ) );
 
 		add_action( 'admin_bar_menu', array( $this, 'remove_from_admin_bar' ), 999);
+
+		// Handle saving settings earlier than load-{page} hook to avoid race conditions in conditional menus.
+		add_action( 'wp_loaded', array( $this, 'save_settings' ) );
+	}
+
+	public function save_settings() {
+		global $current_tab, $current_section;
+
+		// We should only save on the settings page.
+		if ( ! is_admin() || ! isset( $_GET['page'] ) || 'ph-settings' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		// Include settings pages.
+		PH_Admin_Settings::get_settings_pages();
+		
+		// Get current tab/section.
+		$current_tab     = empty( $_GET['tab'] ) ? 'general' : sanitize_title( wp_unslash( $_GET['tab'] ) ); // WPCS: input var okay, CSRF ok.
+		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( wp_unslash( $_REQUEST['section'] ) ); // WPCS: input var okay, CSRF ok.
+		//var_dump( ! empty( $_POST['save'] ) ); die();
+		// Save settings if data has been posted.
+		if ( '' !== $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}_{$current_section}", ! empty( $_POST['save'] ) ) ) { // WPCS: input var okay, CSRF ok.
+			PH_Admin_Settings::save();
+		} elseif ( '' === $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}", ! empty( $_POST['save'] ) ) ) { // WPCS: input var okay, CSRF ok.
+			PH_Admin_Settings::save();
+		}
 	}
 
 	public function remove_from_admin_bar( $wp_admin_bar )
