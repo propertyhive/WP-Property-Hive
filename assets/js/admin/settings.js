@@ -254,7 +254,7 @@ jQuery( function($){
                 {
                     if ( response.success === true )
                     {
-                        window.location.href = propertyhive_admin_settings.license_key_settings_url + '&successmessage=1';
+                        window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=1';
                     }
                     else
                     {
@@ -282,7 +282,7 @@ jQuery( function($){
                 {
                     if ( response.success === true )
                     {
-                        window.location.href = propertyhive_admin_settings.license_key_settings_url + '&successmessage=2';
+                        window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=2';
                     }
                     else
                     {
