@@ -79,9 +79,9 @@ class PH_Settings_General extends PH_Settings_Page {
             else
             {
                 $active_departments_html .= '<fieldset>
-                    <legend class="screen-reader-text"><span>' . __( 'Active Departments', 'propertyhive' ) . '</span></legend>
-                    <label for="propertyhive_active_departments_' . str_replace("residential-", "", $key) . '">
-                        <input name="propertyhive_active_departments_' . str_replace("residential-", "", $key) . '" id="propertyhive_active_departments_' . str_replace("residential-", "", $key) . '" type="checkbox" value="1" ' . checked( get_option('propertyhive_active_departments_' . str_replace("residential-", "", $key)) , 'yes', false ) . '> ' . $value . '
+                    <legend class="screen-reader-text"><span>' . esc_html(__( 'Active Departments', 'propertyhive' )) . '</span></legend>
+                    <label for="propertyhive_active_departments_' . esc_attr(str_replace("residential-", "", $key)) . '">
+                        <input name="propertyhive_active_departments_' . esc_attr(str_replace("residential-", "", $key)) . '" id="propertyhive_active_departments_' . esc_attr(str_replace("residential-", "", $key)) . '" type="checkbox" value="1" ' . checked( get_option('propertyhive_active_departments_' . str_replace("residential-", "", $key)) , 'yes', false ) . '> ' . esc_html($value) . '
                     </label>
                 </fieldset>';
             }
@@ -92,31 +92,31 @@ class PH_Settings_General extends PH_Settings_Page {
             foreach ( $custom_departments as $key => $custom_department )
             {
                 // key will be custom-0, for example
-                $active_departments_html .= '<fieldset id="propertyhive_active_department_fieldset_' . $key . '">
-                    <legend class="screen-reader-text"><span>' . __( 'Active Departments', 'propertyhive' ) . '</span></legend>
+                $active_departments_html .= '<fieldset id="propertyhive_active_department_fieldset_' . esc_attr($key) . '">
+                    <legend class="screen-reader-text"><span>' . esc_html(__( 'Active Departments', 'propertyhive' )) . '</span></legend>
                     <label>
-                        <input name="propertyhive_active_departments_' . $key . '" type="checkbox" value="1" ' . checked( get_option('propertyhive_active_departments_' . $key), 'yes', false ) . '> 
-                        <input type="text" name="propertyhive_active_departments_name_' . $key . '" value="' . $custom_department['name'] . '">
+                        <input name="propertyhive_active_departments_' . esc_attr($key) . '" type="checkbox" value="1" ' . checked( get_option('propertyhive_active_departments_' . $key), 'yes', false ) . '> 
+                        <input type="text" name="propertyhive_active_departments_name_' . esc_attr($key) . '" value="' . $custom_department['name'] . '">
                         ' . __( 'based on', 'propertyhive' ) . '
-                        <select name="propertyhive_active_departments_based_on_' . $key . '">
+                        <select name="propertyhive_active_departments_based_on_' . esc_attr($key) . '">
                             <option value=""></option>';
                         foreach ( $default_departments as $dept_key => $value )
                         {
-                            $active_departments_html .= '<option value="' . $dept_key . '"' . selected( $custom_department['based_on'], $dept_key, false ) . '>' . $value . '</option>';
+                            $active_departments_html .= '<option value="' . esc_attr($dept_key) . '"' . selected( $custom_department['based_on'], $dept_key, false ) . '>' . esc_html($value) . '</option>';
                         }
                         $active_departments_html .= '
                         </select>
-                        <a href="" class="delete-department" data-department="' . $key . '">Delete</a>
+                        <a href="" class="delete-department" data-department="' . esc_attr($key) . '">Delete</a>
                     </label>
                 </fieldset>';
             }
         }
 
         $active_departments_html .= '</div>
-        <a href="" id="add_department">+ ' . __( 'Add Department', 'propertyhive' ) . '</a>
+        <a href="" id="add_department">+ ' . esc_html(__( 'Add Department', 'propertyhive' )) . '</a>
         <input type="hidden" name="propertyhive_new_custom_departments" id="propertyhive_new_custom_departments" value="0">
-        <input type="hidden" name="propertyhive_custom_departments" id="propertyhive_custom_departments" value="' . implode(",", array_keys($custom_departments)) . '">
-        <input type="hidden" name="propertyhive_custom_departments_original" id="propertyhive_custom_departments_original" value="' . implode(",", array_keys($custom_departments)) . '">
+        <input type="hidden" name="propertyhive_custom_departments" id="propertyhive_custom_departments" value="' . esc_attr(implode(",", array_keys($custom_departments))) . '">
+        <input type="hidden" name="propertyhive_custom_departments_original" id="propertyhive_custom_departments_original" value="' . esc_attr(implode(",", array_keys($custom_departments))) . '">
         ';
 
         $active_departments_html .= '<div id="active_department_template" style="display:none">
@@ -130,7 +130,7 @@ class PH_Settings_General extends PH_Settings_Page {
                         <option value=""></option>';
             foreach ( $default_departments as $key => $value )
             {
-                $active_departments_html .= '<option value="' . $key . '">' . $value . '</option>';
+                $active_departments_html .= '<option value="' . esc_attr($key) . '">' . esc_html($value) . '</option>';
             }
             $active_departments_html .= '
                     </select>

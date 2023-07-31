@@ -50,23 +50,23 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
 
         echo '<p class="form-field price_field ">
         
-            <label for="_price">' . __('Price', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
+            <label for="_price">' . esc_html(__('Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
          
         if ( count($currencies) > 1 )
         {
             echo '<select id="_price_currency" name="_price_currency" class="select" style="width:auto; float:left;">';
             foreach ($currencies as $currency_code => $currency_sybmol)
             {
-                echo '<option value="' . $currency_code . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
             }
             echo '</select>';
         }
         else
         {
-            echo '<input type="hidden" name="_price_currency" value="' . $selected_currency . '">';
+            echo '<input type="hidden" name="_price_currency" value="' . esc_attr($selected_currency) . '">';
         }
 
-        echo '<input type="text" class="" name="_price" id="_price" value="' . ph_display_price_field( get_post_meta( $post->ID, '_price', true ) ) . '" placeholder="" style="width:15%;">
+        echo '<input type="text" class="" name="_price" id="_price" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_price', true ) )) . '" placeholder="" style="width:15%;">
             
         </p>';
         

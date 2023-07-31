@@ -37,14 +37,14 @@ class PH_Meta_Box_Property_Virtual_Tours {
                     <div>
 
                         <p class="form-field virtual_tour_field ">
-                            <label for="">' . __( 'Virtual Tour URL', 'propertyhive' ) . '</label>
-                            <input type="text" class="short" name="virtual_tour[]" id="" value="' . get_post_meta($post->ID, '_virtual_tour_' . $i, TRUE) . '" placeholder="https://"> 
+                            <label for="">' . esc_html(__( 'Virtual Tour URL', 'propertyhive' )) . '</label>
+                            <input type="text" class="short" name="virtual_tour[]" id="" value="' . esc_attr(get_post_meta($post->ID, '_virtual_tour_' . $i, TRUE)) . '" placeholder="https://"> 
                             <a href="" class="button remove_virtual_tour"><span class="fa fa-trash"></span></a>
                         </p>
 
                         <p class="form-field virtual_tour_field ">
                             <label for="">' . __( 'Virtual Tour Label', 'propertyhive' ) . '</label>
-                            <input type="text" class="short" name="virtual_tour_label[]" id="" value="' . ( $label != '' ? $label : __( 'Virtual Tour', 'propertyhive' ) ) . '" placeholder="' . __( 'e.g. Virtual Tour', 'propertyhive' ) . '"> 
+                            <input type="text" class="short" name="virtual_tour_label[]" id="" value="' . esc_attr(( $label != '' ? $label : __( 'Virtual Tour', 'propertyhive' ) )) . '" placeholder="' . esc_attr(__( 'e.g. Virtual Tour', 'propertyhive' )) . '"> 
                         </p>
 
                         <hr>
@@ -60,14 +60,14 @@ class PH_Meta_Box_Property_Virtual_Tours {
             <div>
 
                 <p class="form-field virtual_tour_field ">
-                    <label for="">' . __( 'Virtual Tour URL', 'propertyhive' ) . '</label>
+                    <label for="">' . esc_html(__( 'Virtual Tour URL', 'propertyhive' )) . '</label>
                     <input type="text" class="short" name="virtual_tour[]" id="" value="" placeholder="https://"> 
                     <a href="" class="button remove_virtual_tour"><span class="fa fa-trash"></span></a>
                 </p>
 
                 <p class="form-field virtual_tour_field ">
-                    <label for="">' . __( 'Virtual Tour Label', 'propertyhive' ) . '</label>
-                    <input type="text" class="short" name="virtual_tour_label[]" id="" value="' . __( 'Virtual Tour', 'propertyhive' ) . '" placeholder="' . __( 'e.g. Virtual Tour', 'propertyhive' ) . '"> 
+                    <label for="">' . esc_html(__( 'Virtual Tour Label', 'propertyhive' )) . '</label>
+                    <input type="text" class="short" name="virtual_tour_label[]" id="" value="' . esc_attr(__( 'Virtual Tour', 'propertyhive' )) . '" placeholder="' . esc_attr(__( 'e.g. Virtual Tour', 'propertyhive' )) . '"> 
                 </p>
 
                 <hr>
@@ -79,7 +79,7 @@ class PH_Meta_Box_Property_Virtual_Tours {
             echo '            
             <p class="form-field">
                 <label for="">&nbsp;</label>
-                <a href="" class="button button-primary add_property_virtual_tour"><span class="fa fa-plus"></span> ' . __( 'Add Virtual Tour', 'propertyhive' ) . '</a>
+                <a href="" class="button button-primary add_property_virtual_tour"><span class="fa fa-plus"></span> ' . esc_html(__( 'Add Virtual Tour', 'propertyhive' )) . '</a>
             </p>';
         
             do_action('propertyhive_property_virtual_tours_fields');

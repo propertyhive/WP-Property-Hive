@@ -28,7 +28,7 @@ class PH_Admin_Merge_Contacts {
         ?>
         <div class="wrap propertyhive">
 
-        <h1><?php echo __('Merge Contacts', 'propertyhive'); ?></h1>
+        <h1><?php echo esc_html(__('Merge Contacts', 'propertyhive')); ?></h1>
 
         <p>When you click 'Merge Contacts', all associated records will be moved onto the contact selected as the primary contact, and all other contacts will be deleted.</p>
 
@@ -126,8 +126,8 @@ class PH_Admin_Merge_Contacts {
                 echo implode( '<br>', $contact_parts );
             ?>
             <label style="position:absolute; right:25px; top:25px;">
-                <?php echo __( 'Use as Primary Contact', 'propertyhive' ); ?>
-                <input type="radio" name="primary_merge_contact" value="<?php echo (int)$contact_id; ?>"<?php if ( $i == 0 ) { echo ' checked'; } ?>>
+                <?php echo esc_html(__( 'Use as Primary Contact', 'propertyhive' )); ?>
+                <input type="radio" name="primary_merge_contact" value="<?php echo esc_attr((int)$contact_id); ?>"<?php if ( $i == 0 ) { echo ' checked'; } ?>>
             </label>
                 <?php
 
@@ -135,8 +135,8 @@ class PH_Admin_Merge_Contacts {
             }
             ?>
             <p class="form-field">
-                <input type="button" value="<?php echo __( 'Merge Contacts', 'propertyhive' ); ?>" class="button-primary" id="merge_contacts_button">
-                <a href="<?php echo wp_get_raw_referer(); ?>" class="button" id="cancel_merge_button"><?php echo __( 'Cancel', 'propertyhive' ); ?></a>
+                <input type="button" value="<?php echo esc_attr(__( 'Merge Contacts', 'propertyhive' )); ?>" class="button-primary" id="merge_contacts_button">
+                <a href="<?php echo wp_get_raw_referer(); ?>" class="button" id="cancel_merge_button"><?php echo esc_html(__( 'Cancel', 'propertyhive' )); ?></a>
             </p>
 
             <script>

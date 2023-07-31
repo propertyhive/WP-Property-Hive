@@ -61,9 +61,9 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 			        {
 			            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
 			            {
-			            	echo '<option value="' . $key . '"';
+			            	echo '<option value="' . esc_attr($key) . '"';
 			            	if ( isset($_POST['department']) && $_POST['department'] == $key ) { echo ' selected'; }
-			            	echo '>' . $value . '</option>';
+			            	echo '>' . esc_html($value) . '</option>';
 			           	}
 			        }
 				?>
@@ -98,7 +98,7 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 						{
 							$office_query->the_post();
 					?>
-					<option value="<?php echo get_the_ID(); ?>"<?php if ( isset($_POST['office_id']) && ($_POST['office_id'] == get_the_ID()) ) { echo ' selected'; } ?>><?php echo get_the_title(get_the_ID()); ?></option>
+					<option value="<?php echo esc_attr(get_the_ID()); ?>"<?php if ( isset($_POST['office_id']) && ($_POST['office_id'] == get_the_ID()) ) { echo ' selected'; } ?>><?php echo esc_html(get_the_title(get_the_ID())); ?></option>
 					<?php 
 						} 
 					}
@@ -312,9 +312,9 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					{
 						echo '<tr>';
 
-						echo '<td><a href="' . get_edit_post_link( get_the_ID() ) . '">' . $property->get_formatted_full_address() . '</a></td>';
+						echo '<td><a href="' . get_edit_post_link( get_the_ID() ) . '">' . esc_html($property->get_formatted_full_address()) . '</a></td>';
 						
-						echo '<td>' . implode(", ", $missing) . '</td>';
+						echo '<td>' . esc_html(implode(", ", $missing)) . '</td>';
 
 						echo '</tr>';
 					}

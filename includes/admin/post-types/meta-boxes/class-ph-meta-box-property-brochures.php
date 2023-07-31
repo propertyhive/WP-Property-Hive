@@ -39,8 +39,8 @@ class PH_Meta_Box_Property_Brochures {
                     {
                         echo '
                         <p class="form-field brochure_url_field ">
-                            <label for="brochure_url_' . $i . '">Brochure URL</label>
-                            <input type="text" class="short" name="brochure_url[]" id="" value="' . $brochure['url'] . '" placeholder="http://"> 
+                            <label for="brochure_url_' . esc_attr($i) . '">Brochure URL</label>
+                            <input type="text" class="short" name="brochure_url[]" id="" value="' . esc_attr($brochure['url']) . '" placeholder="https://"> 
                             <a href="" class="button remove_brochure_url"><span class="fa fa-trash"></span></a>
                         </p>';
 
@@ -130,9 +130,9 @@ class PH_Meta_Box_Property_Brochures {
                             }
                         }
                         
-                        echo '<li id="brochure_' . $brochures_attachment_id . '">';
+                        echo '<li id="brochure_' . esc_attr($brochures_attachment_id) . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
-                            echo '<a href="' . wp_get_attachment_url( $brochures_attachment_id ) . '" target="_blank"><img src="' . PH()->plugin_url() . '/assets/images/filetypes/' . $icon . '" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></a>';
+                            echo '<a href="' . wp_get_attachment_url( $brochures_attachment_id ) . '" target="_blank"><img src="' . PH()->plugin_url() . '/assets/images/filetypes/' . $icon . '" alt="" width="' . esc_attr($thumbnail_width) . '" height="' . esc_attr($thumbnail_height) . '"></a>';
                         echo '</li>';
                     }
                 }
@@ -143,12 +143,12 @@ class PH_Meta_Box_Property_Brochures {
                 
                 echo '</ul></div>';
                 
-                echo '<a href="" class="button button-primary ph_upload_brochure_button">' . __('Add Brochures', 'propertyhive') . '</a>';
+                echo '<a href="" class="button button-primary ph_upload_brochure_button">' . esc_html(__('Add Brochures', 'propertyhive')) . '</a>';
     
                 do_action('propertyhive_property_brochures_fields');
     	        
-                echo '<input type="hidden" name="previous_brochure_attachment_ids" id="previous_brochure_attachment_ids" value="' . $input_value . '">';
-                echo '<input type="hidden" name="brochure_attachment_ids" id="brochure_attachment_ids" value="' . $input_value . '">';
+                echo '<input type="hidden" name="previous_brochure_attachment_ids" id="previous_brochure_attachment_ids" value="' . esc_attr($input_value) . '">';
+                echo '<input type="hidden" name="brochure_attachment_ids" id="brochure_attachment_ids" value="' . esc_attr($input_value) . '">';
 
                 echo '<script>
                     // Uploading files

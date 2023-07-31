@@ -39,8 +39,8 @@ class PH_Meta_Box_Property_Floorplans {
                     {
                         echo '
                         <p class="form-field floorplan_url_field ">
-                            <label for="floorplan_url_' . $i . '">Floorplan URL</label>
-                            <input type="text" class="short" name="floorplan_url[]" id="" value="' . $floorplan['url'] . '" placeholder="http://"> 
+                            <label for="floorplan_url_' . esc_attr($i) . '">Floorplan URL</label>
+                            <input type="text" class="short" name="floorplan_url[]" id="" value="' . esc_attr($floorplan['url']) . '" placeholder="https://"> 
                             <a href="" class="button remove_floorplan_url"><span class="fa fa-trash"></span></a>
                         </p>';
 

@@ -33,22 +33,22 @@ class PH_Meta_Box_Tenancy_Details {
 		{
 			echo '<p class="form-field">
         
-            <label for="">' . __( 'Status', 'propertyhive' ) . '</label>';
+            <label for="">' . esc_html(__( 'Status', 'propertyhive' )) . '</label>';
 
 			if ( $start_date && strtotime( $start_date ) > time() )
 			{
-				echo __( 'Pending', 'propertyhive' );
+				echo esc_html(__( 'Pending', 'propertyhive' ));
 			}
 			elseif ( 
                 $start_date && strtotime( $start_date ) <= time() && 
                 ( time() <= strtotime( $end_date ) || $end_date == '' )
             )
 			{
-				echo __( 'Current', 'propertyhive' );
+				echo esc_html(__( 'Current', 'propertyhive' ));
 			}
 			elseif ( $end_date && strtotime( $end_date ) < time() )
 			{
-				echo __( 'Finished', 'propertyhive' );
+				echo esc_html(__( 'Finished', 'propertyhive' ));
 			}
 
 			echo '</p>';
@@ -64,13 +64,13 @@ class PH_Meta_Box_Tenancy_Details {
             $lease_term_type_html = '
                 <p class="form-field lease_term_type_field">
             
-                <label for="_length">' . __('Lease Term and Type', 'propertyhive') . '</label>
+                <label for="_length">' . esc_html(__('Lease Term and Type', 'propertyhive')) . '</label>
 
-                <input type="number" class="" name="_length" id="_length" value="' . get_post_meta( $post->ID, '_length', true ) . '" placeholder="" style="width:70px">
+                <input type="number" class="" name="_length" id="_length" value="' . esc_attr(get_post_meta( $post->ID, '_length', true )) . '" placeholder="" style="width:70px">
                 
                 <select id="_length_units" name="_length_units" class="select" style="width:auto">
-                    <option value="week"' . ( $length_units == 'week' ? ' selected' : '') . '>' . __('Weeks', 'propertyhive') . '</option>
-                    <option value="month"' . ( ($length_units == 'month' || $length_units == '') ? ' selected' : '') . '>' . __('Months', 'propertyhive') . '</option>
+                    <option value="week"' . ( $length_units == 'week' ? ' selected' : '') . '>' . esc_html(__('Weeks', 'propertyhive')) . '</option>
+                    <option value="month"' . ( ($length_units == 'month' || $length_units == '') ? ' selected' : '') . '>' . esc_html(__('Months', 'propertyhive')) . '</option>
                 </select>';
         }
         else
@@ -78,7 +78,7 @@ class PH_Meta_Box_Tenancy_Details {
             $lease_term_type_html = '
                 <p class="form-field lease_term_type_field">
             
-                <label for="_lease_type">' . __('Lease Type', 'propertyhive') . '</label>
+                <label for="_lease_type">' . esc_html(__('Lease Type', 'propertyhive')) . '</label>
             ';
         }
 
@@ -94,7 +94,7 @@ class PH_Meta_Box_Tenancy_Details {
         $i = 1;
         foreach ( $lease_type_options as $lease_type_name => $lease_type_display )
         {
-            $lease_term_type_html .= '<option value="' . $lease_type_name . '"' . ( ($lease_type == $lease_type_name || ( $lease_type == '' && $i === 1 ) ) ? ' selected' : '') . '>' . __($lease_type_display, 'propertyhive') . '</option>';
+            $lease_term_type_html .= '<option value="' . esc_attr($lease_type_name) . '"' . ( ($lease_type == $lease_type_name || ( $lease_type == '' && $i === 1 ) ) ? ' selected' : '') . '>' . esc_html(__($lease_type_display, 'propertyhive')) . '</option>';
             $i++;
         }
 
@@ -150,37 +150,37 @@ class PH_Meta_Box_Tenancy_Details {
 
         echo '<p class="form-field rent_field ">
         
-            <label for="_rent">' . __('Rent', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
+            <label for="_rent">' . esc_html(__('Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
         
         if ( count($currencies) > 1 )
         {
             echo '<select id="_rent_currency" name="_rent_currency" class="select" style="width:auto; float:left;">';
             foreach ($currencies as $currency_code => $currency_sybmol)
             {
-                echo '<option value="' . $currency_code . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
             }
             echo '</select>';
         }
         else
         {
-            echo '<input type="hidden" name="_rent_currency" value="' . $selected_currency . '">';
+            echo '<input type="hidden" name="_rent_currency" value="' . esc_attr($selected_currency) . '">';
         }
 
-        echo '<input type="text" class="" name="_rent" id="_rent" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent', true ) ) . '" placeholder="" style="width:70px">
+        echo '<input type="text" class="" name="_rent" id="_rent" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_rent', true ) )) . '" placeholder="" style="width:70px">
             
             <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:auto">
-                <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
-                <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
-                <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
-                <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>
+                <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . esc_html(__('Per Week', 'propertyhive')) . '</option>
+                <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . esc_html(__('Per Calendar Month', 'propertyhive')) . '</option>
+                <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . esc_html(__('Per Quarter', 'propertyhive')) . '</option>
+                <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . esc_html(__('Per Annum', 'propertyhive')) . '</option>
             </select>
             
         </p>';
 
 		echo '<p class="form-field deposit_field ">
         
-            <label for="_summary_deposit">' . __('Deposit', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>
-			<input type="text" class="" name="_deposit" id="_summary_deposit" value="' . ph_display_price_field( get_post_meta( $post->ID, '_deposit', true ) ) . '" placeholder="" style="width:70px">           
+            <label for="_summary_deposit">' . esc_html(__('Deposit', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>
+			<input type="text" class="" name="_deposit" id="_summary_deposit" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_deposit', true ) )) . '" placeholder="" style="width:70px">           
         </p>';
 
         $args = array(

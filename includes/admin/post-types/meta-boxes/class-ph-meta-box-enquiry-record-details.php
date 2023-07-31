@@ -70,7 +70,7 @@ class PH_Meta_Box_Enquiry_Record_Details {
         
         echo '<p class="form-field office_id_field">
         
-            <label for="office_id">' . __('Office', 'propertyhive') . '</label>
+            <label for="office_id">' . esc_html(__('Office', 'propertyhive')) . '</label>
             
             <select id="_office_id" name="_office_id" class="select short">';
         
@@ -88,12 +88,12 @@ class PH_Meta_Box_Enquiry_Record_Details {
             {
                 $office_query->the_post();
                 
-                echo '<option value="' . $post->ID . '"';
+                echo '<option value="' . esc_attr($post->ID) . '"';
                 if ($post->ID == $office_id)
                 {
                     echo ' selected';
                 }
-                echo '>' . get_the_title() . '</option>';
+                echo '>' . esc_html(get_the_title()) . '</option>';
             }
         }
         

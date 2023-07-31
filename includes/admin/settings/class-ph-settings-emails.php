@@ -435,11 +435,11 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							<input type="hidden" name="page" value="ph-settings">
 							<input type="hidden" name="tab" value="email">
 							<input type="hidden" name="section" value="log">
-							<input type="hidden" name="status" value="<?php echo ( ( isset($_GET['status']) ) ? ph_clean($_GET['status']) : '' ); ?>">
+							<input type="hidden" name="status" value="<?php echo ( ( isset($_GET['status']) ) ? esc_attr(ph_clean($_GET['status'])) : '' ); ?>">
 							<select name="date_from" id="dropdown_date_from">
-								<option value="<?php echo date("Y-m-d", strtotime("-7 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-7 days")) ) { echo ' selected'; } ?>>Last 7 Days</option>
-								<option value="<?php echo date("Y-m-d", strtotime("-14 days")); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-14 days")) ) { echo ' selected'; } ?>>Last 14 Days</option>
-								<option value="<?php echo date("Y-m-d", strtotime("-30 days")); ?>"<?php if ( !isset($_GET['date_from']) || ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-30 days")) ) ) { echo ' selected'; } ?>>Last 30 Days</option>
+								<option value="<?php echo esc_attr(date("Y-m-d", strtotime("-7 days"))); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-7 days")) ) { echo ' selected'; } ?>>Last 7 Days</option>
+								<option value="<?php echo esc_attr(date("Y-m-d", strtotime("-14 days"))); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-14 days")) ) { echo ' selected'; } ?>>Last 14 Days</option>
+								<option value="<?php echo esc_attr(date("Y-m-d", strtotime("-30 days"))); ?>"<?php if ( !isset($_GET['date_from']) || ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-30 days")) ) ) { echo ' selected'; } ?>>Last 30 Days</option>
 								<option value="all"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == 'all' ) { echo ' selected'; } ?>>All Time</option>
 							</select>
 							<input type="submit" name="filter_action" id="post-query-submit" class="button" value="Filter">
@@ -460,10 +460,10 @@ class PH_Settings_Emails extends PH_Settings_Page {
                 <table class="ph_email_queue widefat" cellspacing="0">
                     <thead>
                         <tr>
-                        	<th class="date-time"><?php _e( 'Date/Time', 'propertyhive' ); ?></th>
-                        	<th class="recipient"><?php _e( 'Recipient', 'propertyhive' ); ?></th>
-                            <th class="subject"><?php _e( 'Subject', 'propertyhive' ); ?></th>
-                            <th class="status"><?php _e( 'Status', 'propertyhive' ); ?></th>
+                        	<th class="date-time"><?php echo esc_html(__( 'Date/Time', 'propertyhive' )); ?></th>
+                        	<th class="recipient"><?php echo esc_html(__( 'Recipient', 'propertyhive' )); ?></th>
+                            <th class="subject"><?php echo esc_html(__( 'Subject', 'propertyhive' )); ?></th>
+                            <th class="status"><?php echo esc_html(__( 'Status', 'propertyhive' )); ?></th>
                             <th class="actions">&nbsp;</th>
                         </tr>
                     </thead>
@@ -502,9 +502,9 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							{
 						?>
 						<tr>
-	                    	<td class="date-time"><?php echo date("jS M Y H:i", strtotime($email->send_at)); ?></td>
-	                    	<td class="recipient"><?php echo '<a href="' . get_edit_post_link($email->contact_id) . '">' . get_the_title($email->contact_id) . '</a><br>' . $email->to_email_address; ?></td>
-	                        <td class="subject"><?php echo $email->subject; ?></td>
+	                    	<td class="date-time"><?php echo esc_html(date("jS M Y H:i", strtotime($email->send_at))); ?></td>
+	                    	<td class="recipient"><?php echo '<a href="' . get_edit_post_link($email->contact_id) . '">' . esc_html(get_the_title($email->contact_id)) . '</a><br>' . esc_html($email->to_email_address); ?></td>
+	                        <td class="subject"><?php echo esc_html($email->subject); ?></td>
 	                        <td class="status"><?php
 	                        	switch ($email->status)
 	                        	{

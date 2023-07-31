@@ -39,14 +39,14 @@
 <div class="tablenav top">
     <div class="alignleft actions">
         <select name="_status" id="_sale_status_filter">
-            <option value=""><?php echo __( 'All Statuses', 'propertyhive' ); ?></option>
+            <option value=""><?php echo esc_html(__( 'All Statuses', 'propertyhive' )); ?></option>
             <?php
                 $sale_statuses = ph_get_sale_statuses();
 
                 foreach ( $sale_statuses as $status => $display_status )
                 {
                     ?>
-                    <option value="<?php echo $status; ?>" <?php selected( $status, $selected_status ); ?>><?php echo $display_status; ?></option>
+                    <option value="<?php echo esc_attr($status); ?>" <?php selected( $status, $selected_status ); ?>><?php echo esc_html($display_status); ?></option>
                     <?php
                 }
             ?>
@@ -55,7 +55,7 @@
         <a href="" name="export_action" id="export-property-sales-grid" class="button">Export</a>
     </div>
     <div class='tablenav-pages one-page'>
-        <span class="displaying-num"><?php echo $sales_count; ?> item<?php echo $sales_count != 1 ? 's' : ''; ?></span>
+        <span class="displaying-num"><?php echo esc_attr($sales_count); ?> item<?php echo $sales_count != 1 ? 's' : ''; ?></span>
     </div>
     <br class="clear" />
 </div>
@@ -66,7 +66,7 @@
             foreach ( $columns as $column_key => $column )
             {
                 ?>
-                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo $column; ?></th>
+                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo esc_html($column); ?></th>
                 <?php
             }
         ?>
@@ -86,15 +86,15 @@
                 $column_data = array(
                     'date' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '" data-sale-id="' . get_the_ID() . '">' . date("jS F Y", strtotime($the_sale->_sale_date_time)) . '</a>',
                     'applicant' => $the_sale->get_applicants( true, true ),
-                    'amount' => $the_sale->get_formatted_amount(),
-                    'status' => __( ucwords(str_replace("_", " ", $the_sale->_status)), 'propertyhive' ),
+                    'amount' => esc_html($the_sale->get_formatted_amount()),
+                    'status' => esc_html(__( ucwords(str_replace("_", " ", $the_sale->_status)), 'propertyhive' )),
                 );
 
                 $row_classes = array( 'status-' . $the_sale->_status );
                 $row_classes = apply_filters( 'propertyhive_property_sales_row_classes', $row_classes, get_the_ID(), $the_sale );
                 $row_classes = is_array($row_classes) ? array_map( 'sanitize_html_class', array_map( 'strtolower', $row_classes ) ) : array();
                 ?>
-                    <tr class="<?php echo implode(" ", $row_classes); ?>" >
+                    <tr class="<?php echo esc_attr(implode(" ", $row_classes)); ?>" >
                     <?php
                         foreach ( $columns as $column_key => $column )
                         {
@@ -118,7 +118,7 @@
         {
             ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="<?php echo count($columns); ?>"><?php echo __( 'No sales found', 'propertyhive' ); ?></td>
+                <td class="colspanchange" colspan="<?php echo esc_attr(count($columns)); ?>"><?php echo esc_html(__( 'No sales found', 'propertyhive' )); ?></td>
             </tr>
             <?php
         }

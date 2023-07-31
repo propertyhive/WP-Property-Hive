@@ -31,7 +31,7 @@ class PH_Meta_Box_Property_Actions {
 			                href="' . admin_url('admin.php?page=ph-matching-applicants&property_id=' . $post->ID) . '" 
 			                class="button"
 			                style="width:100%; margin-bottom:7px; text-align:center" 
-			            >' . __('View Matching Applicants', 'propertyhive') . '</a>';
+			            >' . esc_html(__('View Matching Applicants', 'propertyhive')) . '</a>';
 		        }
 
 		        if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
@@ -40,7 +40,7 @@ class PH_Meta_Box_Property_Actions {
 			                href="' . admin_url('post-new.php?post_type=enquiry&property_id=' . $post->ID) . '" 
 			                class="button"
 			                style="width:100%; margin-bottom:7px; text-align:center" 
-			            >' . __('Record Enquiry', 'propertyhive') . '</a>';
+			            >' . esc_html(__('Record Enquiry', 'propertyhive')) . '</a>';
             	}
 
 	        	if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
@@ -49,7 +49,7 @@ class PH_Meta_Box_Property_Actions {
 			                href="#action_panel_book_viewing" 
 			                class="button property-action"
 			                style="width:100%; margin-bottom:7px; text-align:center" 
-			            >' . __('Book Viewing', 'propertyhive') . '</a>';
+			            >' . esc_html(__('Book Viewing', 'propertyhive')) . '</a>';
 		        }
 
 		        if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
@@ -71,7 +71,7 @@ class PH_Meta_Box_Property_Actions {
 				                href="#action_panel_record_offer" 
 				                class="button property-action"
 				                style="width:100%; margin-bottom:7px; text-align:center" 
-				            >' . __('Record Offer', 'propertyhive') . '</a>';
+				            >' . esc_html(__('Record Offer', 'propertyhive')) . '</a>';
 			        }
 			    }
 
@@ -83,7 +83,7 @@ class PH_Meta_Box_Property_Actions {
 								href="' . admin_url('post-new.php?post_type=tenancy&property_id=' . $post->ID) . '"
 								class="button"
 								style="width:100%; margin-bottom:7px; text-align:center"
-							>' . __('Create Tenancy', 'propertyhive') . '</a>';
+							>' . esc_html(__('Create Tenancy', 'propertyhive')) . '</a>';
 					}
 				}
 
@@ -96,7 +96,7 @@ class PH_Meta_Box_Property_Actions {
 		        }
 		        else
 		        {
-		        	echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+		        	echo '<div style="text-align:center">' . esc_html(__( 'No actions to display', 'propertyhive' )) . '</div>';
 		        }
 
 	        echo '</div>';
@@ -110,22 +110,22 @@ class PH_Meta_Box_Property_Actions {
 
 	    		<div class="form-field">
 
-		            <label for="_viewing_start_date">' . __( 'Viewing Date/Time', 'propertyhive' ) . '</label>
+		            <label for="_viewing_start_date">' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</label>
 
-	            	<input type="date" class="small" name="_viewing_start_date" id="_viewing_start_date" value="' . date("Y-m-d") . '" placeholder="" style="width:55%">
+	            	<input type="date" class="small" name="_viewing_start_date" id="_viewing_start_date" value="' . esc_attr(date("Y-m-d")) . '" placeholder="" style="width:55%">
 					<select id="_viewing_start_time_hours" name="_viewing_start_time_hours" class="select short" style="max-width:20%">';
 	            	for ( $i = 0; $i <= 23; ++$i )
 	            	{
 	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
-	            		echo '<option value="' . $j . '"';
+	            		echo '<option value="' . esc_attr($j) . '"';
 	            		if ( $j == date("H") ) { echo ' selected'; }
-	            		echo '>' . $j . '</option>';
+	            		echo '>' . esc_html($j) . '</option>';
 	            	}
 	            	echo '</select><select id="_viewing_start_time_minutes" name="_viewing_start_time_minutes" class="select short" style="max-width:20%">';
 	            	for ( $i = 0; $i <= 59; $i+=5 )
 	            	{
 	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
-	            		echo '<option value="' . $j . '">' . $j . '</option>';
+	            		echo '<option value="' . esc_attr($j) . '">' . esc_html($j) . '</option>';
 	            	}
 	            	echo '</select>
 
@@ -136,13 +136,13 @@ class PH_Meta_Box_Property_Actions {
 		        <div class="form-field">
 
 		            <label for="viewing_applicant_search">
-		            	<div style="float:right;"><a href="#" id="viewing-applicant-search-new-toggle" style="text-decoration:none;">' . __( 'Applicant Doesn\'t Exist', 'propertyhive' ) . '</a></div>
-		            	' . __( 'Applicant', 'propertyhive' ) . '
+		            	<div style="float:right;"><a href="#" id="viewing-applicant-search-new-toggle" style="text-decoration:none;">' . esc_html(__( 'Applicant Doesn\'t Exist', 'propertyhive' )) . '</a></div>
+		            	' . esc_html(__( 'Applicant', 'propertyhive' )) . '
 		            </label>
 
 		            <div id="viewing_existing_applicant_search" style="position:relative">
 
-		            	<input type="text" name="viewing_applicant_search" id="viewing_applicant_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
+		            	<input type="text" name="viewing_applicant_search" id="viewing_applicant_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Existing Contacts', 'propertyhive' )) . '..." autocomplete="false">
 
 		            	<div id="viewing_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -151,8 +151,8 @@ class PH_Meta_Box_Property_Actions {
 		            </div>
 
 		            <div id="viewing_new_applicant" style="display:none">
-		            	<input type="text" name="viewing_applicant_name" id="viewing_applicant_name" style="width:100%;" placeholder="' . __( 'Enter Applicant Name', 'propertyhive' ) . '">
-		            	<em>Upon booking a new ' . str_replace("-", " ", get_post_meta( $post->ID, '_department', TRUE)) . ' applicant will be created with this name.</em>
+		            	<input type="text" name="viewing_applicant_name" id="viewing_applicant_name" style="width:100%;" placeholder="' . esc_attr(__( 'Enter Applicant Name', 'propertyhive' )) . '">
+		            	<em>Upon booking a new ' . esc_html(str_replace("-", " ", get_post_meta( $post->ID, '_department', TRUE))) . ' applicant will be created with this name.</em>
 		            </div>
 
 		        </div>
@@ -161,9 +161,9 @@ class PH_Meta_Box_Property_Actions {
 
 		        <div class="form-field" style="position:relative">
 
-		            <label for="viewing_negotiator_search">' . __( 'Attending Negotiator(s)', 'propertyhive' ) . '</label>
+		            <label for="viewing_negotiator_search">' . esc_html(__( 'Attending Negotiator(s)', 'propertyhive' )) . '</label>
 
-		            <input type="text" name="viewing_negotiator_search" id="viewing_negotiator_search" style="width:100%;" placeholder="' . __( 'Search Negotiators', 'propertyhive' ) . '..." autocomplete="false">
+		            <input type="text" name="viewing_negotiator_search" id="viewing_negotiator_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Negotiators', 'propertyhive' )) . '..." autocomplete="false">
 
 		            <div id="viewing_search_negotiator_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -171,8 +171,8 @@ class PH_Meta_Box_Property_Actions {
 
 		        </div>
 
-		        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-		        <a class="button button-primary viewing-action-submit" href="#">' . __( 'Book Viewing', 'propertyhive' ) . '</a>
+		        <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+		        <a class="button button-primary viewing-action-submit" href="#">' . esc_html(__( 'Book Viewing', 'propertyhive' )) . '</a>
 
 			</div>
 
@@ -185,22 +185,22 @@ class PH_Meta_Box_Property_Actions {
 
 	    		<div class="form-field">
 
-		            <label for="_offer_date">' . __( 'Offer Date/Time', 'propertyhive' ) . '</label>
+		            <label for="_offer_date">' . esc_html(__( 'Offer Date/Time', 'propertyhive' )) . '</label>
 
-	            	<input type="date" class="small" name="_offer_date" id="_offer_date" value="' . date("Y-m-d") . '" placeholder="" style="width:55%">
+	            	<input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(date("Y-m-d")) . '" placeholder="" style="width:55%">
 					<select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="max-width:20%">';
 	            	for ( $i = 0; $i <= 23; ++$i )
 	            	{
 	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
-	            		echo '<option value="' . $j . '"';
+	            		echo '<option value="' . esc_attr($j) . '"';
 	            		if ( $j == date("H") ) { echo ' selected'; }
-	            		echo '>' . $j . '</option>';
+	            		echo '>' . esc_html($j) . '</option>';
 	            	}
 	            	echo '</select><select id="_offer_time_minutes" name="_offer_time_minutes" class="select short" style="max-width:20%">';
 	            	for ( $i = 0; $i <= 59; $i+=5 )
 	            	{
 	            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
-	            		echo '<option value="' . $j . '">' . $j . '</option>';
+	            		echo '<option value="' . esc_attr($j) . '">' . esc_html($j) . '</option>';
 	            	}
 	            	echo '</select>
 
@@ -211,13 +211,13 @@ class PH_Meta_Box_Property_Actions {
 		        <div class="form-field">
 
 		            <label for="offer_applicant_search">
-		            	<div style="float:right;"><a href="#" id="offer-applicant-search-new-toggle" style="text-decoration:none;">' . __( 'Applicant Doesn\'t Exist', 'propertyhive' ) . '</a></div>
-		            	' . __( 'Applicant', 'propertyhive' ) . '
+		            	<div style="float:right;"><a href="#" id="offer-applicant-search-new-toggle" style="text-decoration:none;">' . esc_html(__( 'Applicant Doesn\'t Exist', 'propertyhive' )) . '</a></div>
+		            	' . esc_html(__( 'Applicant', 'propertyhive' )) . '
 		            </label>
 
 		            <div id="offer_existing_applicant_search" style="position:relative">
 
-		            	<input type="text" name="offer_applicant_search" id="offer_applicant_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
+		            	<input type="text" name="offer_applicant_search" id="offer_applicant_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Existing Contacts', 'propertyhive' )) . '..." autocomplete="false">
 
 		            	<div id="offer_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -226,8 +226,8 @@ class PH_Meta_Box_Property_Actions {
 		            </div>
 
 		            <div id="offer_new_applicant" style="display:none">
-		            	<input type="text" name="offer_applicant_name" id="offer_applicant_name" style="width:100%;" placeholder="' . __( 'Enter Applicant Name', 'propertyhive' ) . '">
-		            	<em>Upon booking a new ' . str_replace("-", " ", get_post_meta( $post->ID, '_department', TRUE)) . ' applicant will be created with this name.</em>
+		            	<input type="text" name="offer_applicant_name" id="offer_applicant_name" style="width:100%;" placeholder="' . esc_attr(__( 'Enter Applicant Name', 'propertyhive' )) . '">
+		            	<em>Upon booking a new ' . esc_html(str_replace("-", " ", get_post_meta( $post->ID, '_department', TRUE))) . ' applicant will be created with this name.</em>
 		            </div>
 
 		        </div>
@@ -236,14 +236,14 @@ class PH_Meta_Box_Property_Actions {
 
 		        <div class="form-field" style="position:relative">
 
-		            <label for="_offer_amount">' . __( 'Offer Amount', 'propertyhive' ) . ' (&pound;)</label>
+		            <label for="_offer_amount">' . esc_html(__( 'Offer Amount', 'propertyhive' )) . ' (&pound;)</label>
 
 		            <input type="text" name="_offer_amount" id="_offer_amount" style="width:100%;">
 
 		        </div>
 
-		        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-		        <a class="button button-primary offer-action-submit" href="#">' . __( 'Record Offer', 'propertyhive' ) . '</a>
+		        <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+		        <a class="button button-primary offer-action-submit" href="#">' . esc_html(__( 'Record Offer', 'propertyhive' )) . '</a>
 
 			</div>
 
@@ -256,7 +256,7 @@ class PH_Meta_Box_Property_Actions {
 
     			<div id="success_actions"></div>
 
-    			<a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+    			<a class="button action-cancel" style="width:100%;" href="#">' . esc_html(__( 'Back To Actions', 'propertyhive' )) . '</a>
 
     		</div>
 

@@ -227,11 +227,11 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
                 	// confirmation status
                 	if ( $the_appraisal->all_confirmed == 'yes' )
                 	{
-                		echo __( 'All Parties Confirmed', 'propertyhive' );
+                		echo esc_html(__( 'All Parties Confirmed', 'propertyhive' ));
                 	}
                 	else
                 	{
-                		echo __( 'Awaiting Confirmation', 'propertyhive' );
+                		echo esc_html(__( 'Awaiting Confirmation', 'propertyhive' ));
                 	}
                 }
 
@@ -246,11 +246,11 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
             			$user_info = get_userdata($negotiator_id);
             			$negotiators[] = $user_info->display_name;
             		}
-            		echo implode(", ", $negotiators);
+            		echo esc_html(implode(", ", $negotiators));
             	}
             	else
             	{
-            		echo '<em>- ' . __( 'None Set', 'propertyhive' ) . ' -</em>';
+            		echo '<em>- ' . esc_html(__( 'None Set', 'propertyhive' )) . ' -</em>';
             	}
             	break;
 			default :

@@ -59,18 +59,18 @@ class PH_Meta_Box_Viewing_Applicant {
                 $fields = array(
                     'name' => array(
                         'label' => __('Name', 'propertyhive'),
-                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . $applicant_contact_id . '" data-viewing-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
+                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . esc_attr($applicant_contact_id) . '" data-viewing-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
                     ),
                     'telephone_number' => array(
                         'label' => __('Telephone Number', 'propertyhive'),
-                        'value' => $contact->telephone_number,
+                        'value' => esc_html($contact->telephone_number),
                     ),
                     'email_address' => array(
                         'label' => __('Email Address', 'propertyhive'),
-                        'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                        'value' => '<a href="mailto:' . esc_attr($contact->email_address) . '">' . esc_html($contact->email_address) . '</a>',
                     ),
                 );
-                echo '<input type="hidden" name="existing_viewing_applicant" value="' . $applicant_contact_id . '">';
+                echo '<input type="hidden" name="existing_viewing_applicant" value="' . esc_attr($applicant_contact_id) . '">';
 
                 $fields = apply_filters( 'propertyhive_viewing_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
@@ -91,17 +91,17 @@ class PH_Meta_Box_Viewing_Applicant {
             }
         }
         ?>
-        <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo ( !empty($applicant_contact_ids) ? implode('|', $applicant_contact_ids ) : '' ); ?>">
+        <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo ( !empty($applicant_contact_ids) ? esc_attr(implode('|', $applicant_contact_ids )) : '' ); ?>">
 
         <div id="viewing_applicant_search_existing">
 
             <p class="form-field">
 
-                <label for="viewing_applicant_search"><?php echo __('Search Applicants', 'propertyhive'); ?></label>
+                <label for="viewing_applicant_search"><?php echo esc_html(__('Search Applicants', 'propertyhive')); ?></label>
 
                 <span style="position:relative;">
 
-                    <input type="text" name="viewing_applicant_search" id="viewing_applicant_search" style="width:100%;" placeholder="<?php echo __( 'Search Existing Contacts', 'propertyhive' ); ?>..." autocomplete="false">
+                    <input type="text" name="viewing_applicant_search" id="viewing_applicant_search" style="width:100%;" placeholder="<?php echo esc_attr(__( 'Search Existing Contacts', 'propertyhive' )); ?>..." autocomplete="false">
 
                     <div id="viewing_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 

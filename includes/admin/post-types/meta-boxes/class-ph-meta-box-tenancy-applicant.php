@@ -59,18 +59,18 @@ class PH_Meta_Box_Tenancy_Applicant {
                 $fields = array(
                     'name' => array(
                         'label' => __('Name', 'propertyhive'),
-                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-tenancy-applicant-id="' . $applicant_contact_id . '" data-tenancy-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
+                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-tenancy-applicant-id="' . esc_attr($applicant_contact_id) . '" data-tenancy-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
                     ),
                     'telephone_number' => array(
                         'label' => __('Telephone Number', 'propertyhive'),
-                        'value' => $contact->telephone_number,
+                        'value' => esc_html($contact->telephone_number),
                     ),
                     'email_address' => array(
                         'label' => __('Email Address', 'propertyhive'),
-                        'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                        'value' => '<a href="mailto:' . esc_attr($contact->email_address) . '">' . esc_html($contact->email_address) . '</a>',
                     ),
                 );
-                echo '<input type="hidden" name="existing_tenancy_applicant" value="' . $applicant_contact_id . '">';
+                echo '<input type="hidden" name="existing_tenancy_applicant" value="' . esc_attr($applicant_contact_id) . '">';
 
                 $fields = apply_filters( 'propertyhive_tenancy_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
@@ -82,7 +82,7 @@ class PH_Meta_Box_Tenancy_Applicant {
 
                         <label>' . esc_html($field['label']) . '</label>
 
-                        ' . $field['value'] . '
+                        ' .  $field['value'] . '
 
                     </p>';
                 }
@@ -92,7 +92,7 @@ class PH_Meta_Box_Tenancy_Applicant {
                 ?>
                     <p class="form-field">
                         <label></label>
-                        <a href="" class="button" id="remove-tenancy-tenant-<?php echo $applicant_contact_id; ?>"><?php echo __('Remove Tenant', 'propertyhive'); ?></a>
+                        <a href="" class="button" id="remove-tenancy-tenant-<?php echo esc_attr($applicant_contact_id); ?>"><?php echo esc_html(__('Remove Tenant', 'propertyhive')); ?></a>
                     </p>
                 <?php
                 }
@@ -101,16 +101,16 @@ class PH_Meta_Box_Tenancy_Applicant {
             }
         }
         ?>
-        <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo ( !empty($applicant_contact_ids) ? implode('|', $applicant_contact_ids ) : '' ); ?>">
+        <input type="hidden" name="_applicant_contact_ids" id="_applicant_contact_ids" value="<?php echo ( !empty($applicant_contact_ids) ? esc_attr(implode('|', $applicant_contact_ids )) : '' ); ?>">
 
         <div id="tenancy_applicant_search_existing">
             <p class="form-field">
 
-                <label for="tenancy_applicant_search"><?php echo __(( empty($applicant_contact_ids) ? 'Search Applicants' : 'Add Applicants' ), 'propertyhive'); ?></label>
+                <label for="tenancy_applicant_search"><?php echo esc_html(__(( empty($applicant_contact_ids) ? 'Search Applicants' : 'Add Applicants' ), 'propertyhive')); ?></label>
 
                 <span style="position:relative;">
 
-                    <input type="text" name="tenancy_applicant_search" id="tenancy_applicant_search" style="width:100%;" placeholder="<?php echo __( 'Search Existing Contacts', 'propertyhive' ); ?>..." autocomplete="false">
+                    <input type="text" name="tenancy_applicant_search" id="tenancy_applicant_search" style="width:100%;" placeholder="<?php echo esc_attr(__( 'Search Existing Contacts', 'propertyhive' )); ?>..." autocomplete="false">
 
                     <div id="tenancy_search_applicant_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 

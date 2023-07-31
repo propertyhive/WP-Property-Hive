@@ -73,11 +73,11 @@ class PH_Meta_Box_Offer_Property {
         {
 echo '<p class="form-field">
             
-                <label for="offer_property_search">' . __('Search Properties', 'propertyhive') . '</label>
+                <label for="offer_property_search">' . esc_html(__('Search Properties', 'propertyhive')) . '</label>
                 
                 <span style="position:relative;">
 
-                    <input type="text" name="offer_property_search" id="offer_property_search" style="width:100%;" placeholder="' . __( 'Search Properties', 'propertyhive' ) . '..." autocomplete="false">
+                    <input type="text" name="offer_property_search" id="offer_property_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Properties', 'propertyhive' )) . '..." autocomplete="false">
 
                     <div id="offer_search_property_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 

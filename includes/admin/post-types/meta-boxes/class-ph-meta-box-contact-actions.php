@@ -102,20 +102,20 @@ class PH_Meta_Box_Contact_Actions {
 
 			            <label for="_viewing_start_date">' . __( 'Viewing Date/Time', 'propertyhive' ) . '</label>
 
-		            	<input type="date" class="small" name="_viewing_start_date" id="_viewing_start_date" value="' . date("Y-m-d") . '" placeholder="" style="width:55%">
+		            	<input type="date" class="small" name="_viewing_start_date" id="_viewing_start_date" value="' . esc_attr(date("Y-m-d")) . '" placeholder="" style="width:55%">
 						<select id="_viewing_start_time_hours" name="_viewing_start_time_hours" class="select short" style="max-width:20%">';
 		            	for ( $i = 0; $i <= 23; ++$i )
 		            	{
 		            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
-		            		echo '<option value="' . $j . '"';
+		            		echo '<option value="' . esc_attr($j) . '"';
 		            		if ( $j == date("H") ) { echo ' selected'; }
-		            		echo '>' . $j . '</option>';
+		            		echo '>' . esc_html($j) . '</option>';
 		            	}
 		            	echo '</select><select id="_viewing_start_time_minutes" name="_viewing_start_time_minutes" class="select short" style="max-width:20%">';
 		            	for ( $i = 0; $i <= 59; $i+=5 )
 		            	{
 		            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
-		            		echo '<option value="' . $j . '">' . $j . '</option>';
+		            		echo '<option value="' . esc_attr($j) . '">' . esc_html($j) . '</option>';
 		            	}
 		            	echo '</select>
 
@@ -167,20 +167,20 @@ class PH_Meta_Box_Contact_Actions {
 
 			            <label for="_offer_date">' . __( 'Offer Date/Time', 'propertyhive' ) . '</label>
 
-		            	<input type="date" class="small" name="_offer_date" id="_offer_date" value="' . date("Y-m-d") . '" placeholder="" style="width:55%">
+		            	<input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(date("Y-m-d")) . '" placeholder="" style="width:55%">
 						<select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="max-width:20%">';
 		            	for ( $i = 0; $i <= 23; ++$i )
 		            	{
 		            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
-		            		echo '<option value="' . $j . '"';
+		            		echo '<option value="' . esc_attr($j) . '"';
 		            		if ( $j == date("H") ) { echo ' selected'; }
-		            		echo '>' . $j . '</option>';
+		            		echo '>' . esc_html($j) . '</option>';
 		            	}
 		            	echo '</select><select id="_offer_time_minutes" name="_offer_time_minutes" class="select short" style="max-width:20%">';
 		            	for ( $i = 0; $i <= 59; $i+=5 )
 		            	{
 		            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
-		            		echo '<option value="' . $j . '">' . $j . '</option>';
+		            		echo '<option value="' . esc_attr($j) . '">' . esc_html($j) . '</option>';
 		            	}
 		            	echo '</select>
 
@@ -292,7 +292,7 @@ class PH_Meta_Box_Contact_Actions {
 		        }
 		        else
 		        {
-		        	echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+		        	echo '<div style="text-align:center">' . esc_html(__( 'No actions to display', 'propertyhive' )) . '</div>';
 		        }
 
 			echo '</div>';

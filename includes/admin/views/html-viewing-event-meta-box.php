@@ -24,15 +24,15 @@ echo '<div class="propertyhive_meta_box">';
 
     echo '<p class="form-field event_start_time_field">
     
-        <label for="_start_date">' . __('Viewing Date / Time', 'propertyhive') . '</label>';
+        <label for="_start_date">' . esc_html(__('Viewing Date / Time', 'propertyhive')) . '</label>';
     
     if ( $readonly )
     {
-        echo date("H:i", strtotime($start_date_time)) . ' on ' . date("l jS F Y", strtotime($start_date_time));
+        echo esc_html(date("H:i", strtotime($start_date_time)) . ' on ' . date("l jS F Y", strtotime($start_date_time)));
     }
     else
     {
-        echo '<input type="date" class="small" name="_start_date" id="_start_date" value="' . date("Y-m-d", strtotime($start_date_time)) . '" placeholder="">
+        echo '<input type="date" class="small" name="_start_date" id="_start_date" value="' . esc_attr(date("Y-m-d", strtotime($start_date_time))) . '" placeholder="">
             <select id="_start_time_hours" name="_start_time_hours" class="select short" style="width:55px">';
         
         if ( $start_date_time == '' )
@@ -46,9 +46,9 @@ echo '<div class="propertyhive_meta_box">';
         for ( $i = 0; $i < 23; ++$i )
         {
             $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-            echo '<option value="' . $j . '"';
+            echo '<option value="' . esc_attr($j) . '"';
             if ($i == $value) { echo ' selected'; }
-            echo '>' . $j . '</option>';
+            echo '>' . esc_html($j) . '</option>';
         }
         
         echo '</select>
@@ -66,9 +66,9 @@ echo '<div class="propertyhive_meta_box">';
         for ( $i = 0; $i < 60; $i+=5 )
         {
             $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-            echo '<option value="' . $j . '"';
+            echo '<option value="' . esc_attr($j) . '"';
             if ($i == $value) { echo ' selected'; }
-            echo '>' . $j . '</option>';
+            echo '>' . esc_html($j) . '</option>';
         }
         
         echo '</select>';
@@ -99,7 +99,7 @@ echo '<div class="propertyhive_meta_box">';
     {
         echo '<p class="form-field">
         
-            <label for="_duration">' . __('Duration', 'propertyhive') . '</label>
+            <label for="_duration">' . esc_html(__('Duration', 'propertyhive')) . '</label>
             
             <select id="_duration" name="_duration" class="select short">';
 
@@ -108,13 +108,13 @@ echo '<div class="propertyhive_meta_box">';
                 // convert duration to reable format (i.e. 1 hour 15 minutes)
                 $hours = floor($duration / 60);
                 $minutes = $duration % 60;
-                echo '<option value="' . ($duration * 60) . '"' . ( $value == ($duration * 60) ? 'selected' : '' ) . '>' . ( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' '. $minutes . ' minutes' : '' ) . '</option>';
+                echo '<option value="' . esc_attr(($duration * 60)) . '"' . ( $value == ($duration * 60) ? 'selected' : '' ) . '>' . esc_html(( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' '. $minutes . ' minutes' : '' )) . '</option>';
             }
             if ( !in_array( $value / 60, $durations))
             {
                 $hours = floor(($value / 60) / 60);
                 $minutes = ($value / 60) % 60;
-                echo '<option value="' . $value . '" selected>' . ( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' ' . $minutes . ' minutes' : '' ) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" selected>' . esc_html(( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' ' . $minutes . ' minutes' : '' )) . '</option>';
             }
 
         echo '</select>
@@ -123,7 +123,7 @@ echo '<div class="propertyhive_meta_box">';
     }
 
     echo '
-    <p class="form-field"><label for="_negotiator_ids">' . __( 'Attending Negotiator(s)', 'propertyhive' ) . '</label>';
+    <p class="form-field"><label for="_negotiator_ids">' . esc_html(__( 'Attending Negotiator(s)', 'propertyhive' )) . '</label>';
 
     $negotiator_ids = get_post_meta( $post->ID, '_negotiator_id' );
     if ( $readonly )
@@ -139,17 +139,17 @@ echo '<div class="propertyhive_meta_box">';
                     $names[] = $user_info->display_name;
                 }
             }
-            echo implode(", ", $names);
+            echo esc_html(implode(", ", $names));
         }
         else
         {
-            echo __( 'Unaccompanied', 'propertyhive' );
+            echo esc_html(__( 'Unaccompanied', 'propertyhive' ));
         }
     }
     else
     {
         echo '
-        <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . __( 'Unaccompanied', 'propertyhive' ) . '" class="multiselect attribute_values">';
+        <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . esc_attr(__( 'Unaccompanied', 'propertyhive' )) . '" class="multiselect attribute_values">';
         
         if ( $pagenow == 'post-new.php' )
         {
@@ -167,12 +167,12 @@ echo '<div class="propertyhive_meta_box">';
         {
             foreach ( $user_query->results as $user ) 
             {
-                echo '<option value="' . $user->ID . '"';
+                echo '<option value="' . esc_attr($user->ID) . '"';
                 if ( in_array($user->ID, $negotiator_ids) )
                 {
                     echo ' selected';
                 }
-                echo '>' . $user->display_name . '</option>';
+                echo '>' . esc_html($user->display_name) . '</option>';
             }
         }
 
@@ -192,7 +192,7 @@ echo '<div class="propertyhive_meta_box">';
     {
         echo '<p class="form-field">
     
-            <label for="">' . __('Booking Notes', 'propertyhive') . '</label>
+            <label for="">' . esc_html(__('Booking Notes', 'propertyhive')) . '</label>
 
             ' . nl2br(esc_html($viewing->booking_notes)) . '
 
@@ -229,7 +229,7 @@ echo '<div class="propertyhive_meta_box">';
     
     if ( isset($_GET['viewing_id']) )
     {
-        echo '<input type="hidden" name="_original_viewing_id" value="' . (int)$_GET['viewing_id'] . '">';
+        echo '<input type="hidden" name="_original_viewing_id" value="' . esc_attr((int)$_GET['viewing_id']) . '">';
     }
 
     echo '<input type="hidden" name="_num_requiring_confirmation" id="_num_requiring_confirmation" value="">';

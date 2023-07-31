@@ -278,8 +278,8 @@ class PH_Meta_Box_Property_Address {
         }
         
 ?>
-<p class="form-field location_id_field"><label for="location_id"><?php _e( 'Location', 'propertyhive' ); ?></label>
-        <select id="location_id" name="location_id[]" multiple="multiple" data-placeholder="<?php _e( 'Select location(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
+<p class="form-field location_id_field"><label for="location_id"><?php echo esc_html(__( 'Location', 'propertyhive' )); ?></label>
+        <select id="location_id" name="location_id[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select location(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
             <?php
 
                 $options = array( '' => '' );

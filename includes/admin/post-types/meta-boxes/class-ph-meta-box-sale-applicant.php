@@ -44,15 +44,15 @@ class PH_Meta_Box_Sale_Applicant {
                 $fields = array(
                     'name' => array(
                         'label' => __('Name', 'propertyhive'),
-                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-sale-applicant-id="' . $applicant_contact_id . '" data-sale-applicant-name="' . get_the_title($applicant_contact_id) . '">' . get_the_title($applicant_contact_id) . '</a>',
+                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-sale-applicant-id="' . esc_attr($applicant_contact_id) . '" data-sale-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
                     ),
                     'telephone_number' => array(
                         'label' => __('Telephone Number', 'propertyhive'),
-                        'value' => $contact->telephone_number,
+                        'value' => esc_html($contact->telephone_number),
                     ),
                     'email_address' => array(
                         'label' => __('Email Address', 'propertyhive'),
-                        'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                        'value' => '<a href="mailto:' . esc_attr($contact->email_address) . '">' . esc_html($contact->email_address) . '</a>',
                     ),
                 );
 

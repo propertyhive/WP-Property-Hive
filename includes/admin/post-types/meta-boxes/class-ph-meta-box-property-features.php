@@ -69,12 +69,12 @@ class PH_Meta_Box_Property_Features {
                         echo '</tr>';
                     }
 
-                    echo '<td width="33%"><label style="margin:0; padding:0; float:none; width:100%;"><input type="checkbox" name="feature_ids[]" value="' . $term_id . '"';
+                    echo '<td width="33%"><label style="margin:0; padding:0; float:none; width:100%;"><input type="checkbox" name="feature_ids[]" value="' . esc_attr($term_id) . '"';
                     if ( in_array($term_id, $selected_values) )
                     {
                         echo ' checked';
                     }
-                    echo '> ' . $name . '</label></td>';
+                    echo '> ' . esc_html($name) . '</label></td>';
 
                     ++$i;
                 }
@@ -113,7 +113,7 @@ class PH_Meta_Box_Property_Features {
                         echo '
                         <p class="form-field feature_field ">
                             <label for="features_1">Feature</label>
-                            <input type="text" class="short" name="feature[]" id="" value="' . get_post_meta($post->ID, '_feature_' . $i, TRUE) . '" placeholder=""> 
+                            <input type="text" class="short" name="feature[]" id="" value="' . esc_attr(get_post_meta($post->ID, '_feature_' . $i, TRUE)) . '" placeholder=""> 
                             <a href="" class="button remove_feature"><span class="fa fa-trash"></span></a>
                         </p>';
                     }
@@ -125,7 +125,7 @@ class PH_Meta_Box_Property_Features {
                 echo '
                 <p class="form-field feature_field ">
                     <label for="features_1">Feature</label>
-                    <input type="text" class="short" name="feature[]" id="" value="" placeholder="' . __( 'e.g. Close to main transport links', 'propertyhive' ) . '"> 
+                    <input type="text" class="short" name="feature[]" id="" value="" placeholder="' . esc_attr(__( 'e.g. Close to main transport links', 'propertyhive' )) . '"> 
                     <a href="" class="button remove_feature"><span class="fa fa-trash"></span></a>
                 </p>';
                 

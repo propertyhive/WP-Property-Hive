@@ -55,9 +55,9 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 
 											foreach ( array( 'pending', 'booked', 'complete' ) as $status )
 											{
-													$output .= '<option value="' . $status . '"';
+													$output .= '<option value="' . esc_attr($status) . '"';
 													$output .= selected($status, $selected_value, false );
-													$output .= '>' . ucwords($status) . '</option>';
+													$output .= '>' . esc_html(ucwords($status)) . '</option>';
 											}
 
 											$output .= '</select>';
