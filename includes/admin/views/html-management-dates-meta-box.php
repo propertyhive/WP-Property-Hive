@@ -119,7 +119,7 @@
     <div class="alignleft actions">
 
     <select name="_key_date_type_id" id="_type_id_filter">
-        <option value=""><?php echo __( 'All Types', 'propertyhive' ); ?></option>
+        <option value=""><?php echo esc_html(__( 'All Types', 'propertyhive' )); ?></option>
         <?php
         if ( !empty( $key_date_type_terms ) && !is_wp_error( $key_date_type_terms ) )
         {
@@ -129,7 +129,7 @@
                 if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
                 {
                     $selected = ( isset($selected_type_id) && $selected_type_id == $key_date_type_term->term_id ) ? ' selected' : '';
-                    echo '<option value="' . $key_date_type_term->term_id . '"' . $selected . '>' . $key_date_type_term->name . '</option>';
+                    echo '<option value="' . esc_attr($key_date_type_term->term_id) . '"' . $selected . '>' . esc_html($key_date_type_term->name) . '</option>';
                 }
             }
         }
@@ -187,24 +187,24 @@
             {
                 $key_date = new PH_Key_Date( $key_date_post );
                 ?>
-                <tr id="post-<?php echo $key_date_post->ID; ?>" class="post-<?php echo $key_date_post->ID; ?> key-date-row">
+                <tr id="post-<?php echo $key_date_post->ID; ?>" class="post-<?php echo esc_attr($key_date_post->ID); ?> key-date-row">
                     <td class="description column-description" data-colname="Description">
                         <div class="cell-main-content"><?php echo $key_date->description(); ?></div>
                         <div class="row-actions">
                             <span class="inline hide-if-no-js">
-                                <button type="button" id="<?php echo $key_date_post->ID; ?>" class="button-link meta-box-quick-edit">
+                                <button type="button" id="<?php echo esc_attr($key_date_post->ID); ?>" class="button-link meta-box-quick-edit">
                                     Quick&nbsp;Edit
                                 </button>
                                  | 
                             </span>
                             <span class="trash">
-                                <a href="" id="<?php echo $key_date_post->ID; ?>" class="submitdelete meta-box-delete">Delete</a>
+                                <a href="" id="<?php echo esc_attr($key_date_post->ID); ?>" class="submitdelete meta-box-delete">Delete</a>
                             </span>
                         </div>
                     </td>
                     <td class="notes column-notes" data-colname="Notes">
-                        <div class="cell-main-content"><?php echo !empty($key_date->notes()) ? nl2br( $key_date->notes() ) : '-'; ?></div>
-                        <div class="hidden hidden-key-date-notes"><?php echo $key_date->notes(); ?></div>
+                        <div class="cell-main-content"><?php echo !empty($key_date->notes()) ? nl2br( esc_html($key_date->notes()) ) : '-'; ?></div>
+                        <div class="hidden hidden-key-date-notes"><?php echo esc_html($key_date->notes()); ?></div>
                     </td>
                     <td class="tenants column-tenants" data-colname="Tenants">
                         <div class="cell-main-content">
@@ -230,11 +230,11 @@
                                 $date_format = 'H:i jS F Y';
                             }
                         ?>
-                        <div class="cell-main-content"><?php echo $key_date->date_due()->format( $date_format ); ?></div>
+                        <div class="cell-main-content"><?php echo esc_html($key_date->date_due()->format( $date_format )); ?></div>
                     </td>
                     <td class="status column-status" data-colname="Status">
-                        <div class="cell-main-content"><?php echo ucwords( $key_date->status() ); ?></div>
-                        <div class="hidden hidden-date-type-id"><?php echo $key_date->key_date_type_id(); ?></div>
+                        <div class="cell-main-content"><?php echo esc_html(ucwords( $key_date->status() )); ?></div>
+                        <div class="hidden hidden-date-type-id"><?php echo esc_html($key_date->key_date_type_id()); ?></div>
                     </td>
                 </tr>
                 <?php
@@ -278,7 +278,7 @@
 <div class="propertyhive_meta_box">
     <div class="options_group">
         <p class="form-field _add_key_date_type_field">
-            <label for="_add_key_date_type"><?php echo __('Key Date Type', 'propertyhive'); ?></label>
+            <label for="_add_key_date_type"><?php echo esc_html(__('Key Date Type', 'propertyhive')); ?></label>
             <select id="_add_key_date_type" name="_add_key_date_type" class="select short">
                 <option value="">Select Type</option>
                 <?php
@@ -289,7 +289,7 @@
                         $recurrence_type = isset($recurrence_rules[$key_date_type_term->term_id]) ? $recurrence_rules[$key_date_type_term->term_id]['recurrence_type'] : '';
                         if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
                         {
-                            echo '<option value="' . $key_date_type_term->term_id . '">' . $key_date_type_term->name . '</option>';
+                            echo '<option value="' . esc_attr($key_date_type_term->term_id) . '">' . esc_html($key_date_type_term->name) . '</option>';
                         }
                     }
                 }
@@ -297,19 +297,19 @@
             </select>
         </p>
         <p class="form-field _add_key_date_description_field">
-            <label for="_add_key_date_description"><?php echo __('Description', 'propertyhive'); ?></label>
+            <label for="_add_key_date_description"><?php echo esc_html(__('Description', 'propertyhive')); ?></label>
             <input type="text" id="_add_key_date_description" name="_add_key_date_description" value="" class="short">
         </p>
         <p class="form-field _add_key_date_due_field">
-            <label for="_add_key_date_due"><?php echo __('Date Due', 'propertyhive'); ?></label>
-            <input type="date" class="small" name="_add_key_date_due" id="_add_key_date_due" value="<?php echo date("Y-m-d"); ?>" placeholder="">
+            <label for="_add_key_date_due"><?php echo esc_html(__('Date Due', 'propertyhive')); ?></label>
+            <input type="date" class="small" name="_add_key_date_due" id="_add_key_date_due" value="<?php echo esc_attr(date("Y-m-d")); ?>" placeholder="">
 
             <select id="_add_key_date_due_hours" name="_add_key_date_due_hours" class="select short" style="width:55px">';
                 <?php
                 for ( $i = 0; $i < 23; ++$i )
                 {
                     $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-                    echo '<option value="' . $j . '">' . $j . '</option>';
+                    echo '<option value="' . esc_attr($j) . '">' . esc_html($j) . '</option>';
                 }
                 ?>
             </select>
@@ -319,17 +319,17 @@
                 for ( $i = 0; $i < 60; $i+=5 )
                 {
                     $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-                    echo '<option value="' . $j . '">' . $j . '</option>';
+                    echo '<option value="' . esc_attr($j) . '">' . esc_html($j) . '</option>';
                 }
                 ?>
             </select>
         </p>
         <p class="form-field _add_key_notes_field">
-            <label for="_add_key_date_notes"><?php echo __('Notes', 'propertyhive'); ?></label>
+            <label for="_add_key_date_notes"><?php echo esc_html(__('Notes', 'propertyhive')); ?></label>
             <textarea id="_add_key_date_notes" name="_add_key_date_notes" class="short"></textarea>
         </p>
         <p>
-            <a href="#" class="add_key_date button button-primary"><?php _e( 'Add Key Date', 'propertyhive' ); ?></a>
+            <a href="#" class="add_key_date button button-primary"><?php echo esc_html(__( 'Add Key Date', 'propertyhive' )); ?></a>
         </p>
     </div>
 </div>

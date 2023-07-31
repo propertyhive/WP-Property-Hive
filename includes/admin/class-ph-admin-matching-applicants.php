@@ -74,13 +74,13 @@ class PH_Admin_Matching_Applicants {
 ?>
             <p class="submit">
 
-                <input name="save" class="button-primary" type="submit" value="<?php echo __( 'Send Matches', 'propertyhive' ); ?>" />
+                <input name="save" class="button-primary" type="submit" value="<?php echo esc_attr(__( 'Send Matches', 'propertyhive' )); ?>" />
                 <?php if ( isset($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) ) { ?>
-                <input name="preview" id="preview_email" class="button" type="button" value="<?php echo __( 'Preview Email', 'propertyhive' ); ?>" />
+                <input name="preview" id="preview_email" class="button" type="button" value="<?php echo esc_attr(__( 'Preview Email', 'propertyhive' )); ?>" />
                 <?php } ?>
 
                 <input type="hidden" name="step" value="two" />
-                <input type="hidden" name="email_contact_applicant_profile_id" value="<?php echo ( isset($_POST['email_contact_applicant_profile_id']) && is_array($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) ) ? implode(",", ph_clean($_POST['email_contact_applicant_profile_id'])) : ''; ?>" />
+                <input type="hidden" name="email_contact_applicant_profile_id" value="<?php echo ( isset($_POST['email_contact_applicant_profile_id']) && is_array($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) ) ? esc_attr(implode(",", ph_clean($_POST['email_contact_applicant_profile_id']))) : ''; ?>" />
                 <?php do_action( 'propertyhive_applicant_match_step_two_hidden_fields' ); ?>
                 <?php wp_nonce_field( 'propertyhive-matching-applicants' ); ?>
 

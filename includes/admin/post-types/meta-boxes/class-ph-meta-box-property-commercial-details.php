@@ -94,39 +94,39 @@ class PH_Meta_Box_Property_Commercial_Details {
 
         echo '<p class="form-field price_field">
         
-            <label for="_price_from">' . __('Price', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_sale_currency] . '</span>)' : '' ) . '</label>';
+            <label for="_price_from">' . esc_html(__('Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_sale_currency] . '</span>)' : '' ) . '</label>';
          
         if ( count($currencies) > 1 )
         {
             echo '<select id="_commercial_price_currency" name="_commercial_price_currency" class="select" style="width:auto; float:left;">';
             foreach ($currencies as $currency_code => $currency_sybmol)
             {
-                echo '<option value="' . $currency_code . '"' . ( ($currency_code == $selected_sale_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_sale_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
             }
             echo '</select>';
         }
         else
         {
-            echo '<input type="hidden" name="_commercial_price_currency" value="' . $selected_sale_currency . '">';
+            echo '<input type="hidden" name="_commercial_price_currency" value="' . esc_attr($selected_sale_currency) . '">';
         }
 
         $price_options = get_commercial_price_units( );
 
         echo '
-        <input type="text" class="" name="_price_from" id="_price_from" value="' . ph_display_price_field( get_post_meta( $post->ID, '_price_from', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_price_from" id="_price_from" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_price_from', true ) )) . '" placeholder="" style="width:15%; min-width:85px;">
         <span style="float:left"> - </span>
-        <input type="text" class="" name="_price_to" id="_price_to" value="' . ph_display_price_field( get_post_meta( $post->ID, '_price_to', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_price_to" id="_price_to" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_price_to', true ) )) . '" placeholder="" style="width:15%; min-width:85px;">
 
         <select name="_price_units" id="_price_units">
             <option value=""></option>';
         foreach ( $price_options as $key => $value )
         {
-            echo '<option value="' . $key . '"';
+            echo '<option value="' . esc_attr($key) . '"';
             if ( $key == get_post_meta( $post->ID, '_price_units', true ) )
             {
                 echo ' selected';
             }
-            echo '>' . $value . '</option>';
+            echo '>' . esc_html($value) . '</option>';
         }
         echo '</select>
 
@@ -221,43 +221,43 @@ class PH_Meta_Box_Property_Commercial_Details {
 
         echo '<p class="form-field price_field">
         
-            <label for="_rent_from">' . __('Rent', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_rent_currency] . '</span>)' : '' ) . '</label>';
+            <label for="_rent_from">' . esc_html(__('Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_rent_currency] . '</span>)' : '' ) . '</label>';
          
         if ( count($currencies) > 1 )
         {
             echo '<select id="_commercial_rent_currency" name="_commercial_rent_currency" class="select" style="width:auto; float:left;">';
             foreach ($currencies as $currency_code => $currency_sybmol)
             {
-                echo '<option value="' . $currency_code . '"' . ( ($currency_code == $selected_rent_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_rent_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
             }
             echo '</select>';
         }
         else
         {
-            echo '<input type="hidden" name="_commercial_rent_currency" value="' . $selected_rent_currency . '">';
+            echo '<input type="hidden" name="_commercial_rent_currency" value="' . esc_attr($selected_rent_currency) . '">';
         }
 
         $rent_units = get_post_meta( $post->ID, '_rent_units', true );
 
         echo '
-        <input type="text" class="" name="_rent_from" id="_rent_from" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent_from', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_rent_from" id="_rent_from" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_rent_from', true ) )) . '" placeholder="" style="width:15%; min-width:85px;">
         <span style="float:left; padding:0 5px"> - </span>
-        <input type="text" class="" name="_rent_to" id="_rent_to" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent_to', true ) ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_rent_to" id="_rent_to" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_rent_to', true ) )) . '" placeholder="" style="width:15%; min-width:85px;">
         
         <select name="_rent_units" id="_rent_units">
-            <option value="pd"' . ( ($rent_units == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
-            <option value="pw"' . ( ($rent_units == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
-            <option value="pcm"' . ( ($rent_units == 'pcm') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
-            <option value="pq"' . ( ($rent_units == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
-            <option value="pa"' . ( ($rent_units == 'pa' || $rent_units == '') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>';
+            <option value="pd"' . ( ($rent_units == 'pd') ? ' selected' : '') . '>' . esc_html(__('Per Day', 'propertyhive')) . '</option>
+            <option value="pw"' . ( ($rent_units == 'pw') ? ' selected' : '') . '>' . esc_html(__('Per Week', 'propertyhive')) . '</option>
+            <option value="pcm"' . ( ($rent_units == 'pcm') ? ' selected' : '') . '>' . esc_html(__('Per Calendar Month', 'propertyhive')) . '</option>
+            <option value="pq"' . ( ($rent_units == 'pq') ? ' selected' : '') . '>' . esc_html(__('Per Quarter', 'propertyhive')) . '</option>
+            <option value="pa"' . ( ($rent_units == 'pa' || $rent_units == '') ? ' selected' : '') . '>' . esc_html(__('Per Annum', 'propertyhive')) . '</option>';
         foreach ( $price_options as $key => $value )
         {
-            echo '<option value="' . $key . '"';
+            echo '<option value="' . esc_attr($key) . '"';
             if ( $key == $rent_units )
             {
                 echo ' selected';
             }
-            echo '>' . $value . '</option>';
+            echo '>' . esc_html($value) . '</option>';
         }
         echo '</select>
 
@@ -313,8 +313,8 @@ class PH_Meta_Box_Property_Commercial_Details {
 
         ?>
 
-        <p class="form-field"><label for="property_type_ids"><?php _e( 'Property Types', 'propertyhive' ); ?></label>
-        <select id="property_type_ids" name="property_type_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select property types', 'propertyhive' ); ?>" class="multiselect attribute_values">
+        <p class="form-field"><label for="property_type_ids"><?php echo esc_html(__( 'Property Types', 'propertyhive' )); ?></label>
+        <select id="property_type_ids" name="property_type_ids[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select property types', 'propertyhive' )); ?>" class="multiselect attribute_values">
             <?php
                 $options = array( '' => '' );
                 $args = array(
@@ -392,21 +392,21 @@ class PH_Meta_Box_Property_Commercial_Details {
 
         echo '<p class="form-field">
 
-        <label for="_floor_area_from">' . __('Floor Area', 'propertyhive') . '</label>
+        <label for="_floor_area_from">' . esc_html(__('Floor Area', 'propertyhive')) . '</label>
         
-        <input type="text" class="" name="_floor_area_from" id="_floor_area_from" value="' . get_post_meta( $post->ID, '_floor_area_from', true ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_floor_area_from" id="_floor_area_from" value="' . esc_attr(get_post_meta( $post->ID, '_floor_area_from', true )) . '" placeholder="" style="width:15%; min-width:85px;">
         <span style="float:left; padding:0 5px"> - </span>
-        <input type="text" class="" name="_floor_area_to" id="_floor_area_to" value="' . get_post_meta( $post->ID, '_floor_area_to', true ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_floor_area_to" id="_floor_area_to" value="' . esc_attr(get_post_meta( $post->ID, '_floor_area_to', true )) . '" placeholder="" style="width:15%; min-width:85px;">
 
         <select name="_floor_area_units" id="_floor_area_units">';
         foreach ( $size_options as $key => $value )
         {
-            echo '<option value="' . $key . '"';
+            echo '<option value="' . esc_attr($key) . '"';
             if ( $key == $floor_area_units || ($floor_area_units == '' && $key == apply_filters('propertyhive_default_commercial_floor_area_unit', 'sqft')) )
             {
                 echo ' selected';
             }
-            echo '>' . $value . '</option>';
+            echo '>' . esc_html($value) . '</option>';
         }
         echo '</select>
 
@@ -416,21 +416,21 @@ class PH_Meta_Box_Property_Commercial_Details {
 
         echo '<p class="form-field">
 
-        <label for="_site_area_from">' . __('Site Area', 'propertyhive') . '</label>
+        <label for="_site_area_from">' . esc_html(__('Site Area', 'propertyhive')) . '</label>
         
-        <input type="text" class="" name="_site_area_from" id="_site_area_from" value="' . get_post_meta( $post->ID, '_site_area_from', true ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_site_area_from" id="_site_area_from" value="' . esc_attr(get_post_meta( $post->ID, '_site_area_from', true )) . '" placeholder="" style="width:15%; min-width:85px;">
         <span style="float:left; padding:0 5px"> - </span>
-        <input type="text" class="" name="_site_area_to" id="_site_area_to" value="' . get_post_meta( $post->ID, '_site_area_to', true ) . '" placeholder="" style="width:15%; min-width:85px;">
+        <input type="text" class="" name="_site_area_to" id="_site_area_to" value="' . esc_attr(get_post_meta( $post->ID, '_site_area_to', true )) . '" placeholder="" style="width:15%; min-width:85px;">
 
         <select name="_site_area_units" id="_site_area_units">';
         foreach ( $size_options as $key => $value )
         {
-            echo '<option value="' . $key . '"';
+            echo '<option value="' . esc_attr($key) . '"';
             if ( $key == $site_area_units )
             {
                 echo ' selected';
             }
-            echo '>' . $value . '</option>';
+            echo '>' . esc_html($value) . '</option>';
         }
         echo '</select>
 

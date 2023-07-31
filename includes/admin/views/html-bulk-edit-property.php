@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="inline-edit-group">
 			<label class="alignleft">
-				<span class="title"><?php _e( 'On Market', 'propertyhive' ); ?></span>
+				<span class="title"><?php echo esc_html(__( 'On Market', 'propertyhive' )); ?></span>
 				<span class="input-text-wrap">
 					<select class="on_market" name="_on_market">
 					<?php
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							'no' => __( 'No', 'propertyhive' ),
 						);
 						foreach ($options as $key => $value) {
-							echo '<option value="' . esc_attr( $key ) . '">' . $value . '</option>';
+							echo '<option value="' . esc_attr( $key ) . '">' . esc_html($value) . '</option>';
 						}
 					?>
 					</select>
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="inline-edit-group">
 			<label class="alignleft">
-				<span class="title"><?php _e( 'Availability', 'propertyhive' ); ?></span>
+				<span class="title"><?php echo esc_html(__( 'Availability', 'propertyhive' )); ?></span>
 				<span class="input-text-wrap">
 					<select class="availability" name="_availability">
 					<?php
@@ -58,7 +58,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		                }
 
 						foreach ($options as $key => $value) {
-							echo '<option value="' . esc_attr( $key ) . '">' . $value . '</option>';
+							echo '<option value="' . esc_attr( $key ) . '">' . esc_html($value) . '</option>';
 						}
 					?>
 					</select>
@@ -68,7 +68,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="inline-edit-group">
 			<label class="alignleft">
-				<span class="title"><?php _e( 'Negotiator', 'propertyhive' ); ?></span>
+				<span class="title"><?php echo esc_html(__( 'Negotiator', 'propertyhive' )); ?></span>
 				<span class="input-text-wrap">
 				<?php
 					$args = array(
@@ -85,7 +85,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="inline-edit-group">
 			<label class="alignleft">
-				<span class="title"><?php _e( 'Office', 'propertyhive' ); ?></span>
+				<span class="title"><?php echo esc_html(__( 'Office', 'propertyhive' )); ?></span>
 				<span class="input-text-wrap">
 					<select class="office_id" name="_office_id">
 					<?php
@@ -112,7 +112,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				        $office_query->reset_postdata();
 
 						foreach ($options as $key => $value) {
-							echo '<option value="' . esc_attr( $key ) . '">' . $value . '</option>';
+							echo '<option value="' . esc_attr( $key ) . '">' . esc_html($value) . '</option>';
 						}
 					?>
 					</select>

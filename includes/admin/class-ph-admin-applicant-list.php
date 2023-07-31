@@ -56,7 +56,7 @@ class PH_Admin_Applicant_List {
 
                         foreach ( $department_options as $key => $department )
                         {
-                        	echo '<option value="' . $key . '"';
+                        	echo '<option value="' . esc_attr($key) . '"';
                         	if ( isset($_POST['department']) && $_POST['department'] == $key )
                         	{
                         		echo ' selected';
@@ -65,7 +65,7 @@ class PH_Admin_Applicant_List {
                         	{
                         		echo ' selected';
                         	}
-                        	echo '>' . $department . '</option>';
+                        	echo '>' . esc_html($department) . '</option>';
                         }
 					?>
 					
@@ -216,7 +216,7 @@ class PH_Admin_Applicant_List {
             <?php do_action('propertyhive_applicant_list_additional_fields'); ?>
 
             <p class="form-field">
-                <input type="submit" value="<?php echo __( 'Generate Applicant List', 'propertyhive' ); ?>" class="button-primary">
+                <input type="submit" value="<?php echo esc_attr(__( 'Generate Applicant List', 'propertyhive' )); ?>" class="button-primary">
                 <a href="" class="button" id="export_applicant_list_results_button">Export To CSV</a>
                 <input type="hidden" name="export_applicant_list_results" value="">
             </p>
@@ -234,7 +234,7 @@ class PH_Admin_Applicant_List {
         ?>
         <br>
         <div class="applicant-list-results">
-            <h3><?php echo number_format(count($results)); ?> Applicants Found Matching Your Criteria</h3>
+            <h3><?php echo esc_html(number_format(count($results))); ?> Applicants Found Matching Your Criteria</h3>
             <table width="100%" cellpadding="8" cellspacing="0">
                 <thead>
                     <tr>
@@ -251,7 +251,7 @@ class PH_Admin_Applicant_List {
                             { 
                     ?>
                     <tr>
-                        <td><a href="<?php echo $result['edit_link'] ?>" target="_blank"><?php echo $result['name']; ?></a></td>
+                        <td><a href="<?php echo esc_attr($result['edit_link']); ?>" target="_blank"><?php echo esc_html($result['name']); ?></a></td>
                         <td><?php
                             $contact_details = array();
                             if ( $result['telephone_number'] != '' )
@@ -262,7 +262,7 @@ class PH_Admin_Applicant_List {
                             {
                                 $contact_details[] = 'E: ' . $result['email_address'];
                             }
-                            echo !empty($contact_details) ? implode("<br>", $contact_details) : '-';
+                            echo !empty($contact_details) ? implode("<br>", esc_html($contact_details)) : '-';
                         ?></td>
                         <td><?php
                             if ( isset($result['profile']['department']) )
@@ -274,11 +274,11 @@ class PH_Admin_Applicant_List {
                                         $output = array();
                                         if ( isset($result['profile']['max_price']) && $result['profile']['max_price'] != '' && $result['profile']['max_price'] != 0 )
                                         {
-                                            $output[] = '<strong>Max Price:</strong> &pound;' . number_format($result['profile']['max_price']);
+                                            $output[] = '<strong>Max Price:</strong> &pound;' . esc_html(number_format($result['profile']['max_price']));
                                         }
                                         if ( isset($result['profile']['min_beds']) && $result['profile']['min_beds'] != '' && $result['profile']['min_beds'] != 0 )
                                         {
-                                            $output[] = '<strong>Min Beds:</strong> ' . number_format($result['profile']['min_beds']);
+                                            $output[] = '<strong>Min Beds:</strong> ' . esc_html(number_format($result['profile']['min_beds']));
                                         }
                                         if ( isset($result['profile']['property_types']) && is_array($result['profile']['property_types']) && !empty($result['profile']['property_types']) )
                                         {
@@ -287,7 +287,7 @@ class PH_Admin_Applicant_List {
                                             {
                                                 $output_types[] = $property_types[$profile_type];
                                             }
-                                            $output[] = '<strong>Property Types:</strong> ' . implode(", ", $output_types);
+                                            $output[] = '<strong>Property Types:</strong> ' . esc_html(implode(", ", $output_types));
                                         }
                                         if ( isset($result['profile']['locations']) && is_array($result['profile']['locations']) && !empty($result['profile']['locations']) )
                                         {
@@ -296,11 +296,11 @@ class PH_Admin_Applicant_List {
                                             {
                                                 $output_locations[] = $locations[$profile_location];
                                             }
-                                            $output[] = '<strong>Locations:</strong> ' . implode(", ", $output_locations);
+                                            $output[] = '<strong>Locations:</strong> ' . esc_html(implode(", ", $output_locations));
                                         }
                                         if ( isset($result['profile']['notes']) && $result['profile']['notes'] != '' )
                                         {
-                                            $output[] = '<strong>Additional Requirements:</strong> ' . nl2br($result['profile']['notes']);
+                                            $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
                                         echo( !empty($output) ? implode("<br>", $output) : '-' );
                                         break;
@@ -310,11 +310,11 @@ class PH_Admin_Applicant_List {
                                         $output = array();
                                         if ( isset($result['profile']['max_rent']) && $result['profile']['max_rent'] != '' && $result['profile']['max_rent'] != 0 )
                                         {
-                                            $output[] = '<strong>Max Rent:</strong> &pound;' . number_format($result['profile']['max_rent']) . $result['profile']['rent_frequency'];
+                                            $output[] = '<strong>Max Rent:</strong> &pound;' . esc_html(number_format($result['profile']['max_rent']) . $result['profile']['rent_frequency']);
                                         }
                                         if ( isset($result['profile']['min_beds']) && $result['profile']['min_beds'] != '' && $result['profile']['min_beds'] != 0 )
                                         {
-                                            $output[] = '<strong>Min Beds:</strong> ' . number_format($result['profile']['min_beds']);
+                                            $output[] = '<strong>Min Beds:</strong> ' . esc_html(number_format($result['profile']['min_beds']));
                                         }
                                         if ( isset($result['profile']['property_types']) && is_array($result['profile']['property_types']) && !empty($result['profile']['property_types']) )
                                         {
@@ -323,7 +323,7 @@ class PH_Admin_Applicant_List {
                                             {
                                                 $output_types[] = $property_types[$profile_type];
                                             }
-                                            $output[] = '<strong>Property Types:</strong> ' . implode(", ", $output_types);
+                                            $output[] = '<strong>Property Types:</strong> ' . esc_html(implode(", ", $output_types));
                                         }
                                         if ( isset($result['profile']['locations']) && is_array($result['profile']['locations']) && !empty($result['profile']['locations']) )
                                         {
@@ -332,11 +332,11 @@ class PH_Admin_Applicant_List {
                                             {
                                                 $output_locations[] = $locations[$profile_location];
                                             }
-                                            $output[] = '<strong>Locations:</strong> ' . implode(", ", $output_locations);
+                                            $output[] = '<strong>Locations:</strong> ' . esc_html(implode(", ", $output_locations));
                                         }
                                         if ( isset($result['profile']['notes']) && $result['profile']['notes'] != '' )
                                         {
-                                            $output[] = '<strong>Additional Requirements:</strong> ' . nl2br($result['profile']['notes']);
+                                            $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
                                         echo( !empty($output) ? implode("<br>", $output) : '-' );
                                         break;
@@ -368,11 +368,11 @@ class PH_Admin_Applicant_List {
                                             {
                                                 $output_locations[] = $locations[$profile_location];
                                             }
-                                            $output[] = '<strong>Locations:</strong> ' . implode(", ", $output_locations);
+                                            $output[] = '<strong>Locations:</strong> ' . esc_html(implode(", ", $output_locations));
                                         }
                                         if ( isset($result['profile']['notes']) && $result['profile']['notes'] != '' )
                                         {
-                                            $output[] = '<strong>Additional Requirements:</strong> ' . nl2br($result['profile']['notes']);
+                                            $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
                                         echo( !empty($output) ? implode("<br>", $output) : '-' );
                                         break;
@@ -388,7 +388,7 @@ class PH_Admin_Applicant_List {
                         {
                     ?>
                     <tr>
-                        <td colspan="3" style="text-align:center"><?php echo __( 'No matching applicants found', 'propertyhive' ); ?></td>
+                        <td colspan="3" style="text-align:center"><?php echo esc_html(__( 'No matching applicants found', 'propertyhive' )); ?></td>
                     </tr>
                     <?php
                         }

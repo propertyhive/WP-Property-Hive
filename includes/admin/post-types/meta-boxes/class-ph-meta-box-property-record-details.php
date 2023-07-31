@@ -46,7 +46,7 @@ class PH_Meta_Box_Property_Record_Details {
         
         echo '<p class="form-field negotiator_field">
         
-            <label for="_negotiator_id">' . __('Negotiator', 'propertyhive') . '</label>';
+            <label for="_negotiator_id">' . esc_html(__('Negotiator', 'propertyhive')) . '</label>';
             
             $args = array(
                 'name' => '_negotiator_id', 
@@ -78,7 +78,7 @@ class PH_Meta_Box_Property_Record_Details {
         
         echo '<p class="form-field negotiator_field">
         
-            <label for="_office_id">' . __('Office', 'propertyhive') . '</label>
+            <label for="_office_id">' . esc_html(__('Office', 'propertyhive')) . '</label>
             
             <select id="_office_id" name="_office_id" class="select short">';
         
@@ -98,12 +98,12 @@ class PH_Meta_Box_Property_Record_Details {
             {
                 $office_query->the_post();
                 
-                echo '<option value="' . $post->ID . '"';
+                echo '<option value="' . esc_attr($post->ID) . '"';
                 if ($post->ID == $office_id)
                 {
                     echo ' selected';
                 }
-                echo '>' . get_the_title() . '</option>';
+                echo '>' . esc_html(get_the_title()) . '</option>';
             }
         }
         

@@ -3,7 +3,7 @@
         <div class="options_group">
             <p class="form-field">
                 <label for="date_description">Description</label>
-                <input type="text" id="date_description" class="short" value="<?php echo isset( $_POST['description'] ) ? ph_clean($_POST['description']) : ''; ?>">
+                <input type="text" id="date_description" class="short" value="<?php echo isset( $_POST['description'] ) ? esc_html(ph_clean($_POST['description'])) : ''; ?>">
             </p>
             <p class="form-field">
                 <label for="key_date_status">Status</label>
@@ -17,9 +17,9 @@
                         {
                             $selected_value = 'pending';
                         }
-                        $output .= '<option value="' . $status . '"';
+                        $output .= '<option value="' . esc_attr($status) . '"';
                         $output .= selected($status, $selected_value, false );
-                        $output .=  '>' . ucwords($status) . '</option>';
+                        $output .=  '>' . esc_html(ucwords($status)) . '</option>';
                     }
 
                     $output .= '</select>';
@@ -32,16 +32,16 @@
                 $due_date_time = isset( $_POST['due_date_time'] ) ? strtotime($_POST['due_date_time']) : '';
                 ?>
                 <label for="date_due_quick_edit">Due Date</label>
-                <input type="date" class="small" name="date_due_quick_edit" id="date_due_quick_edit" value="<?php echo date('Y-m-d', $due_date_time); ?>" placeholder="">
+                <input type="date" class="small" name="date_due_quick_edit" id="date_due_quick_edit" value="<?php echo esc_attr(date('Y-m-d', $due_date_time)); ?>" placeholder="">
 
                 <select id="date_due_hours_quick_edit" name="date_due_hours_quick_edit" class="select short" style="width:55px">';
                     <?php
                     for ( $i = 0; $i < 23; ++$i )
                     {
                         $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-                        echo '<option value="' . $j . '"';
+                        echo '<option value="' . esc_attr($j) . '"';
                         if ( date('H', $due_date_time) == $j ) { echo ' selected'; }
-                        echo '>' . $j . '</option>';
+                        echo '>' . esc_html($j) . '</option>';
                     }
                     ?>
                 </select>
@@ -51,15 +51,15 @@
                     for ( $i = 0; $i < 60; $i+=5 )
                     {
                         $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-                        echo '<option value="' . $j . '"';
+                        echo '<option value="' . esc_attr($j) . '"';
                         if ( date('i', $due_date_time) == $j ) { echo ' selected'; }
-                        echo '>' . $j . '</option>';
+                        echo '>' . esc_html($j) . '</option>';
                     }
                     ?>
                 </select>
             </p>
             <p class="form-field">
-                <label for="date_type"><?php echo __('Key Date Type', 'propertyhive'); ?></label>
+                <label for="date_type"><?php echo esc_html(__('Key Date Type', 'propertyhive')); ?></label>
                 <select id="date_type" name="date_type" class="select short">
                     <?php
                     $key_date_type_terms = get_terms( 'management_key_date_type', array(
@@ -77,9 +77,9 @@
                             $recurrence_type = isset($recurrence_rules[$key_date_type_term->term_id]) ? $recurrence_rules[$key_date_type_term->term_id]['recurrence_type'] : '';
                             if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
                             {
-                                echo '<option value="' . $key_date_type_term->term_id . '"';
+                                echo '<option value="' . esc_attr($key_date_type_term->term_id) . '"';
                                 if ( isset( $_POST['type'] ) && $_POST['type'] == $key_date_type_term->term_id ) { echo ' selected'; }
-                                echo '>' . $key_date_type_term->name . '</option>';
+                                echo '>' . esc_html($key_date_type_term->name) . '</option>';
                             }
                         }
                     }
@@ -88,7 +88,7 @@
             </p>
             <p class="form-field">
                 <label for="date_notes_quick_edit">Notes</label>
-                <textarea id="date_notes_quick_edit" class="short"><?php echo ( isset( $_POST['notes'] ) && $_POST['notes'] != '-' ) ? stripslashes( $_POST['notes'] ) : ''; ?></textarea>
+                <textarea id="date_notes_quick_edit" class="short"><?php echo ( isset( $_POST['notes'] ) && $_POST['notes'] != '-' ) ? stripslashes( sanitize_textarea_field($_POST['notes']) ) : ''; ?></textarea>
             </p>
             <?php
             if ( isset($recurrence_rules[$_POST['type']]) && isset( $recurrence_rules[$_POST['type']]['recurrence_rule'] ) )
@@ -104,7 +104,7 @@
                 {
                     ?>
                     <p id="next_key_date_checkbox" class="form-field hidden">
-                        <label for="book_next_key_date"><?php echo __('Book Next ' . ( isset( $_POST['description'] ) ? ph_clean($_POST['description']) : 'Key Date' ) . '?', 'propertyhive'); ?></label>
+                        <label for="book_next_key_date"><?php echo __('Book Next ' . ( isset( $_POST['description'] ) ? esc_html(ph_clean($_POST['description'])) : 'Key Date' ) . '?', 'propertyhive'); ?></label>
                         <input type="checkbox" id="book_next_key_date" >
                     </p>
                     <?php
@@ -139,16 +139,16 @@
                     ?>
                     <p id="next_key_date_field" class="form-field hidden">
                         <label for="next_key_date">&nbsp;</label>
-                        <input type="date" class="small" name="next_key_date" id="next_key_date" value="<?php echo $next_key_date; ?>" placeholder="">
+                        <input type="date" class="small" name="next_key_date" id="next_key_date" value="<?php echo esc_attr($next_key_date); ?>" placeholder="">
 
                         <select id="next_key_date_hours" name="next_key_date_hours" class="select short" style="width:55px">';
                             <?php
                             for ( $i = 0; $i < 23; ++$i )
                             {
                                 $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-                                echo '<option value="' . $j . '"';
+                                echo '<option value="' . esc_attr($j) . '"';
                                 if ( $next_key_date_hours == $j ) { echo ' selected'; }
-                                echo '>' . $j . '</option>';
+                                echo '>' . esc_html($j) . '</option>';
                             }
                             ?>
                         </select>
@@ -158,9 +158,9 @@
                             for ( $i = 0; $i < 60; $i+=5 )
                             {
                                 $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-                                echo '<option value="' . $j . '"';
+                                echo '<option value="' . esc_attr($j) . '"';
                                 if ( $next_key_date_minutes == $j ) { echo ' selected'; }
-                                echo '>' . $j . '</option>';
+                                echo '>' . esc_html($j) . '</option>';
                             }
                             ?>
                         </select>
@@ -169,8 +169,8 @@
                 }
             }
             ?>
-            <button type="button" id="<?php echo (int)$_POST['date_post_id']; ?>" class="button button-primary save-quick-edit">Update</button>&nbsp;
-            <button type="button" id="<?php echo (int)$_POST['date_post_id']; ?>" class="button cancel-quick-edit">Cancel</button>
+            <button type="button" id="<?php echo esc_attr((int)$_POST['date_post_id']); ?>" class="button button-primary save-quick-edit">Update</button>&nbsp;
+            <button type="button" id="<?php echo esc_attr((int)$_POST['date_post_id']); ?>" class="button cancel-quick-edit">Cancel</button>
         </div>
     </div>
 </td>

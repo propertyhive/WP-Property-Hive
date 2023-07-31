@@ -53,14 +53,14 @@
 <div class="tablenav top">
     <div class="alignleft actions">
         <select name="_status" id="_enquiry_status_filter">
-            <option value=""><?php echo __( 'All Statuses', 'propertyhive' ); ?></option>
+            <option value=""><?php echo esc_html(__( 'All Statuses', 'propertyhive' )); ?></option>
             <?php
                 $enquiry_statuses = ph_get_enquiry_statuses();
 
                 foreach ( $enquiry_statuses as $status => $display_status )
                 {
                     ?>
-                    <option value="<?php echo $status; ?>" <?php selected( $status, $selected_status ); ?>><?php echo $display_status; ?></option>
+                    <option value="<?php echo esc_attr($status); ?>" <?php selected( $status, $selected_status ); ?>><?php echo esc_html($display_status); ?></option>
                     <?php
                 }
             ?>
@@ -79,7 +79,7 @@
             foreach ( $columns as $column_key => $column )
             {
                 ?>
-                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo $column; ?></th>
+                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo esc_html($column); ?></th>
                 <?php
             }
         ?>
@@ -97,18 +97,18 @@
                 $edit_link = get_edit_post_link( get_the_ID() );
 
                 $column_data = array(
-                    'date_time' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '">' . get_the_time( 'jS M Y H:i' ) . '</a>',
-                    'subject' => get_the_title(),
-                    'status' => ucfirst( $the_enquiry->status ),
-                    'negotiator' => $the_enquiry->get_negotiator(),
-                    'office' => $the_enquiry->get_office(),
+                    'date_time' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '">' . esc_html(get_the_time( 'jS M Y H:i' )) . '</a>',
+                    'subject' => esc_html(get_the_title()),
+                    'status' => esc_html(ucfirst( $the_enquiry->status )),
+                    'negotiator' => esc_html($the_enquiry->get_negotiator()),
+                    'office' => esc_html($the_enquiry->get_office()),
                 );
 
                 $row_classes = array( 'status-' . $the_enquiry->_status );
                 $row_classes = apply_filters( 'propertyhive_contact_enquiries_row_classes', $row_classes, get_the_ID(), $the_enquiry );
                 $row_classes = is_array($row_classes) ? array_map( 'sanitize_html_class', array_map( 'strtolower', $row_classes ) ) : array();
                 ?>
-                    <tr class="<?php echo implode(" ", $row_classes); ?>" >
+                    <tr class="<?php echo esc_attr(implode(" ", $row_classes)); ?>" >
                     <?php
                         foreach ( $columns as $column_key => $column )
                         {
@@ -132,7 +132,7 @@
         {
             ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="<?php echo count($columns); ?>"><?php echo __( 'No enquiries found', 'propertyhive' ); ?></td>
+                <td class="colspanchange" colspan="<?php echo count($columns); ?>"><?php echo esc_html(__( 'No enquiries found', 'propertyhive' )); ?></td>
             </tr>
             <?php
         }

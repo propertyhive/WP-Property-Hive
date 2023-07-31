@@ -234,9 +234,9 @@ class PH_Admin_Post_Types {
             {
                 if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
                 {
-                    $output .= '<option value="' . $key . '"';
+                    $output .= '<option value="' . esc_attr($key) . '"';
                     $output .= selected( $key, $selected_department, false );
-                    $output .= '>' . $value . '</option>';
+                    $output .= '>' . esc_html($value) . '</option>';
                 }
             }
 
@@ -270,12 +270,12 @@ class PH_Admin_Post_Types {
             {
                 $office_query->the_post();
                 
-                $output .= '<option value="' . $post->ID . '"';
+                $output .= '<option value="' . esc_attr($post->ID) . '"';
                 if ( isset( $_GET['_office_id'] ) && ! empty( $_GET['_office_id'] ) )
                 {
                     $output .= selected( $post->ID, (int)$_GET['_office_id'], false );
                 }
-                $output .= '>' . get_the_title() . '</option>';
+                $output .= '>' . esc_html(get_the_title()) . '</option>';
             }
         }
         
@@ -295,7 +295,7 @@ class PH_Admin_Post_Types {
             'name' => '_negotiator_id', 
             'id' => 'dropdown_property_negotiator_id',
             'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
-            'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int) $_GET['_negotiator_id'],
+            'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int)$_GET['_negotiator_id'],
             'echo' => false,
             'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
         ));
@@ -306,7 +306,7 @@ class PH_Admin_Post_Types {
 	 */
 	public function date_range_filter() {
 
-		$date_range_label = empty( $_GET['_date_range_label'] ) ? 'Any Time' : $_GET['_date_range_label'];
+		$date_range_label = empty( $_GET['_date_range_label'] ) ? __( 'Any Time', 'propertyhive' ) : $_GET['_date_range_label'];
 
 		// The date picker doesn't have a concept of 'Any Time', so valid dates must be used
 		// I've used the last and first date of the month (reversed) as it's a range that is not selectable, but is within the current month
@@ -318,10 +318,10 @@ class PH_Admin_Post_Types {
 
 		return "
             <select name='_date_range_label' id='date_range' style='max-width:25rem;'>
-                <option selected>$date_range_label</option>
+                <option selected>" . esc_html($date_range_label) . "</option>
             <select/>
-            <input type='hidden' name='_date_range_from' id='date_range_from' value='$date_range_from'>
-            <input type='hidden' name='_date_range_to' id='date_range_to' value='$date_range_to'>
+            <input type='hidden' name='_date_range_from' id='date_range_from' value='" . esc_attr($date_range_from) . "'>
+            <input type='hidden' name='_date_range_to' id='date_range_to' value='" . esc_attr($date_range_to) . "'>
         ";
 	}
 
@@ -377,18 +377,18 @@ class PH_Admin_Post_Types {
             }
         }
         
-        $output .= '<option value="">' . __( 'All Locations', 'propertyhive' ) . '</option>';
+        $output .= '<option value="">' . esc_html(__( 'All Locations', 'propertyhive' )) . '</option>';
         
         if ( !empty($options) )
         {
             foreach ( $options as $value => $label )
             {
-                $output .= '<option value="' . $value . '"';
+                $output .= '<option value="' . esc_attr($value) . '"';
                 if ( isset( $_GET['_location_id'] ) && ! empty( $_GET['_location_id'] ) )
                 {
                     $output .= selected( $value, (int)$_GET['_location_id'], false );
                 }
-                $output .= '>' . $label . '</option>';
+                $output .= '>' . esc_html($label) . '</option>';
             }
         }
         
@@ -421,18 +421,18 @@ class PH_Admin_Post_Types {
             }
         }
         
-        $output .= '<option value="">' . __( 'All Availabilities', 'propertyhive' ) . '</option>';
+        $output .= '<option value="">' . esc_html(__( 'All Availabilities', 'propertyhive' )) . '</option>';
         
         if ( !empty($options) )
         {
             foreach ( $options as $value => $label )
             {
-                $output .= '<option value="' . $value . '"';
+                $output .= '<option value="' . esc_attr($value) . '"';
                 if ( isset( $_GET['_availability_id'] ) && ! empty( $_GET['_availability_id'] ) )
                 {
                     $output .= selected( $value, (int)$_GET['_availability_id'], false );
                 }
-                $output .= '>' . $label . '</option>';
+                $output .= '>' . esc_html($label) . '</option>';
             }
         }
         
@@ -476,12 +476,12 @@ class PH_Admin_Post_Types {
 
         foreach ( $options as $key => $value )
         {
-            $output .= '<option value="' . $key . '"';
+            $output .= '<option value="' . esc_attr($key) . '"';
             if ( isset( $_GET['_marketing'] ) && ! empty( $_GET['_marketing'] ) )
             {
                 $output .= selected( $key, sanitize_text_field($_GET['_marketing']), false );
             }
-            $output .= '>' . $value . '</option>';
+            $output .= '>' . esc_html($value) . '</option>';
         }
 
         $output .= '</select>';
@@ -495,7 +495,7 @@ class PH_Admin_Post_Types {
     public function contact_filters() {
         global $wp_query;
 
-        $selected_contact_type = isset( $_GET['_contact_type'] ) && in_array( $_GET['_contact_type'], array( 'owner', 'potentialowner', 'applicant', 'hotapplicant', 'thirdparty' ) ) ? $_GET['_contact_type'] : '';
+        $selected_contact_type = isset( $_GET['_contact_type'] ) && in_array( $_GET['_contact_type'], array( 'owner', 'potentialowner', 'applicant', 'hotapplicant', 'thirdparty' ) ) ? ph_clean($_GET['_contact_type']) : '';
         
         // Type filtering        
         $options = array();
@@ -503,35 +503,35 @@ class PH_Admin_Post_Types {
         // Owners
         $option = '<option value="owner"';
         $option .= selected( 'owner', $selected_contact_type, false );
-        $option .= '>' . __( 'Owners and Landlords', 'propertyhive' ) . '</option>';
+        $option .= '>' . esc_html(__( 'Owners and Landlords', 'propertyhive' )) . '</option>';
 
         $options[] = $option;
 
         // Potential Owners
         $option = '<option value="potentialowner"';
         $option .= selected( 'potentialowner', $selected_contact_type, false );
-        $option .= '>' . __( 'Potential Owners and Landlords', 'propertyhive' ) . '</option>';
+        $option .= '>' . esc_html(__( 'Potential Owners and Landlords', 'propertyhive' )) . '</option>';
 
         $options[] = $option;
 
         // Applicants
         $option = '<option value="applicant"';
         $option .= selected( 'applicant', $selected_contact_type, false );
-        $option .= '>' . __( 'Applicants', 'propertyhive' ) . '</option>';
+        $option .= '>' . esc_html(__( 'Applicants', 'propertyhive' )) . '</option>';
 
         $options[] = $option;
 
         // Hot Applicants
         $option = '<option value="hotapplicant"';
         $option .= selected( 'hotapplicant', $selected_contact_type, false );
-        $option .= '>- ' . __( 'Hot Applicants', 'propertyhive' ) . '</option>';
+        $option .= '>- ' . esc_html(__( 'Hot Applicants', 'propertyhive' )) . '</option>';
 
         $options[] = $option;
 
         // Third Parties
         $option = '<option value="thirdparty"';
         $option .= selected( 'thirdparty', $selected_contact_type, false );
-        $option .= '>' . __( 'Third Party Contacts', 'propertyhive' ) . '</option>';
+        $option .= '>' . esc_html(__( 'Third Party Contacts', 'propertyhive' )) . '</option>';
 
         $options[] = $option;
 
@@ -585,13 +585,13 @@ class PH_Admin_Post_Types {
 
             foreach ( $enquiry_statuses as $status => $display_status )
             {
-                $output .= '<option value="' . $status . '"';
+                $output .= '<option value="' . esc_attr($status) . '"';
                 if ( $status == $selected_status || ( $status == 'open' && ( !isset($_GET['_status']) || empty($_GET['_status']) ) ) )
                 {
                     $output .= ' selected';
                 }
                 $output .= selected( $status, $selected_status, false );
-                $output .= '>' . $display_status . '</option>';
+                $output .= '>' . esc_html($display_status) . '</option>';
             }
 
         $output .= '</select>';
@@ -621,12 +621,12 @@ class PH_Admin_Post_Types {
             
             foreach ( $sources as $key => $value )
             {
-                $output .= '<option value="' . $key . '"';
+                $output .= '<option value="' . esc_attr($key) . '"';
                 if ( isset( $_GET['_source'] ) && ! empty( $_GET['_source'] ) )
                 {
                     $output .= selected( $key, sanitize_text_field($_GET['_source']), false );
                 }
-                $output .= '>' . __( $value, 'propertyhive' ) . '</option>';
+                $output .= '>' . esc_html(__( $value, 'propertyhive' )) . '</option>';
             }
             
         $output .= '</select>';
@@ -659,12 +659,12 @@ class PH_Admin_Post_Types {
             {
                 $office_query->the_post();
                 
-                $output .= '<option value="' . $post->ID . '"';
+                $output .= '<option value="' . esc_attr($post->ID) . '"';
                 if ( isset( $_GET['_office_id'] ) && ! empty( $_GET['_office_id'] ) )
                 {
                     $output .= selected( $post->ID, (int)$_GET['_office_id'], false );
                 }
-                $output .= '>' . get_the_title() . '</option>';
+                $output .= '>' . esc_html(get_the_title()) . '</option>';
             }
         }
         
@@ -683,7 +683,7 @@ class PH_Admin_Post_Types {
             'name' => '_negotiator_id', 
             'id' => 'dropdown_enquiry_negotiator_id',
             'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
-            'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int) $_GET['_negotiator_id'],
+            'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int)$_GET['_negotiator_id'],
             'echo' => false,
             'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
         ));
@@ -710,7 +710,7 @@ class PH_Admin_Post_Types {
     public function appraisal_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'carried_out', 'won', 'lost', 'instructed', 'cancelled' ) ) ? $_GET['_status'] : '';
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'carried_out', 'won', 'lost', 'instructed', 'cancelled' ) ) ? ph_clean($_GET['_status']) : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_appraisal_status">';
@@ -719,27 +719,27 @@ class PH_Admin_Post_Types {
 
             $output .= '<option value="pending"';
             $output .= selected( 'pending', $selected_status, false );
-            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+            $output .= '>' . esc_html(__( 'Pending', 'propertyhive' )) . '</option>';
 
             $output .= '<option value="carried_out"';
             $output .= selected( 'carried_out', $selected_status, false );
-            $output .= '>' . __( 'Carried Out', 'propertyhive' ) . '</option>';
+            $output .= '>' . esc_html(__( 'Carried Out', 'propertyhive' )) . '</option>';
 
             $output .= '<option value="won"';
             $output .= selected( 'won', $selected_status, false );
-            $output .= '>- ' . __( 'Won', 'propertyhive' ) . '</option>';
+            $output .= '>- ' . esc_html(__( 'Won', 'propertyhive' )) . '</option>';
 
             $output .= '<option value="lost"';
             $output .= selected( 'lost', $selected_status, false );
-            $output .= '>- ' . __( 'Lost', 'propertyhive' ) . '</option>';
+            $output .= '>- ' . esc_html(__( 'Lost', 'propertyhive' )) . '</option>';
 
             $output .= '<option value="instructed"';
             $output .= selected( 'instructed', $selected_status, false );
-            $output .= '>- ' . __( 'Instructed', 'propertyhive' ) . '</option>';
+            $output .= '>- ' . esc_html(__( 'Instructed', 'propertyhive' )) . '</option>';
 
             $output .= '<option value="cancelled"';
             $output .= selected( 'cancelled', $selected_status, false );
-            $output .= '>' . __( 'Cancelled', 'propertyhive' ) . '</option>';
+            $output .= '>' . esc_html(__( 'Cancelled', 'propertyhive' )) . '</option>';
             
         $output .= '</select>';
 
@@ -769,7 +769,7 @@ class PH_Admin_Post_Types {
     public function viewing_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'confirmed', 'unconfirmed', 'carried_out', 'awaiting_feedback', 'feedback_passed_on', 'feedback_not_passed_on', 'cancelled', 'no_show' ) ) ? $_GET['_status'] : '';
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'confirmed', 'unconfirmed', 'carried_out', 'awaiting_feedback', 'feedback_passed_on', 'feedback_not_passed_on', 'cancelled', 'no_show' ) ) ? ph_clean($_GET['_status']) : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_viewing_status">';
@@ -780,9 +780,9 @@ class PH_Admin_Post_Types {
 
             foreach ( $viewing_statuses as $status => $display_status )
             {
-                $output .= '<option value="' . $status . '"';
+                $output .= '<option value="' . esc_attr($status) . '"';
                 $output .= selected( $status, $selected_status, false );
-                $output .= '>' . $display_status . '</option>';
+                $output .= '>' . esc_html($display_status) . '</option>';
             }
 
         $output .= '</select>';
@@ -810,7 +810,7 @@ class PH_Admin_Post_Types {
         return $query . '
            INNER JOIN ' . $wpdb->postmeta . ' AS property_meta ON property_meta.post_id = ' . $wpdb->posts . '.ID AND property_meta.meta_key = "_property_id"
            INNER JOIN ' . $wpdb->postmeta . ' AS property_office_meta ON property_office_meta.post_id = property_meta.meta_value AND property_office_meta.meta_key = "_office_id"
-             AND property_office_meta.meta_value = ' . (int) $_GET['_office_id'];
+             AND property_office_meta.meta_value = ' . (int)$_GET['_office_id'];
     }
 
     /**
@@ -834,20 +834,20 @@ class PH_Admin_Post_Types {
     public function offer_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'accepted', 'declined' ) ) ? $_GET['_status'] : '';
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'accepted', 'declined' ) ) ? ph_clean($_GET['_status']) : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_offer_status">';
 
-            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . esc_html(__( 'All Statuses', 'propertyhive' )) . '</option>';
 
             $offer_statuses = ph_get_offer_statuses();
 
             foreach ( $offer_statuses as $status => $display_status )
             {
-                $output .= '<option value="' . $status . '"';
+                $output .= '<option value="' . esc_attr($status) . '"';
                 $output .= selected( $status, $selected_status, false );
-                $output .= '>' . $display_status . '</option>';
+                $output .= '>' . esc_html($display_status) . '</option>';
             }
 
         $output .= '</select>';
@@ -876,7 +876,7 @@ class PH_Admin_Post_Types {
     public function sale_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'current', 'exchanged', 'completed', 'fallen_through' ) ) ? $_GET['_status'] : '';
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'current', 'exchanged', 'completed', 'fallen_through' ) ) ? ph_clean($_GET['_status']) : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_sale_status">';
@@ -887,9 +887,9 @@ class PH_Admin_Post_Types {
 
             foreach ( $sale_statuses as $status => $display_status )
             {
-                $output .= '<option value="' . $status . '"';
+                $output .= '<option value="' . esc_attr($status) . '"';
                 $output .= selected( $status, $selected_status, false );
-                $output .= '>' . $display_status . '</option>';
+                $output .= '>' . esc_html($display_status) . '</option>';
             }
             
         $output .= '</select>';
@@ -917,24 +917,24 @@ class PH_Admin_Post_Types {
     public function tenancy_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'current', 'finished') ) ? $_GET['_status'] : '';
+        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'current', 'finished') ) ? ph_clean($_GET['_status']) : '';
 
         // Status filtering
         $output  = '<select name="_status" id="dropdown_tenancy_status">';
 
-            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . esc_html(__( 'All Statuses', 'propertyhive' )) . '</option>';
 
             $output .= '<option value="pending"';
             $output .= selected( 'pending', $selected_status, false );
-            $output .= '>' . __( 'Pending', 'propertyhive' ) . '</option>';
+            $output .= '>' . esc_html(__( 'Pending', 'propertyhive' )) . '</option>';
 
             $output .= '<option value="current"';
             $output .= selected( 'current', $selected_status, false );
-            $output .= '> ' . __( 'Current', 'propertyhive' ) . '</option>';
+            $output .= '> ' . esc_html(__( 'Current', 'propertyhive' )) . '</option>';
 
             $output .= '<option value="finished"';
             $output .= selected( 'finished', $selected_status, false );
-            $output .= '> ' . __( 'Finished', 'propertyhive' ) . '</option>';
+            $output .= '> ' . esc_html(__( 'Finished', 'propertyhive' )) . '</option>';
 
         $output .= '</select>';
 
@@ -952,18 +952,18 @@ class PH_Admin_Post_Types {
             'fully_managed' => 'Fully Managed'
         ) );
 
-        $selected_management_type = isset( $_GET['_management_type'] ) && in_array( $_GET['_management_type'], array_keys($management_types) ) ? $_GET['_management_type'] : '';
+        $selected_management_type = isset( $_GET['_management_type'] ) && in_array( $_GET['_management_type'], array_keys($management_types) ) ? ph_clean($_GET['_management_type']) : '';
 
         // Status filtering
         $output  = '<select name="_management_type" id="dropdown_tenancy_management_type">';
 
-            $output .= '<option value="">' . __( 'All Management Types', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . esc_html(__( 'All Management Types', 'propertyhive' )) . '</option>';
 
             foreach ( $management_types as $key => $value )
             {
-                $output .= '<option value="' . $key . '"';
+                $output .= '<option value="' . esc_attr($key) . '"';
                 $output .= selected( $key, $selected_management_type, false );
-                $output .= '>' . __( $value, 'propertyhive' ) . '</option>';
+                $output .= '>' . esc_html(__( $value, 'propertyhive' )) . '</option>';
             }
 
         $output .= '</select>';
@@ -984,22 +984,22 @@ class PH_Admin_Post_Types {
 
 	public function key_date_type_filter() {
 
-		$selected_value = ! empty($_GET['_key_date_type_id']) ? (int) $_GET['_key_date_type_id'] : '';
+		$selected_value = ! empty($_GET['_key_date_type_id']) ? (int)$_GET['_key_date_type_id'] : '';
 		$terms = get_terms( 'management_key_date_type', array(
 			'hide_empty' => false,
 			'parent' => 0
 		) );
 
 		$output  = '<select name="_key_date_type_id">';
-		$output .= '<option value="">' . __( 'All Types', 'propertyhive' ) . '</option>';
+		$output .= '<option value="">' . esc_html(__( 'All Types', 'propertyhive' )) . '</option>';
 
 		if ( !empty( $terms ) && !is_wp_error( $terms ) )
 		{
 			foreach ($terms as $term)
 			{
-				$output .= '<option value="' . $term->term_id . '"';
+				$output .= '<option value="' . esc_attr($term->term_id) . '"';
 				$output .= selected($term->term_id, $selected_value, false );
-				$output .= '>' . $term->name . '</option>';
+				$output .= '>' . esc_html($term->name) . '</option>';
 			}
 		}
 
@@ -1011,31 +1011,31 @@ class PH_Admin_Post_Types {
 
 	public function key_date_status_filter() {
 
-		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending') ) ? $_GET['status'] : '';
+		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending') ) ? ph_clean($_GET['status']) : '';
 
 		$output  = '<select name="status" id="dropdown_key_date_status">';
 
-		$output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
+		$output .= '<option value="">' . esc_html(__( 'All Statuses', 'propertyhive' )) . '</option>';
 
 		$output .= '<option value="upcoming_and_overdue"';
 		$output .= selected( 'upcoming_and_overdue', $selected_status, false );
-		$output .= '>' . __( 'Upcoming & Overdue', 'propertyhive' ) . '</option>';
+		$output .= '>' . esc_html(__( 'Upcoming & Overdue', 'propertyhive' )) . '</option>';
 
         $output .= '<option value="overdue"';
         $output .= selected( 'overdue', $selected_status, false );
-        $output .= '>' . __( 'Overdue', 'propertyhive' ) . '</option>';
+        $output .= '>' . esc_html(__( 'Overdue', 'propertyhive' )) . '</option>';
 
 		$output .= '<option value="booked"';
 		$output .= selected( 'booked', $selected_status, false );
-		$output .= '> ' . __( 'Booked', 'propertyhive' ) . '</option>';
+		$output .= '> ' . esc_html(__( 'Booked', 'propertyhive' )) . '</option>';
 
 		$output .= '<option value="complete"';
 		$output .= selected( 'complete', $selected_status, false );
-		$output .= '> ' . __( 'Complete', 'propertyhive' ) . '</option>';
+		$output .= '> ' . esc_html(__( 'Complete', 'propertyhive' )) . '</option>';
 
 		$output .= '<option value="pending"';
 		$output .= selected( 'pending', $selected_status, false );
-		$output .= '> ' . __( 'Pending', 'propertyhive' ) . '</option>';
+		$output .= '> ' . esc_html(__( 'Pending', 'propertyhive' )) . '</option>';
 
 		$output .= '</select>';
 
@@ -1402,13 +1402,13 @@ class PH_Admin_Post_Types {
 		    $vars['meta_query'] = array_merge($vars['meta_query'], array (
 			    array(
 				    'key' => $meta_key,
-				    'value' => $_GET['_date_range_from'],
+				    'value' => ph_clean($_GET['_date_range_from']),
 				    'type'  => 'date',
 				    'compare' => '>='
 			    ),
 			    array(
 				    'key' => $meta_key,
-				    'value' => $_GET['_date_range_to'],
+				    'value' => ph_clean($_GET['_date_range_to']),
 				    'type'  => 'date',
 				    'compare' => '<='
 			    ),

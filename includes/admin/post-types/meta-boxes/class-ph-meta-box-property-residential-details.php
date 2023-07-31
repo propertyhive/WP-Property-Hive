@@ -60,8 +60,8 @@ class PH_Meta_Box_Property_Residential_Details {
         
         // Property Type
         ?>
-        <p class="form-field property_type_id_field"><label for="property_type_id"><?php _e( 'Property Type', 'propertyhive' ); ?></label>
-        <select id="property_type_id" name="property_type_id[]" multiple="multiple" data-placeholder="<?php _e( 'Select property type(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
+        <p class="form-field property_type_id_field"><label for="property_type_id"><?php echo esc_html(__( 'Property Type', 'propertyhive' )); ?></label>
+        <select id="property_type_id" name="property_type_id[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select property type(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
             <?php
                 $args = array(
                     'hide_empty' => false,
@@ -132,8 +132,8 @@ class PH_Meta_Box_Property_Residential_Details {
             ?>
         </select>
 
-        <p class="form-field parking_ids_field"><label for="parking_ids"><?php _e( 'Parking', 'propertyhive' ); ?></label>
-        <select id="parking_ids" name="parking_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select parking', 'propertyhive' ); ?>" class="multiselect attribute_values">
+        <p class="form-field parking_ids_field"><label for="parking_ids"><?php echo esc_html(__( 'Parking', 'propertyhive' )); ?></label>
+        <select id="parking_ids" name="parking_ids[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select parking', 'propertyhive' )); ?>" class="multiselect attribute_values">
             <?php
                 $options = array( '' => '' );
                 $args = array(
@@ -167,8 +167,8 @@ class PH_Meta_Box_Property_Residential_Details {
             ?>
         </select>
 
-        <p class="form-field outside_space_ids_field"><label for="outside_space_ids"><?php _e( 'Outside Space', 'propertyhive' ); ?></label>
-        <select id="outside_space_ids" name="outside_space_ids[]" multiple="multiple" data-placeholder="<?php _e( 'Select outside space(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
+        <p class="form-field outside_space_ids_field"><label for="outside_space_ids"><?php echo esc_html(__( 'Outside Space', 'propertyhive' )); ?></label>
+        <select id="outside_space_ids" name="outside_space_ids[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select outside space(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
             <?php
                 $options = array( '' => '' );
                 $args = array(

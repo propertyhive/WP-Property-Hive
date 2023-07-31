@@ -404,7 +404,7 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 					foreach ( $metrics as $metric => $metric_data ) 
 					{
 				?>
-				<option value="<?php echo $metric; ?>"<?php if ( $metric == $metric_one ) { echo ' selected'; } ?>><?php echo $metric_data['label']; ?></option>
+				<option value="<?php echo esc_attr($metric); ?>"<?php if ( $metric == $metric_one ) { echo ' selected'; } ?>><?php echo esc_html($metric_data['label']); ?></option>
 				<?php 
 					} 
 				?>
@@ -419,7 +419,7 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 					{
 						if ($metric_data['taxonomy']) { continue; }
 				?>
-				<option value="<?php echo $metric; ?>"<?php if ( $metric == $metric_two ) { echo ' selected'; } ?>><?php echo $metric_data['label']; ?></option>
+				<option value="<?php echo esc_attr($metric); ?>"<?php if ( $metric == $metric_two ) { echo ' selected'; } ?>><?php echo esc_html($metric_data['label']); ?></option>
 				<?php 
 					} 
 				?>
@@ -446,7 +446,7 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 						{
 							$office_query->the_post();
 					?>
-					<option value="<?php echo get_the_ID(); ?>"<?php if ( get_the_ID() == $office_id ) { echo ' selected'; } ?>><?php echo get_the_title(get_the_ID()); ?></option>
+					<option value="<?php echo esc_attr(get_the_ID()); ?>"<?php if ( get_the_ID() == $office_id ) { echo ' selected'; } ?>><?php echo esc_html(get_the_title(get_the_ID())); ?></option>
 					<?php 
 						} 
 					}
@@ -480,9 +480,9 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 				foreach ( $metrics as $metric => $metric_data ) 
 				{
 		?>
-		<label style="display:block; padding:5px 0"><input type="checkbox" name="metrics[]" value="<?php echo $metric; ?>"<?php
+		<label style="display:block; padding:5px 0"><input type="checkbox" name="metrics[]" value="<?php echo esc_attr($metric); ?>"<?php
 			if ( in_array($metric, $selected_metrics) || empty($selected_metrics) ) { echo ' checked'; }
-		?>> <?php echo $metric_data['label']; ?></label>
+		?>> <?php echo esc_html($metric_data['label']); ?></label>
 		<?php
 				}
 		?>
@@ -507,7 +507,7 @@ class PH_Report_Sales_Property_Stock_Analysis extends PH_Admin_Report {
 						{
 							$office_query->the_post();
 					?>
-					<option value="<?php echo get_the_ID(); ?>"<?php if ( get_the_ID() == $office_id ) { echo ' selected'; } ?>><?php echo get_the_title(get_the_ID()); ?></option>
+					<option value="<?php echo esc_attr(get_the_ID()); ?>"<?php if ( get_the_ID() == $office_id ) { echo ' selected'; } ?>><?php echo esc_html(get_the_title(get_the_ID())); ?></option>
 					<?php 
 						} 
 					}

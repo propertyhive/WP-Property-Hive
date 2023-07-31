@@ -148,7 +148,7 @@ class PH_Meta_Box_Contact_Relationships {
                         $owner_type = __( 'Property Landlord', 'propertyhive' );
                     }   
                     echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
-                        <a href="#tab_property_data_' . $property_post->ID . '">' . $owner_type . '</a>
+                        <a href="#tab_property_data_' . esc_attr($property_post->ID) . '">' . esc_html($owner_type) . '</a>
                     </li>';
                     
                     ++$tab;
@@ -163,7 +163,7 @@ class PH_Meta_Box_Contact_Relationships {
                         $owner_type = __( 'Potential Landlord', 'propertyhive' );
                     }   
                     echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
-                        <a href="#tab_appraisal_data_' . $appraisal_post->ID . '">' . $owner_type . ' (' . ucwords( str_replace("_", " ", get_post_meta( $appraisal_post->ID, '_status', TRUE ) ) ) . ')</a>
+                        <a href="#tab_appraisal_data_' . esc_attr($appraisal_post->ID) . '">' . esc_html($owner_type . ' (' . ucwords( str_replace("_", " ", get_post_meta( $appraisal_post->ID, '_status', TRUE ) ) ) ) . ')</a>
                     </li>';
                     
                     ++$tab;
@@ -176,6 +176,8 @@ class PH_Meta_Box_Contact_Relationships {
                 );
                 foreach ($applicant_profiles as $key => $applicant_profile)
                 {
+                    $key = (int)$key;
+
                     $label = __( 'New Applicant', 'propertyhive' );
 
                     if ( isset($applicant_profile['department']) )
@@ -195,7 +197,7 @@ class PH_Meta_Box_Contact_Relationships {
                         }
                     }
                     echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
-                        <a href="#tab_applicant_data_' . $key . '">' . $label . '</a>
+                        <a href="#tab_applicant_data_' . esc_attr($key) . '">' . esc_html($label) . '</a>
                     </li>';
                     
                     ++$tab;
@@ -213,7 +215,7 @@ class PH_Meta_Box_Contact_Relationships {
                         }
                     }
                     echo '<li class="property_tab' . ( ($tab == 0) ? ' active' : '') . '">
-                        <a href="#tab_third_party_data_' . $key . '">' . $label . '</a>
+                        <a href="#tab_third_party_data_' . esc_attr($key) . '">' . esc_html($label) . '</a>
                     </li>';
                     
                     ++$tab;
@@ -232,32 +234,32 @@ class PH_Meta_Box_Contact_Relationships {
                 {
                     $the_property = new PH_Property( $property_post->ID );
                     
-                    echo '<div id="tab_property_data_' . $property_post->ID . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
+                    echo '<div id="tab_property_data_' . esc_attr($property_post->ID) . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                         <div class="options_group" style="float:left; width:100%;">';
                         
                         echo '<p class="form-field">';
-                            echo '<label>' . __('Address', 'propertyhive') . '</label>';
+                            echo '<label>' . esc_html(__('Address', 'propertyhive')) . '</label>';
                             echo $the_property->get_formatted_full_address('<br>');
                         echo '</p>';
                         
                         echo '<p class="form-field">';
-                            echo '<label>' . __('Price', 'propertyhive') . '</label>';
-                            echo $the_property->get_formatted_price();
+                            echo '<label>' . esc_html(__('Price', 'propertyhive')) . '</label>';
+                            echo esc_html($the_property->get_formatted_price());
                         echo '</p>';
                         
                         echo '<p class="form-field">';
-                            echo '<label>' . __('Bedrooms', 'propertyhive') . '</label>';
-                            echo $the_property->_bedrooms;
+                            echo '<label>' . esc_html(__('Bedrooms', 'propertyhive')) . '</label>';
+                            echo esc_html($the_property->_bedrooms);
                         echo '</p>';
                         
                         echo '<p class="form-field">';
                             echo '<label>' . __('Status', 'propertyhive') . '</label>';
-                            echo ( ($the_property->_on_market == 'yes') ? __('On Market', 'propertyhive') : __('Not On Market', 'propertyhive') );
+                            echo ( ($the_property->_on_market == 'yes') ? esc_html(__('On Market', 'propertyhive')) : esc_html(__('Not On Market', 'propertyhive')) );
                         echo '</p>';
                         
                         echo '<p class="form-field">';
                             echo '<label></label>';
-                            echo '<a href="' . get_edit_post_link( $property_post->ID ) . '" class="button">' . __( 'View Property Record', 'propertyhive' ) . '</a>';
+                            echo '<a href="' . esc_attr(get_edit_post_link( $property_post->ID )) . '" class="button">' . esc_html(__( 'View Property Record', 'propertyhive' )) . '</a>';
                         echo '</p>';
                         
                         echo '
@@ -270,22 +272,22 @@ class PH_Meta_Box_Contact_Relationships {
                 {
                     $the_appraisal = new PH_Appraisal( $appraisal_post->ID );
                     
-                    echo '<div id="tab_appraisal_data_' . $appraisal_post->ID . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
+                    echo '<div id="tab_appraisal_data_' . esc_attr($appraisal_post->ID) . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                         <div class="options_group" style="float:left; width:100%;">';
                         
                         echo '<p class="form-field">';
-                            echo '<label>' . __('Address', 'propertyhive') . '</label>';
+                            echo '<label>' . esc_html(__('Address', 'propertyhive')) . '</label>';
                             echo ( ( $the_appraisal->get_formatted_full_address('<br>') != '' ) ? $the_appraisal->get_formatted_full_address('<br>') : '-' );
                         echo '</p>';
                         
                         echo '<p class="form-field">';
-                            echo '<label>' . __('Appraisal Status', 'propertyhive') . '</label>';
-                            echo ucwords(str_replace("_", " ", $the_appraisal->status));
+                            echo '<label>' . esc_html(__('Appraisal Status', 'propertyhive')) . '</label>';
+                            echo esc_html(ucwords(str_replace("_", " ", $the_appraisal->status)));
                         echo '</p>';
                         
                         echo '<p class="form-field">';
                             echo '<label></label>';
-                            echo '<a href="' . get_edit_post_link( $appraisal_post->ID ) . '" class="button">' . __( 'View Appraisal Record', 'propertyhive' ) . '</a>';
+                            echo '<a href="' . esc_attr(get_edit_post_link( $appraisal_post->ID )) . '" class="button">' . esc_html(__( 'View Appraisal Record', 'propertyhive' )) . '</a>';
                         echo '</p>';
                         
                         echo '
@@ -298,9 +300,9 @@ class PH_Meta_Box_Contact_Relationships {
 
                 foreach ($applicant_profiles as $key => $applicant_profile)
                 {
-                    echo '<div id="tab_applicant_data_' . $key . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
+                    echo '<div id="tab_applicant_data_' . esc_attr($key) . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                         
-                        <div class="options_group applicant-fields-' . $key . '" style="float:left; width:100%;">';
+                        <div class="options_group applicant-fields-' . esc_attr($key) . '" style="float:left; width:100%;">';
 
                         // This profile was created automatically from the Create Applicant button on an enquiry
                         if ( isset( $applicant_profile['added_from_enquiry'] ) && $applicant_profile['added_from_enquiry'] == 'yes' )
@@ -334,7 +336,7 @@ class PH_Meta_Box_Contact_Relationships {
                         }
                         propertyhive_wp_radio( $args );
 
-                        echo '<div class="propertyhive-applicant-residential-sales-details-' . $key . '">';
+                        echo '<div class="propertyhive-applicant-residential-sales-details-' . esc_attr($key) . '">';
 
                         // Display Relationship Name if it's already set
                         // Or we're editing a profile and at least two of this department exist
@@ -416,13 +418,13 @@ class PH_Meta_Box_Contact_Relationships {
 
                             echo '<p class="form-field applicant_match_price_range_field ">
                             
-                                <label for="_applicant_match_price_range_' . $key . '">' . __('Match Price Range', 'propertyhive') . ' (&pound;)</label>
+                                <label for="_applicant_match_price_range_' . esc_attr($key) . '">' . esc_html(__('Match Price Range', 'propertyhive')) . ' (&pound;)</label>
                                 
-                                <input type="text" class="" name="_applicant_match_price_range_lower_' . $key . '" id="_applicant_match_price_range_lower_' . $key . '" value="' . ph_display_price_field( $match_price_range_lower ) . '" style="width:20%; max-width:150px;">
+                                <input type="text" class="" name="_applicant_match_price_range_lower_' . esc_attr($key) . '" id="_applicant_match_price_range_lower_' . esc_attr($key) . '" value="' . esc_attr(ph_display_price_field( $match_price_range_lower )) . '" style="width:20%; max-width:150px;">
                                 <span style="float:left; margin:0 5px;">to</span>
-                                <input type="text" class="" name="_applicant_match_price_range_higher_' . $key . '" id="_applicant_match_price_range_higher_' . $key . '" value="' . ph_display_price_field( $match_price_range_higher ) . '" style="width:20%; max-width:150px;">
+                                <input type="text" class="" name="_applicant_match_price_range_higher_' . esc_attr($key) . '" id="_applicant_match_price_range_higher_' . esc_attr($key) . '" value="' . esc_attr(ph_display_price_field( $match_price_range_higher )) . '" style="width:20%; max-width:150px;">
                                 &nbsp;
-                                <a href="" id="match_price_range_shortcut_' . $key . '" style="display:none">' . __( 'Update', 'propertyhive' ) . '</a>
+                                <a href="" id="match_price_range_shortcut_' . esc_attr($key) . '" style="display:none">' . esc_html(__( 'Update', 'propertyhive' )) . '</a>
                                 
                             </p>';
 
@@ -491,7 +493,7 @@ class PH_Meta_Box_Contact_Relationships {
 
                         echo '</div>';
 
-                        echo '<div class="propertyhive-applicant-residential-lettings-details-' . $key . '">';
+                        echo '<div class="propertyhive-applicant-residential-lettings-details-' . esc_attr($key) . '">';
 
                         // Display Relationship Name if it's already set
                         // Or we're editing a profile and at least two of this department exist
@@ -525,15 +527,15 @@ class PH_Meta_Box_Contact_Relationships {
                         $rent_frequency = ( ( isset($applicant_profile['rent_frequency']) ) ? $applicant_profile['rent_frequency'] : '' );
                         echo '<p class="form-field rent_field ">
                         
-                            <label for="_applicant_maximum_rent_' . $key . '">' . __('Maximum Rent', 'propertyhive') . ' (&pound;)</label>
+                            <label for="_applicant_maximum_rent_' . esc_attr($key) . '">' . esc_html(__('Maximum Rent', 'propertyhive')) . ' (&pound;)</label>
                             
-                            <input type="text" class="" name="_applicant_maximum_rent_' . $key . '" id="_applicant_maximum_rent_' . $key . '" value="' . ( ( isset($applicant_profile['max_rent']) ) ? ph_display_price_field( $applicant_profile['max_rent']) : '' ) . '" placeholder="" style="width:20%; max-width:150px;">
+                            <input type="text" class="" name="_applicant_maximum_rent_' . esc_attr($key) . '" id="_applicant_maximum_rent_' . esc_attr($key) . '" value="' . ( ( isset($applicant_profile['max_rent']) ) ? esc_attr(ph_display_price_field( $applicant_profile['max_rent'])) : '' ) . '" placeholder="" style="width:20%; max-width:150px;">
                             
-                            <select id="_applicant_rent_frequency_' . $key . '" name="_applicant_rent_frequency_' . $key . '" class="select short">
-                                <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
-                                <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
-                                <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
-                                <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>
+                            <select id="_applicant_rent_frequency_' . esc_attr($key) . '" name="_applicant_rent_frequency_' . esc_attr($key) . '" class="select short">
+                                <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . esc_html(__('Per Week', 'propertyhive')) . '</option>
+                                <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . esc_html(__('Per Calendar Month', 'propertyhive')) . '</option>
+                                <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . esc_html(__('Per Quarter', 'propertyhive')) . '</option>
+                                <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . esc_html(__('Per Annum', 'propertyhive')) . '</option>
                             </select>
                             
                         </p>';
@@ -542,7 +544,7 @@ class PH_Meta_Box_Contact_Relationships {
 
                         echo '</div>';
 
-                        echo '<div class="propertyhive-applicant-residential-details-' . $key . '">';
+                        echo '<div class="propertyhive-applicant-residential-details-' . esc_attr($key) . '">';
 
                         // Bedrooms
                         propertyhive_wp_text_input( array( 
@@ -559,8 +561,8 @@ class PH_Meta_Box_Contact_Relationships {
 
                         // Residential Types
                     ?>
-                        <p class="form-field"><label for="_applicant_property_types_<?php echo $key; ?>"><?php _e( 'Property Types', 'propertyhive' ); ?></label>
-                        <select id="_applicant_property_types_<?php echo $key; ?>" name="_applicant_property_types_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add property types..." class="multiselect attribute_values">
+                        <p class="form-field"><label for="_applicant_property_types_<?php echo esc_attr($key); ?>"><?php echo esc_html(__( 'Property Types', 'propertyhive' )); ?></label>
+                        <select id="_applicant_property_types_<?php echo esc_attr($key); ?>" name="_applicant_property_types_<?php echo esc_attr($key); ?>[]" multiple="multiple" data-placeholder="Start typing to add property types..." class="multiselect attribute_values">
                             <?php
                                 $options = array( '' => '' );
                                 $args = array(
@@ -618,7 +620,7 @@ class PH_Meta_Box_Contact_Relationships {
 
                         echo '</div>'; // end 'propertyhive-applicant-residential-details-' . $key
 
-                        echo '<div class="propertyhive-applicant-commercial-details-' . $key . '">';
+                        echo '<div class="propertyhive-applicant-commercial-details-' . esc_attr($key) . '">';
 
                         // Display Relationship Name if it's already set
                         // Or we're editing a profile and at least two of this department exist
@@ -694,8 +696,8 @@ class PH_Meta_Box_Contact_Relationships {
 
                         // Commercial Types
                     ?>
-                        <p class="form-field"><label for="_applicant_commercial_property_types_<?php echo $key; ?>"><?php _e( 'Property Types', 'propertyhive' ); ?></label>
-                        <select id="_applicant_commercial_property_types_<?php echo $key; ?>" name="_applicant_commercial_property_types_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add property types..." class="multiselect attribute_values">
+                        <p class="form-field"><label for="_applicant_commercial_property_types_<?php echo esc_attr($key); ?>"><?php echo esc_html(__( 'Property Types', 'propertyhive' )); ?></label>
+                        <select id="_applicant_commercial_property_types_<?php echo esc_attr($key); ?>" name="_applicant_commercial_property_types_<?php echo esc_attr($key); ?>[]" multiple="multiple" data-placeholder="Start typing to add property types..." class="multiselect attribute_values">
                             <?php
                                 $options = array( '' => '' );
                                 $args = array(
@@ -757,8 +759,8 @@ class PH_Meta_Box_Contact_Relationships {
                         if ( get_option('propertyhive_applicant_locations_type') != 'text' )
                         {
                     ?>
-                        <p class="form-field"><label for="_applicant_locations_<?php echo $key; ?>"><?php _e( 'Locations', 'propertyhive' ); ?></label>
-                        <select id="_applicant_locations_<?php echo $key; ?>" name="_applicant_locations_<?php echo $key; ?>[]" multiple="multiple" data-placeholder="Start typing to add location..." class="multiselect attribute_values">
+                        <p class="form-field"><label for="_applicant_locations_<?php echo esc_attr($key); ?>"><?php echo esc_html(__( 'Locations', 'propertyhive' )); ?></label>
+                        <select id="_applicant_locations_<?php echo esc_attr($key); ?>" name="_applicant_locations_<?php echo esc_attr($key); ?>[]" multiple="multiple" data-placeholder="Start typing to add location..." class="multiselect attribute_values">
                             <?php
                                 $options = array( '' => '' );
                                 $args = array(
@@ -890,7 +892,7 @@ class PH_Meta_Box_Contact_Relationships {
 
                             <a 
                                 href="' . admin_url('admin.php?page=ph-matching-properties&contact_id=' . $contact_id . '&applicant_profile=' . $key) . '" 
-                                class="button view-matching-properties-' . $key . '" 
+                                class="button view-matching-properties-' . esc_attr($key) . '" 
                                 ' . ( ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == '' ) ? ' disabled title="Send Matching Properties not selected"' : '' ) . '
                             >' . __('View Matching Properties', 'propertyhive') . '</a>
 
@@ -900,13 +902,13 @@ class PH_Meta_Box_Contact_Relationships {
                                 onclick="var confirmBox = confirm(\'' . __('Are you sure you wish to delete this applicant relationship?', 'propertyhive') . '\'); return confirmBox;"
                             >' . __('Delete Relationship', 'propertyhive') . '</a>
 
-                            <div id="view_matching_properties_' . $key . '" style="display:none;">
+                            <div id="view_matching_properties_' . esc_attr($key) . '" style="display:none;">
                                 
                                 <div class="loading-properties" style="text-align:center;"><br><br>Loading matching properties...</div>
 
                                 <div class="need-to-save-changes" style="text-align:center;"><br><br>Please save your changes before viewing matching properties</div>
 
-                                <div class="matching-properties" id="matching_properties_' . $key . '" style="display:none;">
+                                <div class="matching-properties" id="matching_properties_' . esc_attr($key) . '" style="display:none;">
 
                                 </div>
 
@@ -977,26 +979,26 @@ class PH_Meta_Box_Contact_Relationships {
 
                 foreach ($third_party_profiles as $key => $category)
                 {
-                    echo '<div id="tab_third_party_data_' . $key . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
+                    echo '<div id="tab_third_party_data_' . esc_attr($key) . '" class="panel propertyhive_options_panel" style="' . ( ($tab == 0) ? 'display:block;' : 'display:none;') . '">
                         <div class="options_group" style="float:left; width:100%;">';
                         
                         echo '<p class="form-field rent_field ">
                         
-                            <label for="_third_party_category_' . $key . '">' . __('Contact Category', 'propertyhive') . '</label>
+                            <label for="_third_party_category_' . esc_attr($key) . '">' . esc_html(__('Contact Category', 'propertyhive')) . '</label>
                             
-                            <select id="_third_party_category_' . $key . '" name="_third_party_category[]" class="select short">';
+                            <select id="_third_party_category_' . esc_attr($key) . '" name="_third_party_category[]" class="select short">';
 
                         echo '<option value=""></option>';
 
                         $categories = $ph_third_party_contacts->get_categories();
                         foreach ( $categories as $id => $category_name )
                         {
-                            echo '<option value="' . $id . '"';
+                            echo '<option value="' . esc_attr($id) . '"';
                             if ( $id == $category )
                             {
                                 echo ' selected';
                             }
-                            echo '>' . $category_name . '</option>';
+                            echo '>' . esc_html($category_name) . '</option>';
                         }
 
                         echo '</select>
@@ -1013,7 +1015,7 @@ class PH_Meta_Box_Contact_Relationships {
                     <div class="options_group">';
                 
                     echo '<p class="form-field">';
-                        echo '<label>' . __('New Relationship Type', 'propertyhive') . '</label>';
+                        echo '<label>' . esc_html(__('New Relationship Type', 'propertyhive')) . '</label>';
                         echo '<a href="' . wp_nonce_url( admin_url( 'post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships' ), '1', 'add_applicant_relationship' ) . '" class="button">' . __( 'New Applicant Profile', 'propertyhive' ) . '</a><br><br>';
                         echo '<a href="' . admin_url( 'post-new.php?post_type=property&owner_contact_id=' . $thepostid ) . '" class="button">' . __( 'New Property Owner / Landlord', 'propertyhive' ) . '</a><br><br>';
                         echo '<a href="' . wp_nonce_url( admin_url( 'post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships' ), '1', 'add_third_party_relationship' ) . '" class="button">' . __( 'New Third Party Contact', 'propertyhive' ) . '</a>';

@@ -41,7 +41,7 @@ class PH_Meta_Box_Appraisal_Event {
         
             <label for="_start_date">' . __('Appraisal Date / Time', 'propertyhive') . '</label>
 
-            <input type="date" class="small" name="_start_date" id="_start_date" value="' . date("Y-m-d", strtotime($start_date_time)) . '" placeholder="">
+            <input type="date" class="small" name="_start_date" id="_start_date" value="' . esc_attr(date("Y-m-d", strtotime($start_date_time))) . '" placeholder="">
             <select id="_start_time_hours" name="_start_time_hours" class="select short" style="width:55px">';
         
         if ( $start_date_time == '' )
@@ -55,9 +55,9 @@ class PH_Meta_Box_Appraisal_Event {
         for ( $i = 0; $i < 23; ++$i )
         {
             $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-            echo '<option value="' . $j . '"';
+            echo '<option value="' . esc_attr($j) . '"';
             if ($i == $value) { echo ' selected'; }
-            echo '>' . $j . '</option>';
+            echo '>' . esc_html($j) . '</option>';
         }
         
         echo '</select>
@@ -75,9 +75,9 @@ class PH_Meta_Box_Appraisal_Event {
         for ( $i = 0; $i < 60; $i+=5 )
         {
             $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-            echo '<option value="' . $j . '"';
+            echo '<option value="' . esc_attr($j) . '"';
             if ($i == $value) { echo ' selected'; }
-            echo '>' . $j . '</option>';
+            echo '>' . esc_html($j) . '</option>';
         }
         
         echo '</select>
@@ -115,13 +115,13 @@ class PH_Meta_Box_Appraisal_Event {
                 // convert duration to reable format (i.e. 1 hour 15 minutes)
                 $hours = floor($duration / 60);
                 $minutes = $duration % 60;
-                echo '<option value="' . ($duration * 60) . '"' . ( $value == ($duration * 60) ? 'selected' : '' ) . '>' . ( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' '. $minutes . ' minutes' : '' ) . '</option>';
+                echo '<option value="' . esc_attr(($duration * 60)) . '"' . ( $value == ($duration * 60) ? 'selected' : '' ) . '>' . esc_html(( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' '. $minutes . ' minutes' : '' )) . '</option>';
             }
             if ( !in_array( $value / 60, $durations))
             {
                 $hours = floor(($value / 60) / 60);
                 $minutes = ($value / 60) % 60;
-                echo '<option value="' . $value . '" selected>' . ( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' ' . $minutes . ' minutes' : '' ) . '</option>';
+                echo '<option value="' . esc_attr($value) . '" selected>' . esc_html(( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' ' . $minutes . ' minutes' : '' )) . '</option>';
             }
 
         echo '</select>
@@ -149,12 +149,12 @@ class PH_Meta_Box_Appraisal_Event {
         {
             foreach ( $user_query->results as $user ) 
             {
-                echo '<option value="' . $user->ID . '"';
+                echo '<option value="' . esc_attr($user->ID) . '"';
                 if ( in_array($user->ID, $negotiator_ids) )
                 {
                     echo ' selected';
                 }
-                echo '>' . $user->display_name . '</option>';
+                echo '>' . esc_html($user->display_name) . '</option>';
             }
         }
 

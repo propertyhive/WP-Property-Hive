@@ -31,9 +31,9 @@ class PH_Meta_Box_Tenancy_Property {
 
             echo '<p class="form-field">
             
-                <label>' . __('Address', 'propertyhive') . '</label>
+                <label>' . esc_html(__('Address', 'propertyhive')) . '</label>
                 
-                <a href="' . get_edit_post_link($property_id, '') . '">' . $property->get_formatted_full_address() . '</a> (<a href="' . get_permalink($property_id) . '" target="_blank">View On Website</a>)
+                <a href="' . get_edit_post_link($property_id, '') . '">' . esc_html($property->get_formatted_full_address()) . '</a> (<a href="' . get_permalink($property_id) . '" target="_blank">View On Website</a>)
                 
             </p>';
 
@@ -56,15 +56,15 @@ class PH_Meta_Box_Tenancy_Property {
                 foreach ( $owner_contact_ids as $owner_contact_id )
                 {
                     $owner = new PH_Contact((int)$owner_contact_id);
-                    echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '" data-tenancy-owner-id="' . $owner_contact_id . '" data-tenancy-owner-name="' . get_the_title($owner_contact_id, '') . '">' . get_the_title($owner_contact_id) . '</a><br>';
-                    echo 'Telephone: ' . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
-                    echo 'Email: ' . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
+                    echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '" data-tenancy-owner-id="' . esc_attr($owner_contact_id) . '" data-tenancy-owner-name="' . esc_attr(get_the_title($owner_contact_id, '')) . '">' . esc_html(get_the_title($owner_contact_id)) . '</a><br>';
+                    echo 'Telephone: ' . ( ( $owner->telephone_number != '' ) ? esc_html($owner->telephone_number) : '-' ) . '<br>';
+                    echo 'Email: ' . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . esc_attr($owner->email_address) . '">' . esc_html($owner->email_address) . '</a>' : '-' );
                     echo '<br><br>';
                 }
             }
             else
             {
-                echo 'No ' . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified';
+                echo esc_html('No ' . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified');
             }
                 
             echo '</p>';
@@ -73,11 +73,11 @@ class PH_Meta_Box_Tenancy_Property {
         {
 echo '<p class="form-field">
             
-                <label for="tenancy_property_search">' . __('Search Properties', 'propertyhive') . '</label>
+                <label for="tenancy_property_search">' . esc_html(__('Search Properties', 'propertyhive')) . '</label>
                 
                 <span style="position:relative;">
 
-                    <input type="text" name="tenancy_property_search" id="tenancy_property_search" style="width:100%;" placeholder="' . __( 'Search Properties', 'propertyhive' ) . '..." autocomplete="false">
+                    <input type="text" name="tenancy_property_search" id="tenancy_property_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Properties', 'propertyhive' )) . '..." autocomplete="false">
 
                     <div id="tenancy_search_property_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 

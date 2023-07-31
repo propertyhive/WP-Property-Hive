@@ -1329,13 +1329,13 @@ class PH_AJAX {
         
         $contact = get_post($contact_id);
         
-        echo '<div id="existing-owner-details-' . $contact_id . '">';
+        echo '<div id="existing-owner-details-' . esc_attr($contact_id) . '">';
         
         if ( !is_null( $contact ) )
         {
             echo '<p class="form-field">';
-                echo '<label>' . __('Name', 'propertyhive') . '</label>';
-                echo '<a href="' . get_edit_post_link( $contact_id ) . '">' . get_the_title($contact_id) . '</a>';
+                echo '<label>' . esc_html(__('Name', 'propertyhive')) . '</label>';
+                echo '<a href="' . get_edit_post_link( $contact_id ) . '">' . esc_html(get_the_title($contact_id)) . '</a>';
             echo '</p>';
             
             $address = array();
@@ -1349,18 +1349,18 @@ class PH_AJAX {
             }
 
             echo '<p class="form-field">';
-                echo '<label>' . __('Address', 'propertyhive') . '</label>';
-                echo ( ( !empty($address) ) ? implode(", ", $address) : '-' );
+                echo '<label>' . esc_html(__('Address', 'propertyhive')) . '</label>';
+                echo ( ( !empty($address) ) ? esc_html(implode(", ", $address)) : '-' );
             echo '</p>';
             
             echo '<p class="form-field">';
-                echo '<label>' . __('Telephone Number', 'propertyhive') . '</label>';
-                echo ( ( get_post_meta($contact_id, '_telephone_number', TRUE) != '' ) ? get_post_meta($contact_id, '_telephone_number', TRUE) : '-' );
+                echo '<label>' . esc_html(__('Telephone Number', 'propertyhive')) . '</label>';
+                echo ( ( get_post_meta($contact_id, '_telephone_number', TRUE) != '' ) ? esc_html(get_post_meta($contact_id, '_telephone_number', TRUE)) : '-' );
             echo '</p>';
             
             echo '<p class="form-field">';
-                echo '<label>' . __('Email Address', 'propertyhive') . '</label>';
-                echo ( ( get_post_meta($contact_id, '_email_address', TRUE) != '' ) ? get_post_meta($contact_id, '_email_address', TRUE) : '-' );
+                echo '<label>' . esc_html(__('Email Address', 'propertyhive')) . '</label>';
+                echo ( ( get_post_meta($contact_id, '_email_address', TRUE) != '' ) ? esc_html(get_post_meta($contact_id, '_email_address', TRUE)) : '-' );
             echo '</p>';
 
             $contact_solicitor_contact_id = get_post_meta( $contact_id, '_contact_solicitor_contact_id', true );
@@ -1370,19 +1370,19 @@ class PH_AJAX {
                 $solicitor_contact = new PH_Contact($contact_solicitor_contact_id);
 
                 echo '<p class="form-field">';
-                    echo '<label>' . __('Solicitor', 'propertyhive') . '</label>';
-                    echo '<a href="' . get_edit_post_link($contact_solicitor_contact_id, '') . '">' . get_the_title($contact_solicitor_contact_id) . ( $solicitor_contact->company_name != '' && $solicitor_contact->company_name != get_the_title($contact_solicitor_contact_id) ? ' (' . $solicitor_contact->company_name . ')' : '' ) . '</a>';
+                    echo '<label>' . esc_html(__('Solicitor', 'propertyhive')) . '</label>';
+                    echo '<a href="' . get_edit_post_link($contact_solicitor_contact_id, '') . '">' . esc_html(get_the_title($contact_solicitor_contact_id) . ( $solicitor_contact->company_name != '' && $solicitor_contact->company_name != get_the_title($contact_solicitor_contact_id) ? ' (' . $solicitor_contact->company_name . ')' : '' )) . '</a>';
                 echo '</p>';
             }
         }
         else
         {
-            echo __( 'Invalid contact record', 'propertyhive' );
+            echo esc_html(__( 'Invalid contact record', 'propertyhive' ));
         }
         
         echo '<p class="form-field">';
             echo '<label></label>';
-            echo '<a href="" class="button" id="remove-owner-contact-' . $contact_id . '">Remove Owner</a> ';
+            echo '<a href="" class="button" id="remove-owner-contact-' . esc_attr($contact_id) . '">Remove Owner</a> ';
             echo '<a href="" class="button add-additional-owner-contact">Add Additional Owner</a>';
         echo '</p>';
 
@@ -2866,9 +2866,9 @@ class PH_AJAX {
 
         echo '<p class="form-field">
         
-            <label for="">' . __('Status', 'propertyhive') . '</label>
+            <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
             
-            ' . ucwords(str_replace("_", " ", $appraisal->status));
+            ' . esc_html(ucwords(str_replace("_", " ", $appraisal->status)));
         
         echo '</p>';
 
@@ -2906,17 +2906,17 @@ class PH_AJAX {
 
                 echo '<p class="form-field">
         
-                    <label for="">' . __('Valued Rent', 'propertyhive') . ' (&pound;)</label>
+                    <label for="">' . esc_html(__('Valued Rent', 'propertyhive')) . ' (&pound;)</label>
 
-                    <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . ph_display_price_field( $appraisal->valued_rent ) . '" placeholder="" style="width:10%; min-width:100px;">
+                    <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . esc_attr(ph_display_price_field( $appraisal->valued_rent )) . '" placeholder="" style="width:10%; min-width:100px;">
                 
                     <select id="_valued_rent_frequency" name="_valued_rent_frequency" class="select" style="width:auto">
-                        <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
-                        <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . __('Per Person Per Week', 'propertyhive') . '</option>
-                        <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
-                        <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
-                        <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
-                        <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>
+                        <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . esc_html(__('Per Day', 'propertyhive')) . '</option>
+                        <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . esc_html(__('Per Person Per Week', 'propertyhive')) . '</option>
+                        <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . esc_html(__('Per Week', 'propertyhive')) . '</option>
+                        <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . esc_html(__('Per Calendar Month', 'propertyhive')) . '</option>
+                        <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . esc_html(__('Per Quarter', 'propertyhive')) . '</option>
+                        <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . esc_html(__('Per Annum', 'propertyhive')) . '</option>
                     </select>
 
                 </p>';
@@ -2984,7 +2984,7 @@ class PH_AJAX {
                             href="#action_panel_appraisal_email_owner_booking_confirmation_customise" 
                             class="button appraisal-action"
                             style="width:100%; margin-bottom:7px; text-align:center" 
-                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? esc_html(__('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive')) : esc_html(__('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) ) . '</a>';
 
                     $show_customise_confirmation_meta_boxes = true;
                 }
@@ -2994,10 +2994,10 @@ class PH_AJAX {
                             href="#action_panel_appraisal_email_owner_booking_confirmation"
                             class="button appraisal-action"
                             style="width:100%; margin-bottom:7px; text-align:center"
-                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) . '</a>';
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? esc_html(__('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive')) : esc_html(__('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') )) . '</a>';
                 }
 
-                $actions[] = '<div id="appraisal_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_booking_confirmation_sent_at . '">' . date("jS F", strtotime($owner_booking_confirmation_sent_at)) : '' ) . '</span></div>';
+                $actions[] = '<div id="appraisal_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . esc_html(strtolower($owner_or_landlord)) . ' on <span title="' . esc_attr($owner_booking_confirmation_sent_at) . '">' . esc_html(date("jS F", strtotime($owner_booking_confirmation_sent_at))) . '</span>' : '' ) . '</div>';
 
                 $actions[] = '<hr>';
             }
@@ -3019,12 +3019,12 @@ class PH_AJAX {
                     href="#action_panel_appraisal_carried_out" 
                     class="button button-success appraisal-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Appraisal Carried Out', 'propertyhive') . '</a>';
+                >' . esc_html(__('Appraisal Carried Out', 'propertyhive')) . '</a>';
             $actions[] = '<a 
                     href="#action_panel_appraisal_cancelled" 
                     class="button appraisal-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Appraisal Cancelled', 'propertyhive') . '</a>';
+                >' . esc_html(__('Appraisal Cancelled', 'propertyhive')) . '</a>';
 
             $show_cancelled_meta_boxes = true;
             $show_carried_out_meta_boxes = true;
@@ -3036,13 +3036,13 @@ class PH_AJAX {
                     href="#action_panel_appraisal_won" 
                     class="button button-success appraisal-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Appraisal Won', 'propertyhive') . '</a>';
+                >' . esc_html(__('Appraisal Won', 'propertyhive')) . '</a>';
 
             $actions[] = '<a 
                     href="#action_panel_appraisal_lost" 
                     class="button button-danger appraisal-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Appraisal Lost', 'propertyhive') . '</a>';
+                >' . esc_html(__('Appraisal Lost', 'propertyhive')) . '</a>';
 
             $show_lost_meta_boxes = true;
         }
@@ -3053,7 +3053,7 @@ class PH_AJAX {
                     href="#action_panel_appraisal_instruct" 
                     class="button button-success appraisal-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Instruct Property', 'propertyhive') . '</a>';
+                >' . esc_html(__('Instruct Property', 'propertyhive')) . '</a>';
 
             $show_instructed_meta_boxes = true;
         }
@@ -3064,7 +3064,7 @@ class PH_AJAX {
                     href="#action_panel_appraisal_revert_carried_out" 
                     class="button appraisal-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Revert To Carried Out', 'propertyhive') . '</a>';
+                >' . esc_html(__('Revert To Carried Out', 'propertyhive')) . '</a>';
         }
 
         if ( $status == 'instructed' )
@@ -3075,7 +3075,7 @@ class PH_AJAX {
                     href="' . get_edit_post_link($property_id) . '" 
                     class="button"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('View Instructed Property', 'propertyhive') . '</a>';
+                >' . esc_html(__('View Instructed Property', 'propertyhive')) . '</a>';
 
             /*$actions[] = '<a 
                     href="#action_panel_appraisal_revert_won" 
@@ -3090,7 +3090,7 @@ class PH_AJAX {
                     href="#action_panel_appraisal_revert_pending" 
                     class="button appraisal-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Revert To Pending', 'propertyhive') . '</a>';
+                >' . esc_html(__('Revert To Pending', 'propertyhive')) . '</a>';
         }
 
         $actions = apply_filters( 'propertyhive_admin_appraisal_actions', $actions, $post_id );
@@ -3102,7 +3102,7 @@ class PH_AJAX {
         }
         else
         {
-            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+            echo '<div style="text-align:center">' . esc_html(__( 'No actions to display', 'propertyhive' )) . '</div>';
         }
 
         echo '</div>
@@ -3116,7 +3116,7 @@ class PH_AJAX {
 
                 <div id="success_actions"></div>
 
-                <a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+                <a class="button action-cancel" style="width:100%;" href="#">' . esc_html(__( 'Back To Actions', 'propertyhive' )) . '</a>
 
             </div>
 
@@ -3136,22 +3136,22 @@ class PH_AJAX {
 
                     <div class="form-field">
 
-                        <label for="_owner_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                        <label for="_owner_confirmation_email_subject">' . esc_html(__( 'Subject', 'propertyhive' )) . '</label>
                         
-                        <input id="_owner_confirmation_email_subject" name="_owner_confirmation_email_subject" style="width:100%;" value="' . $subject . '">
+                        <input id="_owner_confirmation_email_subject" name="_owner_confirmation_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
 
                     </div>
 
                     <div class="form-field">
 
-                        <label for="_owner_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                        <label for="_owner_confirmation_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                         
-                        <textarea id="_owner_confirmation_email_body" name="_owner_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+                        <textarea id="_owner_confirmation_email_body" name="_owner_confirmation_email_body" style="width:100%; height:100px;">' . esc_html($body) . '</textarea>
 
                     </div>
 
-                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-                    <a class="button button-primary owner-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
+                    <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+                    <a class="button button-primary owner-booking-confirmation-action-submit" href="#">' . esc_html(__( 'Send', 'propertyhive' )) . '</a>
 
                 </div>
 
@@ -3166,14 +3166,14 @@ class PH_AJAX {
 
                     <div class="form-field">
 
-                        <label for="_appraisal_cancelled_reason">' . __( 'Reason Cancelled', 'propertyhive' ) . '</label>
+                        <label for="_appraisal_cancelled_reason">' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . '</label>
                         
-                        <textarea id="_cancelled_reason" name="_cancelled_reason" style="width:100%;">' . get_post_meta( $post_id, '_cancelled_reason', TRUE ) . '</textarea>
+                        <textarea id="_cancelled_reason" name="_cancelled_reason" style="width:100%;">' . esc_html(get_post_meta( $post_id, '_cancelled_reason', TRUE )) . '</textarea>
 
                     </div>
 
-                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-                    <a class="button button-primary cancelled-reason-action-submit" href="#">' . __( 'Save', 'propertyhive' ) . '</a>
+                    <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+                    <a class="button button-primary cancelled-reason-action-submit" href="#">' . esc_html(__( 'Save', 'propertyhive' )) . '</a>
 
                 </div>
 
@@ -3190,9 +3190,9 @@ class PH_AJAX {
             {
                 echo '<div class="form-field">
 
-                        <label for="_price">' . __( 'Valued Price (&pound;)', 'propertyhive' ) . '</label>
+                        <label for="_price">' . esc_html(__( 'Valued Price (&pound;)', 'propertyhive' )) . '</label>
                         
-                        <input type="text" id="_price" name="_price" style="width:100%;" value="' . get_post_meta( $post_id, '_valued_price', TRUE ) . '">
+                        <input type="text" id="_price" name="_price" style="width:100%;" value="' . esc_attr(get_post_meta( $post_id, '_valued_price', TRUE )) . '">
 
                     </div>';
             }
@@ -3201,24 +3201,24 @@ class PH_AJAX {
                 $rent_frequency = get_post_meta( $post_id, '_valued_rent_frequency', TRUE );
                 echo '<div class="form-field">
 
-                        <label for="_price">' . __( 'Valued Rent (&pound;)', 'propertyhive' ) . '</label>
+                        <label for="_price">' . esc_html(__( 'Valued Rent (&pound;)', 'propertyhive' )) . '</label>
                         
-                        <input type="text" id="_price" name="_price" style="width:100%;" value="' . get_post_meta( $post_id, '_valued_rent', TRUE ) . '">
+                        <input type="text" id="_price" name="_price" style="width:100%;" value="' . esc_attr(get_post_meta( $post_id, '_valued_rent', TRUE )) . '">
 
                         <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:100%">
-                            <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
-                            <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . __('Per Person Per Week', 'propertyhive') . '</option>
-                            <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
-                            <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
-                            <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
-                            <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>
+                            <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . esc_html(__('Per Day', 'propertyhive')) . '</option>
+                            <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . esc_html(__('Per Person Per Week', 'propertyhive')) . '</option>
+                            <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . esc_html(__('Per Week', 'propertyhive')) . '</option>
+                            <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . esc_html(__('Per Calendar Month', 'propertyhive')) . '</option>
+                            <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . esc_html(__('Per Quarter', 'propertyhive')) . '</option>
+                            <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . esc_html(__('Per Annum', 'propertyhive')) . '</option>
                         </select>
 
                     </div>';
             }
 
-            echo '<a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-                    <a class="button button-primary carried-out-action-submit" href="#">' . __( 'Save', 'propertyhive' ) . '</a>
+            echo '<a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+                    <a class="button button-primary carried-out-action-submit" href="#">' . esc_html(__( 'Save', 'propertyhive' )) . '</a>
 
                 </div>
 
@@ -3231,10 +3231,10 @@ class PH_AJAX {
 
                 <div class="options_group" style="padding-top:8px;">';
 
-                echo '<div style="margin-bottom:13px;">' . __( 'Upon instruction a new property record will be created within the \'Properties\' area.', 'propertyhive' ) . '</div>';
+                echo '<div style="margin-bottom:13px;">' . esc_html(__( 'Upon instruction a new property record will be created within the \'Properties\' area.', 'propertyhive' )) . '</div>';
 
-            echo '<a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-                    <a class="button button-primary instructed-action-submit" href="#">' . __( 'OK', 'propertyhive' ) . '</a>
+            echo '<a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+                    <a class="button button-primary instructed-action-submit" href="#">' . esc_html(__( 'OK', 'propertyhive' )) . '</a>
 
                 </div>
 
@@ -3249,14 +3249,14 @@ class PH_AJAX {
 
                     <div class="form-field">
 
-                        <label for="_lost_reason">' . __( 'Reason Lost', 'propertyhive' ) . '</label>
+                        <label for="_lost_reason">' . esc_html(__( 'Reason Lost', 'propertyhive' )) . '</label>
                         
-                        <textarea id="_lost_reason" name="_lost_reason" style="width:100%;">' . get_post_meta( $post_id, '_lost_reason', TRUE ) . '</textarea>
+                        <textarea id="_lost_reason" name="_lost_reason" style="width:100%;">' . esc_html(get_post_meta( $post_id, '_lost_reason', TRUE )) . '</textarea>
 
                     </div>
 
-                    <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-                    <a class="button button-primary lost-reason-action-submit" href="#">' . wp_kses_post( __( 'Save Reason Lost', 'propertyhive' ) ) . '</a>
+                    <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+                    <a class="button button-primary lost-reason-action-submit" href="#">' . esc_html( __( 'Save Reason Lost', 'propertyhive' ) ) . '</a>
 
                 </div>
 
@@ -5131,7 +5131,7 @@ class PH_AJAX {
     
             <label for="_offer_date">' . __('Offer Date / Time', 'propertyhive') . '</label>
             
-            <input type="date" class="small" name="_offer_date" id="_offer_date" value="' . date("Y-m-d", strtotime($offer_date_time)) . '" placeholder="">
+            <input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(date("Y-m-d", strtotime($offer_date_time))) . '" placeholder="">
             <select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="width:55px">';
         
         if ( empty($offer_date_time) )
@@ -5145,9 +5145,9 @@ class PH_AJAX {
         for ( $i = 0; $i < 23; ++$i )
         {
             $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-            echo '<option value="' . $j . '"';
+            echo '<option value="' . esc_attr($j) . '"';
             if ($i == $value) { echo ' selected'; }
-            echo '>' . $j . '</option>';
+            echo '>' . esc_html($j) . '</option>';
         }
         
         echo '</select>
@@ -5165,9 +5165,9 @@ class PH_AJAX {
         for ( $i = 0; $i < 60; $i+=5 )
         {
             $j = str_pad($i, 2, '0', STR_PAD_LEFT);
-            echo '<option value="' . $j . '"';
+            echo '<option value="' . esc_attr($j) . '"';
             if ($i == $value) { echo ' selected'; }
-            echo '>' . $j . '</option>';
+            echo '>' . esc_html($j) . '</option>';
         }
         
         echo '</select>

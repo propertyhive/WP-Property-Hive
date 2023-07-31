@@ -1861,7 +1861,7 @@ class PH_Shortcodes {
 		// check key provided is valid
 		if ( !isset($_GET['key']) || empty(ph_clean($_GET['key'])) || !isset($_GET['id']) || empty(absint($_GET['id'])) )
 		{
-			echo __( 'Invalid key or id provided. Please try again', 'propertyhive' );
+			echo esc_html(__( 'Invalid key or id provided. Please try again', 'propertyhive' ));
 			return ob_get_clean();
 		}
 
@@ -1875,7 +1875,7 @@ class PH_Shortcodes {
 
 		if ( is_wp_error( $user ) ) 
 		{
-			echo __( 'This key is invalid or has already been used. Please reset your password again if needed.', 'propertyhive' );
+			echo esc_html(__( 'This key is invalid or has already been used. Please reset your password again if needed.', 'propertyhive' ));
 			return ob_get_clean();
 		}
 

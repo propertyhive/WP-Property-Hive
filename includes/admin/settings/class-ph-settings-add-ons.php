@@ -124,14 +124,14 @@ class PH_Settings_Add_Ons extends PH_Settings_Page {
                             <div class="thumbnail">';
                         if (isset($add_on->image) && $add_on->image != '')
                         {
-                            echo '<a href="' . $add_on->url . '" target="_blank"><img src="' . $add_on->image . '" alt="' . $add_on->name . '"></a>';
+                            echo '<a href="' . esc_url($add_on->url) . '" target="_blank"><img src="' . esc_url($add_on->image) . '" alt="' . esc_attr($add_on->name) . '"></a>';
                         }
                         echo '</div>
                         <div class="details">
-                            <h3><a href="' . $add_on->url . '" target="_blank">' . $add_on->name . '</a></h3>
-                            <p>' . $add_on->description . '</p>
+                            <h3><a href="' . esc_url($add_on->url) . '" target="_blank">' . esc_html($add_on->name) . '</a></h3>
+                            <p>' . esc_html($add_on->description) . '</p>
                             <br>
-                            <a href="' . $add_on->url . '" target="_blank" class="button">'. __('View Add On', 'propertyhive') .'</a>
+                            <a href="' . esc_url($add_on->url) . '" target="_blank" class="button">'. esc_html(__('View Add On', 'propertyhive')) .'</a>
                         </div>
                         </div>
                         </li>';
@@ -143,14 +143,14 @@ class PH_Settings_Add_Ons extends PH_Settings_Page {
                 }
                 else
                 {
-                    echo '<p>'. __('No add ons are currently available for Property Hive. As add ons become available they will appear here. Please check back soon.', 'propertyhive') . '</p>';
+                    echo '<p>'. esc_html(__('No add ons are currently available for Property Hive. As add ons become available they will appear here. Please check back soon.', 'propertyhive')) . '</p>';
                 }
             }
             else
             {
-                echo '<p>'. __('Unable to retrieve list of add-ons. Please visit the Property Hive add ons page to view a full list of add ons available.', 'propertyhive') . '</p>';
+                echo '<p>'. esc_html(__('Unable to retrieve list of add-ons. Please visit the Property Hive add ons page to view a full list of add ons available.', 'propertyhive')) . '</p>';
                 
-                echo '<br><p><a href="https://wp-property-hive.com/add-ons/" class="button button-primary">'. __('Browse All Add Ons', 'propertyhive') . '</a></p>';
+                echo '<br><p><a href="https://wp-property-hive.com/add-ons/" class="button button-primary">'. esc_html(__('Browse All Add Ons', 'propertyhive')) . '</a></p>';
             }
         ?>
         

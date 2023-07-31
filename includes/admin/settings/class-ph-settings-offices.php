@@ -368,19 +368,19 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
-                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=offices&section=add' ); ?>" class="button alignright"><?php echo __( 'Add New Office', 'propertyhive' ); ?></a>
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=offices&section=add' ); ?>" class="button alignright"><?php echo esc_html(__( 'Add New Office', 'propertyhive' )); ?></a>
             </td>
         </tr>
         <tr valign="top">
-            <th scope="row" class="titledesc"><?php _e( 'Offices', 'propertyhive' ) ?></th>
+            <th scope="row" class="titledesc"><?php echo esc_html(__( 'Offices', 'propertyhive' )); ?></th>
             <td class="forminp">
                 <table class="ph_offices widefat" cellspacing="0">
                     <thead>
                         <tr>
-                            <th class="primary"><?php _e( 'Primary', 'propertyhive' ); ?></th>
-                            <th class="name"><?php _e( 'Name', 'propertyhive' ); ?></th>
-                            <th class="address"><?php _e( 'Address', 'propertyhive' ); ?></th>
-                            <th class="contact"><?php _e( 'Contact Details', 'propertyhive' ); ?></th>
+                            <th class="primary"><?php echo esc_html(__( 'Primary', 'propertyhive' )); ?></th>
+                            <th class="name"><?php echo esc_html(__( 'Name', 'propertyhive' )); ?></th>
+                            <th class="address"><?php echo esc_html(__( 'Address', 'propertyhive' )); ?></th>
+                            <th class="contact"><?php echo esc_html(__( 'Contact Details', 'propertyhive' )); ?></th>
                             <?php do_action( 'propertyhive_office_table_header_columns' ); ?>
                             <th class="settings">&nbsp;</th>
                         </tr>
@@ -423,8 +423,8 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                     {
                                         if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
                                         {
-                                            $contact_details .= 'T: ' . get_post_meta($post->ID, '_office_telephone_number_' . str_replace("residential-", "", $key), TRUE) . '<br>';
-                                            $contact_details .= 'E: ' . get_post_meta($post->ID, '_office_email_address_' . str_replace("residential-", "", $key), TRUE) . '<br>';
+                                            $contact_details .= 'T: ' . esc_html(get_post_meta($post->ID, '_office_telephone_number_' . str_replace("residential-", "", $key), TRUE)) . '<br>';
+                                            $contact_details .= 'E: ' . esc_html(get_post_meta($post->ID, '_office_email_address_' . str_replace("residential-", "", $key), TRUE)) . '<br>';
                                         }
                                     }
                                     
@@ -433,10 +433,10 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                             <input type="radio" name="primary" value="' . esc_attr( $post->ID ) . '" ' . checked( get_post_meta($post->ID, 'primary', TRUE), '1', false ) . ' />
                                         </td>
                                         <td class="name">
-                                            ' . get_the_title() . '
+                                            ' . esc_html(get_the_title()) . '
                                         </td>
                                         <td class="address">
-                                            ' . $address . '
+                                            ' . esc_html($address) . '
                                         </td>
                                         <td class="contact">
                                             ' . $contact_details . '
@@ -444,11 +444,11 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                     do_action( 'propertyhive_office_table_row_columns', get_the_ID() );
                                     echo '
                                         <td class="settings">
-                                            <a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=edit&id=' . $post->ID ) . '">' . __( 'Edit', 'propertyhive' ) . '</a>
+                                            <a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=edit&id=' . $post->ID ) . '">' . esc_html(__( 'Edit', 'propertyhive' )) . '</a>
                                             ';
                                     if ( $num_offices > 1 && get_post_meta($post->ID, 'primary', TRUE) != '1' )
                                     {
-                                        echo '<a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=delete&id=' . $post->ID ) . '">' . __( 'Delete', 'propertyhive' ) . '</a>';    
+                                        echo '<a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=delete&id=' . $post->ID ) . '">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>';    
                                     }
                                     echo '
                                     </td>
@@ -466,7 +466,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
-                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=offices&section=add' ); ?>" class="button alignright"><?php echo __( 'Add New Office', 'propertyhive' ); ?></a>
+                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=offices&section=add' ); ?>" class="button alignright"><?php echo esc_html(__( 'Add New Office', 'propertyhive' )); ?></a>
             </td>
         </tr>
         <?php

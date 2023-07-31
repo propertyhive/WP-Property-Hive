@@ -52,31 +52,31 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
 
         echo '<p class="form-field rent_field ">
         
-            <label for="_rent">' . __('Rent', 'propertyhive') . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
+            <label for="_rent">' . esc_html(__('Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
         
         if ( count($currencies) > 1 )
         {
             echo '<select id="_rent_currency" name="_rent_currency" class="select" style="width:auto; float:left;">';
             foreach ($currencies as $currency_code => $currency_sybmol)
             {
-                echo '<option value="' . $currency_code . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
             }
             echo '</select>';
         }
         else
         {
-            echo '<input type="hidden" name="_rent_currency" value="' . $selected_currency . '">';
+            echo '<input type="hidden" name="_rent_currency" value="' . esc_attr($selected_currency) . '">';
         }
 
-        echo '<input type="text" class="" name="_rent" id="_rent" value="' . ph_display_price_field( get_post_meta( $post->ID, '_rent', true ) ) . '" placeholder="" style="width:20%;">
+        echo '<input type="text" class="" name="_rent" id="_rent" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_rent', true ) )) . '" placeholder="" style="width:20%;">
             
             <select id="_rent_frequency" name="_rent_frequency" class="select" style="width:auto">
-                <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . __('Per Day', 'propertyhive') . '</option>
-                <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . __('Per Person Per Week', 'propertyhive') . '</option>
-                <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . __('Per Week', 'propertyhive') . '</option>
-                <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . __('Per Calendar Month', 'propertyhive') . '</option>
-                <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . __('Per Quarter', 'propertyhive') . '</option>
-                <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . __('Per Annum', 'propertyhive') . '</option>
+                <option value="pd"' . ( ($rent_frequency == 'pd') ? ' selected' : '') . '>' . esc_html(__('Per Day', 'propertyhive')) . '</option>
+                <option value="pppw"' . ( ($rent_frequency == 'pppw') ? ' selected' : '') . '>' . esc_html(__('Per Person Per Week', 'propertyhive')) . '</option>
+                <option value="pw"' . ( ($rent_frequency == 'pw') ? ' selected' : '') . '>' . esc_html(__('Per Week', 'propertyhive')) . '</option>
+                <option value="pcm"' . ( ($rent_frequency == 'pcm' || $rent_frequency == '') ? ' selected' : '') . '>' . esc_html(__('Per Calendar Month', 'propertyhive')) . '</option>
+                <option value="pq"' . ( ($rent_frequency == 'pq') ? ' selected' : '') . '>' . esc_html(__('Per Quarter', 'propertyhive')) . '</option>
+                <option value="pa"' . ( ($rent_frequency == 'pa') ? ' selected' : '') . '>' . esc_html(__('Per Annum', 'propertyhive')) . '</option>
             </select>
             
         </p>';

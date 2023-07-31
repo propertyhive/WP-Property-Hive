@@ -112,7 +112,7 @@
             foreach ( $columns as $column_key => $column )
             {
                 ?>
-                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo $column; ?></th>
+                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo esc_html($column); ?></th>
                 <?php
             }
         ?>
@@ -134,19 +134,19 @@
 
                 $column_data = array(
                     'dates' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '">
-                        Start Date: ' . ( $the_tenancy->_start_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_start_date ) ) : '-' ) . '<br>
-                        End Date: ' . ( $the_tenancy->_end_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_end_date ) ) : '-' ) . '
+                        Start Date: ' . ( $the_tenancy->_start_date != '' ? esc_html(date( "d/m/Y", strtotime( $the_tenancy->_start_date ) )) : '-' ) . '<br>
+                        End Date: ' . ( $the_tenancy->_end_date != '' ? esc_html(date( "d/m/Y", strtotime( $the_tenancy->_end_date ) )) : '-' ) . '
                     </a>',
-                    'property' => $property->get_formatted_full_address(),
-                    'rent' => $the_tenancy->get_formatted_rent(),
-                    'status' => $the_tenancy->get_status(),
+                    'property' => esc_html($property->get_formatted_full_address()),
+                    'rent' => esc_html($the_tenancy->get_formatted_rent()),
+                    'status' => esc_html($the_tenancy->get_status()),
                 );
 
                 $row_classes = array( 'status-' . $the_tenancy->get_status() );
                 $row_classes = apply_filters( 'propertyhive_contact_tenancies_row_classes', $row_classes, get_the_ID(), $the_tenancy );
                 $row_classes = is_array($row_classes) ? array_map( 'sanitize_html_class', array_map( 'strtolower', $row_classes ) ) : array();
                 ?>
-                    <tr class="<?php echo implode(" ", $row_classes); ?>" >
+                    <tr class="<?php echo esc_attr(implode(" ", $row_classes)); ?>" >
                     <?php
                         foreach ( $columns as $column_key => $column )
                         {
@@ -170,7 +170,7 @@
         {
             ?>
             <tr class="no-items">
-                <td class="colspanchange" colspan="4"><?php echo __( 'No tenancies found', 'propertyhive' ); ?></td>
+                <td class="colspanchange" colspan="4"><?php echo esc_html(__( 'No tenancies found', 'propertyhive' )); ?></td>
             </tr>
             <?php
         }

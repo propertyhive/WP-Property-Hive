@@ -59,7 +59,7 @@ class PH_Meta_Box_Property_Owner {
         
         echo '<div class="options_group">';
         
-        echo '<input type="hidden" name="_owner_contact_id" id="_owner_contact_id" value="' . implode("|", $owner_contact_ids) . '">';
+        echo '<input type="hidden" name="_owner_contact_id" id="_owner_contact_id" value="' . esc_attr(implode("|", $owner_contact_ids)) . '">';
         echo '<input type="hidden" name="_owner_contact_add_new" id="_owner_contact_add_new" value="">';
 
             // No owner currently selected
@@ -79,7 +79,7 @@ class PH_Meta_Box_Property_Owner {
                 echo '<p class="form-field"><label>&nbsp;</label>';
                 
                 echo __('Or', 'propertyhive') . '<br><br>';
-                echo '<a href="#" class="button add-new-property-owner-contact">' . __('Add New Contact', 'propertyhive') . '</a>';
+                echo '<a href="#" class="button add-new-property-owner-contact">' . esc_html(__('Add New Contact', 'propertyhive')) . '</a>';
     
                 echo '</p>';
                 
