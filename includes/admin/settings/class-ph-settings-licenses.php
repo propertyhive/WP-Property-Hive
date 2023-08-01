@@ -61,6 +61,11 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		{
 			$output = '<span style="color:#900">' . __( 'Invalid license key entered. If you\'re seeing this message and the license key is correct please contact Property Hive support.', 'propertyhive' ) . '</span>';
 			$input_border_color = '#900';
+
+			if ( get_option( 'propertyhive_license_key_error', '' ) != '' )
+			{
+				$output .= ' <span style="color:#900">' . esc_html(get_option( 'propertyhive_license_key_error', '' )) . '</span>';
+			}
 		}
 		elseif ( isset($license['active']) && $license['active'] != '1' )
 		{
