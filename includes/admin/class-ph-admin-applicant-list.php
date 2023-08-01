@@ -256,13 +256,13 @@ class PH_Admin_Applicant_List {
                             $contact_details = array();
                             if ( $result['telephone_number'] != '' )
                             {
-                                $contact_details[] = 'T: ' . $result['telephone_number'];
+                                $contact_details[] = 'T: ' . esc_html($result['telephone_number']);
                             }
                             if ( $result['email_address'] != '' )
                             {
-                                $contact_details[] = 'E: ' . $result['email_address'];
+                                $contact_details[] = 'E: ' . esc_html($result['email_address']);
                             }
-                            echo !empty($contact_details) ? implode("<br>", esc_html($contact_details)) : '-';
+                            echo !empty($contact_details) ? implode("<br>", $contact_details) : '-';
                         ?></td>
                         <td><?php
                             if ( isset($result['profile']['department']) )
