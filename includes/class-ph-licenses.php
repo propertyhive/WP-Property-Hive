@@ -78,6 +78,7 @@ class PH_Licenses {
 
 		// Start by removing what we already know about the license
 		update_option( 'propertyhive_license_key_details', '', 'no' );
+		update_option( 'propertyhive_license_key_error', '', 'no' );
 
 		$data = array();
 
@@ -180,9 +181,17 @@ class PH_Licenses {
 			'user-agent'  => 'PH/' . PH_VERSION . '; ' . get_bloginfo( 'url' )
 		) );
 
-		if ( is_wp_error( $request ) || ( !is_wp_error( $request ) && isset($request['body']) && $request['body'] == '' ) )
+		if ( is_wp_error( $request ) )
 		{
 			update_option( 'propertyhive_license_key_details', array(), 'no' );
+			update_option( 'propertyhive_license_key_error', $request->get_error_message(), 'no' );
+			return false;
+		}
+
+		if ( isset($request['body']) && $request['body'] == '' )
+		{
+			update_option( 'propertyhive_license_key_details', array(), 'no' );
+			update_option( 'propertyhive_license_key_error', 'No response received when checking license', 'no' );
 			return false;
 		}
 
@@ -190,6 +199,11 @@ class PH_Licenses {
 		if ( $body !== FALSE && is_array($body) && !empty($body) )
 		{
 			update_option( 'propertyhive_license_key_details', $body, 'no' );
+		}
+		else
+		{
+			update_option( 'propertyhive_license_key_details', array(), 'no' );
+			update_option( 'propertyhive_license_key_error', 'Failed to process response data: ' . print_r($request['body'], true), 'no' );
 		}
 	}
 
