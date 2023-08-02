@@ -25,7 +25,6 @@ class PH_Admin_Menus {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
 		add_action( 'admin_menu', array( $this, 'reports_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'settings_menu' ), 50 );
-		add_action( 'admin_menu', array( $this, 'add_ons_menu' ), 60 );
 		add_action( 'admin_menu', array( $this, 'crm_only_mode_menu' ), 99 );
 
 		add_action( 'admin_head', array( $this, 'menu_highlight' ) );
@@ -281,13 +280,6 @@ class PH_Admin_Menus {
 		$settings_page = add_submenu_page( 'propertyhive', __( 'Property Hive Settings', 'propertyhive' ),  __( 'Settings', 'propertyhive' ) , 'manage_options', 'ph-settings', array( $this, 'settings_page' ) );
 
 		//add_action( 'load-' . $settings_page, array( $this, 'settings_page_init' ) );
-	}
-
-	/**
-	 * Add menu item
-	 */
-	public function add_ons_menu() {
-		$settings_page = add_submenu_page( 'propertyhive', __( 'Add Ons', 'propertyhive' ),  __( 'Add Ons', 'propertyhive' ) , 'manage_options', 'admin.php?page=ph-settings&tab=addons'/*, array( $this, 'settings_page' )*/ );
 	}
 
 	/**
