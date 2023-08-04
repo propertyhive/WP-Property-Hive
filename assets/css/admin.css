@@ -185,7 +185,7 @@ table.ph_offices .primary input {
 .pro-feature-settings ul li .pro { position:absolute; top:25px; right:20px; background:orange; color:#FFF; font-weight:500; border-radius:13px; padding:3px 12px; font-size:12px; }
 .pro-feature-settings ul li .inner h3 { margin-top:0 }
 .pro-feature-settings ul li .inner .loading { display:none }
-.pro-feature-settings ul li .inner .loading img { height:34px; }
+.pro-feature-settings ul li .inner .loading img { height:34px; display:block }
 .pro-feature-settings .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
 /* Hide default HTML checkbox */
 .pro-feature-settings .switch input { opacity: 0; width: 0; height: 0; }

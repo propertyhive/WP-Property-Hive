@@ -6079,8 +6079,44 @@ class PH_AJAX {
 
             if ( $valid_license_key === false )
             {
-                // check license key valid
-                
+                // check pro license key valid
+                if ( PH()->license->is_valid_pro_license_key() )
+                {
+                    $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
+
+                    if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
+                    {
+                        if ( 
+                            isset($feature['packages']) && 
+                            isset($product_id_and_package['package']) &&
+                            in_array($product_id_and_package['package'], $feature['packages'])
+                        )
+                        {
+                            
+                        }
+                        else
+                        {
+                            $return = array(
+                                'errorMessage' => 'Trying to activate a feature that\'s not on your chosen plan'
+                            );
+                            wp_send_json_error($return);
+                        }
+                    }
+                    else
+                    {
+                        $return = array(
+                            'errorMessage' => 'License key valid but failed to get package'
+                        );
+                        wp_send_json_error($return);
+                    }
+                }
+                else
+                {
+                    $return = array(
+                        'errorMessage' => 'Trying to activate a PRO feature but no valid PRO license key entered'
+                    );
+                    wp_send_json_error($return);
+                }
             }
 
             if ( $valid_license_key === false )

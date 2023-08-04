@@ -73,12 +73,12 @@ class PH_Settings_Features extends PH_Settings_Page {
 
             echo '<li>
                 <div class="inner">
-                    <h3>' . ( ( isset($feature['icon']) && !empty($feature['icon']) ) ? '<span class="dashicons ' . $feature['icon'] . '"></span> ' : '' ) . $feature['name'] . '</h3>' . 
+                    <h3>' . ( ( isset($feature['icon']) && !empty($feature['icon']) ) ? '<span class="dashicons ' . esc_attr($feature['icon']) . '"></span> ' : '' ) . esc_html($feature['name']) . '</h3>' . 
                     ( ( isset($feature['pro']) && $feature['pro'] === true ) ? '<span class="pro">PRO</span>' : '' ) . 
-                    ( ( isset($feature['description']) && !empty($feature['description']) ) ? '<p>' . $feature['description'] . '</p>' : '' ) . '
+                    ( ( isset($feature['description']) && !empty($feature['description']) ) ? '<p>' . esc_html($feature['description']) . '</p>' : '' ) . '
                     <p>
-                    ' . ( ( isset($feature['url']) && !empty($feature['url']) ) ? '<a href="' . $feature['url'] . '" target="_blank">' . __( 'Read More', 'propertyhive' ) . '</a>' : '' ) . 
-                    ( ( isset($feature['docs_url']) && !empty($feature['docs_url']) ) ? '&nbsp;&nbsp;|&nbsp;&nbsp;<a href="' . $feature['docs_url'] . '" target="_blank">' . __( 'Docs', 'propertyhive' ) . '</a>' : '' ) . 
+                    ' . ( ( isset($feature['url']) && !empty($feature['url']) ) ? '<a href="' . esc_url($feature['url']) . '" target="_blank">' . esc_html(__( 'Read More', 'propertyhive' )) . '</a>' : '' ) . 
+                    ( ( isset($feature['docs_url']) && !empty($feature['docs_url']) ) ? '&nbsp;&nbsp;|&nbsp;&nbsp;<a href="' . esc_url($feature['docs_url']) . '" target="_blank">' . esc_html(__( 'Docs', 'propertyhive' )) . '</a>' : '' ) . 
                     '</p>';
 
                 
@@ -91,13 +91,13 @@ class PH_Settings_Features extends PH_Settings_Page {
 
                         if ( version_compare($plugin_data['Version'], $transient->response[$feature['plugin']]->new_version, '<') )
                         {
-                            echo '<div style="float:right"><a href="' . admin_url('update-core.php') . '" style="text-decoration:none"><span class="dashicons dashicons-update"></span> Update available</a></div>';
+                            echo '<div style="float:right"><a href="' . esc_url(admin_url('update-core.php')) . '" style="text-decoration:none"><span class="dashicons dashicons-update"></span> Update available</a></div>';
                         }
                     }
                 }
 
                 echo '<label class="switch">
-                  <input type="checkbox" name="active_plugins[]" value="' . $feature['slug'] . '"' . ( $feature_status == 'active' ? ' checked' : '' ) . '>
+                  <input type="checkbox" name="active_plugins[]" value="' . esc_attr($feature['slug']) . '"' . ( $feature_status == 'active' ? ' checked' : '' ) . '>
                   <span class="slider round"></span>
                 </label>';
 
