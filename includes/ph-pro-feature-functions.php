@@ -38,6 +38,20 @@ function get_ph_pro_features()
             'docs_url' => 'https://docs.wp-property-hive.com/add-ons/property-import/',
             'pro' => true,
             'categories' => array('import_export'),
+            'packages' => array( 'import' )
+        ),
+        array(
+            'slug' => 'propertyhive-map-search',
+            'plugin' => 'propertyhive-map-search/propertyhive-map-search.php',
+            'download_url' => 'https://wp-property-hive.com/add-on-store/propertyhive-map-search-g11can9z/propertyhive-map-search.zip',
+            'name' => __( 'Map View & Draw-a-Search', 'propertyhive' ),
+            'icon' => 'dashicons-location-alt',
+            'description' => 'Map description here',
+            'url' => 'https://wp-property-hive.com/addons/map-search/',
+            'docs_url' => 'https://docs.wp-property-hive.com/add-ons/map-view-and-draw-a-search/',
+            'pro' => true,
+            'categories' => array('website_enhancement'),
+            'packages' => array( 'import', 'complete' )
         ),
         array(
             'slug' => 'property-hive-rental-affordability-calculator',
