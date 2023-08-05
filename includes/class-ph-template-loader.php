@@ -46,6 +46,10 @@ class PH_Template_Loader {
 							'value'   => 'singular:post_type:property:all',
 							'compare' => '=',
 						),
+						array(
+							'key'     => '_et_theme_builder_marked_as_unused',
+							'compare' => 'NOT EXISTS',
+						),
 					),
 				)
 			);
@@ -56,6 +60,8 @@ class PH_Template_Loader {
 		}
 
 		// Check for single Elementor property page template
+
+		// Check for single Bricks Builder property page template
 
 
 		$priority = 10;
