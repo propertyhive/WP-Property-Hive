@@ -59,6 +59,16 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             ]
         );
 
+        $this->add_control(
+            'start_at_image',
+            [
+                'label' => __( 'Start at Image #', 'propertyhive' ),
+                'type' => \Elementor\Controls_Manager::NUMBER,
+                'default' => 1,
+                'min' => 1,
+            ]
+        );
+
         $this->end_controls_section();
     }
 
@@ -72,11 +82,29 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             return;
         }
 
+        $start_at_image = ( isset($settings['start_at_image']) && !empty($settings['start_at_image']) && is_numeric($settings['start_at_image']) ) ? ($settings['start_at_image'] - 1) : 0;
+        
         $images = array();
+        $images_hidden = array();
         if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
         {
             $photo_urls = $property->_photo_urls;
             if ( !is_array($photo_urls) ) { $photo_urls = array(); }
+
+            if ( $start_at_image > 0 )
+            {
+                $photo_urls_hidden = array_slice($photo_urls, 0, $start_at_image);
+
+                foreach ( $photo_urls_hidden as $photo )
+                {
+                    $images_hidden[] = array(
+                        'title' => isset($photo['title']) ? $photo['title'] : '',
+                        'url'  => isset($photo['url']) ? $photo['url'] : '',
+                        'image' => '<img src="' . ( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . ( isset($photo['title']) ? $photo['title'] : '' ) . '">',
+                    );
+                }
+            }
+            $photo_urls = array_slice($photo_urls, $start_at_image);
 
             foreach ( $photo_urls as $photo )
             {
@@ -93,6 +121,23 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
 
             if ( !empty($gallery_attachments) )
             {
+                if ( $start_at_image > 0 )
+                {
+                    $gallery_attachments_hidden = array_slice($gallery_attachments, 0, $start_at_image);
+
+                    foreach ($gallery_attachments_hidden as $gallery_attachment)
+                    {
+                        $images_hidden[] = array(
+                            'title' => esc_attr( get_the_title( $gallery_attachment ) ),
+                            'url'  => wp_get_attachment_url( $gallery_attachment ),
+                            'image' => wp_get_attachment_image( $gallery_attachment, apply_filters( 'propertyhive_single_property_image_size', 'large' ) ),
+                            'attachment_id' => $gallery_attachment,
+                        );
+                    }
+                }
+
+                $gallery_attachments = array_slice($gallery_attachments, $start_at_image);
+
                 foreach ($gallery_attachments as $gallery_attachment)
                 {
                     $images[] = array(
@@ -216,9 +261,20 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             }
         </script>
 
+        <?php
+            
+            foreach ( $images_hidden as $image_hidden ) 
+            {
+                echo '<a href="' . $image_hidden['url'] . '" data-fancybox="elementor-gallery"></a>';
+                ++$image_number;
+            }
+        ?>
+
         <div class="ph-elementor-gallery">
         <?php
+            
             $image_number = 0;
+
             for ( $j = 0; $j < $max_images; $j++ ) 
             {
                 echo '<div class="gallery-column">';
@@ -233,13 +289,13 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                     if ( $image_number == 1 )
                     {
                         echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
-                        printf( __( 'See all %d images', 'propertyhive' ), count($images) );
+                        printf( __( 'See all %d images', 'propertyhive' ), count($images) + count($images_hidden) );
                         echo '</a></div></div>';
                     }
                     if ( $image_number == ($max_images - 1) )
                     {
                         echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
-                        printf( __( 'See all %d images', 'propertyhive' ), count($images) );
+                        printf( __( 'See all %d images', 'propertyhive' ), count($images) + count($images_hidden) );
                         echo '</a></div></div>';
                     }
                 }
