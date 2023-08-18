@@ -73,15 +73,18 @@ class PH_Query {
 
 	public function keyword_excerpt_where( $where, $query )
 	{
-		if ( $query->get('post_type') == 'property' )
+		if ( ( is_array($query->get('post_type')) && in_array('property', $query->get('post_type')) ) || ( !is_array($query->get('post_type')) && $query->get('post_type') == 'property' ) )
         {
         	global $wpdb;
 
         	if ( isset($_REQUEST['keyword']) && ph_clean($_REQUEST['keyword']) != '' )
         	{
         		$ref_pos = strpos($where, '_features_concatenated');
-        		$str_to_insert = " $wpdb->posts.post_excerpt LIKE '%" . esc_sql(ph_clean($_REQUEST['keyword'])) . "%' OR ";
-        		$where = substr_replace($where, $str_to_insert, $ref_pos - 18, 0);
+        		if ( $ref_pos !== FALSE )
+        		{
+	        		$str_to_insert = " $wpdb->posts.post_excerpt LIKE '%" . esc_sql(ph_clean($_REQUEST['keyword'])) . "%' OR ";
+	        		$where = substr_replace($where, $str_to_insert, $ref_pos - 18, 0);
+	        	}
         	}
         }
 
