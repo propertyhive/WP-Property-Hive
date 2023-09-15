@@ -276,43 +276,11 @@ function ph_get_search_form_fields()
             'options' => $sizes
         );
 
-        // Property Type
-        $options = array( '' => __( 'No preference', 'propertyhive' ) );
-        $args = array(
-            'hide_empty' => false,
-            'parent' => 0
-        );
-        $terms = get_terms( 'commercial_property_type', $args );
-
-        $selected_value = '';
-        if ( !empty( $terms ) && !is_wp_error( $terms ) )
-        {
-            foreach ($terms as $term)
-            {
-                $options[$term->term_id] = $term->name;
-
-                $args = array(
-                    'hide_empty' => false,
-                    'parent' => $term->term_id
-                );
-                $subterms = get_terms( 'commercial_property_type', $args );
-
-                if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
-                {
-                    foreach ($subterms as $term)
-                    {
-                        $options[$term->term_id] = '- ' . $term->name;
-                    }
-                }
-            }
-        }
-
         $fields['commercial_property_type'] = array(
             'type' => 'commercial_property_type',
             'show_label' => true,
             'before' => '<div class="control control-commercial_property_type commercial-only">',
             'label' => __( 'Type', 'propertyhive' ),
-            'options' => $options
         );
     }
 
