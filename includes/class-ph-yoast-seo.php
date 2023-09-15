@@ -27,7 +27,18 @@ class PH_Yoast_SEO {
 		add_filter( 'manage_edit-property_columns', array( __CLASS__, 'yoast_remove_columns') );
 		add_filter( 'wpseo_exclude_from_sitemap_by_post_ids', array( __CLASS__, 'sitemap_exclude_off_market') );
 		add_filter( 'wpseo_schema_webpage_type', array( __CLASS__, 'yoast_schema_webpage_type') );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 	}
+
+	public static function enqueue_scripts() 
+	{
+		$screen = get_current_screen();
+
+		if ( in_array( $screen->id, array( 'property' ) ) )
+        {
+        	wp_enqueue_script( 'propertyhive-yoast', PH()->plugin_url() . '/assets/js/admin/yoast.js', array(), PH_VERSION );
+        }
+    }
 
 	public static function yoast_schema_webpage_type( $type )
 	{
