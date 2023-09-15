@@ -215,6 +215,7 @@ class PH_Elementor {
 			'Property Tenure',
 			'Property Council Tax Band',
 			'Property Let Available Date',
+			'Property Deposit',
 			'Property Map',
 			'Property Map Link',
 			'Property Street View',
