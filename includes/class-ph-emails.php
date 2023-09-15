@@ -631,11 +631,7 @@ class PH_Emails {
 				{
 					$similar_html = '';
 
-					$department = get_post_meta( $property_id, '_department', TRUE );
-					$bedrooms = get_post_meta( $property_id, '_bedrooms', TRUE );
-					$price = get_post_meta( $property_id, '_price_actual', true );
-					$lower_price = $price - ($price / 10);
-					$higher_price = $price + ($price / 10);
+					$department = get_post_meta( $property_id, '_department', TRUE );					
 
 					// Get three similar properties
 					$args = array(
@@ -658,25 +654,55 @@ class PH_Emails {
 						'value' 	=> 'yes',
 					);
 
-					$meta_query[] = array(
-						'key' 		=> '_bedrooms',
-						'value' 	=> $bedrooms,
-						'type'      => 'NUMERIC'
-					);
+					if ( $department != 'commercial' && ph_get_custom_department_based_on( $department ) != 'commercial' )
+					{
+						$bedrooms = get_post_meta( $property_id, '_bedrooms', TRUE );
 
-					$meta_query[] = array(
-						'key' 		=> '_price_actual',
-						'value' 	=> $lower_price,
-						'compare'   => '>=',
-						'type'      => 'NUMERIC'
-					);
+						$meta_query[] = array(
+							'key' 		=> '_bedrooms',
+							'value' 	=> $bedrooms,
+							'type'      => 'NUMERIC'
+						);
 
-					$meta_query[] = array(
-						'key' 		=> '_price_actual',
-						'value' 	=> $higher_price,
-						'compare'   => '<=',
-						'type'      => 'NUMERIC'
-					);
+
+						$price = get_post_meta( $property_id, '_price_actual', true );
+						$lower_price = $price - ($price / 10);
+						$higher_price = $price + ($price / 10);
+
+						$meta_query[] = array(
+							'key' 		=> '_price_actual',
+							'value' 	=> $lower_price,
+							'compare'   => '>=',
+							'type'      => 'NUMERIC'
+						);
+
+						$meta_query[] = array(
+							'key' 		=> '_price_actual',
+							'value' 	=> $higher_price,
+							'compare'   => '<=',
+							'type'      => 'NUMERIC'
+						);
+					}
+					else
+					{
+						$for_sale = get_post_meta( $property_id, '_for_sale', true );
+						$to_rent = get_post_meta( $property_id, '_to_rent', true );
+
+						if ( $for_sale == 'yes' )
+						{
+							$meta_query[] = array(
+								'key' 		=> '_for_sale',
+								'value' 	=> 'yes',
+							);
+						}
+						elseif ( $to_rent == 'yes' )
+						{
+							$meta_query[] = array(
+								'key' 		=> '_to_rent',
+								'value' 	=> 'yes',
+							);
+						}
+					}
 
 					$args['meta_query'] = $meta_query;
 
