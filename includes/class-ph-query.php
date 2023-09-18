@@ -856,6 +856,7 @@ class PH_Query {
 		      		'_address_three',
 		      		'_address_four',
 		      		'_address_postcode',
+		      		'_address_concatenated',
 		      	);
 
 		      	$address_keywords = array();
@@ -888,11 +889,6 @@ class PH_Query {
 						if ( strpos( $address_keyword, '\'' ) !== FALSE )
 						{
 							$address_keywords[] = str_replace("'", "", ph_clean($address_keyword));
-						}
-
-						if ( strpos( $address_keyword, ', ' ) !== FALSE )
-						{
-							$address_fields_to_query[] = '_address_concatenated';
 						}
 					}
 				}
