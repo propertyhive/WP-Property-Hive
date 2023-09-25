@@ -1,21 +1,21 @@
 <?php
 /**
- * Elementor Property Price Widget.
+ * Elementor Property Price Qualifier Widget.
  *
  * @since 1.0.0
  */
-class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
+class Elementor_Property_Price_Qualifier_Widget extends \Elementor\Widget_Base {
 
 	public function get_name() {
-		return 'property-price';
+		return 'property-price-qualifier';
 	}
 
 	public function get_title() {
-		return __( 'Price', 'propertyhive' );
+		return __( 'Price Qualifier', 'propertyhive' );
 	}
 
 	public function get_icon() {
-		return 'eicon-number-field';
+		return 'eicon-meta-data';
 	}
 
 	public function get_categories() {
@@ -23,7 +23,7 @@ class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'property hive', 'propertyhive', 'property', 'price' ];
+		return [ 'property hive', 'propertyhive', 'property', 'qualifier', 'price qualifier' ];
 	}
 
 	protected function register_controls() {
@@ -31,7 +31,7 @@ class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'style_section',
 			[
-				'label' => __( 'Price', 'propertyhive' ),
+				'label' => __( 'Price Qualifier', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
 			]
 		);
@@ -39,15 +39,15 @@ class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			[
-				'name' => 'price_typography',
+				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
 				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
-				'selector' => '{{WRAPPER}} .price',
+				'selector' => '{{WRAPPER}} .elementor-widget-property-price-qualifier',
 			]
 		);
 
 		$this->add_control(
-			'price_color',
+			'color',
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
@@ -56,7 +56,7 @@ class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
 					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .price' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .elementor-widget-property-price-qualifier' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -83,20 +83,8 @@ class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
 				'default' => 'left',
 				'toggle' => true,
 				'selectors' => [
-					'{{WRAPPER}} .price' => 'text-align: {{VALUE}}',
+					'{{WRAPPER}} .elementor-widget-property-price-qualifier' => 'text-align: {{VALUE}}',
 				],
-			]
-		);
-
-		$this->add_control(
-			'show_price_qualifier',
-			[
-				'label' => __( 'Show Price Qualifier', 'propertyhive' ),
-				'type' => \Elementor\Controls_Manager::SWITCHER,
-				'label_on' => __( 'Show', 'propertyhive' ),
-				'label_off' => __( 'Hide', 'propertyhive' ),
-				'return_value' => 'yes',
-				'default' => 'yes',
 			]
 		);
 
@@ -114,16 +102,10 @@ class Elementor_Property_Price_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
-		if ( isset($settings['show_price_qualifier']) && $settings['show_price_qualifier'] != 'yes' )
+        if ( $property->price_qualifier != '' )
 		{
-?>
-<style type="text/css">
-.price .price-qualifier { display:none; }
-</style>
-<?php
-		}
-
-		propertyhive_template_single_price();
+	        echo '<div class="elementor-widget-property-price-qualifier">' . $property->price_qualifier . '</div>';
+	    }
 
 	}
 
