@@ -17,12 +17,12 @@ class Divi_Property_Image_Widget extends ET_Builder_Module
     {
         $fields = array(
             'image_number' => array(
-                'label' => 'Image #',
+                'label' => __( 'Image #', 'propertyhive' ),
                 'type' => 'number',
                 'toggle_slug' => 'main_content',
             ),
             'image_size' => array(
-                'label' => 'Image Size',
+                'label' => __( 'Image Size', 'propertyhive' ),
                 'type' => 'select',
                 'options' => [
                     'thumbnail' => __( 'Thumbnail', 'propertyhive' ),
@@ -33,7 +33,7 @@ class Divi_Property_Image_Widget extends ET_Builder_Module
                 'toggle_slug' => 'main_content',
             ),
             'output_ratio' => array(
-                'label' => 'Image Ratio',
+                'label' => __( 'Image Ratio', 'propertyhive' ),
                 'type' => 'select',
                 'options' => [
                     '' => __( 'Uploaded Ratio', 'propertyhive' ),
@@ -49,7 +49,7 @@ class Divi_Property_Image_Widget extends ET_Builder_Module
         return $fields;
     }
 
-    public function render($attrs, $render_slug, $content = null)
+    public function render( $attrs, $content, $render_slug )
     {
         $post_id = get_the_ID();
 

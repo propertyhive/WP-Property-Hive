@@ -10,23 +10,24 @@ class Divi_Property_Street_View_Widget extends ET_Builder_Module
 
     public function init() {
         $this->name = esc_html__( 'Property Street View', 'propertyhive' );
-        $this->icon = '&';
+        $this->icon = 'Y';
     }
 
     public function get_fields()
     {
         $fields = array(
-            'image_number' => array(
-                'label' => 'Image #',
+            'map_height' => array(
+                'label' => __( 'Height (px)', 'propertyhive' ),
                 'type' => 'number',
                 'toggle_slug' => 'main_content',
+                'default' => 400
             ),
         );
 
         return $fields;
     }
 
-    public function render($attrs, $render_slug, $content = null)
+    public function render( $attrs, $content, $render_slug )
     {
         $post_id = get_the_ID();
 
@@ -36,8 +37,16 @@ class Divi_Property_Street_View_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = 'Street_View';
+        ob_start();
 
-        return $this->_render_module_wrapper( $return, $render_slug );
+        $attributes = array();
+        if ( isset($this->props['map_height']) && $this->props['map_height'] != '' )
+        {
+            $attributes['height'] = $this->props['map_height'];
+        }
+
+        get_property_street_view($attributes);
+
+        return $this->_render_module_wrapper( ob_get_clean(), $render_slug );
     }
 }

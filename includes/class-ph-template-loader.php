@@ -24,7 +24,7 @@ class PH_Template_Loader {
 	public function init()
 	{
 		// Check for single divi property page template
-		if ( class_exists( 'ET_Theme_Builder_Request' ) )
+		if ( is_singular('property') && class_exists( 'ET_Theme_Builder_Request' ) )
 		{
 			$template = new WP_Query(
 				array(

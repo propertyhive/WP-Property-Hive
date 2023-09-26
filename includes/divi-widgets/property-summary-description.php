@@ -15,18 +15,12 @@ class Divi_Property_Summary_Description_Widget extends ET_Builder_Module
 
     public function get_fields()
     {
-        $fields = array(
-            'image_number' => array(
-                'label' => 'Image #',
-                'type' => 'number',
-                'toggle_slug' => 'main_content',
-            ),
-        );
+        $fields = array();
 
         return $fields;
     }
 
-    public function render($attrs, $render_slug, $content = null)
+    public function render( $attrs, $content, $render_slug )
     {
         $post_id = get_the_ID();
 
@@ -36,8 +30,10 @@ class Divi_Property_Summary_Description_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = 'Summary_Description';
+        ob_start();
 
-        return $this->_render_module_wrapper( $return, $render_slug );
+        propertyhive_template_single_summary();
+
+        return $this->_render_module_wrapper( ob_get_clean(), $render_slug );
     }
 }
