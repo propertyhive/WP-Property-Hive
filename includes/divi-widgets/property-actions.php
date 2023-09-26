@@ -10,15 +10,20 @@ class Divi_Property_Actions_Widget extends ET_Builder_Module
 
     public function init() {
         $this->name = esc_html__( 'Property Actions', 'propertyhive' );
-        $this->icon = '&';
+        $this->icon = '|';
+        $this->main_css_element = '%%order_class%%';
     }
 
     public function get_fields()
     {
         $fields = array(
-            'image_number' => array(
-                'label' => 'Image #',
-                'type' => 'number',
+            'display' => array(
+                'label' => __( 'Display As', 'propertyhive' ),
+                'type' => 'select',
+                'options' => [
+                    'list' => __( 'List', 'propertyhive' ),
+                    'buttons' => __( 'Buttons', 'propertyhive' ),
+                ],
                 'toggle_slug' => 'main_content',
             ),
         );
@@ -26,7 +31,7 @@ class Divi_Property_Actions_Widget extends ET_Builder_Module
         return $fields;
     }
 
-    public function render($attrs, $render_slug, $content = null)
+    public function render( $attrs, $content, $render_slug )
     {
         $post_id = get_the_ID();
 
@@ -36,8 +41,19 @@ class Divi_Property_Actions_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = 'actions';
+        ob_start();
 
-        return $this->_render_module_wrapper( $return, $render_slug );
+        if ( isset($this->props['display']) && $this->props['display'] == 'buttons' )
+        {
+            echo '<style type="text/css">';
+            echo '.property_actions ul { list-style-type:none; margin:0; padding:0; }';
+            echo '.property_actions ul li { display:inline-block; }';
+            echo '.property_actions ul li a { display:block; }';
+            echo '</style>';
+        }
+
+        propertyhive_template_single_actions();
+
+        return $this->_render_module_wrapper( ob_get_clean(), $render_slug );
     }
 }

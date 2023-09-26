@@ -20,7 +20,7 @@ class Divi_Property_Price_Widget extends ET_Builder_Module
         return $fields;
     }
 
-    public function render($attrs, $render_slug, $content = null)
+    public function render( $attrs, $content, $render_slug )
     {
         $post_id = get_the_ID();
 

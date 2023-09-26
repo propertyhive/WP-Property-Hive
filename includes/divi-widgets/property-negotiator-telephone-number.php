@@ -10,23 +10,17 @@ class Divi_Property_Negotiator_Telephone_Number_Widget extends ET_Builder_Module
 
     public function init() {
         $this->name = esc_html__( 'Property Negotiator Telephone Number', 'propertyhive' );
-        $this->icon = '&';
+        $this->icon = 'G';
     }
 
     public function get_fields()
     {
-        $fields = array(
-            'image_number' => array(
-                'label' => 'Image #',
-                'type' => 'number',
-                'toggle_slug' => 'main_content',
-            ),
-        );
+        $fields = array();
 
         return $fields;
     }
 
-    public function render($attrs, $render_slug, $content = null)
+    public function render( $attrs, $content, $render_slug )
     {
         $post_id = get_the_ID();
 
@@ -36,7 +30,7 @@ class Divi_Property_Negotiator_Telephone_Number_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = 'Negotiator_Telephone_Number';
+        $return = $property->negotiator_telephone_number;
 
         return $this->_render_module_wrapper( $return, $render_slug );
     }

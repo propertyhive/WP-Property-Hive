@@ -67,8 +67,7 @@ class PH_Divi {
 				{
 					require_once( $widget_dir . "/" . sanitize_title($widget) . ".php" );
 					$class_name = 'Divi_' . str_replace(" ", "_", $widget) . '_Widget';
-					$widget_class = new $class_name();
-					$widget_class->init();
+					new $class_name();
 				}
 			}
 		}
