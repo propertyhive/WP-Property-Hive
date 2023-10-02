@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 6.2.2
-Stable tag: 1.5.53
+Tested up to: 6.3.1
+Stable tag: 1.5.54
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,20 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 1.5.54 - 2023-10-02 =
+* Initial Divi support. Single property page only at present. Includes new widgets so property details page can be built using Divi Theme Builder
+* Added ability to start Elementor Gallery widget at a specific image. Useful if displaying the main image at the top and then wanting to show the rest of the images in a gallery further down the page
+* Catered for post type being an array when keyword search is performed (Elementor specific)
+* Added new Deposit Elementor widget
+* Added new Price Qualifier Elementor widget
+* Added ability to hide price qualifier in Price Elementor widget. Useful if wanting to display price qualifier separately
+* Always include 'address_concatenated' meta key when searching by address
+* Yoast SEO to take descriptions/rooms into account when doing analysis
+* Corrected issue with commercial similar properties in auto-responder
+* Prevented ejquiry autoresponder similar property thumbnail blowing out layout when storing images as URL's or if no thumbnail version of images is stored
+* Store and display error should license key not be able to be obtained
+* Declared compatibility for WordPress 6.3.1
 
 = 1.5.53 - 2023-07-31 =
 * New option in Image Elementor widget to choose image ratio
