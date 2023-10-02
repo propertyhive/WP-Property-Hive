@@ -148,7 +148,7 @@ class Divi_Property_Bathrooms_Widget extends ET_Builder_Module
 
         if ( isset($this->props['before']) && $this->props['before'] != '' ) { $return .= $this->props['before'] . ' '; }
 
-        $return = $property->bathrooms;
+        $return .= $property->bathrooms;
         
         if ( isset($this->props['after']) && $this->props['after'] != '' ) { $return .= ' ' . $this->props['after']; }
 

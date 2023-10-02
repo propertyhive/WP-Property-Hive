@@ -32,6 +32,10 @@ class Divi_Property_Images_Widget extends ET_Builder_Module
 
         ob_start();
 
+        echo '<style type="text/css">
+        .flexslider ul { list-style-type:none; margin:0; padding:0 }
+        </style>';
+
         propertyhive_show_property_images();
 
         return $this->_render_module_wrapper( ob_get_clean(), $render_slug );
