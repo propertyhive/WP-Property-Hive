@@ -4,7 +4,7 @@
 				$image = $property->get_main_photo_src();
 				if ( $image !== false )
 				{
-					echo '<a href="' . get_permalink() . '"><img src="' . $image . '" alt="' . get_the_title() . '"></a>';
+					echo '<a href="' . get_permalink() . '"><img src="' . $image . '" alt="' . get_the_title() . '" style="max-width:100%"></a>';
 				}
 		?></td>
 		<td valign="top" class="text">
