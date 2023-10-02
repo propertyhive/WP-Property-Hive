@@ -15,7 +15,18 @@ class Divi_Property_Reference_Number_Widget extends ET_Builder_Module
 
     public function get_fields()
     {
-        $fields = array();
+        $fields = array(
+            'before' => array(
+                'label' => __( 'Before', 'propertyhive' ),
+                'type' => 'text',
+                'toggle_slug' => 'main_content',
+            ),
+            'after' => array(
+                'label' => __( 'After', 'propertyhive' ),
+                'type' => 'text',
+                'toggle_slug' => 'main_content',
+            ),
+        );
 
         return $fields;
     }
@@ -30,7 +41,18 @@ class Divi_Property_Reference_Number_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = $property->reference_number;
+        if ( $property->reference_number == '' )
+        {
+            return;
+        }
+
+        $return = '';
+
+        if ( isset($this->props['before']) && $this->props['before'] != '' ) { $return .= $this->props['before'] . ' '; }
+
+        $return .= $property->reference_number;
+
+        if ( isset($this->props['after']) && $this->props['after'] != '' ) { $return .= ' ' . $this->props['after']; }
 
         return $this->_render_module_wrapper( $return, $render_slug );
     }

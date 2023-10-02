@@ -46,8 +46,6 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
             return;
         }
 
-        echo 'Layout: ' . $this->props['gallery_layout'];
-
         ob_start();
 
         $start_at_image = ( isset($this->props['start_at_image']) && !empty($this->props['start_at_image']) && is_numeric($this->props['start_at_image']) ) ? ($this->props['start_at_image'] - 1) : 0;
