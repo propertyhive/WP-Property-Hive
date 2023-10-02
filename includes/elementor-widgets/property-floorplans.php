@@ -107,10 +107,16 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
             $floorplan_urls = $property->_floorplan_urls;
             if ( is_array($floorplan_urls) && !empty( $floorplan_urls ) )
             {
-                foreach ($floorplan_urls as $floorplan)
-                {
-                	echo '<a href="' . $floorplan['url'] . '" data-fancybox="floorplans" rel="nofollow"><img src="' . $floorplan['url'] . '" alt=""></a>';
-                }
+            	echo '<div class="floorplans">';
+
+                    echo '<h4>' . __( 'Floorplans', 'propertyhive' ) . '</h4>';
+
+	                foreach ($floorplan_urls as $floorplan)
+	                {
+	                	echo '<a href="' . $floorplan['url'] . '" data-fancybox="floorplans" rel="nofollow"><img src="' . $floorplan['url'] . '" alt=""></a>';
+	                }
+
+	            echo '</div>';
             }
         }
         else
