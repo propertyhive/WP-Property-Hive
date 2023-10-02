@@ -36,6 +36,8 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 		// Admin Columns
 		add_filter( 'manage_edit-tenancy_columns', array( $this, 'edit_columns' ) );
 		add_action( 'manage_tenancy_posts_custom_column', array( $this, 'custom_columns' ), 2 );
+		add_filter( 'manage_edit-tenancy_sortable_columns', array( $this, 'custom_columns_sort' ) );
+		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
 
 		// Bulk / quick edit
 		add_filter( 'bulk_actions-edit-tenancy', array( $this, 'remove_bulk_actions' ) );
@@ -97,7 +99,8 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 		$columns['property']       = __( 'Property', 'propertyhive' );
 		$columns['property_owner'] = __( 'Landlord', 'propertyhive' );
 		$columns['applicant']      = __( 'Tenants', 'propertyhive' );
-		$columns['dates']          = __( 'Start / End Dates', 'propertyhive' );
+		$columns['start_date']     = __( 'Start Date', 'propertyhive' );
+		$columns['end_date']       = __( 'End Date', 'propertyhive' );
 		$columns['rent']           = __( 'Rent', 'propertyhive' );
 		$columns['status']         = __( 'Status', 'propertyhive' );
 
@@ -202,9 +205,12 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				echo $the_tenancy->get_tenants(false, true);
 
 				break;
-			case 'dates' :
-				echo 'Start Date: ' . ( $the_tenancy->_start_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_start_date ) ) : '-' ) . '<br>';
-				echo 'End Date: ' . ( $the_tenancy->_end_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_end_date ) ) : '-' );
+			case 'start_date' :
+				echo ( $the_tenancy->_start_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_start_date ) ) : '-' );
+
+				break;
+			case 'end_date' :
+				echo ( $the_tenancy->_end_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_end_date ) ) : '-' );
 
 				break;
 			case 'rent' :
@@ -220,6 +226,49 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 			default :
 				break;
 		}
+	}
+
+	/**
+	 * Make property columns sortable
+	 *
+	 * https://gist.github.com/906872
+	 *
+	 * @access public
+	 * @param mixed $columns
+	 * @return array
+	 */
+	public function custom_columns_sort( $columns ) {
+		$custom = array(
+			'start_date' => '_start_date',
+			'end_date' => '_end_date'
+		);
+		return wp_parse_args( $custom, $columns );
+	}
+
+	/**
+	 * Property column orderby
+	 *
+	 * @access public
+	 * @param mixed $vars
+	 * @return array
+	 */
+	public function custom_columns_orderby( $vars ) {
+		if ( isset( $vars['orderby'] ) ) {
+			if ( '_start_date' == $vars['orderby'] ) {
+				$vars = array_merge( $vars, array(
+					'meta_key' 	=> '_start_date',
+					'orderby' 	=> 'meta_value'
+				) );
+			}
+			elseif ( '_end_date' == $vars['orderby'] ) {
+				$vars = array_merge( $vars, array(
+					'meta_key' 	=> '_end_date',
+					'orderby' 	=> 'meta_value'
+				) );
+			}
+		}
+
+		return $vars;
 	}
 
 	/**

@@ -18,6 +18,52 @@ class PH_Template_Loader {
 	 */
 	public function __construct() {
 
+		add_action( 'init', array( $this, 'init' ) );
+	}
+
+	public function init()
+	{
+		// Check for single divi property page template
+		if ( is_singular('property') && class_exists( 'ET_Theme_Builder_Request' ) )
+		{
+			$template = new WP_Query(
+				array(
+					'post_type'              => ET_THEME_BUILDER_TEMPLATE_POST_TYPE,
+					'post_status'            => 'publish',
+					'posts_per_page'         => 1,
+					'fields'                 => 'ids',
+					'no_found_rows'          => true,
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
+					'meta_query'             => array(
+						array(
+							'key'     => '_et_enabled',
+							'value'   => '1',
+							'compare' => '=',
+						),
+						array(
+							'key'     => "_et_use_on",
+							'value'   => 'singular:post_type:property:all',
+							'compare' => '=',
+						),
+						array(
+							'key'     => '_et_theme_builder_marked_as_unused',
+							'compare' => 'NOT EXISTS',
+						),
+					),
+				)
+			);
+
+			if ( $template->have_posts() ) {
+				return;
+			}
+		}
+
+		// Check for single Elementor property page template
+
+		// Check for single Bricks Builder property page template
+
+
 		$priority = 10;
 		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 		if ( is_plugin_active( 'oxygen/functions.php' ) )
