@@ -770,8 +770,14 @@ class PH_Property {
         $ph_countries = new PH_Countries();
 
         $currency = $ph_countries->get_currency( $this->_currency );
-        $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
-        $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+
+        if ( $currency === false )
+        {
+            return number_format($this->_deposit, 0);
+        }
+
+        $prefix = ( !isset($currency['currency_prefix']) || ( isset($currency['currency_prefix']) && $currency['currency_prefix'] ) ) ? $currency['currency_symbol'] : '';
+        $suffix = ( isset($currency['currency_prefix']) && !$currency['currency_prefix'] ) ? $currency['currency_symbol'] : '';
 
         return $prefix . number_format($this->_deposit, 0) . $suffix;
     }
