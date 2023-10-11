@@ -496,6 +496,8 @@ class PH_Shortcodes {
 			$args['meta_key'] = '_on_market_change_date';
 		}
 
+		$args['orderby'] .= ' post_title';
+
 		ob_start();
 
 		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
@@ -696,6 +698,8 @@ class PH_Shortcodes {
 			$args['orderby'] = 'meta_value';
 			$args['meta_key'] = '_on_market_change_date';
 		}
+
+		$args['orderby'] .= ' post_title';
 
 		ob_start();
 
@@ -965,6 +969,8 @@ class PH_Shortcodes {
 			$args['orderby'] = 'meta_value';
 			$args['meta_key'] = '_on_market_change_date';
 		}
+
+		$args['orderby'] .= ' post_title';
 
 		ob_start();
 
@@ -1363,6 +1369,8 @@ class PH_Shortcodes {
 				$args['orderby'] = 'meta_value';
 				$args['meta_key'] = '_on_market_change_date';
 			}
+
+			$args['orderby'] .= ' post_title';
 
 			ob_start();
 
