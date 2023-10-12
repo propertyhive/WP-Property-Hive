@@ -66,11 +66,14 @@ function propertyhive_update_200_pre_pro_record_installed_plugins()
 
     foreach ( $features as $feature )
     {
-        if ( is_dir( WP_PLUGIN_DIR . '/' . $feature['slug'] ) )
+        $slug = explode("/", $feature['wordpress_plugin_file']);
+        $slug = $slug[0];
+
+        if ( is_dir( WP_PLUGIN_DIR . '/' . $slug ) )
         {
             $installed_plugins[] = array(
-                'slug' => $feature['slug'],
-                'plugin' => $feature['plugin']
+                'slug' => $slug,
+                'plugin' => $feature['wordpress_plugin_file']
         }
     }
 
