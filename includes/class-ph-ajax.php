@@ -6052,7 +6052,7 @@ class PH_AJAX {
             wp_send_json_error($return);
         }
 
-        if ( is_plugin_active( $feature['plugin'] ) )
+        if ( is_plugin_active( $feature['wordpress_plugin_file'] ) )
         {
             $return = array(
                 'errorMessage' => 'Plugin already active'
@@ -6060,8 +6060,15 @@ class PH_AJAX {
             wp_send_json_error($return);
         }
 
+        $pro = false;
+        $plans = (isset($feature['plans']) & is_array($feature['plans'])) ? $feature['plans'] : array();
+        if ( !in_array('free', $plans) )
+        {
+            $pro = true;
+        }
+
         // check it's not a pro feature if they don't have pro enabled
-        if ( isset($feature['pro']) && $feature['pro'] === true )
+        if ( $pro )
         {
             $valid_license_key = false;
 
@@ -6087,9 +6094,9 @@ class PH_AJAX {
                     if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
                     {
                         if ( 
-                            isset($feature['packages']) && 
+                            isset($feature['plans']) && 
                             isset($product_id_and_package['package']) &&
-                            in_array($product_id_and_package['package'], $feature['packages'])
+                            in_array($product_id_and_package['package'], $feature['plans'])
                         )
                         {
                             
@@ -6131,7 +6138,7 @@ class PH_AJAX {
         if ( is_dir(WP_PLUGIN_DIR . '/' . $slug) )
         {
             // folder already exists. just activate it
-            $activated = activate_plugin( $feature['plugin'] );
+            $activated = activate_plugin( $feature['wordpress_plugin_file'] );
             if ( is_wp_error( $activated ) ) 
             {
                 $return = array(
@@ -6171,7 +6178,7 @@ class PH_AJAX {
 
         $feature = get_ph_pro_feature( $slug );
 
-        if ( !is_plugin_active( $feature['plugin'] ) )
+        if ( !is_plugin_active( $feature['wordpress_plugin_file'] ) )
         {
             $return = array(
                 'errorMessage' => 'Plugin not active'
@@ -6179,7 +6186,7 @@ class PH_AJAX {
             wp_send_json_error($return);
         }
 
-        deactivate_plugins( array($feature['plugin']) );
+        deactivate_plugins( array($feature['wordpress_plugin_file']) );
 
         wp_send_json_success();
     }

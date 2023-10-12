@@ -55,49 +55,105 @@ class PH_Settings_Features extends PH_Settings_Page {
         echo '<div class="pro-feature-settings">';
 
         // filters
+        $categories = array(
+            '' => 'All',
+            'import' => 'Property Import',
+            'export' => 'Portal Feeds',
+            'website' => 'Website Tools',
+            'crm' => 'Internal',
+            'data-bridges' => 'Data Bridges',
+            'free' => 'Free',
+        );
+
+        $selected_category = '';
+        if ( isset($_GET['profilter']) && array_key_exists(sanitize_text_field($_GET['profilter']), $categories) )
+        {
+            $selected_category = sanitize_text_field($_GET['profilter']);
+        }
+
+        echo '<div class="pro-filters">';
+            echo '<ul>';
+            $i = 0;
+            foreach ( $categories as $key => $value )
+            {
+                echo '<li ' . ( $selected_category == $key ? ' class="active"' : '' ) . '><a href="" data-filter="' . $key . '">' . $value . '</a></li>';
+                ++$i;
+            }
+        echo '</ul>';
+        echo '</div>';
 
         // list of features
+        echo '<div class="pro-features">';
         echo '<ul>';
         foreach ( $features as $feature )
         {
+            $slug = explode("/", $feature['wordpress_plugin_file']);
+            $slug = $slug[0];
+
             $feature_status = false;
 
-            if ( is_dir( WP_PLUGIN_DIR . '/' . $feature['slug'] ) )
+            if ( is_dir( WP_PLUGIN_DIR . '/' . $slug ) )
             {
                 $feature_status = 'installed';
             }
-            if ( is_plugin_active( $feature['plugin'] ) ) 
+            if ( is_plugin_active( $feature['wordpress_plugin_file'] ) ) 
             {
                 $feature_status = 'active';
             }
 
-            echo '<li>
-                <div class="inner">
-                    <h3>' . ( ( isset($feature['icon']) && !empty($feature['icon']) ) ? '<span class="dashicons ' . esc_attr($feature['icon']) . '"></span> ' : '' ) . esc_html($feature['name']) . '</h3>' . 
-                    ( ( isset($feature['pro']) && $feature['pro'] === true ) ? '<span class="pro">PRO</span>' : '' ) . 
-                    ( ( isset($feature['description']) && !empty($feature['description']) ) ? '<p>' . esc_html($feature['description']) . '</p>' : '' ) . '
-                    <p>
-                    ' . ( ( isset($feature['url']) && !empty($feature['url']) ) ? '<a href="' . esc_url($feature['url']) . '" target="_blank">' . esc_html(__( 'Read More', 'propertyhive' )) . '</a>' : '' ) . 
-                    ( ( isset($feature['docs_url']) && !empty($feature['docs_url']) ) ? '&nbsp;&nbsp;|&nbsp;&nbsp;<a href="' . esc_url($feature['docs_url']) . '" target="_blank">' . esc_html(__( 'Docs', 'propertyhive' )) . '</a>' : '' ) . 
-                    '</p>';
+            echo '<li class="';
+            if ( isset($feature['categories']) && is_array($feature['categories']) && !empty($feature['categories']) )
+            {
+                echo implode(" ", $feature['categories']);
+            }
 
-                
+            $pro = false;
+            $plans = (isset($feature['plans']) & is_array($feature['plans'])) ? $feature['plans'] : array();
+            if ( !in_array('free', $plans) )
+            {
+                $pro = true;
+            }
+
+            echo '">
+                <div class="inner">
+                    <h3>' . ( ( isset($feature['dashicon']) && !empty($feature['dashicon']) ) ? '<span class="dashicons ' . esc_attr($feature['dashicon']) . '"></span> ' : '' ) . esc_html($feature['name']) . '</h3>' . 
+                    ( $pro ? '<span class="pro"><span><a href="https://wp-property-hive.com/pricing" target="_blank">PRO</a></span></span>' : '' ) . 
+                    ( !$pro ? '<span class="free"><span>FREE</span></span>' : '' ) . '
+                ';
+
+                $links = array();
+                if ( isset($feature['description']) && !empty($feature['description']) )
+                {
+                    $links[] = '<span style="color:#999;" class="help_tip" data-tip="' . esc_attr($feature['description']) . '"><span class="dashicons dashicons-info-outline"></span></span>';
+                }
+                if ( isset($feature['url']) && !empty($feature['url']) )
+                {
+                    $links[] = '<a href="' . esc_url($feature['url']) . '" target="_blank" style="text-decoration:none">' . esc_html(__( 'Details', 'propertyhive' )) . '</a>';
+                }
+                if ( isset($feature['docs_url']) && !empty($feature['docs_url']) )
+                {
+                    $links[] = '<a href="' . esc_url($feature['docs_url']) . '" target="_blank" style="text-decoration:none">' . esc_html(__( 'Docs', 'propertyhive' )) . '</a>';
+                }
                 if ( $feature_status == 'active' )
                 {
                     $transient = get_site_transient( 'update_plugins' );
-                    if ( isset($transient->response) && is_array($transient->response) && isset($transient->response[$feature['plugin']]) && isset($transient->response[$feature['plugin']]->new_version) )
+                    if ( isset($transient->response) && is_array($transient->response) && isset($transient->response[$feature['wordpress_plugin_file']]) && isset($transient->response[$feature['wordpress_plugin_file']]->new_version) )
                     {
-                        $plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $feature['plugin'] );
+                        $plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $feature['wordpress_plugin_file'] );
 
-                        if ( version_compare($plugin_data['Version'], $transient->response[$feature['plugin']]->new_version, '<') )
+                        if ( version_compare($plugin_data['Version'], $transient->response[$feature['wordpress_plugin_file']]->new_version, '<') )
                         {
-                            echo '<div style="float:right"><a href="' . esc_url(admin_url('update-core.php')) . '" style="text-decoration:none"><span class="dashicons dashicons-update"></span> Update available</a></div>';
+                            $links[] = '<a href="' . esc_url(admin_url('update-core.php')) . '" style="text-decoration:none"><span class="dashicons dashicons-update"></span> ' . esc_html(__( 'Update', 'propertyhive' )) . '</a>';
                         }
                     }
                 }
 
+                echo '<div style="float:right; padding-top:6px;">';
+                echo implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links);
+                echo '</div>';
+
                 echo '<label class="switch">
-                  <input type="checkbox" name="active_plugins[]" value="' . esc_attr($feature['slug']) . '"' . ( $feature_status == 'active' ? ' checked' : '' ) . '>
+                  <input type="checkbox" name="active_plugins[]" value="' . esc_attr($slug) . '"' . ( $feature_status == 'active' ? ' checked' : '' ) . '>
                   <span class="slider round"></span>
                 </label>';
 
@@ -106,7 +162,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                 echo '</div>';
             echo '</li>';
         }
-        echo '</ul><div style="clear:both"></div>';
+        echo '</ul><div style="clear:both"></div></div>';
 
         echo '</div>';
     }

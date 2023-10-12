@@ -84,8 +84,6 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		}
 
 		// get new license information
-		$pro_license = PH()->license->get_current_pro_license();
-
 		$valid_pro_license = false;
 		$pro_input_border_color = '';
 		$pro_output = '';
@@ -97,6 +95,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			}
 			else
 			{
+				$pro_license = PH()->license->get_current_pro_license();
 				$pro_input_border_color = '#900'; 
 				$pro_output = $pro_license['error'];
 			}

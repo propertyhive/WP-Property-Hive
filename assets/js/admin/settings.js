@@ -228,6 +228,32 @@ jQuery( function($){
     });
     ph_toggle_auto_incremental_reference_number_options();
 
+    jQuery('.pro-feature-settings .pro-filters ul li a').click(function(e)
+    {
+        e.preventDefault();
+
+        var data_filter = jQuery(this).data('filter');
+
+        jQuery('.pro-feature-settings .pro-filters ul li').removeClass('active');
+        jQuery(this).parent().addClass('active');
+
+        if ( data_filter == '' )
+        {
+            jQuery('.pro-feature-settings .pro-features ul li').hide();
+            jQuery('.pro-feature-settings .pro-features ul li').fadeIn('fast');
+        }
+        else
+        {
+            jQuery('.pro-feature-settings .pro-features ul li').hide();
+            jQuery('.pro-feature-settings .pro-features ul li.' + data_filter).fadeIn('fast');
+        }
+    });
+
+    if ( jQuery('.pro-feature-settings .pro-filters').length > 0 )
+    {
+        jQuery('.pro-feature-settings .pro-filters ul li.active a').trigger('click');
+    }
+
     jQuery('.pro-feature-settings input[name=\'active_plugins[]\']').change(function()
     {
         var parent_el = jQuery(this);
@@ -254,7 +280,22 @@ jQuery( function($){
                 {
                     if ( response.success === true )
                     {
-                        window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=1';
+                        if ( typeof response.data !== 'undefined' && typeof response.data.activateUrl !== 'undefined' )
+                        {
+                            jQuery.ajax({
+                                url : response.data.activateUrl,
+                                method: 'GET',
+                                data : {},
+                                success: function(response) 
+                                {
+                                    window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=1' + ( (jQuery('.pro-filters li.active a').data('filter') != '') ? '&profilter=' + jQuery('.pro-filters li.active a').data('filter') : '' );
+                                }
+                            });
+                        }
+                        else
+                        {
+                            window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=1' + ( (jQuery('.pro-filters li.active a').data('filter') != '') ? '&profilter=' + jQuery('.pro-filters li.active a').data('filter') : '' );
+                        }
                     }
                     else
                     {
@@ -282,7 +323,7 @@ jQuery( function($){
                 {
                     if ( response.success === true )
                     {
-                        window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=2';
+                        window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=2' + ( (jQuery('.pro-filters li.active a').data('filter') != '') ? '&profilter=' + jQuery('.pro-filters li.active a').data('filter') : '' );
                     }
                     else
                     {
@@ -305,7 +346,33 @@ jQuery( function($){
             ph_toggle_license_key_settings();
         });
     }
+
+    ph_resize_pro_features_list();
 });
+
+jQuery(window).on( "resize", function() 
+{
+    ph_resize_pro_features_list();
+});
+
+function ph_resize_pro_features_list()
+{
+    if ( jQuery('.pro-features').length > 0 )
+    {
+        jQuery('.pro-features ul li .inner').css('height', 'auto');
+
+        var max_height = 0;
+        jQuery('.pro-features ul li .inner').each(function()
+        {
+            if ( jQuery(this).height() > max_height )
+            {
+                max_height = jQuery(this).height();
+            }
+        });
+
+        jQuery('.pro-features ul li .inner').css('height', max_height + 'px');
+    }
+}
 
 function ph_toggle_license_key_settings()
 {
