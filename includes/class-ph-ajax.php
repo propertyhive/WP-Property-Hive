@@ -6135,6 +6135,41 @@ class PH_AJAX {
             }
         }
 
+        if ( !is_dir(WP_PLUGIN_DIR . '/' . $slug) && strpos($feature['download_url'], 'wordpress.org') === false )
+        {
+
+
+            // not a public WP plugin. Must be hosted privately
+            $feature['download_url'] = str_replace("http://dev2022.wp-property-hive.com", "https://wp-property-hive.com", $feature['download_url']);
+            $zip_contents = @file_get_contents($feature['download_url']);
+            
+            if ( $zip_contents === false || empty($zip_contents) )
+            {
+                $return = array(
+                    'errorMessage' => 'Failed to obtain plugin'
+                );
+                wp_send_json_error($return);
+            }
+
+            $tmpfname = rtrim(sys_get_temp_dir(), '/') . '/' . $slug . '.zip';
+
+            $handle = fopen($tmpfname, "w");
+            fwrite($handle, $zip_contents);
+            fclose($handle);
+
+            // file obtained and stored. need to unzip and put into plugins directory
+            $unzipped = unzip_file( $tmpfname, WP_PLUGIN_DIR );
+            if ( is_wp_error( $unzipped ) ) 
+            {
+                $return = array(
+                    'errorMessage' => $unzipped->get_error_message()
+                );
+                wp_send_json_error($return);
+            }
+
+            unlink($tmpfname);
+        }
+
         if ( is_dir(WP_PLUGIN_DIR . '/' . $slug) )
         {
             // folder already exists. just activate it
@@ -6150,7 +6185,11 @@ class PH_AJAX {
             wp_send_json_success();
         }
 
-        wp_ajax_install_plugin();
+        if ( strpos($feature['download_url'], 'wordpress.org') !== false )
+        {
+            // this is a public WP plugin
+            wp_ajax_install_plugin();
+        }
 
         wp_send_json_success();
     }
