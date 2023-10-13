@@ -31,10 +31,10 @@ class PH_Admin_Settings {
 			include_once( 'settings/class-ph-settings-page.php' );
 
 			$settings[] = include( 'settings/class-ph-settings-general.php' );
-			$settings[] = include( 'settings/class-ph-settings-features.php' );
             $settings[] = include( 'settings/class-ph-settings-offices.php' );
             $settings[] = include( 'settings/class-ph-settings-custom-fields.php' );
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
+            $settings[] = include( 'settings/class-ph-settings-features.php' );
             $settings[] = include( 'settings/class-ph-settings-licenses.php' );
 
 			// Only show demo data tab if demo data add on not active, tab not dismissed and if newly installed since 2021-04-13 00:00:00
