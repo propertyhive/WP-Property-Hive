@@ -60,7 +60,7 @@ class PH_Settings_Features extends PH_Settings_Page {
             'import' => 'Property Import',
             'export' => 'Portal Feeds',
             'website' => 'Website Tools',
-            'crm' => 'Internal',
+            'crm' => 'CRM Tools',
             'data-bridges' => 'Data Bridges',
             'free' => 'Free',
         );
