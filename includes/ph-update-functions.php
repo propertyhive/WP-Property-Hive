@@ -74,6 +74,7 @@ function propertyhive_update_200_pre_pro_record_installed_plugins()
             $installed_plugins[] = array(
                 'slug' => $slug,
                 'plugin' => $feature['wordpress_plugin_file']
+            );
         }
     }
 
