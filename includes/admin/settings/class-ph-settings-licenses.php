@@ -39,6 +39,10 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	public function get_settings() {
 
 		$license_type = PH()->license->get_license_type();
+		if ( $license_type == '' )
+		{
+			$license_type = 'pro';
+		}
 
 		// get old license information
 		$license = PH()->license->get_current_license();
