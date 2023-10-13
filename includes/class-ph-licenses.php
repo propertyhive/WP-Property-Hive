@@ -64,6 +64,88 @@ class PH_Licenses {
 	 */
 	public function __construct() {
 		add_action( 'propertyhive_check_licenses', array( $this, 'ph_check_licenses' ) );
+		add_filter( 'properyhive_add_on_can_be_used', array( $this, 'ph_check_add_on_can_be_used' ), 10, 2 );
+		add_filter( 'properyhive_add_on_can_be_updated', array( $this, 'ph_check_add_on_can_be_updated' ), 10, 2 );
+	}
+
+	public function ph_check_add_on_can_be_used( $can, $slug )
+	{
+        // Check we have the right kind of license key to operate this add on
+
+        $license_type = $this->get_license_type();
+
+        if ( $license_type == 'pro' )
+        {
+            if ( get_option('propertyhive_pro_license_key', '') != '' ) 
+            { 
+                if ( !$this->is_valid_pro_license_key() )
+                {
+                    // show warning
+                    return false;
+                }
+
+                // Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
+            }
+        }
+        else
+        {
+            // Not a pro user. Check it's in the list of installed add ons
+            $was_installed_pre_pro = false;
+
+            $pre_installed_addons = get_option( 'propertyhive_pre_pro_add_ons', '' );
+            if ( !is_array($pre_installed_addons) ) { $pre_installed_addons = array(); }
+
+            if ( !empty($pre_installed_addons) )
+            {
+                foreach ( $pre_installed_addons as $pre_installed_addon )
+                {
+                    if ( isset( $pre_installed_addon['slug'] ) && $pre_installed_addon['slug'] == $slug )
+                    {
+                        $was_installed_pre_pro = true;
+                    }
+                }
+            }
+
+            if ( !$was_installed_pre_pro )
+            {
+                // show warning
+                return false;
+            }
+        }
+
+        return $can;
+	}
+
+	public function ph_check_add_on_can_be_updated( $can, $slug )
+	{
+        $license_type = $this->get_license_type();
+
+		if ( $license_type == 'old' )
+		{
+			$license = get_option( 'propertyhive_license_key_details', array() );
+
+			if ( !is_array( $license ) ) { $license = array(); }
+
+		    if ( isset($license['active']) && $license['active'] == '1' && isset($license['expires_at']) && $license['expires_at'] != '' && strtotime($license['expires_at']) > time() )
+		    {
+		    	return true;
+		    }
+		}
+		elseif ( $license_type == 'pro' )
+		{
+			// get new license information
+			if ( get_option('propertyhive_pro_license_key', '') != '' ) 
+			{ 
+				if ( $this->is_valid_pro_license_key() )
+				{
+					return true;
+				}
+
+				// Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
+			}
+		}
+
+        return $can;
 	}
 
 	public function get_license_type()
