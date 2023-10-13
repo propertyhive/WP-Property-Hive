@@ -26,7 +26,7 @@ class PH_Settings_Features extends PH_Settings_Page {
 		$this->id    = 'features';
 		$this->label = __( 'Features', 'propertyhive' );
 
-		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 5 );
+		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
         add_action( 'propertyhive_admin_field_pro_features', array( $this, 'pro_features_setting' ) );
 	}
