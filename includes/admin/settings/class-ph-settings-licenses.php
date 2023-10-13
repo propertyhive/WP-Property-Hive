@@ -24,7 +24,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 */
 	public function __construct() {
 		$this->id    = 'licensekey';
-		$this->label = __( 'License Key', 'propertyhive' );
+		$this->label = __( 'License', 'propertyhive' );
 
 		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
