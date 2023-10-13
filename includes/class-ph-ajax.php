@@ -6099,7 +6099,7 @@ class PH_AJAX {
                             in_array($product_id_and_package['package'], $feature['plans'])
                         )
                         {
-                            
+                            $valid_license_key === true;
                         }
                         else
                         {
