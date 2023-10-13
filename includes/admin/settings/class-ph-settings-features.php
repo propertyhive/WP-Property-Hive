@@ -101,7 +101,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                 $feature_status = 'active';
             }
 
-            echo '<li class="';
+            echo '<li style="visibility:hidden" class="';
             if ( isset($feature['categories']) && is_array($feature['categories']) && !empty($feature['categories']) )
             {
                 echo implode(" ", $feature['categories']);

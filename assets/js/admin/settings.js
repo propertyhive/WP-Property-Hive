@@ -247,6 +247,8 @@ jQuery( function($){
             jQuery('.pro-feature-settings .pro-features ul li').hide();
             jQuery('.pro-feature-settings .pro-features ul li.' + data_filter).fadeIn('fast');
         }
+
+        ph_resize_pro_features_list();
     });
 
     if ( jQuery('.pro-feature-settings .pro-filters').length > 0 )
@@ -364,13 +366,14 @@ function ph_resize_pro_features_list()
         var max_height = 0;
         jQuery('.pro-features ul li .inner').each(function()
         {
-            if ( jQuery(this).height() > max_height )
+            if ( jQuery(this).parent().css('display') != 'none' && jQuery(this).height() > max_height )
             {
                 max_height = jQuery(this).height();
             }
         });
 
         jQuery('.pro-features ul li .inner').css('height', max_height + 'px');
+        jQuery('.pro-features ul li').css('visibility', 'visible');
     }
 }
 
