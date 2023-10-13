@@ -119,14 +119,14 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			'default' 	  => $license_type,
 			'options'     => array(
 				'pro' => 'Pro',
-				'old' => 'Old-Style (deprecated 1st September 2023)'
+				'old' => 'Old-Style (deprecated October 2023)'
 			)
 		);
 
 		$settings[] = array(
 			'type'        => 'html',
 			'id' 		  => 'pro_license_key_info',
-			'html' 		  => __( '<p>With a Pro license key you\'ll unlock a wide array of Property Hive functionality. We offer multiple packages to suit your needs. Your Pro subscription details and license key can be found within the \'<a href="https://wp-property-hive.com/my-account/" target="_blank">My Account</a>\' section of our website.</p>
+			'html' 		  => __( '<p>With a Pro license subscription you\'ll unlock a wide array of Property Hive functionality. We offer multiple packages to suit your needs. Your Pro subscription details and license key can be found within the \'<a href="https://wp-property-hive.com/my-account/" target="_blank">My Account</a>\' section of our website.</p>
 							' . ( (!$valid_pro_license) ? 
 									'<br><p><a href="https://wp-property-hive.com/pricing/" class="button button-primary" target="_blank">Get PRO</a></p>' : 
 									'<br><p><a href="https://wp-property-hive.com/my-account/" class="button button-primary" target="_blank">Manage Subscription and Get License Key</a></p>' 
@@ -145,7 +145,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		$settings[] = array(
 			'type'        => 'html',
 			'id' 		  => 'license_key_info',
-			'html' 		  => __( '<p>If you purchased a license key prior to 1st September 2023 you can enter it here to benefit from updates to any existing add ons you\'ve purchased.</p>
+			'html' 		  => __( '<p>If you purchased a license key prior to 16th October 2023 you can enter it here to benefit from updates to any existing add ons you\'ve purchased.</p>
 				<p>We\'ve since moved to a new and improved <a href="https://wp-property-hive.com/pricing/" target="_blank">pro pricing model</a> that is more cost effective for you and gives access to more features.</p>
 				' . ( $license_type == 'old' ? '<p>To switch your existing license key over to the new pricing model please get in touch at <a href="mailto:info@wp-property-hive.com.">info@wp-property-hive.com</a>.</p>' : '' ) . '
 				<br><p><a href="https://wp-property-hive.com/pricing/" class="button button-primary" target="_blank">Get PRO</a></p>', 'propertyhive' ),
