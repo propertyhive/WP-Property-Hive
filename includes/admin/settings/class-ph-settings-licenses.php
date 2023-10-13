@@ -93,13 +93,16 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		$pro_output = '';
 		if (get_option('propertyhive_pro_license_key', '') != '') 
 		{ 
+			$pro_license = PH()->license->get_current_pro_license(true);
+
 			if (PH()->license->is_valid_pro_license_key())
 			{
+				// to be used for displaying subscription level in future
+				//$product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
 				$pro_input_border_color = '#090';
 			}
 			else
 			{
-				$pro_license = PH()->license->get_current_pro_license();
 				$pro_input_border_color = '#900'; 
 				$pro_output = $pro_license['error'];
 			}
