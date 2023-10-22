@@ -363,7 +363,7 @@ class PH_Licenses {
 	    	$data = array();
 
 			// found API key. It's product ID will be stored in product_id
-			$url = 'https://dev2022.wp-property-hive.com/?';
+			$url = 'https://wp-property-hive.com/?';
 	    	$url .= 'wc-api=wc-am-api&';
 	    	$url .= 'wc_am_action=activate&';
 	    	$url .= 'instance=' . $instance_id . '&';
@@ -458,7 +458,7 @@ class PH_Licenses {
 	    	$data = array();
 
 			// found API key. It's product ID will be stored in product_id
-			$url = 'https://dev2022.wp-property-hive.com/?';
+			$url = 'https://wp-property-hive.com/?';
 	    	$url .= 'wc-api=wc-am-api&';
 	    	$url .= 'wc_am_action=deactivate&';
 	    	$url .= 'instance=' . $instance_id . '&';
@@ -563,7 +563,7 @@ class PH_Licenses {
 
         $data = $this->get_data_for_license_check();
 
-        $url = 'https://dev2022.wp-property-hive.com/?';
+        $url = 'https://wp-property-hive.com/?';
     	$url .= 'wc-api=wc-am-api&';
     	$url .= 'wc_am_action=product_list&';
     	$url .= 'instance=' . $instance_id . '&';
@@ -714,7 +714,7 @@ class PH_Licenses {
 
         $data = $this->get_data_for_license_check();
 
-        $url = 'https://dev2022.wp-property-hive.com/?';
+        $url = 'https://wp-property-hive.com/?';
     	$url .= 'wc-api=wc-am-api&';
     	$url .= 'wc_am_action=status&';
     	$url .= 'product_id=' . $product_id_and_package['product_id'] . '&';
