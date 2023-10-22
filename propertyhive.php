@@ -3,7 +3,7 @@
  * Plugin Name: Property Hive
  * Plugin URI: https://wordpress.org/plugins/propertyhive/
  * Description: Estate Agency Property Software Plugin for WordPress
- * Version: 1.5.54
+ * Version: 2.0.0
  * Author: PropertyHive
  * Author URI: https://wp-property-hive.com
  * Requires at least: 3.8
@@ -27,14 +27,14 @@ if ( ! class_exists( 'PropertyHive' ) )
     * Main PropertyHive Class
     *
     * @class PropertyHive
-    * @version 1.5.54
+    * @version 2.0.0
     */
     final class PropertyHive {
          
         /**
          * @var string
          */
-        public $version = '1.5.54';
+        public $version = '2.0.0';
          
         /**
          * @var PropertyHive The single instance of the class
