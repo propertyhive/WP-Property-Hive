@@ -278,7 +278,17 @@ class PH_Admin_Assets {
                 'default_country_not_in_selected'           => __( 'The default country hasn\'t been selected as a country you operate in', 'propertyhive' ),
                 'admin_url'                                 => admin_url(),
                 'taxonomy_section'                          => ( ( isset($_GET['section']) ) ? sanitize_text_field($_GET['section']) : '' ),
+                'ajax_nonce'                                => wp_create_nonce("updates"),
+                'features_settings_url'                     => admin_url('admin.php?page=ph-settings&tab=features'),
             );
+            if ( isset($_GET['tab']) && ph_clean($_GET['tab']) == 'licensekey' )
+            {
+                $params['valid_pro_license_key'] = PH()->license->is_valid_pro_license_key(true);
+            }
+            else
+            {
+                $params['valid_pro_license_key'] = PH()->license->is_valid_pro_license_key();
+            }
             wp_localize_script( 'propertyhive_admin_settings', 'propertyhive_admin_settings', $params );
         }
         

@@ -25,12 +25,37 @@ class PH_Admin_Menus {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
 		add_action( 'admin_menu', array( $this, 'reports_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'settings_menu' ), 50 );
-		add_action( 'admin_menu', array( $this, 'add_ons_menu' ), 60 );
 		add_action( 'admin_menu', array( $this, 'crm_only_mode_menu' ), 99 );
 
 		add_action( 'admin_head', array( $this, 'menu_highlight' ) );
 
 		add_action( 'admin_bar_menu', array( $this, 'remove_from_admin_bar' ), 999);
+
+		// Handle saving settings earlier than load-{page} hook to avoid race conditions in conditional menus.
+		add_action( 'wp_loaded', array( $this, 'save_settings' ) );
+	}
+
+	public function save_settings() {
+		global $current_tab, $current_section;
+
+		// We should only save on the settings page.
+		if ( ! is_admin() || ! isset( $_GET['page'] ) || 'ph-settings' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		// Include settings pages.
+		PH_Admin_Settings::get_settings_pages();
+		
+		// Get current tab/section.
+		$current_tab     = empty( $_GET['tab'] ) ? 'general' : sanitize_title( wp_unslash( $_GET['tab'] ) ); // WPCS: input var okay, CSRF ok.
+		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( wp_unslash( $_REQUEST['section'] ) ); // WPCS: input var okay, CSRF ok.
+		//var_dump( ! empty( $_POST['save'] ) ); die();
+		// Save settings if data has been posted.
+		if ( '' !== $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}_{$current_section}", ! empty( $_POST['save'] ) ) ) { // WPCS: input var okay, CSRF ok.
+			PH_Admin_Settings::save();
+		} elseif ( '' === $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}", ! empty( $_POST['save'] ) ) ) { // WPCS: input var okay, CSRF ok.
+			PH_Admin_Settings::save();
+		}
 	}
 
 	public function remove_from_admin_bar( $wp_admin_bar )
@@ -255,13 +280,6 @@ class PH_Admin_Menus {
 		$settings_page = add_submenu_page( 'propertyhive', __( 'Property Hive Settings', 'propertyhive' ),  __( 'Settings', 'propertyhive' ) , 'manage_options', 'ph-settings', array( $this, 'settings_page' ) );
 
 		//add_action( 'load-' . $settings_page, array( $this, 'settings_page_init' ) );
-	}
-
-	/**
-	 * Add menu item
-	 */
-	public function add_ons_menu() {
-		$settings_page = add_submenu_page( 'propertyhive', __( 'Add Ons', 'propertyhive' ),  __( 'Add Ons', 'propertyhive' ) , 'manage_options', 'admin.php?page=ph-settings&tab=addons'/*, array( $this, 'settings_page' )*/ );
 	}
 
 	/**

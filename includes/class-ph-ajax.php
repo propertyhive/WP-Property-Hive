@@ -129,12 +129,17 @@ class PH_AJAX {
             'save_account_details' => true,
             'save_account_requirements' => true,
 
+            // Dismissing notices
             'dismiss_notice_leave_review' => false,
             'dismiss_notice_demo_data' => false,
             'dismiss_notice_missing_search_results' => false,
             'dismiss_notice_missing_google_maps_api_key' => false,
             'dismiss_notice_invalid_expired_license_key' => false,
             'dismiss_notice_email_cron_not_running' => false,
+
+            // PRO features activate/deactivate
+            'activate_pro_feature' => false,
+            'deactivate_pro_feature' => false,
 		);
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) {
@@ -6030,6 +6035,226 @@ class PH_AJAX {
 
         // Quit out
         die();
+    }
+
+    public function activate_pro_feature()
+    {
+        // check plugin status
+        $slug = ph_clean($_POST['slug']);
+
+        $feature = get_ph_pro_feature( $slug );
+
+        if ( $feature === false )
+        {
+            $return = array(
+                'errorMessage' => 'Feature not found'
+            );
+            wp_send_json_error($return);
+        }
+
+        if ( is_plugin_active( $feature['wordpress_plugin_file'] ) )
+        {
+            $return = array(
+                'errorMessage' => 'Plugin already active'
+            );
+            wp_send_json_error($return);
+        }
+
+        $pro = false;
+        $plans = (isset($feature['plans']) & is_array($feature['plans'])) ? $feature['plans'] : array();
+        if ( !in_array('free', $plans) )
+        {
+            $pro = true;
+        }
+
+        // check it's not a pro feature if they don't have pro enabled
+        if ( $pro )
+        {
+            $valid_license_key = false;
+
+            // check it's not a plugin that was installed pre version 2
+            $pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', array() );
+            if ( empty($pre_pro_add_ons) ) { $pre_pro_add_ons = array(); }
+            foreach ($pre_pro_add_ons as $pre_pro_add_on)
+            {
+                if ( $pre_pro_add_on['slug'] == $slug )
+                {
+                    // Yep. It was installed already and should be allowed to be activated
+                    $valid_license_key = true;
+                }
+            }
+
+            if ( $valid_license_key === false )
+            {
+                // check pro license key valid
+                if ( PH()->license->is_valid_pro_license_key(true) )
+                {
+                    $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
+
+                    if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
+                    {
+                        if ( 
+                            isset($feature['plans']) && 
+                            isset($product_id_and_package['package']) &&
+                            in_array($product_id_and_package['package'], $feature['plans'])
+                        )
+                        {
+                            $valid_license_key = true;
+                        }
+                        else
+                        {
+                            $return = array(
+                                'errorMessage' => 'Trying to activate a feature that\'s not on your chosen plan'
+                            );
+                            wp_send_json_error($return);
+                        }
+                    }
+                    else
+                    {
+                        $return = array(
+                            'errorMessage' => 'License key valid but failed to get package'
+                        );
+                        wp_send_json_error($return);
+                    }
+                }
+                else
+                {
+                    $return = array(
+                        'errorMessage' => 'Trying to activate a PRO feature but no valid PRO license key entered'
+                    );
+                    wp_send_json_error($return);
+                }
+            }
+
+            if ( $valid_license_key === false )
+            {
+                $return = array(
+                    'errorMessage' => 'Trying to activate a PRO feature but no valid PRO license key entered'
+                );
+                wp_send_json_error($return);
+            }
+        }
+
+        if ( !is_dir(WP_PLUGIN_DIR . '/' . $slug) && strpos($feature['download_url'], 'wordpress.org') === false )
+        {
+            // not a public WP plugin. Must be hosted privately
+            $feature['download_url'] = str_replace("http://dev2022.wp-property-hive.com", "https://wp-property-hive.com", $feature['download_url']);
+            $zip_contents = @file_get_contents($feature['download_url']);
+            
+            if ( $zip_contents === false || empty($zip_contents) )
+            {
+                $return = array(
+                    'errorMessage' => 'Failed to obtain plugin'
+                );
+                wp_send_json_error($return);
+            }
+
+            $tmpfname = rtrim(sys_get_temp_dir(), '/') . '/' . $slug . '.zip';
+
+            $handle = fopen($tmpfname, "w");
+            if ( $handle === false )
+            {
+                $return = array(
+                    'errorMessage' => 'Failed to write plugin contents to temp file: ' . $tmpfname
+                );
+                wp_send_json_error($return);
+            }
+            fwrite($handle, $zip_contents);
+            fclose($handle);
+
+            // file obtained and stored. need to unzip and put into plugins directory
+            $unzipped = unzip_file( $tmpfname, WP_PLUGIN_DIR );
+            if ( is_wp_error( $unzipped ) ) 
+            {
+                $return = array(
+                    'errorMessage' => $unzipped->get_error_message()
+                );
+                wp_send_json_error($return);
+            }
+
+            unlink($tmpfname);
+
+            // Need to sort out cache for activate plugin to work
+            // Taken from WordPress.org docs
+            $cache_plugins = wp_cache_get( 'plugins', 'plugins' );
+            if ( !empty( $cache_plugins ) ) 
+            {
+                $new_plugin = array(
+                    'Name' => $slug,
+                    'PluginURI' => '',
+                    'Version' => '',
+                    'Description' => '',
+                    'Author' => '',
+                    'AuthorURI' => '',
+                    'TextDomain' => '',
+                    'DomainPath' => '',
+                    'Network' => '',
+                    'Title' => $slug,
+                    'AuthorName' => '',
+                );
+                $cache_plugins[''][$feature['wordpress_plugin_file']] = $new_plugin;
+                wp_cache_set( 'plugins', $cache_plugins, 'plugins' );
+            }
+        }
+
+        if ( is_dir(WP_PLUGIN_DIR . '/' . $slug) )
+        {
+            // folder already exists. just activate it
+            $activated = activate_plugin( $feature['wordpress_plugin_file'] );
+            if ( is_wp_error( $activated ) ) 
+            {
+                $return = array(
+                    'errorMessage' => $activated->get_error_message()
+                );
+                wp_send_json_error($return);
+            }
+
+            wp_send_json_success();
+        }
+
+        if ( strpos($feature['download_url'], 'wordpress.org') !== false )
+        {
+            // this is a public WP plugin
+            wp_ajax_install_plugin();
+        }
+
+        wp_send_json_success();
+    }
+
+    public function deactivate_pro_feature()
+    {
+        if ( !wp_verify_nonce( $_POST['_ajax_nonce'], "updates" ) ) 
+        {
+            $return = array(
+                'errorMessage' => 'Invalid nonce provided'
+            );
+            wp_send_json_error($return);
+        } 
+
+        if ( ! current_user_can( 'install_plugins' ) ) 
+        {
+            $return = array(
+                'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.' )
+            );
+            wp_send_json_error( $status );
+        }
+
+        // check plugin is active
+        $slug = ph_clean($_POST['slug']);
+
+        $feature = get_ph_pro_feature( $slug );
+
+        if ( !is_plugin_active( $feature['wordpress_plugin_file'] ) )
+        {
+            $return = array(
+                'errorMessage' => 'Plugin not active'
+            );
+            wp_send_json_error($return);
+        }
+
+        deactivate_plugins( array($feature['wordpress_plugin_file']) );
+
+        wp_send_json_success();
     }
 }
 

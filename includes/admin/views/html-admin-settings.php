@@ -25,7 +25,7 @@
                        $button_text = $GLOBALS['save_button_text'];
                    }
             ?>
-        		<input name="save" class="button-primary" type="submit" value="<?php echo $button_text; ?>" />
+        		<button name="save" class="button-primary" type="submit" value="<?php echo esc_attr($button_text); ?>"><?php echo esc_html($button_text); ?></button>
         	<?php
                }
         	?>

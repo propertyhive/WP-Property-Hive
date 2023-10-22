@@ -26,6 +26,9 @@ class PH_Install {
 		'1.4.68' => array(
 			'propertyhive_update_1468_on_market_change_dates',
 		),
+        '2.0.0' => array(
+            'propertyhive_update_200_pre_pro_record_installed_plugins',
+        ),
 	);
 
 	/**

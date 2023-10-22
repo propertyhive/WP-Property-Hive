@@ -408,8 +408,8 @@ class PH_Admin {
                 <p><strong style="font-size:14px;"><a href="https://wp-property-hive.com/add-ons/?category=tools" target="_blank">Internal Tools</a></strong><br>
                 Add ons aimed to make your life easier and to save you time. Includes Digital Window Displays, Address Lookup and more.</p>
 
-                <p><strong style="font-size:14px;"><a href="https://wp-property-hive.com/add-ons/?category=import-export" target="_blank">Import and Export</a></strong><br>
-                Send your properties to portals like Rightmove, Zoopla and more or import properties from thid party software. These add ons automate the import and export of property data.</p>
+                <p><strong style="font-size:14px;"><a href="https://wp-property-hive.com/add-ons/?category=import" target="_blank">Import and Export</a></strong><br>
+                Import properties from third party software or send your properties to portals like Rightmove, Zoopla and more. These add ons automate the import and export of property data.</p>
 
             </div>
 
@@ -420,10 +420,7 @@ class PH_Admin {
                 We pride ourselves on great support at Property Hive and will always do what we can to help you make create the best site possible. Please find below some useful links relating to our support:
 
                 <p><strong style="font-size:14px;">Documentation</strong><br>
-                We have documentation <a href="https://wp-property-hive.com/documentation/" target="_blank">available on our website</a> covering setup advice, help with theming, and more.</p>
-
-                <p><strong style="font-size:14px;">Priority One-To-One Support</strong><br>
-                If you require help quickly, or wish to discuss a bespoke requirement, then <a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" target="_blank">priority support</a> might be best for you. With a license key priced at just £49.99 per year you'll not only get priority support but also updates to any add ons you've purchased.</p>
+                We have documentation <a href="https://docs.wp-property-hive.com" target="_blank">available on our website</a> covering setup advice, help with theming, and more.</p>
 
                 <p><strong style="font-size:14px;">Our Support Policy</strong><br>
                 Our <a href="https://wp-property-hive.com/support-policy/" target="_blank">Support Policy is available to view here</a> and outlines how you can get in touch, how we will (and won't) help, and how to report bugs.</p>

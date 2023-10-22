@@ -34,13 +34,8 @@ class PH_Admin_Settings {
             $settings[] = include( 'settings/class-ph-settings-offices.php' );
             $settings[] = include( 'settings/class-ph-settings-custom-fields.php' );
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
+            $settings[] = include( 'settings/class-ph-settings-features.php' );
             $settings[] = include( 'settings/class-ph-settings-licenses.php' );
-
-            $settings[] = include( 'settings/class-ph-settings-add-ons.php' );
-
-			if ( apply_filters('propertyhive_show_get_involved_settings_tab', true) ) {
-				$settings[] = include( 'settings/class-ph-settings-get-involved.php' );
-			}
 
 			// Only show demo data tab if demo data add on not active, tab not dismissed and if newly installed since 2021-04-13 00:00:00
             if ( 
@@ -142,8 +137,8 @@ class PH_Admin_Settings {
 		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( $_REQUEST['section'] );
 
 	    // Save settings if data has been posted
-	    if ( ! empty( $_POST ) )
-	    	self::save();
+	    //if ( ! empty( $_POST ) )
+	    //	self::save();
 
 	    // Add any posted messages
 	    if ( ! empty( $_GET['ph_error'] ) )
