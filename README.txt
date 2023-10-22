@@ -3,8 +3,8 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=N68UHATHAEDLN&lc=GB&item_name=BIOSTALL&no_note=0&cn=Add%20special%20instructions%20to%20the%20seller%3a&no_shipping=1&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Requires at least: 3.8
-Tested up to: 6.3.1
-Stable tag: 1.5.54
+Tested up to: 6.3.2
+Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,17 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
 
 == Changelog ==
+
+= 2.0.0 - 2023-10-22 =
+* Launched new 'Pro' pricing model containing different packages to simplify things
+* New 'Features' setting tab containing a dashboard allowing you to turn on/off the features you wish to use
+* Existing users updating won't be effected as it remembers the add ons active at the time of update
+* New users will need the relevant subscription to activate certain feature
+* License key page updated to support new Pro license key
+* Added ability to sort contacts by name in admin lists
+* Added secondary order to shortcodes to prevent issues where properties with same price go over multiple pages
+* Catered for no currency being set when formatting deposit
+* Declared compatibility for WordPress 6.3.2
 
 = 1.5.54 - 2023-10-02 =
 * Initial Divi support. Single property page only at present. Includes new widgets so property details page can be built using Divi Theme Builder
