@@ -91,12 +91,26 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		$valid_pro_license = false;
 		$pro_input_border_color = '';
 		$pro_output = '';
+		$license_key_to_display = '';
 		if (get_option('propertyhive_pro_license_key', '') != '') 
 		{ 
+			$length = strlen(get_option('propertyhive_pro_license_key', '')); 
+			$license_key_to_display = get_option('propertyhive_pro_license_key', '');
+			if ( $length >= 6 )
+			{
+				$license_key_to_display = get_option('propertyhive_pro_license_key', '')[0] . 
+				get_option('propertyhive_pro_license_key', '')[1] . 
+				get_option('propertyhive_pro_license_key', '')[2] . 
+				str_repeat('*', $length - 4) . 
+				get_option('propertyhive_pro_license_key', '')[$length-3] . 
+				get_option('propertyhive_pro_license_key', '')[$length-2] . 
+				get_option('propertyhive_pro_license_key', '')[$length-1]; 
+			}
 			$pro_license = PH()->license->get_current_pro_license(true);
 
-			if (PH()->license->is_valid_pro_license_key())
+			if ( PH()->license->is_valid_pro_license_key() )
 			{
+				$valid_pro_license = true;				
 				// to be used for displaying subscription level in future
 				//$product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
 				$pro_input_border_color = '#090';
@@ -134,16 +148,34 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 									'<br><p><a href="https://wp-property-hive.com/pricing/" class="button button-primary" target="_blank">Get PRO</a></p>' : 
 									'<br><p><a href="https://wp-property-hive.com/my-account/" class="button button-primary" target="_blank">Manage Subscription and Get License Key</a></p>' 
 								), 'propertyhive' ) . '
-			<input type="hidden" name="pro_license_key_action" value="' . ( PH()->license->is_valid_pro_license_key() ? 'deactivate' : 'activate' ) . '">',
+			<input type="hidden" name="pro_license_key_action" value="' . ( $valid_pro_license ? 'deactivate' : 'activate' ) . '">',
 		);
 
-		$settings[] = array(
-			'title'       => __( 'License Key', 'propertyhive' ),
-			'id'          => 'propertyhive_pro_license_key',
-			'type'        => 'text',
-			'css'         => 'min-width:350px; border:1px solid ' . $pro_input_border_color,
-			'desc' 		  => $pro_output,
-		);
+		if ( $valid_pro_license )
+		{
+			$settings[] = array(
+				'type'        => 'html',
+				'id' 		  => 'pro_license_key_display',
+				'title'		  => __( 'License Key', 'propertyhive' ),
+				'html' 		  => '<input type="text" disabled="disabled" value="' . $license_key_to_display . '" style="min-width:350px; border:1px solid ' . $pro_input_border_color . '"> ' . $pro_output
+			);
+
+			$settings[] = array(
+				'title'       => __( 'License Key', 'propertyhive' ),
+				'id'          => 'propertyhive_pro_license_key',
+				'type'        => 'hidden'
+			);
+		}
+		else
+		{
+			$settings[] = array(
+				'title'       => __( 'License Key', 'propertyhive' ),
+				'id'          => 'propertyhive_pro_license_key',
+				'type'        => 'text',
+				'css' 	  => 'min-width:350px; border:1px solid ' . $pro_input_border_color,
+				'desc' 		  => $pro_output
+			);
+		}
 
 		$settings[] = array(
 			'type'        => 'html',
