@@ -24,23 +24,11 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 */
 	public function __construct() {
 		$this->id    = 'licensekey';
-		$this->label = __( 'License Key', 'propertyhive' );
+		$this->label = __( 'License', 'propertyhive' );
 
 		add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
 		add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
 		add_action( 'propertyhive_settings_save_' . $this->id, array( $this, 'save' ) );
-	}
-
-	/**
-	 * Get sections.
-	 *
-	 * @return array
-	 */
-	public function get_sections() {
-		$sections = array(
-			'' => __( 'License Key', 'propertyhive' ),
-		);
-		return apply_filters( 'propertyhive_get_sections_' . $this->id, $sections );
 	}
 
 	/**
@@ -50,11 +38,18 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 */
 	public function get_settings() {
 
+		$license_type = PH()->license->get_license_type();
+		if ( $license_type == '' )
+		{
+			$license_type = 'pro';
+		}
+
+		// get old license information
 		$license = PH()->license->get_current_license();
 
 		$output = '';
 		$input_border_color = '';
-		$renew_link = '<a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
+		$renew_link = '<a href="https://wp-property-hive.com/license-key/" target="_blank">' . __( 'Renew License', 'propertyhive' ) . '</a>';
 		$valid_license = false;
 
 		if ( is_array($license) && empty($license) && get_option( 'propertyhive_license_key', '' ) != '' )
@@ -92,30 +87,114 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			}
 		}
 
-		$settings = apply_filters( 'propertyhive_licenses_settings', array(
+		// get new license information
+		$valid_pro_license = false;
+		$pro_input_border_color = '';
+		$pro_output = '';
+		$license_key_to_display = '';
+		if (get_option('propertyhive_pro_license_key', '') != '') 
+		{ 
+			$length = strlen(get_option('propertyhive_pro_license_key', '')); 
+			$license_key_to_display = get_option('propertyhive_pro_license_key', '');
+			if ( $length >= 6 )
+			{
+				$license_key_to_display = get_option('propertyhive_pro_license_key', '')[0] . 
+				get_option('propertyhive_pro_license_key', '')[1] . 
+				get_option('propertyhive_pro_license_key', '')[2] . 
+				str_repeat('*', $length - 4) . 
+				get_option('propertyhive_pro_license_key', '')[$length-3] . 
+				get_option('propertyhive_pro_license_key', '')[$length-2] . 
+				get_option('propertyhive_pro_license_key', '')[$length-1]; 
+			}
+			$pro_license = PH()->license->get_current_pro_license(true);
+
+			if ( PH()->license->is_valid_pro_license_key() )
+			{
+				$valid_pro_license = true;				
+				// to be used for displaying subscription level in future
+				//$product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
+				$pro_input_border_color = '#090';
+			}
+			else
+			{
+				$pro_input_border_color = '#900'; 
+				$pro_output = $pro_license['error'];
+			}
+		}
+		
+
+		$settings = array(
 
 			array( 'title' => __( 'License Key', 'propertyhive' ), 'type' => 'title', 'id' => 'license_options' ),
 
-			array(
+		);
+
+		$settings[] = array(
+			'title'       => __( 'License Type', 'propertyhive' ),
+			'id'          => 'propertyhive_license_type',
+			'type'        => 'radio',
+			'default' 	  => $license_type,
+			'options'     => array(
+				'pro' => 'Pro',
+				'old' => 'Old-Style (deprecated October 2023)'
+			)
+		);
+
+		$settings[] = array(
+			'type'        => 'html',
+			'id' 		  => 'pro_license_key_info',
+			'html' 		  => __( '<p>With a Pro license subscription you\'ll unlock a wide array of Property Hive functionality. We offer multiple packages to suit your needs. Your Pro subscription details and license key can be found within the \'<a href="https://wp-property-hive.com/my-account/" target="_blank">My Account</a>\' section of our website.</p>
+							' . ( (!$valid_pro_license) ? 
+									'<br><p><a href="https://wp-property-hive.com/pricing/" class="button button-primary" target="_blank">Get PRO</a></p>' : 
+									'<br><p><a href="https://wp-property-hive.com/my-account/" class="button button-primary" target="_blank">Manage Subscription and Get License Key</a></p>' 
+								), 'propertyhive' ) . '
+			<input type="hidden" name="pro_license_key_action" value="' . ( $valid_pro_license ? 'deactivate' : 'activate' ) . '">',
+		);
+
+		if ( $valid_pro_license )
+		{
+			$settings[] = array(
 				'type'        => 'html',
-				'html' 		  => __( '<p>By having a license key you will benefit from priority one-to-one email support, setup assistance, troubleshooting, and updates to purchased add ons containing new functionality and fixes.</p>
+				'id' 		  => 'pro_license_key_display',
+				'title'		  => __( 'License Key', 'propertyhive' ),
+				'html' 		  => '<input type="text" disabled="disabled" value="' . $license_key_to_display . '" style="min-width:350px; border:1px solid ' . $pro_input_border_color . '"> ' . $pro_output
+			);
 
-					<p>Licenses are valid for 12 months from the date of purchase and exist on a per-site-basis. Should a license key not exist, your website will still function as it does now. However support will be limited and potentially slower than usual and you won’t receive updates to any purchased add ons.</p>
-
-					' . ( (!$valid_license) ? '<br><p><a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" class="button button-primary" target="_blank">Purchase License Key</a></p>' : '' ), 'propertyhive' ),
-			),
-
-			array(
+			$settings[] = array(
 				'title'       => __( 'License Key', 'propertyhive' ),
-				'id'          => 'propertyhive_license_key',
+				'id'          => 'propertyhive_pro_license_key',
+				'type'        => 'hidden'
+			);
+		}
+		else
+		{
+			$settings[] = array(
+				'title'       => __( 'License Key', 'propertyhive' ),
+				'id'          => 'propertyhive_pro_license_key',
 				'type'        => 'text',
-				'css'         => 'min-width:300px; border:1px solid ' . $input_border_color,
-				'desc' 		  => $output,
-			),
+				'css' 	  => 'min-width:350px; border:1px solid ' . $pro_input_border_color,
+				'desc' 		  => $pro_output
+			);
+		}
 
-			array( 'type' => 'sectionend', 'id' => 'license_options' ),
+		$settings[] = array(
+			'type'        => 'html',
+			'id' 		  => 'license_key_info',
+			'html' 		  => __( '<p>If you purchased a license key prior to 16th October 2023 you can enter it here to benefit from updates to any existing add ons you\'ve purchased.</p>
+				<p>We\'ve since moved to a new and improved <a href="https://wp-property-hive.com/pricing/" target="_blank">pro pricing model</a> that is more cost effective for you and gives access to more features.</p>
+				' . ( $license_type == 'old' ? '<p>To switch your existing license key over to the new pricing model please get in touch at <a href="mailto:info@wp-property-hive.com.">info@wp-property-hive.com</a>.</p>' : '' ) . '
+				<br><p><a href="https://wp-property-hive.com/pricing/" class="button button-primary" target="_blank">Get PRO</a></p>', 'propertyhive' ),
+		);
 
-		) );
+		$settings[] = array(
+			'title'       => __( 'License Key', 'propertyhive' ),
+			'id'          => 'propertyhive_license_key',
+			'type'        => 'text',
+			'css'         => 'min-width:350px; border:1px solid ' . $input_border_color,
+			'desc' 		  => $output,
+		);
+
+		$settings[] = array( 'type' => 'sectionend', 'id' => 'license_options' );
 
 		return apply_filters( 'propertyhive_get_settings_' . $this->id, $settings );
 	}
@@ -124,9 +203,10 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 * Output the settings.
 	 */
 	public function output() {
-		global $current_section;
+		global $current_section, $hide_save_button;
 
-		$settings = $this->get_settings();
+        $settings = $this->get_settings();
+
 		PH_Admin_Settings::output_fields( $settings );
 	}
 
@@ -134,11 +214,43 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 * Save settings.
 	 */
 	public function save() {
-		PH_Admin_Settings::save_fields( $this->get_settings() );
+
+		$settings = $this->get_settings();
+
+		PH_Admin_Settings::save_fields( $settings );
 
 		update_option( 'missing_invalid_expired_license_key_notice_dismissed', '' );
 
-		PH()->license->ph_check_licenses(true);
+		if ( $_POST['propertyhive_license_type'] == 'pro' && isset($_POST['propertyhive_pro_license_key']) && !empty(ph_clean($_POST['propertyhive_pro_license_key'])) && $_POST['pro_license_key_action'] == 'activate' )
+		{
+			$return = PH()->license->activate_pro_license_key();
+			if ( $return['success'] === false )
+			{
+				PH_Admin_Settings::add_error($return['error']);
+			}
+			else
+			{
+				PH_Admin_Settings::add_message('License key activated successfully');
+			}
+		}
+
+		if ( $_POST['propertyhive_license_type'] == 'pro' && isset($_POST['propertyhive_pro_license_key']) && !empty(ph_clean($_POST['propertyhive_pro_license_key'])) && $_POST['pro_license_key_action'] == 'deactivate' )
+		{
+			$return = PH()->license->deactivate_pro_license_key();
+			if ( $return['success'] === false )
+			{
+				PH_Admin_Settings::add_error($return['error']);
+			}
+			else
+			{
+				PH_Admin_Settings::add_message('License key deactivated successfully');
+			}
+		}
+
+		if ( $_POST['propertyhive_license_type'] == 'old' )
+		{
+			PH()->license->ph_check_licenses(true);
+		}
 	}
 }
 

@@ -31,30 +31,46 @@ class PH_Plugin_Updates {
 
 		if ( is_network_admin() || ! is_multisite() ) 
 		{
-			$license = PH()->license->get_current_license();
+			$license_type = PH()->license->get_license_type();
 
 			$valid_license = false;
 
-			if ( is_array($license) && empty($license) && get_option( 'propertyhive_license_key', '' ) != '' )
+			if ( $license_type == 'old' )
 			{
-				
-			}
-			elseif ( isset($license['active']) && $license['active'] != '1' )
-			{
+				$license = PH()->license->get_current_license();
 
-			}
-			else
-			{
-				if ( isset($license['expires_at']) && $license['expires_at'] != '' )
+				if ( is_array($license) && empty($license) && get_option( 'propertyhive_license_key', '' ) != '' )
 				{
-					if ( strtotime($license['expires_at']) <= time() )
-					{
-						// Expired
+					
+				}
+				elseif ( isset($license['active']) && $license['active'] != '1' )
+				{
 
-					}
-					else
+				}
+				else
+				{
+					if ( isset($license['expires_at']) && $license['expires_at'] != '' )
 					{
-						// Valid
+						if ( strtotime($license['expires_at']) <= time() )
+						{
+							// Expired
+
+						}
+						else
+						{
+							// Valid
+							$valid_license = true;
+						}
+					}
+				}
+			}
+			elseif ( $license_type == 'pro' )
+			{
+				// get new license information
+				if ( get_option('propertyhive_pro_license_key', '') != '' ) 
+				{ 
+					if ( PH()->license->is_valid_pro_license_key() )
+					{
 						$valid_license = true;
 					}
 				}
@@ -62,44 +78,54 @@ class PH_Plugin_Updates {
 
 			if ( !$valid_license )
 			{
-				$add_ons = @file_get_contents('http://wp-property-hive.com/add-ons-json.php');
+				$add_ons = '';
+				if ( false === ( $add_ons = get_transient( 'propertyhive_features' ) ) || isset($_GET['ph_force_get_features']) ) 
+			    {
+			        // It wasn't there, so regenerate the data and save the transient
+			        $add_ons = @file_get_contents('https://dev2022.wp-property-hive.com/add-ons-json.php');
 
-				if ($add_ons !== FALSE && $add_ons !== '')
-		        {
-		            $add_ons = json_decode($add_ons);
-		            
-		            if ($add_ons !== FALSE && !empty($add_ons))
-		            {
-		            	foreach ($add_ons as $add_on)
-		                {
-		                	$url = trim($add_on->url, '/');
+			        if ( $add_ons !== FALSE && $add_ons !== '' )
+			        {
+			            $add_ons = json_decode($add_ons, TRUE);
+			            
+			            if ( $add_ons !== FALSE && is_array($add_ons) && !empty($add_ons) )
+			            {
+			                set_transient( 'propertyhive_features', $add_ons, DAY_IN_SECONDS );
+			            }
+			        }
+			    }
 
-		                	if ( 
-		                		isset($add_on->wordpress_plugin_file) && $add_on->wordpress_plugin_file != '' && $add_on->wordpress_plugin_file != false &&
-		                		isset($add_on->wordpress_version_option_name) && $add_on->wordpress_version_option_name != '' && $add_on->wordpress_version_option_name != false 
-		                	)
+	            if ($add_ons !== FALSE && !empty($add_ons))
+	            {
+	            	foreach ($add_ons as $add_on)
+	                {
+	                	$url = trim($add_on['url'], '/');
+
+	                	if ( 
+	                		isset($add_on['wordpress_plugin_file']) && $add_on['wordpress_plugin_file'] != '' && $add_on['wordpress_plugin_file'] != false &&
+	                		isset($add_on['wordpress_version_option_name']) && $add_on['wordpress_version_option_name'] != '' && $add_on['wordpress_version_option_name'] != false 
+	                	)
+	                	{
+		                	$plugin_file = $add_on['wordpress_plugin_file'];
+
+		                	if ( is_plugin_active($plugin_file) )
 		                	{
-			                	$plugin_file = $add_on->wordpress_plugin_file;
+			                	$current_version = get_option($add_on['wordpress_version_option_name'], '');
 
-			                	if ( is_plugin_active($plugin_file) )
+			                	if ( $current_version != '' )
 			                	{
-				                	$current_version = get_option($add_on->wordpress_version_option_name, '');
+				                	// check if add on update available
+				                	$new_version = $add_on['version'];
 
-				                	if ( $current_version != '' )
+				                	if ( version_compare($new_version, $current_version) == 1 )
 				                	{
-					                	// check if add on update available
-					                	$new_version = $add_on->version;
-
-					                	if( version_compare($new_version, $current_version) == 1 )
-					                	{
-						                	add_action( 'after_plugin_row_' . $plugin_file, array( $this, 'test' ), 10, 3 );
-						                }
+					                	add_action( 'after_plugin_row_' . $plugin_file, array( $this, 'test' ), 10, 3 );
 					                }
-					            }
+				                }
 				            }
-		                }
-		            }
-		        }
+			            }
+	                }
+	            }
 		    }
 	    }
 	}
@@ -115,7 +141,7 @@ class PH_Plugin_Updates {
 		echo '<tr class="plugin-update-tr' . $active_class . '">
 			<td colspan="3" class="plugin-update colspanchange">
 				<div class="update-message notice inline notice-warning notice-alt">
-					<p>An update is available for this add on. It is recommended that you update to ensure you receive the latest features and bug fixes. You can access updates to any purchased add ons by <a href="https://wp-property-hive.com/product/12-month-license-key-subscription/" target="_blank">purchasing a license key</a>.</p>
+					<p>An update is available for this plugin. It is recommended that you update to ensure you receive the latest features and bug fixes. You can access updates to plugins by <a href="https://wp-property-hive.com/pricing/" target="_blank">purchasing a pro package</a>.</p>
 				</div>
 			</td>
 		</tr>';

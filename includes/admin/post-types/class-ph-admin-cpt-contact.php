@@ -46,8 +46,8 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		// Admin Columns
 		add_filter( 'manage_edit-contact_columns', array( $this, 'edit_columns' ) );
 		add_action( 'manage_contact_posts_custom_column', array( $this, 'custom_columns' ), 2 );
-		// add_filter( 'manage_edit-property_sortable_columns', array( $this, 'custom_columns_sort' ) );
-		// add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
+		add_filter( 'manage_edit-contact_sortable_columns', array( $this, 'custom_columns_sort' ) );
+		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
 
 		// Sort link
 		// add_filter( 'views_edit-property', array( $this, 'default_sorting_link' ) );

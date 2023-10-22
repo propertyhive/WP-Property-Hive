@@ -1,4 +1,8 @@
+var initial_save_changes_value = '';
+
 jQuery( function($){
+
+    initial_save_changes_value = (jQuery('p.submit button.button-primary').length > 0) ? jQuery('p.submit button.button-primary').text() : '';
 
     $('a#add_department').click(function(e)
     {
@@ -223,7 +227,185 @@ jQuery( function($){
         ph_toggle_auto_incremental_reference_number_options();
     });
     ph_toggle_auto_incremental_reference_number_options();
+
+    jQuery('.pro-feature-settings .pro-filters ul li a').click(function(e)
+    {
+        e.preventDefault();
+
+        var data_filter = jQuery(this).data('filter');
+
+        jQuery('.pro-feature-settings .pro-filters ul li').removeClass('active');
+        jQuery(this).parent().addClass('active');
+
+        if ( data_filter == '' )
+        {
+            jQuery('.pro-feature-settings .pro-features ul li').hide();
+            jQuery('.pro-feature-settings .pro-features ul li').fadeIn('fast');
+        }
+        else
+        {
+            jQuery('.pro-feature-settings .pro-features ul li').hide();
+            jQuery('.pro-feature-settings .pro-features ul li.' + data_filter).fadeIn('fast');
+        }
+
+        ph_resize_pro_features_list();
+    });
+
+    if ( jQuery('.pro-feature-settings .pro-filters').length > 0 )
+    {
+        jQuery('.pro-feature-settings .pro-filters ul li.active a').trigger('click');
+    }
+
+    jQuery('.pro-feature-settings input[name=\'active_plugins[]\']').change(function()
+    {
+        var parent_el = jQuery(this);
+        var is_checked = parent_el.is(':checked');
+
+        var slug = parent_el.val();
+
+        jQuery(this).parent().next('.loading').show();
+        jQuery(this).parent().hide();
+
+        if ( is_checked )
+        {
+            // need to install/activate plugin
+            jQuery.ajax({
+                url : ajaxurl,
+                method: 'POST',
+                data : {
+                    action: "propertyhive_activate_pro_feature", 
+                    slug : slug, 
+                    _ajax_nonce: propertyhive_admin_settings.ajax_nonce
+                },
+                dataType : "json",
+                success: function(response) 
+                {
+                    if ( response.success === true )
+                    {
+                        if ( typeof response.data !== 'undefined' && typeof response.data.activateUrl !== 'undefined' )
+                        {
+                            jQuery.ajax({
+                                url : response.data.activateUrl,
+                                method: 'GET',
+                                data : {},
+                                success: function(response) 
+                                {
+                                    window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=1' + ( (jQuery('.pro-filters li.active a').data('filter') != '') ? '&profilter=' + jQuery('.pro-filters li.active a').data('filter') : '' );
+                                }
+                            });
+                        }
+                        else
+                        {
+                            window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=1' + ( (jQuery('.pro-filters li.active a').data('filter') != '') ? '&profilter=' + jQuery('.pro-filters li.active a').data('filter') : '' );
+                        }
+                    }
+                    else
+                    {
+                        parent_el.prop('checked', false);
+                        parent_el.parent().next('.loading').hide();
+                        parent_el.parent().show();
+                        alert(response.data.errorMessage);
+                    }
+                }
+            });
+        }
+        else
+        {
+            // need to deactivate plugin
+            jQuery.ajax({
+                url : ajaxurl,
+                method: 'POST',
+                data : {
+                    action: "propertyhive_deactivate_pro_feature", 
+                    slug : slug, 
+                    _ajax_nonce: propertyhive_admin_settings.ajax_nonce
+                },
+                dataType : "json",
+                success: function(response) 
+                {
+                    if ( response.success === true )
+                    {
+                        window.location.href = propertyhive_admin_settings.features_settings_url + '&successmessage=2' + ( (jQuery('.pro-filters li.active a').data('filter') != '') ? '&profilter=' + jQuery('.pro-filters li.active a').data('filter') : '' );
+                    }
+                    else
+                    {
+                        parent_el.prop('checked', 'checked');
+                        parent_el.parent().next('.loading').hide();
+                        parent_el.parent().show();
+                        alert(response.data.errorMessage);
+                    }
+                }
+            });
+        }
+    });
+
+    if ( jQuery('[name=\'propertyhive_license_type\']').length > 0 )
+    {
+        ph_toggle_license_key_settings();
+
+        jQuery('[name=\'propertyhive_license_type\']').change(function()
+        {
+            ph_toggle_license_key_settings();
+        });
+    }
+
+    ph_resize_pro_features_list();
 });
+
+jQuery(window).on( "resize", function() 
+{
+    ph_resize_pro_features_list();
+});
+
+function ph_resize_pro_features_list()
+{
+    if ( jQuery('.pro-features').length > 0 )
+    {
+        jQuery('.pro-features ul li .inner').css('height', 'auto');
+
+        var max_height = 0;
+        jQuery('.pro-features ul li .inner').each(function()
+        {
+            if ( jQuery(this).parent().css('display') != 'none' && jQuery(this).height() > max_height )
+            {
+                max_height = jQuery(this).height();
+            }
+        });
+
+        jQuery('.pro-features ul li .inner').css('height', max_height + 'px');
+        jQuery('.pro-features ul li').css('visibility', 'visible');
+    }
+}
+
+function ph_toggle_license_key_settings()
+{
+    if ( jQuery('[name=\'propertyhive_license_type\']:checked').val() == 'old' )
+    {
+        jQuery('#row_pro_license_key_info').hide();
+        jQuery('#row_pro_license_key_display').hide();
+        jQuery('#row_propertyhive_pro_license_key').hide();
+        jQuery('#row_license_key_info').show();
+        jQuery('#row_propertyhive_license_key').show();
+        jQuery('p.submit button.button-primary').text(initial_save_changes_value);
+    }
+    else
+    {
+        jQuery('#row_pro_license_key_info').show();
+        jQuery('#row_propertyhive_pro_license_key').show();
+        jQuery('#row_pro_license_key_display').show();
+        jQuery('#row_license_key_info').hide();
+        jQuery('#row_propertyhive_license_key').hide();
+
+        if ( propertyhive_admin_settings.valid_pro_license_key )
+        {
+            jQuery('p.submit button.button-primary').text('Deactivate key');
+        }
+        else
+        {
+            jQuery('p.submit button.button-primary').text('Activate key');
+        }
+    }
+}
 
 function ph_toggle_maps_provider_options()
 {
