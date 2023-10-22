@@ -22,8 +22,6 @@ class PH_Licenses {
 
 	private $pro_license_status = array();
 
-	private $pro_license_product_id_and_package = array();
-
 	/**
 	 * Main PH_Licenses Instance.
 	 *
@@ -536,9 +534,16 @@ class PH_Licenses {
 
 	public function get_pro_license_product_id_and_package($force = false)
 	{
-		if ( $force != true && !empty($this->pro_license_product_id_and_package) )
+		if ( $force !== true )
     	{
-    		return $this->pro_license_product_id_and_package;
+    		// Not forcing. Get from transient if possible
+    		$pro_license_product_id_and_package = get_transient( 'ph_pro_license_product_id_and_package' );
+
+    		if ( $pro_license_product_id_and_package !== false ) 
+    		{
+    			// return transient value
+				return $pro_license_product_id_and_package;
+			}
     	}
 
     	$license_key = get_option( 'propertyhive_pro_license_key', '' );
@@ -549,7 +554,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'No license key entered', 'propertyhive' )
         	);
-        	$this->pro_license_product_id_and_package = $return;
+        	set_transient( 'ph_pro_license_product_id_and_package', $return, HOUR_IN_SECONDS );
         	return $return;
         }
 
@@ -579,7 +584,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'Failed to request license product list', 'propertyhive' ) . ': ' . $response->get_error_message()
         	);
-        	$this->pro_license_product_id_and_package = $return;
+        	//set_transient( 'ph_pro_license_product_id_and_package', $return, HOUR_IN_SECONDS );
         	return $return;
 		}
 
@@ -589,7 +594,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'Received response code ' . wp_remote_retrieve_response_code( $response ) . ' when requesting license key product list', 'propertyhive' )
         	);
-        	$this->pro_license_product_id_and_package = $return;
+        	//set_transient( 'ph_pro_license_product_id_and_package', $return, HOUR_IN_SECONDS );
         	return $return;
 		}
 
@@ -603,7 +608,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'Failed to decode response when requesting license key product list. Please try again', 'propertyhive' ) . ': ' . print_r( $result, true )
         	);
-        	$this->pro_license_product_id_and_package = $return;
+        	//set_transient( 'ph_pro_license_product_id_and_package', $return, HOUR_IN_SECONDS );
         	return $return;
 		}
 
@@ -620,11 +625,11 @@ class PH_Licenses {
 					{
 						if ( isset($resource['product_id']) )
 						{
-							if ( in_array($resource['product_id'], array(13794, 13796, 13801)) )
+							if ( in_array($resource['product_id'], array(14492, 14493, 14494)) )
 							{
 								$package = 'import';
 							}
-							elseif ( in_array($resource['product_id'], array(13797, 137981, 13802)) )
+							elseif ( in_array($resource['product_id'], array(14495, 14496, 14497)) )
 							{
 								$package = 'complete';
 							}
@@ -664,7 +669,7 @@ class PH_Licenses {
 	        	);
 			}
 
-			$this->pro_license_product_id_and_package = $return;
+			set_transient( 'ph_pro_license_product_id_and_package', $return, HOUR_IN_SECONDS );
 			return $return;
 		}
 		else
@@ -673,16 +678,23 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'Something went wrong when requesting license key product list', 'propertyhive' ) . ': ' . print_r($body, true)
         	);
-        	$this->pro_license_product_id_and_package = $return;
+        	//set_transient( 'ph_pro_license_product_id_and_package', $return, HOUR_IN_SECONDS );
 			return $return;
 		}
 	}
 
 	public function get_current_pro_license($force = false)
 	{
-		if ( $force != true && !empty($this->pro_license_status) )
+		if ( $force !== true )
     	{
-    		return $this->pro_license_status;
+    		// Not forcing. Get from transient if possible
+    		$pro_license_status = get_transient( 'ph_pro_license_status' );
+
+    		if ( $pro_license_status !== false ) 
+    		{
+    			// return transient value
+				return $pro_license_status;
+			}
     	}
 
     	$product_id_and_package = $this->get_pro_license_product_id_and_package($force);
@@ -700,7 +712,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'No license key entered', 'propertyhive' )
         	);
-        	$this->pro_license_status = $return;
+        	set_transient( 'ph_pro_license_status', $return, HOUR_IN_SECONDS );
         	return $return;
         }
 
@@ -738,7 +750,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'Failed to request license status', 'propertyhive' ) . ': ' . $response->get_error_message()
         	);
-        	$this->pro_license_status = $return;
+        	//set_transient( 'ph_pro_license_status', $return, HOUR_IN_SECONDS );
         	return $return;
 		}
 
@@ -755,7 +767,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'Received response code ' . wp_remote_retrieve_response_code( $response ) . ' when requesting license key status', 'propertyhive' )
         	);
-        	$this->pro_license_status = $return;
+        	//set_transient( 'ph_pro_license_status', $return, HOUR_IN_SECONDS );
         	return $return;
 		}
 
@@ -769,7 +781,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'Failed to decode response when requesting license key status. Please try again', 'propertyhive' ) . ': ' . print_r( $result, true )
         	);
-        	$this->pro_license_status = $return;
+        	//set_transient( 'ph_pro_license_status', $return, HOUR_IN_SECONDS );
         	return $return;
 		}
 
@@ -802,7 +814,7 @@ class PH_Licenses {
 			update_option( 'propertyhive_pro_license_key_last_checked', time() );
 			update_option( 'propertyhive_pro_license_key_status', $return );
 
-			$this->pro_license_status = $return;
+			set_transient( 'ph_pro_license_status', $return, HOUR_IN_SECONDS );
 			return $return;
 		}
 		else
@@ -811,7 +823,7 @@ class PH_Licenses {
         		'success' => false,
         		'error' => __( 'Something went wrong when requesting license key status', 'propertyhive' ) . ': ' . print_r($body, true)
         	);
-        	$this->pro_license_status = $return;
+        	//set_transient( 'ph_pro_license_status', $return, HOUR_IN_SECONDS );
 			return $return;
 		}
 	}
