@@ -7,7 +7,7 @@ function get_ph_pro_features()
     if ( false === ( $features = get_transient( 'propertyhive_features' ) ) || isset($_GET['ph_force_get_features']) ) 
     {
         // It wasn't there, so regenerate the data and save the transient
-        $add_ons = @file_get_contents('https://dev2022.wp-property-hive.com/add-ons-json.php');
+        $add_ons = @file_get_contents('https://wp-property-hive.com/add-ons-json.php');
 
         if ( $add_ons !== FALSE && $add_ons !== '' )
         {

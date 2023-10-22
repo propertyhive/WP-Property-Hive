@@ -6138,7 +6138,6 @@ class PH_AJAX {
         if ( !is_dir(WP_PLUGIN_DIR . '/' . $slug) && strpos($feature['download_url'], 'wordpress.org') === false )
         {
             // not a public WP plugin. Must be hosted privately
-            $feature['download_url'] = str_replace("http://dev2022.wp-property-hive.com", "https://wp-property-hive.com", $feature['download_url']);
             $zip_contents = @file_get_contents($feature['download_url']);
             
             if ( $zip_contents === false || empty($zip_contents) )
