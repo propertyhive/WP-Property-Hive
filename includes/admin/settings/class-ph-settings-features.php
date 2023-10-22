@@ -143,7 +143,7 @@ class PH_Settings_Features extends PH_Settings_Page {
 
                         if ( version_compare($plugin_data['Version'], $transient->response[$feature['wordpress_plugin_file']]->new_version, '<') )
                         {
-                            $links[] = '<a href="' . esc_url(admin_url('update-core.php')) . '" style="text-decoration:none"><span class="dashicons dashicons-update"></span> ' . esc_html(__( 'Update', 'propertyhive' )) . '</a>';
+                            $links[] = '<a href="' . esc_url(admin_url('plugins.php?plugin_status=upgrade')) . '" style="text-decoration:none"><span class="dashicons dashicons-update"></span> ' . esc_html(__( 'Update', 'propertyhive' )) . '</a>';
                         }
                     }
                 }

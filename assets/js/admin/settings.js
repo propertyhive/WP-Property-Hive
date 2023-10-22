@@ -382,6 +382,7 @@ function ph_toggle_license_key_settings()
     if ( jQuery('[name=\'propertyhive_license_type\']:checked').val() == 'old' )
     {
         jQuery('#row_pro_license_key_info').hide();
+        jQuery('#row_pro_license_key_display').hide();
         jQuery('#row_propertyhive_pro_license_key').hide();
         jQuery('#row_license_key_info').show();
         jQuery('#row_propertyhive_license_key').show();
@@ -391,6 +392,7 @@ function ph_toggle_license_key_settings()
     {
         jQuery('#row_pro_license_key_info').show();
         jQuery('#row_propertyhive_pro_license_key').show();
+        jQuery('#row_pro_license_key_display').show();
         jQuery('#row_license_key_info').hide();
         jQuery('#row_propertyhive_license_key').hide();
 

@@ -64,8 +64,8 @@ class PH_Licenses {
 	 */
 	public function __construct() {
 		add_action( 'propertyhive_check_licenses', array( $this, 'ph_check_licenses' ) );
-		add_filter( 'properyhive_add_on_can_be_used', array( $this, 'ph_check_add_on_can_be_used' ), 10, 2 );
-		add_filter( 'properyhive_add_on_can_be_updated', array( $this, 'ph_check_add_on_can_be_updated' ), 10, 2 );
+		add_filter( 'propertyhive_add_on_can_be_used', array( $this, 'ph_check_add_on_can_be_used' ), 10, 2 );
+		add_filter( 'propertyhive_add_on_can_be_updated', array( $this, 'ph_check_add_on_can_be_updated' ), 10, 2 );
 	}
 
 	public function ph_check_add_on_can_be_used( $can, $slug )
@@ -346,7 +346,7 @@ class PH_Licenses {
 
 	public function activate_pro_license_key()
 	{
-		$license = $this->get_pro_license_product_id_and_package($force);
+		$license = $this->get_pro_license_product_id_and_package(true);
 
 		if ( isset($license['success']) && $license['success'] === true )
 		{
@@ -359,6 +359,8 @@ class PH_Licenses {
 	    		$instance_id = wp_generate_password( 12, false ); // disable specialchars
 	    		update_option('propertyhive_pro_instance_id', $instance_id );
 	    	}
+
+	    	$data = array();
 
 			// found API key. It's product ID will be stored in product_id
 			$url = 'https://dev2022.wp-property-hive.com/?';
@@ -439,7 +441,7 @@ class PH_Licenses {
 
 	public function deactivate_pro_license_key()
 	{
-		$license = $this->get_pro_license_product_id_and_package($force);
+		$license = $this->get_pro_license_product_id_and_package(true);
 
 		if ( isset($license['success']) && $license['success'] === true )
 		{
@@ -452,6 +454,8 @@ class PH_Licenses {
 	    		$instance_id = wp_generate_password( 12, false ); // disable specialchars
 	    		update_option('propertyhive_pro_instance_id', $instance_id );
 	    	}
+
+	    	$data = array();
 
 			// found API key. It's product ID will be stored in product_id
 			$url = 'https://dev2022.wp-property-hive.com/?';

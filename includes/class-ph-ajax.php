@@ -6087,7 +6087,7 @@ class PH_AJAX {
             if ( $valid_license_key === false )
             {
                 // check pro license key valid
-                if ( PH()->license->is_valid_pro_license_key() )
+                if ( PH()->license->is_valid_pro_license_key(true) )
                 {
                     $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
 
@@ -6099,7 +6099,7 @@ class PH_AJAX {
                             in_array($product_id_and_package['package'], $feature['plans'])
                         )
                         {
-                            $valid_license_key === true;
+                            $valid_license_key = true;
                         }
                         else
                         {
@@ -6137,8 +6137,6 @@ class PH_AJAX {
 
         if ( !is_dir(WP_PLUGIN_DIR . '/' . $slug) && strpos($feature['download_url'], 'wordpress.org') === false )
         {
-
-
             // not a public WP plugin. Must be hosted privately
             $feature['download_url'] = str_replace("http://dev2022.wp-property-hive.com", "https://wp-property-hive.com", $feature['download_url']);
             $zip_contents = @file_get_contents($feature['download_url']);
@@ -6154,6 +6152,13 @@ class PH_AJAX {
             $tmpfname = rtrim(sys_get_temp_dir(), '/') . '/' . $slug . '.zip';
 
             $handle = fopen($tmpfname, "w");
+            if ( $handle === false )
+            {
+                $return = array(
+                    'errorMessage' => 'Failed to write plugin contents to temp file: ' . $tmpfname
+                );
+                wp_send_json_error($return);
+            }
             fwrite($handle, $zip_contents);
             fclose($handle);
 
@@ -6168,6 +6173,28 @@ class PH_AJAX {
             }
 
             unlink($tmpfname);
+
+            // Need to sort out cache for activate plugin to work
+            // Taken from WordPress.org docs
+            $cache_plugins = wp_cache_get( 'plugins', 'plugins' );
+            if ( !empty( $cache_plugins ) ) 
+            {
+                $new_plugin = array(
+                    'Name' => $slug,
+                    'PluginURI' => '',
+                    'Version' => '',
+                    'Description' => '',
+                    'Author' => '',
+                    'AuthorURI' => '',
+                    'TextDomain' => '',
+                    'DomainPath' => '',
+                    'Network' => '',
+                    'Title' => $slug,
+                    'AuthorName' => '',
+                );
+                $cache_plugins[''][$feature['wordpress_plugin_file']] = $new_plugin;
+                wp_cache_set( 'plugins', $cache_plugins, 'plugins' );
+            }
         }
 
         if ( is_dir(WP_PLUGIN_DIR . '/' . $slug) )
