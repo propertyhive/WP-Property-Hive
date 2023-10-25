@@ -6148,9 +6148,17 @@ class PH_AJAX {
                 wp_send_json_error($return);
             }
 
-            $tmpfname = rtrim(sys_get_temp_dir(), '/') . '/' . $slug . '.zip';
+            if ( ! wp_is_writable( WP_PLUGIN_DIR ) ) 
+            {
+                $return = array(
+                    'errorMessage' => 'Destination directory (' . WP_PLUGIN_DIR . ') for writing plugin temporarily does not exist or is not writable.'
+                );
+                wp_send_json_error($return);
+            }
 
-            $handle = fopen($tmpfname, "w");
+            $tmpfname = WP_PLUGIN_DIR . '/' . $slug . '.zip';
+
+            $handle = @fopen($tmpfname, "w");
             if ( $handle === false )
             {
                 $return = array(
@@ -6161,17 +6169,33 @@ class PH_AJAX {
             fwrite($handle, $zip_contents);
             fclose($handle);
 
+            global $wp_filesystem;
+
+            require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+            require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+            $wp_filesystem = new WP_Filesystem_Direct( false );
+
+            if ( !defined( 'FS_CHMOD_FILE' ) ) {
+                define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
+            }
+            if ( !defined( 'FS_CHMOD_DIR' ) ) {
+                define( 'FS_CHMOD_DIR', ( fileperms( ABSPATH ) & 0777 | 0755 ) );
+            }
+
             // file obtained and stored. need to unzip and put into plugins directory
             $unzipped = unzip_file( $tmpfname, WP_PLUGIN_DIR );
             if ( is_wp_error( $unzipped ) ) 
             {
+                @unlink($tmpfname);
+
                 $return = array(
                     'errorMessage' => $unzipped->get_error_message()
                 );
                 wp_send_json_error($return);
             }
 
-            unlink($tmpfname);
+            @unlink($tmpfname);
 
             // Need to sort out cache for activate plugin to work
             // Taken from WordPress.org docs
