@@ -34,6 +34,34 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'export_applicant_list' ) );
         add_action( 'admin_init', array( $this, 'export_sub_grid' ) );
         add_action( 'admin_init', array( $this, 'check_hide_demo_data_tab' ) );
+        add_action( 'admin_init', array( $this, 'check_install_add_on' ) );
+    }
+
+    public function check_install_add_on()
+    {
+        if ( 
+            isset($_GET['ph_action']) && $_GET['ph_action'] == 'install_add_on' && 
+            isset($_GET['ph_add_on_slug']) && !empty($_GET['ph_add_on_slug']) && 
+            isset($_GET['ph_add_on_plugin']) && !empty($_GET['ph_add_on_plugin']) 
+        )
+        {
+            $installed_plugins = get_option( 'propertyhive_pre_pro_add_ons', array());
+
+            if ( empty($installed_plugins) )
+            {
+                $installed_plugins = array();
+            }
+
+            $installed_plugins[] = array(
+                'slug' => ph_clean(base64_decode($_GET['ph_add_on_slug'])),
+                'plugin' => ph_clean(base64_decode($_GET['ph_add_on_plugin']))
+            );
+
+            update_option( 'propertyhive_pre_pro_add_ons', $installed_plugins );
+
+            wp_redirect( admin_url('admin.php?page=ph-settings&tab=features') );
+            die();
+        }
     }
 
     public function check_hide_demo_data_tab()
