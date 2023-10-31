@@ -76,6 +76,8 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		do_action( 'propertyhive_elementor_widget_property_image_controls', $this );
+
 		$this->end_controls_section();
 
 	}
@@ -148,6 +150,8 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 				}
 			}
 		}
+
+		do_action( 'propertyhive_elementor_widget_property_image_render_after', $settings, $property );
 	}
 
 }
