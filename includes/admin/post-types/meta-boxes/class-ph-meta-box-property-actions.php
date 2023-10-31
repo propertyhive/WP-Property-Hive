@@ -153,6 +153,10 @@ class PH_Meta_Box_Property_Actions {
 		            <div id="viewing_new_applicant" style="display:none">
 		            	<input type="text" name="viewing_applicant_name" id="viewing_applicant_name" style="width:100%;" placeholder="' . esc_attr(__( 'Enter Applicant Name', 'propertyhive' )) . '">
 		            	<em>Upon booking a new ' . esc_html(str_replace("-", " ", get_post_meta( $post->ID, '_department', TRUE))) . ' applicant will be created with this name.</em>
+
+		            	<div style="margin:8px 0"><input type="email" name="viewing_applicant_email_address" id="viewing_applicant_email_address" style="width:100%;" placeholder="' . esc_attr(__( 'Email Address', 'propertyhive' )) . '"></div>
+
+		            	<input type="text" name="viewing_applicant_telephone_number" id="viewing_applicant_telephone_number" style="width:100%;" placeholder="' . esc_attr(__( 'Telephone Number', 'propertyhive' )) . '">
 		            </div>
 
 		        </div>
@@ -595,6 +599,8 @@ jQuery(document).ready(function($)
             start_date: 	$('#_viewing_start_date').val(),
             start_time: 	$('#_viewing_start_time_hours').val() + ':' + $('#_viewing_start_time_minutes').val() + ':00',
             applicant_name: ( (new_applicant) ? $('#viewing_applicant_name').val() : '' ),
+            applicant_email_address: ( (new_applicant) ? $('#viewing_applicant_email_address').val() : '' ),
+            applicant_telephone_number: ( (new_applicant) ? $('#viewing_applicant_telephone_number').val() : '' ),
             applicant_ids: 	( (!new_applicant) ? Object.keys(viewing_selected_applicants) : '' ),
             negotiator_ids: Object.keys(viewing_selected_negotiators),
             security:       '<?php echo wp_create_nonce( 'book-viewing' ); ?>',
