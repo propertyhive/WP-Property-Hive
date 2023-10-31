@@ -145,6 +145,10 @@ class PH_Rest_Api {
 			'brochures',
 			'epcs',
 			'virtual_tours',
+			'views_total',
+			'views_last_7_days',
+			'views_last_14_days',
+			'views_last_30_days',
 		);
 
 		$field_array = apply_filters( 'propertyhive_rest_api_property_fields', $field_array );
@@ -350,6 +354,42 @@ class PH_Rest_Api {
 		            		case "virtual_tours":
 		            		{
 		            			$return = $property->get_virtual_tours();
+		            			break;
+		            		}
+		            		case "views_last_7_days":
+		            		case "views_last_14_days":
+		            		case "views_last_30_days":
+		            		case "views_total":
+		            		{
+		            			$view_statistics = $property->_view_statistics;
+					            if ( !is_array($view_statistics) )
+					            {
+					                $view_statistics = array();
+					            }
+
+					            $views = 0;
+
+					            $date_from = '2001-01-01';
+					            switch ($field_name)
+					            {
+					            	case "views_last_7_days": { $date_from = date("Y-m-d", strtotime('7 days ago')); break; }
+				            		case "views_last_14_days": { $date_from = date("Y-m-d", strtotime('14 days ago')); break; }
+				            		case "views_last_30_days": { $date_from = date("Y-m-d", strtotime('30 days ago')); break; }
+						        }
+					            $date_from = strtotime($date_from);
+
+					            $date_to = date("Y-m-d");
+					            $date_to = strtotime($date_to);
+
+					            for ($i = $date_from; $i <= $date_to; $i += 86400) 
+            					{ 
+					                if ( isset($view_statistics[date("Y-m-d", $i)]) )
+					                {
+					                    $views += $view_statistics[date("Y-m-d", $i)];
+					                }
+            					}
+
+		            			$return = $views;
 		            			break;
 		            		}
 		            		default:
