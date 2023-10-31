@@ -273,7 +273,7 @@ if ($section != 'enquiry')
 		<input type="checkbox" name="pinned" id="pinned" value="1"> <?php _e( 'Pin Note', 'propertyhive' ); ?>
 	</p>
 	<p>
-		<a href="#" class="add_note button" data-section="<?php echo $section; ?>"><?php _e( 'Add', 'propertyhive' ); ?></a>
+		<a href="#" class="add_note button-primary" data-section="<?php echo $section; ?>"><?php _e( 'Save Note', 'propertyhive' ); ?></a>
 	</p>
 </div>
 <?php } ?>
