@@ -1173,6 +1173,8 @@ function propertyhive_my_account_pages()
         {
             $applicant_profiles = $contact->applicant_profiles;
 
+            $buy_rent = array();
+
             if ( $applicant_profiles && $applicant_profiles > 0 )
             {
                 for ( $i = 0; $i < $applicant_profiles; ++$i )
@@ -1181,7 +1183,16 @@ function propertyhive_my_account_pages()
                         'name' => __( 'Requirements', 'propertyhive' ),
                     );
 
-                    break;  // At the moment we'll only allow them to manage the first set of requirements
+                    $applicant_profile = $contact->{'applicant_profile_' . $i};
+                    
+                    if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-sales' )
+                    {
+                        $buy_rent[] = 'To Buy';
+                    }
+                    if ( isset($applicant_profile['department']) && $applicant_profile['department'] == 'residential-lettings' )
+                    {
+                        $buy_rent[] = 'To Rent';
+                    }
                 }
             }
 
@@ -1205,7 +1216,7 @@ function propertyhive_my_account_pages()
                 if ( $viewings_query->have_posts() )
                 {
                     $pages['applicant_viewings'] = array(
-                        'name' => __( 'Viewings', 'propertyhive' ),
+                        'name' => __( 'Viewings', 'propertyhive' ) . ( !empty($buy_rent) ? ' ' . implode('/', $buy_rent) : '' ),
                     );
                 }
                 wp_reset_postdata();
@@ -1213,6 +1224,8 @@ function propertyhive_my_account_pages()
         }
         if ( in_array('owner', $contact_types) )
         {
+            $sell_let = array();
+
             // Get properties belonging to this owner
             $args = array(
                 'post_type'   => 'property', 
@@ -1244,7 +1257,16 @@ function propertyhive_my_account_pages()
                 {
                     $properties_query->the_post();
 
-                    $property_ids[] = get_the_id();
+                    $property_ids[] = get_the_ID();
+
+                    if ( get_post_meta( get_the_ID(), '_department', TRUE ) == 'residential-sales' )
+                    {
+                        $sell_let[] = 'To Sell';
+                    }
+                    if ( get_post_meta( get_the_ID(), '_department', TRUE ) == 'residential-lettings' )
+                    {
+                        $sell_let[] = 'To Let';
+                    }
                 }
 
                 $pages['owner_properties'] = array(
@@ -1279,7 +1301,7 @@ function propertyhive_my_account_pages()
                     if ( $viewings_query->have_posts() )
                     {
                         $pages['owner_viewings'] = array(
-                            'name' => __( 'Viewings', 'propertyhive' ),
+                            'name' => __( 'Viewings', 'propertyhive' ) . ( !empty($sell_let) ? ' ' . implode('/', $sell_let) : '' ),
                         );
                     }
                     wp_reset_postdata();
