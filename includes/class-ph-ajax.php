@@ -3906,6 +3906,11 @@ class PH_AJAX {
 
             update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
 
+            $email_address = isset($_POST['applicant_email_address']) ? sanitize_email($_POST['applicant_email_address']) : '';
+            $telephone_number = isset($_POST['applicant_telephone_number']) ? sanitize_text_field($_POST['applicant_telephone_number']) : '';
+            update_post_meta( $contact_post_id, '_email_address', $email_address );
+            update_post_meta( $contact_post_id, '_telephone_number', $telephone_number );
+
             update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
             update_post_meta( $contact_post_id, '_applicant_profile_0', array( 'department' => $property->department, 'send_matching_properties' => '' ) );
 
