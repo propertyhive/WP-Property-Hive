@@ -114,7 +114,7 @@ Automatic updates should work like a charm; as always though, ensure you backup 
 * Always include 'address_concatenated' meta key when searching by address
 * Yoast SEO to take descriptions/rooms into account when doing analysis
 * Corrected issue with commercial similar properties in auto-responder
-* Prevented ejquiry autoresponder similar property thumbnail blowing out layout when storing images as URL's or if no thumbnail version of images is stored
+* Prevented enquiry autoresponder similar property thumbnail blowing out layout when storing images as URL's or if no thumbnail version of images is stored
 * Store and display error should license key not be able to be obtained
 * Declared compatibility for WordPress 6.3.1
 
