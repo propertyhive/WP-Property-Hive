@@ -136,7 +136,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			'default' 	  => $license_type,
 			'options'     => array(
 				'pro' => 'Pro',
-				'old' => 'Old-Style (deprecated October 2023)'
+				'old' => 'Old-Style (license keys purchased before October 2023)'
 			)
 		);
 
