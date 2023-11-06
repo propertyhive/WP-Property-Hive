@@ -183,8 +183,8 @@ if ( ! class_exists( 'PropertyHive' ) )
         {
             return array_merge( array(
                 '<a href="' . admin_url( 'admin.php?page=ph-settings' ) . '">' . __( 'Settings', 'propertyhive' ) . '</a>',
+                '<a href="' . esc_url( apply_filters( 'propertyhive_features_url', admin_url( 'admin.php?page=ph-settings&tab=features' ) ) ) . '">' . __( 'Features', 'propertyhive' ) . '</a>',
                 '<a href="' . esc_url( apply_filters( 'propertyhive_url', 'https://wp-property-hive.com/', 'propertyhive' ) ) . '" target="_blank">' . __( 'Website', 'propertyhive' ) . '</a>',
-                '<a href="' . esc_url( apply_filters( 'propertyhive_addons_url', 'https://wp-property-hive.com/add-ons' ) ) . '" target="_blank">' . __( 'Add Ons', 'propertyhive' ) . '</a>',
             ), $links );
         }
     
