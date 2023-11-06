@@ -166,6 +166,7 @@ class PH_Admin_Assets {
 
         wp_localize_script( 'multiselect', 'propertyhive_multiselect_params', apply_filters( 'propertyhive_multiselect_params', array(
             'search'    => false,
+            'selected_text' => __( 'selected', 'propertyhive' ),
         ) ) );
 
         // PropertyHive admin pages

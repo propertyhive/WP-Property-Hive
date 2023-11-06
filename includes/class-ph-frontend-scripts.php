@@ -136,6 +136,7 @@ class PH_Frontend_Scripts {
 		if ( wp_script_is( 'multiselect' ) ) {
 			wp_localize_script( 'multiselect', 'propertyhive_multiselect_params', apply_filters( 'propertyhive_multiselect_params', array(
 				'search'	=> false,
+				'selected_text'	=> __( 'selected', 'propertyhive' ),
 			) ) );
 		}
 	}
