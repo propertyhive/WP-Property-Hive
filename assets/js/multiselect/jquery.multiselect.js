@@ -47,7 +47,7 @@
         texts: {
             placeholder    : 'Select options', // text to use in dummy input
             search         : 'Search',         // search input placeholder text
-            selectedOptions: ' selected',      // selected suffix text
+            selectedOptions: ' ' + propertyhive_multiselect_params.selected_text,      // selected suffix text
             selectAll      : 'Select all',     // select all text
             unselectAll    : 'Unselect all',   // unselect all text
             noneSelected   : 'None Selected'   // None selected text
