@@ -28,6 +28,7 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 * Search forms
 * Search results page
 * Property details page
+* Property enquiry/book viewing form
 * Shortcodes
 * Mortgage calculator
 * Stamp duty calculator
