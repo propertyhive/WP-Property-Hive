@@ -68,6 +68,21 @@ class PH_Licenses {
 
 	public function ph_check_add_on_can_be_used( $can, $slug )
 	{
+		// Check add on wasn't active before
+		$pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', array() );
+
+		if ( !empty($pre_pro_add_ons) )
+		{
+			foreach ( $pre_pro_add_ons as $pre_pro_add_on )
+			{
+				if ( isset($pre_pro_add_on['slug']) && $pre_pro_add_on['slug'] == $slug )
+				{
+					// Yes! This add on was being used pre pro so should still be able to be used without license checks
+					return true;
+				}
+			}
+		}
+		
         // Check we have the right kind of license key to operate this add on
 
         $license_type = $this->get_license_type();
