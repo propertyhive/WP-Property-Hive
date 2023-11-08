@@ -8,58 +8,97 @@ Stable tag: 2.0.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Estate agency software for WP. Market properties on your website, manage contacts and applicants, or expand the features through add ons
+Building a property website? Property Hive has everything you need to get started, and so much more. 
 
 == Description ==
 
-Property Hive is the first plugin that aims to bring all of the features you'd normally find in estate agency software into WordPress.
+Hey you. Are you looking to showcase and sell your properties? YOUR website is your most valuable marketing tool and we've got the plugin to get you up and running.
 
-From managing residential and commercial properties, owners and landlords, to tracking applicants, matching and emailing them suitable properties, we want to do it all.
+= Using the Property Hive core plugin you can quickly: =
 
-= Why Property Hive? =
+* Add property search to any existing theme
+* Allow users to filter properties with configurable search forms
+* Display search results
+* Create property details pages 
+* Store and manage your properties in WordPress
+* Access a wide array of shortcodes
 
-There are many estate agency software options available on the market, but here's why we think you'll love Property Hive:
+= Features included in the core plugin: =
 
-**Only use the features your business needs**
+* Store and manage properties
+* Search forms
+* Search results page
+* Property details page
+* Shortcodes
+* Mortgage calculator
+* Stamp duty calculator
+* Rental yield calculator
+* Rental affordability calculator
+* EPC generator
+* QR generator
+* White label
+* Elementor and Divi support
+* Yoast and Rank Math compatibility	
+* Customisable templates
+* Property Hive CRM
 
-By default Property Hive is a property and contact management tool, allowing you to manage your property stock, list properties on your website, record owners details, store applicants requirements and email suitable properties to them.
+= What are the benefits of using the Property Hive plugin? = 
 
-Through use of premium add-ons however, you can choose which features you want to bolt on. The add ons fit seamlessly into the existing plugin, and with each other.
- 
-Want to send your properties to Rightmove, Zoopla and other property portals? There's add-ons for that.
-Want to add Draw-A-Search functionality to your website? There's an add-on for that.
+* **It's flexible** – you can use Property Hive with any standard theme or use our own free theme [Honeycomb](https://wp-property-hive.com/theme-options/honeycomb/)
+* **It's customisable** – you can achieve any layout
+* **It's well supported** – you can trust our plugin
+* **It's extendable** – you can access a host of premium features to enhance your site
 
-Our add-ons are priced individually from just £14.99 meaning you only pay for what you use.
+= Extendable Pro features: =
 
-You can [view all of our add-ons](https://wp-property-hive.com/add-ons/ "Property Hive Add-Ons") on our website.
+* Import properties from the leading CRMs including Alto, Street, Loop, Reapit, 10Ninety, SME Professional, dezrez, Kyero, agentOS, Juvo, Juxpix, Arthur Online, VaultEA, Kato and more
+* Export properties to property portals such as Rightmove, Zoopla, OnTheMarket and many more
+* Map Search
+* Draw-a-search
+* Radial Search
+* Shortlist
+* Saved searches
+* Search results promos
+* Location autocomplete
+* Infinite scroll
+* Send to friend
+* Printable brochures
+* Window cards
+* Digital displays
+* Property portal builder
+* Property Hive CRM tools (calendar, tasks and more)
 
-**Works with any new or existing theme**
+[Update to PRO here](https://wp-property-hive.com/pricing/)
 
-Property Hive isn't a theme. It's a platform allowing you to integrate property search into any website, new or existing. For more details on supported themes [click here](https://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/) or get started with our very own free open-source theme [Honeycomb](https://wp-property-hive.com/property-hive-website-themes/honeycomb//).
+= We're loved by developers because: =
 
-**Integrates with the major software providers and property portals**
+* Property Hive is rich with customisable templates that make even the most bespoke builds possible
+* We've got over 250 WordPress hooks, filters and actions that let you extend Property Hive to match your client's requirements
+* Property Hive integrates with the WordPress REST API
+* You can white label Property Hive and brand it how you like
+* Property Hive is open source meaning you can use GitHub to contribute to the code or raise issues for us or other developers to address
+* You can access our feature roadmap and are welcome to comment on features or 'watch' cards to get notified as they progress 
 
-If you already use software such as Jupix, Vebra Alto, Dezrez, Reapit, ExpertAgent, LetMC and more then it's easy to get your properties imported on an automatic basis at regular intervals so they display on your website. Our [Property Import Add On](https://wp-property-hive.com/addons/property-import/) can have you and running in minutes.
+= Resources and support: =
 
-Likewise, if you send properties to the portals such as Rightmove, Zoopla, OnTheMarket and Gumtree, we have various add ons to allow the exporting of properties to these sites.
+[Support and documentation](https://wp-property-hive.com/support/)
+[Support policy](https://wp-property-hive.com/support/support-policy/)
 
-**Millions of developers**
+= Testimonials: =
 
-Property Hive isn't developed by one person, or a small team. It's built by the world. Property Hive is open-source meaning anyone can contribute, regardless of which country they're in, or how much existing knowledge of the plugin they have already. 
-
-Want to build a new feature? Maybe fix a bug you've found? As long as you have an understanding of PHP and WordPress, or know someone that does, you can make the changes yourself. What's more, your hard work will be received gratefully by everyone else that uses the plugin.
+Don't just take our word for it! [Read our reviews here](https://wordpress.org/support/plugin/propertyhive/reviews/).
 
 == Installation ==
 
 = Minimum Requirements =
 
-* WordPress 3.8 or greater
-* PHP version 5.2.4 or greater
-* MySQL version 5.0 or greater
+* WordPress 5.6 or greater
+* PHP version 7.4 or greater
+* MySQL version 5.7 or greater, OR MariaDB version 10.3 or greater.
 
 = Automatic installation =
 
-Automatic installation is the easiest option as WordPress handles the file transfers itself and you don’t need to leave your web browser. To do an automatic install of Property Hive, log in to your WordPress dashboard, navigate to the Plugins menu and click Add New.
+Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't need to leave your web browser. To do an automatic install of Property Hive, log in to your WordPress dashboard, navigate to the Plugins menu and click Add New.
 
 In the search field type "Property Hive" and click Search Plugins. Once you've found our plugin you can view details about it such as the point release, rating and description. Most importantly of course, you can install it by simply clicking "Install Now".
 
@@ -70,6 +109,54 @@ The manual installation method involves downloading the Property Hive plugin and
 = Updating =
 
 Automatic updates should work like a charm; as always though, ensure you backup your site just in case.
+
+== Frequently Asked Questions ==
+
+= How do I install Property Hive? =
+Click the download button above or from within WordPress navigate to Plugins > Add New and search for 'Property Hive'.
+
+= Does the free core plugin contain everything I need to create a working property website? =
+Yes. It is possible to create a property website out of the box with Property Hive. You can also use our free Honeycomb theme, which compliments the plugin well.
+
+= What kind of properties can I store? =
+Using the Property Hive plugin you can store and manage sales, lettings/rentals and commercial properties. You can also add additional departments such as student lets, new homes, farms and land etc.
+
+= Can I import my properties with Property Hive? =
+Yes. With a [Property Hive Pro](https://wp-property-hive.com/pricing/) subscription you can automatically import properties from all leading CRMs such as Alto, Street, Loop, Reapit, 10Ninety, SME Professional, dezrez, Kyero, agentOS, Juvo, Jupix, Arthur Online, VaultEA, Kato and more.
+
+= Does Property Hive work with other themes? =
+You can use Property Hive with any standard non real estate theme. We also have a free theme of our own, Honeycomb. (https://wp-property-hive.com/theme-options/honeycomb/)
+
+= Does Property Hive work with other plugins? =
+Property Hive is compatible with almost all other plugins. As long as the other plugins you are using don't cause a conflict (for example they also add property search) then there shouldn't be an issue. Contact us if you have questions on this.
+
+= Where are you based? =
+We are based in the UK.
+
+= I list properties that are not in the UK. Can I use this plugin? =
+Yes you can. Property Hive has a range of international options including the option to select which countries you operate in. We also support multiple currencies and store live currency exchange rates to aid with sorting and filtering properties in multiple currencies.
+
+= Is Property Hive compatible with page builders such as Elementor and Divi? =
+Yes, you can use Elementor to build property details and search results pages. You can use Divi to build a property details page. Support for other page builders is coming!
+
+= Do I need to know how to code to use Property Hive? =
+No, you have a few options for styling property pages:
+
+* Use our free Honeycomb theme where everything comes styled by default. Simply add your logo and brand colours.
+* Use any theme and use a page builder such as Elementor to build property pages by dropping in widgets that come with the page builder.
+* With some HTML, CSS and/or PHP knowledge you can go completely bespoke and override the templates.
+
+= Is Property Hive safe and secure? =
+Property Hive has been running since 2015 and since then has undergone multiple security reviews.
+
+All input and output is validated and sanitised and to this date, we have not had one report of a site being compromised as a result of Property Hive.
+
+Any issues surrounding security are taken seriously and addressed as a matter of priority.
+
+= What's the difference between the free core plugin and Property Hive Pro? =
+The free core plugin contains the foundations that you need to create a property website. With the free version you can also access a suite of front and back end tools and fully functioning Property Hive CRM (or use your own).
+
+[Property Hive Pro](https://wp-property-hive.com/pricing/) contains a wider suite of tools that enhance the core plugin. This includes a CRM import tool, portal feeds and much more.
 
 == Screenshots ==
 
