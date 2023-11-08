@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.4
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -178,6 +178,19 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.2 - 2023-11-08 =
+* Added individual Elementor widgets for each line of the address
+* Added hooks so Template Assistant can add option to Elementor Image widget to show flag
+* Added ability to enter applicant email/tel when creating viewing on property
+* Make note save button clearer and more descriptive
+* Rename 'Viewing' tabs in contact account area when someone is a buyer and seller to make it differentiate between them
+* Make the word 'selected' in multiselect plugin translatable
+* Added number of property views to REST API
+* Link to 'Settings > Features' in plugin quick links instead of taking user off to add ons page on our website
+* Take into account pre-pro installed add ons when checking they can be used
+* Updated README contents, FAQs and screenshots
+* Declared compatibility for WordPress 6.4
 
 = 2.0.1 - 2023-10-27 =
 * Corrected issue with enabling PRO features where an error showed about not being able to access filesystem
