@@ -160,20 +160,22 @@ The free core plugin contains the foundations that you need to create a property
 
 == Screenshots ==
 
-1. Once activated, all your property related information is maintained within it's own section
-2. Manage your properties just like you would normal posts and pages
-3. Editing a property record - the 'Summary' tab contains address and owner/landlord information
-4. Editing a property record - the 'Details' tab contains details about the property (bedrooms, price etc)
-5. Editing a property record - The 'Marketing' tab allows you to specify whether the property is on the market, and it's availability
-6. Editing a property record - The 'Descriptions' tab allows you to add features and property descriptions.
-7. Editing a property record - The 'Media' tab is where photos, floorplans, brochures and EPC's are uploaded.
-8. Manage your owners and landlords from the 'Contacts' page.
-9. Editing a contact record - The 'Contact Details' tab is where you store contact information for the contact
-10. Editing a contact record - The 'Relationships' tab contains all of the relationships that you have with this contact (i.e. in the event they're a landlord of two properties)
-11. Record an applicants' requirements. Allows for one or more set of requirements in the case where someone is looking to buy and rent.
-12. View a list of properties that match the applicant's requirements. You can them email these properties to the applicant.
-13. Enquiries made on the site are available from within WordPress. Assign them to a negotiator and mark them as 'Closed' once complete.
-14. The 'Settings' section gives you control over which departments are active, add and edit offices, and edit the custom fields (types, locations etc) that appear within your install
+1. Some examples of sites created using Property Hive
+2. Once activated, all your property related information is maintained within it's own section
+3. Manage your properties just like you would normal posts and pages
+4. Editing a property record - the 'Summary' tab contains address, map co-ordinates and owner/landlord information
+5. Editing a property record - the 'Details' tab contains details about the property (bedrooms, price etc)
+6. Editing a property record - The 'Marketing' tab allows you to specify whether the property is on the market, and it's availability
+7. Editing a property record - The 'Descriptions' tab allows you to add features and property descriptions
+8. Editing a property record - The 'Media' tab is where photos, floorplans, brochures, EPC's and virtual tours are uploaded
+9. Editing a property record - The 'Notes & History' tab logs price and status changes and also allows you to add custom notes
+10. Build unlimited search forms with our drag-and-drag form builder
+11. Quickly activate and deactivate 70+ free and pro features
+12. A wide array of settings allow you to tailer Property Hive to your agency
+13. Customise property types, statuses and more custom fields
+14. Manage your offices. Assigning properties to these offices then ensures enquiries come through to the right place
+15. Specify the countries your operate in for full international support
+16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
 
