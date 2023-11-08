@@ -1,7 +1,7 @@
 === PropertyHive ===
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
-Requires at least: 3.8
+Requires at least: 5.6
 Tested up to: 6.4
 Stable tag: 2.0.1
 License: GPLv3
