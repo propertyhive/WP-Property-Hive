@@ -142,7 +142,7 @@ function get_property_map( $args = array() )
 	{
 		$id_suffix = ( ( isset($args['id']) && $args['id'] != '' ) ? '_' . $args['id'] : '' );
 
-	    echo '<div id="property_map_canvas' . $id_suffix . '" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
+	    echo '<div id="property_map_canvas' . $id_suffix . '" style="background:#EEE; height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
 		
 		if ( get_option('propertyhive_maps_provider') == 'osm' )
 		{
