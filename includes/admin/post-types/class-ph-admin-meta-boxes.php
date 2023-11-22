@@ -218,10 +218,10 @@ class PH_Admin_Meta_Boxes {
                     // Now need to rename any that are higher than $deleting_applicant_profile
                     for ( $j = 0; $j < $num_applicant_profiles; ++$j )
                     {
-                        if ( $j > $deleting_applicant_profile )
+                       if ( $j > $deleting_applicant_profile )
                         {
-                            $this_applicant_profile = get_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j );
-                            update_post_meta( (int)$_GET['post'], '_applicant_profile_' . ($j - 1), $this_applicant_profile[0] );
+                            $this_applicant_profile = get_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j, true );
+                            update_post_meta( (int)$_GET['post'], '_applicant_profile_' . ($j - 1), $this_applicant_profile );
                             delete_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j );
                         }
                     }
