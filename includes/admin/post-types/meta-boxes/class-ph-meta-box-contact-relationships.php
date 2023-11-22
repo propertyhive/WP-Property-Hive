@@ -1050,6 +1050,7 @@ class PH_Meta_Box_Contact_Relationships {
         }
 
         $hot_applicant = ''; // use this to set a global meta key on the contact so applicants can be filtered by hot
+        $applicant_departments = array();
         if ( $num_applicant_profiles > 0 )
         {
             for ( $i = 0; $i < $num_applicant_profiles; ++$i )
@@ -1188,6 +1189,8 @@ class PH_Meta_Box_Contact_Relationships {
                     $hot_applicant = 'yes';
                 }
 
+                $applicant_departments[] = $applicant_profile['department'];
+
                 update_post_meta( $post_id, '_applicant_profile_' . $i, $applicant_profile );
 
                 do_action( 'propertyhive_save_contact_applicant_requirements', $post_id, $i );
@@ -1195,6 +1198,13 @@ class PH_Meta_Box_Contact_Relationships {
         }
 
         update_post_meta( $post_id, '_hot_applicant', $hot_applicant );
+
+        if ( !empty($applicant_departments) )
+        {
+            $applicant_departments = array_filter($applicant_departments);
+            $applicant_departments = array_unique($applicant_departments);
+        }
+        update_post_meta( $post_id, '_applicant_departments', $applicant_departments );
 
         $third_party_categories = array();
         if ( isset($_POST['_third_party_category']) && is_array($_POST['_third_party_category']) && !empty($_POST['_third_party_category']) )
