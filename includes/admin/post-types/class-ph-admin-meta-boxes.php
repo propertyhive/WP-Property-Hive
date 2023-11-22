@@ -243,6 +243,40 @@ class PH_Admin_Meta_Boxes {
 
                     update_post_meta( (int)$_GET['post'], '_applicant_profiles', $num_applicant_profiles - 1 );
 
+                    // update applicant departments
+                    $hot_applicant = '';
+                    $applicant_departments = array();
+
+                    $num_applicant_profiles = get_post_meta( (int)$_GET['post'], '_applicant_profiles', TRUE );
+                    if ( $num_applicant_profiles == '' )
+                    {
+                        $num_applicant_profiles = 0;
+                    }
+
+                    for ( $j = 0; $j < $num_applicant_profiles; ++$j )
+                    {
+                        $applicant_profile = get_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j, true );
+
+                        if ( isset($applicant_profile['department']) && !empty($applicant_profile['department']) )
+                        {
+                            $applicant_departments[] = $applicant_profile['department'];
+                        }
+
+                        if ( isset($applicant_profile['grading']) && ph_clean($applicant_profile['grading']) == 'yes' )
+                        {
+                            $hot_applicant = 'yes';
+                        }
+                    }
+
+                    update_post_meta( (int)$_GET['post'], '_hot_applicant', $hot_applicant );
+
+                    if ( !empty($applicant_departments) )
+                    {
+                        $applicant_departments = array_filter($applicant_departments);
+                        $applicant_departments = array_unique($applicant_departments);
+                    }
+                    update_post_meta( (int)$_GET['post'], '_applicant_departments', $applicant_departments );
+
                     // Do redirect
                     wp_redirect( admin_url( 'post.php?post=' . (int)$_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
                     exit();
