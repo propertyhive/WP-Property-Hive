@@ -176,6 +176,8 @@ class PH_Meta_Box_Viewing_Applicant {
                 }
             }
         ?>
+        var viewing_search_applicants_timeout;
+        var viewing_search_applicants_xhr = jQuery.ajax({});
 
         jQuery(document).ready(function($)
         {
@@ -211,46 +213,14 @@ class PH_Meta_Box_Viewing_Applicant {
                 }
             });
 
+            $('#viewing_applicant_search').keydown(function()
+            {
+                clearTimeout(viewing_search_applicants_timeout);
+            });
+
             $('#viewing_applicant_search').keyup(function()
             {
-                var keyword = $(this).val();
-
-                if (keyword.length == 0)
-                {
-                    $('#viewing_search_applicant_results').html('');
-                    $('#viewing_search_applicant_results').hide();
-                    return false;
-                }
-
-                if (keyword.length < 3)
-                {
-                    $('#viewing_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
-                    $('#viewing_search_applicant_results').show();
-                    return false;
-                }
-
-                var data = {
-                    action:         'propertyhive_search_contacts',
-                    keyword:        keyword,
-                    security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
-                    exclude_ids:    jQuery('#_applicant_contact_ids').val(),
-                };
-                $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
-                {
-                    if (response == '' || response.length == 0)
-                    {
-                        $('#viewing_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
-                    }
-                    else
-                    {
-                        $('#viewing_search_applicant_results').html('<ul style="margin:0; padding:0;"></ul>');
-                        for ( var i in response )
-                        {
-                            $('#viewing_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-applicant-name="' + response[i].post_title + '"><strong>' + response[i].post_title + '</strong><br><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
-                        }
-                    }
-                    $('#viewing_search_applicant_results').show();
-                });
+                viewing_search_applicants_timeout = setTimeout(function() { viewing_perform_applicant_search(); }, 400);
             });
 
             $('body').on('click', '#viewing_search_applicant_results ul li a', function(e)
@@ -284,6 +254,52 @@ class PH_Meta_Box_Viewing_Applicant {
                 viewing_update_selected_applicants();
             });
         });
+
+        function viewing_perform_applicant_search()
+        {
+            var keyword = jQuery('#viewing_applicant_search').val();
+
+            if (keyword.length == 0)
+            {
+                jQuery('#viewing_search_applicant_results').html('');
+                jQuery('#viewing_search_applicant_results').hide();
+                return false;
+            }
+
+            if (keyword.length < 3)
+            {
+                jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+                jQuery('#viewing_search_applicant_results').show();
+                return false;
+            }
+
+            jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;">Loading...</div>');
+            jQuery('#viewing_search_applicant_results').show();
+
+            var data = {
+                action:         'propertyhive_search_contacts',
+                keyword:        keyword,
+                security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+                exclude_ids:    jQuery('#_applicant_contact_ids').val(),
+            };
+            viewing_search_properties_xhr.abort(); // cancel previous request
+            viewing_search_properties_xhr = jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            {
+                if (response == '' || response.length == 0)
+                {
+                    jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+                }
+                else
+                {
+                    jQuery('#viewing_search_applicant_results').html('<ul style="margin:0; padding:0;"></ul>');
+                    for ( var i in response )
+                    {
+                        jQuery('#viewing_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-applicant-name="' + response[i].post_title + '"><strong>' + response[i].post_title + '</strong><br><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
+                    }
+                }
+                jQuery('#viewing_search_applicant_results').show();
+            });
+        }
 
         function viewing_update_selected_applicants()
         {

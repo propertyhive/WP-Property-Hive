@@ -96,6 +96,7 @@ var viewing_selected_properties = [];
 viewing_selected_properties.push({ id: <?php echo (int)$_GET['property_id']; ?>, post_title: '<?php echo addslashes($property->get_formatted_full_address()); ?>' });
 <?php } ?>
 var viewing_search_properties_timeout;
+var viewing_search_properties_xhr = jQuery.ajax({});
 
 jQuery(document).ready(function($)
 {
@@ -111,9 +112,13 @@ jQuery(document).ready(function($)
         }
     });
 
-    $('#viewing_property_search').keyup(function()
+    $('#viewing_property_search').keydown(function()
     {
         clearTimeout(viewing_search_properties_timeout);
+    });
+
+    $('#viewing_property_search').keyup(function()
+    {
         viewing_search_properties_timeout = setTimeout(function() { viewing_perform_property_search(); }, 400);
     });
 
@@ -168,12 +173,16 @@ function viewing_perform_property_search()
         return false;
     }
 
+    jQuery('#viewing_search_property_results').html('<div style="padding:10px;">Loading...</div>');
+    jQuery('#viewing_search_property_results').show();
+
     var data = {
         action:         'propertyhive_search_properties',
         keyword:        keyword,
         security:       '<?php echo wp_create_nonce( 'search-properties' ); ?>',
     };
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    viewing_search_properties_xhr.abort(); // cancel previous request
+    viewing_search_properties_xhr = jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
     {
         if (response == '' || response.length == 0)
         {
