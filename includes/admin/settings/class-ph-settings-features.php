@@ -114,8 +114,14 @@ class PH_Settings_Features extends PH_Settings_Page {
                 $pro = true;
             }
 
+            $can_use = true;
+            if ( $pro && $feature_status == 'active' && apply_filters( 'propertyhive_add_on_can_be_used', true, $slug ) === FALSE )
+            {
+                $can_use = false;
+            }
+
             echo '">
-                <div class="inner">
+                <div class="inner"' . ( !$can_use ? ' style="border:1px solid #900"' : '' ) . '>
                     <h3>' . ( ( isset($feature['dashicon']) && !empty($feature['dashicon']) ) ? '<span class="dashicons ' . esc_attr($feature['dashicon']) . '"></span> ' : '' ) . esc_html($feature['name']) . '</h3>' . 
                     ( $pro ? '<span class="pro"><span><a href="https://wp-property-hive.com/pricing" target="_blank">PRO</a></span></span>' : '' ) . 
                     ( !$pro ? '<span class="free"><span>FREE</span></span>' : '' ) . '
@@ -158,6 +164,11 @@ class PH_Settings_Features extends PH_Settings_Page {
                 </label>';
 
                 echo '<div class="loading"><img src="' . PH()->plugin_url() . '/assets/images/admin/loading.gif" alt=""></div>';
+
+                if ( !$can_use )
+                {
+                    echo '<div style="color:#900; font-size:0.9; margin-top:10px;">Disabled due to <a href="' . admin_url('admin.php?page=ph-settings&tab=licensekey') . '" style="color:inherit">invalid license</a></div>';
+                }
 
                 echo '</div>';
             echo '</li>';
