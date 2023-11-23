@@ -97,32 +97,26 @@ class PH_Licenses {
                     return false;
                 }
 
-                // Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
-            }
-        }
-        else
-        {
-            // Not a pro user. Check it's in the list of installed add ons
-            $was_installed_pre_pro = false;
+                // Valid license. Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
+                $feature = get_ph_pro_feature( $slug );
+                $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
 
-            $pre_installed_addons = get_option( 'propertyhive_pre_pro_add_ons', '' );
-            if ( !is_array($pre_installed_addons) ) { $pre_installed_addons = array(); }
-
-            if ( !empty($pre_installed_addons) )
-            {
-                foreach ( $pre_installed_addons as $pre_installed_addon )
+                if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
                 {
-                    if ( isset( $pre_installed_addon['slug'] ) && $pre_installed_addon['slug'] == $slug )
+                    if ( 
+                        isset($feature['plans']) && 
+                        isset($product_id_and_package['package']) &&
+                        in_array($product_id_and_package['package'], $feature['plans'])
+                    )
                     {
-                        $was_installed_pre_pro = true;
+                        
+                    }
+                    else
+                    {
+                    	// show warning
+                    	return false;
                     }
                 }
-            }
-
-            if ( !$was_installed_pre_pro )
-            {
-                // show warning
-                return false;
             }
         }
 
@@ -151,10 +145,22 @@ class PH_Licenses {
 			{ 
 				if ( $this->is_valid_pro_license_key() )
 				{
-					return true;
-				}
+					// Valid license. Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
+	                $feature = get_ph_pro_feature( $slug );
+	                $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
 
-				// Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
+	                if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
+	                {
+	                    if ( 
+	                        isset($feature['plans']) && 
+	                        isset($product_id_and_package['package']) &&
+	                        in_array($product_id_and_package['package'], $feature['plans'])
+	                    )
+	                    {
+	                        return true;
+	                    }
+	                }
+				}
 			}
 		}
 
