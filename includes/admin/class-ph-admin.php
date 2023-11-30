@@ -815,6 +815,8 @@ class PH_Admin {
                 die( 'Security check' );
             }
 
+            $current_user = wp_get_current_user();
+
             // get the preview email content
             if ( isset($_GET['property_id']) )
             {
@@ -835,6 +837,8 @@ class PH_Admin {
             }
             $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
 
+            $office_counts = array();
+
             if ( strpos($body, '[properties]') !== FALSE )
             {
                 ob_start();
@@ -844,11 +848,45 @@ class PH_Admin {
                     foreach ( $email_property_ids as $email_property_id )
                     {
                         $property = new PH_Property((int)$email_property_id);
+
+                        if ( $property->office_id != '' && $property->office_id != 0 )
+                        {
+                            if ( !isset($office_counts[$property->office_id]) ) { $office_counts[$property->office_id] = 0; }
+                            ++$office_counts[$property->office_id];
+                        }
+
                         ph_get_template( 'emails/applicant-match-property.php', array( 'property' => $property ) );
                     }
                 }
                 $body = str_replace("[properties]", ob_get_clean(), $body);
             }
+
+            $office_name = '';
+            $office_email_address = '';
+
+            $office_id = get_user_meta($current_user->ID, 'office_id', TRUE);
+            if ($office_id == '')
+            {
+                // No office against user. Use email address of office with most properties
+                if ( !empty($office_counts) )
+                {
+                    arsort($office_counts);
+                    reset($office_counts);
+                    $office_id = key($office_counts);
+                }
+            }
+
+            if ( !empty($office_id) )
+            {
+                $office_name = get_the_title($office_id);
+                $office_email_address = get_post_meta( $office_id, '_office_email_address_sales', TRUE );
+            }
+
+            $body = str_replace("[office_name]", $office_name, $body);
+            $body = str_replace("[office_email_address]", $office_email_address, $body);
+
+            $body = str_replace("[negotiator_name]", $current_user->display_name, $body);
+            $body = str_replace("[negotiator_email_address]", $current_user->user_email, $body);
 
             // wrap the content with the email template and then add styles
             $message = apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $body ) ) );
