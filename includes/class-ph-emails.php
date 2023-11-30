@@ -309,13 +309,13 @@ class PH_Emails {
 			return false;
 		}
 
-		// Get all of the office email addresses and store them in an array to save having to query them for every email
-		// Get all contacts that have a type of applicant
+		// Get all of the offices and store them in an array to save having to query them for every email
 		$args = array(
 			'post_type' => 'office',
 			'nopaging' => true
 		);
 
+		$office_names = array();
 		$office_email_addresses = array();
 		$office_query = new WP_Query( $args );
 
@@ -325,6 +325,8 @@ class PH_Emails {
 			{
 				$office_query->the_post();
 
+				$office_names[get_the_ID()] = get_the_title( get_the_ID() );
+
 				$office_email_addresses['residential-sales'][get_the_ID()] = get_post_meta( get_the_ID(), '_office_email_address_sales', TRUE );
 				$office_email_addresses['residential-lettings'][get_the_ID()] = get_post_meta( get_the_ID(), '_office_email_address_lettings', TRUE );
 				$office_email_addresses['commercial'][get_the_ID()] = get_post_meta( get_the_ID(), '_office_email_address_commercial', TRUE );
@@ -332,6 +334,29 @@ class PH_Emails {
 		}
 
 		wp_reset_postdata();
+
+		// Get all of the negotiators and store them in an array to save having to query them for every email
+		$negotiator_names = array();
+		$negotiator_email_addresses = array();
+
+        $args = array(
+            'number' => 9999,
+            'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') ),
+            'fields' => array( 'ID', 'display_name', 'user_email' )
+        );
+        $user_query = new WP_User_Query( $args );
+
+        $negotiators = array();
+
+        if ( ! empty( $user_query->results ) ) 
+        {
+            foreach ( $user_query->results as $user ) 
+            {
+                $negotiator_names[$user->ID] = $user->display_name;
+
+				$negotiator_email_addresses[$user->ID] = $user->user_email;
+            }
+        }
 
 		include_once( dirname(__FILE__) . '/admin/class-ph-admin-matching-properties.php' );
 		$ph_admin_matching_properties = new PH_Admin_Matching_Properties();
@@ -470,11 +495,13 @@ class PH_Emails {
 						        $body = str_replace("[contact_dear]", $contact->dear(), $body);
 						        $body = str_replace("[property_count]", count($new_matching_properties) . ' propert' . ( ( count($new_matching_properties) != 1 ) ? 'ies' : 'y' ), $body);
 
+						        $office_counts = array();
+						        $negotiator_counts = array();
+
 						        if ( strpos($body, '[properties]') !== FALSE )
 						        {
 						            ob_start();
 
-						            $office_counts = array();
 						            if ( !empty($new_matching_properties) )
 						            {
 						                foreach ( $new_matching_properties as $email_property_id )
@@ -487,6 +514,12 @@ class PH_Emails {
 						                    	++$office_counts[$property->office_id];
 						                    }
 
+						                    if ( $property->negotiator_id != '' && $property->negotiator_id != 0 )
+						                    {
+						                    	if ( !isset($negotiator_counts[$property->negotiator_id]) ) { $negotiator_counts[$property->negotiator_id] = 0; }
+						                    	++$negotiator_counts[$property->negotiator_id];
+						                    }
+
 						                    ph_get_template( 'emails/applicant-match-property.php', array( 'property' => $property ) );
 						                }
 						            }
@@ -494,12 +527,14 @@ class PH_Emails {
 						        }
 
 						        // Get email address of office with most properties
+						        $highest_office_name = '';
 						        $highest_office_email_address = '';
 						        if ( !empty($office_counts) )
 						        {
 							        arsort($office_counts);
 							        reset($office_counts);
 									$highest_office_id = key($office_counts);
+									$highest_office_name = ( isset($office_names[$highest_office_id]) ? $office_names[$highest_office_id] : '' );
 									$highest_office_email_address = ( isset($office_email_addresses[$applicant_profile['department']][$highest_office_id]) ? $office_email_addresses[$applicant_profile['department']][$highest_office_id] : '' );
 								}
 								if ( $highest_office_email_address == '' )
@@ -507,6 +542,23 @@ class PH_Emails {
 									// fallback to admin email address
 									$highest_office_email_address = get_option('admin_email');
 								}
+
+								$body = str_replace("[office_name]", $highest_office_name, $body);
+								$body = str_replace("[office_email_address]", $highest_office_email_address, $body);
+
+								$highest_negotiator_name = '';
+								$highest_negotiator_email_address = '';
+						        if ( !empty($negotiator_counts) )
+						        {
+							        arsort($negotiator_counts);
+							        reset($negotiator_counts);
+									$highest_negotiator_id = key($negotiator_counts);
+									$highest_negotiator_name = ( isset($negotiator_names[$highest_negotiator_id]) ? $negotiator_names[$highest_negotiator_id] : '' );
+									$highest_negotiator_email_address = ( isset($negotiator_email_addresses[$highest_negotiator_id]) ? $negotiator_email_addresses[$highest_negotiator_id] : '' );
+								}
+
+								$body = str_replace("[negotiator_name]", $highest_negotiator_name, $body);
+								$body = str_replace("[negotiator_email_address]", $highest_negotiator_email_address, $body);
 
 								$highest_office_email_address = apply_filters( 'propertyhive_auto_match_from_email_address', $highest_office_email_address );
 

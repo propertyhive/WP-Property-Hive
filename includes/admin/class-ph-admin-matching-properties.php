@@ -676,6 +676,8 @@ class PH_Admin_Matching_Properties {
 
         $current_user = wp_get_current_user();
 
+        $applicant_profile = get_post_meta( $contact_id, '_applicant_profile_' . $applicant_profile, TRUE );
+
         $contact = new PH_Contact($contact_id);
         if ( $to_email_address == '' )
         {
@@ -688,6 +690,8 @@ class PH_Admin_Matching_Properties {
         $body = str_replace("[contact_dear]", $contact->dear(), $body);
         $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
 
+        $office_counts = array();
+
         if ( strpos($body, '[properties]') !== FALSE )
         {
             ob_start();
@@ -697,11 +701,46 @@ class PH_Admin_Matching_Properties {
                 {
 
                     $property = new PH_Property((int)$email_property_id);
+
+                    if ( $property->office_id != '' && $property->office_id != 0 )
+                    {
+                        if ( !isset($office_counts[$property->office_id]) ) { $office_counts[$property->office_id] = 0; }
+                        ++$office_counts[$property->office_id];
+                    }
+
                     ph_get_template( 'emails/applicant-match-property.php', array( 'property' => $property ) );
                 }
             }
             $body = str_replace("[properties]", ob_get_clean(), $body);
         }
+
+        // Get email address of office with most properties
+        $office_name = '';
+        $office_email_address = '';
+
+        $office_id = get_user_meta($current_user->ID, 'office_id', TRUE);
+        if ($office_id == '')
+        {
+            // No office against user. Use email address of office with most properties
+            if ( !empty($office_counts) )
+            {
+                arsort($office_counts);
+                reset($office_counts);
+                $office_id = key($office_counts);
+            }
+        }
+
+        if ( !empty($office_id) )
+        {
+            $office_name = get_the_title($office_id);
+            $office_email_address = get_post_meta( $office_id, '_office_email_address_' . str_replace("residential-", "", $applicant_profile['department']), TRUE );
+        }
+
+        $body = str_replace("[office_name]", $office_name, $body);
+        $body = str_replace("[office_email_address]", $office_email_address, $body);
+
+        $body = str_replace("[negotiator_name]", $current_user->display_name, $body);
+        $body = str_replace("[negotiator_email_address]", $current_user->user_email, $body);
 
         // Insert into email log
         $insert = $wpdb->insert( 
