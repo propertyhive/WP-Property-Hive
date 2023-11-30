@@ -2,8 +2,8 @@
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.4
-Stable tag: 2.0.2
+Tested up to: 6.4.1
+Stable tag: 2.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -178,6 +178,16 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.3 - 2023-11-30 =
+* Added support for Bricks Builder page builder
+* Improved license validation to ensure a feature can be used
+* Added support for new negotiator and office tags in match email body template: [negotiator_name], [negotiator_email_address], [office_name] and [office_email_address]
+* Improved property/applicant AJAX searches when adding a viewing. Show 'Loading...' when a search is being performed, and abort any previous requests as sometimes the could complete in a different order than they were made, thus giving odd results
+* Updated storing of 'hot' and applicant department when saving and deleting relationships. Storing applicant department(s) against the top-level contact will allow us to do improved filtering and speed up property matches
+* Corrected issue with deleting applicant relationships whem multiple existed
+* Corrected default Elementor Gallery widget layout
+* Declared compatibility for WordPress 6.4.1
 
 = 2.0.2 - 2023-11-08 =
 * Added individual Elementor widgets for each line of the address
