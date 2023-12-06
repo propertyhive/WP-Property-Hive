@@ -577,7 +577,7 @@ class PH_Admin_Matching_Applicants {
 
         $current_user = wp_get_current_user();
 
-        $applicant_profile = get_post_meta( $contact_id, '_applicant_profile_' . $applicant_profile, TRUE );
+        $applicant_profile_details = get_post_meta( $contact_id, '_applicant_profile_' . $applicant_profile, TRUE );
 
         $contact = new PH_Contact($contact_id);
         if ( $to_email_address == '' )
@@ -633,7 +633,7 @@ class PH_Admin_Matching_Applicants {
         if ( !empty($office_id) )
         {
             $office_name = get_the_title($office_id);
-            $office_email_address = get_post_meta( $office_id, '_office_email_address_' . str_replace("residential-", "", $applicant_profile['department']), TRUE );
+            $office_email_address = get_post_meta( $office_id, '_office_email_address_' . str_replace("residential-", "", $applicant_profile_details['department']), TRUE );
         }
 
         $body = str_replace("[office_name]", $office_name, $body);
