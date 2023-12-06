@@ -2,8 +2,8 @@
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.4.1
-Stable tag: 2.0.3
+Tested up to: 6.4.2
+Stable tag: 2.0.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -178,6 +178,14 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.4 - 2023-12-06 =
+* Cater for Divi templates where set to show for properties but no body. In this case still load Property Hive templates
+* New save_post action to ensure 'floor area to' is always set for commercial properties if it's empty but 'floor area from' has a value
+* Tweak to how filtering commercial properties by floor area on frontend works
+* When filters are in place to stop status and on market changes being saved as comments/notes, ensure the date is still recorded as they are still used for ordering and matching
+* Corrected issue with auto-matches sending multiple times due to variable being overwritten
+* Declared compatibility for WordPress 6.4.2
 
 = 2.0.3 - 2023-11-30 =
 * Added support for Bricks Builder page builder
