@@ -75,6 +75,11 @@ class PH_Template_Loader {
 								'compare' => '=',
 							),
 							array(
+								'key'     => '_et_body_layout_id',
+								'value'   => '0',
+								'compare' => '!=',
+							),
+							array(
 								'key'     => "_et_use_on",
 								'value'   => 'singular:post_type:property:all',
 								'compare' => '=',
