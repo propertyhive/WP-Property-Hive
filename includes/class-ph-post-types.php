@@ -35,6 +35,8 @@ class PH_Post_types {
 
         add_action( 'save_post', array( __CLASS__, 'create_concatenated_indexable_meta' ), 99, 3 );
 
+        add_action( 'save_post', array( __CLASS__, 'ensure_property_floor_area_to_set' ), 99, 3 );
+
         add_action( 'save_post', array( __CLASS__, 'store_related_viewings' ), 99, 3 );
         add_action( 'updated_post_meta', array( __CLASS__, 'store_related_viewings_meta_change' ), 10, 4 );
 
@@ -872,6 +874,35 @@ class PH_Post_types {
                 delete_post_meta( $post->ID, '_user_id' );
 
                 wp_reset_postdata();
+            }
+        }
+    }
+
+    public static function ensure_property_floor_area_to_set( $post_id, $post, $update )
+    {
+        // $post_id and $post are required
+        if ( empty( $post_id ) || empty( $post ) ) {
+            return;
+        }
+
+        // Dont' save meta boxes for revisions or autosaves
+        if ( defined( 'DOING_AUTOSAVE' ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
+            return;
+        }
+
+        if ( $post->post_type !== 'property' ) {
+            return;
+        }
+
+        $property = new PH_Property( $post_id );
+
+
+        if ( $property->department == 'commercial' || ph_get_custom_department_based_on( $property->department ) == 'commercial' )
+        {
+            if ( ($property->floor_area_to_sqft == '' || $property->floor_area_to_sqft == '0') && ( $property->floor_area_from_sqft != '' && $property->floor_area_from_sqft != '0' ) )
+            {
+                update_post_meta( $post_id, '_floor_area_to', $property->floor_area_from );
+                update_post_meta( $post_id, '_floor_area_to_sqft', $property->floor_area_from_sqft);
             }
         }
     }
