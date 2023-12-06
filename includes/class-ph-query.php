@@ -1654,12 +1654,12 @@ class PH_Query {
 			}
 
             $meta_query = array(
-                'key'     => '_floor_area_from_sqft',
+        		'key'     => '_floor_area_to_sqft',
                 'value'   => $value,
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
-            );
-        }
+        	);
+		}
         
         return $meta_query;
     }
@@ -1691,11 +1691,11 @@ class PH_Query {
 			}
 
             $meta_query = array(
-                'key'     => '_floor_area_to_sqft',
+        		'key'     => '_floor_area_from_sqft',
                 'value'   => $value,
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
-            );
+        	);
         }
         
         return $meta_query;
