@@ -68,7 +68,7 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 * Property portal builder
 * Property Hive CRM tools (calendar, tasks and more)
 
-[Update to PRO here](https://wp-property-hive.com/pricing/)
+[Update to PRO here](https://wp-property-hive.com/pricing/?src=wordpress&link=a)
 
 = We're loved by developers because: =
 
@@ -122,7 +122,7 @@ Yes. It is possible to create a property website out of the box with Property Hi
 Using the Property Hive plugin you can store and manage sales, lettings/rentals and commercial properties. You can also add additional departments such as student lets, new homes, farms and land etc.
 
 = Can I import my properties with Property Hive? =
-Yes. With a [Property Hive Pro](https://wp-property-hive.com/pricing/) subscription you can automatically import properties from all leading CRMs such as Alto, Street, Loop, Reapit, 10Ninety, SME Professional, dezrez, Kyero, agentOS, Juvo, Jupix, Arthur Online, VaultEA, Kato and more.
+Yes. With a [Property Hive Pro](https://wp-property-hive.com/pricing/?src=wordpress&link=b) subscription you can automatically import properties from all leading CRMs such as Alto, Street, Loop, Reapit, 10Ninety, SME Professional, dezrez, Kyero, agentOS, Juvo, Jupix, Arthur Online, VaultEA, Kato and more.
 
 = Does Property Hive work with other themes? =
 You can use Property Hive with any standard non real estate theme. We also have a free theme of our own, Honeycomb. (https://wp-property-hive.com/theme-options/honeycomb/)
@@ -156,7 +156,7 @@ Any issues surrounding security are taken seriously and addressed as a matter of
 = What's the difference between the free core plugin and Property Hive Pro? =
 The free core plugin contains the foundations that you need to create a property website. With the free version you can also access a suite of front and back end tools and fully functioning Property Hive CRM (or use your own).
 
-[Property Hive Pro](https://wp-property-hive.com/pricing/) contains a wider suite of tools that enhance the core plugin. This includes a CRM import tool, portal feeds and much more.
+[Property Hive Pro](https://wp-property-hive.com/pricing/?src=wordpress&link=c) contains a wider suite of tools that enhance the core plugin. This includes a CRM import tool, portal feeds and much more.
 
 == Screenshots ==
 
