@@ -246,6 +246,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'JM' => array(
+				'name' => 'Jamaica',
+				'currency_code' => 'JMD',
+				'currency_symbol' => '$',
+				'currency_prefix' => true
+			),
 			'JP' => array(
 				'name' => 'Japan',
 				'currency_code' => 'JPY',
