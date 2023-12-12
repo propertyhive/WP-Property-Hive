@@ -422,9 +422,9 @@ class PH_Meta_Box_Property_Owner {
     public static function save( $post_id, $post ) {
         global $wpdb;
 
-        $contact_post_ids = explode( "|", ph_clean($_POST['_owner_contact_id']) );
+        $contact_post_ids = isset($_POST['_owner_contact_id']) ? explode( "|", ph_clean($_POST['_owner_contact_id']) ) : array();
         
-        if ($_POST['_owner_contact_add_new'] == '1')
+        if ( isset($_POST['_owner_contact_add_new']) && $_POST['_owner_contact_add_new'] == '1' )
         {
             if (
                 $_POST['_owner_name'] != '' ||
