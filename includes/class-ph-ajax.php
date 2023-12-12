@@ -588,7 +588,7 @@ class PH_AJAX {
 
         $form_controls_2 = ph_get_applicant_requirements_form_fields();
     
-        $form_controls_2 = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls_2 );
+        $form_controls_2 = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls_2, false );
         
         $form_controls = array_merge( $form_controls, $form_controls_2 );
 
@@ -1141,9 +1141,13 @@ class PH_AJAX {
             die();
         }
 
+        $contact = new PH_Contact( '', $user_id );
+
+        $contact_post_id = $contact->id;
+
         $form_controls = ph_get_applicant_requirements_form_fields();
     
-        $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls );
+        $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls, get_post_meta( $contact_post_id, '_applicant_profile_' . ( isset($_POST['profile_id']) && $_POST['profile_id'] != '' ? (int)$_POST['profile_id'] : '0' ), true ) );
 
         foreach ( $form_controls as $key => $control )
         {
@@ -1167,10 +1171,6 @@ class PH_AJAX {
         }
         else
         {
-            $contact = new PH_Contact( '', $user_id );
-
-            $contact_post_id = $contact->id;
-
             $applicant_profile = array();
             $applicant_profile['department'] = ph_clean($_POST['department']);
 

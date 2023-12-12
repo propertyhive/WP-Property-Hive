@@ -1777,7 +1777,7 @@ class PH_Shortcodes {
 
     	$form_controls_2 = ph_get_applicant_requirements_form_fields();
 
-    	$form_controls_2 = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls_2 );
+    	$form_controls_2 = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls_2, false );
 
     	$form_controls = array_merge( $form_controls, $form_controls_2 );
 
