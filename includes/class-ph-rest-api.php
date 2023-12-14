@@ -108,6 +108,7 @@ class PH_Rest_Api {
 	{
 		$field_array = array(
 			'department',
+			'reference_number',
 			'address_street',
 			'address_two',
 			'address_three',
