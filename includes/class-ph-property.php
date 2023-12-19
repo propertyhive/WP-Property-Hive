@@ -180,7 +180,7 @@ class PH_Property {
         $this->id                  = $result->ID;
         $this->post_title          = $result->post_title;
         $this->post_status         = $result->post_status;
-        $this->post_excerpt        = $result->post_excerpt;
+        $this->post_excerpt        = apply_filters( 'propertyhive_property_post_excerpt', $result->post_excerpt );
     }
     
     /**
@@ -1140,7 +1140,7 @@ class PH_Property {
             }
         }
         
-        return $features;
+        return apply_filters( 'propertyhive_property_features', $features );
     }
     
     /**
