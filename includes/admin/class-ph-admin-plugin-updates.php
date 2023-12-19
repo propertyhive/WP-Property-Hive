@@ -82,11 +82,18 @@ class PH_Plugin_Updates {
 				if ( false === ( $add_ons = get_transient( 'propertyhive_features' ) ) || isset($_GET['ph_force_get_features']) ) 
 			    {
 			        // It wasn't there, so regenerate the data and save the transient
-			        $add_ons = @file_get_contents('https://wp-property-hive.com/add-ons-json.php');
+			        $response = wp_remote_get(
+			            'https://wp-property-hive.com/add-ons-json.php',
+			            array(
+			                'timeout' => 10
+			            )
+			        );
 
-			        if ( $add_ons !== FALSE && $add_ons !== '' )
+			        if ( !is_wp_error( $response ) && is_array( $response ) )
 			        {
-			            $add_ons = json_decode($add_ons, TRUE);
+			            $body = $response['body']; // use the content
+
+			            $add_ons = json_decode($body, TRUE);
 			            
 			            if ( $add_ons !== FALSE && is_array($add_ons) && !empty($add_ons) )
 			            {
