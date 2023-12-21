@@ -77,6 +77,55 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
+			'form_wrapper_style_section',
+			[
+				'label' => __( 'Form Wrapper', 'propertyhive' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'form_wrapper_background_color',
+			[
+				'label' => __( 'Background Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'scheme' => [
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form' => 'background: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'form_wrapper_padding',
+			[
+				'label' => __( 'Padding', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'form_wrapper_margin',
+			[
+				'label' => __( 'Margin', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
 			'label_style_section',
 			[
 				'label' => __( 'Labels', 'propertyhive' ),
@@ -153,6 +202,82 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
+			'input_style_section',
+			[
+				'label' => __( 'Inputs', 'propertyhive' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'input_typography',
+				'label' => __( 'Input Typography', 'propertyhive' ),
+				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'selector' => '{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']',
+			]
+		);
+
+		$this->add_control(
+			'input_color',
+			[
+				'label' => __( 'Input Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'scheme' => [
+					'type' => \Elementor\Core\Schemes\Color::get_type(),
+					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'input_width',
+			[
+				'label' => esc_html__( 'Input Width', 'textdomain' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => '',
+				'options' => [
+					'' => esc_html__( 'Default', 'propertyhive' ),
+					'block' => esc_html__( 'Full Width (100%)', 'propertyhive' ),
+					'inline' => esc_html__( 'Inline (auto)', 'propertyhive' ),
+				],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']' => 'display: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'input_padding',
+			[
+				'label' => __( 'Input Padding', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'input_margin',
+			[
+				'label' => __( 'Input Margin', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px' ],
+				'selectors' => [
+					'{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
 			'button_style_section',
 			[
 				'label' => __( 'Search Button', 'propertyhive' ),
@@ -219,11 +344,42 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'responsive_style_section',
+			[
+				'label' => __( 'Responsive', 'propertyhive' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'stack_controls_px',
+			[
+				'type' => \Elementor\Controls_Manager::NUMBER,
+				'label' => esc_html__( 'Stack controls at px', 'propertyhive' ),
+				//'placeholder' => esc_html__( 'e.g. default', 'propertyhive' ),
+				'default' => '',
+			]
+		);
+
+		$this->end_controls_section();
 	}
 
 	protected function render() {
 
 		$settings = $this->get_settings_for_display();
+
+		if ( isset($settings['stack_controls_px']) && !empty($settings['stack_controls_px']) )
+		{
+			echo '<style type="text/css">
+				@media(max-width:' . $settings['stack_controls_px'] . 'px) {
+					.property-search-form { display:block }
+					.property-search-form .control { display:block; margin-bottom:8px; }
+					.property-search-form input[type=\'submit\'] { width:100%; }
+				}
+			</style>';
+		}
 
 		echo do_shortcode('[property_search_form id="' . ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) . '"' . ( ( isset($settings['default_department']) && !empty($settings['default_department']) ) ? ' default_department="' . $settings['default_department'] . '"' : '' ) . ']');
 	}
