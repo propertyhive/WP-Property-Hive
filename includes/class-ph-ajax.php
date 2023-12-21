@@ -6143,9 +6143,32 @@ class PH_AJAX {
         if ( !is_dir(WP_PLUGIN_DIR . '/' . $slug) && strpos($feature['download_url'], 'wordpress.org') === false )
         {
             // not a public WP plugin. Must be hosted privately
-            $zip_contents = @file_get_contents($feature['download_url']);
-            
-            if ( $zip_contents === false || empty($zip_contents) )
+            $response = wp_remote_get(
+                $feature['download_url'],
+                array(
+                    'timeout' => 30
+                )
+            );
+
+            if ( is_wp_error( $response ) )
+            {
+                $return = array(
+                    'errorMessage' => $response->get_error_message()
+                );
+                wp_send_json_error($return);
+            }
+
+            if ( !isset($response['body']) )
+            {
+                $return = array(
+                    'errorMessage' => 'No response body received'
+                );
+                wp_send_json_error($return);
+            }
+
+            $zip_contents = $response['body']; // use the content
+        
+            if ( empty($zip_contents) )
             {
                 $return = array(
                     'errorMessage' => 'Failed to obtain plugin'
