@@ -1126,15 +1126,8 @@ class PH_Shortcodes {
 				{
 					$meta_query[] = array(
 						'key' 		=> '_bedrooms',
-						'value' 	=> $lower_bedrooms,
-						'compare'   => '>=',
-						'type'      => 'NUMERIC'
-					);
-
-					$meta_query[] = array(
-						'key' 		=> '_bedrooms',
-						'value' 	=> $higher_bedrooms,
-						'compare'   => '<=',
+						'value' 	=> array( $lower_bedrooms, $higher_bedrooms ),
+						'compare'   => 'BETWEEN',
 						'type'      => 'NUMERIC'
 					);
 				}
@@ -1153,15 +1146,8 @@ class PH_Shortcodes {
 				{
 					$meta_query[] = array(
 						'key' 		=> '_price_actual',
-						'value' 	=> $lower_price,
-						'compare'   => '>=',
-						'type'      => 'NUMERIC'
-					);
-
-					$meta_query[] = array(
-						'key' 		=> '_price_actual',
-						'value' 	=> $higher_price,
-						'compare'   => '<=',
+						'value' 	=> array( $lower_price, $higher_price ),
+						'compare'   => 'BETWEEN',
 						'type'      => 'NUMERIC'
 					);
 				}
