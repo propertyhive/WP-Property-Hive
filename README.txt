@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.4.2
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,6 +56,7 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 * Map Search
 * Draw-a-search
 * Radial Search
+* AI functionality to Write and re-write property descriptions
 * Shortlist
 * Saved searches
 * Search results promos
@@ -178,6 +179,16 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.5 - 2023-12-22 =
+* Added more styling controls to Elementor Search Form widget
+* Added new filters to features and excerpt ('propertyhive_property_post_excerpt' and 'propertyhive_property_features') for use by new AI add on
+* Added reference number to list of supported REST API field
+* Reduced the number of database JOINS in similar properties shortcode to improve query efficiency
+* Use wp_remote_get() instead of file_get_contents() when getting pro features to enhance compatibility with various server configurations
+* Ensure 'propertyhive_applicant_requirements_form_fields' filter is always passed 2 parameters
+* Added Jamaica to list of countries in International settings
+* Corrected PHP warning about undefined variable when saving property and 'Contacts' module has been disabled
 
 = 2.0.4 - 2023-12-06 =
 * Cater for Divi templates where set to show for properties but no body. In this case still load Property Hive templates
