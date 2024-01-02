@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.4.2
-Stable tag: 2.0.5
+Stable tag: 2.0.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -56,7 +56,7 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 * Map Search
 * Draw-a-search
 * Radial Search
-* AI functionality to Write and re-write property descriptions
+* AI functionality to write and re-write property descriptions
 * Shortlist
 * Saved searches
 * Search results promos
@@ -179,6 +179,9 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.6 - 2024-01-02 =
+* Security fix - Store currency cookie data in JSON encoded string instead of serialized string to preveent PHP object injection
 
 = 2.0.5 - 2023-12-22 =
 * Added more styling controls to Elementor Search Form widget
