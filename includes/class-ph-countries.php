@@ -47,8 +47,8 @@ class PH_Countries {
 			}
 			elseif ( isset($_COOKIE['propertyhive_currency']) && $_COOKIE['propertyhive_currency'] != '' )
 			{
-				$currency = unserialize(html_entity_decode($_COOKIE['propertyhive_currency']));
-				if ( isset($currency['currency_code']) && array_key_exists(ph_clean($currency['currency_code']), $form_controls['currency']['options']) )
+				$currency = @json_decode(html_entity_decode($_COOKIE['propertyhive_currency']), TRUE);
+				if ( !empty($currency) && isset($currency['currency_code']) && array_key_exists(ph_clean($currency['currency_code']), $form_controls['currency']['options']) )
 				{
 					$form_controls['currency']['value'] = $currency['currency_code'];
 				}
@@ -86,7 +86,7 @@ class PH_Countries {
 				$currency['exchange_rate'] = $exchange_rates[sanitize_text_field($_GET['currency'])];
 			}
 			
-			ph_setcookie( 'propertyhive_currency', htmlentities(serialize($currency)), time() + (30 * DAY_IN_SECONDS), is_ssl() );
+			ph_setcookie( 'propertyhive_currency', htmlentities(json_encode($currency)), time() + (30 * DAY_IN_SECONDS), is_ssl() );
 		}
 	}
 

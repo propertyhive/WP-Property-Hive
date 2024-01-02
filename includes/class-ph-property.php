@@ -442,7 +442,7 @@ class PH_Property {
                     }
                     elseif ( isset($_COOKIE['propertyhive_currency']) && $_COOKIE['propertyhive_currency'] != '' )
                     {
-                        $currency = unserialize(html_entity_decode($_COOKIE['propertyhive_currency']));
+                        $currency = @json_decode(html_entity_decode($_COOKIE['propertyhive_currency']), true);
                     }
                     else
                     {
