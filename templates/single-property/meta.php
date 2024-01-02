@@ -22,7 +22,7 @@ global $post, $property;
     	<?php
             foreach ( $meta as $key => $value )
             {
-                echo '<li class="' . $key . '"><span>' . $value['label'] . ':</span> ' . $value['value'] . '</li>';
+                echo '<li class="' . esc_attr( $key ) . '"><span>' . $value['label'] . ':</span> ' . $value['value'] . '</li>';
             }
         ?>
 

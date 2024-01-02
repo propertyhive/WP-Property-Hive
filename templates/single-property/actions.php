@@ -34,7 +34,7 @@ global $post, $property;
                $action['class'] = ( isset( $action['class'] ) ) ? $action['class'] : '';
                
                echo '
-               <li class="' . $action['class'] . '"';
+               <li class="' . esc_attr($action['class']) . '"';
                if ( isset( $action['parent_attributes'] ) && ! empty( $action['parent_attributes'] ) )
                {
                    foreach ( $action['parent_attributes'] as $key => $value )
@@ -42,7 +42,7 @@ global $post, $property;
                        echo ' ' . $key . '="' . esc_attr($value) . '"';
                    }
                }
-               echo '><a href="' . $action['href'] . '"';
+               echo '><a href="' . esc_url($action['href']) . '"';
                if ( isset( $action['attributes'] ) && ! empty( $action['attributes'] ) )
                {
                    foreach ( $action['attributes'] as $key => $value )
@@ -50,7 +50,7 @@ global $post, $property;
                        echo ' ' . $key . '="' . esc_attr($value) . '"';
                    }
                }
-               echo '>' . $action['label'] . '</a></li>
+               echo '>' . esc_html($action['label']) . '</a></li>
                ';
            }
     	?>
