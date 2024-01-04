@@ -65,6 +65,19 @@ if ( !empty($notes) )
 						}
 						$note_body .= ' <a href="' . wp_nonce_url( admin_url('?view_propertyhive_email=' . $comment_content['email_log_id'] . '&email_id=' . $comment_content['email_log_id'] ), 'view-email' ) . '" target="_blank">View Mailout</a>';
 					}
+					else
+					{
+						$keep_logs_days = (string)apply_filters( 'propertyhive_keep_email_logs_days', '3650' ); // 10 years
+
+					    // Revert back to 3650 days if anything other than numbers has been passed
+					    // This prevent SQL injection and errors
+					    if ( !preg_match("/^\d+$/", $keep_logs_days) )
+					    {
+					        $keep_logs_days = '3650';
+					    }
+
+						$note_body = 'The details of the email have since been deleted as we remove details of emails sent more then ' . $keep_logs_days . ' days ago';
+					}
 				}
 				break;
 			}
