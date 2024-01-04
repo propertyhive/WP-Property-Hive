@@ -6044,6 +6044,22 @@ class PH_AJAX {
 
     public function activate_pro_feature()
     {
+        if ( !wp_verify_nonce( $_POST['_ajax_nonce'], "updates" ) ) 
+        {
+            $return = array(
+                'errorMessage' => 'Invalid nonce provided'
+            );
+            wp_send_json_error($return);
+        } 
+
+        if ( ! current_user_can( 'install_plugins' ) ) 
+        {
+            $return = array(
+                'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.' )
+            );
+            wp_send_json_error( $status );
+        }
+        
         // check plugin status
         $slug = ph_clean($_POST['slug']);
 
