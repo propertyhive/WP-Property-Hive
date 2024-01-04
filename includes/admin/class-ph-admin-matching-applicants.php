@@ -642,6 +642,17 @@ class PH_Admin_Matching_Applicants {
         $body = str_replace("[negotiator_name]", $current_user->display_name, $body);
         $body = str_replace("[negotiator_email_address]", $current_user->user_email, $body);
 
+        $body = stripslashes($body);
+
+        if (extension_loaded('zlib')) 
+        {
+            $compressed_body = @gzcompress($body);
+            if ( $compressed_body !== false )
+            {
+                $body = $compressed_body;
+            }
+        }
+
         // Insert into email log
         $insert = $wpdb->insert( 
             $wpdb->prefix . 'ph_email_log', 
@@ -655,7 +666,7 @@ class PH_Admin_Matching_Applicants {
                 'from_name' => $from_name,
                 'from_email_address' => $from_email_address,
                 'subject' => stripslashes($subject),
-                'body' => stripslashes($body),
+                'body' => $body,
                 'status' => '',
                 'send_at' => date("Y-m-d H:i:s"),
                 'sent_by' => $current_user->ID,
