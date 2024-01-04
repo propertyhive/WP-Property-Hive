@@ -789,7 +789,14 @@ class PH_Admin {
                 $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . esc_sql( (int)$_GET['email_id'] ) . "'" );
                 if ( null !== $email_log ) 
                 {
-                    echo apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $email_log->body ) ) );
+                    $body = $email_log->body;
+
+                    if ( extension_loaded('zlib') && @gzuncompress($body) !== false ) 
+                    {
+                        $body = gzuncompress($body);
+                    }
+
+                    echo apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $body ) ) );
                     
                 }
                 else

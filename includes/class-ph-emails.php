@@ -242,7 +242,14 @@ class PH_Emails {
 			}
 			$headers[] = 'Content-Type: text/html; charset=UTF-8';
 
-        	$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $email_to_send->body, $email_to_send->contact_id ) ) );
+			$body = $email_to_send->body;
+
+            if ( extension_loaded('zlib') && @gzuncompress($body) !== false ) 
+            {
+                $body = gzuncompress($body);
+            }
+
+        	$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $body, $email_to_send->contact_id ) ) );
 			
 			$sent = wp_mail( 
 				$email_to_send->to_email_address, 
