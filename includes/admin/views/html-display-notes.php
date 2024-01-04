@@ -157,7 +157,7 @@ if ( !empty($notes) )
 			}
 			case "note":
 			{
-				$note_body = $comment_content['note'];
+				$note_body = nl2br($comment_content['note']);
 				break;
 			}
 			case "unsubscribe":
