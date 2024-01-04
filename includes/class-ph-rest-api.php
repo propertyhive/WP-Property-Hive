@@ -124,6 +124,7 @@ class PH_Rest_Api {
 			'price_qualifier',
 			'sale_by',
 			'tenure',
+			'council_tax_band',
 			'deposit',
 			'furnished',
 			'available_date',
