@@ -286,6 +286,18 @@ class PH_Emails {
 			    	email_id = '" . $email_id . "'
 			");
 		}
+
+		// Delete old logs
+		$keep_logs_days = (string)apply_filters( 'propertyhive_keep_email_logs_days', '3650' ); // 10 years
+
+	    // Revert back to 3650 days if anything other than numbers has been passed
+	    // This prevent SQL injection and errors
+	    if ( !preg_match("/^\d+$/", $keep_logs_days) )
+	    {
+	        $keep_logs_days = '3650';
+	    }
+
+	    $wpdb->query( "DELETE FROM " . $wpdb->prefix . "ph_email_log WHERE send_at < DATE_SUB(NOW(), INTERVAL " . $keep_logs_days . " DAY)" );
 	}
 
 	/*
