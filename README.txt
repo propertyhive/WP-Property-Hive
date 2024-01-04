@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.4.2
-Stable tag: 2.0.6
+Stable tag: 2.0.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -179,6 +179,14 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.7 - 2024-01-04 =
+* Changed DB data type of 'body' column in ph_email_log table from longtext to blob. This is done so we can compress the email HTML body going forward as this table could get huge
+* In relation to the above, when sending property matches, the email body is now compressed and uncompressed accordingly using gzcompress() and gzuncompress(). Existing emails should remain unaffected
+* Added new 'propertyhive_keep_email_logs_days' filter so email logs can be auto-cleared down after a number of days. Defaults to 10 years
+* Added council tax band to list of fields returned in REST API
+* Ensured line breaks are retained when entering notes
+* Added extra validation when someone tries to activate a pro feature to ensure they have the correct privileges
 
 = 2.0.6 - 2024-01-02 =
 * Security fix - Store currency cookie data in JSON encoded string instead of serialized string to preveent PHP object injection
