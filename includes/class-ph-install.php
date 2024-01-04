@@ -716,7 +716,7 @@ Should you need to cancel or amend this appraisal, please do not hesitate to con
             from_name varchar(255) NOT NULL,
             from_email_address varchar(255) NOT NULL,
             subject varchar(255) NOT NULL,
-            body longtext NOT NULL,
+            body blob NOT NULL,
             lock_id varchar(23) NOT NULL,
             locked_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
             status varchar(5) NOT NULL,
