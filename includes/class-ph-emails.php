@@ -144,14 +144,22 @@ class PH_Emails {
             	}
 
             	$value = ph_clean($_POST[$key]);
-            	if ( taxonomy_exists($key) )
+            	$values = array();
+            	if ( !empty($value) && taxonomy_exists($key) )
             	{
-            		$term = get_term( ph_clean($_POST[$key]), $key );
+            		if ( !is_array($value) ) { $value = array($value); }
 
-            		if ( isset($term->name) )
+            		foreach ( $value as $value_term )
             		{
-            			$value = $term->name;
-            		}
+	            		$term = get_term( ph_clean($value_term), $key );
+
+	            		if ( isset($term->name) )
+	            		{
+	            			$values[] = $term->name;
+	            		}
+	            	}
+
+	            	$value = implode(", ", $values);
             	}
 
             	if ( ph_clean($value) == '' )
