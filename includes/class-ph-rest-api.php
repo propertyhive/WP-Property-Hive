@@ -98,6 +98,34 @@ class PH_Rest_Api {
 		{
 			update_post_meta( $post->ID, '_featured', '' );
 		}
+
+		// Office
+		$office_id = get_post_meta( $post->ID, '_office_id', true );
+		if ( $office_id == '' )
+		{
+			$primary_office_id = '';
+			$args = array(
+	            'post_type' => 'office',
+	            'nopaging' => true
+	        );
+	        $office_query = new WP_Query($args);
+	        
+	        if ($office_query->have_posts())
+	        {
+	            while ($office_query->have_posts())
+	            {
+	                $office_query->the_post();
+
+	                if (get_post_meta(get_the_ID(), 'primary', TRUE) == '1')
+	                {
+	                	$primary_office_id = get_the_ID();
+	                }
+	            }
+	        }
+	        $office_query->reset_postdata();
+	        
+			update_post_meta( $post->ID, '_office_id', $primary_office_id );
+		}
 	}
 
 	public function modify_rest_order_by($params)
