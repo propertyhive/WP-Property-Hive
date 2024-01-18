@@ -160,9 +160,67 @@ class PH_Template_Loader {
 		} 
 		elseif ( is_post_type_archive( 'property' ) || is_page( ph_get_page_id( 'search_results' ) ) ) 
 		{
-			$file 	= 'archive-property.php';
-			$find[] = $file;
-			$find[] = PH_TEMPLATE_PATH . $file;
+			$use_property_hive_template = true;
+
+			// Check for single Bricks Builder property page template
+			if ( defined('BRICKS_DB_TEMPLATE_SLUG') )
+			{
+				$template_query = new WP_Query(
+					array(
+						'post_type'              => BRICKS_DB_TEMPLATE_SLUG,
+						'post_status'            => 'publish',
+						'fields'                 => 'ids',
+						'no_found_rows'          => true,
+						'update_post_meta_cache' => false,
+						'update_post_term_cache' => false,
+						'meta_query'             => array(
+							array(
+								'key'     => '_bricks_template_type',
+								'compare' => 'archive',
+							),
+						),
+					)
+				);
+
+				if ( $template_query->have_posts() ) 
+				{
+					while ( $template_query->have_posts() )
+					{
+						$template_query->the_post();
+
+						$template_settings = get_post_meta( get_the_ID(), '_bricks_template_settings', TRUE );
+
+						if ( 
+							isset($template_settings['templateConditions']) && 
+							is_array($template_settings['templateConditions']) &&
+							!empty($template_settings['templateConditions'])
+						)
+						{
+							foreach ( $template_settings['templateConditions'] as $templateCondition )
+							{
+								if ( 
+									isset($templateCondition['main']) && 
+									$templateCondition['main'] == 'archiveType' &&
+									is_array($templateCondition['archiveType']) &&
+									in_array('postType', $templateCondition['archiveType']) &&
+									is_array($templateCondition['archivePostTypes']) &&
+									in_array('property', $templateCondition['archivePostTypes'])
+								)
+								{
+									$use_property_hive_template = false;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if ( $use_property_hive_template )
+			{
+				$file 	= 'archive-property.php';
+				$find[] = $file;
+				$find[] = PH_TEMPLATE_PATH . $file;
+			}
 
 		}
 
