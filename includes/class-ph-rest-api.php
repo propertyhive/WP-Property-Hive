@@ -61,6 +61,43 @@ class PH_Rest_Api {
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_property_fields' ), 99 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_office_fields' ), 99 );
 		add_filter( 'rest_property_collection_params', array( $this, 'modify_rest_order_by' ), 10, 1 );
+		add_action( "rest_after_insert_property", array( $this, 'ensure_key_fields_set' ), 10, 3 );
+	}
+
+	public function ensure_key_fields_set( $post, $request, $creating )
+	{
+		// Country / price actual
+		$country = get_post_meta( $post->ID, '_address_country', true );
+		if ( $country == '' )
+		{
+			$default_country = get_option( 'propertyhive_default_country', 'GB' );
+			update_post_meta( $post->ID, '_address_country', $default_country );
+		}
+
+		$ph_countries = new PH_Countries();
+		$ph_countries->update_property_price_actual( $post->ID );
+
+		// Department
+		$department = get_post_meta( $post->ID, '_department', true );
+		if ( $department == '' )
+		{
+			$primary_department = get_option( 'propertyhive_primary_department', 'residential-sales' );
+			update_post_meta( $post->ID, '_department', $primary_department );
+		}
+
+		// On Market
+		$on_market = get_post_meta( $post->ID, '_on_market', true );
+		if ( $on_market != 'yes' )
+		{
+			update_post_meta( $post->ID, '_on_market', '' );
+		}
+
+		// Featured
+		$featured = get_post_meta( $post->ID, '_featured', true );
+		if ( $featured != 'yes' )
+		{
+			update_post_meta( $post->ID, '_featured', '' );
+		}
 	}
 
 	public function modify_rest_order_by($params)
