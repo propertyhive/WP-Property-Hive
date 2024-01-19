@@ -1333,7 +1333,7 @@ function ph_form_field( $key, $field )
                 $field['value'] = sanitize_text_field(wp_unslash($_GET[$key]));
             }
 
-            $output .= '<input type="hidden" name="' . esc_attr( $field['name'] ) . '" value="' . $field['value'] . '">';
+            $output .= '<input type="hidden" name="' . esc_attr( $field['name'] ) . '" value="' . esc_attr($field['value']) . '">';
             break;
         }
         case "html":
@@ -1353,7 +1353,7 @@ function ph_form_field( $key, $field )
             $field['site_key'] = isset( $field['site_key'] ) ? $field['site_key'] : '';
 
             $output .= '<script src="https://www.google.com/recaptcha/api.js"></script>
-            <div class="g-recaptcha" data-sitekey="' . $field['site_key'] . '"></div>';
+            <div class="g-recaptcha" data-sitekey="' . esc_attr($field['site_key']) . '"></div>';
             break;
         }
         case "recaptcha-v3":
