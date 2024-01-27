@@ -136,8 +136,11 @@ class PH_Admin_Post_Types {
      */
     public function remove_month_filter() {
         global $typenow;
-        
-        if ( in_array($typenow, array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date')) )
+
+        $post_types_to_hide_months_dropdown = array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
+        $post_types_to_hide_months_dropdown = apply_filters( 'propertyhive_post_types_to_hide_months_dropdown', $post_types_to_hide_months_dropdown );
+
+        if ( in_array($typenow, $post_types_to_hide_months_dropdown) )
         {
             add_filter('months_dropdown_results', '__return_empty_array');
         }
