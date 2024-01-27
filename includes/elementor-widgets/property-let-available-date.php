@@ -141,7 +141,7 @@ class Elementor_Property_Let_Available_Date_Widget extends \Elementor\Widget_Bas
 			return;
 		}
 
-		if ( $property->department != 'residential-lettings' && ph_get_custom_department_based_on( $property->department ) != 'residential-lettings' )
+		if ( $property->department != 'residential-lettings' && ph_get_custom_department_based_on( $property->department ) != 'residential-lettings' && $property->department != 'rooms' )
 		{
 			return;
 		}
