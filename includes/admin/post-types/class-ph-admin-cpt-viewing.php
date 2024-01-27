@@ -311,7 +311,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
             	}
             	else
             	{
-            		echo '<em>- ' . __( 'Unattended', 'propertyhive' ) . ' -</em>';
+            		echo '<em>- ' . __( 'Unaccompanied', 'propertyhive' ) . ' -</em>';
             	}
             	break;
 			default :
