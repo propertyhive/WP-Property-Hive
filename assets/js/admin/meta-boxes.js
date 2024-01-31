@@ -21,7 +21,7 @@ function ph_init_description_editors()
                 "_description_" + this_id,
                 {
                     'tinymce' : {
-                        'toolbar1': 'bold,italic,underline,undo,redo,link',
+                        'toolbar1': 'formatselect,bold,italic,underline,undo,redo,link',
                     },
                     mediaButtons: false,
                     quicktags: false
@@ -42,7 +42,7 @@ function ph_init_description_editors()
                 "_room_description_" + this_id,
                 {
                     'tinymce' : {
-                        'toolbar1': 'bold,italic,underline,undo,redo,link',
+                        'toolbar1': 'formatselect,bold,italic,underline,undo,redo,link',
                     },
                     mediaButtons: false,
                     quicktags: false
