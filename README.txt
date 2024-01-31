@@ -2,8 +2,8 @@
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.4.2
-Stable tag: 2.0.7
+Tested up to: 6.4.3
+Stable tag: 2.0.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -179,6 +179,16 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.8 - 2024-01-31 =
+* New filter 'propertyhive_post_types_to_hide_months_dropdown' to add month dropdown filtere back on for certain post types
+* Ensure key fields are always set when a property is inserted or updated via the REST API
+* Cater for taxonomy (e.g. property type or location) being an array in applicant registration emails and display them comma-separated accordingly
+* Rename 'Unattended' to 'Unaccompanied' in viewings list
+* Show let date available Elementor widget output for properties belonging to the Rooms department
+* Use &nbsp; between room name and dimensions. For some reason DomPDF was removing the space here for users of the Printable Brochures add on
+* Added sanitization to hidden field values output in search forms
+* Declared compatibility for WordPress 6.4.3
 
 = 2.0.7 - 2024-01-04 =
 * Changed DB data type of 'body' column in ph_email_log table from longtext to blob. This is done so we can compress the email HTML body going forward as this table could get huge
