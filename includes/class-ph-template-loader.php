@@ -152,6 +152,70 @@ class PH_Template_Loader {
 				wp_reset_postdata();
 			}
 
+			// Check for single Salient property page template
+			if ( class_exists( 'Salient_Core' ) )
+			{
+				$template_query = new WP_Query(
+					array(
+						'post_type'              => 'salient_g_sections',
+						'post_status'            => 'publish',
+						'fields'                 => 'ids',
+						'no_found_rows'          => true,
+						'update_post_meta_cache' => false,
+						'update_post_term_cache' => false,
+					)
+				);
+
+				if ( $template_query->have_posts() ) 
+				{
+					while ( $template_query->have_posts() )
+					{
+						$template_query->the_post();
+
+						$conditions = get_post_meta( get_the_ID(), 'nectar_g_section_conditions', TRUE );
+
+						if ( is_array($conditions) )
+						{
+							foreach ( $conditions as $condition )
+							{
+								$condition = (array)$condition;
+								if ( !isset($condition['options']) || !is_array($condition['options']) ) 
+								{
+			                        continue;
+			                    }
+
+			                    $include_met = false;
+			                    $condition_met = false;
+			                    foreach ( $condition['options'] as $option )
+			                    {
+			                    	$option = (array)$option;
+
+			                    	if ( 
+			                    		isset($option['type']) && $option['type'] === 'include' &&
+			                    		isset($option['value']) && $option['value'] === 'include'
+			                    	)
+			                    	{
+			                    		$include_met = true;
+			                    	}
+			                    	if ( 
+			                    		isset($option['type']) && $option['type'] === 'condition' &&
+			                    		isset($option['value']) && $option['value'] === 'post_type__property'
+			                    	)
+			                    	{
+			                    		$condition_met = true;
+			                    	}
+			                    }
+
+			                    if ( $include_met && $condition_met )
+			                    {
+			                    	$use_property_hive_template = false;
+			                    }
+							}
+						}
+					}
+				}
+			}
+
 			if ( $use_property_hive_template )
 			{
 				$file 	= 'single-property.php';
