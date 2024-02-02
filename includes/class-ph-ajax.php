@@ -2533,6 +2533,8 @@ class PH_AJAX {
             )
         );
 
+        $args = apply_filters( 'propertyhive_admin_dashboard_viewings_awaiting_applicant_feedback_args', $args );
+
         $viewings_query = new WP_Query( $args );
 
         if ( $viewings_query->have_posts() )
@@ -2595,6 +2597,9 @@ class PH_AJAX {
             )
         );
 
+        $args = apply_filters( 'propertyhive_admin_dashboard_my_upcoming_appointments_viewing_args', $args );
+        $args = apply_filters( 'propertyhive_admin_dashboard_my_upcoming_appointments_args', $args );
+
         $viewings_query = new WP_Query( $args );
 
         if ( $viewings_query->have_posts() )
@@ -2639,6 +2644,9 @@ class PH_AJAX {
                 ),
             )
         );
+
+        $args = apply_filters( 'propertyhive_admin_dashboard_my_upcoming_appointments_appraisal_args', $args );
+        $args = apply_filters( 'propertyhive_admin_dashboard_my_upcoming_appointments_args', $args );
 
         $appraisals_query = new WP_Query( $args );
 
@@ -2714,6 +2722,7 @@ class PH_AJAX {
             'order' => 'ASC',
         );
 
+        $args = apply_filters( 'propertyhive_admin_dashboard_upcoming_overdue_key_dates_args', $args );
 
         $key_dates_query = new WP_Query( $args );
 
