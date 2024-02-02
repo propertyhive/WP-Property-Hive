@@ -279,6 +279,7 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/class-ph-bricks-builder.php' );         // Bricks Builder
             include_once( 'includes/class-ph-divi.php' );                   // Divi
             include_once( 'includes/class-ph-elementor.php' );              // Elementor
+            include_once( 'includes/class-ph-salient.php' );                // Salient / WPBakery
             include_once( 'includes/class-ph-yoast-seo.php' );              // Yoast SEO
             include_once( 'includes/class-ph-rank-math.php' );              // Rank Math
             include_once( 'includes/class-ph-duplicate-post.php' );         // Duplicate Post
