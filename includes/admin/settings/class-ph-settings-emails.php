@@ -399,7 +399,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							FROM " . $wpdb->prefix . "ph_email_log
 						");
 	            	?>
-					<li class="all"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log' . $additional_query_string); ?>"<?php if ( !isset($_GET['status']) || (isset($_GET['status']) && $_GET['status'] == '') ) { echo ' class="current"'; } ?>>All <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<li class="all"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log' . $additional_query_string)); ?>"<?php if ( !isset($_GET['status']) || (isset($_GET['status']) && $_GET['status'] == '') ) { echo ' class="current"'; } ?>>All <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
 					<?php
 	            		$emails = $wpdb->get_var("
 							SELECT COUNT(*)
@@ -408,7 +408,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 								status = ''
 						");
 	            	?>
-					<li class="queued"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued' . $additional_query_string); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'queued' ) { echo ' class="current"'; } ?>>Queued <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<li class="queued"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued' . $additional_query_string)); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'queued' ) { echo ' class="current"'; } ?>>Queued <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
 					<?php
             		$emails = $wpdb->get_var("
 						SELECT COUNT(*)
@@ -417,7 +417,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							status IN ('fail1', 'fail2')
 					");
             	?>
-					<li class="failed"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&status=failed' . $additional_query_string); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'failed' ) { echo ' class="current"'; } ?>>Failed <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<li class="failed"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=failed' . $additional_query_string)); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'failed' ) { echo ' class="current"'; } ?>>Failed <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
 					<?php
             		$emails = $wpdb->get_var("
 						SELECT COUNT(*)
@@ -426,7 +426,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							status = 'sent'
 					");
             	?>
-					<li class="sent"><a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&status=sent' . $additional_query_string); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'sent' ) { echo ' class="current"'; } ?>>Sent <span class="count">(<?php echo number_format($emails); ?>)</span></a></li>
+					<li class="sent"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=sent' . $additional_query_string)); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'sent' ) { echo ' class="current"'; } ?>>Sent <span class="count">(<?php echo number_format($emails); ?>)</span></a></li>
 				</ul>
 
 				<div class="tablenav top">
