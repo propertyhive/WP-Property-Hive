@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.4.3
-Stable tag: 2.0.8
+Stable tag: 2.0.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -179,6 +179,10 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.9 - 2024-02-03 =
+* Added format styling dropdown to descriptions WYSIWYGs when enabled
+* Sanitisation
 
 = 2.0.8 - 2024-01-31 =
 * New filter 'propertyhive_post_types_to_hide_months_dropdown' to add month dropdown filtere back on for certain post types
