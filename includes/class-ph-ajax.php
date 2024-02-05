@@ -1671,6 +1671,9 @@ class PH_AJAX {
 	public function add_note() {
     
 		check_ajax_referer( 'add-note', 'security' );
+
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
         
 		$post_id = (int)$_POST['post_id'];
 
@@ -1720,6 +1723,9 @@ class PH_AJAX {
 
 		check_ajax_referer( 'delete-note', 'security' );
 
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_send_json_error( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+
 		$note_id = (int)$_POST['note_id'];
 
 		if ( $note_id > 0 ) {
@@ -1738,6 +1744,8 @@ class PH_AJAX {
 
         check_ajax_referer( 'pin-note', 'security' );
 
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_send_json_error( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
 
         $note_id = (int)$_POST['note_id'];
 
@@ -1769,6 +1777,8 @@ class PH_AJAX {
 
         check_ajax_referer( 'get-notes', 'security' );
 
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
         
         $post = get_post((int)$_POST['post_id']);
 
@@ -1785,6 +1795,8 @@ class PH_AJAX {
 
         check_ajax_referer( 'get-notes', 'security' );
 
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
         
         $post = get_post((int)$_POST['post_id']);
 
