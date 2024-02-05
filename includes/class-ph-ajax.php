@@ -1736,7 +1736,8 @@ class PH_AJAX {
      */
     public function toggle_note_pinned() {
 
-        //check_ajax_referer( 'pin-note', 'security' );
+        check_ajax_referer( 'pin-note', 'security' );
+
 
         $note_id = (int)$_POST['note_id'];
 
@@ -1765,6 +1766,9 @@ class PH_AJAX {
     public function get_notes_grid() {
 
         global $wpdb, $post;
+
+        check_ajax_referer( 'get-notes', 'security' );
+
         
         $post = get_post((int)$_POST['post_id']);
 
@@ -1778,6 +1782,9 @@ class PH_AJAX {
     public function get_pinned_notes_grid() {
 
         global $wpdb, $post;
+
+        check_ajax_referer( 'get-notes', 'security' );
+
         
         $post = get_post((int)$_POST['post_id']);
 
