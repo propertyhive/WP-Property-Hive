@@ -247,6 +247,8 @@ class PH_Admin_Assets {
                 'plugin_url'                    => PH()->plugin_url(),
                 'ajax_url'                      => admin_url('admin-ajax.php'),
                 'post_id'                       => isset( $post->ID ) ? $post->ID : '',
+                'get_notes_nonce'                => wp_create_nonce("get-notes"),
+                'pin_note_nonce'                => wp_create_nonce("pin-note"),
                 'add_note_nonce'                => wp_create_nonce("add-note"),
                 'delete_note_nonce'             => wp_create_nonce("delete-note"),
                 'viewing_details_meta_nonce'    => wp_create_nonce( 'viewing-details-meta-box' ),

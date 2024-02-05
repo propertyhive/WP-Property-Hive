@@ -210,7 +210,7 @@ jQuery( function($){
         var data = {
             action:           'propertyhive_toggle_note_pinned',
             note_id:          $(note).attr('rel'),
-            security:         propertyhive_admin_meta_boxes.pin_note_nonce,
+            security:         propertyhive_admin_meta_boxes.pin_note_nonce
         };
 
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
@@ -1241,6 +1241,7 @@ function ph_redraw_notes_grid(section)
         action:         'propertyhive_get_notes_grid',
         post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
         section:        section,
+        security:       propertyhive_admin_meta_boxes.get_notes_nonce
     };
 
     jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
@@ -1256,6 +1257,7 @@ function ph_redraw_pinned_notes_grid(section)
         post_id:        propertyhive_admin_meta_boxes.post_id,
         pinned:         1,
         section:        section,
+        security:       propertyhive_admin_meta_boxes.get_notes_nonce
     };
 
     jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
