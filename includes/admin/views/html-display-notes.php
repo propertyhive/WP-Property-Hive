@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly
+}
+
 $args = array(
 	'post_id' => (int)$post->ID,
 	'type'      => 'propertyhive_note',
