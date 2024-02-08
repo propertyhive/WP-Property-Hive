@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
     $key_date_type_terms = get_terms( 'management_key_date_type', array(
         'hide_empty' => false,
         'parent' => 0

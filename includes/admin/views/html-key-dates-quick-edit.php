@@ -1,4 +1,8 @@
-<td colspan="5">
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+?><td colspan="5">
     <div class="propertyhive_meta_box">
         <div class="options_group">
             <p class="form-field">

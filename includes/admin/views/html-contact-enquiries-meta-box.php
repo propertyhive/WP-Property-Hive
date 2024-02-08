@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
     $meta_query = array(
         array(
             'relation' => 'OR',

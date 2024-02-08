@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 $current_user = wp_get_current_user();
 ?>
 <h1>Emailing <?php echo $property->get_formatted_full_address(); ?> To <?php echo count($_POST['email_contact_applicant_profile_id']); ?> Suitable Applicant<?php echo count($_POST['email_contact_applicant_profile_id']) != 1 ? 's' : ''; ?></h1>

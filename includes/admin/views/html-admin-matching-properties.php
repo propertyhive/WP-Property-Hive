@@ -1,3 +1,9 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+?>
+
 <div class="wrap propertyhive">
 
 	<h1>Matching Properties For <?php echo get_the_title($contact_id); ?> (<?php echo count($properties); ?>)</h1>
