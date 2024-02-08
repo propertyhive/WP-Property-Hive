@@ -182,6 +182,7 @@ The free core plugin contains the foundations that you need to create a property
 
 = 2.0.9 - 2024-02-03 =
 * Added format styling dropdown to descriptions WYSIWYGs when enabled
+* Added new filters for dashboard query args so items output in dashboard widgets can be customised
 * Sanitisation
 
 = 2.0.8 - 2024-01-31 =
