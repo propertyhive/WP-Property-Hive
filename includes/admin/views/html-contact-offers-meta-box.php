@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
     $meta_query = array(
         array(
             'key' => '_applicant_contact_id',

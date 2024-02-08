@@ -1,3 +1,9 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+?>
+
 <h1>Emailing <?php echo count($_POST['email_property_id']); ?> Suitable Properties To <?php echo get_the_title($contact_id); ?></h1>
 
 <table class="form-table">

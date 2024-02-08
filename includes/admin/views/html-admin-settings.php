@@ -1,3 +1,9 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+?>
+
 <div class="wrap propertyhive">
 	<form method="post" id="mainform" action="" enctype="multipart/form-data">
 		<div class="icon32 icon32-propertyhive-settings" id="icon-propertyhive"><br /></div><h2 class="nav-tab-wrapper">
