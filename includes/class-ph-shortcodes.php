@@ -141,6 +141,7 @@ class PH_Shortcodes {
 			'marketing_flag'	=> '', // Deprecated. Use marketing_flag_id instead
 			'marketing_flag_id'	=> '', // Should be marketing_flag_id. Might deprecate this in the future
 			'property_type_id'	=> '',
+			'sale_by_id'		=> '',
 			'location_id'		=> '',
 			'office_id'			=> '',
 			'negotiator_id'		=> '',
@@ -455,6 +456,15 @@ class PH_Shortcodes {
             );
 		}
 
+		if ( isset($atts['sale_by_id']) && $atts['sale_by_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'sale_by',
+                'terms' => explode(",", $atts['sale_by_id']),
+                'compare' => 'IN',
+            );
+		}
+
 		// Change default meta key when department is specified as commercial, or if commercial is the only active department
 		if (
 			( isset($atts['department']) && $base_department == 'commercial' ) ||
@@ -578,6 +588,10 @@ class PH_Shortcodes {
 			'office_id'		=> '',
 			'negotiator_id'		=> '',
 			'availability_id'	=> '',
+			'marketing_flag_id'	=> '',
+			'property_type_id'	=> '',
+			'sale_by_id'		=> '',
+			'location_id'		=> '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
 			'no_results_output' => '',
@@ -673,6 +687,62 @@ class PH_Shortcodes {
 			$tax_query[] = array(
                 'taxonomy'  => 'availability',
                 'terms' => explode(",", $atts['availability_id']),
+                'compare' => 'IN',
+            );
+		}
+
+		if ( isset($atts['marketing_flag_id']) && $atts['marketing_flag_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'marketing_flag',
+                'terms' => explode(",", $atts['marketing_flag_id']),
+                'compare' => 'IN',
+            );
+		}
+
+		if ( isset($atts['property_type_id']) && $atts['property_type_id'] != '' )
+		{
+			// Change field to check when department is specified as commercial, or if commercial is the only active department
+			if (
+				( isset($atts['department']) && $base_department == 'commercial' ) ||
+				(
+					!isset($atts['department']) &&
+					get_option( 'propertyhive_active_departments_sales' ) != 'yes' &&
+					get_option( 'propertyhive_active_departments_lettings' ) != 'yes' &&
+					get_option( 'propertyhive_active_departments_commercial' ) == 'yes'
+				)
+			)
+			{
+				$tax_query[] = array(
+		            'taxonomy'  => 'commercial_property_type',
+		            'terms' => explode(",", $atts['property_type_id']),
+		            'compare' => 'IN',
+		        );
+			}
+			else
+			{
+				$tax_query[] = array(
+		            'taxonomy'  => 'property_type',
+		            'terms' => explode(",", $atts['property_type_id']),
+		            'compare' => 'IN',
+		        );
+			}
+		}
+
+		if ( isset($atts['location_id']) && $atts['location_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'location',
+                'terms' => explode(",", $atts['location_id']),
+                'compare' => 'IN',
+            );
+		}
+
+		if ( isset($atts['sale_by_id']) && $atts['sale_by_id'] != '' )
+		{
+			$tax_query[] = array(
+                'taxonomy'  => 'sale_by',
+                'terms' => explode(",", $atts['sale_by_id']),
                 'compare' => 'IN',
             );
 		}
