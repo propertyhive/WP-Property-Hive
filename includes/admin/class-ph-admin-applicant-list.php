@@ -589,6 +589,9 @@ jQuery(window).resize(function() {
 
         if ( $applicant_query->have_posts() )
         {
+            $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
+            $percentage_higher = get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' );
+
             while ( $applicant_query->have_posts() )
             {
                 $applicant_query->the_post();
@@ -627,9 +630,60 @@ jQuery(window).resize(function() {
                         {
                             $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
 
-                            if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' && $profile['max_price_actual'] != 0 && $profile['max_price_actual'] < $price )
+                            if ( $percentage_lower != '' && $percentage_higher != '' )
                             {
-                                $match = false;
+                                $match_price_range_lower = '';
+                                if ( !isset($profile['match_price_range_lower_actual']) || ( isset($profile['match_price_range_lower_actual']) && $profile['match_price_range_lower_actual'] == '' ) )
+                                {
+                                    if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' )
+                                    {
+                                        if ( $percentage_lower != '' )
+                                        {
+                                            $match_price_range_lower = $profile['max_price_actual'] - ( $profile['max_price_actual'] * ( $percentage_lower / 100 ) );
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    $match_price_range_lower = $profile['match_price_range_lower_actual'];
+                                }
+
+                                $match_price_range_higher = '';
+                                if ( !isset($profile['match_price_range_higher_actual']) || ( isset($profile['match_price_range_higher_actual']) && $profile['match_price_range_higher_actual'] == '' ) )
+                                {
+                                    if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' )
+                                    {
+                                        if ( $percentage_higher != '' )
+                                        {
+                                            $match_price_range_higher = $profile['max_price_actual'] + ( $profile['max_price_actual'] * ( $percentage_higher / 100 ) );
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    $match_price_range_higher = $profile['match_price_range_higher_actual'];
+                                }
+
+                                if (
+                                    !($match_price_range_lower == '' && $match_price_range_higher == '') && // Both bounds are not empty
+                                    !(
+                                        $price >= $match_price_range_lower &&
+                                        $price <= $match_price_range_higher
+                                    ) // Price is not within the bounds
+                                ) {
+                                    $match = false; // Assuming you want to set match to false; adjust as needed
+                                }
+                            }
+                            else
+                            {
+                                if (
+                                    isset($profile['max_price_actual']) &&
+                                    $profile['max_price_actual'] !== '' && // Checks if max_price_actual is not an empty string
+                                    $price > $profile['max_price_actual']  // Checks if price is greater than max_price_actual
+                                )
+                                {
+                                    $match = false;
+                                }
                             }
                         }
                     }
