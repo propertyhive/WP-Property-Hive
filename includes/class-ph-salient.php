@@ -9,25 +9,6 @@ class PH_Salient {
 	public function __construct()
 	{
 		add_action( 'init', array( $this, 'register_widgets' ), 1 );
-		add_shortcode('salient_property_search_form', array( $this, 'render_shortcode' ) );
-	}
-
-	public function render_shortcode($atts)
-	{
-		var_dump('hererere'); die();
-		extract(shortcode_atts(array(
-			'text_content' => '' 
-		), $atts));
-
-		ob_start();
-
-		echo '<p>111'.$text_content.'</p>';
-
-		$output = ob_get_contents();
-
-		ob_end_clean();
-
-		return $output;
 	}
 
 	public function register_widgets()
@@ -39,8 +20,8 @@ class PH_Salient {
 
 		$widgets = array(
 			'Property Search Form',
-			/*'Property Images',
-			'Property Image',
+			'Property Images',
+			/*'Property Image',
 			'Property Gallery',
 			'Property Address Name Number',
 			'Property Address Street',
