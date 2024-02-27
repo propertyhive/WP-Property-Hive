@@ -49,7 +49,7 @@ class PH_Admin_Menus {
 		// Get current tab/section.
 		$current_tab     = empty( $_GET['tab'] ) ? 'general' : sanitize_title( wp_unslash( $_GET['tab'] ) ); // WPCS: input var okay, CSRF ok.
 		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( wp_unslash( $_REQUEST['section'] ) ); // WPCS: input var okay, CSRF ok.
-		//var_dump( ! empty( $_POST['save'] ) ); die();
+
 		// Save settings if data has been posted.
 		if ( '' !== $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}_{$current_section}", ! empty( $_POST['save'] ) ) ) { // WPCS: input var okay, CSRF ok.
 			PH_Admin_Settings::save();
