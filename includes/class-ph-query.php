@@ -1006,7 +1006,10 @@ class PH_Query {
 						}
 					}
 
-					if ( in_array('_address_concatenated', $address_fields_to_query) )
+					if ( 
+						!preg_match('/^(?:[A-Z]{2}\d|[A-Z]\d)/i', $address_keyword) && 
+						in_array('_address_concatenated', $address_fields_to_query) 
+					)
 					{
 						$meta_query[] = array(
 							'key'     => '_address_concatenated',
