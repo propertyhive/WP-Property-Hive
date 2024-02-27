@@ -1239,6 +1239,7 @@ function ph_form_field( $key, $field )
             wp_enqueue_script('jquery');
             wp_enqueue_script('jquery-ui-core');
             wp_enqueue_script('jquery-ui-slider');
+            wp_enqueue_script('jquery-ui-touch-punch', PH()->plugin_url() . '/assets/js/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js', array('jquery'), '0.2.3', true);
             wp_enqueue_style( 'jquery-ui-style', PH()->plugin_url() . '/assets/css/jquery-ui/jquery-ui.css', array(), PH_VERSION );
 
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
