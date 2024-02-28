@@ -39,7 +39,7 @@ class PH_Admin_Applicant_List {
 		<div id="poststuff" class="propertyhive_meta_box">
 
 			<p class="form-field">
-				<label>Looking For</label>
+				<label><?php echo esc_html__( 'Looking For', 'propertyhive' ); ?></label>
 				<select name="department">
 					<?php
 
@@ -73,23 +73,23 @@ class PH_Admin_Applicant_List {
 			</p>
 
 			<p class="form-field sales-only">
-				<label>Maximum Price</label>
+				<label><?php echo esc_html__( 'Maximum Price', 'propertyhive' ); ?></label>
 				<input type="text" name="maximum_price" value="<?php if ( isset($_POST['maximum_price']) ) { echo esc_attr( $_POST['maximum_price'] ); } ?>">
 			</p>
 
 			<p class="form-field lettings-only">
-				<label>Maximum Rent (PCM)</label>
+				<label><?php echo esc_html__( 'Maximum Rent (PCM)', 'propertyhive' ); ?></label>
 				<input type="text" name="maximum_rent" value="<?php if ( isset($_POST['maximum_rent']) ) { echo esc_attr( $_POST['maximum_rent'] ); } ?>">
 			</p>
 
 			<p class="form-field residential-only">
-				<label>Minimum Bedrooms</label>
+				<label><?php echo esc_html__( 'Minimum Bedrooms', 'propertyhive' ); ?></label>
 				<input type="number" name="minimum_bedrooms" class="short" value="<?php if ( isset($_POST['minimum_bedrooms']) ) { echo esc_attr( $_POST['minimum_bedrooms'] ); } ?>">
 			</p>
 
 			<p class="form-field residential-only">
-				<label>Property Types</label>
-				<select id="property_types" name="property_types[]" multiple="multiple" data-placeholder="Start typing to add property types..." class="multiselect attribute_values">
+				<label><?php echo esc_html__( 'Property Types', 'propertyhive' ); ?></label>
+				<select id="property_types" name="property_types[]" multiple="multiple" data-placeholder="<?php echo esc_attr__( 'Start typing to add property types', 'propertyhive' ); ?>..." class="multiselect attribute_values">
                     <?php
                         $options = array( '' => '' );
                         $args = array(
@@ -138,8 +138,8 @@ class PH_Admin_Applicant_List {
 			</p>
 
 			<p class="form-field">
-				<label>Location</label>
-				<select id="locations" name="locations[]" multiple="multiple" data-placeholder="Start typing to add locations..." class="multiselect attribute_values">
+				<label><?php echo esc_html__( 'Location', 'propertyhive' ); ?></label>
+				<select id="locations" name="locations[]" multiple="multiple" data-placeholder="<?php echo esc_attr__( 'Start typing to add locations', 'propertyhive' ); ?>..." class="multiselect attribute_values">
                     <?php
                         $options = array( '' => '' );
                         $args = array(
@@ -209,7 +209,7 @@ class PH_Admin_Applicant_List {
 			</p>
 
             <p class="form-field">
-                <label>Include Applicants with 'Send Matching Properties' Unticked</label>
+                <label><?php echo esc_html__( 'Include Applicants with \'Send Matching Properties\' Unticked', 'propertyhive' ); ?></label>
                 <input type="checkbox" name="include_non_send_matching_properties" value="yes"<?php if ( isset($_POST['include_non_send_matching_properties']) && sanitize_text_field($_POST['include_non_send_matching_properties']) == 'yes' ) { echo ' checked'; } ?>>
             </p>
 
@@ -217,7 +217,7 @@ class PH_Admin_Applicant_List {
 
             <p class="form-field">
                 <input type="submit" value="<?php echo esc_attr(__( 'Generate Applicant List', 'propertyhive' )); ?>" class="button-primary">
-                <a href="" class="button" id="export_applicant_list_results_button">Export To CSV</a>
+                <a href="" class="button" id="export_applicant_list_results_button"><?php echo esc_html__( 'Export To CSV', 'propertyhive' ); ?></a>
                 <input type="hidden" name="export_applicant_list_results" value="">
             </p>
 
@@ -238,9 +238,9 @@ class PH_Admin_Applicant_List {
             <table width="100%" cellpadding="8" cellspacing="0">
                 <thead>
                     <tr>
-                        <th style="text-align:left;">Applicant Name</th>
-                        <th style="text-align:left;">Contact Details</th>
-                        <th style="text-align:left;">Requirements</th>
+                        <th style="text-align:left;"><?php echo esc_html__( 'Applicant Name', 'propertyhive' ); ?></th>
+                        <th style="text-align:left;"><?php echo esc_html__( 'Contact Details', 'propertyhive' ); ?></th>
+                        <th style="text-align:left;"><?php echo esc_html__( 'Requirements', 'propertyhive' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
