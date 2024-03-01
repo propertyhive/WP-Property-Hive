@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.4.3
-Stable tag: 2.0.9
+Stable tag: 2.0.10
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -179,6 +179,20 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.10 - 2024-03-01 =
+* Generating an applicant list now takes into account match range when applicable
+* Display match price range in applicant list output and export
+* Run labels in applicant list filters through __() so they can be translated
+* Added more taxonomy based attributes to a few shortcodes
+* Added Singapore to the list of supported countries
+* Don't query address_concatenated when first part of postcode (i.e. NN1) is being searched. Doing so resulted in properties in NN13 being returned
+* Enqueue Touch Punch jQuery UI library for sliders so they work on mobile
+* Tweak to Flexslider jQuery slideshow plugin so pixels of previous image isn't shown due to rounding of numbers
+* Security update: Prevent direct access to an array of PHP files inside the plugin
+* Security update: Pass 'allowed_classes' to unserialize to prevent malicious classes being executed
+* Security update: Check for correct user capability when doing anything with notes
+* Security update: Ensure nonces are passed through in note-related AJAX requests
 
 = 2.0.9 - 2024-02-03 =
 * Added format styling dropdown to descriptions WYSIWYGs when enabled
