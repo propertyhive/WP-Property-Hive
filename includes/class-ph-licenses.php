@@ -331,7 +331,7 @@ class PH_Licenses {
 			return false;
 		}
 
-		$body = unserialize($request['body']);
+		$body = @unserialize($request['body'], ['allowed_classes' => false]);
 		if ( $body !== FALSE && is_array($body) && !empty($body) )
 		{
 			update_option( 'propertyhive_license_key_details', $body, 'no' );

@@ -1752,15 +1752,18 @@ class PH_AJAX {
         if ( $note_id > 0 ) {
 
             $comment = get_comment($note_id);
-            $comment_content = unserialize($comment->comment_content);
+            $comment_content = @unserialize($comment->comment_content, ['allowed_classes' => false]);
 
-            if (isset($comment_content['pinned']))
+            if ( $comment_content !== false )
             {
-                unset($comment_content['pinned']);
-            }
-            else
-            {
-                $comment_content['pinned'] = '1';
+                if ( isset($comment_content['pinned']))
+                {
+                    unset($comment_content['pinned']);
+                }
+                else
+                {
+                    $comment_content['pinned'] = '1';
+                }
             }
 
             wp_update_comment( array('comment_ID' => $_POST['note_id'], 'comment_content' => serialize($comment_content)) );
