@@ -330,6 +330,12 @@ class PH_Countries {
 				'currency_symbol' => '$',
 				'currency_prefix' => true
 			),
+			'SG' => array(
+			    'name' => 'Singapore',
+			    'currency_code' => 'SGD',
+			    'currency_symbol' => '$',
+			    'currency_prefix' => true
+			),
 			'ZA' => array(
 				'name' => 'South Africa',
 				'currency_code' => 'ZAR',
