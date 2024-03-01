@@ -79,7 +79,7 @@ class PH_Address_Keyword_Polygon {
 
         foreach ( $results as $result ) 
         {
-            return unserialize($result->polygon_coordinates);
+            return @unserialize($result->polygon_coordinates, ['allowed_classes' => false]);
         }
 
         // nothing found in the table. Let's go get it

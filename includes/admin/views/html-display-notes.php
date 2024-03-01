@@ -30,7 +30,12 @@ if ( !empty($notes) )
 {
 	foreach( $notes as $note )
 	{
-		$comment_content = unserialize($note->comment_content);
+		$comment_content = @unserialize($note->comment_content, ['allowed_classes' => false]);
+
+		if ( $comment_content === false )
+		{
+			continue;
+		}
 
 		$note_body = 'Unknown note type';
 		switch ( $comment_content['note_type'] )
@@ -64,8 +69,11 @@ if ( !empty($notes) )
 						}
 						elseif ($section == 'contact')
 						{
-							$property_ids = unserialize($email_log->property_ids);
-							$note_body .= count($property_ids) . ' propert' . ( (count($property_ids) != 1) ? 'ies' : 'y' ) . ' included in ' . $email_status . ' email mailout. ' . $note_suffix;
+							$property_ids = @unserialize($email_log->property_ids, ['allowed_classes' => false]);
+							if ( $property_ids !== false )
+							{
+								$note_body .= count($property_ids) . ' propert' . ( (count($property_ids) != 1) ? 'ies' : 'y' ) . ' included in ' . $email_status . ' email mailout. ' . $note_suffix;
+							}
 						}
 						$note_body .= ' <a href="' . wp_nonce_url( admin_url('?view_propertyhive_email=' . $comment_content['email_log_id'] . '&email_id=' . $comment_content['email_log_id'] ), 'view-email' ) . '" target="_blank">View Mailout</a>';
 					}

@@ -565,9 +565,9 @@ class PH_Admin_Meta_Boxes {
 	 */
 	public function output_errors() {
         
-		$errors = maybe_unserialize( get_option( 'propertyhive_meta_box_errors' ) );
+		$errors = @unserialize( get_option( 'propertyhive_meta_box_errors' ), ['allowed_classes' => false] );
 
-		if ( ! empty( $errors ) ) {
+		if ( $errors !== false && !empty( $errors ) ) {
 
 			echo '<div id="propertyhive_errors" class="error fade">';
 			foreach ( $errors as $error ) {
