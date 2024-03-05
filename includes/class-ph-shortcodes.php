@@ -165,7 +165,7 @@ class PH_Shortcodes {
 				'controlsText' => array("Prev", "Next"),
 				'responsive' => array(
 					640 => array(
-						'items' => $atts['columns']
+						'items' => (int)$atts['columns']
 					)
 				)
 			);
@@ -532,7 +532,7 @@ class PH_Shortcodes {
 			propertyhive_result_count( $paged, $atts['posts_per_page'], $total_posts, $first, $last);
 		}
 
-		$propertyhive_loop['columns'] = $atts['columns'];
+		$propertyhive_loop['columns'] = (int)$atts['columns'];
 
 		if ( $properties->have_posts() ) : ?>
 
@@ -567,7 +567,7 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_properties_shortcode_output', '<div class="propertyhive propertyhive-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		return apply_filters( 'propertyhive_properties_shortcode_output', '<div class="propertyhive propertyhive-properties-shortcode columns-' . (int)$atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
@@ -611,7 +611,7 @@ class PH_Shortcodes {
 				'controlsText' => array("Prev", "Next"),
 				'responsive' => array(
 					640 => array(
-						'items' => $atts['columns']
+						'items' => (int)$atts['columns']
 					)
 				)
 			);
@@ -792,7 +792,7 @@ class PH_Shortcodes {
 			propertyhive_result_count( $paged, $atts['per_page'], $total_posts, $first, $last);
 		}
 
-		$propertyhive_loop['columns'] = $atts['columns'];
+		$propertyhive_loop['columns'] = (int)$atts['columns'];
 
 		if ( $properties->have_posts() ) : ?>
 
@@ -827,7 +827,7 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_recent_properties_shortcode_output', '<div class="propertyhive propertyhive-recent-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		return apply_filters( 'propertyhive_recent_properties_shortcode_output', '<div class="propertyhive propertyhive-recent-properties-shortcode columns-' . (int)$atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 
 	}
 
@@ -869,7 +869,7 @@ class PH_Shortcodes {
 				'controlsText' => array("Prev", "Next"),
 				'responsive' => array(
 					640 => array(
-						'items' => $atts['columns']
+						'items' => (int)$atts['columns']
 					)
 				)
 			);
@@ -1063,7 +1063,7 @@ class PH_Shortcodes {
 			propertyhive_result_count( $paged, $atts['per_page'], $total_posts, $first, $last);
 		}
 
-		$propertyhive_loop['columns'] = $atts['columns'];
+		$propertyhive_loop['columns'] = (int)$atts['columns'];
 
 		if ( $properties->have_posts() ) : ?>
 
@@ -1098,7 +1098,7 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_featured_properties_shortcode_output', '<div class="propertyhive propertyhive-featured-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		return apply_filters( 'propertyhive_featured_properties_shortcode_output', '<div class="propertyhive propertyhive-featured-properties-shortcode columns-' . (int)$atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
@@ -1135,7 +1135,7 @@ class PH_Shortcodes {
 				'controlsText' => array("Prev", "Next"),
 				'responsive' => array(
 					640 => array(
-						'items' => $atts['columns']
+						'items' => (int)$atts['columns']
 					)
 				)
 			);
@@ -1432,7 +1432,7 @@ class PH_Shortcodes {
 
 			$properties = new WP_Query( apply_filters( 'propertyhive_shortcode_similar_properties_query', $args, $atts ) );
 
-			$propertyhive_loop['columns'] = $atts['columns'];
+			$propertyhive_loop['columns'] = (int)$atts['columns'];
 
 			if ( $properties->have_posts() ) : ?>
 
@@ -1467,7 +1467,7 @@ class PH_Shortcodes {
 
 		$shortcode_output = ob_get_clean();
 
-		return apply_filters( 'propertyhive_similar_properties_shortcode_output', '<div class="propertyhive propertyhive-similar-properties-shortcode columns-' . $atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
+		return apply_filters( 'propertyhive_similar_properties_shortcode_output', '<div class="propertyhive propertyhive-similar-properties-shortcode columns-' . (int)$atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
 	}
 
 	/**
