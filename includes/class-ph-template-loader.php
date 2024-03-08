@@ -149,6 +149,7 @@ class PH_Template_Loader {
 						}
 					}
 				}
+				wp_reset_postdata();
 			}
 
 			if ( $use_property_hive_template )
