@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.4.3
-Stable tag: 2.0.10
+Stable tag: 2.0.11
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,14 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.11 - 2024-03-12 =
+* Added Divi widgets for every address element
+* Added 'Full Address' Divi widget
+* Added 'Full Address' Elementor widget
+* Added 'propertyhive_negotiators_query' filter to all negotiator queries
+* Bricks compatibility tweaks
+* Cast columns passed through in shortcodes to int
 
 = 2.0.10 - 2024-03-01 =
 * Generating an applicant list now takes into account match range when applicable
