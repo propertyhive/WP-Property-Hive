@@ -143,6 +143,9 @@ class PH_Meta_Box_Appraisal_Event {
             'orderby' => 'display_name',
             'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
         );
+
+        $args = apply_filters( 'propertyhive_negotiators_query', $args );
+        
         $user_query = new WP_User_Query( $args );
 
         if ( ! empty( $user_query->results ) ) 
