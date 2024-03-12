@@ -1,6 +1,6 @@
 === PropertyHive ===
 Contributors: PropertyHive,BIOSTALL
-Tags: property, real estate, estate agents, estate agent, property management, propertyhive, property hive, properties, property plugin, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
+Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.4.3
 Stable tag: 2.0.10
@@ -16,7 +16,7 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 = Using the Property Hive core plugin you can quickly: =
 
 * Add property search to any existing theme
-* Allow users to filter properties with configurable search forms
+* Allow users to filter property listings with configurable search forms
 * Display search results
 * Create property details pages 
 * Store and manage your properties in WordPress
@@ -41,6 +41,8 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 * Yoast and Rank Math compatibility	
 * Customisable templates
 * Property Hive CRM
+* International support for real estate agents worldwide
+* Manage sales, lettings and commercial properties, student accommodation and more
 
 = What are the benefits of using the Property Hive plugin? = 
 
@@ -51,8 +53,8 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 
 = Extendable Pro features: =
 
-* Import properties from the leading CRMs including Alto, Street, Loop, Reapit, 10Ninety, SME Professional, dezrez, Kyero, agentOS, Juvo, Juxpix, Arthur Online, VaultEA, Kato and more
-* Export properties to property portals such as Rightmove, Zoopla, OnTheMarket and many more
+* Import property listings from the leading CRMs including Alto, Street, Loop, Reapit, 10Ninety, SME Professional, dezrez, Kyero, agentOS, Juvo, Juxpix, Arthur Online, VaultEA, Kato and more
+* Export property listings to property portals such as Rightmove, Zoopla, OnTheMarket and many more
 * Map Search
 * Draw-a-search
 * Radial Search
