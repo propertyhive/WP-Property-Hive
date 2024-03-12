@@ -205,6 +205,7 @@ class PH_Elementor {
 			'Property Address Town City',
 			'Property Address County',
 			'Property Address Postcode',
+			'Property Address Full',
 			'Property Price',
 			'Property Price Qualifier',
 			'Property Features',
