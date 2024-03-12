@@ -162,6 +162,8 @@ class PH_Shortcodes {
 				'controlsPosition' => 'bottom',
 				'gutter' => 20,
 				'mouseDrag' => true,
+				'nav' => false,
+				'navPosition' => 'bottom',
 				'controlsText' => array("Prev", "Next"),
 				'responsive' => array(
 					640 => array(
@@ -608,6 +610,8 @@ class PH_Shortcodes {
 				'controlsPosition' => 'bottom',
 				'gutter' => 20,
 				'mouseDrag' => true,
+				'nav' => false,
+				'navPosition' => 'bottom',
 				'controlsText' => array("Prev", "Next"),
 				'responsive' => array(
 					640 => array(
@@ -866,6 +870,8 @@ class PH_Shortcodes {
 				'controlsPosition' => 'bottom',
 				'gutter' => 20,
 				'mouseDrag' => true,
+				'nav' => false,
+				'navPosition' => 'bottom',
 				'controlsText' => array("Prev", "Next"),
 				'responsive' => array(
 					640 => array(
@@ -1132,6 +1138,8 @@ class PH_Shortcodes {
 				'controlsPosition' => 'bottom',
 				'gutter' => 20,
 				'mouseDrag' => true,
+				'nav' => false,
+				'navPosition' => 'bottom',
 				'controlsText' => array("Prev", "Next"),
 				'responsive' => array(
 					640 => array(
