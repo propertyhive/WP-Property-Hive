@@ -371,6 +371,9 @@ class PH_Emails {
             'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') ),
             'fields' => array( 'ID', 'display_name', 'user_email' )
         );
+
+        $args = apply_filters( 'propertyhive_negotiators_query', $args );
+
         $user_query = new WP_User_Query( $args );
 
         $negotiators = array();
