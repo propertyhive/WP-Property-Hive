@@ -682,11 +682,14 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													$virtual_tour['url']
 												);
 
-												$virtual_tour['url'] = preg_replace(
-										        	'/(https?:\/\/)?(www\.)?(player\.)?vimeo\.com\/?(showcase\/)*([0-9))([a-z]*\/)*([0-9]{6,11})[?]?.*/i',
-										        	"//player.vimeo.com/video/$6",
-										        	$virtual_tour['url']
-										    	);
+												if ( strpos($virtual_tour['url'], 'vimeo') !== FALSE && strpos($virtual_tour['url'], 'player.') === FALSE )
+												{
+													$virtual_tour['url'] = preg_replace(
+											        	'/(https?:\/\/)?(www\.)?(player\.)?vimeo\.com\/?(showcase\/)*([0-9))([a-z]*\/)*([0-9]{6,11})[?]?.*/i',
+											        	"//player.vimeo.com/video/$6",
+											        	$virtual_tour['url']
+											    	);
+												}
 												
 												echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowFullScreen frameborder="0"></iframe>';
 											}
