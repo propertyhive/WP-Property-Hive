@@ -2118,7 +2118,6 @@ class PH_Query {
         	{
         		$keywords[] = str_replace("-", " ", ph_clean($_REQUEST['keyword']));
         	}
-
 			if ( strpos( $_REQUEST['keyword'], '.' ) !== FALSE )
 			{
 				$keywords[] = str_replace(".", "", ph_clean($_REQUEST['keyword']));
@@ -2126,6 +2125,10 @@ class PH_Query {
 			if ( stripos( $_REQUEST['keyword'], 'st ' ) !== FALSE )
 			{
 				$keywords[] = str_ireplace("st ", "st. ", ph_clean($_REQUEST['keyword']));
+			}
+			if ( strpos( $_REQUEST['keyword'], '\'' ) !== FALSE )
+			{
+				$keywords[] = str_replace("'", "", ph_clean($_REQUEST['keyword']));
 			}
 
 	      	$meta_query = array( 'relation' => 'OR' );
