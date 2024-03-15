@@ -265,7 +265,7 @@ class PH_Shortcodes {
 
 		if ( isset($atts['address_keyword']) && $atts['address_keyword'] != '' )
 		{
-			$atts['address_keyword'] = sanitize_text_field( trim( $atts['address_keyword'] ) );
+			$atts['address_keyword'] = ph_clean( trim( $atts['address_keyword'] ) );
 
         	$address_keywords = array( $atts['address_keyword'] );
 
@@ -277,6 +277,18 @@ class PH_Shortcodes {
         	{
         		$address_keywords[] = str_replace("-", " ", $atts['address_keyword']);
         	}
+        	if ( strpos( $atts['address_keyword'], '.' ) !== FALSE )
+			{
+				$address_keywords[] = str_replace(".", "", $atts['address_keyword']);
+			}
+			if ( stripos( $atts['address_keyword'], 'st ' ) !== FALSE )
+			{
+				$address_keywords[] = str_ireplace("st ", "st. ", $atts['address_keyword']);
+			}
+			if ( strpos( $atts['address_keyword'], '\'' ) !== FALSE )
+			{
+				$address_keywords[] = str_replace("'", "", $atts['address_keyword']);
+			}
 
 			$sub_meta_query = array('relation' => 'OR');
 
