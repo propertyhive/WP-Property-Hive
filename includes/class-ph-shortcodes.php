@@ -134,6 +134,7 @@ class PH_Shortcodes {
 			'maximum_price'		=> '',
 			'bedrooms'			=> '',
 			'minimum_bedrooms'	=> '',
+			'keyword'			=> '',
 			'address_keyword'	=> '',
 			'country'			=> '',
 			'country_not'		=> '',
@@ -339,6 +340,114 @@ class PH_Shortcodes {
 	      	}
 
 	      	$meta_query[] = $sub_meta_query;
+		}
+
+		if ( isset($atts['keyword']) && $atts['keyword'] != '' )
+		{
+			$atts['keyword'] = sanitize_text_field( trim( $atts['keyword'] ) );
+
+			$original_keyword = isset($_REQUEST['keyword']) ? $_REQUEST['keyword'] : '';
+			$_REQUEST['keyword'] = $atts['keyword'];
+
+			add_filter( 'posts_where', array( PH()->query, 'keyword_excerpt_where' ), 10, 2 );
+
+			$keywords = array( $atts['keyword'] );
+
+        	if ( strpos( $atts['keyword'], ' ' ) !== FALSE )
+        	{
+        		$keywords[] = str_replace(" ", "-", $atts['keyword']);
+        	}
+        	if ( strpos( $atts['keyword'], '-' ) !== FALSE )
+        	{
+        		$keywords[] = str_replace("-", " ", $atts['keyword']);
+        	}
+        	if ( strpos( $atts['keyword'], '.' ) !== FALSE )
+			{
+				$keywords[] = str_replace(".", "", $atts['keyword']);
+			}
+			if ( stripos( $atts['keyword'], 'st ' ) !== FALSE )
+			{
+				$keywords[] = str_ireplace("st ", "st. ", $atts['keyword']);
+			}
+			if ( strpos( $atts['keyword'], '\'' ) !== FALSE )
+			{
+				$keywords[] = str_replace("'", "", $atts['keyword']);
+			}
+
+			$sub_meta_query = array('relation' => 'OR');
+
+			$address_keyword_compare = get_option( 'propertyhive_address_keyword_compare', '=' );
+			if ( $address_keyword_compare == 'polygon' )
+			{
+				$address_keyword_compare = apply_filters('propertyhive_shortcode_address_keyword_compare', '=');
+			}
+
+			foreach ( $keywords as $keyword )
+	      	{
+	      		$sub_meta_query[] = array(
+				    'key'     => '_reference_number',
+				    'value'   => $keyword,
+				    'compare' => $address_keyword_compare
+				);
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_street',
+				    'value'   => $keyword,
+				    'compare' => $address_keyword_compare
+				);
+      			$sub_meta_query[] = array(
+				    'key'     => '_address_two',
+				    'value'   => $keyword,
+				    'compare' => $address_keyword_compare
+				);
+				$sub_meta_query[] = array(
+				    'key'     => '_address_three',
+				    'value'   => $keyword,
+				    'compare' => $address_keyword_compare
+				);
+				$sub_meta_query[] = array(
+				    'key'     => '_address_four',
+				    'value'   => $keyword,
+				    'compare' => $address_keyword_compare
+				);
+				$sub_meta_query[] = array(
+				    'key'     => '_features_concatenated',
+				    'value'   => $keyword,
+				    'compare' => 'LIKE'
+				);
+				$sub_meta_query[] = array(
+				    'key'     => '_descriptions_concatenated',
+				    'value'   => $keyword,
+				    'compare' => 'LIKE'
+				);
+	      	}
+	      	if ( strlen($atts['keyword']) <= 4 )
+	      	{
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['keyword'] ),
+				    'compare' => '='
+				);
+				// Run regex match where given keyword is at the start of the postcode ^
+				// followed by one or zero letters (for WC2E-style postcodes) [a-zA-Z]?
+				// then a single space [ ]
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['keyword'] ) . '[a-zA-Z]?[ ]',
+				    'compare' => 'RLIKE'
+				);
+	      	}
+	      	else
+	      	{
+	      		$sub_meta_query[] = array(
+				    'key'     => '_address_postcode',
+				    'value'   => sanitize_text_field( $atts['keyword'] ),
+				    'compare' => 'LIKE'
+				);
+	      	}
+
+	      	$meta_query[] = $sub_meta_query;
+
+			$_REQUEST['keyword'] = $original_keyword; // reset back in case it's used elsewhere
 		}
 
 		if ( isset($atts['country']) && $atts['country'] != '' )
