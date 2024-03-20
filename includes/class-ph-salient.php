@@ -26,9 +26,10 @@ class PH_Salient {
 			'Property Address Name Number',
 			'Property Address Street',
 			'Property Address Line 2',
-			'Property Address Town City',
+			'Property Address Town City',*/
 			'Property Address County',
-			'Property Address Postcode',
+			/*'Property Address Postcode',
+			'Property Address Full',
 			'Property Price',
 			'Property Price Qualifier',
 			'Property Features',
@@ -87,3 +88,48 @@ class PH_Salient {
 }
 
 new PH_Salient();
+
+function ph_extract_font_style_from_salient_font_container( $font_container = '' )
+{
+	$style = '';
+
+	if ( empty($font_container) || !function_exists('vc_parse_multi_attribute') )
+	{
+		return $style;
+	}
+
+	$font_container = vc_parse_multi_attribute($font_container);
+
+	if ( !empty($font_container) )
+	{
+		foreach ( $font_container as $key => $value ) {
+			if ( 'tag' !== $key && strlen( $value ) ) {
+				if ( preg_match( '/description/', $key ) ) {
+					continue;
+				}
+				if ( 'font_size' === $key || 'line_height' === $key ) {
+					$value = preg_replace( '/\s+/', '', $value );
+				}
+				if ( 'font_size' === $key ) {
+					$pattern = '/^(\d*(?:\.\d+)?)\s*(px|\%|in|cm|mm|em|rem|ex|pt|pc|vw|vh|vmin|vmax)?$/';
+					// allowed metrics: http://www.w3schools.com/cssref/css_units.asp
+					preg_match( $pattern, $value, $matches );
+					$value = isset( $matches[1] ) ? (float) $matches[1] : (float) $value;
+					$unit = isset( $matches[2] ) ? $matches[2] : 'px';
+					$value = $value . $unit;
+				}
+				if ( strlen( $value ) > 0 ) {
+					$styles[] = str_replace( '_', '-', $key ) . ': ' . $value;
+				}
+			}
+		}
+	}
+
+	if ( ! empty( $styles ) ) {
+		$style = 'style="' . esc_attr( implode( ';', $styles ) ) . '"';
+	} else {
+		$style = '';
+	}
+
+	return $style;
+}
