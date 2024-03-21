@@ -1,13 +1,13 @@
 <?php
 /**
- * Salient Property Address Name/Number Widget.
+ * Salient Property Address Street Widget.
  *
  * @since 1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-class Salient_Property_Address_Name_Number_Widget {
+class Salient_Property_Address_Street_Widget {
 
     public function __construct() 
     {
@@ -18,8 +18,8 @@ class Salient_Property_Address_Name_Number_Widget {
     public function custom_wpbakery_element_icon()
     {
         echo '<style type="text/css">
-            .wpb_salient_property_address_name_number .vc_element-icon:before,
-            a[data-tag="salient_property_address_name_number"] .vc_element-icon:before {
+            .wpb_salient_property_address_street .vc_element-icon:before,
+            a[data-tag="salient_property_address_street"] .vc_element-icon:before {
                 font-family: "Dashicons" !important;
                 content: "\f179";
             }
@@ -35,8 +35,8 @@ class Salient_Property_Address_Name_Number_Widget {
         $html_template = $widget_dir . '/' . str_replace("_", "-", str_replace(array( "salient_", "_widget" ), "", sanitize_title($class_name))) . '-html.php';
 
         vc_map( array(
-            "name" => __( 'Address Name/Number', 'propertyhive' ),
-            "base" => "salient_property_address_name_number",
+            "name" => __( 'Address Street', 'propertyhive' ),
+            "base" => "salient_property_address_street",
             "class" => "",
             "category" => __( "Property Hive", "propertyhive"),
             "html_template" => $html_template,
@@ -71,4 +71,4 @@ class Salient_Property_Address_Name_Number_Widget {
     
 }
 
-new Salient_Property_Address_Name_Number_Widget();
+new Salient_Property_Address_Street_Widget();
