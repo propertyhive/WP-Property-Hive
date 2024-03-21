@@ -2849,8 +2849,6 @@ class PH_AJAX {
         
         echo '<div class="options_group">';
 
-            echo '<h3>' . __( 'Views On Website', 'propertyhive' ) . '</h3>';
-
             $view_statistics = get_post_meta( (int)$_POST['post_id'], '_view_statistics', TRUE );
             if ( !is_array($view_statistics) )
             {
@@ -2864,18 +2862,22 @@ class PH_AJAX {
             $date_to = strtotime($date_to);
 
             $view_statistics_output = array();
+            $total_views = 0;
 
             for ($i = $date_from; $i <= $date_to; $i += 86400) 
             { 
                 if ( isset($view_statistics[date("Y-m-d", $i)]) )
                 {
                     $view_statistics_output[] = array( $i * 1000, $view_statistics[date("Y-m-d", $i)] );
+                    $total_views += $view_statistics[date("Y-m-d", $i)];
                 }
                 else
                 {
                     $view_statistics_output[] = array( $i * 1000, 0 );
                 }
             }
+
+            echo '<h3>' . __( 'Views On Website', 'propertyhive' ) . ' (' . number_format($total_views, 0) . ')</h3>';
 
             echo '<div id="marketing_statistics_website_view_graph" style="height:400px; width:100%;"></div>';
         
