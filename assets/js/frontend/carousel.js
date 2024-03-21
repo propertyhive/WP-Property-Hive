@@ -1,4 +1,4 @@
-jQuery(window).load(function()
+jQuery(window).on('load', function()
 {
   	document.querySelectorAll('.propertyhive-shortcode-carousel').forEach(slider => {
 	    tns({
