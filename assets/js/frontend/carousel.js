@@ -10,7 +10,8 @@ jQuery(window).on('load', function()
 	    	gutter: propertyhive_carousel_params.gutter,
 	    	mouseDrag: propertyhive_carousel_params.mouseDrag,
 	    	controlsText: propertyhive_carousel_params.controlsText,
-	    	responsive: propertyhive_carousel_params.responsive
+	    	responsive: propertyhive_carousel_params.responsive,
+	    	slideBy: "page"
 	    });
 	});
 });
