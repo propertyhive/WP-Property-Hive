@@ -1,13 +1,13 @@
 <?php
 /**
- * Salient Property Features Widget.
+ * Salient Property Map Link Widget.
  *
  * @since 1.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-class Salient_Property_Features_Widget {
+class Salient_Property_Map_Link_Widget {
 
 	public function __construct() 
 	{
@@ -18,8 +18,8 @@ class Salient_Property_Features_Widget {
 	public function custom_wpbakery_element_icon()
 	{
 		echo '<style type="text/css">
-			.wpb_salient_property_features .vc_element-icon:before,
-			a[data-tag="salient_property_features"] .vc_element-icon:before {
+			.wpb_salient_property_map_link .vc_element-icon:before,
+			a[data-tag="salient_property_map_link"] .vc_element-icon:before {
 			  	font-family: "Dashicons" !important;
 			  	content: "\f179";
 			}
@@ -35,24 +35,25 @@ class Salient_Property_Features_Widget {
 		$html_template = $widget_dir . '/' . str_replace("_", "-", str_replace(array( "salient_", "_widget" ), "", sanitize_title($class_name))) . '-html.php';
 
 		vc_map( array(
-      		"name" => __( 'Features', 'propertyhive' ),
-      		"base" => "salient_property_features",
+      		"name" => __( 'Map Link', 'propertyhive' ),
+      		"base" => "salient_property_map_link",
       		"class" => "",
       		"category" => __( "Property Hive", "propertyhive"),
       		"html_template" => $html_template,
       		"params" => array(
-      			array(
+	         	array(
 	          		"type" => "dropdown",
 	          		"class" => "",
-	          		"heading" => __( 'Show Title', 'propertyhive' ),
-	          		"param_name" => "show_title",
+	          		"heading" => __( 'Map Link Type', 'propertyhive' ),
+	          		"param_name" => "map_link_type",
 	          		"value" => array(
-	          			__( 'Yes', 'propertyhive' ) => 'yes',
-						__( 'No', 'propertyhive' ) => 'no',
+	          			__( 'Open map in new window', 'propertyhive' ) => '_blank',
+						__( 'Open embedded map in lightbox', 'propertyhive' ) => 'embedded',
+						__( 'Open iframe map in lightbox', 'propertyhive' ) => 'iframe',
 	          		),
-	          		'std' => 'yes',
+	          		'std' => '_blank',
 	         	),
-      			array(
+	         	array(
 					'type' => 'font_container',
 					'param_name' => 'font_container',
 					'value' => 'text_align:left',
@@ -82,4 +83,4 @@ class Salient_Property_Features_Widget {
 	
 }
 
-new Salient_Property_Features_Widget();
+new Salient_Property_Map_Link_Widget();

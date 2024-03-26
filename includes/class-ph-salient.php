@@ -48,18 +48,16 @@ class PH_Salient {
 			'Property Council Tax Band',
 			'Property Let Available Date',
 			'Property Deposit',
-			/*'Property Map',
+			'Property Map',
 			'Property Map Link',
 			'Property Street View',
 			'Property Floorplans',
-			'Property Floorplans Link',
 			'Property EPCs',
-			'Property EPCs Link',
 			'Property Enquiry Form',
-			'Property Enquiry Form Link',
+			/*'Property Enquiry Form Link',*/
 			'Property Brochures Link',
 			'Property Embedded Virtual Tours',
-			'Property Virtual Tours Link',*/
+			/*'Property Virtual Tours Link',*/
 			/*'Property Office Name',
 			'Property Office Telephone Number',
 			'Property Office Email Address',
