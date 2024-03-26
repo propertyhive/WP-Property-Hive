@@ -4,12 +4,19 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 if ( is_admin() )
 {
-	return;
+	// enqueue?
+	//return;
 }
 
 extract(shortcode_atts(array(
 	"hide_thumbnails" => "", 
 ), $atts));
+
+global $property;
+
+if ( !isset($property->id) ) {
+	return;
+}
 
 if ( isset($atts['hide_thumbnails']) && $atts['hide_thumbnails'] == 'yes' )
 {
