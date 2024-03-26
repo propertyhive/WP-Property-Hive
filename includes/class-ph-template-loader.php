@@ -153,7 +153,7 @@ class PH_Template_Loader {
 			}
 
 			// Check for single Salient property page template
-			if ( class_exists( 'Salient_Core' ) )
+			if ( defined('NECTAR_THEME_NAME') && NECTAR_THEME_NAME == 'salient' && class_exists( 'Salient_Core' ) )
 			{
 				$template_query = new WP_Query(
 					array(
