@@ -22,7 +22,7 @@ class PH_Salient {
 			'Property Search Form',
 			'Property Images',
 			'Property Image',
-			/*'Property Gallery',*/
+			'Property Gallery',
 			'Property Address Name Number',
 			'Property Address Street',
 			'Property Address Line 2',
@@ -35,7 +35,7 @@ class PH_Salient {
 			'Property Features',
 			'Property Summary Description',
 			'Property Full Description',
-			/*'Property Actions',*/
+			'Property Actions',
 			'Property Meta',
 			'Property Availability',
 			'Property Type',
