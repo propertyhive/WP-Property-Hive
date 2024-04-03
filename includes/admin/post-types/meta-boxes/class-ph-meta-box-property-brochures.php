@@ -21,7 +21,9 @@ class PH_Meta_Box_Property_Brochures {
 	public static function output( $post ) {
         
         $thumbnail_width = get_option( 'thumbnail_size_w', 150 );
+        if ( empty($thumbnail_width) ) { $thumbnail_width = 150; }
         $thumbnail_height = get_option( 'thumbnail_size_h', 150 );
+        if ( empty($thumbnail_height) ) { $thumbnail_height = 150; }
         
         echo '<div class="propertyhive_meta_box">';
         
