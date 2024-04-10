@@ -41,7 +41,85 @@ class PH_Post_types {
         add_action( 'updated_post_meta', array( __CLASS__, 'store_related_viewings_meta_change' ), 10, 4 );
 
         add_action( 'propertyhive_update_address_concatenated', array( __CLASS__, 'update_address_concatenated' ) );
+
+        add_filter( 'get_terms', array( $this, 'put_terms_in_order' ), 10, 4 );
 	}
+
+    public static function put_terms_in_order( $terms, $taxonomies, $query_vars, $term_query ) {
+
+        if ( empty($taxonomies) )
+        {
+            return $terms;
+        }
+
+        if ( !is_array($taxonomies) ) { $taxonomies = array($taxonomies); }
+
+        foreach ( $taxonomies as $taxonomy_name )
+        {
+            $taxonomy = get_taxonomy( $taxonomy_name );
+
+            if ( is_array($taxonomy->object_type) && in_array('property', $taxonomy->object_type) )
+            {
+                
+            }
+            else
+            {
+                return $terms;
+            }
+
+            $order = get_option( 'propertyhive_taxonomy_terms_order_' . $taxonomy_name, '' );
+
+            if ( empty($order) )
+            {
+                return $terms;
+            }
+
+            // Convert $order string to an array of IDs
+            $order_array = explode('|', $order);
+
+            // Initialize a new array to store the sorted objects
+            $sorted_array = array();
+
+            // Loop through each order ID and find matching WP_Term objects
+            foreach ( $order_array as $order_id ) 
+            {
+                foreach ( $terms as $item ) 
+                {
+                    if ( $item->term_id == $order_id ) 
+                    {
+                        $sorted_array[] = $item;
+                        break; // Stop the inner loop once a match is found
+                    }
+                }
+            }
+
+            // Append WP_Term objects not listed in $order at the end of $sorted_array
+            foreach ( $terms as $item ) 
+            {
+                // Check if the item is not in $sorted_array
+                $found = false;
+                foreach ( $sorted_array as $sorted_item ) 
+                {
+                    if ( $sorted_item->term_id == $item->term_id ) 
+                    {
+                        $found = true;
+                        break;
+                    }
+                }
+                // If not found, append to $sorted_array
+                if ( !$found ) 
+                {
+                    $sorted_array[] = $item;
+                }
+            }
+
+            // Replace the original array with the sorted array
+            $terms = $sorted_array;
+        }
+
+        return $terms;
+
+    }
 
 	/**
 	 * Register PropertyHive taxonomies.

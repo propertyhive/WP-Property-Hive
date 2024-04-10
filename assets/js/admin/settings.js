@@ -2,6 +2,34 @@ var initial_save_changes_value = '';
 
 jQuery( function($){
 
+    // sortable custom field tables
+
+    $('.ph_customfields.sortable-custom-field').each(function()
+    { 
+        var taxonomy = $(this).data('taxonomy');
+
+        if ( taxonomy == '' )
+        {
+            return;
+        }
+
+        $(this).find('tbody').sortable({
+            axis: 'y',
+            update: function (event, ui) 
+            {
+                var data = $(this).sortable('serialize') + '&'+ $.param({ 'action': 'propertyhive_save_term_order', 'taxonomy': taxonomy, 'security': propertyhive_admin_settings.ajax_nonce });
+
+                $.ajax({
+                    data: data,
+                    type: 'POST',
+                    url: ajaxurl
+                });
+            }
+        });
+    });
+
+    //
+
     initial_save_changes_value = (jQuery('p.submit button.button-primary').length > 0) ? jQuery('p.submit button.button-primary').text() : '';
 
     $('a#add_department').click(function(e)

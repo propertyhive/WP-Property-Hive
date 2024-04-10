@@ -137,6 +137,9 @@ class PH_AJAX {
             'dismiss_notice_invalid_expired_license_key' => false,
             'dismiss_notice_email_cron_not_running' => false,
 
+            // Settings
+            'save_term_order' => false,
+
             // PRO features activate/deactivate
             'activate_pro_feature' => false,
             'deactivate_pro_feature' => false,
@@ -150,6 +153,26 @@ class PH_AJAX {
 			}
 		}
 	}
+
+    public function save_term_order()
+    {
+        check_ajax_referer( 'updates', 'security' );
+
+        if ( !isset($_POST['taxonomy']) || ( isset($_POST['taxonomy']) && empty(ph_clean($_POST['taxonomy'])) ) )
+        {
+            die();
+        }
+
+        if ( !isset($_POST['term']) || ( isset($_POST['term']) && empty(ph_clean($_POST['term'])) ) )
+        {
+            die();
+        }
+
+        update_option( 'propertyhive_taxonomy_terms_order_' . ph_clean($_POST['taxonomy']), implode("|", ph_clean($_POST['term'])));
+        
+        // Quit out
+        die();
+    }
 
     public function dismiss_notice_leave_review()
     {

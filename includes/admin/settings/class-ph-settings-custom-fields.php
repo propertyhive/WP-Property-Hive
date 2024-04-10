@@ -310,7 +310,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php _e( 'Availability Options', 'propertyhive' ) ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="availability" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -333,9 +333,9 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
                             foreach ( $terms as $term )
-                            { 
+                            {
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <?php do_action( 'propertyhive_custom_field_availability_table_before_row_column', $term->term_id ); ?>
@@ -782,7 +782,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php echo esc_html(__( 'Parking Options', 'propertyhive' )); ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="parking" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -805,7 +805,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             foreach ($terms as $term)
                             { 
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <td class="type"><?php echo esc_html($term->name); ?></td>
@@ -864,7 +864,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php echo esc_html(__( 'Outside Spaces', 'propertyhive' )); ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="outside_space" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -887,7 +887,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             foreach ($terms as $term)
                             { 
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <td class="type"><?php echo esc_html($term->name); ?></td>
@@ -946,7 +946,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php echo esc_html(__( 'Price Qualifiers', 'propertyhive' )); ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="price_qualifier" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -969,7 +969,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             foreach ($terms as $term)
                             { 
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <td class="type"><?php echo esc_html($term->name); ?></td>
@@ -1028,7 +1028,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php echo esc_html(__( 'Sale By Options', 'propertyhive' )); ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="sale_by" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -1110,7 +1110,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php echo esc_html(__( 'Tenures', 'propertyhive' )); ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="tenure" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -1133,7 +1133,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             foreach ($terms as $term)
                             { 
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <td class="type"><?php echo esc_html($term->name); ?></td>
@@ -1192,7 +1192,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php echo esc_html(__( 'Tenures', 'propertyhive' )); ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="commercial_tenure" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -1215,7 +1215,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             foreach ($terms as $term)
                             { 
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <td class="type"><?php echo esc_html($term->name); ?></td>
@@ -1274,7 +1274,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php echo esc_html(__( 'Furnished Options', 'propertyhive' )); ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="furnished" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -1297,7 +1297,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             foreach ($terms as $term)
                             { 
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <td class="type"><?php echo esc_html($term->name); ?></td>
@@ -1482,7 +1482,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php echo esc_html(__( 'Marketing Flags', 'propertyhive' )); ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="marketing_flag" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -1505,7 +1505,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             foreach ($terms as $term)
                             { 
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <td class="type"><?php echo esc_html($term->name); ?></td>
