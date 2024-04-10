@@ -310,7 +310,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         <tr valign="top">
             <th scope="row" class="titledesc"><?php _e( 'Availability Options', 'propertyhive' ) ?></th>
             <td class="forminp">
-                <table class="ph_customfields widefat" cellspacing="0">
+                <table class="ph_customfields sortable-custom-field widefat" data-taxonomy="availability" cellspacing="0">
                     <thead>
                         <tr>
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
@@ -333,9 +333,9 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
                             foreach ( $terms as $term )
-                            { 
+                            {
                         ?>
-                        <tr>
+                        <tr id="term-<?php echo esc_attr($term->term_id); ?>">
                             <td class="cb"><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"></td>
                             <td class="id"><?php echo esc_html($term->term_id); ?></td>
                             <?php do_action( 'propertyhive_custom_field_availability_table_before_row_column', $term->term_id ); ?>
