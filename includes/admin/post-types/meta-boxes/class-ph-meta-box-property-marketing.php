@@ -125,7 +125,11 @@ class PH_Meta_Box_Property_Marketing {
 <script>
 var selected_availability = '<?php echo $selected_availability; ?>';
 var availability_departments = <?php echo json_encode($availability_departments); ?>;
-var availabilities = <?php echo json_encode($department_options); ?>;
+
+let availabilities = new Map();
+<?php foreach ( $department_options as $term_id => $name ) { ?>
+availabilities.set("<?php echo $term_id; ?>", "<?php echo $name; ?>");
+<?php } ?>
 
 jQuery(document).ready(function()
 {
@@ -149,7 +153,7 @@ function fill_availability_dropdown()
     {
         jQuery('select[name=\'_availability\']').empty();
 
-        for ( var i in availabilities )
+        for ( let [i, value] of availabilities ) 
         {
             var this_availability_departments = [];
             var availability_departments_exist = true;
@@ -164,7 +168,7 @@ function fill_availability_dropdown()
 
             if ( jQuery.inArray( department, this_availability_departments ) > -1 || !availability_departments_exist )
             {
-                jQuery('select[name=\'_availability\']').append( jQuery("<option />").val(i).text(availabilities[i]) );
+                jQuery('select[name=\'_availability\']').append( jQuery("<option />").val(i).text(value) );
             }
             jQuery('select[name=\'_availability\']').val(selected_availability);
         }
