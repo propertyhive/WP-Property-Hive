@@ -73,7 +73,7 @@ class PH_Admin_Applicant_List {
 			</p>
 
 			<p class="form-field sales-only">
-				<label><?php echo esc_html__( 'Maximum Price', 'propertyhive' ); ?></label>
+				<label><?php echo esc_html__( 'Maximum Price', 'propertyhive' ); ?> <img class="help_tip" data-tip="This will search the applicant's Match Price Range if one is set and return applicants where the price entered falls into this range. Otherwise it will search the Maximum Price and return applicants that have maximum price higher than the value entered" src="<?php echo PH()->plugin_url(); ?>/assets/images/help.png" height="16" width="16" /></label>
 				<input type="text" name="maximum_price" value="<?php if ( isset($_POST['maximum_price']) ) { echo esc_attr( $_POST['maximum_price'] ); } ?>">
 			</p>
 
