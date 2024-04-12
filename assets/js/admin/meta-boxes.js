@@ -395,6 +395,7 @@ jQuery( function($){
             var data = {
                 action: 'propertyhive_delete_key_date',
                 date_post_id: post_id,
+                security: propertyhive_admin_meta_boxes.delete_key_date_nonce,
             };
 
             jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
@@ -485,6 +486,7 @@ jQuery( function($){
             due_date_time: quick_edit_row.find('#date_due_quick_edit').val() + ' ' + quick_edit_row.find('#date_due_hours_quick_edit').val() + ':' + quick_edit_row.find('#date_due_minutes_quick_edit').val(),
             type: quick_edit_row.find('#date_type').val(),
             notes: quick_edit_row.find('#date_notes_quick_edit').val(),
+            security: propertyhive_admin_meta_boxes.save_key_date_nonce,
         };
 
         if (quick_edit_row.find('#book_next_key_date').length !== 0)
