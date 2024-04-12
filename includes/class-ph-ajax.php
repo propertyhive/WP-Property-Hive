@@ -5736,7 +5736,7 @@ class PH_AJAX {
 
     public function get_property_sales_meta_box()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         $selected_status = '';
         if ( isset($_POST['selected_status']) )
@@ -5754,7 +5754,7 @@ class PH_AJAX {
 
     public function get_contact_sales_meta_box()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         $selected_status = '';
         if ( isset($_POST['selected_status']) )
@@ -5772,7 +5772,7 @@ class PH_AJAX {
 
     public function get_property_enquiries_meta_box()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         $selected_status = '';
         if ( isset($_POST['selected_status']) )
@@ -5790,7 +5790,7 @@ class PH_AJAX {
 
     public function get_contact_enquiries_meta_box()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         $selected_status = '';
         if ( isset($_POST['selected_status']) )
@@ -5868,16 +5868,16 @@ class PH_AJAX {
 
     public function get_management_dates_grid()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         if ( isset($_POST['selected_type_id']) )
         {
-            $selected_type_id = $_POST['selected_type_id'];
+            $selected_type_id = (int)$_POST['selected_type_id'];
         }
 
         if ( isset($_POST['selected_status']) )
         {
-            $selected_status = $_POST['selected_status'];
+            $selected_status = ph_clean($_POST['selected_status']);
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-management-dates-meta-box.php' );
@@ -5888,7 +5888,7 @@ class PH_AJAX {
 
     public function get_key_dates_quick_edit_row()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         include( PH()->plugin_path() . '/includes/admin/views/html-key-dates-quick-edit.php' );
 
@@ -5898,7 +5898,7 @@ class PH_AJAX {
 
     public function check_key_date_recurrence()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         $next_key_date = '';
 
@@ -5952,24 +5952,31 @@ class PH_AJAX {
 
     public function save_key_date()
     {
+        check_ajax_referer( 'save-key-date', 'security' );
+
+        $this->json_headers();
+
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_send_json_error( __( 'You do not have permission to manage key dates', 'propertyhive' ), 403 );
+
         $key_date_post_id = (int)$_POST['post_id'];
 
         $args = array(
             'ID' => $key_date_post_id,
-            'post_title' => $_POST['description'],
+            'post_title' => ph_clean($_POST['description']),
         );
         wp_update_post( $args );
 
-        update_post_meta( $key_date_post_id, '_date_due', $_POST['due_date_time'] );
-        update_post_meta( $key_date_post_id, '_key_date_status', $_POST['status'] );
-        update_post_meta( $key_date_post_id, '_key_date_type_id', $_POST['type'] );
+        update_post_meta( $key_date_post_id, '_date_due', ph_clean($_POST['due_date_time']) );
+        update_post_meta( $key_date_post_id, '_key_date_status', ph_clean($_POST['status']) );
+        update_post_meta( $key_date_post_id, '_key_date_type_id', (int)$_POST['type'] );
         update_post_meta( $key_date_post_id, '_key_date_notes', sanitize_textarea_field($_POST['notes'] ));
 
         if ( isset($_POST['next_key_date']) )
         {
             // Insert next key date record
             $next_key_date_post = array(
-                'post_title' => $_POST['description'],
+                'post_title' => ph_clean($_POST['description']),
                 'post_content' => '',
                 'post_type' => 'key_date',
                 'post_status' => 'publish',
@@ -5987,15 +5994,15 @@ class PH_AJAX {
                 die();
             }
 
-            add_post_meta( $next_key_date_post_id, '_date_due', $_POST['next_key_date'] );
+            add_post_meta( $next_key_date_post_id, '_date_due', ph_clean($_POST['next_key_date']) );
             add_post_meta( $next_key_date_post_id, '_key_date_status', 'pending' );
-            add_post_meta( $next_key_date_post_id, '_key_date_type_id', $_POST['type'] );
+            add_post_meta( $next_key_date_post_id, '_key_date_type_id', (int)$_POST['type'] );
 
-            if( metadata_exists('post', $key_date_post_id, '_property_id') ) {
+            if ( metadata_exists('post', $key_date_post_id, '_property_id') ) {
                 add_post_meta( $next_key_date_post_id, '_property_id', get_post_meta($key_date_post_id, '_property_id', true) );
             }
 
-            if( metadata_exists('post', $key_date_post_id, '_tenancy_id') ) {
+            if ( metadata_exists('post', $key_date_post_id, '_tenancy_id') ) {
                 add_post_meta( $next_key_date_post_id, '_tenancy_id', get_post_meta($key_date_post_id, '_tenancy_id', true) );
             }
         }
@@ -6005,7 +6012,12 @@ class PH_AJAX {
 
     public function delete_key_date()
     {
+        check_ajax_referer( 'delete-key-date', 'security' );
+
         $this->json_headers();
+
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_send_json_error( __( 'You do not have permission to manage key dates', 'propertyhive' ), 403 );
 
         $date_post_id = (int)$_POST['date_post_id'];
 
@@ -6019,7 +6031,7 @@ class PH_AJAX {
 
     public function get_property_tenancies_grid()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         if ( isset($_POST['selected_status']) )
         {
@@ -6034,7 +6046,7 @@ class PH_AJAX {
 
     public function get_contact_tenancies_grid()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = (int)$_POST['post_id'];
 
         if ( isset($_POST['selected_status']) )
         {
@@ -6049,16 +6061,16 @@ class PH_AJAX {
 
     public function get_contact_solicitor()
     {
-        switch( get_post_type($_POST['post_id']) )
+        switch( get_post_type((int)$_POST['post_id']) )
         {
             case 'contact':
             {
-                $contact_post_ids = array( $_POST['post_id'] );
+                $contact_post_ids = array( (int)$_POST['post_id'] );
                 break;
             }
             case 'property':
             {
-                $owner_contact_ids = get_post_meta($_POST['post_id'], '_owner_contact_id', TRUE);
+                $owner_contact_ids = get_post_meta((int)$_POST['post_id'], '_owner_contact_id', TRUE);
                 if ( !empty( $owner_contact_ids ) )
                 {
                     if ( !is_array($owner_contact_ids) )
