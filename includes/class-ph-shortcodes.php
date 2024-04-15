@@ -633,7 +633,7 @@ class PH_Shortcodes {
 
 		ob_start();
 
-        do_action('propertyhive_shortcode_properties_before_catalog_ordering');
+        do_action('propertyhive_shortcode_properties_before_catalog_ordering', $atts);
 
 		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
 		{
@@ -641,6 +641,8 @@ class PH_Shortcodes {
 
 			propertyhive_catalog_ordering( $atts['department'], $orderby );
 		}
+
+		do_action('propertyhive_shortcode_properties_after_catalog_ordering', $atts);
 
 		$args = apply_filters( 'propertyhive_properties_query', $args, $atts );
 		$args = apply_filters( 'propertyhive_shortcode_properties_query', $args, $atts );
@@ -657,7 +659,7 @@ class PH_Shortcodes {
 			propertyhive_result_count( $paged, $atts['posts_per_page'], $total_posts, $first, $last);
 		}
 
-        do_action('propertyhive_shortcode_properties_after_result_count');
+        do_action('propertyhive_shortcode_properties_after_result_count', $atts);
 
 		$propertyhive_loop['columns'] = (int)$atts['columns'];
 
