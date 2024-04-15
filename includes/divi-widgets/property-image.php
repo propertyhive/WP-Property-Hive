@@ -30,6 +30,7 @@ class Divi_Property_Image_Widget extends ET_Builder_Module
                     'large' => __( 'Large', 'propertyhive' ),
                     'full' => __( 'Full', 'propertyhive' ),
                 ],
+                'default_on_front' => 'large',
                 'toggle_slug' => 'main_content',
             ),
             'output_ratio' => array(
@@ -42,6 +43,7 @@ class Divi_Property_Image_Widget extends ET_Builder_Module
                     '16:9' => __( '16:9', 'propertyhive' ),
                     '1:1' => __( 'Square', 'propertyhive' ),
                 ],
+                'default_on_front' => '',
                 'toggle_slug' => 'main_content',
             ),
         );
