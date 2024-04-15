@@ -15,7 +15,18 @@ class Divi_Property_Negotiator_Telephone_Number_Widget extends ET_Builder_Module
 
     public function get_fields()
     {
-        $fields = array();
+        $fields = array(
+            'hyperlink' => array(
+                'label' => __( 'Hyperlink', 'propertyhive' ),
+                'type' => 'select',
+                'options' => [
+                    'yes' => __( 'Yes', 'propertyhive' ),
+                    'no' => __( 'No', 'propertyhive' ),
+                ],
+                'default_on_front' => 'yes',
+                'toggle_slug' => 'main_content',
+            ),
+        );
 
         return $fields;
     }
@@ -30,7 +41,19 @@ class Divi_Property_Negotiator_Telephone_Number_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = $property->negotiator_telephone_number;
+        $return = '';
+
+        if ( isset($this->props['hyperlink']) && $this->props['hyperlink'] == 'yes' ) 
+        { 
+            $return .= '<a href="tel:' . esc_attr($property->negotiator_telephone_number) . '">';
+        }
+
+        $return .= $property->negotiator_telephone_number;
+
+        if ( isset($this->props['hyperlink']) && $this->props['hyperlink'] == 'yes' ) 
+        { 
+            $return .= '</a>';
+        }
 
         return $this->_render_module_wrapper( $return, $render_slug );
     }
