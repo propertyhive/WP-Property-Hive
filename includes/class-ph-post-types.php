@@ -135,14 +135,17 @@ class PH_Post_types {
 
         register_taxonomy( 'availability',
             apply_filters( 'propertyhive_taxonomy_objects_availability', array( 'property' ) ),
-            array(
-                'label'                 => __( 'Availabilities', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_availability',
+                array(
+                    'label'                 => __( 'Availabilities', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
 
@@ -164,158 +167,194 @@ class PH_Post_types {
 
         register_taxonomy( 'commercial_property_type',
             apply_filters( 'propertyhive_taxonomy_objects_commercial_property_type', array( 'property', 'appraisal' ) ),
-            array(
-                'label'                 => __( 'Commercial Property Types', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_commercial_property_type',
+                array(
+                    'label'                 => __( 'Commercial Property Types', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
         
         register_taxonomy( 'location',
             apply_filters( 'propertyhive_taxonomy_objects_location', array( 'property' ) ),
-            array(
-                'label'                 => __( 'Locations', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_location',
+                array(
+                    'label'                 => __( 'Locations', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
         
         register_taxonomy( 'parking',
             apply_filters( 'propertyhive_taxonomy_objects_parking', array( 'property', 'appraisal' ) ),
-            array(
-                'label'                 => __( 'Parking', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_parking',
+                array(
+                    'label'                 => __( 'Parking', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
         
         register_taxonomy( 'outside_space',
             apply_filters( 'propertyhive_taxonomy_objects_outside_space', array( 'property', 'appraisal' ) ),
-            array(
-                'label'                 => __( 'Outside Spaces', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_outside_space',
+                array(
+                    'label'                 => __( 'Outside Spaces', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
         
         register_taxonomy( 'price_qualifier',
             apply_filters( 'propertyhive_taxonomy_objects_price_qualifier', array( 'property' ) ),
-            array(
-                'label'                 => __( 'Price Qualifiers', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_price_qualifier',
+                array(
+                    'label'                 => __( 'Price Qualifiers', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
         
         register_taxonomy( 'tenure',
             apply_filters( 'propertyhive_taxonomy_objects_tenure', array( 'property' ) ),
-            array(
-                'label'                 => __( 'Tenures', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_tenure',
+                array(
+                    'label'                 => __( 'Tenures', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
 
         register_taxonomy( 'commercial_tenure',
             apply_filters( 'propertyhive_taxonomy_objects_commercial_tenure', array( 'property' ) ),
-            array(
-                'label'                 => __( 'Commercial Tenures', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_commercial_tenure',
+                array(
+                    'label'                 => __( 'Commercial Tenures', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
         
         register_taxonomy( 'sale_by',
             apply_filters( 'propertyhive_taxonomy_objects_sale_by', array( 'property' ) ),
-            array(
-                'label'                 => __( 'Sale By', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_sale_by',
+                array(
+                    'label'                 => __( 'Sale By', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
         
         register_taxonomy( 'furnished',
             apply_filters( 'propertyhive_taxonomy_objects_furnished', array( 'property', 'appraisal' ) ),
-            array(
-                'label'                 => __( 'Furnished', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_furnished',
+                array(
+                    'label'                 => __( 'Furnished', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
 
         register_taxonomy( 'marketing_flag',
             apply_filters( 'propertyhive_taxonomy_objects_marketing_flag', array( 'property' ) ),
-            array(
-                'label'                 => __( 'Marketing Flags', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_marketing_flag',
+                array(
+                    'label'                 => __( 'Marketing Flags', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
 
         register_taxonomy( 'property_feature',
             apply_filters( 'propertyhive_taxonomy_objects_property_feature', array( 'property' ) ),
-            array(
-                'label'                 => __( 'Property Features', 'propertyhive' ),
-                'hierarchical'          => true,
-                'show_ui'               => false,
-                'show_in_nav_menus'     => false,
-                'query_var'             => is_admin(),
-                'rewrite'               => false,
-                'public'                => true
+            apply_filters(
+                'propertyhive_taxonomy_args_property_feature',
+                array(
+                    'label'                 => __( 'Property Features', 'propertyhive' ),
+                    'hierarchical'          => true,
+                    'show_ui'               => false,
+                    'show_in_nav_menus'     => false,
+                    'query_var'             => is_admin(),
+                    'rewrite'               => false,
+                    'public'                => true
+                )
             )
         );
 
 		register_taxonomy( 'management_key_date_type',
 			apply_filters( 'propertyhive_taxonomy_objects_management_key_date_type', array( 'key_date' ) ),
-			array(
-				'label'                 => __( 'Management Dates', 'propertyhive' ),
-				'hierarchical'          => true,
-				'show_ui'               => false,
-				'show_in_nav_menus'     => false,
-				'query_var'             => is_admin(),
-				'rewrite'               => false,
-				'public'                => true
-			)
+            apply_filters(
+                'propertyhive_taxonomy_args_management_key_date_type',
+    			array(
+    				'label'                 => __( 'Management Dates', 'propertyhive' ),
+    				'hierarchical'          => true,
+    				'show_ui'               => false,
+    				'show_in_nav_menus'     => false,
+    				'query_var'             => is_admin(),
+    				'rewrite'               => false,
+    				'public'                => true
+    			)
+            )
 		);
 			
 		do_action( 'do_action_after_register_taxonomies' );
