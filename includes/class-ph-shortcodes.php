@@ -633,6 +633,8 @@ class PH_Shortcodes {
 
 		ob_start();
 
+        do_action('propertyhive_shortcode_properties_before_catalog_ordering');
+
 		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
 		{
 			list( $args, $orderby ) = self::get_show_order_args( $atts, $args );
@@ -654,6 +656,8 @@ class PH_Shortcodes {
 
 			propertyhive_result_count( $paged, $atts['posts_per_page'], $total_posts, $first, $last);
 		}
+
+        do_action('propertyhive_shortcode_properties_after_result_count');
 
 		$propertyhive_loop['columns'] = (int)$atts['columns'];
 
