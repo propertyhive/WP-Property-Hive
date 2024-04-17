@@ -912,16 +912,9 @@ if ( ! function_exists( 'propertyhive_template_single_sharing' ) ) {
     }
 }
 
-if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
+if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
 
-    /**
-     * Output the product actions (make enquiry etc)
-     *
-     * @access public
-     * @subpackage  Property
-     * @return void
-     */
-    function propertyhive_template_single_actions() {
+    function propertyhive_get_template_single_actions() {
 
         global $post, $property;
 
@@ -1070,19 +1063,27 @@ if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
             }
         }
 
-        /*$actions[] = array(
-            'href' => '',
-            'label' => __( 'View on Map', 'propertyhive' ),
-            'class' => 'action-map'
-        );
-
-        $actions[] = array(
-            'href' => '',
-            'label' => __( 'Street View', 'propertyhive' ),
-            'class' => 'action-street-view'
-        );*/
-
         $actions = apply_filters( 'propertyhive_single_property_actions', $actions );
+
+        return $actions;
+    }
+
+}
+
+if ( ! function_exists( 'propertyhive_template_single_actions' ) ) {
+
+    /**
+     * Output the product actions (make enquiry etc)
+     *
+     * @access public
+     * @subpackage  Property
+     * @return void
+     */
+    function propertyhive_template_single_actions() {
+
+        global $post, $property;
+
+        $actions = propertyhive_get_template_single_actions();
         
         ph_get_template( 'single-property/actions.php', array( 'actions' => $actions ) );
     }
