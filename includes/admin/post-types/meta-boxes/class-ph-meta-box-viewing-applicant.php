@@ -282,8 +282,8 @@ class PH_Meta_Box_Viewing_Applicant {
                 security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
                 exclude_ids:    jQuery('#_applicant_contact_ids').val(),
             };
-            viewing_search_properties_xhr.abort(); // cancel previous request
-            viewing_search_properties_xhr = jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            viewing_search_applicants_xhr.abort(); // cancel previous request
+            viewing_search_applicants_xhr = jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
             {
                 if (response == '' || response.length == 0)
                 {
