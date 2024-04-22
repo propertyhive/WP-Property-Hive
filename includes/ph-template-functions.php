@@ -912,9 +912,9 @@ if ( ! function_exists( 'propertyhive_template_single_sharing' ) ) {
     }
 }
 
-if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
+if ( ! function_exists( 'propertyhive_get_template_single_floorplans_action' ) ) {
 
-    function propertyhive_get_template_single_actions() {
+    function propertyhive_get_template_single_floorplans_action() {
 
         global $post, $property;
 
@@ -966,6 +966,21 @@ if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
             }
         }
 
+        $actions = apply_filters( 'propertyhive_single_property_floorplans_actions', $actions );
+
+        return $actions;
+    }
+
+}
+
+if ( ! function_exists( 'propertyhive_get_template_single_brochures_action' ) ) {
+
+    function propertyhive_get_template_single_brochures_action() {
+
+        global $post, $property;
+
+        $actions = array();
+
         if ( get_option('propertyhive_brochures_stored_as', '') == 'urls' )
         {
             $brochure_urls = $property->_brochure_urls;
@@ -1002,6 +1017,21 @@ if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
                 }
             }
         }
+
+        $actions = apply_filters( 'propertyhive_single_property_brochures_actions', $actions );
+
+        return $actions;
+    }
+
+}
+
+if ( ! function_exists( 'propertyhive_get_template_single_epcs_action' ) ) {
+
+    function propertyhive_get_template_single_epcs_action() {
+
+        global $post, $property;
+
+        $actions = array();
 
         if ( get_option('propertyhive_epcs_stored_as', '') == 'urls' )
         {
@@ -1043,6 +1073,21 @@ if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
             }
         }
 
+        $actions = apply_filters( 'propertyhive_single_property_epcs_actions', $actions );
+
+        return $actions;
+    }
+
+}
+
+if ( ! function_exists( 'propertyhive_get_template_single_virtual_tours_action' ) ) {
+
+    function propertyhive_get_template_single_virtual_tours_action() {
+
+        global $post, $property;
+
+        $actions = array();
+
         $virtual_tours = $property->get_virtual_tours();
         if ( !empty( $virtual_tours ) )
         {
@@ -1063,6 +1108,27 @@ if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
             }
         }
 
+        $actions = apply_filters( 'propertyhive_single_property_virtual_tours_actions', $actions );
+
+        return $actions;
+    }
+
+}
+
+if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
+
+    function propertyhive_get_template_single_actions() {
+
+        global $post, $property;
+
+        $actions = array_merge(
+            propertyhive_get_template_single_floorplans_action(),
+            propertyhive_get_template_single_brochures_action(),
+            propertyhive_get_template_single_epcs_action(),
+            propertyhive_get_template_single_virtual_tours_action()
+        );
+
+        
         $actions = apply_filters( 'propertyhive_single_property_actions', $actions );
 
         return $actions;
