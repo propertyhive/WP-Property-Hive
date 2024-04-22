@@ -41,8 +41,9 @@ class PH_Settings_General extends PH_Settings_Page {
         $sections = array(
             ''              => __( 'General', 'propertyhive' ),
             'modules'       => __( 'Modules', 'propertyhive' ),
-            'international' => __( 'International', 'propertyhive' ),
             'map'           => __( 'Map', 'propertyhive' ),
+            'media'         => __( 'Media', 'propertyhive' ),
+            'international' => __( 'International', 'propertyhive' ),
             'gdpr'          => __( 'GDPR', 'propertyhive' ),
             'misc'          => __( 'Miscellaneous', 'propertyhive' ),
         );
@@ -416,6 +417,72 @@ class PH_Settings_General extends PH_Settings_Page {
 	}
 
     /**
+     * Get media settings array
+     *
+     * @return array
+     */
+    public function get_general_media_setting() {
+            
+        $settings = array(
+
+            array( 'title' => __( 'Property Media Storage', 'propertyhive' ), 'type' => 'title', 'desc' => 'By default media attached to properties will be stored in the WordPress media library. If the property media is hosted elsewhere (for example if you import properties from a third party and they allow you to link direct to the files on their server) you can choose to store media as URL\'s. It also means that the images are not downloaded onto your server, thus saving diskspace.<br><br>Note: If you change this you\'ll need to re-add all of the property media for existing properties.<br>Note: Changing this will not delete all existing media or URLs entered.<br>Note: Choosing to store the media as URLs will mean you don\'t benefit from having access to different sized images (i.e. small, medium, large etc).', 'id' => 'media_storage_options' ),
+
+            array(
+                'title'   => __( 'Images Stored As', 'propertyhive' ),
+                'id'      => 'propertyhive_images_stored_as',
+                'type'    => 'select',
+                'default' => 'files',
+                'options' => array(
+                    'files' => __( 'Media Files', 'propertyhive' ),
+                    'urls' => __( 'URLs', 'propertyhive' ),
+                ),
+                'desc'  => ''
+            ),
+
+            array(
+                'title'   => __( 'Floorplans Stored As', 'propertyhive' ),
+                'id'      => 'propertyhive_floorplans_stored_as',
+                'type'    => 'select',
+                'default' => 'files',
+                'options' => array(
+                    'files' => __( 'Media Files', 'propertyhive' ),
+                    'urls' => __( 'URLs', 'propertyhive' ),
+                ),
+                'desc'  => ''
+            ),
+
+            array(
+                'title'   => __( 'Brochures Stored As', 'propertyhive' ),
+                'id'      => 'propertyhive_brochures_stored_as',
+                'type'    => 'select',
+                'default' => 'files',
+                'options' => array(
+                    'files' => __( 'Media Files', 'propertyhive' ),
+                    'urls' => __( 'URLs', 'propertyhive' ),
+                ),
+                'desc'  => ''
+            ),
+
+            array(
+                'title'   => __( 'EPCs Stored As', 'propertyhive' ),
+                'id'      => 'propertyhive_epcs_stored_as',
+                'type'    => 'select',
+                'default' => 'files',
+                'options' => array(
+                    'files' => __( 'Media Files', 'propertyhive' ),
+                    'urls' => __( 'URLs', 'propertyhive' ),
+                ),
+                'desc'  => ''
+            ),
+
+            array( 'type' => 'sectionend', 'id' => 'media_storage_options')
+
+        );
+
+        return apply_filters( 'propertyhive_general_media_settings', $settings );
+    }
+
+    /**
      * Get GDPR settings array
      *
      * @return array
@@ -608,58 +675,6 @@ class PH_Settings_General extends PH_Settings_Page {
 
             array( 'type' => 'sectionend', 'id' => 'applicant_registration_options'),
 
-            array( 'title' => __( 'Property Media Storage', 'propertyhive' ), 'type' => 'title', 'desc' => 'By default media attached to properties will be stored in the WordPress media library. If the property media is hosted elsewhere (for example if you import properties from a third party and they allow you to link direct to the files on their server) you can choose to store media as URL\'s. It also means that the images are not downloaded onto your server, thus saving diskspace.<br><br>Note: If you change this you\'ll need to re-add all of the property media for existing properties.<br>Note: Changing this will not delete all existing media or URLs entered.<br>Note: Choosing to store the media as URLs will mean you don\'t benefit from having access to different sized images (i.e. small , medium, large etc).', 'id' => 'media_storage_options' ),
-
-            array(
-                'title'   => __( 'Images Stored As', 'propertyhive' ),
-                'id'      => 'propertyhive_images_stored_as',
-                'type'    => 'select',
-                'default' => 'files',
-                'options' => array(
-                    'files' => __( 'Media Files', 'propertyhive' ),
-                    'urls' => __( 'URLs', 'propertyhive' ),
-                ),
-                'desc'  => ''
-            ),
-
-            array(
-                'title'   => __( 'Floorplans Stored As', 'propertyhive' ),
-                'id'      => 'propertyhive_floorplans_stored_as',
-                'type'    => 'select',
-                'default' => 'files',
-                'options' => array(
-                    'files' => __( 'Media Files', 'propertyhive' ),
-                    'urls' => __( 'URLs', 'propertyhive' ),
-                ),
-                'desc'  => ''
-            ),
-
-            array(
-                'title'   => __( 'Brochures Stored As', 'propertyhive' ),
-                'id'      => 'propertyhive_brochures_stored_as',
-                'type'    => 'select',
-                'default' => 'files',
-                'options' => array(
-                    'files' => __( 'Media Files', 'propertyhive' ),
-                    'urls' => __( 'URLs', 'propertyhive' ),
-                ),
-                'desc'  => ''
-            ),
-
-            array(
-                'title'   => __( 'EPCs Stored As', 'propertyhive' ),
-                'id'      => 'propertyhive_epcs_stored_as',
-                'type'    => 'select',
-                'default' => 'files',
-                'options' => array(
-                    'files' => __( 'Media Files', 'propertyhive' ),
-                    'urls' => __( 'URLs', 'propertyhive' ),
-                ),
-                'desc'  => ''
-            ),
-
-            array( 'type' => 'sectionend', 'id' => 'media_storage_options'),
-
             array( 'title' => __( 'Improve Property Hive', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'stat_tracking_options' ),
 
             array(
@@ -688,6 +703,7 @@ class PH_Settings_General extends PH_Settings_Page {
             	case "modules": { $settings = $this->get_general_modules_setting(); break; }
                 case "international": { $settings = $this->get_general_international_setting(); break; }
                 case "map": { $settings = $this->get_general_map_setting(); break; }
+                case "media": { $settings = $this->get_general_media_setting(); break; }
                 case "gdpr": { $settings = $this->get_general_gdpr_setting(); break; }
                 case "misc": { $settings = $this->get_general_misc_setting(); break; }
                 default: { die("Unknown setting section"); }
@@ -769,6 +785,13 @@ class PH_Settings_General extends PH_Settings_Page {
 					PH_Admin_Settings::save_fields( $settings );
 					break;
 				}
+                case 'media':
+                {
+                    $settings = $this->get_general_media_setting();
+
+                    PH_Admin_Settings::save_fields( $settings );
+                    break;
+                }
                 case 'gdpr':
                 {
                     $settings = $this->get_general_gdpr_setting();
