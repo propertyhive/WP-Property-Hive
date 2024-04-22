@@ -15,27 +15,51 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PH_Form_Handler {
 
-	/**
-	 * Hook in methods
-	 */
-	public static function init() {
-		//add_action( 'init', array( __CLASS__, 'process_login' ) );
-		//add_action( 'init', array( __CLASS__, 'process_registration' ) );
+	public function __construct() {
+
+		add_action( 'init', array( $this, 'add_captcha_to_forms' ) );
+
 	}
 
-	/**
-	 * Process the login form.
-	 */
-	public static function process_login() {
-		
+	public function add_captcha_to_forms()
+	{
+		if ( in_array(get_option( 'propertyhive_captcha_service', '' ), array('recaptcha', 'recaptcha-v3', 'hCaptcha')) )
+		{
+			add_filter( 'propertyhive_property_enquiry_form_fields', array( $this, 'add_captcha_to_form' ) );
+			add_filter( 'propertyhive_applicant_registration_form_fields', array( $this, 'add_captcha_to_form' ) );
+			add_filter( 'propertyhive_send_to_friend_form_fields', array( $this, 'add_captcha_to_form' ) );
+		}
 	}
 
-	/**
-	 * Process the registration form.
-	 */
-	public static function process_registration() {
-		
+	public function add_captcha_to_form($fields)
+	{
+		$captcha_service = get_option( 'propertyhive_captcha_service', '' );
+
+		switch ( $captcha_service )
+		{
+			case "recaptcha":
+			case "recaptcha-v3":
+			{
+				$fields['recaptcha'] = array(
+			        'type' => $captcha_service,
+			        'site_key' => get_option( 'propertyhive_captcha_site_key', '' ),
+			        'secret' => get_option( 'propertyhive_captcha_secret', '' ),
+			    );
+				break;
+			}
+			case "hCaptcha":
+			{
+				$fields['hCaptcha'] = array(
+			        'type' => $captcha_service,
+			        'site_key' => get_option( 'propertyhive_captcha_site_key', '' ),
+			        'secret' => get_option( 'propertyhive_captcha_secret', '' ),
+			    );
+				break;
+			}
+		}
+
+		return $fields;
 	}
 }
 
-PH_Form_Handler::init();
+new PH_Form_Handler();
