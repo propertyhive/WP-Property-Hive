@@ -45,6 +45,7 @@ class PH_Settings_General extends PH_Settings_Page {
             'media'         => __( 'Media', 'propertyhive' ),
             'international' => __( 'International', 'propertyhive' ),
             'gdpr'          => __( 'GDPR', 'propertyhive' ),
+            'captcha'       => __( 'CAPTCHA', 'propertyhive' ),
             'misc'          => __( 'Miscellaneous', 'propertyhive' ),
         );
 
@@ -520,6 +521,77 @@ class PH_Settings_General extends PH_Settings_Page {
         ) ); // End general GDPR settings
     }
 
+    /**
+     * Get CAPTCHA settings array
+     *
+     * @return array
+     */
+    public function get_general_captcha_setting() {
+            
+        return apply_filters( 'propertyhive_general_captcha_settings', array(
+
+            array( 'title' => __( 'CAPTCHA Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'captcha_options', 'desc' => __( 'Prevent spam and bots on forms provided by Property Hive by signing up to a CAPTCHA service and entering the details below.<br><br>When enabled, a CAPTCHA will be added to the register, property enquiry and send to friend forms.', 'propertyhive' ) ),
+
+            array(
+                'title'   => __( 'CAPTCHA service', 'propertyhive' ),
+                'id'      => 'propertyhive_captcha_service',
+                'type'    => 'radio',
+                'options' => array(
+                    '' => __( 'None', 'propertyhive' ),
+                    'recaptcha' => __( 'Google reCaptcha v2', 'propertyhive' ) . ' (<a href="https://www.google.com/recaptcha/admin/create" target="_blank">register</a>)',
+                    'recaptcha-v3' => __( 'Google reCaptcha v3', 'propertyhive' ) . ' (<a href="https://www.google.com/recaptcha/admin/create" target="_blank">register</a>)',
+                    'hCaptcha' => __( 'hCaptcha', 'propertyhive' ) . ' (<a href="https://www.hcaptcha.com/" target="_blank">register</a>)',
+                ),
+            ),
+
+            array(
+                'title'   => __( 'Site Key', 'propertyhive' ),
+                'id'      => 'propertyhive_captcha_site_key',
+                'type'    => 'text',
+            ),
+
+            array(
+                'title'   => __( 'Secret', 'propertyhive' ),
+                'id'      => 'propertyhive_captcha_secret',
+                'type'    => 'text',
+            ),
+
+            array(
+                //'title'   => __( 'CAPTCHA service', 'propertyhive' ),
+                'id'      => 'propertyhive_captcha_html',
+                'type'    => 'html',
+                'html'    => '<script>
+                    jQuery(document).ready(function()
+                    {
+                        jQuery(\'input[name=\\\'propertyhive_captcha_service\\\']\').change(function()
+                        {
+                            ph_captcha_service_update();
+                        });
+
+                        ph_captcha_service_update();
+                    });
+
+                    function ph_captcha_service_update()
+                    {
+                        jQuery(\'#row_propertyhive_captcha_site_key\').hide();
+                        jQuery(\'#row_propertyhive_captcha_secret\').hide();
+
+                        var selected_captcha_service = jQuery(\'input[name=\\\'propertyhive_captcha_service\\\']:checked\').val();
+
+                        if ( selected_captcha_service != \'\' )
+                        {
+                            jQuery(\'#row_propertyhive_captcha_site_key\').show();
+                            jQuery(\'#row_propertyhive_captcha_secret\').show();
+                        }
+                    }
+                </script>',
+            ),
+
+            array( 'type' => 'sectionend', 'id' => 'captcha_options'),
+
+        ) ); // End general CAPTCHA settings
+    }
+
 	/**
 	 * Get misc settings array
 	 *
@@ -705,6 +777,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 case "map": { $settings = $this->get_general_map_setting(); break; }
                 case "media": { $settings = $this->get_general_media_setting(); break; }
                 case "gdpr": { $settings = $this->get_general_gdpr_setting(); break; }
+                case "captcha": { $settings = $this->get_general_captcha_setting(); break; }
                 case "misc": { $settings = $this->get_general_misc_setting(); break; }
                 default: { die("Unknown setting section"); }
             }
@@ -795,6 +868,13 @@ class PH_Settings_General extends PH_Settings_Page {
                 case 'gdpr':
                 {
                     $settings = $this->get_general_gdpr_setting();
+
+                    PH_Admin_Settings::save_fields( $settings );
+                    break;
+                }
+                case 'captcha':
+                {
+                    $settings = $this->get_general_captcha_setting();
 
                     PH_Admin_Settings::save_fields( $settings );
                     break;
