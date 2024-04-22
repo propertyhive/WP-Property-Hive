@@ -56,7 +56,7 @@ class PH_Meta_Box_Property_Brochures {
                 echo '
                 <p class="form-field brochure_url_field ">
                     <label for="brochure_url_1">Brochure URL</label>
-                    <input type="text" class="short" name="brochure_url[]" id="" value="" placeholder="http://"> 
+                    <input type="text" class="short" name="brochure_url[]" id="" value="" placeholder="https://"> 
                     <a href="" class="button remove_brochure_url"><span class="fa fa-trash"></span></a>
                 </p>';
                 

@@ -51,7 +51,7 @@ class PH_Meta_Box_Property_Photos {
                 echo '
                 <p class="form-field photo_url_field ">
                     <label for="photo_url_1">Photo URL</label>
-                    <input type="text" class="short" name="photo_url[]" id="" value="" placeholder="http://"> 
+                    <input type="text" class="short" name="photo_url[]" id="" value="" placeholder="https://"> 
                     <a href="" class="button remove_photo_url"><span class="fa fa-trash"></span></a>
                 </p>';
                 
