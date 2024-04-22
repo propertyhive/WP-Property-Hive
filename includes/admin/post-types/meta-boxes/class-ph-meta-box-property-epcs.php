@@ -56,7 +56,7 @@ class PH_Meta_Box_Property_Epcs {
                 echo '
                 <p class="form-field epc_url_field ">
                     <label for="epc_url_1">EPC URL</label>
-                    <input type="text" class="short" name="epc_url[]" id="" value="" placeholder="http://"> 
+                    <input type="text" class="short" name="epc_url[]" id="" value="" placeholder="https://"> 
                     <a href="" class="button remove_epc_url"><span class="fa fa-trash"></span></a>
                 </p>';
                 

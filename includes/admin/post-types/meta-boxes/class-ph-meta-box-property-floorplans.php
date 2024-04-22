@@ -56,7 +56,7 @@ class PH_Meta_Box_Property_Floorplans {
                 echo '
                 <p class="form-field floorplano_url_field ">
                     <label for="floorplan_url_1">Floorplan URL</label>
-                    <input type="text" class="short" name="floorplan_url[]" id="" value="" placeholder="http://"> 
+                    <input type="text" class="short" name="floorplan_url[]" id="" value="" placeholder="https://"> 
                     <a href="" class="button remove_floorplan_url"><span class="fa fa-trash"></span></a>
                 </p>';
                 
