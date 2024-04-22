@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.5.2
-Stable tag: 2.0.12
+Stable tag: 2.0.13
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,19 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.13 - 2024-04-22 =
+* Added settings area allowing a CAPTCHA service to be applied to forms
+* Moved media related settings into it's own settings area to make it more prominent
+* Tidied up settings sub menus to be more equally spaced
+* Changed URL placeholders when storing media as URLs to https:// instead of http:// to promote the former
+* Added ability to hyperlink negotiator email address and telephone number in Divi widgets
+* Moved getting of actions into their own functions so they can be called separately
+* Added 'propertyhive_taxonomy_args_{taxonomy}' filters to all registered taxonomies
+* Added tooltip to 'Maximum Price' label of Generate Applicant List screen to clarify how it works
+* Corrected JS error relating to searching viewing applicants
+* Corrected undefined PHP warning from recent work regarding custom fields reordering
+* Various AJAX-related security and sanitisation tweaks
 
 = 2.0.12 - 2024-04-11 =
 * Added ability to re-order custom fields (availability, parking etc) by dragging and dropping. Only applies to custom fields that don't have a child/parent relationship (i.e. types and locations)
