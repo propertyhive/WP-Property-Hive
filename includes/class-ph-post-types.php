@@ -52,6 +52,11 @@ class PH_Post_types {
             return $terms;
         }
 
+        if ( !isset($query_vars['fields']) || ( isset($query_vars['fields']) && $query_vars['fields'] != 'all' ) )
+        {
+            return $terms;
+        }
+
         if ( !is_array($taxonomies) ) { $taxonomies = array($taxonomies); }
 
         foreach ( $taxonomies as $taxonomy_name )
