@@ -669,7 +669,10 @@ class PH_Shortcodes {
 				ob_start();
 				propertyhive_property_loop_start(); 
 				$loop_start = ob_get_clean();
-				$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+				{
+					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				}
 				echo $loop_start;
 			?>
 
@@ -931,7 +934,10 @@ class PH_Shortcodes {
 				ob_start();
 				propertyhive_property_loop_start(); 
 				$loop_start = ob_get_clean();
-				$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+				{
+					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				}
 				echo $loop_start;
 			?>
 
@@ -1204,7 +1210,10 @@ class PH_Shortcodes {
 				ob_start();
 				propertyhive_property_loop_start(); 
 				$loop_start = ob_get_clean();
-				$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+				{
+					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+				}
 				echo $loop_start;
 			?>
 
@@ -1575,7 +1584,10 @@ class PH_Shortcodes {
 					ob_start();
 					propertyhive_property_loop_start(); 
 					$loop_start = ob_get_clean();
-					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+					if ( isset($atts['carousel']) && !empty($atts['carousel']) )
+					{
+						$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
+					}
 					echo $loop_start;
 				?>
 
