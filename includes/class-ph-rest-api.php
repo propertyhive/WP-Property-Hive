@@ -203,7 +203,7 @@ class PH_Rest_Api {
 			'featured',
 			'location',
 			'availability',
-			'marketing_flags',
+			'marketing_flag',
 			'features',
 			'description',
 			'office',
