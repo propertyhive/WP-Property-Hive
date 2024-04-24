@@ -62,7 +62,7 @@ class Divi_Property_Embedded_Virtual_Tours_Widget extends ET_Builder_Module
                             $virtual_tour['url']
                         );
 
-                        echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowFullScreen frameborder="0"></iframe>';
+                        echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
                     }
                 }
 
