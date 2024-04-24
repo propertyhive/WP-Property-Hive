@@ -691,7 +691,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 											    	);
 												}
 												
-												echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowFullScreen frameborder="0"></iframe>';
+												echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
 											}
 
 											echo '</div>';
