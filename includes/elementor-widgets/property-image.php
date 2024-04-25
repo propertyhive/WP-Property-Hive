@@ -37,6 +37,25 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
+			'image_link',
+			[
+				'label' => __( 'Link', 'propertyhive' ),
+	            'type' => \Elementor\Controls_Manager::URL, // Control type
+	            'default' => [
+	                'url' => '',
+	                'is_external' => false,
+	                'nofollow' => false,
+	            ],
+	            'dynamic' => [
+	                'active' => true,
+	                'settings' => [
+	                    'dynamic_tag' => \Elementor\Plugin::$instance->dynamic_tags->tag_data_to_tag_text( null, 'post-url' )
+	                ]
+	            ],
+			]
+		);
+
+		$this->add_control(
 			'image_number',
 			[
 				'label' => __( 'Image #', 'propertyhive' ),
@@ -127,7 +146,19 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 	        $numbers = explode(':', $output_ratio);
 	        $percent = ( ( (int)$numbers[1] / (int)$numbers[0] ) * 100 ) . '%';
 
-	        echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover; padding-bottom:' . $percent . '">';
+	        
+	        if ( ! empty( $settings['image_link']['url'] ) ) 
+	        {
+	        	echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover;">';
+				$this->add_link_attributes( 'image_link', $settings['image_link'] );
+				?><a <?php $this->print_render_attribute_string( 'image_link' ); ?> style="display:block; <?php echo 'padding-bottom:' . $percent; ?>"><?php
+				echo '</a>';
+				echo '</div>';
+			}
+	        else
+	        {
+	        	echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover; padding-bottom:' . $percent . '"></div>';
+	        }
 		}
 		else
 		{
@@ -137,7 +168,15 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 	        	$photos = $property->_photo_urls;
 	        	if ( isset($photos[$image_number-1]) )
 	        	{
+	        		if ( ! empty( $settings['image_link']['url'] ) ) 
+	        		{
+						$this->add_link_attributes( 'image_link', $settings['image_link'] );
+						?><a <?php $this->print_render_attribute_string( 'image_link' ); ?>><?php
+					}
 	        		echo '<img src="' . $photos[$image_number-1]['url'] . '" alt="">';
+	        		if ( ! empty( $settings['image_link']['url'] ) ) {
+	        			echo '</a>';
+	        		}
 	        	}
 	        }
 	        else
@@ -146,7 +185,15 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 
 				if ( isset($gallery_attachment_ids[$image_number-1]) )
 				{
+					if ( ! empty( $settings['image_link']['url'] ) ) 
+	        		{
+						$this->add_link_attributes( 'image_link', $settings['image_link'] );
+						?><a <?php $this->print_render_attribute_string( 'image_link' ); ?>><?php
+					}
 					echo wp_get_attachment_image( $gallery_attachment_ids[$image_number-1], $settings['image_size'] );
+					if ( ! empty( $settings['image_link']['url'] ) ) {
+	        			echo '</a>';
+	        		}
 				}
 			}
 		}
