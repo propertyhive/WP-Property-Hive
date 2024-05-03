@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.5.2
-Stable tag: 2.0.13
+Stable tag: 2.0.14
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,14 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.14 - 2024-05-03 =
+* Corrected currency exchange rates API URL
+* Added ability to add link to Elementor Property Image widget
+* Ensured 'propertyhive-shortcode-carousel' is only applied to property shortcode output when applicable. Corrects an issue where you have two shortcodes used on the same page; one using carousel, one without
+* Renamed 'marketing_flags' field to 'marketing_flag' in REST API response to mimic taxonomy name
+* Embedded virtual tours had 'AllowFullScreen' changed to 'allowfullscreen' and 'allow="fullscreen"' added
+* Corrected potential XSS issue in search form shortcode by escaping attributes
 
 = 2.0.13 - 2024-04-22 =
 * Added settings area allowing a CAPTCHA service to be applied to forms
