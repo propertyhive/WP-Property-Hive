@@ -6127,7 +6127,7 @@ class PH_AJAX {
             $return = array(
                 'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.' )
             );
-            wp_send_json_error( $status );
+            wp_send_json_error( $return );
         }
         
         // check plugin status
@@ -6373,7 +6373,7 @@ class PH_AJAX {
             $return = array(
                 'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.' )
             );
-            wp_send_json_error( $status );
+            wp_send_json_error( $return );
         }
 
         // check plugin is active
