@@ -35,6 +35,23 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'export_sub_grid' ) );
         add_action( 'admin_init', array( $this, 'check_hide_demo_data_tab' ) );
         add_action( 'admin_init', array( $this, 'check_install_add_on' ) );
+        add_filter( 'propertyhive_screen_ids', array( $this, 'crm_only_mode_screen_id' ) );
+    }
+
+    public function crm_only_mode_screen_id( $screen_ids )
+    {
+        $current_user = wp_get_current_user();
+
+        $user_id = $current_user->ID;
+
+        $crm_only_mode = get_user_meta( $user_id, 'crm_only_mode', TRUE );
+
+        if ( $crm_only_mode == '1' )
+        {
+            $screen_ids[] = 'toplevel_page_ph-settings';
+        }
+        
+        return $screen_ids;
     }
 
     public function check_install_add_on()
