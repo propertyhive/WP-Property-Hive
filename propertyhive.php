@@ -54,6 +54,20 @@ if ( ! class_exists( 'PropertyHive' ) )
          * @var PH_Emails
          */
         public $email = null;
+
+        /**
+         * License instance.
+         *
+         * @var PH_Licenses
+         */
+        public $license = null;
+
+        /**
+         * Countries instance.
+         *
+         * @var PH_Countries
+         */
+        public $countries = null;
         
         /**
          * Main PropertyHive Instance
