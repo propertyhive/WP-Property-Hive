@@ -118,7 +118,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			{
 				$pro_license = PH()->license->get_current_pro_license();
 				$pro_input_border_color = '#900'; 
-				$pro_output = $pro_license['error'];
+				$pro_output = ( isset($pro_license['error']) ? $pro_license['error'] : '' );
 			}
 		}
 		
