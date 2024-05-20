@@ -680,6 +680,7 @@ class PH_Query {
 
 		$meta_query[] = $this->on_market_meta_query();
         $meta_query[] = $this->department_meta_query($q);
+        $meta_query[] = $this->featured_meta_query();
         $meta_query[] = $this->date_added_meta_query();
         $meta_query[] = $this->address_keyword_meta_query();
         $meta_query[] = $this->country_meta_query();
@@ -789,6 +790,28 @@ class PH_Query {
                     'compare' => '='
                 );
             }
+        }
+        
+        return $meta_query;
+    }
+
+    /**
+     * Returns a meta query to handle featured
+     *
+     * @access public
+     * @return array
+     */
+    public function featured_meta_query( ) {
+        
+        $meta_query = array();
+        
+        if ( isset( $_REQUEST['featured'] ) && $_REQUEST['featured'] != '' )
+        {
+            $meta_query = array(
+                'key'     => '_featured',
+                'value'   => 'yes',
+                'compare' => '='
+            );
         }
         
         return $meta_query;
