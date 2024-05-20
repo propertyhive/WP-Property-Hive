@@ -148,10 +148,10 @@ function get_property_map( $args = array() )
 		{
 			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/leaflet/';
 
-			wp_register_style('leaflet', $assets_path . 'leaflet.css', array(), '1.7.1');
+			wp_register_style('leaflet', $assets_path . 'leaflet.css', array(), '1.9.4');
 		    wp_enqueue_style('leaflet');
 
-			wp_register_script('leaflet', $assets_path . 'leaflet.js', array(), '1.7.1', false);
+			wp_register_script('leaflet', $assets_path . 'leaflet.js', array(), '1.9.4', false);
 		    wp_enqueue_script('leaflet');
 ?>
 <script>
@@ -160,6 +160,8 @@ function get_property_map( $args = array() )
 
 	function initialize_property_map<?php echo $id_suffix; ?>() 
 	{
+		if ( property_map<?php echo $id_suffix; ?> != undefined ) { property_map<?php echo $id_suffix; ?>.remove(); }
+
 		property_map<?php echo $id_suffix; ?> = L.map("property_map_canvas<?php echo $id_suffix; ?>"<?php echo ( ( isset($args['scrollwheel']) && ($args['scrollwheel'] === 'false' || $args['scrollwheel'] === FALSE) ) ? ', { scrollWheelZoom: false, dragging: !L.Browser.mobile }' : '' ); ?>).setView([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>], <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?>);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
