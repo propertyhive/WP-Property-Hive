@@ -71,4 +71,4 @@ else
 	}
 }
 
-do_action( 'propertyhive_salient_widget_property_image_render_after', $settings, $property );
+do_action( 'propertyhive_salient_widget_property_image_render_after', $atts, $property );
