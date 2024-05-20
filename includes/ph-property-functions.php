@@ -162,6 +162,8 @@ function get_property_map( $args = array() )
 	{
 		if ( property_map<?php echo $id_suffix; ?> != undefined ) { property_map<?php echo $id_suffix; ?>.remove(); }
 
+		L.Icon.Default.imagePath = '<?php echo $assets_path; ?>/images/';
+
 		property_map<?php echo $id_suffix; ?> = L.map("property_map_canvas<?php echo $id_suffix; ?>"<?php echo ( ( isset($args['scrollwheel']) && ($args['scrollwheel'] === 'false' || $args['scrollwheel'] === FALSE) ) ? ', { scrollWheelZoom: false, dragging: !L.Browser.mobile }' : '' ); ?>).setView([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>], <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?>);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
