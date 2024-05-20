@@ -30,10 +30,10 @@ class Bricks_Builder_Property_Map_Widget extends \Bricks\Element {
 		{
 			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/leaflet/';
 
-			wp_register_style('leaflet', $assets_path . 'leaflet.css', array(), '1.7.1');
+			wp_register_style('leaflet', $assets_path . 'leaflet.css', array(), '1.9.4');
 		    wp_enqueue_style('leaflet');
 
-			wp_register_script('leaflet', $assets_path . 'leaflet.js', array(), '1.7.1', false);
+			wp_register_script('leaflet', $assets_path . 'leaflet.js', array(), '1.9.4', false);
 		    wp_enqueue_script('leaflet');
 		}
 		else

@@ -217,10 +217,10 @@ class PH_Admin_Assets {
             
             if ( get_option('propertyhive_maps_provider') == 'osm' )
             {
-                wp_register_style('leaflet', PH()->plugin_url() . '/assets/js/leaflet/leaflet.css', array(), '1.7.1');
+                wp_register_style('leaflet', PH()->plugin_url() . '/assets/js/leaflet/leaflet.css', array(), '1.9.4');
                 wp_enqueue_style('leaflet');
 
-                wp_register_script('leaflet', PH()->plugin_url() . '/assets/js/leaflet/leaflet.js', array(), '1.7.1', false);
+                wp_register_script('leaflet', PH()->plugin_url() . '/assets/js/leaflet/leaflet.js', array(), '1.9.4', false);
                 wp_enqueue_script('leaflet');
 
                 // Only used for geocoding
