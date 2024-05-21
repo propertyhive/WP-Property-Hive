@@ -23,8 +23,35 @@ class PH_Rank_Math {
 	 */
 	public static function init() {
 		add_filter( 'rank_math/excluded_taxonomies', array( __CLASS__, 'sitemap_exclude_taxonomy' ), 10, 2 );
-		add_filter( 'manage_edit-property_columns', array( __CLASS__, 'remove_columns') );
-		add_filter( 'rank_math/sitemap/posts_to_exclude', array( __CLASS__, 'sitemap_exclude_off_market') );
+		add_filter( 'manage_edit-property_columns', array( __CLASS__, 'remove_columns' ) );
+		add_filter( 'rank_math/sitemap/posts_to_exclude', array( __CLASS__, 'sitemap_exclude_off_market' ) );
+		add_filter( 'rank_math/opengraph/facebook/image', array( __CLASS__, 'custom_og_image_url' ) );
+	}
+
+	public static function custom_og_image_url( $url ) 
+	{
+		if ( !is_single()  ) 
+		{
+			return $url;
+		}
+
+		if ( get_option('propertyhive_images_stored_as', '') != 'urls' )
+    	{
+    		return $url;
+		}
+
+        global $post;
+
+        $photos = get_post_meta( $post->ID, '_photo_urls', true );
+
+        if ( empty( $photos ) ) 
+        {
+        	return $url;
+        }
+
+        $url = esc_url( $photos[0]['url'] );
+        
+	    return $url;
 	}
 
 	public static function sitemap_exclude_taxonomy( $taxonomies ) {
