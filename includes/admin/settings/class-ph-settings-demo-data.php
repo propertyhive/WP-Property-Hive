@@ -84,11 +84,11 @@ class PH_Settings_Demo_Data extends PH_Settings_Page {
                     <p class="intro-text">
                         To get an idea of how Property Hive works, if you're a new user you can quickly fill it with a set of demo data, including properties, applicants and more.
                         <br><br>
-                        Simply download and install our free Demo Data add on below to get started:
+                        Simply activate our free Demo Data feature below to get started:
                     </p>
                     <br>
                     <p>
-                        <a href="https://wp-property-hive.com/addons/demo-data" target="_blank" class="button button-primary">Download Demo Data Add On</a>
+                        <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=features'); ?>" class="button button-primary">Activate Demo Data Feature</a>
                         &nbsp;
                         <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=demodata&hidetab=1'); ?>">Hide This Page</a>
                     </p>
