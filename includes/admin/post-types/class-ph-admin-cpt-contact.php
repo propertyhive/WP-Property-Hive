@@ -529,7 +529,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 			update_post_meta( $post_id, '_availability', ph_clean( $_REQUEST['_availability'] ) );
 		}*/
 
-		do_action( 'propertyhive_product_quick_edit_save', $contact );
+		do_action( 'propertyhive_contact_quick_edit_save', $contact );
 	}
 
 	/**
