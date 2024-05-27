@@ -354,7 +354,7 @@ class PH_Property {
      * @access public
      * @return string
      */
-    public function get_formatted_price( ) {
+    public function get_formatted_price( $plain_text = false ) {
         
         $return = '';
 
@@ -377,16 +377,19 @@ class PH_Property {
                 // Price Details
                 $price = $this->get_formatted_commercial_price();
 
-                if ( $price != '' ) { $price = '<span class="commercial-price">' . $price . '</span>'; }
+                if ( $price != '' && !$plain_text ) 
+                { 
+                    $price = '<span class="commercial-price">' . $price . '</span>';
+                }
 
                 // Rent Details
                 $rent = $this->get_formatted_commercial_rent();
 
-                if ( $rent != '' ) { $rent = '<span class="commercial-rent">' . $rent . '</span>'; }
+                if ( $rent != '' && !$plain_text ) { $rent = '<span class="commercial-rent">' . $rent . '</span>'; }
 
                 if ( $price != '' && $rent != '' )
                 {
-                    $price .= '<br>';
+                    $price .= !$plain_text ? '<br>' : "\n";
                 }
                 $price .= $rent;
 
@@ -811,7 +814,7 @@ class PH_Property {
      * @access public
      * @return string
      */
-    public function get_formatted_description( ) {
+    public function get_formatted_description( $plain_text = false ) {
 
         $department = $this->_department;
         if ( ph_get_custom_department_based_on( $department ) !== false )
@@ -820,11 +823,11 @@ class PH_Property {
         }
         if ( $department == 'commercial' )
         {
-            $description = $this->get_formatted_descriptions(); // Haven't called this commercial_descriptions as we might use generic descriptions for other area going forward
+            $description = $this->get_formatted_descriptions( $plain_text ); // Haven't called this commercial_descriptions as we might use generic descriptions for other areas going forward
         }
         else
         {
-            $description = $this->get_formatted_rooms();
+            $description = $this->get_formatted_rooms( $plain_text );
         }
 
         return apply_filters( 'propertyhive_description_output', $description );
@@ -836,7 +839,7 @@ class PH_Property {
      * @access public
      * @return string
      */
-    public function get_formatted_rooms( ) {
+    public function get_formatted_rooms( $plain_text = false ) {
         
         $rooms = $this->_rooms;
         
@@ -846,20 +849,39 @@ class PH_Property {
         {
             for ($i = 0; $i < $rooms; ++$i)
             {
-                $return .= '<p class="room">';
-                if ($this->{'_room_name_' . $i} != '')
+                if ( !$plain_text )
                 {
-                    $return .= '<strong class="name">' . $this->{'_room_name_' . $i} . '</strong>';
+                    $return .= '<p class="room">';
+                    if ($this->{'_room_name_' . $i} != '')
+                    {
+                        $return .= '<strong class="name">' . $this->{'_room_name_' . $i} . '</strong>';
+                    }
+                    if ($this->{'_room_dimensions_' . $i} != '')
+                    {  
+                        $return .= '&nbsp;<span class="dimension">' . $this->{'_room_dimensions_' . $i} . '</span>';
+                    }
+                    if ($this->{'_room_name_' . $i} != '' || $this->{'_room_dimensions_' . $i} != '')
+                    {
+                        $return .= '<br>';
+                    }
+                    $return .= str_replace("\r\n", "", nl2br($this->{'_room_description_' . $i})) . '</p>';
                 }
-                if ($this->{'_room_dimensions_' . $i} != '')
-                {  
-                    $return .= '&nbsp;<span class="dimension">' . $this->{'_room_dimensions_' . $i} . '</span>';
-                }
-                if ($this->{'_room_name_' . $i} != '' || $this->{'_room_dimensions_' . $i} != '')
+                else
                 {
-                    $return .= '<br>';
+                    if ($this->{'_room_name_' . $i} != '')
+                    {
+                        $return .= $this->{'_room_name_' . $i};
+                    }
+                    if ($this->{'_room_dimensions_' . $i} != '')
+                    {  
+                        $return .= ' ' . $this->{'_room_dimensions_' . $i};
+                    }
+                    if ($this->{'_room_name_' . $i} != '' || $this->{'_room_dimensions_' . $i} != '')
+                    {
+                        $return .= "\n";
+                    }
+                    $return .= strip_tags($this->{'_room_description_' . $i}) . "\n\n";
                 }
-                $return .= str_replace("\r\n", "", nl2br($this->{'_room_description_' . $i})) . '</p>';
             }
         }
 
@@ -872,7 +894,7 @@ class PH_Property {
      * @access public
      * @return string
      */
-    public function get_formatted_descriptions( ) {
+    public function get_formatted_descriptions( $plain_text = false ) {
         
         $descriptions = $this->_descriptions;
         
@@ -882,12 +904,23 @@ class PH_Property {
         {
             for ($i = 0; $i < $descriptions; ++$i)
             {
-                $return .= '<p class="description-section">';
-                if ($this->{'_description_name_' . $i} != '')
+                if ( !$plain_text )
                 {
-                    $return .= '<strong class="description-title">' . $this->{'_description_name_' . $i} . '</strong><br>';
+                    $return .= '<p class="description-section">';
+                    if ($this->{'_description_name_' . $i} != '')
+                    {
+                        $return .= '<strong class="description-title">' . $this->{'_description_name_' . $i} . '</strong><br>';
+                    }
+                    $return .= str_replace("\r\n", "", nl2br($this->{'_description_' . $i})) . '</p>';
                 }
-                $return .= str_replace("\r\n", "", nl2br($this->{'_description_' . $i})) . '</p>';
+                else
+                {
+                    if ($this->{'_description_name_' . $i} != '')
+                    {
+                        $return .= $this->{'_description_name_' . $i} . "\n";
+                    }
+                    $return .= strip_tags($this->{'_description_' . $i}) . "\n\n";
+                }
             }
         }
         
