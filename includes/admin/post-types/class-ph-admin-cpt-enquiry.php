@@ -49,6 +49,8 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
         // Admin Columns
         add_filter( 'manage_edit-enquiry_columns', array( $this, 'edit_columns' ) );
         add_action( 'manage_enquiry_posts_custom_column', array( $this, 'custom_columns' ), 2 );
+        add_filter( 'list_table_primary_column', array( $this, 'set_primary_column' ), 10, 2 );
+        add_filter( 'post_row_actions', array( $this, 'remove_actions' ), 10, 2 );
 
         // Bulk / quick edit
         add_filter( 'bulk_actions-edit-enquiry', array( $this, 'remove_bulk_actions') );
@@ -267,7 +269,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 $edit_link        = get_edit_post_link( $post->ID );
                 $title = _draft_or_post_title();
                 
-                echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title.'</a></strong>';
+                echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title . '</a></strong>';
                 
                 break;
             case 'status' :
@@ -333,6 +335,37 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
             default :
                 break;
         }
+    }
+
+    public function set_primary_column( $default, $screen ) {
+        
+        if ( 'edit-enquiry' === $screen ) 
+        {
+            $default = 'subject';
+        }
+
+        return $default;
+    }
+
+    public function remove_actions($actions, $post) {
+
+        if ( $post->post_type !== 'enquiry' )
+        {
+            return $actions;
+        }
+
+        // Remove 'Quick Edit' link
+        if ( isset($actions['inline hide-if-no-js']) ) 
+        {
+            unset($actions['inline hide-if-no-js']);
+        }
+
+        if ( isset($actions['trash']) ) 
+        {
+            unset($actions['trash']);
+        }
+
+        return $actions;
     }
 
     /**

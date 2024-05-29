@@ -1,5 +1,9 @@
 #preview-action{display:none;}
 
+@media screen and (max-width: 782px) {
+    .wp-list-table .column-thumb { display:none !important }
+}
+
 #generate_applicant_list_button { margin-top:1px; }
 
 .propertyhive_meta_box .checkbox{width:auto;vertical-align:middle;margin:7px 0;}
