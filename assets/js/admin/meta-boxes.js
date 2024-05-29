@@ -56,6 +56,11 @@ jQuery( function($){
     
     ph_init_description_editors();
 
+    // Toggle list table rows on small screens.
+    $( 'div[id^=\'propertyhive_\'][id$=\'_meta_box\'], div[id^=\'propertyhive_\'][id$=\'_grid\']' ).on( 'click', '.toggle-row', function() {
+        $( this ).closest( 'tr' ).toggleClass( 'is-expanded' );
+    });
+
     $('.propertyhive_meta_box #property_rooms').sortable({
          opacity: 0.8,
          revert: true,
