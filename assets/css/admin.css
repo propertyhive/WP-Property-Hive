@@ -2,6 +2,8 @@
 
 @media screen and (max-width: 782px) {
     .wp-list-table .column-thumb { display:none !important }
+    div[id^="propertyhive_"][id$="_meta_box"] .tablenav.top .actions, 
+    div[id^="propertyhive_"][id$="_grid"] .tablenav.top .actions { display:block !important }
 }
 
 #generate_applicant_list_button { margin-top:1px; }

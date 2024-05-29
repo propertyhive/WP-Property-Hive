@@ -80,11 +80,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     <thead>
         <tr>
         <?php
+            $column_i = 0;
             foreach ( $columns as $column_key => $column )
             {
                 ?>
-                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); ?>'><?php echo esc_html($column); ?></th>
+                <th scope="col" id='<?php echo esc_attr($column_key); ?>' class='manage-column column-<?php echo esc_attr($column_key); echo ($column_i == 0 ? ' column-primary' : ''); ?>'><?php echo esc_html($column); ?></th>
                 <?php
+                ++$column_i;
             }
         ?>
         </tr>
@@ -104,7 +106,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     'date_time' => '<a href="' . esc_url($edit_link) . '" target="' . esc_attr(apply_filters('propertyhive_subgrid_link_target', '')) . '">' . esc_html(get_the_time( 'jS M Y H:i' )) . '</a>',
                     'subject' => esc_html(get_the_title()),
                     'status' => esc_html(ucfirst( $the_enquiry->status )),
-                    'negotiator' => esc_html($the_enquiry->get_negotiator()),
+                    'negotiator' => wp_kses($the_enquiry->get_negotiator(), array( 'em' => array() )),
                     'office' => esc_html($the_enquiry->get_office()),
                 );
 
@@ -114,9 +116,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                 ?>
                     <tr class="<?php echo esc_attr(implode(" ", $row_classes)); ?>" >
                     <?php
+                        $column_i = 0;
                         foreach ( $columns as $column_key => $column )
                         {
-                            echo '<td class="' . esc_attr($column_key) . ' column-' . esc_attr($column_key) . '" data-colname="' . esc_attr($column) . '">';
+                            echo '<td class="' . esc_attr($column_key) . ' column-' . esc_attr($column_key) . ($column_i == 0 ? ' column-primary' : '') . '" data-colname="' . esc_attr($column) . '">';
 
                             if ( isset( $column_data[$column_key] ) )
                             {
@@ -125,7 +128,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                             do_action( 'propertyhive_contact_enquiries_custom_column', $column_key );
 
+                            if ( $column_i == 0 ) { echo '<button type="button" class="toggle-row"><span class="screen-reader-text">' . esc_html(__('Show more details', 'propertyhive' )) . '</span></button>'; }
+
                             echo '</td>';
+                            ++$column_i;
                         }
                     ?>
                     </tr>
