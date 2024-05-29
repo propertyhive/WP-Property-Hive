@@ -133,11 +133,17 @@ class PH_Meta_Box_Property_Department {
                 {
                      showHideDepartmentMetaBox();
                 });
+
+                jQuery(\'#_address_country\').change(function()
+                {
+                     showHideDepartmentMetaBox();
+                });
             });
             
             function showHideDepartmentMetaBox()
             {
                 jQuery(\'#propertyhive-property-residential-details\').hide();
+                jQuery(\'#propertyhive-property-material-information\').hide();
         ';
         foreach ( $departments as $key => $value )
         {
@@ -158,6 +164,17 @@ class PH_Meta_Box_Property_Department {
                 if ( jQuery.inArray( selectedDepartment, departments_with_residential_details ) != -1 || ( ph_custom_departments[selectedDepartment] && jQuery.inArray( ph_custom_departments[selectedDepartment].based_on, departments_with_residential_details ) != -1 ) )
                 {
                     jQuery(\'#propertyhive-property-residential-details\').show();
+
+                    var selected_country = \'\';
+                    if (jQuery(\'#_address_country\').is(\'select\')) {
+                        selected_country = jQuery(\'#_address_country\').val();
+                    } else if (jQuery(\'#_address_country\').is(\'input[type="hidden"]\')) {
+                        selected_country = jQuery(\'#_address_country\').val();
+                    }
+                    if ( selected_country == \'GB\' )
+                    {
+                        jQuery(\'#propertyhive-property-material-information\').show();
+                    }
                 }
             }
             

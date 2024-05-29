@@ -426,6 +426,64 @@ function get_property_street_view( $args = array() )
 	}
 }
 
+function get_electricity_types()
+{
+	$types = array(
+		'mains_supply' => __( 'Mains Supply', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'solar_pv_panels' => __( 'Solar PV Panels', 'propertyhive' ),
+		'private_supply' => __( 'Private Supply', 'propertyhive' ),
+		'other' => __( 'Other', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_electricity_types', $types );
+
+	return $types;
+}
+
+function get_electricity_type( $type )
+{
+	$types = get_electricity_types();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
+function get_water_types()
+{
+	$types = array(
+		'mains_supply' => __( 'Mains Supply', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_water_types', $types );
+
+	return $types;
+}
+
+function get_water_type( $type )
+{
+	$types = get_water_types();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
 add_filter( 'get_post_metadata', function ( $value, $post_id, $meta_key, $single ) 
 {
 	static $is_recursing = false; // Used to prevent infinite loop
