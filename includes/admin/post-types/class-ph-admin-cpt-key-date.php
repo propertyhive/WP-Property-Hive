@@ -16,6 +16,8 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 
 			add_filter( 'manage_edit-key_date_columns', array( $this, 'edit_columns' ) );
 			add_action( 'manage_key_date_posts_custom_column', array( $this, 'custom_columns' ) );
+			add_filter( 'list_table_primary_column', array( $this, 'set_primary_column' ), 10, 2 );
+			add_filter( 'post_row_actions', array( $this, 'remove_actions' ), 10, 2 );
 			add_filter( 'manage_edit-key_date_sortable_columns', array( $this, 'sortable_columns' ) );
 			add_filter( 'request', array( $this, 'custom_sorts' ) );
 			add_action( 'quick_edit_custom_box', array( $this, 'key_date_custom_quick_edit_box' ), 10, 3 );
@@ -140,41 +142,6 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 					}
 					echo $key_date->description() . ( $opening_link_tag ? '</a>' : '' ) . '</div>';
 					echo '<div class="row-actions">';
-
-					$actions = array();
-					$actions['inline hide-if-no-js'] = sprintf(
-						'<button type="button" class="button-link editinline" aria-label="%s" aria-expanded="false">%s</button>',
-						esc_attr( sprintf( __( 'Quick edit &#8220;%s&#8221; inline' ), $key_date->description() ) ),
-						__( 'Quick&nbsp;Edit' )
-					);
-
-					if ( current_user_can( $post_type_object->cap->delete_post, $post->ID ) ) 
-					{
-						if ( 'trash' == $post->post_status ) 
-						{
-							$actions['untrash'] = '<a title="' . esc_attr( __( 'Restore this item from the Trash', 'propertyhive' ) ) . '" href="' . wp_nonce_url( admin_url( sprintf( $post_type_object->_edit_link . '&amp;action=untrash', $post->ID ) ), 'untrash-post_' . $post->ID ) . '">' . __( 'Restore', 'propertyhive' ) . '</a>';
-						}
-						elseif ( EMPTY_TRASH_DAYS )
-						{
-							$actions['trash'] = '<a class="submitdelete" title="' . esc_attr( __( 'Move this item to the Trash', 'propertyhive' ) ) . '" href="' . get_delete_post_link( $post->ID ) . '">' . __( 'Trash', 'propertyhive' ) . '</a>';
-						}
-						if ( 'trash' == $post->post_status || ! EMPTY_TRASH_DAYS )
-						{
-							$actions['delete'] = '<a class="submitdelete" title="' . esc_attr( __( 'Delete this item permanently', 'propertyhive' ) ) . '" href="' . get_delete_post_link( $post->ID, '', true ) . '">' . __( 'Delete Permanently', 'propertyhive' ) . '</a>';
-						}
-					}
-
-					$i = 0;
-					$action_count = sizeof($actions);
-
-					foreach ( $actions as $action => $link )
-					{
-						++$i;
-						( $i == $action_count ) ? $sep = '' : $sep = ' | ';
-						echo '<span class="' . $action . '">' . $link . $sep . '</span>';
-					}
-					echo '</div>';
-
 					break;
 
 				case 'notes' :
@@ -208,6 +175,31 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 					break;
 			}
 		}
+
+		public function set_primary_column( $default, $screen ) {
+        
+	        if ( 'edit-key_date' === $screen ) 
+	        {
+	            $default = 'description';
+	        }
+
+	        return $default;
+	    }
+
+	    public function remove_actions($actions, $post) {
+
+	        if ( $post->post_type !== 'key_date' )
+	        {
+	            return $actions;
+	        }
+
+	        if ( isset($actions['edit']) ) 
+	        {
+	            unset($actions['edit']);
+	        }
+
+	        return $actions;
+	    }
 
 		public function sortable_columns( $columns ) {
 			$custom = array(

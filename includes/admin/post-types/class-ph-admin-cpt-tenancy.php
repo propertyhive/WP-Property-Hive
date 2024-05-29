@@ -36,6 +36,8 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 		// Admin Columns
 		add_filter( 'manage_edit-tenancy_columns', array( $this, 'edit_columns' ) );
 		add_action( 'manage_tenancy_posts_custom_column', array( $this, 'custom_columns' ), 2 );
+		add_filter( 'list_table_primary_column', array( $this, 'set_primary_column' ), 10, 2 );
+        add_filter( 'post_row_actions', array( $this, 'remove_actions' ), 10, 2 );
 		add_filter( 'manage_edit-tenancy_sortable_columns', array( $this, 'custom_columns_sort' ) );
 		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
 
@@ -130,43 +132,6 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 
 				$property = new PH_Property( (int) $the_tenancy->property_id );
 				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) . '">' . $property->get_formatted_full_address() . '</a></strong>';
-
-				// Get actions
-				$actions = array();
-
-				if ( $can_edit_post && 'trash' != $post->post_status )
-				{
-					$actions['edit'] = '<a href="' . get_edit_post_link( $post->ID, true ) . '" title="' . esc_attr( __( 'Edit this item', 'propertyhive' ) ) . '">' . __( 'Edit', 'propertyhive' ) . '</a>';
-				}
-
-				if ( current_user_can( $post_type_object->cap->delete_post, $post->ID ) )
-				{
-					if ( 'trash' == $post->post_status ) {
-						$actions['untrash'] = '<a title="' . esc_attr( __( 'Restore this item from the Trash', 'propertyhive' ) ) . '" href="' . wp_nonce_url( admin_url( sprintf( $post_type_object->_edit_link . '&amp;action=untrash', $post->ID ) ), 'untrash-post_' . $post->ID ) . '">' . __( 'Restore', 'propertyhive' ) . '</a>';
-					} elseif ( EMPTY_TRASH_DAYS ) {
-						//$actions['trash'] = '<a class="submitdelete" title="' . esc_attr( __( 'Move this item to the Trash', 'propertyhive' ) ) . '" href="' . get_delete_post_link( $post->ID ) . '">' . __( 'Trash', 'propertyhive' ) . '</a>';
-					}
-
-					if ( 'trash' == $post->post_status || ! EMPTY_TRASH_DAYS ) {
-						$actions['delete'] = '<a class="submitdelete" title="' . esc_attr( __( 'Delete this item permanently', 'propertyhive' ) ) . '" href="' . get_delete_post_link( $post->ID, '', true ) . '">' . __( 'Delete Permanently', 'propertyhive' ) . '</a>';
-					}
-				}
-
-				$actions = apply_filters( 'post_row_actions', $actions, $post );
-
-				echo '<div class="row-actions">';
-
-				$i = 0;
-				$action_count = sizeof( $actions );
-
-				foreach ( $actions as $action => $link )
-				{
-					++ $i;
-					( $i == $action_count ) ? $sep = '' : $sep = ' | ';
-					echo '<span class="' . $action . '">' . $link . $sep . '</span>';
-				}
-				echo '</div>';
-
 				break;
 			case 'property_owner' :
 
@@ -227,6 +192,37 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				break;
 		}
 	}
+
+	public function set_primary_column( $default, $screen ) {
+        
+        if ( 'edit-tenancy' === $screen ) 
+        {
+            $default = 'property';
+        }
+
+        return $default;
+    }
+
+    public function remove_actions($actions, $post) {
+
+        if ( $post->post_type !== 'tenancy' )
+        {
+            return $actions;
+        }
+
+        // Remove 'Quick Edit' link
+        if ( isset($actions['inline hide-if-no-js']) ) 
+        {
+            unset($actions['inline hide-if-no-js']);
+        }
+
+        if ( isset($actions['trash']) ) 
+        {
+            unset($actions['trash']);
+        }
+
+        return $actions;
+    }
 
 	/**
 	 * Make property columns sortable
