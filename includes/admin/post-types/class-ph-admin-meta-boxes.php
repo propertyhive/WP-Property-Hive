@@ -43,6 +43,7 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Lettings_Details::save', 25, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Residential_Sales_Details::save', 30, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Commercial_Details::save', 30, 2 );
+        add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Material_Information::save', 32, 2 );
         
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Marketing::save', 35, 2 );
         
@@ -725,6 +726,14 @@ class PH_Admin_Meta_Boxes {
             'id' => 'propertyhive-property-commercial-details',
             'title' => __( 'Commercial Details', 'propertyhive' ),
             'callback' => 'PH_Meta_Box_Property_Commercial_Details::output',
+            'screen' => 'property',
+            'context' => 'normal',
+            'priority' => 'high'
+        );
+        $meta_boxes[30] = array(
+            'id' => 'propertyhive-property-material-information',
+            'title' => __( 'Utilities & Additional Information', 'propertyhive' ),
+            'callback' => 'PH_Meta_Box_Property_Material_Information::output',
             'screen' => 'property',
             'context' => 'normal',
             'priority' => 'high'
