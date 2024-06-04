@@ -1286,6 +1286,212 @@ class PH_Property {
         return $return;
     }
 
+    public function get_material_information()
+    {
+        $return = array();
+
+        $utilities = array();
+
+        // Utilities
+        $utility_types = array( 
+            'electricity' => __( 'Electricity Type', 'propertyhive' ), 
+            'water' => __( 'Water Type', 'propertyhive' ),  
+            'heating' => __( 'Heating Type', 'propertyhive' ), 
+            'broadband' => __( 'Broadband Type', 'propertyhive' ), 
+            'sewerage' => __( 'Sewerage Type', 'propertyhive' ),  
+        );
+        foreach ( $utility_types as $utility_key => $utility_label )
+        {
+            $property_utility_types = $this->{'_' . $utility_key . '_type'};
+            if ( is_array($property_utility_types) && !empty($property_utility_types) )
+            {
+                $types = array();
+                foreach ( $property_utility_types as $type ) 
+                {
+                    if ( $type == 'other' )
+                    {
+                        $types[] = $this->{'_' . $utility_key . '_type_other'};
+                    }
+                    else
+                    {
+                        $function_name = "get_{$utility_key}_type";
+
+                        if ( function_exists($function_name) )
+                        {
+                            $types[] = $function_name($type);
+                        }
+                        else
+                        {
+                            $types[] = $type;
+                        }
+                    }
+                }
+                if ( !isset($utilities[$utility_key]) ) { $utilities[$utility_key] = array(); }
+                $utilities[$utility_key] = implode(", ", $types);
+            }
+        }
+
+        if ( !empty($utilities) )
+        {
+            $return['utilities'] = $utilities;
+        }
+
+        // Accessibility
+        $accessibility = array();
+
+        $property_accessibility = $this->_accessibility;
+        if ( is_array($property_accessibility) && !empty($property_accessibility) )
+        {
+            foreach ( $property_accessibility as $type ) 
+            {
+                if ( $type == 'other' )
+                {
+                    $accessibility[] = $this->_accessibility_other;
+                }
+                else
+                {
+                    $function_name = "get_accessibility_type";
+
+                    if ( function_exists($function_name) )
+                    {
+                        $accessibility[] = $function_name($type);
+                    }
+                    else
+                    {
+                        $accessibility[] = $type;
+                    }
+                }
+            }
+        }
+
+        if ( !empty($accessibility) )
+        {
+            $return['accessibility'] = implode(", ", $accessibility);
+        }
+
+        // Restrictions
+        $restrictions = array();
+
+        $property_restriction = $this->_restriction;
+        if ( is_array($property_restriction) && !empty($property_restriction) )
+        {
+            foreach ( $property_restriction as $type ) 
+            {
+                if ( $type == 'other' )
+                {
+                    $restrictions[] = $this->_restriction_other;
+                }
+                else
+                {
+                    $function_name = "get_restriction_type";
+
+                    if ( function_exists($function_name) )
+                    {
+                        $restrictions[] = $function_name($type);
+                    }
+                    else
+                    {
+                        $restrictions[] = $type;
+                    }
+                }
+            }
+        }
+
+        if ( !empty($restrictions) )
+        {
+            $return['restrictions'] = implode(", ", $restrictions);
+        }
+
+        // Rights & Easements
+        $rights = array();
+
+        $property_right = $this->_right;
+        if ( is_array($property_right) && !empty($property_right) )
+        {
+            foreach ( $property_right as $type ) 
+            {
+                if ( $type == 'other' )
+                {
+                    $rights[] = $this->_restriction_other;
+                }
+                else
+                {
+                    $function_name = "get_right";
+
+                    if ( function_exists($function_name) )
+                    {
+                        $rights[] = $function_name($type);
+                    }
+                    else
+                    {
+                        $rights[] = $type;
+                    }
+                }
+            }
+        }
+
+        if ( !empty($rights) )
+        {
+            $return['rights'] = implode(", ", $rights);
+        }
+
+        // Flood Risk
+        $flood_data = array();
+
+        $property_flood_data = $this->_flooded_in_last_five_years;
+        if ( !empty($property_flood_data) )
+        {
+            $flood_data['flooded_in_last_five_years'] = ucfirst($property_flood_data);
+        }
+
+        $flood_sources = array();
+
+        $property_flood_source_type = $this->_flood_source_type;
+        if ( is_array($property_flood_source_type) && !empty($property_flood_source_type) )
+        {
+            foreach ( $property_flood_source_type as $type ) 
+            {
+                if ( $type == 'other' )
+                {
+                    $flood_sources[] = $this->_flood_source_type_other;
+                }
+                else
+                {
+                    $function_name = "get_flooding_source_type";
+
+                    if ( function_exists($function_name) )
+                    {
+                        $flood_sources[] = $function_name($type);
+                    }
+                    else
+                    {
+                        $flood_sources[] = $type;
+                    }
+                }
+            }
+        }
+
+        if ( !empty($flood_sources) )
+        {
+            $flood_data['flood_source'] = implode(", ", $flood_sources);
+        }
+
+        $property_flood_data = $this->_flood_defences;
+        if ( !empty($property_flood_data) )
+        {
+            $flood_data['flood_defences'] = ucfirst($property_flood_data);
+        }
+
+        if ( !empty($flood_data) )
+        {
+            $return['flood_risk'] = $flood_data;
+        }
+
+        $return = apply_filters( 'propertyhive_property_material_information', $return, $this );
+
+        return $return;
+    }
+
     public function get_office_name()
     {
         return get_the_title( $this->_office_id );

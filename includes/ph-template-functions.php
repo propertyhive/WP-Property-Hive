@@ -1115,6 +1115,42 @@ if ( ! function_exists( 'propertyhive_get_template_single_virtual_tours_action' 
 
 }
 
+if ( ! function_exists( 'propertyhive_get_template_single_material_information_action' ) ) {
+
+    function propertyhive_get_template_single_material_information_action() {
+
+        global $post, $property;
+
+        $actions = array();
+
+        $material_information = $property->get_material_information();
+
+        // Only show if at least one bit of material information has been completed
+        if ( empty($material_information) )
+        {
+            return $actions;
+        }
+
+        $actions[] = array(
+            'href' => '#ph_material_information',
+            'label' => __( 'Utilities & More', 'propertyhive' ),
+            'class' => 'action-material-information',
+            'attributes' => array( 'data-fancybox' => '' ),
+        );
+
+        echo '<div id="ph_material_information" style="display:none;">';
+
+            ph_get_template( 'single-property/material-information.php' );
+
+        echo '</div>';
+
+        $actions = apply_filters( 'propertyhive_single_property_material_information_actions', $actions );
+
+        return $actions;
+    }
+
+}
+
 if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
 
     function propertyhive_get_template_single_actions() {
@@ -1125,7 +1161,8 @@ if ( ! function_exists( 'propertyhive_get_template_single_actions' ) ) {
             propertyhive_get_template_single_floorplans_action(),
             propertyhive_get_template_single_brochures_action(),
             propertyhive_get_template_single_epcs_action(),
-            propertyhive_get_template_single_virtual_tours_action()
+            propertyhive_get_template_single_virtual_tours_action(),
+            propertyhive_get_template_single_material_information_action(),
         );
 
         
