@@ -2952,11 +2952,34 @@ class PH_AJAX {
 
         if ( $appraisal->status == 'carried_out' || $appraisal->status == 'won' || $appraisal->status == 'instructed' )
         {
+            $ph_countries = new PH_Countries();
+            
+            $currency = 'GBP';
+            $currency_symbol = '&pound;';
+
+            $default_country = get_option( 'propertyhive_default_country', 'GB' );
+            $countries = get_option( 'propertyhive_countries', array( $default_country ) );
+            if ( count($countries) == 1 )
+            {
+                foreach ( $countries as $country )
+                {
+                    $country = $ph_countries->get_country( $country );
+
+                    $currency = $country['currency_code'];
+                }
+            }
+            
+            $currency = $ph_countries->get_currency( $currency );
+            if ( isset($currency['currency_symbol']) )
+            {
+                $currency_symbol = $currency['currency_symbol'];
+            }
+
             if ( $appraisal->department == 'residential-sales' )
             {
                 $args = array( 
                     'id' => '_valued_price', 
-                    'label' => __( 'Valued Price', 'propertyhive' ) . ' (&pound;)', 
+                    'label' => __( 'Valued Price', 'propertyhive' ) . ' (' . $currency_symbol . ')', 
                     'desc_tip' => false, 
                     'class' => 'short',
                     'value' => ph_display_price_field( $appraisal->valued_price ),
@@ -2969,7 +2992,7 @@ class PH_AJAX {
 
                 echo '<p class="form-field">
         
-                    <label for="">' . esc_html(__('Valued Rent', 'propertyhive')) . ' (&pound;)</label>
+                    <label for="">' . esc_html(__('Valued Rent', 'propertyhive')) . ' (' . $currency_symbol . ')</label>
 
                     <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . esc_attr(ph_display_price_field( $appraisal->valued_rent )) . '" placeholder="" style="width:10%; min-width:100px;">
                 
@@ -3249,11 +3272,34 @@ class PH_AJAX {
 
                 <div class="options_group" style="padding-top:8px;">';
 
+            $ph_countries = new PH_Countries();
+
+            $currency = 'GBP';
+            $currency_symbol = '&pound;';
+
+            $default_country = get_option( 'propertyhive_default_country', 'GB' );
+            $countries = get_option( 'propertyhive_countries', array( $default_country ) );
+            if ( count($countries) == 1 )
+            {
+                foreach ( $countries as $country )
+                {
+                    $country = $ph_countries->get_country( $country );
+
+                    $currency = $country['currency_code'];
+                }
+            }
+            
+            $currency = $ph_countries->get_currency( $currency );
+            if ( isset($currency['currency_symbol']) )
+            {
+                $currency_symbol = $currency['currency_symbol'];
+            }
+
             if ( $department == 'residential-sales' )
             {
                 echo '<div class="form-field">
 
-                        <label for="_price">' . esc_html(__( 'Valued Price (&pound;)', 'propertyhive' )) . '</label>
+                        <label for="_price">' . esc_html(__( 'Valued Price (' . $currency_symbol . ')', 'propertyhive' )) . '</label>
                         
                         <input type="text" id="_price" name="_price" style="width:100%;" value="' . esc_attr(get_post_meta( $post_id, '_valued_price', TRUE )) . '">
 
@@ -3264,7 +3310,7 @@ class PH_AJAX {
                 $rent_frequency = get_post_meta( $post_id, '_valued_rent_frequency', TRUE );
                 echo '<div class="form-field">
 
-                        <label for="_price">' . esc_html(__( 'Valued Rent (&pound;)', 'propertyhive' )) . '</label>
+                        <label for="_price">' . esc_html(__( 'Valued Rent (' . $currency_symbol . ')', 'propertyhive' )) . '</label>
                         
                         <input type="text" id="_price" name="_price" style="width:100%;" value="' . esc_attr(get_post_meta( $post_id, '_valued_rent', TRUE )) . '">
 
