@@ -166,8 +166,27 @@ class PH_Appraisal {
      */
     public function get_formatted_price( ) {
         
-        $prefix = '&pound;';
-        $suffix = '';
+        $ph_countries = new PH_Countries();
+
+        $currency = 'GBP';
+
+        $default_country = get_option( 'propertyhive_default_country', 'GB' );
+        $countries = get_option( 'propertyhive_countries', array( $default_country ) );
+        if ( count($countries) == 1 )
+        {
+            foreach ( $countries as $country )
+            {
+                $country = $ph_countries->get_country( $country );
+
+                $currency = $country['currency_code'];
+            }
+        }
+        
+        $currency = $ph_countries->get_currency( $currency );
+
+        $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+        $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
+
         switch ($this->_department)
         {
             case "residential-sales":
