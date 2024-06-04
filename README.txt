@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.5.3
-Stable tag: 2.0.15
+Stable tag: 2.0.16
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,14 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.16 - 2024-06-04 =
+* All tables and grids across Property Hive to be formatted on mobile
+* Added support for NTSELAT Material Information Parts B & C with new fields added to property record under the 'Details' tab for UK residential properties. If any of the information is completed and new 'Utilities & More' button will appear in the default template showing the information in a lightbox
+* Added actions to search form template
+* Added the ability to request plain text descriptions and prices
+* Support for og:image tab in RankMath when storing images as URLs
+* Change wording on 'Demo Data' settings tab now that feature can be enabled through WordPress and doesn't need to be downloaded as a separate plugin
 
 = 2.0.15 - 2024-05-20 =
 * Added new meta query filter for 'featured' so featured properties can be filtered in search results or in REST API by passing in '&featured=1' to URL
