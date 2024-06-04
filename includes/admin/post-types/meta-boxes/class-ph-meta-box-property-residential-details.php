@@ -11,7 +11,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * PH_Meta_Box_Property_Address
+ * PH_Meta_Box_Property_Residential_Details
  */
 class PH_Meta_Box_Property_Residential_Details {
 
