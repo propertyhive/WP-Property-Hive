@@ -40,12 +40,12 @@ if ( empty($material_information) )
                     $label = str_replace("_", " ", $label);
                     $label = ucwords($label);
 
-                    echo '<strong>' . esc_html( __( $label, 'propertyhive' ) ) . ':</strong> ' . $subvalue . '<br>';
+                    echo '<strong>' . esc_html( __( $label, 'propertyhive' ) ) . ':</strong> ' . esc_html($subvalue) . '<br>';
                 }
             }
             else
             {
-                echo '<strong>' . esc_html( __( $label, 'propertyhive' ) ) . ':</strong> ' . $value . '<br>';
+                echo '<strong>' . esc_html( __( $label, 'propertyhive' ) ) . ':</strong> ' . esc_html($value) . '<br>';
             }
         }
     ?>
