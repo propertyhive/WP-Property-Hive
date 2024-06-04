@@ -266,9 +266,14 @@ class PH_Meta_Box_Property_Material_Information {
 
         echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Flood Risk', 'propertyhive' )) . '</h3>';
 
-        propertyhive_wp_checkbox( array( 
+        propertyhive_wp_select( array( 
             'id' => '_flooded_in_last_five_years', 
             'label' => __( 'Flooded in last 5 years?', 'propertyhive' ),
+            'options' => array(
+                '' => '',
+                'no' => __( 'No', 'propertyhive' ),
+                'yes' => __( 'Yes', 'propertyhive' ),
+            )
         ) );
 
         $terms = get_flooding_source_types();
@@ -312,9 +317,14 @@ class PH_Meta_Box_Property_Material_Information {
         );
         propertyhive_wp_text_input( $args );
 
-        propertyhive_wp_checkbox( array( 
+        propertyhive_wp_select( array( 
             'id' => '_flood_defences', 
             'label' => __( 'Are there flood defences?', 'propertyhive' ),
+            'options' => array(
+                '' => '',
+                'no' => __( 'No', 'propertyhive' ),
+                'yes' => __( 'Yes', 'propertyhive' ),
+            )
         ) );
 
         do_action('propertyhive_property_material_information_fields');
