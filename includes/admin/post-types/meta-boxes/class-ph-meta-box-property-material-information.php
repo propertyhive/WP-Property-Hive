@@ -58,65 +58,264 @@ class PH_Meta_Box_Property_Material_Information {
             'type' => 'number'
         ) );*/
         
-        // Electricity Type
-        ?>
-        <p class="form-field electricity_type_field"><label for="electricity_type"><?php echo esc_html(__( 'Electricity Type', 'propertyhive' )); ?></label>
-        <select id="electricity_type" name="electricity_type[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select electricity type(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
-            <?php
-                $terms = get_electricity_types();
+        // Utilities
 
-                $selected_values = array();
-                $term_list = get_post_meta($post->ID, '_electricity_type', true);
-                if ( is_array($term_list) && !empty($term_list) )
-                {
-                    foreach ( $term_list as $term_id )
-                    {
-                        $selected_values[] = $term_id;
-                    }
-                }
-                
-                if ( !empty( $terms ) && !is_wp_error( $terms ) )
-                {
-                    foreach ( $terms as $key => $term )
-                    {
-                        echo '<option value="' . esc_attr( $key ) . '"';
-                        if ( in_array( $key, $selected_values ) )
-                        {
-                            echo ' selected';
-                        }
-                        echo '>' . esc_html( $term ) . '</option>';
-                    }
-                }
-            ?>
-        </select>
-<?php
-        /*$tax_band_options = apply_filters( 'propertyhive_property_residential_tax_bands',
-            array(
-                '' => '',
-                'A' => 'A',
-                'B' => 'B',
-                'C' => 'C',
-                'D' => 'D',
-                'E' => 'E',
-                'F' => 'F',
-                'G' => 'G',
-                'H' => 'H',
-                'I' => 'I',
-            )
-        );
-        $args = array(
-            'id' => '_council_tax_band',
-            'label' => __( 'Council Tax Band', 'propertyhive' ),
-            'desc_tip' => false,
-            'options' => $tax_band_options
-        );
+        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Utilities', 'propertyhive' )) . '</h3>';
 
-        $selected_tax_band = get_post_meta( $post->ID, '_council_tax_band', true );
-        if ( !empty($selected_tax_band) )
+        $utilities = array( 
+            'electricity' => __( 'Electricity Type', 'propertyhive' ), 
+            'water' => __( 'Water Type', 'propertyhive' ),  
+            'heating' => __( 'Heating Type', 'propertyhive' ), 
+            'broadband' => __( 'Broadband Type', 'propertyhive' ), 
+            'sewerage' => __( 'Sewerage Type', 'propertyhive' ),  
+        );
+        foreach ( $utilities as $utility_key => $utility_label )
         {
-            $args['value'] = $selected_tax_band;
+            // Construct the function name based on the utility
+            $function_name = "get_{$utility_key}_types";
+
+            $terms = array();
+
+            // Check if the function exists before calling it
+            if ( function_exists($function_name) ) 
+            {
+                $terms = $function_name();
+            }
+        ?>
+        <p class="form-field <?php echo esc_attr($utility_key); ?>_type_field"><label for="<?php echo esc_attr($utility_key); ?>_type"><?php echo esc_html($utility_label); ?></label>
+            <select id="<?php echo esc_attr($utility_key); ?>_type" name="<?php echo esc_attr($utility_key); ?>_type[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select ' . strtolower($utility_label) . '(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+                <?php
+                    $selected_values = array();
+                    $term_list = get_post_meta($post->ID, '_' . $utility_key . '_type', true);
+                    if ( is_array($term_list) && !empty($term_list) )
+                    {
+                        foreach ( $term_list as $term_id )
+                        {
+                            $selected_values[] = $term_id;
+                        }
+                    }
+                    
+                    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                    {
+                        foreach ( $terms as $key => $term )
+                        {
+                            echo '<option value="' . esc_attr( $key ) . '"';
+                            if ( in_array( $key, $selected_values ) )
+                            {
+                                echo ' selected';
+                            }
+                            echo '>' . esc_html( $term ) . '</option>';
+                        }
+                    }
+                ?>
+            </select>
+        </p>
+<?php
+            $args = array( 
+                'id' => '_' . $utility_key . '_type_other', 
+                'label' => '', 
+                'desc_tip' => false, 
+                'placeholder' => __( 'Enter ' . strtolower($utility_key) . ' type', 'propertyhive' ), 
+                'type' => 'text'
+            );
+            propertyhive_wp_text_input( $args );
         }
-        propertyhive_wp_select( $args );*/
+
+        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Accessibility', 'propertyhive' )) . '</h3>';
+
+        $utilities = array( 
+            'accessibility' => __( 'Accessibility', 'propertyhive' ),
+        );
+        foreach ( $utilities as $utility_key => $utility_label )
+        {
+            // Construct the function name based on the utility
+            $function_name = "get_{$utility_key}_types";
+
+            $terms = array();
+
+            // Check if the function exists before calling it
+            if ( function_exists($function_name) ) 
+            {
+                $terms = $function_name();
+            }
+        ?>
+        <p class="form-field <?php echo esc_attr($utility_key); ?>_field"><label for="<?php echo esc_attr($utility_key); ?>"><?php echo esc_html($utility_label); ?></label>
+            <select id="<?php echo esc_attr($utility_key); ?>" name="<?php echo esc_attr($utility_key); ?>[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select ' . strtolower($utility_label) . '(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+                <?php
+                    $selected_values = array();
+                    $term_list = get_post_meta($post->ID, '_' . $utility_key, true);
+                    if ( is_array($term_list) && !empty($term_list) )
+                    {
+                        foreach ( $term_list as $term_id )
+                        {
+                            $selected_values[] = $term_id;
+                        }
+                    }
+                    
+                    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                    {
+                        foreach ( $terms as $key => $term )
+                        {
+                            echo '<option value="' . esc_attr( $key ) . '"';
+                            if ( in_array( $key, $selected_values ) )
+                            {
+                                echo ' selected';
+                            }
+                            echo '>' . esc_html( $term ) . '</option>';
+                        }
+                    }
+                ?>
+            </select>
+        </p>
+<?php
+            $args = array( 
+                'id' => '_' . $utility_key . '_other', 
+                'label' => '', 
+                'desc_tip' => false, 
+                'placeholder' => __( 'Enter ' . strtolower($utility_key), 'propertyhive' ), 
+                'type' => 'text'
+            );
+            propertyhive_wp_text_input( $args );
+        }
+
+        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Restrictions', 'propertyhive' )) . '</h3>';
+
+        $terms = get_restrictions();
+    ?>
+        <p class="form-field restriction_field"><label for="restriction"><?php echo esc_html( __('Restrictions', 'propertyhive') ); ?></label>
+            <select id="restriction" name="restriction[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select restrictions(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+                <?php
+                    $selected_values = array();
+                    $term_list = get_post_meta($post->ID, '_restriction', true);
+                    if ( is_array($term_list) && !empty($term_list) )
+                    {
+                        foreach ( $term_list as $term_id )
+                        {
+                            $selected_values[] = $term_id;
+                        }
+                    }
+                    
+                    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                    {
+                        foreach ( $terms as $key => $term )
+                        {
+                            echo '<option value="' . esc_attr( $key ) . '"';
+                            if ( in_array( $key, $selected_values ) )
+                            {
+                                echo ' selected';
+                            }
+                            echo '>' . esc_html( $term ) . '</option>';
+                        }
+                    }
+                ?>
+            </select>
+        </p>
+    <?php
+
+        $args = array( 
+            'id' => '_restriction_other', 
+            'label' => '', 
+            'desc_tip' => false, 
+            'placeholder' => __( 'Enter restrictions', 'propertyhive' ), 
+            'type' => 'text'
+        );
+        propertyhive_wp_text_input( $args );
+
+        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Rights & Easements', 'propertyhive' )) . '</h3>';
+
+        $terms = get_rights();
+    ?>
+        <p class="form-field rights_field"><label for="right"><?php echo esc_html( __('Rights & Easements', 'propertyhive') ); ?></label>
+            <select id="right" name="right[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select rights(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+                <?php
+                    $selected_values = array();
+                    $term_list = get_post_meta($post->ID, '_right', true);
+                    if ( is_array($term_list) && !empty($term_list) )
+                    {
+                        foreach ( $term_list as $term_id )
+                        {
+                            $selected_values[] = $term_id;
+                        }
+                    }
+                    
+                    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                    {
+                        foreach ( $terms as $key => $term )
+                        {
+                            echo '<option value="' . esc_attr( $key ) . '"';
+                            if ( in_array( $key, $selected_values ) )
+                            {
+                                echo ' selected';
+                            }
+                            echo '>' . esc_html( $term ) . '</option>';
+                        }
+                    }
+                ?>
+            </select>
+        </p>
+    <?php
+
+        $args = array( 
+            'id' => '_right_other', 
+            'label' => '', 
+            'desc_tip' => false, 
+            'placeholder' => __( 'Enter rights', 'propertyhive' ), 
+            'type' => 'text'
+        );
+        propertyhive_wp_text_input( $args );
+
+        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Flood Risk', 'propertyhive' )) . '</h3>';
+
+        propertyhive_wp_checkbox( array( 
+            'id' => '_flooded_in_last_five_years', 
+            'label' => __( 'Flooded in last 5 years?', 'propertyhive' ),
+        ) );
+
+        $terms = get_flooding_source_types();
+    ?>
+        <p class="form-field flood_source_type_field"><label for="flood_source_type"><?php echo esc_html( __('Flooding Source', 'propertyhive') ); ?></label>
+            <select id="flood_source_type" name="flood_source_type[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select flood source(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+                <?php
+                    $selected_values = array();
+                    $term_list = get_post_meta($post->ID, '_flood_source_type', true);
+                    if ( is_array($term_list) && !empty($term_list) )
+                    {
+                        foreach ( $term_list as $term_id )
+                        {
+                            $selected_values[] = $term_id;
+                        }
+                    }
+                    
+                    if ( !empty( $terms ) && !is_wp_error( $terms ) )
+                    {
+                        foreach ( $terms as $key => $term )
+                        {
+                            echo '<option value="' . esc_attr( $key ) . '"';
+                            if ( in_array( $key, $selected_values ) )
+                            {
+                                echo ' selected';
+                            }
+                            echo '>' . esc_html( $term ) . '</option>';
+                        }
+                    }
+                ?>
+            </select>
+        </p>
+    <?php
+
+        $args = array( 
+            'id' => '_flood_source_type_other', 
+            'label' => '', 
+            'desc_tip' => false, 
+            'placeholder' => __( 'Enter flood source', 'propertyhive' ), 
+            'type' => 'text'
+        );
+        propertyhive_wp_text_input( $args );
+
+        propertyhive_wp_checkbox( array( 
+            'id' => '_flood_defences', 
+            'label' => __( 'Are there flood defences?', 'propertyhive' ),
+        ) );
 
         do_action('propertyhive_property_material_information_fields');
 	   
@@ -144,18 +343,99 @@ class PH_Meta_Box_Property_Material_Information {
             in_array( ph_get_custom_department_based_on( $department ), $departments_with_residential_details )
         )
         {
-            //$rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bedrooms']));
-            //update_post_meta( $post_id, '_bedrooms', $rooms );
-
-            $electricity_types = array();
-            if ( isset( $_POST['electricity_type'] ) && !empty( $_POST['electricity_type'] ) )
+            $utilities = array( 
+                'electricity' => __( 'Electricity Type', 'propertyhive' ), 
+                'water' => __( 'Water Type', 'propertyhive' ),  
+                'heating' => __( 'Heating Type', 'propertyhive' ), 
+                'broadband' => __( 'Broadband Type', 'propertyhive' ), 
+                'sewerage' => __( 'Sewerage Type', 'propertyhive' ),  
+            );
+            foreach ( $utilities as $utility_key => $utility_label )
             {
-                foreach ( $_POST['electricity_type'] as $electricity_type )
+                $utility_types = array();
+                if ( isset( $_POST[$utility_key . '_type'] ) && !empty( $_POST[$utility_key . '_type'] ) )
                 {
-                    $electricity_types[] = ph_clean($electricity_type);
+                    foreach ( $_POST[$utility_key . '_type'] as $utility_type )
+                    {
+                        $utility_types[] = ph_clean($utility_type);
+
+                        if ( ph_clean($utility_type) == 'other' )
+                        {
+                            update_post_meta( $post_id, '_' . $utility_key . '_type_other', $_POST['_' . $utility_key . '_type_other'] );
+                        }
+                    }
+                }
+                update_post_meta( $post_id, '_' . $utility_key . '_type', $utility_types );
+            }
+
+            $utilities = array( 
+                'accessibility' => __( 'Accessibility', 'propertyhive' ), 
+            );
+            foreach ( $utilities as $utility_key => $utility_label )
+            {
+                $utility_types = array();
+                if ( isset( $_POST[$utility_key] ) && !empty( $_POST[$utility_key] ) )
+                {
+                    foreach ( $_POST[$utility_key] as $utility_type )
+                    {
+                        $utility_types[] = ph_clean($utility_type);
+
+                        if ( ph_clean($utility_type) == 'other' )
+                        {
+                            update_post_meta( $post_id, '_' . $utility_key . '_other', $_POST['_' . $utility_key . '_other'] );
+                        }
+                    }
+                }
+                update_post_meta( $post_id, '_' . $utility_key, $utility_types );
+            }
+
+            $restrictions = array();
+            if ( isset( $_POST['restriction'] ) && !empty( $_POST['restriction'] ) )
+            {
+                foreach ( $_POST['restriction'] as $restriction )
+                {
+                    $restrictions[] = ph_clean($restriction);
+
+                    if ( ph_clean($restriction) == 'other' )
+                    {
+                        update_post_meta( $post_id, '_restriction_other', $_POST['_restriction_other'] );
+                    }
                 }
             }
-            update_post_meta( $post_id, '_electricity_type', $electricity_types );
+            update_post_meta( $post_id, '_restriction', $restrictions );
+
+            $rights = array();
+            if ( isset( $_POST['right'] ) && !empty( $_POST['right'] ) )
+            {
+                foreach ( $_POST['right'] as $right )
+                {
+                    $rights[] = ph_clean($right);
+
+                    if ( ph_clean($right) == 'other' )
+                    {
+                        update_post_meta( $post_id, '_right_other', $_POST['_right_other'] );
+                    }
+                }
+            }
+            update_post_meta( $post_id, '_right', $rights );
+
+            $flood_source_types = array();
+            if ( isset( $_POST['flood_source_type'] ) && !empty( $_POST['flood_source_type'] ) )
+            {
+                foreach ( $_POST['flood_source_type'] as $flood_source_type )
+                {
+                    $flood_source_types[] = ph_clean($flood_source_type);
+
+                    if ( ph_clean($flood_source_type) == 'other' )
+                    {
+                        update_post_meta( $post_id, '_flood_source_type_other', $_POST['_flood_source_type_other'] );
+                    }
+                }
+            }
+            update_post_meta( $post_id, '_flood_source_type', $flood_source_types );
+
+            update_post_meta($post_id, '_flooded_in_last_five_years', ( isset($_POST['_flooded_in_last_five_years']) ? ph_clean($_POST['_flooded_in_last_five_years']) : '' ) );
+            update_post_meta($post_id, '_flood_defences', ( isset($_POST['_flood_defences']) ? ph_clean($_POST['_flood_defences']) : '' ) );
 
             do_action( 'propertyhive_save_property_material_information', $post_id );
         }

@@ -433,10 +433,13 @@ function get_electricity_types()
 		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
 		'solar_pv_panels' => __( 'Solar PV Panels', 'propertyhive' ),
 		'private_supply' => __( 'Private Supply', 'propertyhive' ),
-		'other' => __( 'Other', 'propertyhive' ),
 	);
 
 	$types = apply_filters( 'propertyhive_electricity_types', $types );
+
+	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
 
 	return $types;
 }
@@ -457,17 +460,14 @@ function get_water_types()
 {
 	$types = array(
 		'mains_supply' => __( 'Mains Supply', 'propertyhive' ),
-		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
-		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
-		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
-		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
-		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
-		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
-		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
-		'wind_turbine' => __( 'Wind Turbine', 'propertyhive' ),
+		'private_supply' => __( 'Private Supply', 'propertyhive' ),
 	);
 
 	$types = apply_filters( 'propertyhive_water_types', $types );
+
+	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
 
 	return $types;
 }
@@ -475,6 +475,244 @@ function get_water_types()
 function get_water_type( $type )
 {
 	$types = get_water_types();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
+function get_broadband_types()
+{
+	$types = array(
+		'adsl' => __( 'ADSL', 'propertyhive' ),
+		'cable' => __( 'Cable', 'propertyhive' ),
+		'fttc' => __( 'FTTC (Fibre to the Cabinet)', 'propertyhive' ),
+		'fttp' => __( 'FTTP (Fibre to the Premises)', 'propertyhive' ),
+		'none' => __( 'None', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_broadband_types', $types );
+
+	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
+
+	return $types;
+}
+
+function get_broadband_type( $type )
+{
+	$types = get_broadband_types();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
+function get_heating_types()
+{
+	$types = array(
+	    'air_conditioning' => __( 'Air Conditioning', 'propertyhive' ),
+	    'central' => __( 'Central Heating', 'propertyhive' ),
+	    'double_glazing' => __( 'Double Glazing', 'propertyhive' ),
+	    'eco_friendly' => __( 'Eco-Friendly', 'propertyhive' ),
+	    'electric' => __( 'Electric Heating', 'propertyhive' ),
+	    'gas' => __( 'Gas Heating', 'propertyhive' ),
+	    'gas_central' => __( 'Gas Central Heating', 'propertyhive' ),
+	    'night_storage' => __( 'Night Storage Heating', 'propertyhive' ),
+	    'oil' => __( 'Oil Heating', 'propertyhive' ),
+	    'solar' => __( 'Solar Panels', 'propertyhive' ),
+	    'solar_water' => __( 'Solar Water Heating', 'propertyhive' ),
+	    'under_floor' => __( 'Underfloor Heating', 'propertyhive' ),
+	    'wood_burner' => __( 'Wood Burner', 'propertyhive' ),
+	    'open_fire' => __( 'Open Fire', 'propertyhive' ),
+	    'biomass_boiler' => __( 'Biomass Boiler', 'propertyhive' ),
+	    'ground_source_heat_pump' => __( 'Ground Source Heat Pump', 'propertyhive' ),
+	    'air_source_heat_pump' => __( 'Air Source Heat Pump', 'propertyhive' ),
+	    'solar_pv_thermal' => __( 'Solar PV Thermal', 'propertyhive' ),
+	    'under_floor_heating' => __( 'Underfloor Heating', 'propertyhive' ),
+	    'solar_thermal' => __( 'Solar Thermal Heating', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_heating_types', $types );
+
+	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
+
+	return $types;
+}
+
+function get_heating_type( $type )
+{
+	$types = get_broadband_types();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
+function get_sewerage_types()
+{
+	$types = array(
+		'mains_supply' => __( 'Mains Supply', 'propertyhive' ),
+		'private_supply' => __( 'Private Supply', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_sewerage_types', $types );
+
+	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
+
+	return $types;
+}
+
+function get_sewerage_type( $type )
+{
+	$types = get_sewerage_types();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
+function get_flooding_source_types()
+{
+	$types = array(
+    	'river' => __( 'River', 'propertyhive' ),
+	    'sea' => __( 'Sea', 'propertyhive' ),
+	    'groundwater' => __( 'Groundwater', 'propertyhive' ),
+	    'lake' => __( 'Lake', 'propertyhive' ),
+	    'reservoir' => __( 'Reservoir', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_flooding_source_types', $types );
+
+	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
+
+	return $types;
+}
+
+function get_flooding_source_type( $type )
+{
+	$types = get_flooding_source_types();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
+function get_accessibility_types()
+{
+	$types = array(
+	    'lateral_living' => __( 'Lateral Living', 'propertyhive' ),
+	    'level_access' => __( 'Level Access', 'propertyhive' ),
+	    'lift_access' => __( 'Lift Access', 'propertyhive' ),
+	    'step_free_access' => __( 'Step-Free Access', 'propertyhive' ),
+	    'wet_room' => __( 'Wet Room', 'propertyhive' ),
+	    'level_access_shower' => __( 'Level Access Shower', 'propertyhive' ),
+	    'wide_doorways' => __( 'Wide Doorways', 'propertyhive' ),
+	    'ramped_access' => __( 'Ramped Access', 'propertyhive' ),
+	    'unsuitableForWheelchairs' => __( 'Unsuitable for Wheelchairs', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_accessibility_types', $types );
+
+	asort($types);
+
+	return $types;
+}
+
+function get_accessibility_type( $type )
+{
+	$types = get_accessibility_types();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
+function get_restrictions()
+{
+	$types = array(
+	    'conservation_area' => __( 'Restrictions due to being in a conservation area', 'propertyhive' ),
+	    'lease_restrictions' => __( 'Restrictions in the lease', 'propertyhive' ),
+	    'listed_building' => __( 'Restrictions due to being listed', 'propertyhive' ),
+	    'permitted_development' => __( 'Restrictions on property development', 'propertyhive' ),
+	    'real_burdens' => __( 'A real burden applies to this property (Scotland only)', 'propertyhive' ),
+	    'holiday_home_rental' => __( 'Holiday home rental restrictions', 'propertyhive' ),
+	    'restrictive_covenant' => __( 'Restrictive covenants', 'propertyhive' ),
+	    'business_from_property' => __( 'Restrictions on running a business', 'propertyhive' ),
+	    'property_subletting' => __( 'Restrictions regarding subletting', 'propertyhive' ),
+	    'tree_preservation_order' => __( 'Tree preservation orders', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_restrictions', $types );
+
+	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
+
+	return $types;
+}
+
+function get_restriction( $type )
+{
+	$types = get_restrictions();
+
+	if ( isset($types[$type]) )
+	{
+		return $types[$type];
+	}
+
+	return '';
+}
+
+function get_rights()
+{
+	$types = array(
+	    'right_of_way_public' => __( 'Public rights of way', 'propertyhive' ),
+	    'right_of_way_private' => __( 'Private rights of way', 'propertyhive' ),
+	    'registered_easements_hmlr' => __( 'Registered easements/rights with the HMLR (Land Registry)', 'propertyhive' ),
+	    'servitudes' => __( 'Servitudes  (Scotland only)', 'propertyhive' ),
+	    'shared_driveway' => __( 'Shared driveway', 'propertyhive' ),
+	    'loft_access' => __( 'Loft access', 'propertyhive' ),
+	    'drain_access' => __( 'Drain access', 'propertyhive' ),
+	);
+
+	$types = apply_filters( 'propertyhive_rights', $types );
+
+	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
+
+	return $types;
+}
+
+function get_right( $type )
+{
+	$types = get_rights();
 
 	if ( isset($types[$type]) )
 	{

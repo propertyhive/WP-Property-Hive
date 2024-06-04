@@ -52,9 +52,34 @@ function ph_init_description_editors()
     });
 }
 
+function show_other_material_information_rows()
+{
+    jQuery('#propertyhive-property-material-information .form-field[class*=\'_other_field\']').hide();
+
+    jQuery('#propertyhive-property-material-information .form-field:not([class*=\'_other_field\'])').each(function()
+    {
+        if ( jQuery(this).next('[class*="_other_field"]').length > 0 ) 
+        {
+            // If select is 'Other' then show row
+            var selected_values = jQuery(this).find('select').val();
+            if (selected_values && jQuery.inArray('other', selected_values) !== -1) 
+            {
+                jQuery(this).next('[class*="_other_field"]').show();
+            }
+        }
+    });
+}
+
 jQuery( function($){
     
     ph_init_description_editors();
+
+    show_other_material_information_rows();
+
+    $('#propertyhive-property-material-information .form-field:not([class*=\'_other_field\']) select').on('change', function()
+    {
+        show_other_material_information_rows();
+    });
 
     // Toggle list table rows on small screens.
     $( 'div[id^=\'propertyhive_\'][id$=\'_meta_box\'], div[id^=\'propertyhive_\'][id$=\'_grid\']' ).on( 'click', '.toggle-row', function() {
