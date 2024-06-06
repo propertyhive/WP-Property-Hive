@@ -37,6 +37,8 @@ class PH_Post_types {
 
         add_action( 'save_post', array( __CLASS__, 'ensure_property_floor_area_to_set' ), 99, 3 );
 
+        add_action( 'save_post', array( __CLASS__, 'update_property_indexed_owner_names' ), 99, 3 );
+
         add_action( 'save_post', array( __CLASS__, 'store_related_viewings' ), 99, 3 );
         add_action( 'updated_post_meta', array( __CLASS__, 'store_related_viewings_meta_change' ), 10, 4 );
 
@@ -44,6 +46,116 @@ class PH_Post_types {
 
         add_filter( 'get_terms', array( $this, 'put_terms_in_order' ), 10, 4 );
 	}
+
+    public static function update_property_indexed_owner_names( $post_id, $post, $update )
+    {
+        // $post_id and $post are required
+        if ( empty( $post_id ) || empty( $post ) ) {
+            return;
+        }
+
+        // Dont' save meta boxes for revisions or autosaves
+        if ( defined( 'DOING_AUTOSAVE' ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
+            return;
+        }
+
+        if ( $post->post_type !== 'property' && $post->post_type !== 'contact' ) {
+            return;
+        }
+
+        if ( $post->post_type == 'property' )
+        {
+            // Get the owner contact IDs
+            $contact_ids = get_post_meta($post_id, '_owner_contact_id', true);
+            if ( !is_array($contact_ids) ) 
+            {
+                $contact_ids = array($contact_ids);
+            }
+
+            // Get the names of the contacts
+            $owner_details = array();
+            if ( !empty($contact_ids) )
+            {
+                foreach ( $contact_ids as $contact_id ) 
+                {
+                    $contact_post = get_post($contact_id);
+                    if ( $contact_post && $contact_post->post_type == 'contact' ) 
+                    {
+                        $owner_details[] = $contact_post->post_title;
+                        if ( get_post_meta( $contact_id, '_telephone_number', TRUE ) != '' )
+                        {
+                            $owner_details[] = get_post_meta( $contact_id, '_telephone_number', TRUE );
+                        }
+                        if ( get_post_meta( $contact_id, '_email_address', TRUE ) != '' )
+                        {
+                            $owner_details[] = get_post_meta( $contact_id, '_email_address', TRUE );
+                        }
+                    }
+                }
+
+                $owner_details = array_filter($owner_details);
+                $owner_details = array_unique($owner_details);
+            }
+
+            // Update the owner names meta field
+            update_post_meta($post_id, '_owner_details', implode(', ', $owner_details));
+        }
+
+        if ( $post->post_type == 'contact' )
+        {
+            // Find all properties linked to this contact
+            $args = array(
+                'post_type' => 'property',
+                'meta_query' => array(
+                    array(
+                        'key' => '_owner_contact_id',
+                        'value' => '"' . $post_id . '"',
+                        'compare' => 'LIKE'
+                    )
+                ),
+                'posts_per_page' => -1
+            );
+
+            $properties = get_posts($args);
+            foreach ( $properties as $property ) 
+            {
+                // Get the owner contact IDs
+                $contact_ids = get_post_meta($property->ID, '_owner_contact_id', true);
+                if ( !is_array($contact_ids) ) 
+                {
+                    $contact_ids = array($contact_ids);
+                }
+
+                // Get the names of the contacts
+                $owner_details = array();
+                if ( !empty($contact_ids) )
+                {
+                    foreach ( $contact_ids as $contact_id ) 
+                    {
+                        $contact_post = get_post($contact_id);
+                        if ( $contact_post && $contact_post->post_type == 'contact' ) 
+                        {
+                            $owner_details[] = $contact_post->post_title;
+                            if ( get_post_meta( $contact_id, '_telephone_number', TRUE ) != '' )
+                            {
+                                $owner_details[] = get_post_meta( $contact_id, '_telephone_number', TRUE );
+                            }
+                            if ( get_post_meta( $contact_id, '_email_address', TRUE ) != '' )
+                            {
+                                $owner_details[] = get_post_meta( $contact_id, '_email_address', TRUE );
+                            }
+                        }
+                    }
+
+                    $owner_details = array_filter($owner_details);
+                    $owner_details = array_unique($owner_details);
+                }
+
+                // Update the owner names meta field
+                update_post_meta($property->ID, '_owner_details', implode(', ', $owner_details));
+            }
+        }
+    }
 
     public static function put_terms_in_order( $terms, $taxonomies, $query_vars, $term_query ) {
 
