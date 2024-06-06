@@ -1435,6 +1435,7 @@ class PH_Admin_Post_Types {
             $join .= " 
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_address_concatenated ON " . $wpdb->posts . ".ID = ph_property_filter_meta_address_concatenated.post_id AND ph_property_filter_meta_address_concatenated.meta_key = '_address_concatenated'
 LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_reference_number ON " . $wpdb->posts . ".ID = ph_property_filter_meta_reference_number.post_id AND ph_property_filter_meta_reference_number.meta_key = '_reference_number'
+LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_owner_details ON " . $wpdb->posts . ".ID = ph_property_filter_meta_owner_details.post_id AND ph_property_filter_meta_owner_details.meta_key = '_owner_details'
 ";
         }
         elseif ( 'contact' === $typenow ) 
@@ -1500,6 +1501,8 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
                     (ph_property_filter_meta_address_concatenated.meta_value LIKE $1)
                     OR 
                     (ph_property_filter_meta_reference_number.meta_value LIKE '" . esc_sql($_GET['s']) . "%')
+                    OR 
+                    (ph_property_filter_meta_owner_details.meta_value LIKE $1)
                 )", 
                 $where 
             );
