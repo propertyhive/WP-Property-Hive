@@ -265,20 +265,34 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 					echo apply_filters( 'the_excerpt', $post->post_excerpt );
 				}
 
-				if ( $the_property->bedrooms != '' || $the_property->property_type != '' )
+				if ( $the_property->bedrooms != '' || $the_property->property_type != '' || $the_property->reference_number != '' )
 				{
-					echo '<br>' . ( 
-						( 
+					echo '<br>';
+
+					$details = array();
+
+					if ( $the_property->bedrooms != '' || $the_property->property_type != '' )
+					{
+						$details[] = ( 
 							( 
-								$the_property->department == 'residential-sales' || 
-								$the_property->department == 'residential-lettings' ||
-								ph_get_custom_department_based_on($the_property->department) == 'residential-sales' || 
-								ph_get_custom_department_based_on($the_property->department) == 'residential-lettings'
-							)
-							&& 
-							$the_property->bedrooms != '' 
-						) ? $the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' ) . ' ' : '' 
-					) . $the_property->property_type;
+								( 
+									$the_property->department == 'residential-sales' || 
+									$the_property->department == 'residential-lettings' ||
+									ph_get_custom_department_based_on($the_property->department) == 'residential-sales' || 
+									ph_get_custom_department_based_on($the_property->department) == 'residential-lettings'
+								)
+								&& 
+								$the_property->bedrooms != '' 
+							) ? $the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' ) . ' ' : '' 
+						) . $the_property->property_type;
+					}
+
+					if ( $the_property->reference_number )
+					{
+						$details[] = '<span style="opacity:0.6">' . __( 'Ref', 'propertyhive' ) . ': ' . $the_property->reference_number . '<span>';
+					}
+
+					echo implode("<br>", $details);
 				}
 
 				get_inline_data( $post );
