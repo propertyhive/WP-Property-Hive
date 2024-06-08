@@ -381,6 +381,12 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			</style>';
 		}
 
-		echo do_shortcode('[property_search_form id="' . ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) . '"' . ( ( isset($settings['default_department']) && !empty($settings['default_department']) ) ? ' default_department="' . $settings['default_department'] . '"' : '' ) . ']');
+		if ( isset($settings['default_department']) && !empty($settings['default_department']) )
+		{
+			$_GET['department'] = $settings['default_department'];
+			$_REQUEST['department'] = $settings['default_department'];
+		}
+		ph_get_search_form( ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) );
+
 	}
 }
