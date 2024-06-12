@@ -536,7 +536,6 @@ function get_heating_types()
 	    'ground_source_heat_pump' => __( 'Ground Source Heat Pump', 'propertyhive' ),
 	    'air_source_heat_pump' => __( 'Air Source Heat Pump', 'propertyhive' ),
 	    'solar_pv_thermal' => __( 'Solar PV Thermal', 'propertyhive' ),
-	    'under_floor_heating' => __( 'Underfloor Heating', 'propertyhive' ),
 	    'solar_thermal' => __( 'Solar Thermal Heating', 'propertyhive' ),
 	);
 
