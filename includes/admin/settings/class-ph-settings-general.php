@@ -639,6 +639,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     '' => __( 'Still show the property details', 'propertyhive' ),
                     'redirect' => __( 'Do a 301 redirect to the search results page', 'propertyhive' ),
                 ),
+                'desc'    => __( 'If 301 redirect is selected, this will only apply to non-logged in users', 'propertyhive' )
             ),
 
             array(
