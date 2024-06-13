@@ -381,7 +381,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			</style>';
 		}
 
-		if ( isset($settings['default_department']) && !empty($settings['default_department']) )
+		if ( isset($settings['default_department']) && !empty($settings['default_department']) && !isset($_GET['department']) )
 		{
 			$_GET['department'] = $settings['default_department'];
 			$_REQUEST['department'] = $settings['default_department'];
