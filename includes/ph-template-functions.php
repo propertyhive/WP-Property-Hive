@@ -521,8 +521,11 @@ if ( get_option('propertyhive_off_market_behaviour', '') == 'redirect' )
         {
             if ( get_post_meta(get_the_ID(), '_on_market', TRUE) === '' )
             {
-                wp_redirect(get_permalink(ph_get_page_id('search_results')), 301);
-                exit;
+                if ( !is_user_logged_in() || !current_user_can('administrator') && !current_user_can('editor') )
+                {
+                    wp_redirect(get_permalink(ph_get_page_id('search_results')), 301);
+                    exit;
+                }
             }
         }
     }
