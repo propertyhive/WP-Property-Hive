@@ -188,3 +188,20 @@ if ( ! function_exists( 'ph_format_hex' ) ) {
 		return $hex ? '#' . $hex : null;
 	}
 }
+
+function ph_nl2br($str) 
+{
+    // Match any <ul> or <ol> with their content
+    $pattern = '/(<ul[^>]*>.*?<\/ul>|<ol[^>]*>.*?<\/ol>)/is';
+    $parts = preg_split($pattern, $str, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+    
+    foreach ($parts as &$part) {
+        // If the part is not a list, apply nl2br
+        if (!preg_match($pattern, $part)) {
+            $part = nl2br($part);
+        }
+    }
+    
+    // Reassemble the string
+    return implode('', $parts);
+}
