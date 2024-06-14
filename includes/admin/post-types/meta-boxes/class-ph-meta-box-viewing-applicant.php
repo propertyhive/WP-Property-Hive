@@ -128,6 +128,7 @@ class PH_Meta_Box_Viewing_Applicant {
                 'id' => '_applicant_name',
                 'label' => __( 'Name', 'propertyhive' ),
                 'desc_tip' => false,
+                'description' => 'Upon booking a new applicant record will be created with these details.',
                 'type' => 'text',
             );
             propertyhive_wp_text_input( $args );
@@ -144,10 +145,16 @@ class PH_Meta_Box_Viewing_Applicant {
                 'id' => '_applicant_email_address',
                 'label' => __( 'Email Address', 'propertyhive' ),
                 'desc_tip' => false,
-                'description' => 'Upon booking a new applicant record will be created with these details.',
                 'type' => 'email',
             );
             propertyhive_wp_text_input( $args );
+
+            $args = array(
+                'id' => '_applicant_address',
+                'label' => __( 'Address', 'propertyhive' ),
+                'desc_tip' => false,
+            );
+            propertyhive_wp_textarea_input( $args );
             ?>
 
             <p class="form-field">
@@ -381,6 +388,19 @@ class PH_Meta_Box_Viewing_Applicant {
                     update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean($_POST['_applicant_telephone_number'], true) );
 
                     update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_applicant_email_address'])) );
+
+                    if ( isset($_POST['_applicant_address']) && !empty(sanitize_textarea_field($_POST['_applicant_address'])) )
+                    {
+                        $address = ph_split_address_into_fields( sanitize_textarea_field($_POST['_applicant_address']) );
+
+                        update_post_meta( $contact_post_id, '_address_name_number', $address['address_name_number'] );
+                        update_post_meta( $contact_post_id, '_address_street', $address['address_street'] );
+                        update_post_meta( $contact_post_id, '_address_two', $address['address_two'] );
+                        update_post_meta( $contact_post_id, '_address_three', $address['address_three'] );
+                        update_post_meta( $contact_post_id, '_address_four', $address['address_four'] );
+                        update_post_meta( $contact_post_id, '_address_postcode', $address['address_postcode'] );
+                        update_post_meta( $contact_post_id, '_address_country', get_option( 'propertyhive_default_country', 'GB' ) );
+                    }
 
                     update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
 
