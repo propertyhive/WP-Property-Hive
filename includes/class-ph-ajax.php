@@ -3882,7 +3882,13 @@ class PH_AJAX {
 
             $headers = apply_filters( 'propertyhive_appraisal_owner_booking_confirmation_email_headers', $headers );
 
-            wp_mail($to, $subject, $body, $headers);
+            $sent = wp_mail($to, $subject, $body, $headers);
+
+            if ( !$sent )
+            {
+                wp_send_json_error('Failed to send email');
+            }
+
 
             update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
@@ -4527,10 +4533,16 @@ class PH_AJAX {
 
             $headers = apply_filters( 'propertyhive_viewing_applicant_booking_confirmation_email_headers', $headers );
 
-            wp_mail($to, $subject, $body, $headers);
+            $sent = wp_mail($to, $subject, $body, $headers, $attachments);
+
             foreach ($attachments as $temp_file) 
             {
                 @unlink($temp_file);
+            }
+
+            if ( !$sent )
+            {
+                wp_send_json_error('Failed to send email');
             }
 
             update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
@@ -4701,12 +4713,17 @@ class PH_AJAX {
 
             $headers = apply_filters( 'propertyhive_viewing_owner_booking_confirmation_email_headers', $headers );
 
-            wp_mail($to, $subject, $body, $headers);
+            $sent = wp_mail($to, $subject, $body, $headers, $attachments);
+
             foreach ($attachments as $temp_file) 
             {
                 @unlink($temp_file);
             }
 
+            if ( !$sent )
+            {
+                wp_send_json_error('Failed to send email');
+            }
             update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
             wp_send_json_success();
@@ -4898,12 +4915,17 @@ class PH_AJAX {
 
             $headers = apply_filters( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_headers', $headers );
 
-            wp_mail($to, $subject, $body, $headers);
+            $sent = wp_mail($to, $subject, $body, $headers, $attachments);
+
             foreach ($attachments as $temp_file) 
             {
                 @unlink($temp_file);
             }
 
+            if ( !$sent )
+            {
+                wp_send_json_error('Failed to send email');
+            }
             update_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
             wp_send_json_success();
