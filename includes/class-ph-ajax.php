@@ -3869,7 +3869,17 @@ class PH_AJAX {
 
             $body = apply_filters( 'appraisal_owner_booking_confirmation_email_body', $body, $post_id );
 
-            $from = get_option('propertyhive_email_from_address', '');
+            $from = '';
+            $from_setting = get_option( 'propertyhive_confirmations_default_from', '' );
+            if ( $from_setting == 'user' )
+            {
+                $current_user = wp_get_current_user();
+                $from = ( isset($current_user->user_email) ? $current_user->user_email : '' );
+            }
+            if ( $from == '' )
+            {
+                $from = get_option('propertyhive_email_from_address', '');
+            }
             if ( $from == '' )
             {
                 $from = get_bloginfo('admin_email');
@@ -4491,14 +4501,29 @@ class PH_AJAX {
 
             $body = apply_filters( 'viewing_applicant_booking_confirmation_email_body', $body, $post_id, $property_id );
 
-            $from = $property->office_email_address;
-            if ( sanitize_email($from) == '' )
+            $from = '';
+            $from_setting = get_option( 'propertyhive_confirmations_default_from', '' );
+            if ( $from_setting == 'user' )
             {
-                $from = get_option('propertyhive_email_from_address', '');
+                $current_user = wp_get_current_user();
+                $from = ( isset($current_user->user_email) ? $current_user->user_email : '' );
+
                 if ( $from == '' )
                 {
-                    $from = get_bloginfo('admin_email');
+                    $from = $property->office_email_address;
                 }
+            }
+            if ( $from_setting == 'office' )
+            {
+                $from = $property->office_email_address;
+            }
+            if ( $from == '' )
+            {
+                $from = get_option('propertyhive_email_from_address', '');
+            }
+            if ( $from == '' )
+            {
+                $from = get_bloginfo('admin_email');
             }
 
             $attachments = array();
@@ -4683,14 +4708,29 @@ class PH_AJAX {
 
             $body = apply_filters( 'viewing_owner_booking_confirmation_email_body', $body, $post_id, $property_id );
 
-            $from = $property->office_email_address;
-            if ( sanitize_email($from) == '' )
+            $from = '';
+            $from_setting = get_option( 'propertyhive_confirmations_default_from', '' );
+            if ( $from_setting == 'user' )
             {
-                $from = get_option('propertyhive_email_from_address', '');
+                $current_user = wp_get_current_user();
+                $from = ( isset($current_user->user_email) ? $current_user->user_email : '' );
+
                 if ( $from == '' )
                 {
-                    $from = get_bloginfo('admin_email');
+                    $from = $property->office_email_address;
                 }
+            }
+            if ( $from_setting == 'office' )
+            {
+                $from = $property->office_email_address;
+            }
+            if ( $from == '' )
+            {
+                $from = get_option('propertyhive_email_from_address', '');
+            }
+            if ( $from == '' )
+            {
+                $from = get_bloginfo('admin_email');
             }
 
             $attachments = array();
@@ -4898,14 +4938,29 @@ class PH_AJAX {
 
             $body = apply_filters( 'viewing_attending_negotiator_booking_confirmation_email_body', $body, $post_id, $property_id );
 
-            $from = $property->office_email_address;
-            if ( sanitize_email($from) == '' )
+            $from = '';
+            $from_setting = get_option( 'propertyhive_confirmations_default_from', '' );
+            if ( $from_setting == 'user' )
             {
-                $from = get_option('propertyhive_email_from_address', '');
+                $current_user = wp_get_current_user();
+                $from = ( isset($current_user->user_email) ? $current_user->user_email : '' );
+
                 if ( $from == '' )
                 {
-                    $from = get_bloginfo('admin_email');
+                    $from = $property->office_email_address;
                 }
+            }
+            if ( $from_setting == 'office' )
+            {
+                $from = $property->office_email_address;
+            }
+            if ( $from == '' )
+            {
+                $from = get_option('propertyhive_email_from_address', '');
+            }
+            if ( $from == '' )
+            {
+                $from = get_bloginfo('admin_email');
             }
 
             $attachments = array();

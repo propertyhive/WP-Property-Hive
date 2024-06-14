@@ -357,6 +357,20 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	        $settings[] = array( 'title' => __( 'Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'booking_confirmation_email_options' );
 
 	        $settings[] = array(
+				'title'   => __( 'Sent From Email Address', 'propertyhive' ),
+				'id'      => 'propertyhive_confirmations_default_from',
+				'type'    => 'select',
+				'default' => '',
+				'css'     => 'min-width:300px;',
+				'options' => array(
+					'' => __( 'Default "From" Email Address', 'propertyhive' ),
+					'office' => __( 'Office Email Address', 'propertyhive' ),
+					'user' => __( 'User Email Address', 'propertyhive' ),
+				),
+				'desc'    => '<p>' . __( 'This sets the email address that booking confirmations come from and that will receive the response should someone reply.', 'propertyhive' ) . '</p>',
+			);
+
+	        $settings[] = array(
 	            'title'   => __( 'Customise Confirmation Emails Before Sending', 'propertyhive' ),
 	            'id'      => 'propertyhive_customise_confirmation_emails',
 	            'type'    => 'checkbox',
