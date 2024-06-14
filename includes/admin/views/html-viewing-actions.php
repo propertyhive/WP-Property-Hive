@@ -313,6 +313,14 @@ if ( $show_customise_confirmation_meta_boxes )
 
             </div>
 
+            <div class="form-field">
+
+                <label for="_owner_confirmation_email_attachment">' . __( 'Attach File(s)', 'propertyhive' ) . '</label>
+                
+                <input type="file" id="_owner_confirmation_email_attachment" name="_owner_confirmation_email_attachment" style="width:100%;" multiple>
+
+            </div>
+
             <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
             <a class="button button-primary owner-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
 
@@ -343,6 +351,14 @@ if ( $show_customise_confirmation_meta_boxes )
 
             </div>
 
+            <div class="form-field">
+
+                <label for="_applicant_confirmation_email_attachment">' . __( 'Attach File(s)', 'propertyhive' ) . '</label>
+                
+                <input type="file" id="_applicant_confirmation_email_attachment" name="_applicant_confirmation_email_attachment" style="width:100%;" multiple>
+
+            </div>
+
             <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
             <a class="button button-primary applicant-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
 
@@ -370,6 +386,14 @@ if ( $show_customise_confirmation_meta_boxes )
                 <label for="_attending_negotiator_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
                 
                 <textarea id="_attending_negotiator_confirmation_email_body" name="_attending_negotiator_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_attending_negotiator_confirmation_email_attachment">' . __( 'Attach File(s)', 'propertyhive' ) . '</label>
+                
+                <input type="file" id="_attending_negotiator_confirmation_email_attachment" name="_attending_negotiator_confirmation_email_attachment" style="width:100%;" multiple>
 
             </div>
 
