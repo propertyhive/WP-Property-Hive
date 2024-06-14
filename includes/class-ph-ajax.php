@@ -1070,6 +1070,7 @@ class PH_AJAX {
             if (isset($_POST['telephone_number']))
             {
                 update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['telephone_number']) );
+                update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean(ph_clean_telephone_number($_POST['telephone_number'])) );
             }
 
             // Update user
@@ -2274,6 +2275,7 @@ class PH_AJAX {
 
         if ( $telephone !== FALSE ) { 
             update_post_meta( $contact_post_id, '_telephone_number', ph_clean( ph_clean_telephone_number( $telephone ) ) );
+            update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number($telephone) ) );
         }
 
         if ( $email !== FALSE ) { update_post_meta( $contact_post_id, '_email_address', ph_clean( $email ) ); }
