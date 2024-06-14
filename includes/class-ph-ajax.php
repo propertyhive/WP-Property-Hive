@@ -4570,7 +4570,7 @@ class PH_AJAX {
         }
         else
         {
-            wp_send_json_error('No recipient email addresses');
+            wp_send_json_error('No valid recipient email addresses');
         }
 
         wp_die();
