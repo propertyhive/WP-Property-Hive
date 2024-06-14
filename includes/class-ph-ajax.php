@@ -4014,6 +4014,20 @@ class PH_AJAX {
             $telephone_number = isset($_POST['applicant_telephone_number']) ? sanitize_text_field($_POST['applicant_telephone_number']) : '';
             update_post_meta( $contact_post_id, '_email_address', $email_address );
             update_post_meta( $contact_post_id, '_telephone_number', $telephone_number );
+            update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number($telephone_number) ) );
+
+            if ( isset($_POST['applicant_address']) && !empty(sanitize_textarea_field($_POST['applicant_address'])) )
+            {
+                $address = ph_split_address_into_fields( sanitize_textarea_field($_POST['applicant_address']) );
+
+                update_post_meta( $contact_post_id, '_address_name_number', $address['address_name_number'] );
+                update_post_meta( $contact_post_id, '_address_street', $address['address_street'] );
+                update_post_meta( $contact_post_id, '_address_two', $address['address_two'] );
+                update_post_meta( $contact_post_id, '_address_three', $address['address_three'] );
+                update_post_meta( $contact_post_id, '_address_four', $address['address_four'] );
+                update_post_meta( $contact_post_id, '_address_postcode', $address['address_postcode'] );
+                update_post_meta( $contact_post_id, '_address_country', get_option( 'propertyhive_default_country', 'GB' ) );
+            }
 
             update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
             update_post_meta( $contact_post_id, '_applicant_profile_0', array( 'department' => $property->department, 'send_matching_properties' => '' ) );
@@ -5009,6 +5023,25 @@ class PH_AJAX {
             }
 
             update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
+
+            $email_address = isset($_POST['applicant_email_address']) ? sanitize_email($_POST['applicant_email_address']) : '';
+            $telephone_number = isset($_POST['applicant_telephone_number']) ? sanitize_text_field($_POST['applicant_telephone_number']) : '';
+            update_post_meta( $contact_post_id, '_email_address', $email_address );
+            update_post_meta( $contact_post_id, '_telephone_number', $telephone_number );
+            update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number($telephone_number) ) );
+
+            if ( isset($_POST['applicant_address']) && !empty(sanitize_textarea_field($_POST['applicant_address'])) )
+            {
+                $address = ph_split_address_into_fields( sanitize_textarea_field($_POST['applicant_address']) );
+
+                update_post_meta( $contact_post_id, '_address_name_number', $address['address_name_number'] );
+                update_post_meta( $contact_post_id, '_address_street', $address['address_street'] );
+                update_post_meta( $contact_post_id, '_address_two', $address['address_two'] );
+                update_post_meta( $contact_post_id, '_address_three', $address['address_three'] );
+                update_post_meta( $contact_post_id, '_address_four', $address['address_four'] );
+                update_post_meta( $contact_post_id, '_address_postcode', $address['address_postcode'] );
+                update_post_meta( $contact_post_id, '_address_country', get_option( 'propertyhive_default_country', 'GB' ) );
+            }
 
             update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
             update_post_meta( $contact_post_id, '_applicant_profile_0', array( 'department' => $property->department, 'send_matching_properties' => '' ) );

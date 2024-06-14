@@ -156,7 +156,9 @@ class PH_Meta_Box_Property_Actions {
 
 		            	<div style="margin:8px 0"><input type="email" name="viewing_applicant_email_address" id="viewing_applicant_email_address" style="width:100%;" placeholder="' . esc_attr(__( 'Email Address', 'propertyhive' )) . '"></div>
 
-		            	<input type="text" name="viewing_applicant_telephone_number" id="viewing_applicant_telephone_number" style="width:100%;" placeholder="' . esc_attr(__( 'Telephone Number', 'propertyhive' )) . '">
+		            	<div style="margin:8px 0"><input type="text" name="viewing_applicant_telephone_number" id="viewing_applicant_telephone_number" style="width:100%;" placeholder="' . esc_attr(__( 'Telephone Number', 'propertyhive' )) . '"></div>
+
+		            	<div style="margin-top:8px"><textarea name="viewing_applicant_address" id="viewing_applicant_address" style="width:100%;" placeholder="' . esc_attr(__( 'Address', 'propertyhive' )) . '"></textarea></div>
 		            </div>
 
 		        </div>
@@ -232,6 +234,12 @@ class PH_Meta_Box_Property_Actions {
 		            <div id="offer_new_applicant" style="display:none">
 		            	<input type="text" name="offer_applicant_name" id="offer_applicant_name" style="width:100%;" placeholder="' . esc_attr(__( 'Enter Applicant Name', 'propertyhive' )) . '">
 		            	<em>Upon booking a new ' . esc_html(str_replace("-", " ", get_post_meta( $post->ID, '_department', TRUE))) . ' applicant will be created with this name.</em>
+		            
+		            	<div style="margin:8px 0"><input type="email" name="offer_applicant_email_address" id="offer_applicant_email_address" style="width:100%;" placeholder="' . esc_attr(__( 'Email Address', 'propertyhive' )) . '"></div>
+
+		            	<div style="margin:8px 0"><input type="text" name="offer_applicant_telephone_number" id="offer_applicant_telephone_number" style="width:100%;" placeholder="' . esc_attr(__( 'Telephone Number', 'propertyhive' )) . '"></div>
+
+		            	<div style="margin-top:8px"><textarea name="offer_applicant_address" id="offer_applicant_address" style="width:100%;" placeholder="' . esc_attr(__( 'Address', 'propertyhive' )) . '"></textarea></div>
 		            </div>
 
 		        </div>
@@ -601,6 +609,7 @@ jQuery(document).ready(function($)
             applicant_name: ( (new_applicant) ? $('#viewing_applicant_name').val() : '' ),
             applicant_email_address: ( (new_applicant) ? $('#viewing_applicant_email_address').val() : '' ),
             applicant_telephone_number: ( (new_applicant) ? $('#viewing_applicant_telephone_number').val() : '' ),
+            applicant_address: ( (new_applicant) ? $('#viewing_applicant_address').val() : '' ),
             applicant_ids: 	( (!new_applicant) ? Object.keys(viewing_selected_applicants) : '' ),
             negotiator_ids: Object.keys(viewing_selected_negotiators),
             security:       '<?php echo wp_create_nonce( 'book-viewing' ); ?>',
@@ -849,6 +858,9 @@ jQuery(document).ready(function($)
             offer_date: 	$('#_offer_date').val(),
             offer_time: 	$('#_offer_time_hours').val() + ':' + $('#_offer_time_minutes').val() + ':00',
             applicant_name: ( (new_applicant) ? $('#offer_applicant_name').val() : '' ),
+            applicant_email_address: ( (new_applicant) ? $('#offer_applicant_email_address').val() : '' ),
+            applicant_telephone_number: ( (new_applicant) ? $('#offer_applicant_telephone_number').val() : '' ),
+            applicant_address: ( (new_applicant) ? $('#offer_applicant_address').val() : '' ),
             applicant_ids: 	( (!new_applicant) ? Object.keys(offer_selected_applicants) : '' ),
             amount: 		$('#_offer_amount').val(),
             security:       '<?php echo wp_create_nonce( 'record-offer' ); ?>',
