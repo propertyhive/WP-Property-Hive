@@ -248,6 +248,8 @@ function redraw_appraisal_actions()
 
     	jQuery(document).trigger('ph:adminAppraisalActionsRedrawn');
     	jQuery(document).trigger('ph:adminPostActionsRedrawn', ['appraisal']);
+
+    	ph_redraw_notes_grid('appraisal');
     }, 'html');
 
     redraw_appraisal_details_meta_box();
