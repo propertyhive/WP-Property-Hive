@@ -151,7 +151,7 @@ echo '<div class="propertyhive_meta_box">';
         echo '
         <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . esc_attr(__( 'Unaccompanied', 'propertyhive' )) . '" class="multiselect attribute_values">';
         
-        if ( $pagenow == 'post-new.php' )
+        if ( isset($pagenow) && $pagenow == 'post-new.php' )
         {
             $negotiator_ids = array( get_current_user_id() );
         }
@@ -183,7 +183,11 @@ echo '<div class="propertyhive_meta_box">';
     }
     echo '</p>';
 
-    if ( $pagenow != 'post-new.php' )
+    if ( isset($pagenow) && $pagenow == 'post-new.php' )
+    {
+
+    }
+    else
     {
         propertyhive_wp_hidden_input( array( 
             'id' => '_previous_negotiator_ids', 
