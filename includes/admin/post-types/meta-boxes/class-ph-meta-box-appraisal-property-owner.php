@@ -395,7 +395,7 @@ function appraisal_update_selected_property_owners()
                     update_post_meta( $contact_post_id, '_contact_types', array('potentialowner') );
 
                     update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['_property_owner_telephone_number']) );
-                    update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean($_POST['_property_owner_telephone_number'], true) );
+                    update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean(ph_clean_telephone_number($_POST['_property_owner_telephone_number'])) );
 
                     update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_property_owner_email_address'])) );
 
