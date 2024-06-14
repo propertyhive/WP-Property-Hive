@@ -1037,6 +1037,10 @@ jQuery(document).ready(function($)
             };
             jQuery.post( ajaxurl, data, function(response) 
             {
+                if ( !response.success )
+                {
+                    alert('Error: ' + response.data);
+                }
                 redraw_viewing_actions();
             }, 'json');
             return;
@@ -1051,6 +1055,10 @@ jQuery(document).ready(function($)
             };
             jQuery.post( ajaxurl, data, function(response) 
             {
+                if ( !response.success )
+                {
+                    alert('Error: ' + response.data);
+                }
                 redraw_viewing_actions();
             }, 'json');
             return;
@@ -1071,6 +1079,10 @@ jQuery(document).ready(function($)
             };
             jQuery.post( ajaxurl, data, function(response) 
             {
+                if ( !response.success )
+                {
+                    alert('Error: ' + response.data);
+                }
                 redraw_viewing_actions();
             }, 'json');
             return;
@@ -1152,7 +1164,8 @@ jQuery(document).ready(function($)
     {
         e.preventDefault();
 
-        $(this).attr('disabled', 'disabled');
+        var ph_action_button = $(this);
+        ph_action_button.attr('disabled', 'disabled');
 
         // Create FormData object and append data
         var form_data = new FormData();
@@ -1192,6 +1205,7 @@ jQuery(document).ready(function($)
                 else
                 {
                     alert('Error: ' + response.data);
+                    ph_action_button.attr('disabled', false);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -1206,7 +1220,8 @@ jQuery(document).ready(function($)
     {
         e.preventDefault();
 
-        $(this).attr('disabled', 'disabled');
+        var ph_action_button = $(this);
+        ph_action_button.attr('disabled', 'disabled');
 
         // Create FormData object and append data
         var form_data = new FormData();
@@ -1246,6 +1261,7 @@ jQuery(document).ready(function($)
                 else
                 {
                     alert('Error: ' + response.data);
+                    ph_action_button.attr('disabled', false);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -1260,7 +1276,8 @@ jQuery(document).ready(function($)
     {
         e.preventDefault();
 
-        $(this).attr('disabled', 'disabled');
+        var ph_action_button = $(this);
+        ph_action_button.attr('disabled', 'disabled');
 
         // Create FormData object and append data
         var form_data = new FormData();
@@ -1300,6 +1317,7 @@ jQuery(document).ready(function($)
                 else
                 {
                     alert('Error: ' + response.data);
+                    ph_action_button.attr('disabled', false);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {

@@ -63,7 +63,12 @@ jQuery(document).ready(function($)
 		    };
 			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
 		    {
-		    	redraw_appraisal_actions();
+		    	if (!response.success)
+	        	{
+	        		alert('Error: ' + response.data);
+	        	}
+			    
+			    redraw_appraisal_actions();
 		    }, 'json');
 			return;
 		}
@@ -116,7 +121,8 @@ jQuery(document).ready(function($)
 	{
 		e.preventDefault();
 
-		$(this).attr('disabled', 'disabled');
+		var ph_action_button = $(this);
+		ph_action_button.attr('disabled', 'disabled');
 
         var data = {
             action:         'propertyhive_appraisal_email_owner_booking_confirmation',
@@ -127,7 +133,15 @@ jQuery(document).ready(function($)
         };
         jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
         {
-            redraw_appraisal_actions();
+        	if (response.success)
+        	{
+	            redraw_appraisal_actions();
+	        }
+	        else
+	        {
+	        	alert('Error: ' + response.data);
+	        	ph_action_button.attr('disabled', false);
+	        }
         }, 'json');
 	});
 
