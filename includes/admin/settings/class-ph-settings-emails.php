@@ -42,9 +42,23 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	public function get_sections() {
 		$sections = array(
 			'' => __( 'Email Options', 'propertyhive' ),
+			'enquiry-auto-responder' => __( 'Enquiry Auto-Responder', 'propertyhive' ),
 		);
 
 		if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
+	    {
+	    	$sections['match'] = __( 'Property Match', 'propertyhive' );
+	    }
+
+	    if ( 
+	    	get_option('propertyhive_module_disabled_viewings', '') != 'yes' ||
+	    	get_option('propertyhive_module_disabled_appraisals', '') != 'yes'
+	    )
+	    {
+	    	$sections['booking-confirmation'] = __( 'Booking Confirmation', 'propertyhive' );
+	    }
+
+	    if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
 	    {
 	    	$sections['log'] = __( 'Email Queue', 'propertyhive' );
 	    }
@@ -123,24 +137,40 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
 			array( 'type' => 'sectionend', 'id' => 'email_template_options' ),
 
-			array( 'title' => __( 'Enquiry Auto Responder Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'enquiry_auto_responder_email_options' ),
+        );
+
+		$settings = apply_filters( 'propertyhive_email_settings', $settings );
+
+		return apply_filters( 'propertyhive_get_settings_' . $this->id, $settings );
+	}
+
+	/**
+	 * Get enquiry auto-responder settings array
+	 *
+	 * @return array
+	 */
+	public function get_enquiry_autoresponder_settings() {
+		    
+		return apply_filters( 'propertyhive_enquiry_autoresponder_settings', array(
+
+			array( 'title' => __( 'Enquiry Auto-Responder Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'enquiry_auto_responder_email_options' ),
 
             array(
-                'title'   => __( 'Auto Responder Enabled', 'propertyhive' ),
+                'title'   => __( 'Auto-Responder Enabled', 'propertyhive' ),
                 'id'      => 'propertyhive_enquiry_auto_responder',
                 'type'    => 'checkbox',
                 'default' => '',
             ),
 
             array(
-                'title'   => __( 'Auto Responder Email Subject', 'propertyhive' ),
+                'title'   => __( 'Auto-Responder Email Subject', 'propertyhive' ),
                 'id'      => 'propertyhive_enquiry_auto_responder_email_subject',
                 'type'    => 'text',
                 'css'         => 'min-width:300px;',
             ),
 
             array(
-                'title'   => __( 'Auto Responder Email Body', 'propertyhive' ),
+                'title'   => __( 'Auto-Responder Email Body', 'propertyhive' ),
                 'id'      => 'propertyhive_enquiry_auto_responder_email_body',
                 'type'    => 'textarea',
                 'css'         => 'min-width:300px; height:110px;',
@@ -148,77 +178,96 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
             array( 'type' => 'sectionend', 'id' => 'enquiry_auto_responder_email_options' )
 
+		) ); // End settings
+	}
+
+	/**
+	 * Get property match settings settings array
+	 *
+	 * @return array
+	 */
+	public function get_property_match_settings() {
+
+		$settings = array();
+
+		$settings[] = array( 'title' => __( 'Property Match Email Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_match_email_options' );
+
+        $settings[] = array(
+            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+            'id'      => 'propertyhive_property_match_default_email_subject',
+            'type'    => 'text',
+            'css'         => 'min-width:300px;',
         );
 
-		if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
-	    {
-			$settings[] = array( 'title' => __( 'Property Match Email Settings', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_match_email_options' );
+        $settings[] = array(
+            'title'   => __( 'Default Email Body', 'propertyhive' ),
+            'id'      => 'propertyhive_property_match_default_email_body',
+            'type'    => 'textarea',
+            'css'         => 'min-width:300px; height:110px;',
+        );
 
-	        $settings[] = array(
-	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
-	            'id'      => 'propertyhive_property_match_default_email_subject',
-	            'type'    => 'text',
-	            'css'         => 'min-width:300px;',
-	        );
+		$settings[] = array(
+			'title'   => __( 'Default From Email Address', 'propertyhive' ),
+			'id'      => 'propertyhive_property_match_default_from',
+			'type'    => 'select',
+			'default' => '',
+			'css'     => 'min-width:300px;',
+			'options' => array(
+				'' => __( 'User Email Address', 'propertyhive' ),
+				'default_from_email' => __( 'Default "From" Email Address', 'propertyhive' ),
+			),
+			'desc'    => '<p>' . __( 'This sets the email address that manual matches will be sent from by default. This can still be edited when you go to send the match.<br>Automatic matches, if enabled, will still be sent from the email address of the office that most of the properties in the match belong to.', 'propertyhive' ) . '</p>',
+		);
 
-	        $settings[] = array(
-	            'title'   => __( 'Default Email Body', 'propertyhive' ),
-	            'id'      => 'propertyhive_property_match_default_email_body',
-	            'type'    => 'textarea',
-	            'css'         => 'min-width:300px; height:110px;',
-	        );
-
-			$settings[] = array(
-				'title'   => __( 'Default From Email Address', 'propertyhive' ),
-				'id'      => 'propertyhive_property_match_default_from',
-				'type'    => 'select',
-				'default' => '',
-				'css'     => 'min-width:300px;',
-				'options' => array(
-					'' => __( 'User Email Address', 'propertyhive' ),
-					'default_from_email' => __( 'Default "From" Email Address', 'propertyhive' ),
-				),
-				'desc'    => '<p>' . __( 'This sets the email address that manual matches will be sent from by default. This can still be edited when you go to send the match.<br>Automatic matches, if enabled, will still be sent from the email address of the office that most of the properties in the match belong to.', 'propertyhive' ) . '</p>',
-			);
-
-	        $options = array();
-	        $args = array(
-                'hide_empty' => false,
-                'parent' => 0
-            );
-            $terms = get_terms( 'availability', $args );
-            
-            if ( !empty( $terms ) && !is_wp_error( $terms ) )
-            {
-                foreach ($terms as $term)
-                { 
-                	$options[$term->term_id] = $term->name;
-                }
+        $options = array();
+        $args = array(
+            'hide_empty' => false,
+            'parent' => 0
+        );
+        $terms = get_terms( 'availability', $args );
+        
+        if ( !empty( $terms ) && !is_wp_error( $terms ) )
+        {
+            foreach ($terms as $term)
+            { 
+            	$options[$term->term_id] = $term->name;
             }
-	        $settings[] = array(
-	            'title'   => __( 'Only Include Properties With Statuses', 'propertyhive' ),
-	            'id'      => 'propertyhive_property_match_statuses',
-	            'type'    => 'multiselect',
-	            'css'     => 'min-width:300px; height:110px;',
-	            'options' => $options,
-	            'desc'	=> '<p>' . __( 'By default, all on market properties will come back in matches when sending properties to applicants. If you wish to only send properties with a certain status you can choose this here. For example, maybe you don\'t want Sold STC properties to be sent. Hold ctrl/cmd whilst clicking to select multiple.<br>This will also affect the Similar Properties included in the Auto Responder above, if applicable.', 'propertyhive' ) . '</p>',
-	        );
+        }
+        $settings[] = array(
+            'title'   => __( 'Only Include Properties With Statuses', 'propertyhive' ),
+            'id'      => 'propertyhive_property_match_statuses',
+            'type'    => 'multiselect',
+            'css'     => 'min-width:300px; height:110px;',
+            'options' => $options,
+            'desc'	=> '<p>' . __( 'By default, all on market properties will come back in matches when sending properties to applicants. If you wish to only send properties with a certain status you can choose this here. For example, maybe you don\'t want Sold STC properties to be sent. Hold ctrl/cmd whilst clicking to select multiple.<br>This will also affect the Similar Properties included in the Auto Responder above, if applicable.', 'propertyhive' ) . '</p>',
+        );
 
-	        $time_offset = (int) get_option('gmt_offset') * 60 * 60;
+        $time_offset = (int) get_option('gmt_offset') * 60 * 60;
 
-	        $settings[] = array(
-	            'title'   => __( 'Automatically Send Matching Properties To Applicants', 'propertyhive' ),
-	            'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent properties.<br><br>
-	            	- This will only apply to properties added from the moment this option is activated.<br>
-	            	- When enabled, this can disabled on a per-applicant basis by going into their record<br>
-	            	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ) . ( ( get_option( 'propertyhive_auto_property_match', '' ) == 'yes' && get_option( 'propertyhive_auto_property_match_enabled_date', '' ) != '' ) ? '<br><br>Enabled on ' . date("jS F Y H:i", strtotime(get_option( 'propertyhive_auto_property_match_enabled_date', '' )) + $time_offset) : '' ),
-	            'id'      => 'propertyhive_auto_property_match',
-	            'type'    => 'checkbox',
-	            'default' => '',
-	        );
+        $settings[] = array(
+            'title'   => __( 'Automatically Send Matching Properties To Applicants', 'propertyhive' ),
+            'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent properties.<br><br>
+            	- This will only apply to properties added from the moment this option is activated.<br>
+            	- When enabled, this can disabled on a per-applicant basis by going into their record<br>
+            	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ) . ( ( get_option( 'propertyhive_auto_property_match', '' ) == 'yes' && get_option( 'propertyhive_auto_property_match_enabled_date', '' ) != '' ) ? '<br><br>Enabled on ' . date("jS F Y H:i", strtotime(get_option( 'propertyhive_auto_property_match_enabled_date', '' )) + $time_offset) : '' ),
+            'id'      => 'propertyhive_auto_property_match',
+            'type'    => 'checkbox',
+            'default' => '',
+        );
 
-			$settings[] = array( 'type' => 'sectionend', 'id' => 'applicant_match_email_options' );
-		}
+		$settings[] = array( 'type' => 'sectionend', 'id' => 'applicant_match_email_options' );
+		    
+		return apply_filters( 'propertyhive_property_match_settings', $settings ); // End settings
+	}
+
+	/**
+	 * Get booking confirmation email settings array
+	 *
+	 * @return array
+	 */
+	public function get_booking_confirmation_settings() {
+		    
+		$settings = array();
 
 		if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
 	    {
@@ -317,9 +366,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	        $settings[] = array( 'type' => 'sectionend', 'id' => 'booking_confirmation_email_options' );
 	    }
 
-		$settings = apply_filters( 'propertyhive_email_settings', $settings );
-
-		return apply_filters( 'propertyhive_get_settings_' . $this->id, $settings );
+		return apply_filters( 'propertyhive_booking_confirmation_settings', $settings  ); // End general map settings
 	}
 
 	/**
@@ -547,6 +594,9 @@ class PH_Settings_Emails extends PH_Settings_Page {
         {
         	switch ($current_section)
             {
+            	case "enquiry-auto-responder": { $settings = $this->get_enquiry_autoresponder_settings(); break; }
+            	case "match": { $settings = $this->get_property_match_settings();  break; }
+            	case "booking-confirmation": { $settings = $this->get_booking_confirmation_settings(); break; }
             	case "log": { $settings = $this->get_email_queue_settings(); $hide_save_button = true; break; }
                 default: { die("Unknown setting section"); }
             }
@@ -562,41 +612,75 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	/**
 	 * Save settings.
 	 */
-	public function save() {
-		$previous_auto_property_match = get_option( 'propertyhive_auto_property_match', '' );
+	public function save() 
+	{
+		global $current_section;
 
-		PH_Admin_Settings::save_fields( $this->get_settings() );
+		if ( $current_section != '' ) 
+        {
+        	switch ($current_section)
+        	{
+        		case 'enquiry-auto-responder':
+				{
+					$settings = $this->get_enquiry_autoresponder_settings();
 
-		if ( isset($_POST['propertyhive_auto_property_match']) && $_POST['propertyhive_auto_property_match'] == '1' )
-		{
-			if ( $previous_auto_property_match != 'yes' )
-			{
-				// it's been activated
-				update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
+					PH_Admin_Settings::save_fields( $settings );
+					break;
+				}
+				case 'match':
+				{
+					$settings = $this->get_property_match_settings();
+
+					PH_Admin_Settings::save_fields( $settings );
+
+					$previous_auto_property_match = get_option( 'propertyhive_auto_property_match', '' );
+
+					if ( isset($_POST['propertyhive_auto_property_match']) && $_POST['propertyhive_auto_property_match'] == '1' )
+					{
+						if ( $previous_auto_property_match != 'yes' )
+						{
+							// it's been activated
+							update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
+						}
+
+						$timestamp = wp_next_scheduled( 'propertyhive_auto_email_match' );
+			            wp_unschedule_event($timestamp, 'propertyhive_auto_email_match' );
+			            wp_clear_scheduled_hook('propertyhive_auto_email_match');
+
+						$recurrence = apply_filters( 'propertyhive_auto_email_match_cron_recurrence', 'daily' );
+						if ( $recurrence != 'hourly' )
+						{
+							$timestamp = strtotime( 'tomorrow +2hours' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+						}
+						else
+						{
+							$timestamp = strtotime( '+1 hours' );
+						}
+						wp_schedule_event( 
+							apply_filters( 'propertyhive_auto_email_match_cron_timestamp', $timestamp ), 
+							$recurrence, 
+							'propertyhive_auto_email_match' 
+						);
+					}
+					else
+					{
+						wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
+					}
+					break;
+				}
+				case 'booking-confirmation':
+				{
+					$settings = $this->get_booking_confirmation_settings();
+
+					PH_Admin_Settings::save_fields( $settings );
+					break;
+				}
+				default: { die("Unknown setting section"); }
 			}
-
-			$timestamp = wp_next_scheduled( 'propertyhive_auto_email_match' );
-            wp_unschedule_event($timestamp, 'propertyhive_auto_email_match' );
-            wp_clear_scheduled_hook('propertyhive_auto_email_match');
-
-			$recurrence = apply_filters( 'propertyhive_auto_email_match_cron_recurrence', 'daily' );
-			if ( $recurrence != 'hourly' )
-			{
-				$timestamp = strtotime( 'tomorrow +2hours' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
-			}
-			else
-			{
-				$timestamp = strtotime( '+1 hours' );
-			}
-			wp_schedule_event( 
-				apply_filters( 'propertyhive_auto_email_match_cron_timestamp', $timestamp ), 
-				$recurrence, 
-				'propertyhive_auto_email_match' 
-			);
 		}
 		else
 		{
-			wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
+			PH_Admin_Settings::save_fields( $this->get_settings() );
 		}
 	}
 }
