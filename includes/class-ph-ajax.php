@@ -3856,6 +3856,8 @@ class PH_AJAX {
             $subject = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
 
+            $subject = apply_filters( 'appraisal_owner_booking_confirmation_email_subject', $subject, $post_id );
+
             $body = str_replace('[property_address]', $appraisal->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', $owner_names_string, $body);
             $body = str_replace('[owner_dear]', $owner_dears_string, $body);
@@ -4459,6 +4461,8 @@ class PH_AJAX {
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
 
+            $subject = apply_filters( 'viewing_applicant_booking_confirmation_email_subject', $subject, $post_id, $property_id );
+
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
@@ -4588,6 +4592,8 @@ class PH_AJAX {
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+
+            $subject = apply_filters( 'viewing_owner_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', $owner_names_string, $body);
@@ -4741,6 +4747,8 @@ class PH_AJAX {
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+
+            $subject = apply_filters( 'viewing_attending_negotiator_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', $owner_names_string, $body);
