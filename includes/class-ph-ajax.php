@@ -3889,6 +3889,13 @@ class PH_AJAX {
                 wp_send_json_error('Failed to send email');
             }
 
+            // Add note/comment to appraisal
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'appraisal_owner_booking_confirmation_email',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
 
             update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
@@ -4547,6 +4554,14 @@ class PH_AJAX {
 
             update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_applicant_booking_confirmation_email',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
             wp_send_json_success();
         }
 
@@ -4724,6 +4739,15 @@ class PH_AJAX {
             {
                 wp_send_json_error('Failed to send email');
             }
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_owner_booking_confirmation_email',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
             update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
             wp_send_json_success();
@@ -4926,6 +4950,15 @@ class PH_AJAX {
             {
                 wp_send_json_error('Failed to send email');
             }
+
+            // Add note/comment to viewing
+            $comment = array(
+                'note_type' => 'action',
+                'action' => 'viewing_attending_negotiator_booking_confirmation_email',
+            );
+
+            PH_Comments::insert_note( $post_id, $comment );
+
             update_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
             wp_send_json_success();
