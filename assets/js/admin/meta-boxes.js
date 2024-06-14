@@ -982,8 +982,6 @@ function redraw_viewing_actions()
 
             jQuery(document).trigger('ph:adminViewingActionsRedrawn');
             jQuery(document).trigger('ph:adminPostActionsRedrawn', ['viewing']);
-
-            ph_redraw_notes_grid('viewing');
         }, 'html');
     }
 
