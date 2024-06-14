@@ -205,3 +205,69 @@ function ph_nl2br($str)
     // Reassemble the string
     return implode('', $parts);
 }
+
+function ph_split_address_into_fields( $address )
+{
+	$fields = [
+        'address_name_number' => '',
+        'address_street' => '',
+        'address_two' => '',
+        'address_three' => '',
+        'address_four' => '',
+        'address_postcode' => '',
+        'address_country' => ''
+    ];
+
+    // Replace newlines with commas and remove consecutive commas
+    $address = preg_replace('/\s*,\s*/', ', ', $address);
+    $address = preg_replace('/\s*\n\s*/', ', ', $address);
+    $address = preg_replace('/,+/', ',', $address);
+
+    // Explode the address by comma
+    $parts = explode(',', $address);
+
+    // Trim whitespace from each part
+    $parts = array_map('trim', $parts);
+
+    // Remove empty parts
+    $parts = array_filter($parts);
+
+    // Check the first part for building number and street
+    if (isset($parts[0])) {
+        if (preg_match('/^(\d+)\s+(.*)$/', $parts[0], $matches)) {
+            $fields['address_name_number'] = $matches[1];
+            $fields['address_street'] = $matches[2];
+        } else {
+            $fields['address_street'] = $parts[0];
+        }
+        array_shift($parts);
+    }
+
+    // Detect postcode in the remaining parts
+    foreach ($parts as $index => $part) {
+        if (preg_match('/[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}/i', $part, $postcodeMatch)) {
+            $fields['address_postcode'] = $postcodeMatch[0];
+            // Split the part containing the postcode
+            $remainingPart = preg_replace('/[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}/i', '', $part);
+            if (!empty(trim($remainingPart))) {
+                array_splice($parts, $index, 1, trim($remainingPart));
+            } else {
+                unset($parts[$index]);
+            }
+            // Check if the next part is the country
+            if (isset($parts[$index + 1])) {
+                $fields['address_country'] = $parts[$index + 1];
+                unset($parts[$index + 1]);
+            }
+            break;
+        }
+    }
+
+    // Assign remaining parts to Address Line 2, Town/City, and County
+    $remainingParts = array_values($parts);
+    if (isset($remainingParts[0])) $fields['address_two'] = $remainingParts[0];
+    if (isset($remainingParts[1])) $fields['address_three'] = $remainingParts[1];
+    if (isset($remainingParts[2])) $fields['address_four'] = $remainingParts[2];
+
+    return $fields;
+}
