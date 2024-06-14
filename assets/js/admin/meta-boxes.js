@@ -982,6 +982,8 @@ function redraw_viewing_actions()
 
             jQuery(document).trigger('ph:adminViewingActionsRedrawn');
             jQuery(document).trigger('ph:adminPostActionsRedrawn', ['viewing']);
+
+            ph_redraw_notes_grid('viewing');
         }, 'html');
     }
 
@@ -1152,17 +1154,51 @@ jQuery(document).ready(function($)
 
         $(this).attr('disabled', 'disabled');
 
-        var data = {
-            action:         'propertyhive_viewing_email_owner_booking_confirmation',
-            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
-            subject:        $('#_owner_confirmation_email_subject').val(),
-            body:           $('#_owner_confirmation_email_body').val(),
-            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
-        };
-        jQuery.post( ajaxurl, data, function(response) 
+        // Create FormData object and append data
+        var form_data = new FormData();
+        form_data.append('action', 'propertyhive_viewing_email_owner_booking_confirmation');
+        form_data.append('viewing_id', ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ));
+        form_data.append('subject', $('#_owner_confirmation_email_subject').val());
+        form_data.append('body', $('#_owner_confirmation_email_body').val());
+        form_data.append('security', propertyhive_admin_meta_boxes.viewing_actions_nonce);
+
+        // Get the file input element and the selected files
+        var file_input = $('#_owner_confirmation_email_attachment');
+        var files = file_input.prop('files');   
+
+        // Check if at least one file has been selected
+        if (files.length !== 0) 
         {
-            redraw_viewing_actions();
-        }, 'json');
+            // Append each file to the FormData object
+            $.each(files, function(index, file) 
+            {
+                form_data.append('attachments[]', file);
+            });
+        }
+
+        $.ajax({
+            url: ajaxurl, // WordPress AJAX URL
+            type: 'POST',
+            data: form_data,
+            contentType: false,
+            processData: false,
+            dataType: 'json', // Expect JSON response
+            success: function(response) 
+            {
+                if (response.success) 
+                {
+                    redraw_viewing_actions();
+                }
+                else
+                {
+                    alert('Error: ' + response.data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('AJAX error: ' + textStatus + ' : ' + errorThrown);
+                alert('An unexpected error occurred: ' + textStatus + ' : ' + errorThrown);
+            }
+        });
         return;
     });
 
@@ -1172,17 +1208,51 @@ jQuery(document).ready(function($)
 
         $(this).attr('disabled', 'disabled');
 
-        var data = {
-            action:         'propertyhive_viewing_email_applicant_booking_confirmation',
-            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
-            subject:        $('#_applicant_confirmation_email_subject').val(),
-            body:           $('#_applicant_confirmation_email_body').val(),
-            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
-        };
-        jQuery.post( ajaxurl, data, function(response) 
+        // Create FormData object and append data
+        var form_data = new FormData();
+        form_data.append('action', 'propertyhive_viewing_email_applicant_booking_confirmation');
+        form_data.append('viewing_id', ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ));
+        form_data.append('subject', $('#_applicant_confirmation_email_subject').val());
+        form_data.append('body', $('#_applicant_confirmation_email_body').val());
+        form_data.append('security', propertyhive_admin_meta_boxes.viewing_actions_nonce);
+
+        // Get the file input element and the selected files
+        var file_input = $('#_applicant_confirmation_email_attachment');
+        var files = file_input.prop('files');   
+
+        // Check if at least one file has been selected
+        if (files.length !== 0) 
         {
-            redraw_viewing_actions();
-        }, 'json');
+            // Append each file to the FormData object
+            $.each(files, function(index, file) 
+            {
+                form_data.append('attachments[]', file);
+            });
+        }
+
+        $.ajax({
+            url: ajaxurl, // WordPress AJAX URL
+            type: 'POST',
+            data: form_data,
+            contentType: false,
+            processData: false,
+            dataType: 'json', // Expect JSON response
+            success: function(response) 
+            {
+                if (response.success) 
+                {
+                    redraw_viewing_actions();
+                }
+                else
+                {
+                    alert('Error: ' + response.data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('AJAX error: ' + textStatus + ' : ' + errorThrown);
+                alert('An unexpected error occurred: ' + textStatus + ' : ' + errorThrown);
+            }
+        });
         return;
     });
 
@@ -1192,17 +1262,52 @@ jQuery(document).ready(function($)
 
         $(this).attr('disabled', 'disabled');
 
-        var data = {
-            action:         'propertyhive_viewing_email_attending_negotiator_booking_confirmation',
-            viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
-            subject:        $('#_attending_negotiator_confirmation_email_subject').val(),
-            body:           $('#_attending_negotiator_confirmation_email_body').val(),
-            security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
-        };
-        jQuery.post( ajaxurl, data, function(response) 
+        // Create FormData object and append data
+        var form_data = new FormData();
+        form_data.append('action', 'propertyhive_viewing_email_attending_negotiator_booking_confirmation');
+        form_data.append('viewing_id', ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ));
+        form_data.append('subject', $('#_attending_negotiator_confirmation_email_subject').val());
+        form_data.append('body', $('#_attending_negotiator_confirmation_email_body').val());
+        form_data.append('security', propertyhive_admin_meta_boxes.viewing_actions_nonce);
+
+        // Get the file input element and the selected files
+        var file_input = $('#_attending_negotiator_confirmation_email_attachment');
+        var files = file_input.prop('files');   
+
+        // Check if at least one file has been selected
+        if (files.length !== 0) 
         {
-            redraw_viewing_actions();
-        }, 'json');
+            // Append each file to the FormData object
+            $.each(files, function(index, file) 
+            {
+                form_data.append('attachments[]', file);
+            });
+        }
+
+        $.ajax({
+            url: ajaxurl, // WordPress AJAX URL
+            type: 'POST',
+            data: form_data,
+            contentType: false,
+            processData: false,
+            dataType: 'json', // Expect JSON response
+            success: function(response) 
+            {
+                if (response.success) 
+                {
+                    redraw_viewing_actions();
+                }
+                else
+                {
+                    alert('Error: ' + response.data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('AJAX error: ' + textStatus + ' : ' + errorThrown);
+                alert('An unexpected error occurred: ' + textStatus + ' : ' + errorThrown);
+            }
+        });
+
         return;
     });
 
