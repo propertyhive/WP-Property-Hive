@@ -644,12 +644,6 @@ jQuery(document).ready(function($)
         });
 	});
 
-
-
-
-
-
-
 	// offer specific actions
 	$('a#offer-applicant-search-new-toggle').click(function(e)
 	{

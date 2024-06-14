@@ -90,8 +90,6 @@ class PH_Countries {
 		}
 	}
 
-
-
 	public function get_country( $country_code ) {
 
 		$countries = $this->get_countries();
