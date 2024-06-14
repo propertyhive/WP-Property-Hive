@@ -4484,6 +4484,42 @@ class PH_AJAX {
                 }
             }
 
+            $attachments = array();
+            if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
+            {
+                $uploaded_files = $_FILES['attachments'];
+
+                // Handle each file upload
+                foreach ($uploaded_files['name'] as $key => $value) 
+                {
+                    if ($uploaded_files['name'][$key]) 
+                    {
+                        $file = array(
+                            'name'     => $uploaded_files['name'][$key],
+                            'type'     => $uploaded_files['type'][$key],
+                            'tmp_name' => $uploaded_files['tmp_name'][$key],
+                            'error'    => $uploaded_files['error'][$key],
+                            'size'     => $uploaded_files['size'][$key]
+                        );
+
+                        // Move the file to a temporary location
+                        $upload_overrides = array('test_form' => false);
+                        $movefile = wp_handle_upload($file, $upload_overrides);
+
+                        if ($movefile && !isset($movefile['error'])) 
+                        {
+                            // Add the file path to attachments array
+                            $attachments[] = $movefile['file'];
+                        } 
+                        else
+                        {
+                            // Handle error in file upload
+                            wp_send_json_error($movefile['error']);
+                        }
+                    }
+                }
+            }
+
             $headers = array();
             $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
             $headers[] = 'Reply-To: ' . sanitize_email($from);
@@ -4492,6 +4528,10 @@ class PH_AJAX {
             $headers = apply_filters( 'propertyhive_viewing_applicant_booking_confirmation_email_headers', $headers );
 
             wp_mail($to, $subject, $body, $headers);
+            foreach ($attachments as $temp_file) 
+            {
+                @unlink($temp_file);
+            }
 
             update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
@@ -4618,6 +4658,42 @@ class PH_AJAX {
                 }
             }
 
+            $attachments = array();
+            if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
+            {
+                $uploaded_files = $_FILES['attachments'];
+
+                // Handle each file upload
+                foreach ($uploaded_files['name'] as $key => $value) 
+                {
+                    if ($uploaded_files['name'][$key]) 
+                    {
+                        $file = array(
+                            'name'     => $uploaded_files['name'][$key],
+                            'type'     => $uploaded_files['type'][$key],
+                            'tmp_name' => $uploaded_files['tmp_name'][$key],
+                            'error'    => $uploaded_files['error'][$key],
+                            'size'     => $uploaded_files['size'][$key]
+                        );
+
+                        // Move the file to a temporary location
+                        $upload_overrides = array('test_form' => false);
+                        $movefile = wp_handle_upload($file, $upload_overrides);
+
+                        if ($movefile && !isset($movefile['error'])) 
+                        {
+                            // Add the file path to attachments array
+                            $attachments[] = $movefile['file'];
+                        } 
+                        else
+                        {
+                            // Handle error in file upload
+                            wp_send_json_error($movefile['error']);
+                        }
+                    }
+                }
+            }
+
             $headers = array();
             $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
             $headers[] = 'Reply-To: ' . sanitize_email($from);
@@ -4626,6 +4702,10 @@ class PH_AJAX {
             $headers = apply_filters( 'propertyhive_viewing_owner_booking_confirmation_email_headers', $headers );
 
             wp_mail($to, $subject, $body, $headers);
+            foreach ($attachments as $temp_file) 
+            {
+                @unlink($temp_file);
+            }
 
             update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
@@ -4775,6 +4855,42 @@ class PH_AJAX {
                 }
             }
 
+            $attachments = array();
+            if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
+            {
+                $uploaded_files = $_FILES['attachments'];
+
+                // Handle each file upload
+                foreach ($uploaded_files['name'] as $key => $value) 
+                {
+                    if ($uploaded_files['name'][$key]) 
+                    {
+                        $file = array(
+                            'name'     => $uploaded_files['name'][$key],
+                            'type'     => $uploaded_files['type'][$key],
+                            'tmp_name' => $uploaded_files['tmp_name'][$key],
+                            'error'    => $uploaded_files['error'][$key],
+                            'size'     => $uploaded_files['size'][$key]
+                        );
+
+                        // Move the file to a temporary location
+                        $upload_overrides = array('test_form' => false);
+                        $movefile = wp_handle_upload($file, $upload_overrides);
+
+                        if ($movefile && !isset($movefile['error'])) 
+                        {
+                            // Add the file path to attachments array
+                            $attachments[] = $movefile['file'];
+                        } 
+                        else
+                        {
+                            // Handle error in file upload
+                            wp_send_json_error($movefile['error']);
+                        }
+                    }
+                }
+            }
+
             $headers = array();
             $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
             $headers[] = 'Reply-To: ' . sanitize_email($from);
@@ -4783,6 +4899,10 @@ class PH_AJAX {
             $headers = apply_filters( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_headers', $headers );
 
             wp_mail($to, $subject, $body, $headers);
+            foreach ($attachments as $temp_file) 
+            {
+                @unlink($temp_file);
+            }
 
             update_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
 
