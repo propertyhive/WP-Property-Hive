@@ -3901,8 +3901,12 @@ class PH_AJAX {
 
             wp_send_json_success();
         }
+        else
+        {
+            wp_send_json_error('No owner recipients found');
+        }
 
-        wp_send_json_error();
+        wp_die();
     }
 
     public function appraisal_revert_pending()
@@ -4409,7 +4413,7 @@ class PH_AJAX {
 
         if ( !is_array($applicant_contact_ids) || (int)$property_id == '' || count($applicant_contact_ids) == 0 || (int)$property_id == 0 )
         {
-            wp_send_json_error();
+            wp_send_json_error('Missing contact or property');
         }
 
         $property = new PH_Property((int)$property_id);
@@ -4564,8 +4568,12 @@ class PH_AJAX {
 
             wp_send_json_success();
         }
+        else
+        {
+            wp_send_json_error('No recipient email addresses');
+        }
 
-        wp_send_json_error();
+        wp_die();
     }
 
     public function viewing_email_owner_booking_confirmation()
@@ -4752,8 +4760,12 @@ class PH_AJAX {
 
             wp_send_json_success();
         }
+        else
+        {
+            wp_send_json_error('No owner recipients');
+        }
 
-        wp_send_json_error();
+        wp_die();
     }
 
     public function viewing_email_attending_negotiator_booking_confirmation()
@@ -4963,8 +4975,12 @@ class PH_AJAX {
 
             wp_send_json_success();
         }
+        else
+        {
+            wp_send_json_error('No attending negotiator recipients');
+        }
 
-        wp_send_json_error();
+        wp_die();
     }
 
     public function viewing_interested_feedback()
