@@ -51,6 +51,8 @@ class PH_Admin_Assets {
             wp_enqueue_style( 'chosen', PH()->plugin_url() . '/assets/css/chosen.css', array(), PH_VERSION );
 
             wp_enqueue_style( 'multiselect', PH()->plugin_url() . '/assets/css/jquery.multiselect.css', array(), '2.4.18' );
+
+            wp_enqueue_style( 'tinymce-mention', PH()->plugin_url() . '/assets/js/tinymce-mention-plugin/autocomplete.css', array(), PH_VERSION );
         }
 
 	    if ( in_array( $screen->id, array( 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale' ) ) )
