@@ -52,7 +52,10 @@ class PH_Admin_Assets {
 
             wp_enqueue_style( 'multiselect', PH()->plugin_url() . '/assets/css/jquery.multiselect.css', array(), '2.4.18' );
 
-            wp_enqueue_style( 'tinymce-mention', PH()->plugin_url() . '/assets/js/tinymce-mention-plugin/autocomplete.css', array(), PH_VERSION );
+            if ( apply_filters('propertyhive_disable_notes_mention', false) === false ) 
+            {
+                wp_enqueue_style( 'tinymce-mention', PH()->plugin_url() . '/assets/js/tinymce-mention-plugin/autocomplete.css', array(), PH_VERSION );
+            }
         }
 
 	    if ( in_array( $screen->id, array( 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale' ) ) )
@@ -216,6 +219,7 @@ class PH_Admin_Assets {
             wp_enqueue_script( 'ajax-chosen' );
             wp_enqueue_script( 'chosen' );
             wp_enqueue_script( 'jquery-ui-sortable' );
+            wp_enqueue_script( 'wp-tinymce' );
             
             if ( get_option('propertyhive_maps_provider') == 'osm' )
             {
@@ -259,6 +263,7 @@ class PH_Admin_Assets {
                 'delete_key_date_nonce'         => wp_create_nonce( 'delete-key-date' ),
                 'enable_description_editor'    => apply_filters('propertyhive_enable_description_editor', false),
                 'leasehold_tenures'             => apply_filters('propertyhive_leasehold_tenure_names', array( 'leasehold', 'share of freehold' ) ),
+                'disable_notes_mention'         => apply_filters('propertyhive_disable_notes_mention', false),
             );
             wp_localize_script( 'propertyhive_admin_meta_boxes', 'propertyhive_admin_meta_boxes', $params );
 

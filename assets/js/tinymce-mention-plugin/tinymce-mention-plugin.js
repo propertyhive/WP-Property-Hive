@@ -283,12 +283,21 @@
           },
   
           renderDropdown: function () {
-              return '<ul class="rte-autocomplete dropdown-menu" style="position:absolute;"><li style="list-style:none;"><div class="' + this.options.loading_class + '"></div>' + this.options.loading_text + '</li></ul>';
+              return '<ul class="rte-autocomplete dropdown-menu" style="position:absolute;"><li style="list-style:none; padding: 3px 20px;">' + this.options.loading_text + '</li></ul>';
           },
   
           render: function (item, index) {
+              var icon = '';
+              if ( item.type == 'contact' )
+              {
+                icon = '<span class="dashicons dashicons-admin-users" style="font-size:16px; vertical-align:middle"></span> ';
+              }
+              if ( item.type == 'property' )
+              {
+                icon = '<span class="dashicons dashicons-admin-home" style="font-size:16px; vertical-align:middle"></span> ';
+              }
               return '<li class="dropdown-item">' +
-                          '<a style="color:#000;" href="javascript:;"><span>' + item[this.options.queryBy] + '</span></a>' +
+                          '<a href="javascript:;"><span>' + icon + item[this.options.queryBy] + '</span><br><span class="details" style="font-size:11px;">' + item.details + '</span></a>' +
                       '</li>';
           },
   

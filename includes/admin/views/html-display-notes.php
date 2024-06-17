@@ -169,7 +169,77 @@ if ( !empty($notes) )
 			}
 			case "note":
 			{
-				$note_body = nl2br($comment_content['note']);
+				$note_body = $comment_content['note'];
+
+				// Regular expression pattern to match {{mention-ID|NAME}} or {{mention-ID}}
+			    $pattern = '/\{\{mention-(\d+)(?:\|([^}]*))?\}\}/';
+			    
+			    // Callback function to replace the mentions with HTML links
+			    $callback = function($matches) 
+			    {
+			        $post_id = $matches[1];
+			        $title = isset($matches[2]) ? $matches[2] : '';
+			        $edit_url = get_edit_post_link($post_id);
+			        $post_title = get_the_title($post_id);
+			        if ( get_post_type($post_id) == 'property' )
+			        {
+			        	$property = new PH_Property((int)$post_id);
+			        	$post_title = $property->get_formatted_full_address();
+			        }
+			        
+			        // If the post exists, create the link
+			        if ( $edit_url && $post_title ) 
+			        {
+			            return '<a href="' . esc_url($edit_url) . '">' . esc_html($post_title) . '</a>';
+			        }
+			        else 
+			        {
+			            if ( !empty($title) )
+			            {
+			            	return $title;
+			            }
+			            else
+			            {
+				            return '{{mention-' . $post_id . '}}';
+				        }
+			        }
+			    };
+
+			    $note_body = preg_replace_callback($pattern, $callback, $note_body);
+
+				/*$pattern = '/\{\{mention-(\d+)(\|.*)?\}\}/';
+			    $replacement = function($matches) {
+			        $post_id = $matches[1];
+			        $title = trim(trim($matches[2], '|'));
+			        $edit_url = get_edit_post_link($post_id);
+			        $post_title = get_the_title($post_id);
+			        if ( get_post_type($post_id) == 'property' )
+			        {
+			        	$property = new PH_Property((int)$post_id);
+			        	$post_title = $property->get_formatted_full_address();
+			        }
+			        
+			        // If the post exists, create the link
+			        if ( $edit_url && $post_title ) 
+			        {
+			            return '<a href="' . esc_url($edit_url) . '">' . esc_html($post_title) . '</a>';
+			        }
+			        else 
+			        {
+			            if ( !empty($title) )
+			            {
+			            	return $title;
+			            }
+			            else
+			            {
+				            return '{{mention-' . $post_id . '}}';
+				        }
+			        }
+			    };
+			    $note_body = preg_replace_callback($pattern, $replacement, $note_body);*/
+
+				$note_body = nl2br($note_body);
+
 				break;
 			}
 			case "unsubscribe":
@@ -293,7 +363,7 @@ if ($section != 'enquiry')
 <div class="add_note">
 	<h4><?php _e( 'Add Note', 'propertyhive' ); ?></h4>
 	<p>
-		<textarea type="text" name="note" id="add_note" class="input-text" cols="20" rows="6"></textarea>
+		<textarea type="text" name="note" id="add_note" class="input-text" cols="20" rows="6" placeholder="Enter your note<?php if ( apply_filters('propertyhive_disable_notes_mention', false) === false ) { ?><br>Type <code style='background:#f9f9f9; border:1px solid #DDD; padding:0 2px; border-radius:5px; vertical-align:middle'>@</code> to tag a contact and property<?php } ?>"></textarea>
 		<br>
 		<input type="checkbox" name="pinned" id="pinned" value="1"> <?php _e( 'Pin Note', 'propertyhive' ); ?>
 	</p>

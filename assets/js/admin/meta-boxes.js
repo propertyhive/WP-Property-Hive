@@ -162,7 +162,19 @@ jQuery( function($){
     {
         var section = $(this).attr('data-section');
 
-        if ( ! $('#propertyhive_' +  section + '_notes_container textarea#add_note').val() ) return;
+        if ( propertyhive_admin_meta_boxes.disable_notes_mention != true ) 
+        { 
+            var content = tinymce.get('add_note').getContent();
+            if ( content === false || content === '' )
+            {
+                return;
+            }
+        }
+        else
+        {
+            if ( ! $('#propertyhive_' +  section + '_notes_container textarea#add_note').val() ) return;
+            content = $('#propertyhive_' +  section + '_notes_container textarea#add_note').val();
+        }
 
         if ( $(this).text() == 'Adding...' ) { return false; }
 
@@ -172,7 +184,7 @@ jQuery( function($){
         var data = {
             action:         'propertyhive_add_note',
             post_id:        ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
-            note:           $('#propertyhive_' +  section + '_notes_container textarea#add_note').val().replace(/\\/g, ''),
+            note:           content.replace(/\\/g, ''),
             note_type:      'propertyhive_note',
             security:       propertyhive_admin_meta_boxes.add_note_nonce,
         };
@@ -1401,46 +1413,53 @@ function ph_redraw_notes_grid(section)
 
     jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
     {
+        if ( propertyhive_admin_meta_boxes.disable_notes_mention != true ) { tinymce.remove('textarea#add_note'); }
+
         jQuery('#propertyhive_' +  section + '_notes_container').html(response);
 
-        tinymce.init({
-            selector: 'textarea#add_note', // Replace with the ID of your textarea
-            menubar: false,
-            toolbar: false,
-            statusbar: false,
-            forced_root_block: '', // Disable the <p> tags
-            force_br_newlines: true,
-            force_p_newlines: false,
-            external_plugins: 
-            {
-                'mention' : propertyhive_admin_meta_boxes.plugin_url + '/assets/js/tinymce-mention-plugin/tinymce-mention-plugin.js'
-            },
-            setup: function(editor) 
-            {
-                editor.on('init', function() 
+        if ( propertyhive_admin_meta_boxes.disable_notes_mention != true ) 
+        { 
+            tinymce.init({
+                selector: 'textarea#add_note',
+                menubar: false,
+                toolbar: false,
+                statusbar: false,
+                forced_root_block: '', // Disable the <p> tags
+                force_br_newlines: true,
+                force_p_newlines: false,
+                external_plugins: 
                 {
-                    editor.getContainer().style.border = '1px solid #ccc';
-                });
-            },
-            mentions: 
-            {
-                source: function (query, process, delimiter) 
+                    'mention' : propertyhive_admin_meta_boxes.plugin_url + '/assets/js/tinymce-mention-plugin/tinymce-mention-plugin.js',
+                    'placeholder' : propertyhive_admin_meta_boxes.plugin_url + '/assets/js/tinymce-placeholder/mce.placeholder.js'
+                },
+                setup: function(editor) 
                 {
-                    // Do your ajax call
-                    jQuery.ajax({
-                        url: ajaxurl, // Use WordPress AJAX URL
-                        method: 'POST',
-                        data: {
-                            action: 'propertyhive_fetch_note_mentions',
-                            query: query
-                        },
-                        success: function(response) {
-                            process(response);
-                        }
+                    editor.on('init', function() 
+                    {
+                        editor.getContainer().style.border = '1px solid #ccc';
                     });
+                },
+                mentions: 
+                {
+                    source: function (query, process, delimiter) 
+                    {
+                        // Do your ajax call
+                        jQuery.ajax({
+                            url: ajaxurl, // Use WordPress AJAX URL
+                            method: 'POST',
+                            data: {
+                                action: 'propertyhive_fetch_note_mentions',
+                                query: query,
+                                security: propertyhive_admin_meta_boxes.get_notes_nonce
+                            },
+                            success: function(response) {
+                                process(response);
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
     }, 'html');
 }
 
