@@ -27,6 +27,7 @@ class PH_AJAX {
 			'toggle_note_pinned' => false,
 			'get_notes_grid' => false,
             'get_pinned_notes_grid' => false,
+            'fetch_note_mentions' => false,
 			'search_contacts' => false,
             'search_properties' => false,
             'search_negotiators' => false,
@@ -1834,6 +1835,32 @@ class PH_AJAX {
 
         // Quit out
         die();
+    }
+
+    public function fetch_note_mentions() {
+
+        global $wpdb;
+
+        //check_ajax_referer( 'get-notes', 'security' );
+
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+        
+        $query = sanitize_text_field($_POST['query']);
+
+        // Example data - replace with your actual data fetching logic
+        $mentions = [
+            ['id' => 1, 'name' => 'Property 1'],
+            ['id' => 2, 'name' => 'Contact 1'],
+            ['id' => 3, 'name' => 'Property 2'],
+        ];
+
+        // Filter mentions based on query
+        $filtered_mentions = array_filter($mentions, function($mention) use ($query) {
+            return stripos($mention['name'], $query) !== false;
+        });
+
+        wp_send_json(array_values($filtered_mentions));
     }
 
     /**

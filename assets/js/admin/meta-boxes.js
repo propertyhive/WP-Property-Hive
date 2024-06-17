@@ -1402,6 +1402,45 @@ function ph_redraw_notes_grid(section)
     jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
     {
         jQuery('#propertyhive_' +  section + '_notes_container').html(response);
+
+        tinymce.init({
+            selector: 'textarea#add_note', // Replace with the ID of your textarea
+            menubar: false,
+            toolbar: false,
+            statusbar: false,
+            forced_root_block: '', // Disable the <p> tags
+            force_br_newlines: true,
+            force_p_newlines: false,
+            external_plugins: 
+            {
+                'mention' : propertyhive_admin_meta_boxes.plugin_url + '/assets/js/tinymce-mention-plugin/tinymce-mention-plugin.js'
+            },
+            setup: function(editor) 
+            {
+                editor.on('init', function() 
+                {
+                    editor.getContainer().style.border = '1px solid #ccc';
+                });
+            },
+            mentions: 
+            {
+                source: function (query, process, delimiter) 
+                {
+                    // Do your ajax call
+                    jQuery.ajax({
+                        url: ajaxurl, // Use WordPress AJAX URL
+                        method: 'POST',
+                        data: {
+                            action: 'propertyhive_fetch_note_mentions',
+                            query: query
+                        },
+                        success: function(response) {
+                            process(response);
+                        }
+                    });
+                }
+            }
+        });
     }, 'html');
 }
 
