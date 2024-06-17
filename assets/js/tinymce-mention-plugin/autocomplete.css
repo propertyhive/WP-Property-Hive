@@ -51,7 +51,7 @@
 .rte-autocomplete > li.loading,
 .rte-autocomplete > li > a {
     display: block;
-    padding: 3px 20px;
+    padding: 3px 15px;
     clear: both;
     font-weight: normal;
     line-height: 20px;
@@ -59,6 +59,8 @@
     white-space: nowrap;
     text-decoration: none;
 }
+
+.rte-autocomplete >li > a .details { font-size:11px; color:#999 }
 
 .rte-autocomplete >li > a:hover, .rte-autocomplete > li > a:focus, .rte-autocomplete:hover > a, .rte-autocomplete:focus > a {
     color: #fff;
@@ -85,4 +87,8 @@
     background-repeat: repeat-x;
     outline: 0;
     filter: progid:DXImageTransform.Microsoft;
+}
+
+.rte-autocomplete >li > a:hover .details, .rte-autocomplete > li > a:focus .details, .rte-autocomplete:hover > a .details, .rte-autocomplete:focus > a .details {
+    color: #fff;
 }
