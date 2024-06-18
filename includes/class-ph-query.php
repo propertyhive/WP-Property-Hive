@@ -66,9 +66,79 @@ class PH_Query {
 			add_action( 'wp', array( $this, 'remove_ordering_args' ) );
         	add_filter( 'posts_where', array( $this, 'commercial_display_where' ), 10, 2 );
         	add_filter( 'posts_where', array( $this, 'keyword_excerpt_where' ), 10, 2 );
+        	add_action( 'pre_get_posts', array( $this, 'custom_order_properties_by_availability' ), 10, 2 );
 		}
 
 		$this->init_query_vars();
+	}
+
+	public function custom_order_properties_by_availability($query) 
+	{
+	    if ( is_admin() ) 
+	    {
+	        return;
+	    }
+
+	    if ( !$query->is_main_query() )
+	    {
+	    	return;
+	    }
+
+	    if ( !is_post_type_archive('property') )
+	    {
+	    	return;
+	    }
+
+	    if ( apply_filters( 'propertyhive_order_by_availability', false ) === false )
+	    {
+	    	return;
+	    }
+
+        $availability_order = get_option('propertyhive_taxonomy_terms_order_availability', array());
+
+        if ( empty($availability_order) ) 
+        {
+        	return;
+        }
+
+        // Sanitize and prepare the order
+        $availability_order = explode("|", $availability_order);
+        $availability_order = array_map('intval', $availability_order);
+
+        // Modify the main query to join with term relationships and term taxonomy tables using custom aliases
+        add_filter('posts_join', function ($join, $query) 
+        {
+            global $wpdb;
+
+            if ($query->is_main_query() && is_post_type_archive('property')) 
+            {
+                $join .= " LEFT JOIN {$wpdb->term_relationships} AS avstr ON ({$wpdb->posts}.ID = avstr.object_id) ";
+                $join .= " LEFT JOIN {$wpdb->term_taxonomy} AS avstt ON (avstr.term_taxonomy_id = avstt.term_taxonomy_id) ";
+            }
+
+            return $join;
+        }, 10, 2);
+
+        // Add a custom ordering clause
+        add_filter('posts_orderby', function ($orderby, $query) use ($availability_order) 
+        {
+            global $wpdb;
+
+            if ($query->is_main_query() && is_post_type_archive('property')) {
+                // Retrieve the original orderby clause
+                $original_orderby = $orderby ? $orderby : "{$wpdb->posts}.post_date DESC";
+
+                // Construct the custom order by clause
+                $order_by_custom = "FIELD(avstt.term_id, " . implode(',', $availability_order) . ")";
+
+                // Combine the custom order by with the original order by
+                $orderby_combined = "$order_by_custom, $original_orderby";
+
+                return $orderby_combined;
+            }
+
+            return $orderby;
+        }, 10, 2);
 	}
 
 	public function keyword_excerpt_where( $where, $query )
