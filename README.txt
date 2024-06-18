@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.5.4
-Stable tag: 2.0.16
+Stable tag: 2.0.17
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,29 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.17 - 2024-06-18 =
+* Tag contacts and properties in notes by typing @ followed by the name or address respectively. Can be disabled via the 'propertyhive_disable_notes_mention' filter
+* Added the ability to enable ordering properties by availability through use of a new filter 'propertyhive_order_by_availability'. Eventually this will be a setting in the Template Assistant add on
+* Split email settings area into subsections for easier navigation
+* Added the ability to search properties in the backend by owner/landlord details
+* Added the ability to attach files to viewing email confirmations (only applicable when the 'Customise Confirmation Emails Before Sending' option is ticked in under email settings)
+* Added new option to email settings area allowing you to customise which email address booking confirmaitons come from
+* Improved error handling surrounding booking confirmation emails
+* Added 'propertyhive_log_booking_confirmation_emails' filter to enable the insertion of a note/comment when email confirmations are sent (disabled by default)
+* Added new filters so booking email confirmation subjects can be customised
+* Redraw the notes grid instantly on an appraisal record when an appraisal action is performed
+* Redraw the notes grid instantly on a viewing record when a viewing action is performed
+* Allow addition of address when creating applicant via new viewing or offer. The address can be entered into a single textarea and we'll then intelligently split it out into the relevant address fields on the contact record
+* When opting to redirect off market property URLs, only do these 301 redirects for off market properties for non-logged in users and update tooltip
+* Put reference number back into the main admin list after accidental removal
+* Elementor search form widget to call ph_get_search_form() instead of using shortcode
+* Show relevant currency in appraisals section when a different country is used. Previously it was hardcoded to GBP
+* Ensure a 'clean' telephone number is always stored against a contact. This is a version of the telephone number with no spaces and is used for searches
+* Cater for lists in summary descriptions. Previously the nl2br() function would cause gaps between the list items so a new function has been written to handle this scenario and to not add <br> tags between list items
+* Remove 'underfloor heating' from heating options as 'underfloor' already existed
+* Correct undefined PHP variable warning on the user profile
+* Declared compatibility for WordPress 6.5.4
 
 = 2.0.16 - 2024-06-04 =
 * All tables and grids across Property Hive to be formatted on mobile
