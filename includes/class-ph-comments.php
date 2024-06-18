@@ -263,6 +263,21 @@ class PH_Comments {
 			}
 		}
 
+		if ( isset($comment['note_type']) && $comment['note_type'] == 'note' && isset($comment['note']) && !empty($comment['note']) )
+		{
+			// Regular expression pattern to match {{mention-ID|NAME}} or {{mention-ID}}
+			$pattern = '/\{\{mention-(\d+)(?:\|([^}]*))?\}\}/';
+
+			// Use preg_match_all to find all matches
+			if ( preg_match_all($pattern, $comment['note'], $matches, PREG_SET_ORDER) ) 
+			{
+			    foreach ($matches as $match) 
+			    {
+			        $related_to[] = (int)$match[1];
+			    }
+			}
+		}
+
 		$related_to = apply_filters( 'property_insert_note_related_to', $related_to, $post_id );
 
 		$related_to = array_filter( $related_to );
