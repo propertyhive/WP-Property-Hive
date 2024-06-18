@@ -27,6 +27,7 @@ class PH_AJAX {
 			'toggle_note_pinned' => false,
 			'get_notes_grid' => false,
             'get_pinned_notes_grid' => false,
+            'fetch_note_mentions' => false,
 			'search_contacts' => false,
             'search_properties' => false,
             'search_negotiators' => false,
@@ -1705,7 +1706,19 @@ class PH_AJAX {
 
 		if ( $post_id > 0 ) {
 
-            $note = wp_kses_post( trim( stripslashes( $_POST['note'] ) ) );
+            $note = trim( stripslashes( $_POST['note'] ) );
+
+            $pattern = '/<span [^>]*data-post-id="(\d+)"[^>]*>([^<]*)<\/span>/i';
+            $replacement = function($matches) {
+                $post_id = $matches[1];
+                $text = $matches[2];
+                return '{{mention-' . $post_id . '|' . $text . '}}';
+            };
+            $note = preg_replace_callback($pattern, $replacement, $note);
+
+            $note = str_replace( array('<br>', '<br />'), "\n", $note );
+
+            $note = strip_tags( $note );
 
             // Add note/comment to property
             $comment = array(
@@ -1834,6 +1847,119 @@ class PH_AJAX {
 
         // Quit out
         die();
+    }
+
+    public function fetch_note_mentions() {
+
+        global $wpdb;
+
+        check_ajax_referer( 'get-notes', 'security' );
+
+        if ( ! current_user_can( 'manage_propertyhive' ) )
+            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+        
+        $query = sanitize_text_field($_POST['query']);
+
+        $mentions = array();
+
+        // Get contacts
+        $args = array(
+            'post_type' => 'contact',
+            'posts_per_page' => 10,
+            'post_status' => array( 'publish' ),
+            's' => $query
+        );
+
+        $contacts_query = new WP_Query( $args );
+
+        if ( $contacts_query->have_posts() )
+        {
+            while ( $contacts_query->have_posts() )
+            {
+                $contacts_query->the_post();
+
+                $contact = new PH_Contact(get_the_ID());
+
+                $details = array();
+                if ( $contact->get_formatted_full_address() != '' )
+                {
+                    $details[] = $contact->get_formatted_full_address();
+                }
+                if ( $contact->email_address != '' || $contact->telephone_number != '' )
+                {
+                    $sub_details = array();
+                    if ( $contact->email_address != '' )
+                    {
+                        $sub_details[] = 'E: ' . $contact->email_address;
+                    }
+                    if ( $contact->telephone_number != '' )
+                    {
+                        $sub_details[] = 'T: ' . $contact->telephone_number;
+                    }
+                    $details[] = implode(" | ", $sub_details);
+                }
+
+                $mentions[] = array( 
+                    'type' => 'contact', 
+                    'id' => get_the_ID(), 
+                    'name' => get_the_title(), 
+                    'details' => implode("<br>", $details),
+                );
+            }
+        }
+        wp_reset_postdata();
+
+        // Get properties
+        $args = array(
+            'post_type' => 'property',
+            'posts_per_page' => 10,
+            'post_status' => array( 'publish' ),
+            'meta_query' => array(
+                'relation' => 'OR',
+                array(
+                    'key' => '_address_concatenated',
+                    'value' => $query,
+                    'compare' => 'LIKE'
+                ),
+                array(
+                    'key' => '_reference_number',
+                    'value' => $query,
+                    'compare' => '='
+                )
+            )
+        );
+
+        $properties_query = new WP_Query( $args );
+
+        if ( $properties_query->have_posts() )
+        {
+            while ( $properties_query->have_posts() )
+            {
+                $properties_query->the_post();
+
+                $property = new PH_Property(get_the_ID());
+
+                $details = array();
+                if ( $property->get_formatted_price() != '' )
+                {
+                    $details[] = $property->get_formatted_price();
+                }
+                if ( $property->property_type != '' )
+                {
+                    $details[] = $property->property_type;
+                }
+                
+                $mentions[] = array( 
+                    'type' => 'property', 
+                    'id' => get_the_ID(), 
+                    'name' => $property->get_formatted_full_address(), 
+                    'details' => implode(" | ", $details),
+                );
+            }
+        }
+        wp_reset_postdata();
+
+        wp_send_json($mentions);
     }
 
     /**

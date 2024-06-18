@@ -94,6 +94,10 @@ ul.record_notes li a.delete_note{color:#a00}
 ul.record_notes li .note_content:after{content:"";display:block;position:absolute;bottom:-10px;left:20px;width:0;height:0;border-width:10px 10px 0 0;border-style:solid;border-color:#efefef transparent}
 ul.record_notes li .pinned:after{border-color:#f5e57e transparent !important}
 
+.propertyhive-notes-container .mce-container,
+.propertyhive-notes-container .mce-container * { font-family:inherit; }
+.propertyhive-notes-container .mce-panel { box-shadow:none; border:0 }
+
 .propertyhive table.form-table table.widefat th {
     padding-right: inherit;
 }
