@@ -207,7 +207,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             'label' => __( 'Ground Rent Per Year (&pound;)', 'propertyhive' ), 
             'desc_tip' => false,
             //'class' => '',
-            'value' => ph_display_price_field( get_post_meta( $post->ID, '_ground_rent', true ) ),
+            'value' => ph_display_price_field( get_post_meta( $post->ID, '_ground_rent', true ), true ),
         ) );
 
         propertyhive_wp_text_input( array( 
@@ -222,7 +222,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             'label' => __( 'Service Charge Per Year (&pound;)', 'propertyhive' ), 
             'desc_tip' => false,
             //'class' => '',
-            'value' => ph_display_price_field( get_post_meta( $post->ID, '_service_charge', true ) ),
+            'value' => ph_display_price_field( get_post_meta( $post->ID, '_service_charge', true ), true ),
         ) );
 
         propertyhive_wp_text_input( array( 

@@ -829,7 +829,7 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
                     {
                         $meta['ground-rent'] = array(
                             'label' => __('Ground Rent', 'propertyhive'),
-                            'value' => '&pound;' . number_format($property->ground_rent, 2)
+                            'value' => '&pound;' . ph_display_price_field($property->ground_rent, true)
                         );
                     }
 
@@ -845,7 +845,7 @@ if ( ! function_exists( 'propertyhive_template_single_meta' ) ) {
                     {
                         $meta['service-charge'] = array(
                             'label' => __('Service Charge', 'propertyhive'),
-                            'value' => '&pound;' . number_format($property->service_charge, 2)
+                            'value' => '&pound;' . ph_display_price_field($property->service_charge, true)
                         );
                     }
 

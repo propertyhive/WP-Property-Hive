@@ -44,7 +44,7 @@ function ph_clean_telephone_number( $var ) {
  * @param string
  * @return string
  */
-function ph_display_price_field( $var )
+function ph_display_price_field( $var, $use_separator_setting = false )
 {
 	$float_var = (float)$var;
 
@@ -54,9 +54,17 @@ function ph_display_price_field( $var )
 		// If there are decimals on the number, display them. If not, display none
 		$decimals = $float_var == intval($var) ? 0 : 2;
 
-		// Get custom decimal and thousands separators, if set
-		$decimal_separator = get_option('propertyhive_price_decimal_separator', '.');
-		$thousands_separator = get_option('propertyhive_price_thousand_separator', ',');
+		if ( !$use_separator_setting )
+		{
+			$decimal_separator = '.';
+			$thousands_separator = ',';
+		}
+		else
+		{
+			// Get custom thousands and decimal and separators, if set, when not displaying in an input
+			$thousands_separator = get_option('propertyhive_price_thousand_separator', ',');
+			$decimal_separator = get_option('propertyhive_price_decimal_separator', '.');
+		}
 
 		$var = number_format( $float_var, $decimals, $decimal_separator, $thousands_separator );
 	}

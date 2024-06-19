@@ -362,10 +362,12 @@ class PH_Property {
         $prefix = '';
         $suffix = '';
 
+        $is_admin = ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) ? false : true;
+
         if ( $this->_department == 'commercial' || ph_get_custom_department_based_on( $this->_department ) == 'commercial' )
         {
             if ( 
-                ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) &&
+                !$is_admin &&
                 $this->_for_sale == 'yes' && $this->_price_poa == 'yes' &&
                 $this->_to_rent == 'yes' && $this->_rent_poa == 'yes'
             )
@@ -398,7 +400,7 @@ class PH_Property {
         }
         else
         {
-            if ( ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) && $this->_poa == 'yes')
+            if ( !$is_admin && $this->_poa == 'yes')
             {
                 $return = __( 'POA', 'propertyhive' );
             }
@@ -406,7 +408,7 @@ class PH_Property {
             {
                 $ph_countries = new PH_Countries();
 
-                if ( !is_admin() )
+                if ( !$is_admin )
                 {
                     if ( isset($_GET['currency']) )
                     {
@@ -498,10 +500,7 @@ class PH_Property {
                             $price = round($this->_price_actual * $currency['exchange_rate'], 0);
                         }
 
-                        // If there are decimals on the number, display them. If not, display none
-                        $decimals = (float)$price == intval($price) ? 0 : 2;
-
-                        $return = ( ( $price != '' ) ? $prefix . number_format($price, $decimals, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix : '-' );
+                        $return = ( ( $price != '' ) ? $prefix . ph_display_price_field($price, !$is_admin) . $suffix : '-' );
                         break;
                     }
                     case "residential-lettings":
@@ -520,10 +519,7 @@ class PH_Property {
                             }
                         }
 
-                        // If there are decimals on the number, display them. If not, display none
-                        $decimals = (float)$price == intval($price) ? 0 : 2;
-
-                        $return = ( ( $price != '' ) ? $prefix . number_format($price, $decimals, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                        $return = ( ( $price != '' ) ? $prefix . ph_display_price_field($price, !$is_admin) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                         break;
                     }
                 }
@@ -545,7 +541,9 @@ class PH_Property {
 
         if ( $this->_for_sale == 'yes' )
         {
-            if ( ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) && $this->_price_poa == 'yes' )
+            $is_admin = ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) ? false : true;
+
+            if ( !$is_admin && $this->_price_poa == 'yes' )
             {
                 $price .= __( 'POA', 'propertyhive' );
             }
@@ -565,15 +563,7 @@ class PH_Property {
 
                 if ( $this->_price_from != '' )
                 {
-                    $explode_price = explode(".", $this->_price_from);
-                    if ( count($explode_price) == 2 )
-                    {
-                        $price .= $prefix . number_format($explode_price[0], 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . get_option('propertyhive_price_decimal_separator', '.') . $explode_price[1] . $suffix;
-                    }
-                    else
-                    {
-                        $price .= $prefix . number_format($this->_price_from, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix;
-                    }
+                    $price .= $prefix . ph_display_price_field($this->_price_from, !$is_admin) . $suffix;
                 }
                 if ( $this->_price_to != '' && $this->_price_to != $this->_price_from )
                 {
@@ -581,15 +571,7 @@ class PH_Property {
                     {
                         $price .= ' - ';
                     }
-                    $explode_price = explode(".", $this->_price_to);
-                    if ( count($explode_price) == 2 )
-                    {
-                        $price .= $prefix . number_format($explode_price[0], 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . get_option('propertyhive_price_decimal_separator', '.') . $explode_price[1] . $suffix;
-                    }
-                    else
-                    {
-                        $price .= $prefix . number_format($this->_price_to, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix;
-                    }
+                    $price .= $prefix . ph_display_price_field($this->_price_to, !$is_admin) . $suffix;
                 }
                 if ( $price != '' )
                 {
@@ -614,7 +596,9 @@ class PH_Property {
 
         if ( $this->_to_rent == 'yes' )
         {
-            if ( ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) && $this->_rent_poa == 'yes' )
+            $is_admin = ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) ? false : true;
+
+            if ( !$is_admin && $this->_rent_poa == 'yes' )
             {
                 $rent .= __( 'POA', 'propertyhive' );
             }
@@ -634,15 +618,7 @@ class PH_Property {
 
                 if ( $this->_rent_from != '' )
                 {
-                    $explode_rent = explode(".", $this->_rent_from);
-                    if ( count($explode_rent) == 2 )
-                    {
-                        $rent .= $prefix . number_format($explode_rent[0], 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . get_option('propertyhive_price_decimal_separator', '.') . $explode_rent[1] . $suffix;
-                    }
-                    else
-                    {
-                        $rent .= $prefix . number_format($this->_rent_from, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix;
-                    }
+                    $rent .= $prefix . ph_display_price_field($this->_rent_from, !$is_admin) . $suffix;
                 }
                 if ( $this->_rent_to != '' && $this->_rent_to != $this->_rent_from )
                 {
@@ -650,15 +626,7 @@ class PH_Property {
                     {
                         $rent .= ' - ';
                     }
-                    $explode_rent = explode(".", $this->_rent_to);
-                    if ( count($explode_rent) == 2 )
-                    {
-                        $rent .= $prefix . number_format($explode_rent[0], 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . get_option('propertyhive_price_decimal_separator', '.') . $explode_rent[1] . $suffix;
-                    }
-                    else
-                    {
-                        $rent .= $prefix . number_format($this->_rent_to, 0, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix;
-                    }
+                    $rent .= $prefix . ph_display_price_field($this->_rent_to, !$is_admin) . $suffix;
                 }
                 if ( $rent != '' )
                 {
@@ -774,15 +742,17 @@ class PH_Property {
 
         $currency = $ph_countries->get_currency( $this->_currency );
 
+        $is_admin = ( !is_admin() || ( is_admin() && defined('DOING_AJAX') && DOING_AJAX ) ) ? false : true;
+
         if ( $currency === false )
         {
-            return number_format($this->_deposit, 0);
+            return ph_display_price_field($this->_deposit, !$is_admin);
         }
 
         $prefix = ( !isset($currency['currency_prefix']) || ( isset($currency['currency_prefix']) && $currency['currency_prefix'] ) ) ? $currency['currency_symbol'] : '';
         $suffix = ( isset($currency['currency_prefix']) && !$currency['currency_prefix'] ) ? $currency['currency_symbol'] : '';
 
-        return $prefix . number_format($this->_deposit, 0) . $suffix;
+        return $prefix . ph_display_price_field($this->_deposit, !$is_admin) . $suffix;
     }
     
     /**
