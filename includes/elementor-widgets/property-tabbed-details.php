@@ -438,10 +438,6 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 								$onclick = '';
 								if ( in_array('map', $item['tab_display']) )
 								{
-									if ( get_option('propertyhive_maps_provider') == 'osm' )
-									{
-										$onclick .= 'if (property_map != undefined) { property_map.remove(); }';
-									}
 									$onclick .= 'setTimeout(function() { initialize_property_map(); }, 10);';
 								}
 								if ( in_array('street_view', $item['tab_display']) )
