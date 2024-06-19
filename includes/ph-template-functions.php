@@ -541,7 +541,7 @@ if ( ! function_exists( 'propertyhive_show_property_images' ) ) {
      * @subpackage  Property
      * @return void
      */
-    function propertyhive_show_property_images() 
+    function propertyhive_show_property_images( $num_images = '' ) 
     {
         global $property;
 
@@ -550,6 +550,11 @@ if ( ! function_exists( 'propertyhive_show_property_images' ) ) {
         {
             $photo_urls = $property->_photo_urls;
             if ( !is_array($photo_urls) ) { $photo_urls = array(); }
+
+            if ( !empty($num_images) )
+            {
+                $photo_urls = array_slice($photo_urls, 0, $num_images);
+            }
 
             foreach ( $photo_urls as $photo )
             {
@@ -566,6 +571,11 @@ if ( ! function_exists( 'propertyhive_show_property_images' ) ) {
 
             if ( !empty($gallery_attachments) ) 
             {
+                if ( !empty($num_images) )
+                {
+                    $gallery_attachments = array_slice($gallery_attachments, 0, $num_images);
+                }
+            
                 foreach ($gallery_attachments as $gallery_attachment)
                 {
                     $images[] = array(
