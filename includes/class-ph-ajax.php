@@ -820,7 +820,7 @@ class PH_AJAX {
 
             if ( $base_department == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
+                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
 
                 $applicant_profile['max_price'] = $price;
 
@@ -832,7 +832,7 @@ class PH_AJAX {
 
                 if ( $percentage_lower != '' && $percentage_higher != '' && $_POST['maximum_price'] != '' && $_POST['maximum_price'] != 0 )
                 {
-                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
+                    $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
                     $applicant_profile['match_price_range_lower'] = $price - ( $price * ( $percentage_lower / 100 ) );
                     $applicant_profile['match_price_range_lower_actual'] = $price - ( $price * ( $percentage_lower / 100 ) );
                     
@@ -842,7 +842,7 @@ class PH_AJAX {
             }
             elseif ( $base_department == 'residential-lettings' )
             {
-                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
+                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_rent']));
 
                 $applicant_profile['max_rent'] = $price;
                 $applicant_profile['rent_frequency'] = 'pcm';
@@ -852,7 +852,7 @@ class PH_AJAX {
 
             if ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' )
             {
-                $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
+                $beds = preg_replace("/[^0-9.]/", '', ph_clean($_POST['minimum_bedrooms']));
                 $applicant_profile['min_beds'] = $beds;
 
                 if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
@@ -1207,7 +1207,7 @@ class PH_AJAX {
 
             if ( $base_department == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
+                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
 
                 $applicant_profile['max_price'] = $price;
 
@@ -1219,7 +1219,7 @@ class PH_AJAX {
 
                 if ( $percentage_lower != '' && $percentage_higher != '' && $_POST['maximum_price'] != '' && $_POST['maximum_price'] != 0 )
                 {
-                    $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
+                    $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
                     $applicant_profile['match_price_range_lower'] = $price - ( $price * ( $percentage_lower / 100 ) );
                     $applicant_profile['match_price_range_lower_actual'] = $price - ( $price * ( $percentage_lower / 100 ) );
                     
@@ -1229,7 +1229,7 @@ class PH_AJAX {
             }
             elseif ( $base_department == 'residential-lettings' )
             {
-                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
+                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_rent']));
 
                 $applicant_profile['max_rent'] = $price;
                 $applicant_profile['rent_frequency'] = 'pcm';
@@ -2449,7 +2449,7 @@ class PH_AJAX {
 
             if ( $base_department == 'residential-sales' )
             {
-                $property_price = preg_replace("/[^0-9]/", '', ph_clean(get_post_meta( $property_id, '_price', TRUE )));
+                $property_price = preg_replace("/[^0-9.]/", '', ph_clean(get_post_meta( $property_id, '_price', TRUE )));
 
                 if ( !empty($property_price) )
                 {
@@ -2473,7 +2473,7 @@ class PH_AJAX {
             }
             elseif ( $base_department == 'residential-lettings' )
             {
-                $property_rent = preg_replace("/[^0-9]/", '', ph_clean(get_post_meta( $property_id, '_rent', TRUE )));
+                $property_rent = preg_replace("/[^0-9.]/", '', ph_clean(get_post_meta( $property_id, '_rent', TRUE )));
                 $property_rent_freq = get_post_meta( $property_id, '_rent_frequency', TRUE );
 
                 $applicant_profile['max_rent'] = $property_rent;
@@ -3517,13 +3517,13 @@ class PH_AJAX {
 
             if ( get_post_meta( $post_id, '_department', TRUE ) == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['price']));
+                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['price']));
                 update_post_meta( $post_id, '_valued_price', $price );
                 update_post_meta( $post_id, '_valued_price_actual', $price );
             }
             elseif ( get_post_meta( $post_id, '_department', TRUE ) == 'residential-lettings' )
             {
-                $rent = preg_replace("/[^0-9]/", '', ph_clean($_POST['rent']));
+                $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['rent']));
                 update_post_meta( $post_id, '_valued_rent', $rent );
 
                 update_post_meta( $post_id, '_valued_rent_frequency', ph_clean($_POST['rent_frequency']) );
@@ -3809,7 +3809,7 @@ class PH_AJAX {
                     {
                         update_post_meta( $property_post_id, '_currency', 'GBP' );
 
-                        $price = preg_replace("/[^0-9]/", '', get_post_meta( $post_id, '_valued_price', TRUE ));
+                        $price = preg_replace("/[^0-9.]/", '', get_post_meta( $post_id, '_valued_price', TRUE ));
                         update_post_meta( $property_post_id, '_price', $price );
                         
                         break;
@@ -5490,7 +5490,7 @@ class PH_AJAX {
                 die();
             }
 
-            $amount = preg_replace("/[^0-9]/", '', $_POST['amount']);
+            $amount = preg_replace("/[^0-9.]/", '', $_POST['amount']);
             
             add_post_meta( $offer_post_id, '_offer_date_time', ph_clean($_POST['offer_date']) . ' ' . ph_clean($_POST['offer_time']) );
             add_post_meta( $offer_post_id, '_property_id', (int)$_POST['property_id'] );
@@ -5586,7 +5586,7 @@ class PH_AJAX {
                 die();
             }
 
-            $amount = preg_replace("/[^0-9]/", '', ph_clean($_POST['amount']));
+            $amount = preg_replace("/[^0-9.]/", '', ph_clean($_POST['amount']));
             
             add_post_meta( $offer_post_id, '_offer_date_time', ph_clean($_POST['offer_date']) . ' ' . ph_clean($_POST['offer_time']) );
             add_post_meta( $offer_post_id, '_property_id', (int)$property_id );

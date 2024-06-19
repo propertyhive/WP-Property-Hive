@@ -104,7 +104,7 @@ class PH_Sale {
 
         $amount = $this->_amount;
         $prefix = '&pound;';
-        return ( ( $amount != '' ) ? $prefix . number_format($amount , 0) : '-' );
+        return ( ( $amount != '' ) ? $prefix . ph_display_price_field($amount) : '-' );
 
     }
 

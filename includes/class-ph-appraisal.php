@@ -193,10 +193,7 @@ class PH_Appraisal {
             {
                 $price = $this->_valued_price;
 
-                // If there are decimals on the number, display them. If not, display none
-                $decimals = (float)$price == intval($price) ? 0 : 2;
-
-                return ( ( $price != '' ) ? $prefix . number_format($price, $decimals, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix : '-' );
+                return ( ( $price != '' ) ? $prefix . ph_display_price_field($price) . $suffix : '-' );
                 break;
             }
             case "residential-lettings":
@@ -213,10 +210,7 @@ class PH_Appraisal {
                     }
                 }
 
-                // If there are decimals on the number, display them. If not, display none
-                $decimals = (float)$price == intval($price) ? 0 : 2;
-
-                return ( ( $price != '' ) ? $prefix . number_format($price, $decimals, get_option('propertyhive_price_decimal_separator', '.'), get_option('propertyhive_price_thousand_separator', ',')) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                return ( ( $price != '' ) ? $prefix . ph_display_price_field($price) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
                 break;
             }
         }

@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 $requirements[] = array(
                     'label' => __( 'Maximum Price', 'propertyhive' ),
-                    'value' => '&pound;' . number_format($applicant_profile['max_price']),
+                    'value' => '&pound;' . ph_display_price_field($applicant_profile['max_price']),
                 );
             }
             if ( 
@@ -70,7 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     {
                         $requirements[] = array(
                             'label' => __( 'Match Price Range', 'propertyhive' ),
-                            'value' => '&pound;' . number_format($match_price_range_lower) . ' to &pound;' . number_format($match_price_range_higher),
+                            'value' => '&pound;' . ph_display_price_field($match_price_range_lower) . ' to &pound;' . ph_display_price_field($match_price_range_higher),
                         );
                     }
                 }
@@ -82,7 +82,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 $requirements[] = array(
                     'label' => __( 'Maximum Rent', 'propertyhive' ),
-                    'value' => '&pound;' . number_format($applicant_profile['max_rent']) . ' ' . $applicant_profile['rent_frequency'],
+                    'value' => '&pound;' . ph_display_price_field($applicant_profile['max_rent']) . ' ' . $applicant_profile['rent_frequency'],
                 );
             }
             if ( 

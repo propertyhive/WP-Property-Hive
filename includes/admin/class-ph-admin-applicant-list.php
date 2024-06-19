@@ -277,7 +277,7 @@ class PH_Admin_Applicant_List {
                                         $output = array();
                                         if ( isset($result['profile']['max_price']) && $result['profile']['max_price'] != '' && $result['profile']['max_price'] != 0 )
                                         {
-                                            $output[] = '<strong>Max Price:</strong> &pound;' . esc_html(number_format($result['profile']['max_price']));
+                                            $output[] = '<strong>Max Price:</strong> &pound;' . esc_html(ph_display_price_field($result['profile']['max_price']));
 
                                             if ( $percentage_lower != '' && $percentage_higher != '' )
                                             {
@@ -311,7 +311,7 @@ class PH_Admin_Applicant_List {
                                                     $match_price_range_lower != '' && $match_price_range_higher != ''
                                                 )
                                                 {
-                                                    $output[] = '<strong>Max Price Range:</strong> &pound;' . esc_html(number_format($match_price_range_lower)) . ' to &pound;' . esc_html(number_format($match_price_range_higher));
+                                                    $output[] = '<strong>Max Price Range:</strong> &pound;' . esc_html(ph_display_price_field($match_price_range_lower)) . ' to &pound;' . esc_html(ph_display_price_field($match_price_range_higher));
                                                 }
                                             }
                                         }
@@ -349,7 +349,7 @@ class PH_Admin_Applicant_List {
                                         $output = array();
                                         if ( isset($result['profile']['max_rent']) && $result['profile']['max_rent'] != '' && $result['profile']['max_rent'] != 0 )
                                         {
-                                            $output[] = '<strong>Max Rent:</strong> &pound;' . esc_html(number_format($result['profile']['max_rent']) . $result['profile']['rent_frequency']);
+                                            $output[] = '<strong>Max Rent:</strong> &pound;' . esc_html(ph_display_price_field($result['profile']['max_rent']) . $result['profile']['rent_frequency']);
                                         }
                                         if ( isset($result['profile']['min_beds']) && $result['profile']['min_beds'] != '' && $result['profile']['min_beds'] != 0 )
                                         {
@@ -383,23 +383,6 @@ class PH_Admin_Applicant_List {
                                     case "commercial":
                                     {
                                         $output = array();
-                                        /*if ( isset($result['profile']['max_price']) && $result['profile']['max_price'] != '' && $result['profile']['max_price'] != 0 )
-                                        {
-                                            $output[] = '<strong>Max Price:</strong> &pound;' . number_format($result['profile']['max_price']);
-                                        }
-                                        if ( isset($result['profile']['min_beds']) && $result['profile']['min_beds'] != '' && $result['profile']['min_beds'] != 0 )
-                                        {
-                                            $output[] = '<strong>Min Beds:</strong> ' . number_format($result['profile']['min_beds']);
-                                        }
-                                        if ( isset($result['profile']['property_types']) && is_array($result['profile']['property_types']) && !empty($result['profile']['property_types']) )
-                                        {
-                                            $output_types = array();
-                                            foreach ( $result['profile']['property_types'] as $profile_type )
-                                            {
-                                                $output_types[] = $property_types[$profile_type];
-                                            }
-                                            $output[] = '<strong>Property Types:</strong> ' . implode(", ", $output_types);
-                                        }*/
                                         if ( isset($result['profile']['locations']) && is_array($result['profile']['locations']) && !empty($result['profile']['locations']) )
                                         {
                                             $output_locations = array();
@@ -667,7 +650,7 @@ jQuery(window).resize(function() {
                     {
                         if ( isset($_POST['maximum_price']) && ph_clean($_POST['maximum_price']) != '' ) 
                         {
-                            $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_price']));
+                            $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
 
                             if ( $percentage_lower != '' && $percentage_higher != '' )
                             {
@@ -730,7 +713,7 @@ jQuery(window).resize(function() {
                     {
                         if ( isset($_POST['maximum_rent']) && ph_clean($_POST['maximum_rent']) != '' )
                         {
-                            $price = preg_replace("/[^0-9]/", '', ph_clean($_POST['maximum_rent']));
+                            $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_rent']));
 
                             if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' && $profile['max_price_actual'] != 0 && $profile['max_price_actual'] < $price )
                             {
@@ -750,7 +733,7 @@ jQuery(window).resize(function() {
                     {
                         if ( isset($_POST['minimum_bedrooms']) && ph_clean($_POST['minimum_bedrooms']) != '' ) 
                         {
-                            $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
+                            $beds = preg_replace("/[^0-9.]/", '', ph_clean($_POST['minimum_bedrooms']));
 
                             if ( isset($profile['min_beds']) && $profile['min_beds'] != '' && $profile['min_beds'] != 0 && $profile['min_beds'] > $beds )
                             {

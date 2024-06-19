@@ -307,6 +307,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'    => 'text',
                 'default' => ',',
                 'css'       => 'width:50px;',
+                'desc'  => __( 'This only effects prices output on the frontend. Prices entered and displayed in the backend will use the comma character (,) as the thousand separator.', 'propertyhive' )
             ),
 
             array(
@@ -315,6 +316,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'    => 'text',
                 'default' => '.',
                 'css'       => 'width:50px;',
+                'desc'  => __( 'This only effects prices output on the frontend. Prices entered and displayed in the backend will use the period character (.) as the decimal separator.', 'propertyhive' )
             )
         );
 

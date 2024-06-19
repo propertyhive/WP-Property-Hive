@@ -81,7 +81,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     {
                         $requirements[] = array(
                             'label' => __( 'Maximum Price', 'propertyhive' ),
-                            'value' => '&pound;' . number_format($applicant['applicant_profile']['max_price']),
+                            'value' => '&pound;' . ph_display_price_field($applicant['applicant_profile']['max_price']),
                         );
                     }
                     if ( $percentage_lower != '' && $percentage_higher != '' )
@@ -118,7 +118,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         {
                             $requirements[] = array(
                                 'label' => __( 'Maximum Price Range', 'propertyhive' ),
-                                'value' => '&pound;' . number_format($match_price_range_lower) . ' to &pound;' . number_format($match_price_range_higher),
+                                'value' => '&pound;' . ph_display_price_field($match_price_range_lower) . ' to &pound;' . ph_display_price_field($match_price_range_higher),
                             );
                         }
                     }
