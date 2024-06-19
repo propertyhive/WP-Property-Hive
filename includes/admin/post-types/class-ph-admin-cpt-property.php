@@ -289,7 +289,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 					if ( $the_property->reference_number )
 					{
-						$details[] = '<span style="opacity:0.6">' . __( 'Ref', 'propertyhive' ) . ': ' . $the_property->reference_number . '<span>';
+						$details[] = '<span style="opacity:0.6">' . __( 'Ref', 'propertyhive' ) . ': ' . $the_property->reference_number . '</span>';
 					}
 
 					echo implode("<br>", $details);
