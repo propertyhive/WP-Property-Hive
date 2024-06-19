@@ -72,6 +72,13 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
+		$suffix               = '';
+		$assets_path          = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
+
+		wp_enqueue_script( 'flexslider', $assets_path . 'js/flexslider/jquery.flexslider' . $suffix . '.js', array( 'jquery' ), '2.7.2', true );
+        wp_enqueue_script( 'flexslider-init', $assets_path . 'js/flexslider/jquery.flexslider.init' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
+        wp_enqueue_style( 'flexslider_css', $assets_path . 'css/flexslider.css', array(), '2.7.2' );
+
 		if ( 'yes' === $settings['hide_thumbnails'] ) 
 		{
 			remove_action( 'propertyhive_product_thumbnails', 'propertyhive_show_property_thumbnails', 20 );
