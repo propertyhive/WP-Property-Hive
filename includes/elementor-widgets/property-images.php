@@ -48,6 +48,16 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+            'num_images',
+            [
+                'label' => __( 'Images To Show', 'propertyhive' ),
+                'type' => \Elementor\Controls_Manager::NUMBER,
+                //'default' => 1,
+                //'min' => 1,
+            ]
+        );
+
 		$this->end_controls_section();
 
 	}
@@ -67,7 +77,7 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 			remove_action( 'propertyhive_product_thumbnails', 'propertyhive_show_property_thumbnails', 20 );
 		}
 
-		propertyhive_show_property_images();
+		propertyhive_show_property_images( ( isset($settings['num_images']) && !empty($settings['num_images']) && is_numeric($settings['num_images']) ) ? (int)$settings['num_images'] : '' );
 
 		// On render widget from Editor - trigger the init manually.
 		if ( wp_doing_ajax() ) {
