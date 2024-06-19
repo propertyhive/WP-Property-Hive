@@ -3,10 +3,7 @@ jQuery(window).on('load', function() {
 });
 
 // Resize flexsider image to prevent images showing as incorrect height when lazy loading
-jQuery('#slider.flexslider .slides img').on('load', function(){
-    setTimeout(function() { jQuery(window).trigger('resize'); }, 500);
-});
-jQuery('#carousel.thumbnails .slides img').on('load', function(){
+jQuery(document).on('load', '#slider.flexslider .slides img, #carousel.thumbnails .slides img', function() {
     setTimeout(function() { jQuery(window).trigger('resize'); }, 500);
 });
 
@@ -20,25 +17,45 @@ jQuery(window).on('resize', function() {
     });
 });
 
-function ph_init_slideshow()
-{
-    // The slider being synced must be initialized first
-    jQuery('#carousel').flexslider({
-        animation: "slide",
-        controlNav: false,
-        animationLoop: true,
-        slideshow: false,
-        itemWidth: 150,
-        itemMargin: 5,
-        asNavFor: '#slider'
-    });
+function ph_init_slideshow() {
+    // Loop through each instance of #slider using querySelectorAll
+    document.querySelectorAll('#slider').forEach(function(slider, index) {
+        var $slider = jQuery(slider);
 
-    jQuery('#slider').flexslider({
-        animation: "slide",
-        controlNav: false,
-        animationLoop: true,
-        slideshow: false,
-        sync: "#carousel",
-        smoothHeight: true
+        // Find the corresponding #carousel within the same parent container if it exists
+        var $parent = $slider.parent(); // Adjust this selector as needed based on your HTML structure
+        var $carousel = $parent.find('#carousel').length ? $parent.find('#carousel') : null;
+
+        if ($carousel && $carousel.length) {
+            // Initialize the carousel if it exists
+            $carousel.flexslider({
+                animation: "slide",
+                controlNav: false,
+                animationLoop: true,
+                slideshow: false,
+                itemWidth: 150,
+                itemMargin: 5,
+                asNavFor: $slider
+            });
+
+            // Initialize the slider
+            $slider.flexslider({
+                animation: "slide",
+                controlNav: false,
+                animationLoop: true,
+                slideshow: false,
+                sync: $carousel,
+                smoothHeight: true
+            });
+        } else {
+            // Initialize the slider without carousel sync
+            $slider.flexslider({
+                animation: "slide",
+                controlNav: false,
+                animationLoop: true,
+                slideshow: false,
+                smoothHeight: true
+            });
+        }
     });
 }
