@@ -57,14 +57,234 @@ class PH_Rest_Api {
 	 *
 	 */
 	public function __construct() {
+		// Property
 		add_filter( 'rest_property_query', array( $this, 'modify_rest_property_query' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_property_fields' ), 99 );
-		add_action( 'rest_api_init', array( $this, 'register_rest_api_office_fields' ), 99 );
 		add_filter( 'rest_property_collection_params', array( $this, 'modify_rest_order_by' ), 10, 1 );
-		add_action( "rest_after_insert_property", array( $this, 'ensure_key_fields_set' ), 10, 3 );
+		add_action( "rest_after_insert_property", array( $this, 'ensure_key_property_fields_set' ), 10, 3 );
+
+		// Enquiry
+		add_action( 'rest_api_init', array( $this, 'register_enquiry_rest_route' ), 11 );
+		add_action( "rest_after_insert_enquiry", array( $this, 'ensure_key_enquiry_fields_set' ), 10, 3 );
+
+		// Office
+		add_action( 'rest_api_init', array( $this, 'register_rest_api_office_fields' ), 99 );
 	}
 
-	public function ensure_key_fields_set( $post, $request, $creating )
+	public function register_enquiry_rest_route()
+	{
+	    register_rest_route('wp/v2', '/enquiry', array(
+	        array(
+	            'methods'   => WP_REST_Server::CREATABLE,
+	            'callback'  => array( $this, 'handle_enquiry_post' ),
+	            'permission_callback' => array( $this, 'enquiry_permission_check' )
+	        ),
+	    ));
+	}
+
+	public function enquiry_permission_check() 
+	{
+	    // Check if the user is authenticated
+	    if (is_user_logged_in() || apply_filters('rest_authentication_errors', null) === null) {
+	        // Check if the user has the capability to create enquiries (e.g., 'edit_posts')
+	        if (current_user_can('edit_posts')) {
+	            return true;
+	        } else {
+	            return new WP_Error('rest_forbidden', 'You do not have permissions to create enquiries.', array('status' => 403));
+	        }
+	    } else {
+	        return new WP_Error('rest_forbidden', 'You are not authenticated.', array('status' => 403));
+	    }
+	}
+
+	public function handle_enquiry_post(WP_REST_Request $request)
+	{
+	    // Handle the creation of the enquiry post
+	    $params = $request->get_params();
+
+	    // validate office ID
+	    if ( isset($params['office_id']) && !empty($params['office_id']) ) 
+	    {
+	    	if ( get_post_type((int)$params['office_id']) != 'office' )
+	    	{
+		    	return new WP_Error('rest_enquiry_error', __( 'Invalid office ID passed', 'propertyhive' ) . ' ('. (int)$params['office_id'] . ')', array('status' => 400));
+		    }
+	    }
+
+	    // validate negotiator ID
+	    if ( isset($params['negotiator_id']) && !empty($params['negotiator_id']) ) 
+	    {
+	    	if ( get_userdata((int)$params['negotiator_id']) === false )
+	    	{
+		    	return new WP_Error('rest_enquiry_error', __( 'Invalid negotiator ID passed', 'propertyhive' ) . ' ('. (int)$params['negotiator_id'] . ')', array('status' => 400));
+		    }
+	    }
+
+	    // validate source
+	    $valid_sources = array(
+            'office' => __( 'Office', 'propertyhive' ),
+            'website' => __( 'Website', 'propertyhive' )
+        );
+
+        $valid_sources = apply_filters( 'propertyhive_enquiry_sources', $valid_sources );
+
+	    if ( isset($params['source']) && !empty($params['source']) ) 
+	    {
+	    	if ( !array_key_exists($params['source'], $valid_sources) )
+	    	{
+			    return new WP_Error('rest_enquiry_error', __( 'Invalid source passed. Should be one of', 'propertyhive' ) . ': ' . implode(", ", array_keys($valid_sources)), array('status' => 400));
+			}
+	    }
+
+	    if ( isset($params['property_id']) && !empty($params['property_id']) ) 
+	    {
+	    	if ( !is_array($params['property_id']) ) 
+	    	{ 
+	    		$property_ids = array($params['property_id']); 
+	    	}
+	    	else
+	    	{
+	    		$property_ids = $params['property_id'];
+	    	}
+
+	    	foreach ( $property_ids as $property_id )
+	    	{
+	    		if ( get_post_type((int)$property_id) != 'property' )
+	    		{
+	    			return new WP_Error('rest_enquiry_error', __( 'Invalid property ID passed', 'propertyhive' ) . ' ('. (int)$property_id . ')', array('status' => 400));
+	    		}
+	    	}
+	    }
+
+	    $title = ( isset($params['title']) && !empty($params['title']) ? $params['title'] : '' );
+	    if (empty($title))
+	    {
+	    	$title = 'Enquiry';
+	    	if ( isset($params['name']) && !empty($params['name']) )
+	    	{
+	    		$title .= ' from ' . $params['name'];
+	    	}
+	    	if ( isset($params['property_id']) && !empty($params['property_id']) )
+	    	{
+	    		if ( is_array($params['property_id']) )
+	    		{
+	    			$title .= ' about ' . count($params['property_id']) . ' properties';
+		    	}
+		    	else
+		    	{
+		    		$title .= ' about ' . get_the_title($params['property_id']);
+		    	}
+	    	}
+	    }
+	    $data = array(
+	        'post_type'    => 'enquiry',
+	        'post_status'  => 'publish',
+	        'post_title'   => sanitize_text_field($title),
+	        'post_content'   => '',
+	        'comment_status' => 'closed',
+            'ping_status'    => 'closed',
+	    );
+
+	    $post_id = wp_insert_post($data, true);
+
+	    if ( is_wp_error($post_id) ) 
+	    {
+	        return new WP_Error('rest_enquiry_error', $post_id->get_error_message(), array('status' => 500));
+	    }
+
+	    // Status
+	    if ( isset($params['status']) && !empty($params['status']) && in_array($params['status'], array('open', 'closed')) )
+	    {
+	    	update_post_meta( $post_id, '_status', sanitize_text_field($params['status']) );
+	    }
+	    else
+	    {
+			update_post_meta( $post_id, '_status', 'open' );
+	    }
+
+		if ( isset($params['office_id']) && !empty($params['office_id']) && is_numeric($params['office_id']) )
+	    {
+	    	// Should be a valid office ID as this has already been validated by this point
+	    	update_post_meta( $post_id, '_office_id', (int)$params['office_id'] );
+	    }
+	    else
+	    {
+	        $primary_office_id = '';
+	        $args = array(
+	            'post_type' => 'office',
+	            'nopaging' => true
+	        );
+	        $office_query = new WP_Query($args);
+
+	        if ($office_query->have_posts())
+	        {
+	            while ($office_query->have_posts())
+	            {
+	                $office_query->the_post();
+
+	                if (get_post_meta(get_the_ID(), 'primary', TRUE) == '1')
+	                {
+	                    $primary_office_id = get_the_ID();
+	                }
+	            }
+	        }
+	        $office_query->reset_postdata();
+
+	        update_post_meta( $post_id, '_office_id', $primary_office_id );
+	    }
+
+	    if ( isset($params['negotiator_id']) && !empty($params['negotiator_id']) && is_numeric($params['negotiator_id']) )
+	    {
+	    	// Should be a valid neg ID as this has already been validated by this point
+	    	update_post_meta( $post_id, '_negotiator_id', (int)$params['negotiator_id'] );
+	    }
+	    
+		// Source
+		if ( isset($params['source']) && !empty($params['source']) && array_key_exists($params['source'], $valid_sources) )
+	    {
+	    	update_post_meta( $post_id, '_source', sanitize_text_field($params['source']) );
+	    }
+	    else
+	    {
+			update_post_meta( $post_id, '_source', 'website' );
+	    }
+
+	    if ( isset($params['name']) && !empty($params['name']) )
+	    {
+	    	update_post_meta( $post_id, 'name', sanitize_text_field($params['name']) );
+	    }
+
+	    if ( isset($params['email_address']) && !empty($params['email_address']) )
+	    {
+	    	update_post_meta( $post_id, 'email_address', sanitize_email($params['email_address']) );
+	    }
+
+	    if ( isset($params['telephone_number']) && !empty($params['telephone_number']) )
+	    {
+	    	update_post_meta( $post_id, 'telephone_number', sanitize_text_field($params['telephone_number']) );
+	    }
+
+	    if ( isset($params['message']) && !empty($params['message']) )
+	    {	
+	    	update_post_meta( $post_id, 'message', sanitize_textarea_field($params['message']) );
+	    }
+
+	    if ( isset($params['property_id']) && !empty($params['property_id']) && ( is_numeric($params['property_id']) || is_array($params['property_id']) ) )
+	    {
+	    	// Should be a valid property  ID as this has already been validated by this point
+	    	$property_ids = $params['property_id'];
+	    	if ( !is_array($property_ids) ) { $property_ids = array($property_ids); }
+
+	    	foreach ( $property_ids as $property_id )
+	    	{
+		    	add_post_meta( $post_id, 'property_id', (int)$property_id );
+		    }
+	    }
+
+	    return new WP_REST_Response(array('ID' => $post_id), 201);
+	}
+
+	public function ensure_key_property_fields_set( $post, $request, $creating )
 	{
 		// Country / price actual
 		$country = get_post_meta( $post->ID, '_address_country', true );
