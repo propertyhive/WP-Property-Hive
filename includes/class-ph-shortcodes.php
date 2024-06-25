@@ -686,7 +686,7 @@ class PH_Shortcodes {
 
 		<?php else: ?>
 
-            <?php echo $atts['no_results_output']; ?>
+            <p class="propertyhive-info no-results-message"><?php echo $atts['no_results_output']; ?></p>
 
 		<?php endif;
 
@@ -951,7 +951,7 @@ class PH_Shortcodes {
 
 		<?php else: ?>
 
-            <?php echo $atts['no_results_output']; ?>
+            <p class="propertyhive-info no-results-message"><?php echo $atts['no_results_output']; ?></p>
 
 		<?php endif;
 
@@ -1227,7 +1227,7 @@ class PH_Shortcodes {
 
 		<?php else: ?>
 
-            <?php echo $atts['no_results_output']; ?>
+            <p class="propertyhive-info no-results-message"><?php echo $atts['no_results_output']; ?></p>
 
 		<?php endif;
 
@@ -1601,7 +1601,7 @@ class PH_Shortcodes {
 
 			<?php else: ?>
 
-            	<?php echo $atts['no_results_output']; ?>
+            	<p class="propertyhive-info no-results-message"><?php echo $atts['no_results_output']; ?></p>
 
 			<?php endif;
 
