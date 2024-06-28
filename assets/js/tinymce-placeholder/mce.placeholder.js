@@ -56,7 +56,7 @@
 
 			tinymce.DOM.setStyle( this.contentAreaContainer, 'position', 'relative' );
 			
-			attrs = {id: 'mce-placeholder-plugin-label', style: {position: 'absolute', top: 0, left: 0, color: '#888', lineHeight:'1.3em', padding: '9px 10px', width: '98%', overflow: 'hidden', display: 'none' }};
+			attrs = {id: 'mce-placeholder-plugin-label', style: {pointerEvents:'none', position: 'absolute', top: 0, left: 0, color: '#888', lineHeight:'1.3em', padding: '9px 10px', width: '98%', overflow: 'hidden', display: 'none' }};
 			this.el = tinymce.DOM.add( this.contentAreaContainer, "label", attrs, this.text );
 		};
 

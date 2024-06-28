@@ -1457,7 +1457,17 @@ function ph_redraw_notes_grid(section)
                             }
                         });
                     }
-                }
+                },
+                content_style: `
+                  html {
+                    min-height: 100% /* to allow body to expand its height to full height of the edit area */
+                  }
+                  .mce-content-body {
+                    margin: 0; /* to replace it with padding */
+                    padding: 1rem; /* to replace margin, which results in context menu working even when right-clicking on the spacing around the content */
+                    height: calc(100% - 2rem); /* to avoid vertical overflow due to additional padding: 1rem (top) + 1rem (bottom) = 2rem */
+                  }
+                `
             });
         }
     }, 'html');
