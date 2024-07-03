@@ -1632,7 +1632,8 @@ class PH_Shortcodes {
 			'id'        	=> '',
 			'height'        => '400',
 			'zoom'          => '14',
-			'scrollwheel'   => 'true'
+			'scrollwheel'   => 'true',
+			'init_on_load'  => 'true'
 		), $atts, 'property_map' );
 
 		ob_start();
