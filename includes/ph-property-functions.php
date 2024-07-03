@@ -216,11 +216,13 @@ function get_property_map( $args = array() )
 		L.marker([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>]<?php echo $icon_code; ?>).addTo(property_map<?php echo $id_suffix; ?>);
 	}
 
+	<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
 	if (window.addEventListener) {
 		window.addEventListener('load', initialize_property_map<?php echo $id_suffix; ?>);
 	}else{
 		window.attachEvent('onload', initialize_property_map<?php echo $id_suffix; ?>);
 	}
+	<?php } ?>
 
 </script>
 <?php
@@ -301,11 +303,13 @@ function get_property_map( $args = array() )
 		<?php do_action( 'propertyhive_property_map_actions' ); ?>
 	}
 	
+	<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
 	if(window.addEventListener) {
 		window.addEventListener('load', initialize_property_map<?php echo $id_suffix; ?>);
 	}else{
 		window.attachEvent('onload', initialize_property_map<?php echo $id_suffix; ?>);
 	}
+	<?php } ?>
 
 </script>
 <?php
