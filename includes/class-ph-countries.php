@@ -268,6 +268,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'MY' => array(
+				'name' => 'Malaysia',
+				'currency_code' => 'MYR',
+				'currency_symbol' => 'RM',
+				'currency_prefix' => true
+			),
 			'MT' => array(
 				'name' => 'Malta',
 				'currency_code' => 'EUR',
