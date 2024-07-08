@@ -137,7 +137,7 @@ class PH_Admin_Post_Types {
     public function remove_month_filter() {
         global $typenow;
 
-        $post_types_to_hide_months_dropdown = array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
+        $post_types_to_hide_months_dropdown = array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
         $post_types_to_hide_months_dropdown = apply_filters( 'propertyhive_post_types_to_hide_months_dropdown', $post_types_to_hide_months_dropdown );
 
         if ( in_array($typenow, $post_types_to_hide_months_dropdown) )
@@ -564,6 +564,7 @@ class PH_Admin_Post_Types {
         // Department filtering
         $output = '';
         
+        $output .= $this->date_range_filter();
         $output .= $this->enquiry_status_filter();
         $output .= $this->enquiry_source_filter();
         $output .= $this->enquiry_office_filter();
@@ -1173,6 +1174,8 @@ class PH_Admin_Post_Types {
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
+
+            $vars = $this->filter_by_date_range($vars, 'date_query');
         }
         elseif ( 'appraisal' === $typenow )
         {
@@ -1402,20 +1405,30 @@ class PH_Admin_Post_Types {
 		    && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_to']) !== false
 	    )
 	    {
-		    $vars['meta_query'] = array_merge($vars['meta_query'], array (
-			    array(
-				    'key' => $meta_key,
-				    'value' => ph_clean($_GET['_date_range_from']),
-				    'type'  => 'date',
-				    'compare' => '>='
-			    ),
-			    array(
-				    'key' => $meta_key,
-				    'value' => ph_clean($_GET['_date_range_to']),
-				    'type'  => 'date',
-				    'compare' => '<='
-			    ),
-		    ));
+            if ( $meta_key == 'date_query' )
+            {
+                $vars['date_query'] = array(
+                    'after' => $_GET['_date_range_from'] . ' 00:00:00',
+                    'before' => $_GET['_date_range_to'] . ' 23:59:59',
+                );
+            }
+            else
+            {
+    		    $vars['meta_query'] = array_merge($vars['meta_query'], array (
+    			    array(
+    				    'key' => $meta_key,
+    				    'value' => ph_clean($_GET['_date_range_from']),
+    				    'type'  => 'date',
+    				    'compare' => '>='
+    			    ),
+    			    array(
+    				    'key' => $meta_key,
+    				    'value' => ph_clean($_GET['_date_range_to']),
+    				    'type'  => 'date',
+    				    'compare' => '<='
+    			    ),
+    		    ));
+            }
 	    }
 
 	    return $vars;

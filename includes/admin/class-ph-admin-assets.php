@@ -58,7 +58,7 @@ class PH_Admin_Assets {
             }
         }
 
-	    if ( in_array( $screen->id, array( 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale' ) ) )
+	    if ( in_array( $screen->id, array( 'edit-enquiry', 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale' ) ) )
 	    {
 		    wp_enqueue_style( 'daterangepicker.css', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css' );
 	    }
@@ -185,7 +185,7 @@ class PH_Admin_Assets {
             wp_localize_script( 'propertyhive_dashboard', 'propertyhive_dashboard', $params );
         }
 
-	    if ( in_array( $screen->id, array( 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale' ) ) )
+	    if ( in_array( $screen->id, array( 'edit-enquiry', 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale' ) ) )
 	    {
 		    wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
 		    wp_enqueue_script( 'daterangepicker.js', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js' );
