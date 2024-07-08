@@ -106,6 +106,8 @@ class Elementor_Property_Map_Widget extends \Elementor\Widget_Base {
 			$attributes['scrollwheel'] = $settings['scrollwheel'];
 		}
 
+		$attributes = apply_filters( 'propertyhive_elementor_property_map_attributes', $attributes );
+
 		get_property_map($attributes);
 
 	}
