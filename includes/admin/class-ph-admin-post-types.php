@@ -38,8 +38,242 @@ class PH_Admin_Post_Types {
 		add_action( 'wp_trash_post', array( $this, 'trash_post' ) );
 		add_action( 'untrash_post', array( $this, 'untrash_post' ) );
 
+        add_action( 'admin_init', array( $this, 'handle_archive_action' ) );
+        add_action( 'admin_init', array( $this, 'handle_unarchive_action' ) );
 
+        $post_types = array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
+        $post_types = apply_filters( 'propertyhive_post_types_with_archive', $post_types );
+
+        foreach ( $post_types as $post_type )
+        {
+            add_filter( 'views_edit-' . $post_type, array( $this, 'adjust_post_status_views' ) );
+            add_filter( "bulk_actions-edit-$post_type", array( $this, 'register_bulk_action_move_to_archive' ) );
+            add_filter( "handle_bulk_actions-edit-$post_type", array( $this, 'handle_bulk_action_archive_and_unarchive' ), 10, 3 );
+        }
+
+        add_filter( 'post_row_actions', array( $this, 'modify_post_row_actions_for_archived' ), 10, 2 );
 	}
+
+    public function handle_bulk_action_archive_and_unarchive($redirect_to, $doaction, $post_ids) 
+    {
+        if ($doaction === 'move_to_archive') 
+        {
+            foreach ($post_ids as $post_id) 
+            {
+                // Check permissions
+                if (!current_user_can('edit_post', $post_id)) {
+                    continue;
+                }
+
+                // Update the post status to 'archive'
+                $updated_post = array(
+                    'ID'           => $post_id,
+                    'post_status'  => 'archive',
+                );
+
+                wp_update_post($updated_post);
+            }
+
+            $redirect_to = add_query_arg('bulk_archived_posts', count($post_ids), $redirect_to);
+        }
+        elseif ($doaction === 'unarchive') 
+        {
+            foreach ($post_ids as $post_id) 
+            {
+                // Check permissions
+                if (!current_user_can('edit_post', $post_id)) {
+                    continue;
+                }
+
+                // Update the post status to 'publish' (or whatever the original status should be)
+                $updated_post = array(
+                    'ID'           => $post_id,
+                    'post_status'  => 'publish',
+                );
+
+                wp_update_post($updated_post);
+            }
+
+            $redirect_to = add_query_arg('bulk_unarchived_posts', count($post_ids), $redirect_to);
+        }
+
+        return $redirect_to;
+    }
+
+    public function register_bulk_action_move_to_archive( $bulk_actions ) 
+    {
+        global $post_status;
+
+        // Define our custom actions
+        $custom_actions = array();
+
+        if ($post_status === 'archive') {
+            $custom_actions['unarchive'] = __('Unarchive', 'propertyhive');
+        } else {
+            $custom_actions['move_to_archive'] = __('Move to Archive', 'propertyhive');
+        }
+
+        // Check if 'trash' exists and insert custom actions before it
+        if (isset($bulk_actions['trash'])) 
+        {
+            $new_actions = array();
+            foreach ($bulk_actions as $key => $value) {
+                if ($key === 'trash') {
+                    $new_actions = array_merge($new_actions, $custom_actions);
+                }
+                $new_actions[$key] = $value;
+            }
+            return $new_actions;
+        }
+        elseif (isset($bulk_actions['untrash'])) 
+        {
+            $new_actions = array();
+            foreach ($bulk_actions as $key => $value) {
+                if ($key === 'untrash') {
+                    $new_actions = array_merge($new_actions, $custom_actions);
+                }
+                $new_actions[$key] = $value;
+            }
+            return $new_actions;
+        }
+        else
+        {
+            // If 'trash' doesn't exist, append custom actions at the end
+            return array_merge($bulk_actions, $custom_actions);
+        }
+    }
+
+    public function modify_post_row_actions_for_archived( $actions, $post ) 
+    {
+        // Define the post types that can be archived
+        $post_types = array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
+        $post_types = apply_filters('propertyhive_post_types_with_archive', $post_types);
+
+        // Check if the current post type is in the allowed post types and if the post is archived
+        if ( in_array($post->post_type, $post_types) && $post->post_status == 'archive' ) 
+        {
+            // Remove the "View" link
+            if (isset($actions['view'])) {
+                unset($actions['view']);
+            }
+
+            // Add the "Unarchive" link
+            $unarchive_url = wp_nonce_url(admin_url('post.php?post=' . $post->ID . '&action=unarchive&return=archive'), 'unarchive-post_' . $post->ID);
+            $actions['unarchive'] = '<a href="' . esc_url($unarchive_url) . '">' . __('Unarchive', 'propertyhive') . '</a>';
+        }
+
+        return $actions;
+    }
+
+    public function adjust_post_status_views( $views ) 
+    {
+        if (isset($views['archive'])) 
+        {
+            $archive = $views['archive'];
+            unset($views['archive']);
+
+            $new_views = array();
+            $bin_exists = false;
+            
+            foreach ($views as $key => $view) {
+                if ($key === 'trash') {
+                    $bin_exists = true;
+                    $new_views['archive'] = $archive;
+                }
+                $new_views[$key] = $view;
+            }
+
+            // Ensure 'archive' is added to the end if 'trash' is not present
+            if (!$bin_exists) {
+                $new_views['archive'] = $archive;
+            }
+
+            return $new_views;
+        }
+
+        return $views;
+    }
+
+    public function handle_archive_action() 
+    {
+        // Check if the action and nonce are set and valid
+        if ( !isset($_GET['action']) || $_GET['action'] !== 'archive_single' )
+            return;
+        
+        $post_id = isset($_GET['post']) ? intval($_GET['post']) : 0;
+        $post_type = get_post_type($post_id);
+
+        if ( !wp_verify_nonce($_GET['_wpnonce'], 'archive-post_' . $post_id) )
+        {
+            wp_die(__('Security check failed.', 'propertyhive'));
+        }
+
+        if ( !current_user_can('edit_post', $post_id) )
+        {
+            wp_die(__('You do not have permission to edit this post.', 'propertyhive'));
+        }
+
+        // Update the post status to 'archive'
+        $updated_post = array(
+            'ID'           => $post_id,
+            'post_status'  => 'archive',
+        );
+
+        $result = wp_update_post($updated_post, true);
+
+        if ( is_wp_error($result) ) 
+        {
+            wp_die(__('An error occurred while archiving the post.', 'propertyhive'));
+        }
+
+        // Redirect to the main list of contacts
+        wp_redirect(admin_url('edit.php?post_type=' . $post_type));
+        exit;
+    }
+
+    public function handle_unarchive_action() 
+    {
+        // Check if the action and nonce are set and valid
+        if ( !isset($_GET['action']) || $_GET['action'] !== 'unarchive_single' )
+            return;
+        
+        $post_id = isset($_GET['post']) ? intval($_GET['post']) : 0;
+        $post_type = get_post_type($post_id);
+
+        if ( !wp_verify_nonce($_GET['_wpnonce'], 'unarchive-post_' . $post_id) )
+        {
+            wp_die(__('Security check failed.', 'propertyhive'));
+        }
+
+        if ( !current_user_can('edit_post', $post_id) )
+        {
+            wp_die(__('You do not have permission to edit this post.', 'propertyhive'));
+        }
+
+        // Update the post status to 'publish'
+        $updated_post = array(
+            'ID'           => $post_id,
+            'post_status'  => 'publish',
+        );
+
+        $result = wp_update_post($updated_post, true);
+
+        if ( is_wp_error($result) ) 
+        {
+            wp_die(__('An error occurred while unarchiving the post.', 'propertyhive'));
+        }
+
+        // Redirect to the main list of contacts
+        if ( isset($_GET['return']) && $_GET['return'] === 'archive' ) 
+        {
+            wp_redirect(admin_url('edit.php?post_status=archive&post_type=' . get_post_type($post_id)));
+        }
+        else
+        {
+            wp_redirect(admin_url('edit.php?post_type=' . get_post_type($post_id)));
+        }
+        exit;
+    }
 
 	/**
 	 * Conditonally load classes and functions only needed when viewing a post type.

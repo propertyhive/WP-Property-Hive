@@ -52,7 +52,7 @@ class PH_Post_types {
     {
         register_post_status('archive', array(
             'label'                     => _x('Archived', 'post'),
-            'public'                    => true,
+            'public'                    => false,
             'exclude_from_search'       => true,
             'show_in_admin_all_list'    => false,
             'show_in_admin_status_list' => true,
