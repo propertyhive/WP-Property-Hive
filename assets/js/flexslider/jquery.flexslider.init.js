@@ -2,21 +2,6 @@ jQuery(window).on('load', function() {
     ph_init_slideshow();
 });
 
-// Resize flexsider image to prevent images showing as incorrect height when lazy loading
-jQuery(document).on('load', '#slider.flexslider .slides img, #carousel.thumbnails .slides img', function() {
-    setTimeout(function() { jQuery(window).trigger('resize'); }, 500);
-});
-
-jQuery(window).on('resize', function() {
-    // set height of all thumbnails to be the same (i.e. height of the first one) 
-    jQuery('#carousel.thumbnails .slides img').css('height', 'auto');
-    var thumbnail_height = jQuery('#carousel.thumbnails .slides img:eq(0)').height();
-    jQuery('#carousel.thumbnails .slides img').each(function()
-    {
-        jQuery(this).height(thumbnail_height);
-    });
-});
-
 function ph_init_slideshow() {
     // Loop through each instance of #slider using querySelectorAll
     document.querySelectorAll('#slider').forEach(function(slider, index) {
@@ -47,6 +32,48 @@ function ph_init_slideshow() {
                 sync: $carousel,
                 smoothHeight: true
             });
+
+            // Ensure all images in the carousel are loaded before adjusting heights
+            var thumbnails = $carousel.find('.slides img');
+            var imagesLoadedCount = 0;
+            var totalImages = thumbnails.length;
+
+            function setThumbnailHeight() {
+                thumbnails.css('height', 'auto');
+                var thumbnail_height = thumbnails.eq(0).height();
+                // Check if the first thumbnail has a valid height
+                if (thumbnail_height > 0) 
+                {
+                    thumbnails.each(function() {
+                        jQuery(this).height(thumbnail_height);
+                    });
+                }
+                else
+                {
+                    setTimeout(setThumbnailHeight, 100); // Retry after a short delay
+                }
+            }
+
+            // Check if all images are loaded
+            function checkAllImagesLoaded() {
+                imagesLoadedCount++;
+                if (imagesLoadedCount === totalImages) {
+                    setThumbnailHeight();
+                    jQuery(window).on('resize', setThumbnailHeight);
+                }
+            }
+
+            // Attach load event to each image
+            thumbnails.each(function() {
+                if (this.complete) {
+                    // Image is already loaded
+                    checkAllImagesLoaded();
+                } else {
+                    // Attach event listener to load event
+                    jQuery(this).on('load', checkAllImagesLoaded);
+                }
+            });
+
         } else {
             // Initialize the slider without carousel sync
             $slider.flexslider({
