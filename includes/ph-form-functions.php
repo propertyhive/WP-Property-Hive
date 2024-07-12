@@ -971,7 +971,13 @@ function ph_form_field( $key, $field )
 
             if ($field['show_label'])
             {
-                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+                // get first option as 'for'
+                $option_key = '';
+                foreach ( $field['options'] as $option_key => $value )
+                {
+                    break;
+                }
+                $output .= '<label for="' . esc_attr( $key ) . '_' . esc_attr( $option_key ) . '">' . $field['label'] . '</label>';
             }
 
             foreach ( $field['options'] as $option_key => $value )
