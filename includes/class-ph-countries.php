@@ -232,6 +232,12 @@ class PH_Countries {
 				'currency_symbol' => '₹',
 				'currency_prefix' => true
 			),
+			'ID' => array(
+		        'name' => 'Indonesia',
+		        'currency_code' => 'IDR',
+		        'currency_symbol' => 'Rp',
+		        'currency_prefix' => true
+		    ),
 			'IE' => array(
 				'name' => 'Ireland',
 				'currency_code' => 'EUR',
