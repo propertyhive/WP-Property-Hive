@@ -127,17 +127,32 @@ class PH_Admin_Meta_Boxes {
 
     function add_archive_link_to_post_submitbox() 
     {
-        global $post;
+        global $post, $current_screen;
+
+        if ( isset($current_screen) && $current_screen->base === 'post' && $current_screen->action === 'add' )
+            return;
 
         // Check if the post status is not 'archive'
         $post_types = array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
         $post_types = apply_filters( 'propertyhive_post_types_with_archive', $post_types );
 
-        if ( in_array($post->post_type, $post_types) && $post->post_status != 'archive' ) 
+        if ( in_array($post->post_type, $post_types) ) 
         {
-            echo '<div id="archive-action" style="float:left; line-height:2.30769231">';
-                echo '<a href="#" id="archive-post" class="submitdelete deletion">' . esc_html( __('Archive', 'propertyhive') ) . '</a>&nbsp;&nbsp;|&nbsp;&nbsp;';
-            echo '</div>';
+            if ( $post->post_status != 'archive' )
+            {
+                echo '<div id="archive-action" style="float:left; line-height:2.30769231">';
+                    $archive_url = wp_nonce_url(admin_url('post.php?post=' . $post->ID . '&action=archive_single'), 'archive-post_' . $post->ID);
+                    echo '<a href="' . esc_url($archive_url) . '" id="archive-post" class="submitdelete deletion">' . esc_html( __('Archive', 'propertyhive') ) . '</a>&nbsp;&nbsp;|&nbsp;&nbsp;';
+                echo '</div>';
+            }
+            else
+            {
+                // This is an archived post
+                echo '<div id="archive-action" style="float:left; line-height:2.30769231">';
+                    $archive_url = wp_nonce_url(admin_url('post.php?post=' . $post->ID . '&action=unarchive_single'), 'unarchive-post_' . $post->ID);
+                    echo '<a href="' . esc_url($archive_url) . '" id="unarchive-post" class="submitdelete deletion">' . esc_html( __('Unarchive', 'propertyhive') ) . '</a>&nbsp;&nbsp;|&nbsp;&nbsp;';
+                echo '</div>';
+            }
         }
     }
 
