@@ -22,6 +22,7 @@ class PH_Post_types {
 	public function __construct() {
 	    add_action( 'init', array( __CLASS__, 'register_taxonomies' ), 5 );
 		add_action( 'init', array( __CLASS__, 'register_post_types' ), 5 );
+        add_action( 'init', array( __CLASS__, 'register_post_statuses' ), 5 );
 
         add_action( 'wp_trash_post', array( __CLASS__, 'trash_property_children' ), 5 );
         add_action( 'wp_trash_post', array( __CLASS__, 'trash_property_enquiries' ), 5 );
@@ -46,6 +47,18 @@ class PH_Post_types {
 
         add_filter( 'get_terms', array( $this, 'put_terms_in_order' ), 10, 4 );
 	}
+
+    public static function register_post_statuses()
+    {
+        register_post_status('archive', array(
+            'label'                     => _x('Archived', 'post'),
+            'public'                    => true,
+            'exclude_from_search'       => true,
+            'show_in_admin_all_list'    => false,
+            'show_in_admin_status_list' => true,
+            'label_count'               => _n_noop('Archived <span class="count">(%s)</span>', 'Archived <span class="count">(%s)</span>'),
+        ));
+    }
 
     public static function update_property_indexed_owner_names( $post_id, $post, $update )
     {
