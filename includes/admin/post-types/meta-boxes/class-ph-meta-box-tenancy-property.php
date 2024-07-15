@@ -33,7 +33,7 @@ class PH_Meta_Box_Tenancy_Property {
             
                 <label>' . esc_html(__('Address', 'propertyhive')) . '</label>
                 
-                <a href="' . get_edit_post_link($property_id, '') . '">' . esc_html($property->get_formatted_full_address()) . '</a> (<a href="' . get_permalink($property_id) . '" target="_blank">View On Website</a>)
+                <a href="' . get_edit_post_link($property_id, '') . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . get_permalink($property_id) . '" target="_blank">View On Website</a>)' : '' ) . '
                 
             </p>';
 
