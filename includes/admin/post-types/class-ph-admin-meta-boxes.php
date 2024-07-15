@@ -32,6 +32,8 @@ class PH_Admin_Meta_Boxes {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 30 );
 		add_action( 'save_post', array( $this, 'save_meta_boxes' ), 1, 2 );
 
+        add_action( 'post_submitbox_start', array( $this, 'add_archive_link_to_post_submitbox' ) );
+
 		// Save Property Meta Boxes
 		add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Address::save', 10, 2 );
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Owner::save', 12, 2 );
@@ -122,6 +124,37 @@ class PH_Admin_Meta_Boxes {
         $this->check_create_sale();
         $this->check_create_tenancy();
 	}
+
+    function add_archive_link_to_post_submitbox() 
+    {
+        global $post, $current_screen;
+
+        if ( isset($current_screen) && $current_screen->base === 'post' && $current_screen->action === 'add' )
+            return;
+
+        // Check if the post status is not 'archive'
+        $post_types = array('property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
+        $post_types = apply_filters( 'propertyhive_post_types_with_archive', $post_types );
+
+        if ( in_array($post->post_type, $post_types) ) 
+        {
+            if ( $post->post_status != 'archive' )
+            {
+                echo '<div id="archive-action" style="float:left; line-height:2.30769231">';
+                    $archive_url = wp_nonce_url(admin_url('post.php?post=' . $post->ID . '&action=archive_single'), 'archive-post_' . $post->ID);
+                    echo '<a href="' . esc_url($archive_url) . '" id="archive-post" class="submitdelete deletion">' . esc_html( __('Archive', 'propertyhive') ) . '</a>&nbsp;&nbsp;|&nbsp;&nbsp;';
+                echo '</div>';
+            }
+            else
+            {
+                // This is an archived post
+                echo '<div id="archive-action" style="float:left; line-height:2.30769231">';
+                    $archive_url = wp_nonce_url(admin_url('post.php?post=' . $post->ID . '&action=unarchive_single'), 'unarchive-post_' . $post->ID);
+                    echo '<a href="' . esc_url($archive_url) . '" id="unarchive-post" class="submitdelete deletion">' . esc_html( __('Unarchive', 'propertyhive') ) . '</a>&nbsp;&nbsp;|&nbsp;&nbsp;';
+                echo '</div>';
+            }
+        }
+    }
 
     public function redirect_to_tab( $url, $post_id )
     {

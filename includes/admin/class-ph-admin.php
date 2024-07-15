@@ -24,6 +24,7 @@ class PH_Admin {
         add_action( 'current_screen', array( $this, 'disable_propertyhive_meta_box_dragging' ) );
         add_action( 'current_screen', array( $this, 'remove_propertyhive_meta_boxes_from_screen_options' ) );
         add_action( 'admin_notices', array( $this, 'review_admin_notices') );
+        add_action( 'admin_notices', array( $this, 'archive_admin_notices' ) );
         add_action( 'admin_menu', array( $this, 'admin_dashboard_pages' ) );
         add_action( 'admin_head', array( $this, 'admin_head' ) );
         add_action( 'admin_init', array( $this, 'admin_redirects' ) );
@@ -36,6 +37,41 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'check_hide_demo_data_tab' ) );
         add_action( 'admin_init', array( $this, 'check_install_add_on' ) );
         add_filter( 'propertyhive_screen_ids', array( $this, 'crm_only_mode_screen_id' ) );
+    }
+
+    public function archive_admin_notices() 
+    {
+        if ( isset($_GET['bulk_archived_posts']) && !empty($_GET['bulk_archived_posts'])) 
+        {
+            $post_type = isset($_GET['post_type']) ? $_GET['post_type'] : '';
+            if ( $post_type ) 
+            {
+                $post_type_object = get_post_type_object($post_type);
+
+                $count = intval($_GET['bulk_archived_posts']);
+
+                printf(
+                    '<div id="message" class="notice is-dismissible updated"><p>' . _n('%s ' . $post_type_object->labels->singular_name . ' moved to Archive.', '%s ' . $post_type_object->labels->name . ' moved to Archive.', $count, 'propertyhive') . '</p></div>',
+                    $count
+                );
+            }
+        }
+
+        if ( isset($_GET['bulk_unarchived_posts']) && !empty($_GET['bulk_unarchived_posts']) ) 
+        {
+            $post_type = isset($_GET['post_type']) ? $_GET['post_type'] : '';
+            if ( $post_type ) 
+            {
+                $post_type_object = get_post_type_object($post_type);
+
+                $count = intval($_GET['bulk_unarchived_posts']);
+
+                printf(
+                    '<div id="message" class="notice is-dismissible updated"><p>' . _n('%s ' . $post_type_object->labels->singular_name . ' Removed from Archive.', '%s ' . $post_type_object->labels->name . ' removed from Archive.', $count, 'propertyhive') . '</p></div>',
+                    $count
+                );
+            }
+        }
     }
 
     public function crm_only_mode_screen_id( $screen_ids )
