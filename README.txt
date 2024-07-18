@@ -2,8 +2,8 @@
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.5.4
-Stable tag: 2.0.17
+Tested up to: 6.6
+Stable tag: 2.0.18
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,24 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.18 - 2024-07-18 =
+* Added new 'Archive' ability to all Property Hive records. Once a record is archived it will no longer show in searches or lists and are then only available by filtering by 'Archived' from the main posts list
+* Added support for POST'ing enquiries into Property Hive via the REST API so third parties can push enquiries back
+* Added Indonesia and Malaysia to list of supported countries
+* Added advanced date filter to enquiries list
+* Added option to 'Images' Elementor widget to set number of images shown
+* Added support for multiple image sliders being added on the same page
+* Added HTML around no_results_output output from shortcodes so it can be styled
+* Added additional 'no-results-message' class to no properties found message/templates used in search results
+* Tweaks to 'History & Notes' WYSIWYG to improve right-click context menu consistency following recent change from textarea to WYSIWYG
+* Don't show 'View on website' link next to property in viewing, offer and sale records when the property is trased or archived
+* Prices throughout Property Hive changed to use ph_display_price_field() so there is consistency in terms of separators and formatting etc
+* Added tooltips next to the price decimal/thousands separator settings containing an explanation of where this effects
+* Set correct 'for' attribute on primary label of radio button form controls to ensure HTML validity
+* Tweaks aimed at improving reliability of setting thumbnail heights in Flexslider carousels and disabled 'smoothHeight' setting in an effort to improve reliability further
+* Correct OpenStreetMaps not working in Elementor 'Property Map' widget
+* Declared compatibility for WordPress 6.6
 
 = 2.0.17 - 2024-06-18 =
 * Tag contacts and properties in notes by typing @ followed by the name or address respectively. Can be disabled via the 'propertyhive_disable_notes_mention' filter
