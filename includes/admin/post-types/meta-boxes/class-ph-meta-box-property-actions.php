@@ -407,7 +407,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'<br><a href="new-applicant" data-name="' + keyword + '">Add as new applicant?</a></div>');
+	        	$('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'<br><a href="new-applicant" data-name="' + keyword + '"><?php echo esc_html__( 'Add as new applicant?', 'propertyhive' ); ?></a></div>');
 	        }
 	        else
 	        {
