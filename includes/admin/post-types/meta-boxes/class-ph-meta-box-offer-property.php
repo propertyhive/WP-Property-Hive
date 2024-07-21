@@ -123,7 +123,7 @@ jQuery(document).ready(function($)
 
         if (keyword.length < 3)
         {
-            $('#offer_search_property_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+            $('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
             $('#offer_search_property_results').show();
             return false;
         }
@@ -138,7 +138,7 @@ jQuery(document).ready(function($)
         {
             if (response == '' || response.length == 0)
             {
-                $('#offer_search_property_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+                $('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
             }
             else
             {
