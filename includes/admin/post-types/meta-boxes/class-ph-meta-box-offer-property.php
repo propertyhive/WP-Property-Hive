@@ -57,14 +57,14 @@ class PH_Meta_Box_Offer_Property {
                 {
                     $owner = new PH_Contact((int)$owner_contact_id);
                     echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '">' . get_the_title($owner_contact_id) . '</a><br>';
-                    echo 'Telephone: ' . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
-                    echo 'Email: ' . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
+                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
+                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
                     echo '<br><br>';
                 }
             }
             else
             {
-                echo 'No ' . ( ( $property->department == 'residential-lettings' || ph_get_custom_department_based_on($property->department) == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified';
+                echo __('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' || ph_get_custom_department_based_on($property->department) == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . __(' specified', 'propertyhive');
             }
                 
             echo '</p>';
