@@ -163,7 +163,7 @@ function tenancy_perform_property_search()
 
     if (keyword.length < 3)
     {
-        jQuery('#tenancy_search_property_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+        jQuery('#tenancy_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
         jQuery('#tenancy_search_property_results').show();
         return false;
     }
@@ -178,7 +178,7 @@ function tenancy_perform_property_search()
     {
         if (response == '' || response.length == 0)
         {
-            jQuery('#tenancy_search_property_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+            jQuery('#tenancy_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
         }
         else
         {
