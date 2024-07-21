@@ -635,7 +635,7 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Viewing</a>'', 'propertyhive' ); ?>);
+        		$('#success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Viewing', 'propertyhive' ); ?></a>');
         		
         		for ( var i in response.success.properties )
         		{
