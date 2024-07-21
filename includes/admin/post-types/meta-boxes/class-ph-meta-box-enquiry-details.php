@@ -162,7 +162,7 @@ function viewing_perform_property_search()
 
     if (keyword.length < 3)
     {
-        jQuery('#viewing_search_property_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+        jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
         jQuery('#viewing_search_property_results').show();
         return false;
     }
@@ -176,7 +176,7 @@ function viewing_perform_property_search()
     {
         if (response == '' || response.length == 0)
         {
-            jQuery('#viewing_search_property_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+            jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
         }
         else
         {
@@ -356,14 +356,14 @@ function viewing_update_selected_properties()
                                         if (response.error)
                                         {
                                             $(that).attr('disabled', false);
-                                            $(that).html('<?php echo __( 'Create ' . $enquiry_contact_type, 'propertyhive' ); ?>');
+                                            $(that).html('<?php echo __( 'Create ', 'propertyhive' ) . $enquiry_contact_type; ?>');
                                         }
                                         if (response.success)
                                         {
                                             $(that).attr('disabled', false);
                                             $(that).addClass('button-primary');
                                             $(that).attr('href', response.success);
-                                            $(that).html('<?php echo __( $enquiry_contact_type . ' Created. View Now', 'propertyhive' ); ?>');
+                                            $(that).html('<?php echo $enquiry_contact_type . __(' Created. View Now', 'propertyhive' ); ?>');
                                         }
                                     }, 'json');
                                 }
