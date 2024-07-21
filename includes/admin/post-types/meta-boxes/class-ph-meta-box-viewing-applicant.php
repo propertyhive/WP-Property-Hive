@@ -115,7 +115,7 @@ class PH_Meta_Box_Viewing_Applicant {
 
                 <label for="">&nbsp;</label>
 
-                <a href="" class="create-viewing-applicant button">Create New Applicant</a>
+                <a href="" class="create-viewing-applicant button"><?php echo esc_html__( 'Create New Applicant', 'propertyhive' ); ?></a>
 
             </p>
 
