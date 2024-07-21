@@ -598,7 +598,7 @@ jQuery(document).ready(function($)
 		}
 
 		$(this).attr('disabled', 'disabled');
-		$(this).text(<?php echo __( 'Booking...', 'propertyhive' ); ?>);
+		$(this).text('Booking...');
 
 		// Validation passed. Submit form
 		var data = {
