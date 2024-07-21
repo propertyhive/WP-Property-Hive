@@ -161,7 +161,7 @@ class PH_Meta_Box_Viewing_Applicant {
 
                 <label for="">&nbsp;</label>
 
-                <a href="" class="create-viewing-applicant-cancel">Cancel and Search Existing Applicants</a>
+                <a href="" class="create-viewing-applicant-cancel"><?php echo esc_html__( 'Cancel and Search Existing Applicants', 'propertyhive' ); ?></a>
 
             </p>
 
@@ -275,12 +275,12 @@ class PH_Meta_Box_Viewing_Applicant {
 
             if (keyword.length < 3)
             {
-                jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+                jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
                 jQuery('#viewing_search_applicant_results').show();
                 return false;
             }
 
-            jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;">Loading...</div>');
+            jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Loading...', 'propertyhive' ); ?></div>');
             jQuery('#viewing_search_applicant_results').show();
 
             var data = {
@@ -294,7 +294,7 @@ class PH_Meta_Box_Viewing_Applicant {
             {
                 if (response == '' || response.length == 0)
                 {
-                    jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+                    jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
                 }
                 else
                 {
