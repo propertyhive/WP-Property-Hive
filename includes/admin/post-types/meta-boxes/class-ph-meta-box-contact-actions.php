@@ -611,7 +611,7 @@ jQuery(document).ready(function($)
 		}*/
 
 		$(this).attr('disabled', 'disabled');
-		$(this).text('<?php echo __( 'Booking...', 'propertyhive' ); ?>');
+		$(this).text('Booking...');
 
 		// Validation passed. Submit form
 		var data = {
@@ -779,7 +779,7 @@ jQuery(document).ready(function($)
 		}
 
 		$(this).attr('disabled', 'disabled');
-		$(this).text('<?php echo __( 'Saving...', 'propertyhive' ); ?>');
+		$(this).text('Saving...');
 
 		// Validation passed. Submit form
 		var data = {
