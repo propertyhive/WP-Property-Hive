@@ -390,7 +390,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#viewing_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+			$('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
 			$('#viewing_search_applicant_results').show();
 			return false;
 		}
@@ -407,7 +407,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'<br><a href="new-applicant" data-name="' + keyword + '">Add as new applicant?</a></div>');
+	        	$('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'<br><a href="new-applicant" data-name="' + keyword + '">Add as new applicant?</a></div>');
 	        }
 	        else
 	        {
@@ -487,7 +487,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#viewing_search_negotiator_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+			$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
 			$('#viewing_search_negotiator_results').show();
 			return false;
 		}
@@ -503,7 +503,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_negotiator_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+	        	$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
 	        }
 	        else
 	        {
@@ -626,11 +626,11 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Viewing</a>');
+        		$('#success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Viewing', 'propertyhive' ); ?></a>');
         		
         		for ( var i in response.success.applicant_contacts )
         		{
-        			$('#success_actions').append('<a href="' + response.success.applicant_contacts[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Applicant - ' + response.success.applicant_contacts[i].post_title + '</a>');
+        			$('#success_actions').append('<a href="' + response.success.applicant_contacts[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Applicant - ', 'propertyhive' ); ?>' + response.success.applicant_contacts[i].post_title + '</a>');
         		}
 
         		$('#action_panel_book_viewing').stop().fadeOut(300, function()
@@ -640,7 +640,7 @@ jQuery(document).ready(function($)
         	}
 
         	$(that).attr('disabled', false);
-        	$(that).text('Book Viewing');
+        	$(that).text('<?php echo __( 'Book Viewing', 'propertyhive' ); ?>');
         });
 	});
 
@@ -727,7 +727,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#offer_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+			$('#offer_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
 			$('#offer_search_applicant_results').show();
 			return false;
 		}
@@ -743,7 +743,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#offer_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'<br><a href="new-applicant" data-name="' + keyword + '">Add as new applicant?</a></div>');
+	        	$('#offer_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'<br><a href="new-applicant" data-name="' + keyword + '"><?php echo esc_html__( 'Add as new applicant?', 'propertyhive' ); ?></a></div>');
 	        }
 	        else
 	        {
@@ -843,7 +843,7 @@ jQuery(document).ready(function($)
 		}
 
 		$(this).attr('disabled', 'disabled');
-		$(this).text('Saving...');
+		$(this).text('<?php echo __( 'Saving...', 'propertyhive' ); ?>');
 
 		// Validation passed. Submit form
 		var data = {
@@ -871,11 +871,11 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<a href="' + response.success.offer.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Offer</a>');
+        		$('#success_actions').append('<a href="' + response.success.offer.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Offer', 'propertyhive' ); ?></a>');
         		
         		for ( var i in response.success.applicant_contacts )
         		{
-        			$('#success_actions').append('<a href="' + response.success.applicant_contacts[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Applicant - ' + response.success.applicant_contacts[i].post_title + '</a>');
+        			$('#success_actions').append('<a href="' + response.success.applicant_contacts[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Applicant - ', 'propertyhive' ); ?>' + response.success.applicant_contacts[i].post_title + '</a>');
         		}
 
         		$('#action_panel_record_offer').stop().fadeOut(300, function()
@@ -885,7 +885,7 @@ jQuery(document).ready(function($)
         	}
 
         	$(that).attr('disabled', false);
-        	$(that).text('Record Offer');
+        	$(that).text('<?php echo __( 'Record Offer', 'propertyhive' ); ?>');
         });
 	});
 });
@@ -922,7 +922,7 @@ function viewing_update_selected_negotiators()
 	}
 	else
 	{
-		jQuery('#viewing_selected_negotiators').html('<ul><li><em>Unattended</em></li></ul>');
+		jQuery('#viewing_selected_negotiators').html('<ul><li><em><?php echo esc_html__( 'Unattended', 'propertyhive' ); ?></em></li></ul>');
 		jQuery('#viewing_selected_negotiators').show();
 	}
 }
