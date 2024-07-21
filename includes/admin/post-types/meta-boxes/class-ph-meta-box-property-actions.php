@@ -843,7 +843,7 @@ jQuery(document).ready(function($)
 		}
 
 		$(this).attr('disabled', 'disabled');
-		$(this).text('<?php echo __( 'Saving...', 'propertyhive' ); ?>');
+		$(this).text('Saving...');
 
 		// Validation passed. Submit form
 		var data = {
