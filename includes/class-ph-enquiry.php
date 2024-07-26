@@ -198,6 +198,10 @@ class PH_Enquiry {
 
         $display_parts[] = $property_status;
 
-        return implode( '<br>', array_filter($display_parts) );
+        $display_parts = array_filter($display_parts);
+
+        $display_parts = apply_filters( 'propertyhive_enquiry_list_property_display_parts', $display_parts, $property_id );
+
+        return implode( '<br>', $display_parts );
     }
 }
