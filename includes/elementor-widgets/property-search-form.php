@@ -381,9 +381,15 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			</style>';
 		}
 
-		$original_department = isset($_GET['department']) ? $_GET['department'] : '';
+		$original_department = isset($_GET['department']) ? $_GET['department'] : false;
 		$changed_department = false;
-		if ( isset($settings['default_department']) && !empty($settings['default_department']) && !isset($_GET['department']) )
+		if ( 
+			isset($settings['default_department']) && !empty($settings['default_department']) && 
+			( 
+				!isset($_GET['department']) ||
+				( isset($_GET['department']) && empty($_GET['department']) )
+			)
+		)
 		{
 			$_GET['department'] = $settings['default_department'];
 			$_REQUEST['department'] = $settings['default_department'];
@@ -393,8 +399,16 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		ph_get_search_form( ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) );
 		if ( $changed_department === true )
 		{
-			$_GET['department'] = $original_department;
-			$_REQUEST['department'] = $original_department;
+			if ( $original_department === false )
+			{
+				unset($_GET['department']);
+				unset($_REQUEST['department']);
+			}
+			else
+			{
+				$_GET['department'] = $original_department;
+				$_REQUEST['department'] = $original_department;
+			}
 		}
 	}
 }
