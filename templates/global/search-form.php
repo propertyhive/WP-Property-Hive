@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php do_action( 'propertyhive_after_search_form_controls', $id, $form_controls ); ?>
 
-    <input type="submit" value="<?php echo esc_attr( 'Search', 'propertyhive' ); ?>">
+    <input type="submit" value="<?php echo esc_attr__( 'Search', 'propertyhive' ); ?>">
 
     <?php do_action( 'propertyhive_after_search_form_submit', $id, $form_controls ); ?>
 
