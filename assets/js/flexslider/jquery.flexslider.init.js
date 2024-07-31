@@ -30,7 +30,7 @@ function ph_init_slideshow() {
                 animationLoop: true,
                 slideshow: false,
                 sync: $carousel,
-                smoothHeight: false
+                smoothHeight: true
             });
 
             // Ensure all images in the carousel are loaded before adjusting heights
