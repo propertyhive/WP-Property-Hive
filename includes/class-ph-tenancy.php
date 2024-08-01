@@ -116,7 +116,9 @@ class PH_Tenancy {
         $prefix = ( ($currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
         $suffix = ( (!$currency['currency_prefix']) ? $currency['currency_symbol'] : '' );
 
-        return ( ( $amount != '' ) ? $prefix . ph_display_price_field($this->_rent) : '-' ) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' );
+        $amount = $this->_rent;
+
+        return ( ( $amount != '' ) ? $prefix . ph_display_price_field($amount) : '-' ) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' );
 
     }
 
