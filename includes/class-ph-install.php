@@ -722,6 +722,7 @@ Should you need to cancel or amend this appraisal, please do not hesitate to con
             status varchar(5) NOT NULL,
             send_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
             sent_by bigint(20) unsigned NOT NULL,
+            opens text NULL,
             PRIMARY KEY  (email_id)
         ) $collate;";
 
