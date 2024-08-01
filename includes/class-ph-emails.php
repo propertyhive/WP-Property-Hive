@@ -74,6 +74,65 @@ class PH_Emails {
 		add_action( 'admin_init', array( $this, 'run_custom_email_cron' ), 10, 1 );
 
 		add_action( 'init', array( $this, 'check_email_queue_is_scheduled'), 99 );
+
+		add_action( 'init', array( $this, 'add_tracking_endpoint' )  );
+
+		add_action( 'template_redirect', array( $this, 'handle_email_open_tracking' ) );
+	}
+
+	public function handle_email_open_tracking() 
+	{
+	    if (get_query_var('email_open_contact_id') && get_query_var('email_open_email_id')) 
+	    {
+	        $contact_id = intval(get_query_var('email_open_contact_id'));
+	        $email_id = intval(get_query_var('email_open_email_id'));
+
+	        if ($contact_id && $email_id) 
+	        {
+	            // Log the email open event in the CRM system
+	            $this->log_email_open($contact_id, $email_id);
+	        }
+
+	        // Return a 1x1 transparent pixel
+	        header('Content-Type: image/gif');
+	        echo base64_decode('R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
+	        exit;
+	    }
+	}
+
+	private function log_email_open($contact_id, $email_id) 
+	{
+	    global $wpdb;
+
+	    $table_name = $wpdb->prefix . 'ph_process_email_log';
+
+	    // Get the current value of the 'opens' column
+	    $current_opens = $wpdb->get_var($wpdb->prepare(
+	        "SELECT opens FROM $table_name WHERE contact_id = %d AND email_id = %d",
+	        $contact_id, $email_id
+	    ));
+
+	    // If there are existing opens, unserialize them
+	    $opens_array = $current_opens ? unserialize($current_opens) : array();
+
+	    // Add the new open time in UTC format
+	    $opens_array[] = gmdate('Y-m-d H:i:s');
+
+	    // Serialize the array back to a string
+	    $opens_serialized = serialize($opens_array);
+
+	    // Update the 'opens' column with the new serialized array
+	    $wpdb->update($table_name, array(
+	        'opens' => $opens_serialized
+	    ), array(
+	        'contact_id' => $contact_id,
+	        'email_id' => $email_id
+	    ));
+	}
+
+	public function add_tracking_endpoint() 
+	{
+	    add_rewrite_rule('email-open/([^/]+)/([^/]+)/?', 'index.php?email_open_contact_id=$matches[1]&email_open_email_id=$matches[2]', 'top');
 	}
 
 	public function check_email_queue_is_scheduled()
@@ -234,6 +293,8 @@ class PH_Emails {
 				lock_id = '" . $lock_id . "'
 		");
 
+		$track_opens = get_option( 'propertyhive_track_email_opens', '' );
+
 		foreach ( $emails_to_send as $email_to_send ) 
 		{
 			$email_id = $email_to_send->email_id;
@@ -256,6 +317,13 @@ class PH_Emails {
             {
                 $body = gzuncompress($body);
             }
+
+            // Append tracking URL to body so we can record it being opened, if setting enabled
+            if ( $track_opens == 'yes' )
+            {
+	            $tracking_url = home_url('/email-open/' . $email_to_send->contact_id . '/' . $email_id . '/');
+	            $body .= '<img src="' . esc_url($tracking_url) . '" width="1" height="1" style="display:none;">';
+	        }
 
         	$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $body, $email_to_send->contact_id ) ) );
 			
