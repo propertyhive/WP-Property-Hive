@@ -980,8 +980,6 @@ class PH_Settings_General extends PH_Settings_Page {
                     }
                 }
             }
-
-			flush_rewrite_rules();
 		}
 	}
 
