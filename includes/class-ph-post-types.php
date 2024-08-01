@@ -46,7 +46,17 @@ class PH_Post_types {
         add_action( 'propertyhive_update_address_concatenated', array( __CLASS__, 'update_address_concatenated' ) );
 
         add_filter( 'get_terms', array( $this, 'put_terms_in_order' ), 10, 4 );
+
+        add_action( 'propertyhive_after_register_post_types', array( __CLASS__, 'maybe_flush_rewrite_rules' ) );
 	}
+
+    public static function maybe_flush_rewrite_rules()
+    {
+        if ( 'yes' === get_option( 'propertyhive_queue_flush_rewrite_rules' ) ) {
+            update_option( 'propertyhive_queue_flush_rewrite_rules', 'no' );
+            flush_rewrite_rules();
+        }
+    }
 
     public static function register_post_statuses()
     {

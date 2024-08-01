@@ -66,17 +66,9 @@ class PH_Admin_Settings {
 	    do_action( 'propertyhive_update_options_' . $current_tab );
 	    do_action( 'propertyhive_update_options' );
 
-    	// Clear any unwanted data
-		//ph_delete_property_transients();
-		//delete_transient( 'propertyhive_cache_excluded_uris' );
-
 		self::add_message( __( 'Your settings have been saved.', 'propertyhive' ) );
-		//self::check_download_folder_protection();
 
-		// Re-add endpoints and flush rules
-		//PH()->query->init_query_vars();
-		//PH()->query->add_endpoints();
-		flush_rewrite_rules();
+		update_option( 'propertyhive_queue_flush_rewrite_rules', 'yes' );
 
 		do_action( 'propertyhive_settings_saved' );
 	}
