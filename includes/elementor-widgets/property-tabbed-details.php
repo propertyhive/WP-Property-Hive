@@ -108,6 +108,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 							'features' => __( 'Features', 'propertyhive' ),
 							'summary_description' => __( 'Summary Description', 'propertyhive' ),
 							'full_description' => __( 'Full Description', 'propertyhive' ),
+							'gallery' => __( 'Gallery', 'propertyhive' ),
 							'floorplan' => __( 'Floorplans', 'propertyhive' ),
 							'brochure' => __( 'Brochures', 'propertyhive' ),
 							'epc' => __( 'EPCs', 'propertyhive' ),
@@ -306,6 +307,28 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		{
 			switch ( $display )
 			{
+				case "gallery":
+				{
+					if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
+        			{
+        				$photo_urls = $property->photo_urls;
+			            if ( !is_array($photo_urls) ) { $photo_urls = array(); }
+
+			            if ( !empty($photo_urls) )
+						{
+							return true;
+						}
+        			}
+        			else
+        			{
+						$attachment_ids = $property->get_gallery_attachment_ids();
+						if ( !empty($attachment_ids) )
+						{
+							return true;
+						}
+					}
+					break;
+				}
 				case "floorplan":
 				{
 					if ( get_option('propertyhive_floorplans_stored_as', '') == 'urls' )
@@ -444,6 +467,10 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 								{
 									$onclick .= 'setTimeout(function() { initialize_property_street_view(); }, 10);';
 								}
+								if ( in_array('gallery', $item['tab_display']) )
+								{
+									$onclick .= 'setTimeout(function() { jQuery(window).trigger(\'resize\'); }, 10);';
+								}
 								$onclick = apply_filters( 'propertyhive_elementor_tabbed_details_tab_onclick', $onclick, $property, $item );
 
 								$this->add_render_attribute( $tab_title_setting_key, [
@@ -469,28 +496,28 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 							$show_tab = $this->show_tab($item);
 							if ($show_tab)
 							{
-							$tab_count = $index + 1;
+								$tab_count = $index + 1;
 
-							$tab_content_setting_key = $this->get_repeater_setting_key( 'tab_content', 'tabs', $index );
+								$tab_content_setting_key = $this->get_repeater_setting_key( 'tab_content', 'tabs', $index );
 
-							$tab_title_mobile_setting_key = $this->get_repeater_setting_key( 'tab_title_mobile', 'tabs', $tab_count );
+								$tab_title_mobile_setting_key = $this->get_repeater_setting_key( 'tab_title_mobile', 'tabs', $tab_count );
 
-							$this->add_render_attribute( $tab_content_setting_key, [
-								'id' => 'elementor-tab-content-' . $id_int . $tab_count,
-								'class' => [ 'elementor-tab-content', 'elementor-clearfix' ],
-								'data-tab' => $tab_count,
-								'role' => 'tabpanel',
-								'aria-labelledby' => 'elementor-tab-title-' . $id_int . $tab_count,
-							] );
+								$this->add_render_attribute( $tab_content_setting_key, [
+									'id' => 'elementor-tab-content-' . $id_int . $tab_count,
+									'class' => [ 'elementor-tab-content', 'elementor-clearfix' ],
+									'data-tab' => $tab_count,
+									'role' => 'tabpanel',
+									'aria-labelledby' => 'elementor-tab-title-' . $id_int . $tab_count,
+								] );
 
-							$this->add_render_attribute( $tab_title_mobile_setting_key, [
-								'class' => [ 'elementor-tab-title', 'elementor-tab-mobile-title' ],
-								'tabindex' => $id_int . $tab_count,
-								'data-tab' => $tab_count,
-								'role' => 'tab',
-							] );
+								$this->add_render_attribute( $tab_title_mobile_setting_key, [
+									'class' => [ 'elementor-tab-title', 'elementor-tab-mobile-title' ],
+									'tabindex' => $id_int . $tab_count,
+									'data-tab' => $tab_count,
+									'role' => 'tab',
+								] );
 
-							$this->add_inline_editing_attributes( $tab_content_setting_key, 'advanced' );
+								$this->add_inline_editing_attributes( $tab_content_setting_key, 'advanced' );
 						?>
 						<div <?php echo $this->get_render_attribute_string( $tab_title_mobile_setting_key ); ?>><?php echo $item['tab_title']; ?></div>
 						<div <?php echo $this->get_render_attribute_string( $tab_content_setting_key ); ?>><?php
@@ -511,6 +538,65 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 									case "full_description":
 									{
 										propertyhive_template_single_description();
+										break;
+									}
+									case "gallery":
+									{
+										echo '<style type="text/css">
+											.tabbed-gallery-container {
+												
+											}
+											.tabbed-gallery {
+												display: grid;
+											    grid-template-columns: repeat(4, 1fr); /* 4 items per row */
+											    gap: 10px;
+											}
+											.tabbed-gallery a {  }
+											.tabbed-gallery a img {
+												width: 100%; /* Ensure the images fill their grid cell */
+											    height: auto; /* Maintain aspect ratio */
+											    display: block; /* Ensure no extra space below images */
+											}
+										</style>';
+										if ( get_option('propertyhive_images_stored_as', '') == 'urls' )
+					        			{
+					        				$photo_urls = $property->photo_urls;
+								            if ( !is_array($photo_urls) ) { $photo_urls = array(); }
+
+								            if ( !empty($photo_urls) )
+											{
+												echo '<div class="tabbed-gallery">';
+
+												foreach ( $photo_urls as $photo )
+												{
+													echo '<a href="' . $photo['url'] . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . $photo['url'] . '" alt=""></a>';
+												}
+
+												echo '</div>';
+											}
+					        			}
+					        			else
+					        			{
+											$gallery_attachment_ids = $property->get_gallery_attachment_ids();
+
+											if ( !empty($gallery_attachment_ids) )
+											{
+												echo '<div class="tabbed-gallery">';
+
+												foreach ( $gallery_attachment_ids as $attachment_id )
+												{
+													$image_medium_url = '';
+													$image = wp_get_attachment_image_src( $attachment_id, 'medium' );
+													if ( $image !== false )
+													{
+														$image_medium_url = $image[0];
+													}
+													echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . $image_medium_url . '" alt=""></a>';
+												}
+
+												echo '</div>';
+											}
+										}
 										break;
 									}
 									case "floorplan":
@@ -729,6 +815,20 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 				{
 					jQuery(this).attr('data-widget_type', 'tabs.default');
 				});
+			});
+
+			jQuery(window).on('load', function()
+			{
+				jQuery(window).trigger('resize');
+			});
+
+			jQuery(window).on('resize', function()
+			{
+				jQuery('.tabbed-gallery img').each(function()
+				{
+					var ratio = 3/4;
+					jQuery(this).height( jQuery(this).width() * ratio );
+				})
 			});
 		</script>
 		<?php
