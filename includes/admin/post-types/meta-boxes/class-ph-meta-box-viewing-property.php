@@ -57,14 +57,14 @@ class PH_Meta_Box_Viewing_Property {
                 {
                     $owner = new PH_Contact((int)$owner_contact_id);
                     echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '" data-viewing-owner-id="' . $owner_contact_id . '" data-viewing-owner-name="' . get_the_title($owner_contact_id, '') . '">' . get_the_title($owner_contact_id) . '</a><br>';
-                    echo 'Telephone: ' . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
-                    echo 'Email: ' . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
+                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
+                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
                     echo '<br><br>';
                 }
             }
             else
             {
-                echo 'No ' . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified';
+                echo __('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . __(' specified', 'propertyhive');
             }
                 
             echo '</p>';
@@ -168,12 +168,12 @@ function viewing_perform_property_search()
 
     if (keyword.length < 3)
     {
-        jQuery('#viewing_search_property_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+        jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
         jQuery('#viewing_search_property_results').show();
         return false;
     }
 
-    jQuery('#viewing_search_property_results').html('<div style="padding:10px;">Loading...</div>');
+    jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Loading...', 'propertyhive' ); ?></div>');
     jQuery('#viewing_search_property_results').show();
 
     var data = {
@@ -186,7 +186,7 @@ function viewing_perform_property_search()
     {
         if (response == '' || response.length == 0)
         {
-            jQuery('#viewing_search_property_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+            jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
         }
         else
         {
