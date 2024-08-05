@@ -250,7 +250,7 @@ jQuery(document).ready(function($)
 
         if (keyword.length < 3)
         {
-            $('#appraisal_search_property_owner_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
+            $('#appraisal_search_property_owner_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
             $('#appraisal_search_property_owner_results').show();
             return false;
         }
