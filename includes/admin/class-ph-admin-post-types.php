@@ -786,7 +786,9 @@ class PH_Admin_Post_Types {
             $output .= '</select>';
         }
 
-        echo $output;
+        $output .= $this->date_range_filter('Date Created');
+
+        echo apply_filters( 'propertyhive_contact_filters', $output );
     }
     
     /**
@@ -1370,6 +1372,8 @@ class PH_Admin_Post_Types {
                     'compare' => 'LIKE'
                 );
             }
+
+            $vars = $this->filter_by_date_range($vars, 'date_query');
         }
         elseif ( 'enquiry' === $typenow )
         {

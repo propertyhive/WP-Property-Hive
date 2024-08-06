@@ -195,6 +195,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		$columns['name'] = __( 'Name', 'propertyhive' );
         $columns['address'] = __( 'Address', 'propertyhive' );
         $columns['contact_details'] = __( 'Contact Details', 'propertyhive' );
+        $columns['date'] = __( 'Date Created', 'propertyhive' );
 
 		return array_merge( $columns, $existing_columns );
 	}
@@ -382,33 +383,6 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		$views['byorder'] = '<a href="'. $query_string . '" class="' . esc_attr( $class ) . '">' . __( 'Sort Contacts', 'propertyhive' ) . '</a>';
 
 		return $views;
-	}
-
-	/**
-	 * Show a category filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'contact' != $typenow ) {
-			return;
-		}
-
-
-		echo apply_filters( 'propertyhive_contact_filters', $output );
-	}
-
-	/**
-	 * Filter the contacts in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function contact_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'contact' == $typenow ) {
-			
-		}
 	}
 
 	/**
