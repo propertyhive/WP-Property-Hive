@@ -2,8 +2,8 @@
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.6
-Stable tag: 2.0.18
+Tested up to: 6.6.1
+Stable tag: 2.0.19
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,18 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.19 - 2024-08-06 =
+* Added 'Date Created' column to main contacts list
+* Added 'Date Created' filter to main contacts list
+* Added ability to create an enquiry against multiple properties at once when creating enquiry through backend
+* Improve efficiency of searching for properties when adding enquiry
+* Added option of adding 'Gallery' to Elementor Tabbed Details widget
+* Further tweaks to slideshow, inparticular calculation of thumbnail heights
+* Added new filter 'propertyhive_enquiry_list_property_display_parts' to customise property data shown in enquiry grids
+* Corrected rent not showing in property tenancies grids
+* Corrected department getting overwritten when two Elementor search forms are used on same page with different default departments
+* Declared compatibility for WordPress 6.6.1
 
 = 2.0.18 - 2024-07-18 =
 * Added new 'Archive' ability to all Property Hive records. Once a record is archived it will no longer show in searches or lists and are then only available by filtering by 'Archived' from the main posts list
