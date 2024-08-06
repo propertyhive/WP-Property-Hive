@@ -121,7 +121,7 @@ jQuery(document).ready(function($)
     {
         e.preventDefault();
 
-        viewing_selected_properties = []; // reset to only allow one property for now
+        //viewing_selected_properties = []; // reset to only allow one property for now
         viewing_selected_properties.push({ id: $(this).attr('href'), post_title: $(this).text(), owner_id: $(this).attr('data-viewing-owner-id'), owner_name: $(this).attr('data-viewing-owner-name') });
 
         $('#viewing_search_property_results').html('');
@@ -199,13 +199,17 @@ function viewing_update_selected_properties()
     if ( viewing_selected_properties.length > 0 )
     {
         jQuery('#viewing_selected_properties').html('<ul></ul>');
+        var hidden_field_values = new Array();
         for ( var i in viewing_selected_properties )
         {
             jQuery('#viewing_selected_properties ul').append('<li><a href="' + viewing_selected_properties[i].id + '" class="viewing-remove-property" style="color:inherit; text-decoration:none;" data-viewing-owner-id="' + viewing_selected_properties[i].owner_id + '" data-viewing-owner-name="' + viewing_selected_properties[i].owner_name + '"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_properties[i].post_title + '</li>');
-
-            jQuery('#property_id').val(viewing_selected_properties[i].id);
+            if (hidden_field_values.indexOf(viewing_selected_properties[i].id) === -1) 
+            {
+                hidden_field_values.push(viewing_selected_properties[i].id);
+            }
         }
         jQuery('#viewing_selected_properties').show();
+        jQuery('#property_id').val(hidden_field_values.join("|"));
     }
     else
     {
@@ -398,7 +402,16 @@ function viewing_update_selected_properties()
             update_post_meta( $post_id, 'email', ph_clean($_POST['email']) );
             update_post_meta( $post_id, 'telephone', ph_clean($_POST['telephone']) );
             update_post_meta( $post_id, 'body', sanitize_textarea_field($_POST['body']) );
-            if ( isset($_POST['property_id']) && $_POST['property_id'] != '' ) { update_post_meta( $post_id, 'property_id', (int)$_POST['property_id'] ); }
+
+            delete_post_meta( $post_id, 'property_id' );
+            if ( isset($_POST['property_id']) && $_POST['property_id'] != '' ) 
+            {
+                $explode_property_id = explode("|", sanitize_text_field($_POST['property_id']));
+                foreach ( $explode_property_id as $property_id )
+                {
+                    add_post_meta( $post_id, 'property_id', (int)$property_id ); 
+                }
+            }
         }
     }
 
