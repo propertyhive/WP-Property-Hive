@@ -95,6 +95,7 @@ var viewing_selected_properties = [<?php
     } 
 ?>];
 var viewing_search_properties_timeout;
+var viewing_search_properties_xhr = jQuery.ajax({});
 
 jQuery(document).ready(function($)
 {
@@ -172,7 +173,8 @@ function viewing_perform_property_search()
         keyword:        keyword,
         security:       '<?php echo wp_create_nonce( 'search-properties' ); ?>',
     };
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    viewing_search_properties_xhr.abort(); // cancel previous request
+    viewing_search_properties_xhr = jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
     {
         if (response == '' || response.length == 0)
         {
