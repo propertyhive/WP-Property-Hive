@@ -2805,6 +2805,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     case "price-qualifier-delete":
                     case "sale-by-delete":
                     case "tenure-delete":
+                    case "commercial-tenure-delete":
                     case "furnished-delete":
                     case "management-key-date-type-delete":
                     case "marketing-flag-delete":
