@@ -51,6 +51,17 @@ class PH_Admin_Matching_Applicants {
 
                         $subject = get_option( 'propertyhive_property_match_default_email_subject', '' );
                         $body = get_option( 'propertyhive_property_match_default_email_body', '' );
+
+                        $from_email_option = get_option( 'propertyhive_property_match_default_from', '' );
+                        if( $from_email_option == 'default_from_email' )
+                        {
+                            $from_email_address = get_option('propertyhive_email_from_address', '');
+                        }
+                        else
+                        {
+                            $current_user = wp_get_current_user();
+                            $from_email_address = $current_user->user_email;
+                        }
 					}
 
                     $nothing_to_send = apply_filters( 'propertyhive_applicant_match_nothing_to_send', $nothing_to_send );

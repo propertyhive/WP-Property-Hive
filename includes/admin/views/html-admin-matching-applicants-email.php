@@ -55,14 +55,7 @@ $current_user = wp_get_current_user();
     <tr valign="top">
         <th scope="row" class="titledesc"><?php echo __( 'From Email Address', 'propertyhive' ); ?></th>
         <td class="forminp">
-            <input type="text" name="from_email_address" value="<?php
-
-                if ( trim($current_user->user_email) != '' )
-                {
-                    echo $current_user->user_email;
-                }
-
-            ?>" style="width:100%;">
+            <input type="text" name="from_email_address" value="<?php echo trim($from_email_address); ?>" style="width:100%;">
         </td>
     </tr>
 
