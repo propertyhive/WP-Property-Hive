@@ -221,7 +221,7 @@ class PH_Shortcodes {
 			$base_department = ph_get_custom_department_based_on($base_department);
 		}
 
-		if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
+		if ( isset($atts['department']) && ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' ) && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
         {
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
@@ -242,7 +242,7 @@ class PH_Shortcodes {
             );
         }
 
-        if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['maximum_price']) && $atts['maximum_price'] != '' )
+        if ( isset($atts['department']) && ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' ) && isset($atts['maximum_price']) && $atts['maximum_price'] != '' )
         {
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
