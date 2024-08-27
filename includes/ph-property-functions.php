@@ -554,7 +554,7 @@ function get_heating_types()
 
 function get_heating_type( $type )
 {
-	$types = get_broadband_types();
+	$types = get_heating_types();
 
 	if ( isset($types[$type]) )
 	{
