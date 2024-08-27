@@ -2324,7 +2324,7 @@ class PH_AJAX {
 
         foreach ($enquiry_meta as $key => $value)
         {
-            if ( strpos(strtolower($key), 'name') !== false && $value[0] != '' )
+            if ( strpos(strtolower($key), 'name') !== false && strpos(strtolower($key), 'property') === false && $value[0] != '' )
             {
                 if ( $name === false )
                 {
