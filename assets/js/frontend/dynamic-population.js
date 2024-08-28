@@ -32,7 +32,7 @@ function ph_populate_subsequent_dropdowns(init)
 					jQuery(this).find('select[data-dynamic-population-level=\'' + ( i + 1 ) + '\']').html('');
 					jQuery(this).find('select[data-dynamic-population-level=\'' + ( i + 1 ) + '\']').append(jQuery('<option>', { 
 				        value: '',
-				        text : ''
+				        text : 'Any'
 				    }));
 
 					// Sort options by label
