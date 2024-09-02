@@ -405,6 +405,7 @@ class PH_Rest_Api {
 			'price_actual',
 			'price',
 			'price_formatted',
+			'rent_frequency',
 			'currency',
 			'price_qualifier',
 			'sale_by',
