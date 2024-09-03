@@ -18,6 +18,15 @@ class PH_Property {
     /** @public int Property (post) ID */
     public $id;
 
+    /** @public string Property (post) Title */
+    public $post_title;
+
+    /** @public string Property (post) Status */
+    public $post_status;
+
+    /** @public string Property (post) Excerpt */
+    public $post_excerpt;
+
     /**
      * Get the property if ID is passed, otherwise the property is new and empty.
      *
