@@ -590,7 +590,7 @@ class PH_Property {
             }
         }
 
-        return $price;
+        return apply_filters( 'propertyhive_commercial_price_output', $price, $this );
     }
 
     /**
@@ -645,7 +645,7 @@ class PH_Property {
             }
         }
 
-        return $rent;
+        return apply_filters( 'propertyhive_commercial_rent_output', $rent, $this );
     }
 
     public function get_formatted_floor_area( ) {
