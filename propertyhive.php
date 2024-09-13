@@ -49,6 +49,13 @@ if ( ! class_exists( 'PropertyHive' ) )
         public $query = null;
 
         /**
+         * REST API instance.
+         *
+         * @var PH_Rest_Api
+         */
+        public $rest_api = null;
+
+        /**
          * Email instance.
          *
          * @var PH_Emails
