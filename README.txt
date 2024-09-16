@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.6.2
-Stable tag: 2.0.19
+Stable tag: 2.0.20
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,22 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.20 - 2024-09-16 =
+* Added rent frequency to list of REST API fields
+* Added filters to customise commercial price/rent output
+* Set default label of cascading dropdowns (location and property type) to 'Any'
+* Sort cascading search dropdowns (location and property type) by name
+* Ignore meta keys with 'property' in when creating new contact from enquiry to prevent contact name containing property name
+* Minimum and maximum price shortcode attributes to also work for lettings
+* Performing an applicant match from a property to take into account 'From Email Address' setting
+* Added Nonce validation to details and registration account forms
+* Corrected heating function calling broadband related function
+* Corrected issue with not being able to delete commercial tenures
+* Added 'src' querstring parameter to Property Hive dashboard news URLs for better analytics
+* Corrected issue with undefined variable warnings on upcoming appointments when no property
+* PHP8.2 compatibility
+* Declared compatibility for WordPress 6.6.2
 
 = 2.0.19 - 2024-08-06 =
 * Added 'Date Created' column to main contacts list
