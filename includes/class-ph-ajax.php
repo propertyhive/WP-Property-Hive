@@ -2674,7 +2674,7 @@ class PH_AJAX {
             {
                 $return[] = array(
                     'title' => esc_html( $item->get_title() ),
-                    'permalink' => esc_url( $item->get_permalink() ),
+                    'permalink' => esc_url( $item->get_permalink() ) . '?src=dashboard',
                     'date' => $item->get_date('F d, Y')
                 );
             }
