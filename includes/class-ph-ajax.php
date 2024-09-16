@@ -2912,8 +2912,14 @@ class PH_AJAX {
                 $key_date = new PH_Key_Date( get_post( get_the_ID() ) );
 
                 $property_id = get_post_meta( get_the_ID(), '_property_id', TRUE );
-                $property = new PH_Property((int)$property_id);
-                $property_edit_link = get_edit_post_link( $property_id );
+                $property_edit_link = '';
+                $property_address = '';
+                if ( !empty($property_id) )
+                {
+                    $property = new PH_Property((int)$property_id);
+                    $property_edit_link = get_edit_post_link( $property_id );
+                    $property_address = $property->get_formatted_full_address();
+                }
 
                 $tenancy_id = get_post_meta( get_the_ID(), '_tenancy_id', TRUE );
                 if ( !empty($tenancy_id) )
@@ -2938,7 +2944,7 @@ class PH_AJAX {
                     'description' => $key_date->description(),
                     'upcoming_overdue_status' => $key_date->status(),
                     'property_edit_link' => $property_edit_link,
-                    'property_address' => $property->get_formatted_full_address(),
+                    'property_address' => $property_address,
                     'due_date_time_formatted' => $due_date->format($date_format),
                 );
             }
