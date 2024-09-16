@@ -165,7 +165,7 @@ jQuery(document).ready(function($)
         {
             is_submitting = true;
             
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_details', 'security': propertyhive_account_params.details_nonce });
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_details', 'ph_account_details_security': propertyhive_account_params.userdetails_nonce });
             
             var form_obj = $(this);
 
@@ -190,6 +190,11 @@ jQuery(document).ready(function($)
                         form_obj.find('#detailsError').fadeIn();
                     }
                 }
+
+                if (response.new_details_nonce) 
+                {
+                    propertyhive_account_params.userdetails_nonce = response.new_details_nonce;
+                }
                 
                 is_submitting = false;
                 
@@ -206,7 +211,7 @@ jQuery(document).ready(function($)
         {
             is_submitting = true;
             
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_requirements', 'security': propertyhive_account_params.requirements_nonce });
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_requirements', 'ph_account_requirements_security': propertyhive_account_params.requirements_nonce });
             
             var form_obj = $(this);
 
@@ -230,6 +235,11 @@ jQuery(document).ready(function($)
                     {
                         form_obj.find('#requirementsError').fadeIn();
                     }
+                }
+
+                if (response.new_requirements_nonce) 
+                {
+                    propertyhive_account_params.requirements_nonce = response.new_requirements_nonce;
                 }
                 
                 is_submitting = false;

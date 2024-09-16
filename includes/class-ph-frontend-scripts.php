@@ -128,7 +128,7 @@ class PH_Frontend_Scripts {
 				'lost_password_nonce'	=> wp_create_nonce( "ph_lost_password" ),
 				'reset_password_nonce'	=> wp_create_nonce( "ph_reset_password" ),
 				'register_nonce'	  	=> wp_create_nonce( "ph_register" ),
-				'details_nonce'	  		=> wp_create_nonce( "ph_details" ),
+				'userdetails_nonce'	  		=> wp_create_nonce( "ph_userdetails" ),
 				'requirements_nonce'	=> wp_create_nonce( "ph_requirements" ),
 			) ) );
 		}

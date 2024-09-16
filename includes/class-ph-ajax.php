@@ -982,11 +982,12 @@ class PH_AJAX {
         $return = array(
             'success' => false,
             'errors' => array(),
+            'new_details_nonce' => wp_create_nonce( "ph_userdetails" ),
         );
 
         // Got an issue with nonce being declined on second submission.
         // Need to sort before putting this back in
-        /*if ( check_ajax_referer( 'ph_details', 'security', false ) === FALSE )
+        if ( check_ajax_referer( 'ph_userdetails', 'ph_account_details_security', false ) === FALSE )
         {
             $return['errors'][] = 'Invalid nonce';
 
@@ -995,7 +996,7 @@ class PH_AJAX {
             
             // Quit out
             die();
-        }*/
+        }
         
         // Validate
         $errors = array();
@@ -1133,11 +1134,12 @@ class PH_AJAX {
         $return = array(
             'success' => false,
             'errors' => array(),
+            'new_requirements_nonce' => wp_create_nonce( "ph_requirements" ),
         );
 
         // Got an issue with nonce being declined on second submission.
         // Need to sort before putting this back in
-        /*if ( check_ajax_referer( 'ph_requirements', 'security', false ) === FALSE )
+        if ( check_ajax_referer( 'ph_requirements', 'ph_account_requirements_security', false ) === FALSE )
         {
             $return['errors'][] = 'Invalid nonce';
 
@@ -1146,7 +1148,7 @@ class PH_AJAX {
             
             // Quit out
             die();
-        }*/
+        }
         
         // Validate
         $errors = array();
