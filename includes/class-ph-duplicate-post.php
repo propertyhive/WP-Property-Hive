@@ -31,6 +31,7 @@ class PH_Duplicate_Post {
 		delete_post_meta( $new_post_id, '_address_concatenated' );
 		delete_post_meta( $new_post_id, '_features_concatenated' );
 		delete_post_meta( $new_post_id, '_descriptions_concatenated' );
+		delete_post_meta( $new_post_id, '_owner_details' );
 
 		$post = get_post( $new_post_id );
 		do_action( "save_post", $new_post_id, $post, false );
