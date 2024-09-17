@@ -161,6 +161,8 @@ function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
     $classes[] = 'department-' . $property->department;
     $classes[] = 'office-' . $property->office_id;
 
+    $classes = array_values($classes);
+
     return $classes;
 }
 
