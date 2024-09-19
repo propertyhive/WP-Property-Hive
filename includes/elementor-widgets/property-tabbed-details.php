@@ -26,6 +26,10 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		return [ 'property hive', 'propertyhive', 'property', 'tab', 'tabs', 'tabbed' ];
 	}
 
+	public function get_style_depends(): array {
+		return [ 'widget-tabs' ];
+	}
+
 	protected function register_controls() {
 
 		$this->start_controls_section(
