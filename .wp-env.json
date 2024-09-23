@@ -1,0 +1,9 @@
+{
+    "plugins": [
+        "https://downloads.wordpress.org/plugin/query-monitor.3.16.4.zip",
+        "https://github.com/propertyhive/WP-Property-Hive-Template-Assistant-Add-On/archive/refs/tags/1.0.55.zip",
+        "https://github.com/propertyhive/WP-Property-Hive-Demo-Data-Add-On/archive/refs/tags/2.0.0.zip",
+        "."
+    ],
+    "themes": [ "https://github.com/propertyhive/honeycomb/archive/refs/tags/1.0.10.zip" ]
+}
