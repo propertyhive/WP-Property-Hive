@@ -366,6 +366,8 @@ class PH_Meta_Box_Contact_Relationships {
                             ) );
                         }
 
+                        $ph_countries = new PH_Countries();
+
                         // Price
                         propertyhive_wp_text_input( array( 
                             'id' => '_applicant_maximum_price_' . $key, 
