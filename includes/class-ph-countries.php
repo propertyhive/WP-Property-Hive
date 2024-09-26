@@ -488,40 +488,36 @@ class PH_Countries {
 				}
 
 				$rent = get_post_meta( $postID, '_rent', true );
-				$rent_frequency = get_post_meta( $postID, '_rent_frequency', true );
+				
+				$converted_price = 0;
+				if ( !empty($rent) && is_numeric($rent) )
+				{
+					$price = $rent; // Stored in pcm
+					$rent_frequency = get_post_meta( $postID, '_rent_frequency', true );
+		            switch ($rent_frequency)
+		            {
+		            	case "pd": { $price = ($rent * 365) / 12; break; }
+	                    case "pppw":
+	                    {
+	                        $bedrooms = get_post_meta( $postID, '_bedrooms', true );
+	                        if ( ( $bedrooms !== FALSE && $bedrooms != 0 && $bedrooms != '' ) && apply_filters( 'propertyhive_pppw_to_consider_bedrooms', true ) == true )
+	                        {
+	                            $price = (($rent * 52) / 12) * $bedrooms;
+	                        }
+	                        else
+	                        {
+	                            $price = ($rent * 52) / 12;
+	                        }
+	                        break;
+	                    }
+	                    case "pw": { $price = ($rent * 52) / 12; break; }
+	                    case "pcm": { $price = $rent; break; }
+	                    case "pq": { $price = ($rent * 4) / 12; break; }
+	                    case "pa": { $price = ($rent / 12); break; }
+		            }
 
-				$price = $rent; // Stored in pcm
-	            switch ($rent_frequency)
-	            {
-	            	case "pd":
-						{ 
-							if(gettype($rent) !== 'integer') {
-								$price = 0;
-								break;
-							}
-							$price = ($rent * 365) / 12; 
-							break; 
-						}
-                    case "pppw":
-                    {
-                        $bedrooms = get_post_meta( $postID, '_bedrooms', true );
-                        if ( ( $bedrooms !== FALSE && $bedrooms != 0 && $bedrooms != '' ) && apply_filters( 'propertyhive_pppw_to_consider_bedrooms', true ) == true )
-                        {
-                            $price = (($rent * 52) / 12) * $bedrooms;
-                        }
-                        else
-                        {
-                            $price = ($rent * 52) / 12;
-                        }
-                        break;
-                    }
-                    case "pw": { $price = ($rent * 52) / 12; break; }
-                    case "pcm": { $price = $rent; break; }
-                    case "pq": { $price = ($rent * 4) / 12; break; }
-                    case "pa": { $price = ($rent / 12); break; }
+	                $converted_price = $this->convert_price_to_gbp( $price, $currency );
 	            }
-
-                $converted_price = $this->convert_price_to_gbp( $price, $currency );
 
 	            update_post_meta( $postID, '_price_actual', $converted_price );
 			}
