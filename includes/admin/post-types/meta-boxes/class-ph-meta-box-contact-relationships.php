@@ -364,13 +364,13 @@ class PH_Meta_Box_Contact_Relationships
             echo '<label for="_price">' . esc_html(__('Default Currency', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
 
             if (count($currencies) > 1) {
-                echo '<select id="_price_currency" name="_price_currency" class="select" style="width:50%; float:left;">';
+                echo '<select id="_applicant_currency_' . $key . '" name="_applicant_currency_' . $key . '" class="select" style="width:50%; float:left;">';
                 foreach ($currencies as $currency_code => $currency_sybmol) {
                     echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
                 }
                 echo '</select>';
             } else {
-                echo '<input type="hidden" name="_price_currency" value="' . esc_attr($selected_currency) . '">';
+                echo '<input type="hidden" id="_applicant_currency_' . $key .'" value="' . esc_attr($selected_currency) . '">';
             }
             echo '</p>';
 
@@ -1031,6 +1031,12 @@ class PH_Meta_Box_Contact_Relationships
 
                 $applicant_profile = array();
                 $applicant_profile['department'] = ph_clean($_POST['_applicant_department_' . $i]);
+
+
+                if($_POST['_applicant_currency_' . $i]) {
+                    $applicant_profile['currency'] = ph_clean($_POST);
+                }
+
                 if ($_POST['_applicant_department_' . $i] == 'residential-sales' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-sales') {
                     $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_maximum_price_' . $i]));
 
