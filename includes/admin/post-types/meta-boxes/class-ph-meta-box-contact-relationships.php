@@ -354,7 +354,7 @@ class PH_Meta_Box_Contact_Relationships
             }
 
             // Cater for when no currency selected or currencies have been updated in settings so existing currency doesn't exist
-            $selected_currency = get_post_meta($post->ID, '_currency', true);
+            $selected_currency = $applicant_profile['_applicant_currency'];
             if ($selected_currency == '' || !isset($currencies[$selected_currency])) {
                 $country = $ph_countries->get_country($default_country);
                 $selected_currency = $country['currency_code'];
@@ -1034,7 +1034,7 @@ class PH_Meta_Box_Contact_Relationships
 
 
                 if($_POST['_applicant_currency_' . $i]) {
-                    $applicant_profile['currency'] = ph_clean($_POST);
+                    $applicant_profile['_applicant_currency'] = ph_clean($_POST['_applicant_currency_'.$i]);
                 }
 
                 if ($_POST['_applicant_department_' . $i] == 'residential-sales' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-sales') {
