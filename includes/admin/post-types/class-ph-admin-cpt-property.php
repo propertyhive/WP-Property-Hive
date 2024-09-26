@@ -672,6 +672,13 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 			update_post_meta( $post_id, '_on_market', ph_clean( $on_market ) );
 		}
 
+		if ( ! empty( $_REQUEST['_featured'] ) ) 
+		{
+			$featured = ph_clean( $_REQUEST['_featured'] );
+			if ( $_REQUEST['_featured'] != 'yes' ) { $featured = ''; } // can only be 'yes' or blank
+			update_post_meta( $post_id, '_featured', ph_clean( $featured ) );
+		}
+
 		if ( ! empty( $_REQUEST['_availability'] ) && is_numeric( $_REQUEST['_availability'] ) ) 
 		{
 			wp_set_post_terms( $post_id, (int)$_REQUEST['_availability'], 'availability' );
