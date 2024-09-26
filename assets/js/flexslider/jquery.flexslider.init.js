@@ -27,24 +27,37 @@ jQuery(window).on('resize', function() {
     }
 });
 
-function ph_init_slideshow() {
-    // The slider being synced must be initialized first
-    jQuery('#carousel').flexslider({
-        animation: "slide",
-        controlNav: false,
-        animationLoop: true,
-        slideshow: false,
-        itemWidth: 150,
-        itemMargin: 5,
-        asNavFor: '#slider'
-    });
+function ph_init_slideshow() 
+{
+    // Get all carousel elements on the page
+    jQuery('[id="slider"]').each(function() 
+    {
+        var slider = jQuery(this);
 
-    jQuery('#slider').flexslider({
-        animation: "slide",
-        controlNav: false,
-        animationLoop: true,
-        slideshow: false,
-        sync: "#carousel",
-        smoothHeight: true
+        // Get the parent container of this carousel
+        var parentContainer = slider.parent();
+
+        // Find the related slider within the same parent container
+        var carousel = parentContainer.find('#carousel');
+
+        // Initialize the carousel and slider within this parent container
+        carousel.flexslider({
+            animation: "slide",
+            controlNav: false,
+            animationLoop: true,
+            slideshow: false,
+            itemWidth: 150,
+            itemMargin: 5,
+            asNavFor: slider
+        });
+
+        slider.flexslider({
+            animation: "slide",
+            controlNav: false,
+            animationLoop: true,
+            slideshow: false,
+            sync: carousel,
+            smoothHeight: true
+        });
     });
 }
