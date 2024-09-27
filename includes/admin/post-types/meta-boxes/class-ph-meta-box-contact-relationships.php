@@ -1073,7 +1073,10 @@ class PH_Meta_Box_Contact_Relationships
                     $applicant_profile['max_rent'] = $rent;
                     $applicant_profile['rent_frequency'] = ph_clean($_POST['_applicant_rent_frequency_' . $i]);
 
-                    $price_actual = $rent; // Used for ordering properties. Stored in pcm
+                    $ph_countries = new PH_Countries();
+
+                    $rent = $ph_countries->convert_price_to_gbp($rent, $applicant_profile['_applicant_currency']);
+
                     if (!empty($rent)) {
                         switch ($_POST['_applicant_rent_frequency_' . $i]) {
                             case "pw": {
