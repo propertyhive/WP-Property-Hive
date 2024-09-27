@@ -525,9 +525,18 @@ class PH_Meta_Box_Contact_Relationships
             $rent_frequency = ((isset($applicant_profile['rent_frequency'])) ? $applicant_profile['rent_frequency'] : '');
             echo '<p class="form-field rent_field ">
                         
-                            <label for="_applicant_maximum_rent_' . esc_attr($key) . '">' . esc_html(__('Maximum Rent', 'propertyhive')) . ' (&pound;)</label>
+                            <label for="_applicant_maximum_rent_' . esc_attr($key) . '">' . esc_html(__('Maximum Rent', 'propertyhive')) . ' (&pound;)</label>';
+                            if (count($currencies) > 1) {
+                                echo '<select id="_applicant_currency_' . $key . '" name="_applicant_currency_' . $key . '" class="select" style="width:auto; float:left;">';
+                                foreach ($currencies as $currency_code => $currency_sybmol) {
+                                    echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                                }
+                                echo '</select>';
+                            } else {
+                                echo '<input type="hidden" id="_applicant_currency_' . $key .'" value="' . esc_attr($selected_currency) . '">';
+                            }
                             
-                            <input type="text" class="" name="_applicant_maximum_rent_' . esc_attr($key) . '" id="_applicant_maximum_rent_' . esc_attr($key) . '" value="' . ((isset($applicant_profile['max_rent'])) ? esc_attr(ph_display_price_field($applicant_profile['max_rent'])) : '') . '" placeholder="" style="width:20%; max-width:150px;">
+                            echo '<input type="text" class="" name="_applicant_maximum_rent_' . esc_attr($key) . '" id="_applicant_maximum_rent_' . esc_attr($key) . '" value="' . ((isset($applicant_profile['max_rent'])) ? esc_attr(ph_display_price_field($applicant_profile['max_rent'])) : '') . '" placeholder="" style="width:20%; max-width:150px;">
                             
                             <select id="_applicant_rent_frequency_' . esc_attr($key) . '" name="_applicant_rent_frequency_' . esc_attr($key) . '" class="select short">
                                 <option value="pw"' . (($rent_frequency == 'pw') ? ' selected' : '') . '>' . esc_html(__('Per Week', 'propertyhive')) . '</option>
