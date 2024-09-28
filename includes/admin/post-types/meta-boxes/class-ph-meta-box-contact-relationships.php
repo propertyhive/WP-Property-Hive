@@ -1078,7 +1078,6 @@ class PH_Meta_Box_Contact_Relationships
                     $applicant_profile['rent_frequency'] = ph_clean($_POST['_applicant_rent_frequency_' . $i]);
 
                     $ph_countries = new PH_Countries();
-                    $rent = $ph_countries->convert_price_to_gbp($rent, $applicant_profile['applicant_currency']);
 
                     if (!empty($rent)) {
                         switch ($_POST['_applicant_rent_frequency_' . $i]) {
@@ -1100,6 +1099,9 @@ class PH_Meta_Box_Contact_Relationships
                             }
                         }
                     }
+
+                    $price_actual = $ph_countries->convert_price_to_gbp($price_actual, $applicant_profile['applicant_currency']);
+
                     $applicant_profile['max_price_actual'] = $price_actual;
                 }
 
