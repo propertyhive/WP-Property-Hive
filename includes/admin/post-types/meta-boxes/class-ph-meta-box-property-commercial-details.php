@@ -99,9 +99,9 @@ class PH_Meta_Box_Property_Commercial_Details {
         if ( count($currencies) > 1 )
         {
             echo '<select id="_commercial_price_currency" name="_commercial_price_currency" class="select" style="width:auto; float:left;">';
-            foreach ($currencies as $currency_code => $currency_sybmol)
+            foreach ($currencies as $currency_code => $currency_symbol)
             {
-                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_sale_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_sale_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
             }
             echo '</select>';
         }
@@ -226,9 +226,9 @@ class PH_Meta_Box_Property_Commercial_Details {
         if ( count($currencies) > 1 )
         {
             echo '<select id="_commercial_rent_currency" name="_commercial_rent_currency" class="select" style="width:auto; float:left;">';
-            foreach ($currencies as $currency_code => $currency_sybmol)
+            foreach ($currencies as $currency_code => $currency_symbol)
             {
-                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_rent_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_rent_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
             }
             echo '</select>';
         }
