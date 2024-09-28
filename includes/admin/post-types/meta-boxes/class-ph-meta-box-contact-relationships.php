@@ -364,13 +364,13 @@ class PH_Meta_Box_Contact_Relationships
             echo '<label for="_price">' . esc_html(__('Default Currency', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
 
             if (count($currencies) > 1) {
-                echo '<select id="_applicant_currency_' . $key . '" name="_applicant_currency_' . $key . '" class="select" style="width:50%; float:left;">';
-                foreach ($currencies as $currency_code => $currency_sybmol) {
-                    echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<select id="applicant_currency_' . $key . '" name="applicant_currency_' . $key . '" class="select" style="width:50%; float:left;">';
+                foreach ($currencies as $currency_code => $currency_symbol) {
+                    echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
                 }
                 echo '</select>';
             } else {
-                echo '<input type="hidden" id="_applicant_currency_' . $key .'" value="' . esc_attr($selected_currency) . '">';
+                echo '<input type="hidden" id="applicant_currency_' . $key .'" value="' . esc_attr($selected_currency) . '">';
             }
             echo '</p>';
 
@@ -392,7 +392,7 @@ class PH_Meta_Box_Contact_Relationships
             $percentage_higher = get_option('propertyhive_applicant_match_price_range_percentage_higher', '');
 
             if(gettype($applicant_profile) !== 'string') {
-                $selected_currency = $applicant_profile['_applicant_currency'];
+                $selected_currency = $applicant_profile['applicant_currency'];
             }
 
             if ($percentage_lower != '' && $percentage_higher != '') {
@@ -531,13 +531,13 @@ class PH_Meta_Box_Contact_Relationships
                         
                             <label for="_applicant_maximum_rent_' . esc_attr($key) . '">' . esc_html(__('Maximum Rent', 'propertyhive')) . ' (&pound;)</label>';
                             if (count($currencies) > 1) {
-                                echo '<select id="_applicant_currency_' . $key . '" name="_applicant_currency_' . $key . '" class="select" style="width:auto; float:left;">';
-                                foreach ($currencies as $currency_code => $currency_sybmol) {
-                                    echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                                echo '<select id="applicant_currency_' . $key . '" name="applicant_currency_' . $key . '" class="select" style="width:auto; float:left;">';
+                                foreach ($currencies as $currency_code => $currency_symbol) {
+                                    echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
                                 }
                                 echo '</select>';
                             } else {
-                                echo '<input type="hidden" id="_applicant_currency_' . $key .'" value="' . esc_attr($selected_currency) . '">';
+                                echo '<input type="hidden" id="applicant_currency_' . $key .'" value="' . esc_attr($selected_currency) . '">';
                             }
                             
                             echo '<input type="text" class="" name="_applicant_maximum_rent_' . esc_attr($key) . '" id="_applicant_maximum_rent_' . esc_attr($key) . '" value="' . ((isset($applicant_profile['max_rent'])) ? esc_attr(ph_display_price_field($applicant_profile['max_rent'])) : '') . '" placeholder="" style="width:20%; max-width:150px;">
@@ -1046,8 +1046,8 @@ class PH_Meta_Box_Contact_Relationships
                 $applicant_profile['department'] = ph_clean($_POST['_applicant_department_' . $i]);
 
 
-                if($_POST['_applicant_currency_' . $i]) {
-                    $applicant_profile['_applicant_currency'] = ph_clean($_POST['_applicant_currency_'.$i]);
+                if($_POST['applicant_currency_' . $i]) {
+                    $applicant_profile['applicant_currency'] = ph_clean($_POST['applicant_currency_'.$i]);
                 }
 
                 if ($_POST['_applicant_department_' . $i] == 'residential-sales' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-sales') {
@@ -1078,7 +1078,7 @@ class PH_Meta_Box_Contact_Relationships
                     $applicant_profile['rent_frequency'] = ph_clean($_POST['_applicant_rent_frequency_' . $i]);
 
                     $ph_countries = new PH_Countries();
-                    $rent = $ph_countries->convert_price_to_gbp($rent, $applicant_profile['_applicant_currency']);
+                    $rent = $ph_countries->convert_price_to_gbp($rent, $applicant_profile['applicant_currency']);
 
                     if (!empty($rent)) {
                         switch ($_POST['_applicant_rent_frequency_' . $i]) {
