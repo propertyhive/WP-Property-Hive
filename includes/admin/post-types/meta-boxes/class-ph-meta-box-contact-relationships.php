@@ -341,10 +341,10 @@ class PH_Meta_Box_Contact_Relationships
 
             // Currency / Price
             $ph_countries = new PH_Countries();
-
             $default_country = get_option('propertyhive_default_country', 'GB');
             $countries = get_option('propertyhive_countries', array($default_country));
             $currencies = array();
+
             foreach ($countries as $country) {
                 $country = $ph_countries->get_country($country);
 
@@ -354,7 +354,7 @@ class PH_Meta_Box_Contact_Relationships
             }
 
             // Cater for when no currency selected or currencies have been updated in settings so existing currency doesn't exist
-            $selected_currency = $applicant_profile['_applicant_currency'];
+
             if ($selected_currency == '' || !isset($currencies[$selected_currency])) {
                 $country = $ph_countries->get_country($default_country);
                 $selected_currency = $country['currency_code'];
@@ -390,6 +390,10 @@ class PH_Meta_Box_Contact_Relationships
 
             $percentage_lower = get_option('propertyhive_applicant_match_price_range_percentage_lower', '');
             $percentage_higher = get_option('propertyhive_applicant_match_price_range_percentage_higher', '');
+
+            if(gettype($applicant_profile) !== 'string') {
+                $selected_currency = $applicant_profile['_applicant_currency'];
+            }
 
             if ($percentage_lower != '' && $percentage_higher != '') {
                 $match_price_range_lower = '';
@@ -1074,7 +1078,6 @@ class PH_Meta_Box_Contact_Relationships
                     $applicant_profile['rent_frequency'] = ph_clean($_POST['_applicant_rent_frequency_' . $i]);
 
                     $ph_countries = new PH_Countries();
-
                     $rent = $ph_countries->convert_price_to_gbp($rent, $applicant_profile['_applicant_currency']);
 
                     if (!empty($rent)) {
