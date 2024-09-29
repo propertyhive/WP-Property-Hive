@@ -1050,25 +1050,33 @@ class PH_Meta_Box_Contact_Relationships
                     $applicant_profile['applicant_currency'] = ph_clean($_POST['applicant_currency_'.$i]);
                 }
 
+                $ph_countries = new PH_Countries();
+
                 if ($_POST['_applicant_department_' . $i] == 'residential-sales' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-sales') {
                     $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_maximum_price_' . $i]));
 
                     $applicant_profile['max_price'] = $price;
 
+                    $price_actual = $ph_countries->convert_price_to_gbp($price, $applicant_profile['applicant_currency']);
+
                     // Not used yet but could be if introducing currencies in the future.
-                    $applicant_profile['max_price_actual'] = $price;
+                    $applicant_profile['max_price_actual'] = $price_actual;
 
                     if ($price != '' && $price != 0) {
                         if (isset($_POST['_applicant_match_price_range_lower_' . $i])) {
                             $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_match_price_range_lower_' . $i]));
+                            $price_actual = $ph_countries->convert_price_to_gbp($price, $applicant_profile['applicant_currency']);
+
                             $applicant_profile['match_price_range_lower'] = $price;
-                            $applicant_profile['match_price_range_lower_actual'] = $price;
+                            $applicant_profile['match_price_range_lower_actual'] = $price_actual;
                         }
 
                         if (isset($_POST['_applicant_match_price_range_higher_' . $i])) {
                             $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_match_price_range_higher_' . $i]));
+                            $price_actual = $ph_countries->convert_price_to_gbp($price, $applicant_profile['applicant_currency']);
+
                             $applicant_profile['match_price_range_higher'] = $price;
-                            $applicant_profile['match_price_range_higher_actual'] = $price;
+                            $applicant_profile['match_price_range_higher_actual'] = $price_actual;
                         }
                     }
                 } elseif ($_POST['_applicant_department_' . $i] == 'residential-lettings' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-lettings') {
@@ -1077,7 +1085,6 @@ class PH_Meta_Box_Contact_Relationships
                     $applicant_profile['max_rent'] = $rent;
                     $applicant_profile['rent_frequency'] = ph_clean($_POST['_applicant_rent_frequency_' . $i]);
 
-                    $ph_countries = new PH_Countries();
 
                     if (!empty($rent)) {
                         switch ($_POST['_applicant_rent_frequency_' . $i]) {
