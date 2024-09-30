@@ -353,6 +353,10 @@ class PH_Meta_Box_Contact_Relationships
                 }
             }
 
+            if(isset($applicant_profile['applicant_currency'])) {
+                $selected_currency = $applicant_profile['applicant_currency'];
+            }
+
             // Cater for when no currency selected or currencies have been updated in settings so existing currency doesn't exist
 
             if ($selected_currency == '' || !isset($currencies[$selected_currency])) {
@@ -360,17 +364,19 @@ class PH_Meta_Box_Contact_Relationships
                 $selected_currency = $country['currency_code'];
             }
 
+            // echo("Selected Currency: " . $selected_currency);
+
             echo '<p class="form-field">';
             echo '<label for="_price">' . esc_html(__('Default Currency', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
 
             if (count($currencies) > 1) {
-                echo '<select id="applicant_currency_' . $key . '" name="applicant_currency_' . $key . '" class="select" style="width:50%; float:left;">';
+                echo '<select id="applicant_currency_sales_' . $key . '" name="applicant_currency_sales_' . $key . '" class="select" style="width:50%; float:left;">';
                 foreach ($currencies as $currency_code => $currency_symbol) {
                     echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
                 }
                 echo '</select>';
             } else {
-                echo '<input type="hidden" id="applicant_currency_' . $key .'" value="' . esc_attr($selected_currency) . '">';
+                echo '<input type="hidden" name="applicant_currency_sales_' . $key .  '" id="applicant_currency_sales_' . $key .'" value="' . esc_attr($selected_currency) . '">';
             }
             echo '</p>';
 
@@ -531,13 +537,13 @@ class PH_Meta_Box_Contact_Relationships
                         
                             <label for="_applicant_maximum_rent_' . esc_attr($key) . '">' . esc_html(__('Maximum Rent', 'propertyhive')) . ' (&pound;)</label>';
                             if (count($currencies) > 1) {
-                                echo '<select id="applicant_currency_' . $key . '" name="applicant_currency_' . $key . '" class="select" style="width:auto; float:left;">';
+                                echo '<select id="applicant_currency_' . $key . '" name="applicant_currency_lettings_' . $key . '" class="select" style="width:auto; float:left;">';
                                 foreach ($currencies as $currency_code => $currency_symbol) {
                                     echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
                                 }
                                 echo '</select>';
                             } else {
-                                echo '<input type="hidden" id="applicant_currency_' . $key .'" value="' . esc_attr($selected_currency) . '">';
+                                echo '<input type="hidden" id="applicant_currency_letting_' . $key .'" value="' . esc_attr($selected_currency) . '">';
                             }
                             
                             echo '<input type="text" class="" name="_applicant_maximum_rent_' . esc_attr($key) . '" id="_applicant_maximum_rent_' . esc_attr($key) . '" value="' . ((isset($applicant_profile['max_rent'])) ? esc_attr(ph_display_price_field($applicant_profile['max_rent'])) : '') . '" placeholder="" style="width:20%; max-width:150px;">
@@ -1046,15 +1052,17 @@ class PH_Meta_Box_Contact_Relationships
                 $applicant_profile['department'] = ph_clean($_POST['_applicant_department_' . $i]);
 
 
-                if($_POST['applicant_currency_' . $i]) {
-                    $applicant_profile['applicant_currency'] = ph_clean($_POST['applicant_currency_'.$i]);
-                }
 
                 $ph_countries = new PH_Countries();
 
                 if ($_POST['_applicant_department_' . $i] == 'residential-sales' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-sales') {
                     $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_maximum_price_' . $i]));
-
+                    if($_POST['applicant_currency_sales_' . $i]) {
+                        $applicant_profile['applicant_currency'] = ph_clean($_POST['applicant_currency_sales_'.$i]);
+                        // echo 'New Currency: ' . $applicant_profile['applicant_currency'];
+                        // continue;  
+                    }
+    
                     $applicant_profile['max_price'] = $price;
 
                     $price_actual = $ph_countries->convert_price_to_gbp($price, $applicant_profile['applicant_currency']);
@@ -1081,7 +1089,11 @@ class PH_Meta_Box_Contact_Relationships
                     }
                 } elseif ($_POST['_applicant_department_' . $i] == 'residential-lettings' || ph_get_custom_department_based_on($_POST['_applicant_department_' . $i]) == 'residential-lettings') {
                     $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_applicant_maximum_rent_' . $i]));
-
+                    if($_POST['applicant_currency_lettings_' . $i]) {
+                        $applicant_profile['applicant_currency'] = ph_clean($_POST['applicant_currency_lettings_'.$i]);
+                        // echo 'New Currency: ' . $applicant_profile['applicant_currency'];
+                        // continue;  
+                    }
                     $applicant_profile['max_rent'] = $rent;
                     $applicant_profile['rent_frequency'] = ph_clean($_POST['_applicant_rent_frequency_' . $i]);
 
@@ -1187,6 +1199,7 @@ class PH_Meta_Box_Contact_Relationships
 
                 do_action('propertyhive_save_contact_applicant_requirements', $post_id, $i);
             }
+
         }
 
         update_post_meta($post_id, '_hot_applicant', $hot_applicant);
@@ -1210,4 +1223,5 @@ class PH_Meta_Box_Contact_Relationships
         do_action('propertyhive_save_contact_relationships', $post_id);
     }
 
+    //wp_die();
 }
