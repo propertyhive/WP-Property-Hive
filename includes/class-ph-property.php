@@ -91,89 +91,27 @@ class PH_Property {
      */
     public function __get( $key ) {
 
-        if ( 'property_type' == $key ) 
-        {
-            return $this->get_property_type();
-        }
-        if ( 'availability' == $key ) 
-        {
-            return $this->get_availability();
-        }
-        if ( 'location' == $key ) 
-        {
-            return $this->get_location();
-        }
-        if ( 'price_qualifier' == $key ) 
-        {
-            return $this->get_price_qualifier();
-        }
-        if ( 'tenure' == $key ) 
-        {
-            return $this->get_tenure();
-        }
-        if ( 'sale_by' == $key ) 
-        {
-            return $this->get_sale_by();
-        }
-        if ( 'furnished' == $key ) 
-        {
-            return $this->get_furnished();
-        }
-        if ( 'parking' == $key ) 
-        {
-            return $this->get_parking();
-        }
-        if ( 'outside_space' == $key ) 
-        {
-            return $this->get_outside_space();
-        }
-        if ( 'marketing_flag' == $key ) 
-        {
-            return $this->get_marketing_flag();
-        }
-        if ( 'imported_id' == $key ) 
-        {
-            return $this->get_imported_id();
-        }
-        if ( 'office_name' == $key ) 
-        {
-            return $this->get_office_name();
-        }
-        if ( 'office_address' == $key ) 
-        {
-            return $this->get_office_address();
-        }
-        if ( 'office_telephone_number' == $key ) 
-        {
-            return $this->get_office_telephone_number();
-        }
-        if ( 'office_email_address' == $key ) 
-        {
-            return $this->get_office_email_address();
-        }
-        if ( 'negotiator_name' == $key ) 
-        {
-            return $this->get_negotiator_name();
-        }
-        if ( 'negotiator_telephone_number' == $key ) 
-        {
-            return $this->get_negotiator_telephone_number();
-        }
-        if ( 'negotiator_email_address' == $key ) 
-        {
-            return $this->get_negotiator_email_address();
-        }
-        if ( 'negotiator_photo' == $key ) 
-        {
-            return $this->get_negotiator_photo();
-        }
+        $value = '';
 
-        // Get values or default if not set
-        $value = get_post_meta( $this->id, $key, true );
-        if ($value == '')
+        if ( method_exists($this, 'get_' . $key) ) 
         {
-            $value = get_post_meta( $this->id, '_' . $key, true );
+            $value = $this->{'get_' . $key}();
         }
+        elseif ( 'marketing_flag' == $key ) 
+        {
+            $value = $this->get_marketing_flag();
+        }
+        else
+        {
+            $value = get_post_meta( $this->id, $key, true );
+            if ($value == '')
+            {
+                $value = get_post_meta( $this->id, '_' . $key, true );
+            }
+        }
+        
+        $value = apply_filters( 'propertyhive_get_detail', $value, $key, $this );
+
         return $value;
     }
     
