@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ ."/class-ph-shortcode.php");
+
 
 class PH_Shortcode_Property_Street_View extends PH_Shortcode{
      public function __construct(){
@@ -8,5 +8,18 @@ class PH_Shortcode_Property_Street_View extends PH_Shortcode{
 
     public static function shortcode($atts){
 
+		global $property;
+
+		$atts = shortcode_atts( array(
+			'height'        => '400',
+		), $atts, 'property_street_view' );
+
+		ob_start();
+
+		echo get_property_street_view( $atts );
+
+		return ob_get_clean();
     }
 }
+
+new PH_Shortcode_Property_Street_View();

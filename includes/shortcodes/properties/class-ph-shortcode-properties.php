@@ -589,3 +589,5 @@ class PH_Shortcode_Properties extends PH_Shortcode{
 		return apply_filters( 'propertyhive_properties_shortcode_output', '<div class="propertyhive propertyhive-properties-shortcode columns-' . (int)$atts['columns'] . '">' . $shortcode_output . '</div>', $shortcode_output );
     }
 }
+
+new PH_Shortcode_Properties();

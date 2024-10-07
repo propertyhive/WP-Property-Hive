@@ -275,3 +275,5 @@ class PH_Shortcode_Featured_Properties extends PH_Shortcode{
 
     }
 }
+
+new PH_Shortcode_Featured_Properties() ;

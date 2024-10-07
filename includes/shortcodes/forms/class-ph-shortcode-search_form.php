@@ -1,6 +1,4 @@
 <?php
-require_once(__DIR__ ."/class-ph-shortcode.php");
-
 class PH_Shortcode_Search_form extends PH_Shortcode{
      public function __construct(){
         parent::__construct("property_search_form", __CLASS__ . '::shortcode');
@@ -45,3 +43,5 @@ class PH_Shortcode_Search_form extends PH_Shortcode{
 		return ob_get_clean();
     }
 }
+
+new PH_Shortcode_Search_form();

@@ -265,3 +265,5 @@ class PH_Shortcode_Recent_Properties extends PH_Shortcode{
 
     }
 }
+
+new PH_Shortcode_Recent_Properties() ;
