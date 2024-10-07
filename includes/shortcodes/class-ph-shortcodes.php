@@ -19,15 +19,7 @@ class PH_Shortcodes {
 	public static function init() {
 		// Define shortcodes
 		$shortcodes = array(
-			'property_map'                 => __CLASS__ . '::property_map',
-			'property_static_map'          => __CLASS__ . '::property_static_map',
-			'property_street_view'         => __CLASS__ . '::property_street_view',
-			'property_office_details'      => __CLASS__ . '::property_office_details',
 			'office_map'                   => __CLASS__ . '::office_map',
-			'applicant_registration_form'  => __CLASS__ . '::applicant_registration_form',
-			'propertyhive_my_account'  	   => __CLASS__ . '::my_account',
-			'propertyhive_login_form'  	   => __CLASS__ . '::login_form',
-			'propertyhive_reset_password_form' => __CLASS__ . '::reset_password_form',
 		);
 
 		require_once(__DIR__ . '/shortcodes/ph-shortcode-search_form.php');
