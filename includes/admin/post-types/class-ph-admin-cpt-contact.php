@@ -218,12 +218,13 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				$edit_link        = get_edit_post_link( $post->ID );
 				//$title            = _draft_or_post_title();
                 $title            = $the_contact->post_title;
+                $contact_types    = $the_contact->_contact_types;
                 
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
 				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title . '</a>';
-				if ( isset( $_GET['_contact_type'] ) && strpos( ph_clean($_GET['_contact_type']), 'applicant' ) !== FALSE && in_array('applicant', $the_contact->_contact_types) && $the_contact->_hot_applicant == 'yes' )
+				if ( isset( $_GET['_contact_type'] ) && strpos( ph_clean($_GET['_contact_type']), 'applicant' ) !== FALSE && is_array($contact_types) && in_array('applicant', $contact_types) && $the_contact->_hot_applicant == 'yes' )
 				{
 					echo ' <span style="color:#C00;">(' . __( 'Hot Applicant', 'propertyhive' ) . ')</span>';
 				}
