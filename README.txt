@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.6.2
-Stable tag: 2.0.20
+Stable tag: 2.0.21
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,19 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.0.21 - 2024-10-08 =
+* Added options in Elementor 'Property Images' widget to specify click action
+* Added ability to bulk mark properties as featured
+* Cater for multiple slideshows on one page in the event they're used in search results
+* Give property images a unique fancybox ID for when used in search to ensure you only see images for the property in question
+* Simplify __get() magic call on PH_Property class
+* Corrected rent calculation causing fatal error in newer PHP versions when no rent is set
+* Corrected Elementor 'Tabbed Details' styling by ensuring dependancy is declared
+* Corrected issues with post classes array breaking REST API after they introduced this into the data recently
+* Corrected integration with Yoast Duplicate Post plugin
+* Added wp-env
+* Improved handling of license key failed requests to ensure features don't get deactivated if license server is ever inaccessible or the request fails
 
 = 2.0.20 - 2024-09-16 =
 * Added rent frequency to list of REST API fields
