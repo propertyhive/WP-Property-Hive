@@ -1251,7 +1251,7 @@ class PH_Admin_Post_Types {
 
 	public function key_date_status_filter() {
 
-		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending') ) ? ph_clean($_GET['status']) : '';
+		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending', 'on_hold', 'cancelled') ) ? ph_clean($_GET['status']) : '';
 
 		$output  = '<select name="status" id="dropdown_key_date_status">';
 
@@ -1276,6 +1276,14 @@ class PH_Admin_Post_Types {
 		$output .= '<option value="pending"';
 		$output .= selected( 'pending', $selected_status, false );
 		$output .= '> ' . esc_html(__( 'Pending', 'propertyhive' )) . '</option>';
+
+        $output .= '<option value="on_hold"';
+        $output .= selected( 'on_hold', $selected_status, false );
+        $output .= '> ' . esc_html(__( 'On Hold', 'propertyhive' )) . '</option>';
+
+        $output .= '<option value="cancelled"';
+        $output .= selected( 'cancelled', $selected_status, false );
+        $output .= '> ' . esc_html(__( 'Cancelled', 'propertyhive' )) . '</option>';
 
 		$output .= '</select>';
 
@@ -1577,6 +1585,8 @@ class PH_Admin_Post_Types {
                 switch ($value) {
                     case 'booked':
                     case 'complete':
+                    case 'on_hold':
+                    case 'cancelled':
                         $vars['meta_query'][] = array(
                             'key' => '_key_date_status',
                             'value' => $value,
