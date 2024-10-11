@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php
                     $output = '<select id="key_date_status" name="key_date_status">';
 
-                    foreach ( array( 'pending', 'booked', 'complete' ) as $status )
+                    foreach ( array( 'pending', 'booked', 'complete', 'on_hold', 'cancelled' ) as $status )
                     {
                         $selected_value = isset( $_POST['status'] ) ? strtolower($_POST['status']) : '';
                         if ( in_array($selected_value, array('overdue', 'upcoming') ) )
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         }
                         $output .= '<option value="' . esc_attr($status) . '"';
                         $output .= selected($status, $selected_value, false );
-                        $output .=  '>' . esc_html(ucwords($status)) . '</option>';
+                        $output .=  '>' . esc_html(ucwords(str_replace("_", " ", $status))) . '</option>';
                     }
 
                     $output .= '</select>';
