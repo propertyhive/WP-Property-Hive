@@ -123,7 +123,7 @@ class PH_Settings_Features extends PH_Settings_Page {
             echo '">
                 <div class="inner"' . ( !$can_use ? ' style="border:1px solid #900"' : '' ) . '>
                     <h3>' . ( ( isset($feature['dashicon']) && !empty($feature['dashicon']) ) ? '<span class="dashicons ' . esc_attr($feature['dashicon']) . '"></span> ' : '' ) . esc_html($feature['name']) . '</h3>' . 
-                    ( $pro ? '<span class="pro"><span><a href="https://wp-property-hive.com/pricing" target="_blank">PRO</a></span></span>' : '' ) . 
+                    ( $pro ? '<span class="pro"><span><a href="https://wp-property-hive.com/pricing/?src=plugin-feature-settings" target="_blank">PRO</a></span></span>' : '' ) . 
                     ( !$pro ? '<span class="free"><span>FREE</span></span>' : '' ) . '
                 ';
 
