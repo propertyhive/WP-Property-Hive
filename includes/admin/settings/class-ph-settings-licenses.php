@@ -145,7 +145,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			'id' 		  => 'pro_license_key_info',
 			'html' 		  => __( '<p>With a Pro license subscription you\'ll unlock a wide array of Property Hive functionality. We offer multiple packages to suit your needs. Your Pro subscription details and license key can be found within the \'<a href="https://wp-property-hive.com/my-account/" target="_blank">My Account</a>\' section of our website.</p>
 							' . ( (!$valid_pro_license) ? 
-									'<br><p><a href="https://wp-property-hive.com/pricing/" class="button button-primary" target="_blank">Get PRO</a></p>' : 
+									'<br><p><a href="https://wp-property-hive.com/pricing/?src=plugin-license-settings" class="button button-primary" target="_blank">Get PRO</a></p>' : 
 									'<br><p><a href="https://wp-property-hive.com/my-account/" class="button button-primary" target="_blank">Manage Subscription and Get License Key</a></p>' 
 								), 'propertyhive' ) . '
 			<input type="hidden" name="pro_license_key_action" value="' . ( $valid_pro_license ? 'deactivate' : 'activate' ) . '">',
@@ -185,7 +185,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		            <p>We\'ve since moved to a new and improved <a href="%1$s" target="_blank">pro pricing model</a> that is more cost effective for you and gives access to more features.</p>
 		            %2$s
 		            <br><p><a href="%1$s" class="button button-primary" target="_blank">Get PRO</a></p>', 'propertyhive' ),
-		        esc_url('https://wp-property-hive.com/pricing/'),
+		        esc_url('https://wp-property-hive.com/pricing/?src=plugin-license-settings'),
 		        $license_type == 'old' ? '<p>' . sprintf( __( 'To switch your existing license key over to the new pricing model, please get in touch at <a href="mailto:%s">%s</a>.', 'propertyhive' ), 'info@wp-property-hive.com', 'info@wp-property-hive.com' ) . '</p>' : ''
 		    ),
 		);
