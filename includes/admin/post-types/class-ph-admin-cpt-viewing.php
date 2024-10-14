@@ -82,12 +82,15 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 				( count($related_viewings['previous']) > 0 || count($related_viewings['next']) > 0 )
 			)
 			{
-				$message = __( "This is the " . strtolower(ph_ordinal_suffix(count($related_viewings['previous'])+1)) . ' viewing for this applicant at this property.<br>', 'propertyhive' );
+				$message = sprintf( 
+				    __( 'This is the %s viewing for this applicant at this property.', 'propertyhive' ), 
+				    strtolower(ph_ordinal_suffix(count($related_viewings['previous']) + 1))
+				) . '<br>';
 
 				if ( count($related_viewings['previous']) > 0 )
 				{
 					$previous_viewing_id = end($related_viewings['previous']);
-					$message .= '<a href="' . get_edit_post_link( $previous_viewing_id, '' ) . '"><< Go to previous</a>';
+					$message .= '<a href="' . get_edit_post_link( $previous_viewing_id, '' ) . '"><< '. __( 'Go to previous', 'propertyhive' ) . '</a>';
 				}
 
 				if ( count($related_viewings['next']) > 0 )
@@ -100,7 +103,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 						$message .= ' | ';
 					}
 
-					$message .= '<a href="' . get_edit_post_link( $next_viewing_id, '' ) . '">Go to next >></a>';
+					$message .= '<a href="' . get_edit_post_link( $next_viewing_id, '' ) . '">'. __( 'Go to next', 'propertyhive' ) . ' >></a>';
 				}
 
 				echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
