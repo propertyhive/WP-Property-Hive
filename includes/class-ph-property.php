@@ -1300,7 +1300,7 @@ class PH_Property {
                 }
                 else
                 {
-                    $function_name = "get_restriction_type";
+                    $function_name = "get_restriction";
 
                     if ( function_exists($function_name) )
                     {
