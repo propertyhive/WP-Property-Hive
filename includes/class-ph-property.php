@@ -93,11 +93,7 @@ class PH_Property {
 
         $value = '';
 
-        if ( 'available_date' == $key ) 
-        {
-            $value = $this->get_available_date();
-        }
-        elseif ( method_exists($this, 'get_' . $key) ) 
+        if ( method_exists($this, 'get_' . $key) && 'available_date' != $key ) 
         {
             $value = $this->{'get_' . $key}();
         }
