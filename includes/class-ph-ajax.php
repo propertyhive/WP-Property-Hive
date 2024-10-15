@@ -4459,6 +4459,8 @@ class PH_AJAX {
 
     public function get_viewing_lightbox()
     {
+        global $post;
+        
         $post_id = $_GET['post_id'];
 
         $post = get_post((int)$post_id);
