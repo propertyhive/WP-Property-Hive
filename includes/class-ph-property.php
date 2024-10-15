@@ -93,13 +93,13 @@ class PH_Property {
 
         $value = '';
 
-        if ( method_exists($this, 'get_' . $key) ) 
+        if ( 'available_date' == $key ) 
+        {
+            $value = $this->get_available_date();
+        }
+        elseif ( method_exists($this, 'get_' . $key) ) 
         {
             $value = $this->{'get_' . $key}();
-        }
-        elseif ( 'marketing_flag' == $key ) 
-        {
-            $value = $this->get_marketing_flag();
         }
         else
         {
