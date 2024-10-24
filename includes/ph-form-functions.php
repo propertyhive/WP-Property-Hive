@@ -960,6 +960,7 @@ function ph_form_field( $key, $field )
             $field['after_input'] = isset( $field['after_input'] ) ? $field['after_input'] : '';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : false;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            $field['options'] = ( isset( $field['options'] ) && is_array( $field['options'] ) ) ? $field['options'] : array();
 
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
