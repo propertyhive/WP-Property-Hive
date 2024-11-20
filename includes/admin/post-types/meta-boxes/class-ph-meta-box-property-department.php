@@ -153,7 +153,7 @@ class PH_Meta_Box_Property_Department {
         }
 
         $departments_with_residential_details = apply_filters( 'propertyhive_departments_with_residential_details', array( 'residential-sales', 'residential-lettings' ) );
-
+        
         echo '
                 var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_department\\\']:checked\').val();
                 var departments_with_residential_details = ' . json_encode($departments_with_residential_details) . ';
@@ -171,10 +171,26 @@ class PH_Meta_Box_Property_Department {
                     } else if (jQuery(\'#_address_country\').is(\'input[type="hidden"]\')) {
                         selected_country = jQuery(\'#_address_country\').val();
                     }
-                    if ( selected_country == \'GB\' )
+                    ';
+
+        $countries_with_material_information = apply_filters( 'propertyhive_countries_with_material_information', array( 'GB' ) );
+
+        $material_information_sountry_js = array();
+        if ( !empty($countries_with_material_information) )
+        {
+            foreach ( $countries_with_material_information as $country )
+            {
+                $material_information_sountry_js[] = 'selected_country == \'' . strtoupper($country) . '\'';
+            }
+            echo '
+                    if ( ' . implode(" || ", $material_information_sountry_js) . ' )
                     {
                         jQuery(\'#propertyhive-property-material-information\').show();
                     }
+            ';
+        }
+        
+        echo '
                 }
             }
             
