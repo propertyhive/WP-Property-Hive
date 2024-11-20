@@ -89,7 +89,15 @@ class PH_Elementor {
 
 	public function elementor_query_on_market_sales_only( $query )
 	{
+		$original_department = isset($_REQUEST['department']) ? $_REQUEST['department'] : '';
+		
+		$_GET['department'] = 'residential-sales';
+		$_REQUEST['department'] = 'residential-sales';
+
 		PH()->query->property_query( $query );
+
+		$_GET['department'] = $original_department;
+		$_REQUEST['department'] = $original_department;
 
 		// Set the custom post type 
 		$query->set( 'post_type', [ 'property' ] );
@@ -107,7 +115,15 @@ class PH_Elementor {
 
 	public function elementor_query_on_market_lettings_only( $query )
 	{
+		$original_department = isset($_REQUEST['department']) ? $_REQUEST['department'] : '';
+		
+		$_GET['department'] = 'residential-lettings';
+		$_REQUEST['department'] = 'residential-lettings';
+
 		PH()->query->property_query( $query );
+
+		$_GET['department'] = $original_department;
+		$_REQUEST['department'] = $original_department;
 
 		// Set the custom post type 
 		$query->set( 'post_type', [ 'property' ] );
@@ -125,7 +141,15 @@ class PH_Elementor {
 
 	public function elementor_query_on_market_commercial_only( $query )
 	{
+		$original_department = isset($_REQUEST['department']) ? $_REQUEST['department'] : '';
+		
+		$_GET['department'] = 'commercial';
+		$_REQUEST['department'] = 'commercial';
+
 		PH()->query->property_query( $query );
+
+		$_GET['department'] = $original_department;
+		$_REQUEST['department'] = $original_department;
 
 		// Set the custom post type 
 		$query->set( 'post_type', [ 'property' ] );
