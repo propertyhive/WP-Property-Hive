@@ -1,8 +1,8 @@
 <?php
 /**
- * Applicant viewings page within My Account
+ * Owner viewings page within My Account
  *
- * This template can be overridden by copying it to yourtheme/propertyhive/account/applicant-viewings.php.
+ * This template can be overridden by copying it to yourtheme/propertyhive/account/owner-viewings.php.
  *
  * @author      PropertyHive
  * @package     PropertyHive/Templates
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<div class="propertyhive-applicant-viewings">
+<div class="propertyhive-owner-viewings">
 
 	<h4>Upcoming Viewings</h4>
 
@@ -37,11 +37,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$link_prefix = ( ( $property->on_market == 'yes' ) ? '<a href="' . get_permalink( $viewing->property_id ) . '">' : '' );
 				$link_suffix = ( ( $property->on_market == 'yes' ) ? '</a>' : '' );
 
+				$date_prefix = ( ( $viewing->status == 'cancelled' ) ? '<span style="text-decoration:line-through">' : '' );
+				$date_suffix = ( ( $viewing->status == 'cancelled' ) ? '</span> (' . __( 'Cancelled', 'propertyhive' ) . ')' : '' );
+
 				$image = $property->get_main_photo_src();
 
 				echo '<tr>
 					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . $image . '" width="75" alt="' . get_the_title( $viewing->property_id ) . '">' : '' ) . $link_suffix . '</td>
-					<td>' . date( "H:i jS M Y", strtotime( $viewing->start_date_time ) ) . '</td>
+					<td>' . $date_prefix . date( "H:i jS M Y", strtotime( $viewing->start_date_time ) ) . $date_suffix . '</td>
 					<td>' . $link_prefix . get_the_title( $viewing->property_id ) . $link_suffix . '<br>' . $property->get_formatted_price() . '</td>
 				</tr>';
 			}
@@ -73,11 +76,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$link_prefix = ( ( $property->on_market == 'yes' ) ? '<a href="' . get_permalink( $viewing->property_id ) . '">' : '' );
 				$link_suffix = ( ( $property->on_market == 'yes' ) ? '</a>' : '' );
 
+				$date_prefix = ( ( $viewing->status == 'cancelled' ) ? '<span style="text-decoration:line-through">' : '' );
+				$date_suffix = ( ( $viewing->status == 'cancelled' ) ? '</span> (' . __( 'Cancelled', 'propertyhive' ) . ')' : '' );
+
 				$image = $property->get_main_photo_src();
 
 				echo '<tr>
 					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . $image . '" width="75" alt="' . get_the_title( $viewing->property_id ) . '">' : '' ) . $link_suffix . '</td>
-					<td>' . date( "H:i jS M Y", strtotime( $viewing->start_date_time ) ) . '</td>
+					<td>' . $date_prefix . date( "H:i jS M Y", strtotime( $viewing->start_date_time ) ) . $date_suffix . '</td>
 					<td>' . $link_prefix . get_the_title( $viewing->property_id ) . $link_suffix . '<br>' . $property->get_formatted_price() . '</td>
 				</tr>';
 			}
