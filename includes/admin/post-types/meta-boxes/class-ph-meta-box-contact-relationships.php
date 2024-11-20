@@ -342,6 +342,7 @@ class PH_Meta_Box_Contact_Relationships
             // Currency / Price
             $ph_countries = new PH_Countries();
             $default_country = get_option('propertyhive_default_country', 'GB');
+            $selected_currency = '';
             $countries = get_option('propertyhive_countries', array($default_country));
             $currencies = array();
 
@@ -359,7 +360,7 @@ class PH_Meta_Box_Contact_Relationships
 
             // Cater for when no currency selected or currencies have been updated in settings so existing currency doesn't exist
 
-            if ($selected_currency == '' || !isset($currencies[$selected_currency])) {
+            if (empty($selected_currency) || !isset($currencies[$selected_currency])) {
                 $country = $ph_countries->get_country($default_country);
                 $selected_currency = $country['currency_code'];
             }
@@ -397,7 +398,7 @@ class PH_Meta_Box_Contact_Relationships
             $percentage_lower = get_option('propertyhive_applicant_match_price_range_percentage_lower', '');
             $percentage_higher = get_option('propertyhive_applicant_match_price_range_percentage_higher', '');
 
-            if(gettype($applicant_profile) !== 'string') {
+            if ( isset($applicant_profile['applicant_currency']) && !empty($applicant_profile['applicant_currency']) ) {
                 $selected_currency = $applicant_profile['applicant_currency'];
             }
 
