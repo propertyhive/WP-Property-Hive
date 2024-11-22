@@ -124,7 +124,7 @@ class PH_Meta_Box_Tenancy_Applicant {
 
                 <label for="">&nbsp;</label>
 
-                <a href="" class="create-tenancy-applicant button">Create New Applicant</a>
+                <a href="" class="create-tenancy-applicant button"><?php echo esc_html__( 'Create New Applicant', 'propertyhive' ); ?></a>
 
             </p>
         </div>
@@ -158,7 +158,7 @@ class PH_Meta_Box_Tenancy_Applicant {
             ?>
             <p class="form-field">
                 <label for="">&nbsp;</label>
-                <a href="" class="create-tenancy-applicant-cancel">Cancel and Search Existing Applicants</a>
+                <a href="" class="create-tenancy-applicant-cancel"><?php echo esc_html__( 'Cancel and Search Existing Applicants', 'propertyhive' ); ?></a>
             </p>
         </div>
         <input type="hidden" name="_tenancy_applicant_create_new" id="_tenancy_applicant_create_new" value="">
@@ -227,7 +227,7 @@ jQuery(document).ready(function($)
 
         if (keyword.length < 3)
         {
-            $('#tenancy_search_applicant_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+            $('#tenancy_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
             $('#tenancy_search_applicant_results').show();
             return false;
         }
@@ -242,7 +242,7 @@ jQuery(document).ready(function($)
         {
             if (response == '' || response.length == 0)
             {
-                $('#tenancy_search_applicant_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+                $('#tenancy_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
             }
             else
             {
