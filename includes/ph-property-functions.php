@@ -144,7 +144,102 @@ function get_property_map( $args = array() )
 
 	    echo '<div id="property_map_canvas' . $id_suffix . '" style="background:#EEE; height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
 		
-		if ( get_option('propertyhive_maps_provider') == 'osm' )
+		if ( get_option('propertyhive_maps_provider') == 'mapbox' )
+		{
+			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/mapbox/';
+
+			wp_register_style('mapbox', $assets_path . 'mapbox-gl.css', array(), '3.8.0');
+		    wp_enqueue_style('mapbox');
+
+			wp_register_script('mapbox', $assets_path . 'mapbox-gl.js', array(), '3.8.0', false);
+		    wp_enqueue_script('mapbox');
+?>
+<script>
+
+	var property_map<?php echo $id_suffix; ?>;
+
+	function initialize_property_map<?php echo $id_suffix; ?>() 
+	{
+		if ( property_map<?php echo $id_suffix; ?> != undefined ) { property_map<?php echo $id_suffix; ?>.remove(); }
+
+		mapboxgl.accessToken = '<?php echo get_option( 'propertyhive_mapbox_api_key', '' ); ?>';
+        property_map<?php echo $id_suffix; ?> = new mapboxgl.Map({
+            container: "property_map_canvas<?php echo $id_suffix; ?>", // container ID
+            center: [<?php echo $property->longitude; ?>, <?php echo $property->latitude; ?>], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+            zoom: <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?> // starting zoom
+        });
+
+		<?php
+			$marker_set = false;
+			if ( class_exists( 'PH_Map_Search' ) )
+  			{
+  				$map_add_on_settings = get_option( 'propertyhive_map_search', array() );
+
+				if ( isset($map_add_on_settings['icon_type']) && $map_add_on_settings['icon_type'] == 'custom_single' && isset($map_add_on_settings['custom_icon_attachment_id']) && $map_add_on_settings['custom_icon_attachment_id'] != '' )
+		        {
+		            $marker_icon_url = wp_get_attachment_url( $map_add_on_settings['custom_icon_attachment_id'] );
+		            if ( $marker_icon_url !== FALSE )
+		            {
+						$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
+						if ( $size !== FALSE && !empty($size) )
+						{
+							$icon_anchor_width = $size[0];
+							$icon_anchor_height = $size[1];
+
+							/*if (isset($map_add_on_settings['custom_icon_anchor_position']) && $map_add_on_settings['custom_icon_anchor_position'] == 'center')
+							{
+								$icon_anchor_width = floor($size[0] / 2);
+								$icon_anchor_height = floor($size[1] / 2);
+							}
+							else
+							{
+								$icon_anchor_width = floor($size[0] / 2);
+								$icon_anchor_height = $size[1];
+							}*/
+		?>
+		const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.backgroundImage = 'url(<?php echo $marker_icon_url; ?>)';
+        el.style.width = '<?php echo $icon_anchor_width; ?>px';
+        el.style.height = '<?php echo $icon_anchor_height; ?>px';
+        el.style.backgroundSize = '100%';
+
+        new mapboxgl.Marker(el, {<?php if (isset($map_add_on_settings['custom_icon_anchor_position']) && $map_add_on_settings['custom_icon_anchor_position'] == 'center') { echo 'anchor:\'center\''; }else{ echo 'anchor:\'bottom\''; } ?>})
+            .setLngLat([<?php echo $property->longitude; ?>, <?php echo $property->latitude; ?>])
+            .addTo(property_map<?php echo $id_suffix; ?>);
+		<?php
+							$marker_set = true;
+						}
+		            }
+		        }
+		    }
+		    if ( !$marker_set )
+		    {
+		?>
+		marker = new mapboxgl.Marker({
+            //color: "#FFFFFF",
+            draggable: false
+        }).setLngLat([<?php echo $property->longitude; ?>, <?php echo $property->latitude; ?>])
+            .addTo(property_map<?php echo $id_suffix; ?>);
+		<?php
+		    }
+		    do_action( 'propertyhive_property_map_actions', $property, $args, $id_suffix );
+		?>
+
+	}
+
+	<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
+	if (window.addEventListener) {
+		window.addEventListener('load', initialize_property_map<?php echo $id_suffix; ?>);
+	}else{
+		window.attachEvent('onload', initialize_property_map<?php echo $id_suffix; ?>);
+	}
+	<?php } ?>
+
+</script>
+<?php
+		}
+		elseif ( get_option('propertyhive_maps_provider') == 'osm' )
 		{
 			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/leaflet/';
 

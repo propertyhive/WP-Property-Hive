@@ -437,11 +437,14 @@ function ph_toggle_license_key_settings()
 
 function ph_toggle_maps_provider_options()
 {
-    if ( jQuery('[name=\'propertyhive_maps_provider\']:checked').val() == 'osm' )
+    jQuery('#row_propertyhive_google_maps_api_key').hide();
+    jQuery('#row_propertyhive_mapbox_api_key').hide();
+
+    if ( jQuery('[name=\'propertyhive_maps_provider\']:checked').val() == 'mapbox' )
     {
-        jQuery('#row_propertyhive_google_maps_api_key').hide();
+        jQuery('#row_propertyhive_mapbox_api_key').show();
     }
-    else
+    if ( jQuery('[name=\'propertyhive_maps_provider\']:checked').val() == '' )
     {
         jQuery('#row_propertyhive_google_maps_api_key').show();
     }
@@ -449,15 +452,21 @@ function ph_toggle_maps_provider_options()
 
 function ph_toggle_geocoding_provider_options()
 {
+    jQuery('#row_propertyhive_google_maps_geocoding_api_key').hide();
+    jQuery('#row_propertyhive_mapbox_geocoding_api_key').hide();
+    jQuery('#row_propertyhive_osm_html').hide();
+
+    if ( jQuery('[name=\'propertyhive_geocoding_provider\']:checked').val() == 'mapbox' )
+    {
+        jQuery('#row_propertyhive_mapbox_geocoding_api_key').show();
+    }
     if ( jQuery('[name=\'propertyhive_geocoding_provider\']:checked').val() == 'osm' )
     {
-        jQuery('#row_propertyhive_google_maps_geocoding_api_key').hide();
         jQuery('#row_propertyhive_osm_html').show();
     }
-    else
+    if ( jQuery('[name=\'propertyhive_geocoding_provider\']:checked').val() == '' )
     {
         jQuery('#row_propertyhive_google_maps_geocoding_api_key').show();
-        jQuery('#row_propertyhive_osm_html').hide();
     }
 }
 
