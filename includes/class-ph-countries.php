@@ -298,6 +298,12 @@ class PH_Countries {
 				'currency_symbol' => 'د.م.',
 				'currency_prefix' => false
 			),
+			'NL' => array(
+		        'name' => 'Netherlands',
+		        'currency_code' => 'EUR',
+		        'currency_symbol' => '&euro;',
+		        'currency_prefix' => false
+		    ),
 			'NZ' => array(
 				'name' => 'New Zealand',
 				'currency_code' => 'NZD',
