@@ -3957,15 +3957,36 @@ class PH_AJAX {
 
             $negotiator_names = array();
             $negotiator_names_string = '';
+            
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
             $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
             if ( !empty($negotiator_ids) )
             {
                 foreach ( $negotiator_ids as $negotiator_id )
                 {
                     $negotiator = get_user_by( 'id', $negotiator_id );
-                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    if ( $negotiator !== false )
                     {
-                        $negotiator_names[] = $negotiator->display_name;
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
                     }
                 }
             }
@@ -3975,6 +3996,20 @@ class PH_AJAX {
                 $first = join(', ', array_slice($negotiator_names, 0, -1));
                 $both  = array_filter(array_merge(array($first), $last), 'strlen');
                 $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
             }
 
             $to = implode(",", $owner_emails);
@@ -3989,6 +4024,8 @@ class PH_AJAX {
             $subject = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $subject);
             $subject = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
             $subject = apply_filters( 'appraisal_owner_booking_confirmation_email_subject', $subject, $post_id );
 
@@ -3998,6 +4035,8 @@ class PH_AJAX {
             $body = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $body);
             $body = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -4601,15 +4640,36 @@ class PH_AJAX {
 
             $negotiator_names = array();
             $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
             $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
             if ( !empty($negotiator_ids) )
             {
                 foreach ( $negotiator_ids as $negotiator_id )
                 {
                     $negotiator = get_user_by( 'id', $negotiator_id );
-                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    if ( $negotiator !== false )
                     {
-                        $negotiator_names[] = $negotiator->display_name;
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
                     }
                 }
             }
@@ -4620,12 +4680,28 @@ class PH_AJAX {
                 $both  = array_filter(array_merge(array($first), $last), 'strlen');
                 $negotiator_names_string = join(' and ', $both);
             }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
+            }
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
             $subject = apply_filters( 'viewing_applicant_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
@@ -4635,6 +4711,8 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -4801,15 +4879,36 @@ class PH_AJAX {
 
             $negotiator_names = array();
             $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
             $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
             if ( !empty($negotiator_ids) )
             {
                 foreach ( $negotiator_ids as $negotiator_id )
                 {
                     $negotiator = get_user_by( 'id', $negotiator_id );
-                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    if ( $negotiator !== false )
                     {
-                        $negotiator_names[] = $negotiator->display_name;
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
                     }
                 }
             }
@@ -4819,6 +4918,20 @@ class PH_AJAX {
                 $first = join(', ', array_slice($negotiator_names, 0, -1));
                 $both  = array_filter(array_merge(array($first), $last), 'strlen');
                 $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
             }
 
             $property = new PH_Property((int)$property_id);
@@ -4834,6 +4947,8 @@ class PH_AJAX {
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
             $subject = apply_filters( 'viewing_owner_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
@@ -4845,6 +4960,8 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -5034,15 +5151,36 @@ class PH_AJAX {
 
             $negotiator_names = array();
             $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
             $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
             if ( !empty($negotiator_ids) )
             {
                 foreach ( $negotiator_ids as $negotiator_id )
                 {
                     $negotiator = get_user_by( 'id', $negotiator_id );
-                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    if ( $negotiator !== false )
                     {
-                        $negotiator_names[] = $negotiator->display_name;
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
                     }
                 }
             }
@@ -5052,6 +5190,20 @@ class PH_AJAX {
                 $first = join(', ', array_slice($negotiator_names, 0, -1));
                 $both  = array_filter(array_merge(array($first), $last), 'strlen');
                 $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
             }
 
             $property = new PH_Property((int)$property_id);
@@ -5065,6 +5217,8 @@ class PH_AJAX {
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
             $subject = apply_filters( 'viewing_attending_negotiator_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
@@ -5078,6 +5232,8 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
