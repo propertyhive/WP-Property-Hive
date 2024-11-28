@@ -641,6 +641,8 @@ function get_accessibility_types()
 
 	asort($types);
 
+	$types['other'] = __( 'Other', 'propertyhive' );
+
 	return $types;
 }
 
