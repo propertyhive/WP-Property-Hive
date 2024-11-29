@@ -90,7 +90,7 @@ class PH_Meta_Box_Property_Features {
             else
             {
                 // No features
-                echo __( 'No features available to choose from. These can be edited in the <a href="' . admin_url('admin.php?page=ph-settings&tab=customfields&section=property-feature') . '" target="_blank">Settings</a> area', 'propertyhive' );
+                echo sprintf( __( 'No features available to choose from. These can be edited in the <a href="%s" target="_blank">Settings</a> area', 'propertyhive' ), admin_url('admin.php?page=ph-settings&tab=customfields&section=property-feature') );
             }
 
             echo '</div>';
