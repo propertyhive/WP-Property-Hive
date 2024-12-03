@@ -1147,10 +1147,13 @@ if ( ! function_exists( 'propertyhive_get_template_single_material_information_a
         }
 
         $actions[] = array(
-            'href' => '#ph_material_information',
+            'href' => 'javascript:;',
             'label' => __( 'Utilities & More', 'propertyhive' ),
             'class' => 'action-material-information',
-            'attributes' => array( 'data-fancybox' => '' ),
+            'attributes' => array( 
+                'data-fancybox' => '', 
+                'data-src' => '#ph_material_information' 
+            ),
         );
 
         echo '<div id="ph_material_information" style="display:none;">';
