@@ -1,8 +1,8 @@
 jQuery( function ( $ ) {
 
-	if ($('#contextual-help-link-wrap').length == 0)
+	if ($('#contextual-help-link-wrap .show-recently-viewed').length == 0)
 	{
-		$("#screen-meta-links").append('<div id="contextual-help-link-wrap" class="hide-if-no-js screen-meta-toggle" style="z-index:2;"><button class="show-settings" style="cursor:pointer">Recently Viewed</button></div>');
+		$("#screen-meta-links").append('<div id="contextual-help-link-wrap" class="hide-if-no-js screen-meta-toggle" style="z-index:2;"><button class="show-settings show-recently-viewed" style="cursor:pointer">Recently Viewed</button></div>');
 
 		var html = '';
 
@@ -22,7 +22,7 @@ jQuery( function ( $ ) {
 
 		$("#screen-meta-links").append('<div class="ph-recently-viewed-popup">' + html + '</div>');
 
-		$('body').on('click', '#contextual-help-link-wrap .show-settings', function(e)
+		$('body').on('click', '#contextual-help-link-wrap .show-recently-viewed', function(e)
 		{
 			e.preventDefault();
 
