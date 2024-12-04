@@ -95,8 +95,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	    $query = new WP_Query([
 	        'post_type'      => 'property',
 	        'post_status'    => 'any',
-	        'posts_per_page' => 1,
-	        'fields' => 'ids'
+	        'posts_per_page' => 1
 	    ]);
 
 	    if ($query->have_posts()) {
@@ -109,7 +108,11 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	        return [];
 	    });
 
-	    add_action('manage_posts_extra_tablenav', function () {
+	    add_action('manage_posts_extra_tablenav', function ($which) {
+	    	if ( $which == 'bottom' )
+	    	{
+	    		return;
+	    	}
 	        echo '
 	        <div style="padding: 50px; text-align: center;">
 	            <h2 style="font-size:1.8em; color:#444; margin:0 0 1.5em">' . esc_html( __( 'Your property journey begins here!', 'propertyhive' ) ) . '</h2>
@@ -132,6 +135,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	    add_action('admin_head', function () {
 	        echo '<style>
 	        	.page-title-action,
+	        	.wrap .wp-list-table,
 	            .search-box { display: none !important; }
 	        </style>';
 	    });
