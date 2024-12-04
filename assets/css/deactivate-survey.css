@@ -1,0 +1,62 @@
+/* Modal container styles */
+#surveyModal {
+    display: none; /* Ensure the modal is hidden by default */
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal inner container */
+#surveyModal .modal-container {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    width: 500px;
+}
+
+/* Modal header */
+#surveyModal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom:1px solid #F3F3F3;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+    text-transform: uppercase;
+    color:#CCC;
+}
+
+/* Modal content */
+#surveyModal .modal-content {
+    padding: 20px;
+    text-align: left;
+}
+#surveyModal .modal-content h3 {
+    margin-top:0;
+}
+#surveyModal .modal-content label {
+    display:block;
+    margin-bottom:7px;
+}
+
+/* Modal footer */
+#surveyModal .modal-footer {
+    background-color: #f8f9fa;
+    border-top:1px solid #F3F3F3;
+    padding: 10px 20px;
+    text-align: right;
+}
+
+/* Text area for "Other" reason */
+#otherReasonBox {
+    display: none;
+    margin-top: 10px;
+    width: 100%;
+}
