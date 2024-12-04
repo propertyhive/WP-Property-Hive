@@ -58,6 +58,14 @@ class PH_Admin_Assets {
             }
         }
 
+        if ( in_array( $screen->id, array( 'property' ) ) )
+        {
+            wp_register_style( 'tour-css', PH()->plugin_url() .  '/assets/css/tours/style.css', array(), '1.0.1' );
+            wp_register_style( 'driver-css', PH()->plugin_url() . '/assets/css/tours/driver-js.css', array(), '1.0.1' );
+            wp_enqueue_style( 'tour-css' );
+            wp_enqueue_style( 'driver-css' );
+        }
+
 	    if ( in_array( $screen->id, array( 'edit-contact', 'edit-enquiry', 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale' ) ) )
 	    {
 		    wp_enqueue_style( 'daterangepicker.css', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css' );
@@ -212,6 +220,54 @@ class PH_Admin_Assets {
                 require( ABSPATH . WPINC . '/class-wp-editor.php' );
             }
             add_action( 'admin_print_footer_scripts', array( '_WP_Editors', 'print_default_editor_scripts' ) );
+
+            wp_enqueue_script( 'driver-js', PH()->plugin_url() . '/assets/js/tours/driver-js.js', array(), '1.0.1' );
+            wp_register_script( 'tour', PH()->plugin_url() . '/assets/js/tours/tour.js', array( 'driver-js' ), '1.0.1' );
+            wp_enqueue_script( 'tour' );
+
+            $tours = [
+                'example-tour' => [
+                    [
+                        'element' => '#title',
+                        'popover' => [
+                            'title' => 'Enter property address',
+                            'description' => 'This is the first step.',
+                            'side' => 'bottom',
+                        ],
+                    ],
+                    [
+                        'element' => '#propertyhive_metabox_tabs',
+                        'popover' => [
+                            'title' => 'Navigate the property record',
+                            'description' => 'This is the second step.',
+                            'side' => 'bottom',
+                        ],
+                    ],
+                    [
+                        'element' => '#propertyhive-property-address',
+                        'popover' => [
+                            'title' => 'Enter property data',
+                            'description' => 'This is the second step.',
+                            'side' => 'top',
+                        ],
+                    ],
+                    [
+                        'element' => '#submitdiv',
+                        'popover' => [
+                            'title' => 'Publish your property',
+                            'description' => 'This is the second step.',
+                            'side' => 'left',
+                        ],
+                    ],
+                ],
+            ];
+            wp_localize_script(
+                'tour',
+                'tour_plugin',
+                array(
+                    'tours'    => $tours,
+                )
+            );
         }
 
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
