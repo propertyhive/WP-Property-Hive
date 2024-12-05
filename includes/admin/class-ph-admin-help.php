@@ -39,13 +39,13 @@ class PH_Admin_Help {
 				'id'      => 'propertyhive_support_tab',
 				'title'   => __( 'Help &amp; Support', 'propertyhive' ),
 				'content' =>
-					'<h2>' . __( 'Help &amp; Support', 'propertyhive' ) . '</h2>' .
+					'<h2>' . __( 'Property Hive Help &amp; Support', 'propertyhive' ) . '</h2>' .
 					'<p>' . sprintf(
 						__( 'Should you need help understanding, using, or extending Property Hive, <a href="%s" target="_blank">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more.', 'propertyhive' ),
 						'https://docs.wp-property-hive.com'
 					) . '</p>' .
 					'<p>' . __( 'Before asking for help, we recommend checking the documentation. Otherwise, please get in touch and a member of our team will be happy to assist.', 'propertyhive' ) . '</p>' .
-					'<p><a href="https://docs.wp-property-hive.com" class="button button-primary">' . __( 'View documentation', 'propertyhive' ) . '</a> <a href="https://wp-property-hive.com/support/?src=wordpress-help-tab" class="button" target="_blank">' . __( 'Get support', 'propertyhive' ) . '</a></p>',
+					'<p><a href="https://docs.wp-property-hive.com" class="button button-primary" target="_blank">' . __( 'View documentation', 'propertyhive' ) . '</a> <a href="https://wp-property-hive.com/support/?src=wordpress-help-tab" class="button" target="_blank">' . __( 'Get support', 'propertyhive' ) . '</a></p>',
 			)
 		);
 
