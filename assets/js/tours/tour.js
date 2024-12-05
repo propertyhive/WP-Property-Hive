@@ -7,10 +7,15 @@ window.addEventListener('load', function ()
         jQuery('#propertyhive_metabox_tabs a').eq(0).trigger('click');
     }
 
+    function revert_to_third_tab(activeElement, activeStep, options) {
+        jQuery('#propertyhive_metabox_tabs a').eq(2).trigger('click');
+    }
+
     // Function to resolve string to function
     function getCallbackFunction(callbackName) {
         const callbacks = {
-            revert_to_first_tab
+            revert_to_first_tab,
+            revert_to_third_tab
         };
 
         return callbacks[callbackName] || null;
