@@ -144,9 +144,12 @@ class PH_AJAX {
             // PRO features activate/deactivate
             'activate_pro_feature' => false,
             'deactivate_pro_feature' => false,
+
+            'deactivate_survey' => false,
 		);
 
-		foreach ( $ajax_events as $ajax_event => $nopriv ) {
+		foreach ( $ajax_events as $ajax_event => $nopriv ) 
+        {
 			add_action( 'wp_ajax_propertyhive_' . $ajax_event, array( $this, $ajax_event ) );
 
 			if ( $nopriv ) {
@@ -154,6 +157,93 @@ class PH_AJAX {
 			}
 		}
 	}
+
+    public function deactivate_survey()
+    {
+        // Verify the nonce
+        if ( !isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'deactivate-survey') ) 
+        {
+            wp_send_json_error('Invalid nonce', 403);
+            die();
+        }
+
+        if ( !isset($_POST['reason']) || empty($_POST['reason']) ) 
+        {
+            wp_send_json_error('Reason is required', 400);
+            die();
+        }
+
+        $reason = sanitize_text_field($_POST['reason']);
+        $comments = isset($_POST['comments']) ? sanitize_textarea_field($_POST['comments']) : '';
+        $anonymous = isset($_POST['anonymous']) && $_POST['anonymous'] === 'yes';
+
+        $license_type = get_option('propertyhive_license_type');
+        if ( $license_type == 'pro' )
+        {
+            $license_key = get_option('propertyhive_pro_license_key');
+        }
+        else
+        {
+            $license_key = get_option('propertyhive_license_key');
+        }
+        $propertyhive_install_timestamp = get_option('propertyhive_install_timestamp');
+        $active_plugins = get_option('active_plugins');
+        $all_plugins = get_plugins(); // Fetch detailed data for all plugins
+
+        $active_plugins_with_versions = array();
+
+        foreach ( $active_plugins as $plugin ) 
+        {
+            if ( isset($all_plugins[$plugin]) ) 
+            {
+                $active_plugins_with_versions[] = array(
+                    'name'    => $all_plugins[$plugin]['Name'],
+                    'version' => $all_plugins[$plugin]['Version'],
+                    'path'    => $plugin,
+                );
+            }
+        }
+        $server_software = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
+
+        // Prepare data for third-party POST
+        $third_party_data = array(
+            'reason'    => $reason,
+            'comments'  => $comments,
+            'anonymous' => $anonymous ? 'yes' : 'no',
+        );
+
+        if (!$anonymous) 
+        {
+            $third_party_data['site_url'] = get_site_url();
+            $third_party_data['admin_email'] = get_option('admin_email');
+            $third_party_data['license_type'] = $license_type;
+            $third_party_data['license_key'] = $license_key;
+            $third_party_data['active_plugins'] = $active_plugins_with_versions;
+            $third_party_data['active_theme'] = wp_get_theme()->get('Name');
+            $third_party_data['wordpress_version'] = get_bloginfo('version');
+            $third_party_data['php_version'] = phpversion();
+            $third_party_data['server_software'] = $server_software;
+        }
+
+        //wp_send_json_success(json_encode($third_party_data, true));
+
+        // Make the remote POST request
+        $response = wp_remote_post('https://wp-property-hive.com/deactivate-survey.php', array(
+            'method'  => 'POST',
+            'body'    => $third_party_data
+        ));
+
+        if ( is_wp_error($response) ) 
+        {
+            wp_send_json_error($response->get_error_message(), 500);
+            die();
+        }
+
+        $response_body = wp_remote_retrieve_body($response);
+        wp_send_json_success(json_decode($response_body, true));
+
+        die();
+    }
 
     public function save_term_order()
     {

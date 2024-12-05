@@ -80,6 +80,17 @@ class PH_Admin_Assets {
             wp_enqueue_style( 'propertyhive_admin_dashboard_styles', PH()->plugin_url() . '/assets/css/dashboard.css', array(), PH_VERSION );
         }*/
 
+        if ( $screen->id === 'plugins' ) 
+        {
+            // Enqueue the CSS file
+            wp_enqueue_style(
+                'propertyhive_deactivate_survey',
+                PH()->plugin_url() . '/assets/css/deactivate-survey.css',
+                array(),
+                '1.0.0'
+            );
+        }
+
         do_action( 'propertyhive_admin_css' );
     }
 
@@ -315,6 +326,35 @@ class PH_Admin_Assets {
             wp_enqueue_script( 'flot-time' );
             //wp_enqueue_script( 'flot-pie' );
             //wp_enqueue_script( 'flot-stack' );
+        }
+
+        if ( $screen->id === 'plugins' ) 
+        {
+            // Enqueue the JavaScript file
+            wp_enqueue_script(
+                'propertyhive_deactivate_survey',
+                PH()->plugin_url() . '/assets/js/deactivate-survey.js',
+                array('jquery'), // Depend on jQuery
+                '1.0.0',
+                true // Load in footer
+            );
+
+            wp_localize_script('propertyhive_deactivate_survey', 'deactivation_survey', array(
+                'nonce'            => wp_create_nonce('deactivate-survey'),
+
+                'modalTitle'      => __('If you have a moment, please let us know why you are deactivating:', 'propertyhive'),
+                'modalHeader'     => __('Quick Feedback', 'propertyhive'),
+                'skipDeactivate'  => __('Skip & Deactivate', 'propertyhive'),
+                'cancel'          => __('Cancel', 'propertyhive'),
+                'deactivate'      => __('Submit & Deactivate', 'propertyhive'),
+                'notNeeded'       => __('Not needed anymore', 'propertyhive'),
+                'tooExpensive'    => __('Too expensive', 'propertyhive'),
+                'betterPlugin'    => __('Found a better plugin', 'propertyhive'),
+                'bugsIssues'      => __('Bugs/issues', 'propertyhive'),
+                'other'           => __('Other', 'propertyhive'),
+                'otherPlaceholder'=> __('Please specify...', 'propertyhive'),
+                'anonymous'       => __('Anonymous feedback', 'propertyhive'),
+            ));
         }
     }
 
