@@ -58,6 +58,17 @@ class PH_Admin_Assets {
             }
         }
 
+        if ( in_array( $screen->id, array( 'property' ) ) )
+        {
+            if ( isset($_GET['tutorial']) && sanitize_text_field($_GET['tutorial']) == 'yes' )
+            {
+                wp_register_style( 'tour-css', PH()->plugin_url() .  '/assets/css/tours/style.css', array(), '1.0.1' );
+                wp_register_style( 'driver-css', PH()->plugin_url() . '/assets/css/tours/driver-js.css', array(), '1.0.1' );
+                wp_enqueue_style( 'tour-css' );
+                wp_enqueue_style( 'driver-css' );
+            }
+        }
+
 	    if ( in_array( $screen->id, array( 'edit-contact', 'edit-enquiry', 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale' ) ) )
 	    {
 		    wp_enqueue_style( 'daterangepicker.css', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css' );
@@ -223,6 +234,59 @@ class PH_Admin_Assets {
                 require( ABSPATH . WPINC . '/class-wp-editor.php' );
             }
             add_action( 'admin_print_footer_scripts', array( '_WP_Editors', 'print_default_editor_scripts' ) );
+
+            if ( isset($_GET['tutorial']) && sanitize_text_field($_GET['tutorial']) == 'yes' )
+            {
+                wp_enqueue_script( 'driver-js', PH()->plugin_url() . '/assets/js/tours/driver-js.js', array(), '1.0.1' );
+                wp_register_script( 'tour', PH()->plugin_url() . '/assets/js/tours/tour.js', array( 'driver-js' ), '1.0.1' );
+                wp_enqueue_script( 'tour' );
+
+                $tours = [
+                    'add-property' => [
+                        [
+                            'element' => '#title',
+                            'popover' => [
+                                'title' => __( 'Enter the Property\'s Display Address', 'propertyhive' ),
+                                'description' => __( 'This is the title or address that will be shown publicly. Make it clear and appealing for prospective buyers.', 'propertyhive' ),
+                                'side' => 'bottom',
+                            ],
+                        ],
+                        [
+                            'element' => '#propertyhive_metabox_tabs',
+                            'popover' => [
+                                'title' => __( 'Explore the Property Record', 'propertyhive' ),
+                                'description' => __( 'The property record is organized into sections for easy navigation. Use these tabs to switch between sections.<br><br>Go ahead, try clicking them now.', 'propertyhive' ),
+                                'side' => 'bottom',
+                                'onPrevClick' => 'revert_to_first_tab',
+                                'onNextClick' => 'revert_to_first_tab',
+                            ],
+                        ],
+                        [
+                            'element' => '#propertyhive-property-address',
+                            'popover' => [
+                                'title' => __( 'Enter the Property Details', 'propertyhive' ),
+                                'description' => __( 'Use these fields to input essential property information like address, price, bedrooms, and more. You can also upload images to showcase the property.', 'propertyhive' ),
+                                'side' => 'top',
+                            ],
+                        ],
+                        [
+                            'element' => '#submitdiv',
+                            'popover' => [
+                                'title' => __( 'Publish your Property', 'propertyhive' ),
+                                'description' => __( 'When you\'re done and are ready to save your changes, simply click \'Publish\'', 'propertyhive' ),
+                                'side' => 'left',
+                            ],
+                        ],
+                    ],
+                ];
+                wp_localize_script(
+                    'tour',
+                    'tour_plugin',
+                    array(
+                        'tours'    => $tours,
+                    )
+                );
+            }
         }
 
         if ( in_array( $screen->id, ph_get_screen_ids() ) ) 
