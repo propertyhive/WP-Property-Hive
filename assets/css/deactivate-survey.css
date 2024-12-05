@@ -1,5 +1,5 @@
 /* Modal container styles */
-#surveyModal {
+#propertyhive_survey_modal {
     display: none; /* Ensure the modal is hidden by default */
     position: fixed;
     z-index: 9999;
@@ -13,7 +13,7 @@
 }
 
 /* Modal inner container */
-#surveyModal .modal-container {
+#propertyhive_survey_modal .modal-container {
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     overflow: hidden;
@@ -21,7 +21,7 @@
 }
 
 /* Modal header */
-#surveyModal .modal-header {
+#propertyhive_survey_modal .modal-header {
     background-color: #fbfbfb;
     border-bottom:1px solid #eee;
     padding: 15px 20px;
@@ -33,28 +33,28 @@
 }
 
 /* Modal content */
-#surveyModal .modal-content {
+#propertyhive_survey_modal .modal-content {
     padding: 20px;
     text-align: left;
 }
-#surveyModal .modal-content h3 {
+#propertyhive_survey_modal .modal-content h3 {
     margin-top:0;
     margin-bottom:1.2em;
     font-size:16px;
 }
-#surveyModal .modal-content label {
+#propertyhive_survey_modal .modal-content label {
     display:block;
     margin-bottom:8px;
 }
 
 /* Modal footer */
-#surveyModal .modal-footer {
+#propertyhive_survey_modal .modal-footer {
     position:relative;
     border-top:1px solid #F3F3F3;
     padding: 10px 20px;
     text-align: right;
 }
-#surveyModal .anonymous {
+#propertyhive_survey_modal .anonymous {
     position:absolute;
     display:none;
     left:20px;
@@ -62,7 +62,7 @@
 }
 
 /* Text area for "Other" reason */
-#otherReasonBox {
+#phOtherReasonBox {
     display: none;
     margin-top: 10px;
     width: 100%;

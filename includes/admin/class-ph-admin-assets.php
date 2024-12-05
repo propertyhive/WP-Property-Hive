@@ -339,7 +339,7 @@ class PH_Admin_Assets {
                 true // Load in footer
             );
 
-            wp_localize_script('propertyhive_deactivate_survey', 'surveyModalTranslations', array(
+            wp_localize_script('propertyhive_deactivate_survey', 'deactivation_survey', array(
                 'nonce'            => wp_create_nonce('deactivate-survey'),
 
                 'modalTitle'      => __('If you have a moment, please let us know why you are deactivating:', 'propertyhive'),
