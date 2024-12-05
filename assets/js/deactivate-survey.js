@@ -9,12 +9,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="modal-content">
                     <h3>${deactivation_survey.modalTitle}</h3>
                     <form id="deactivationSurvey">
+                        <label><input type="radio" name="reason" value="Broke site"> ${deactivation_survey.brokeSite}</label>
+                        <label><input type="radio" name="reason" value="Confusing"> ${deactivation_survey.confusing}</label>
                         <label><input type="radio" name="reason" value="Not needed"> ${deactivation_survey.notNeeded}</label>
-                        <label><input type="radio" name="reason" value="Too expensive"> ${deactivation_survey.tooExpensive}</label>
                         <label><input type="radio" name="reason" value="Found a better plugin"> ${deactivation_survey.betterPlugin}</label>
-                        <label><input type="radio" name="reason" value="Bugs/issues"> ${deactivation_survey.bugsIssues}</label>
+                        <label><input type="radio" name="reason" value="Temporary"> ${deactivation_survey.temporary}</label>
                         <label><input type="radio" name="reason" value="Other"> ${deactivation_survey.other}</label>
-                        <textarea id="phOtherReasonBox" name="otherReason" placeholder="${deactivation_survey.otherPlaceholder}" rows="4" cols="50"></textarea>
+                        
+                        <label id="otherLabel" style="margin-top:25px;">${deactivation_survey.otherLabel}</label>
+                        <textarea id="phOtherReasonBox" name="otherReason" rows="4" cols="50"></textarea>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -35,16 +38,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('propertyhive_survey_modal');
     const deactivateButton = document.getElementById('deactivateButton');
     const cancelButton = document.getElementById('cancelButton');
-    const phOtherReasonBox = document.getElementById('phOtherReasonBox');
+    const otherLabel = document.getElementById('otherLabel');
     const anonymous = document.getElementById('anonymous');
 
     // Show/hide "Other" text box and change button text
     document.querySelectorAll('input[name="reason"]').forEach((input) => {
         input.addEventListener('change', function () {
-            if (this.value === 'Other') {
-                phOtherReasonBox.style.display = 'block';
-            } else {
-                phOtherReasonBox.style.display = 'none';
+            
+            switch (this.value) 
+            {
+                case "Broke site": { otherLabel.innerHTML = deactivation_survey.brokeSiteLabel; break; }
+                case "Found a better plugin": { otherLabel.innerHTML = deactivation_survey.betterPluginLabel; break; }
+                default: { otherLabel.innerHTML = deactivation_survey.otherLabel; break; }
             }
 
             // Change button text to "Deactivate"
@@ -78,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 action: 'propertyhive_deactivate_survey',
                 nonce: deactivation_survey.nonce,
                 reason: selectedReason.value,
-                comments: selectedReason.value === 'Other' ? otherReason : null,
+                comments: otherReason,
                 anonymous: isAnonymous ? 'yes' : 'no',
             };
 
@@ -106,6 +111,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    document.getElementById('phOtherReasonBox').addEventListener('input', function () {
+
+        const radioButtons = document.querySelectorAll('input[name="reason"]');
+        const otherReasonRadio = document.querySelector('input[name="reason"][value="Other"]');
+
+        // Check if any radio button is selected
+        const isAnyRadioSelected = Array.from(radioButtons).some(radio => radio.checked);
+
+        // If none are selected, select the 'Other' radio button
+        if (!isAnyRadioSelected) {
+            otherReasonRadio.checked = true;
+
+            const event = new Event('change', { bubbles: true });
+            otherReasonRadio.dispatchEvent(event);
+        }
+    });
+
     // Function to deactivate plugin
     function ph_deactivate_plugin() {
         const originalDeactivateLink = document.getElementById('deactivate-propertyhive');
@@ -127,8 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
         selectedOptions.forEach((option) => (option.checked = false));
 
         // Hide the "Other" text box
-        phOtherReasonBox.style.display = 'none';
-        phOtherReasonBox.value = '';
+        otherLabel.innerHTML = deactivation_survey.otherLabel;
 
         // Reset the button text
         deactivateButton.textContent = deactivation_survey.skipDeactivate;

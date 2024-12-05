@@ -63,7 +63,5 @@
 
 /* Text area for "Other" reason */
 #phOtherReasonBox {
-    display: none;
-    margin-top: 10px;
     width: 100%;
 }

@@ -423,12 +423,18 @@ class PH_Admin_Assets {
                 'skipDeactivate'  => __('Skip & Deactivate', 'propertyhive'),
                 'cancel'          => __('Cancel', 'propertyhive'),
                 'deactivate'      => __('Submit & Deactivate', 'propertyhive'),
-                'notNeeded'       => __('Not needed anymore', 'propertyhive'),
-                'tooExpensive'    => __('Too expensive', 'propertyhive'),
-                'betterPlugin'    => __('Found a better plugin', 'propertyhive'),
-                'bugsIssues'      => __('Bugs/issues', 'propertyhive'),
+
+                'brokeSite'       => __('The plugin broke my site', 'propertyhive'),
+                'confusing'       => __('The plugin is confusing', 'propertyhive'),
+                'notNeeded'       => __('I no longer need the plugin', 'propertyhive'),
+                'betterPlugin'    => __('I found a better plugin', 'propertyhive'),
+                'temporary'       => __('It\'s a temporary deactivation', 'propertyhive'),
                 'other'           => __('Other', 'propertyhive'),
-                'otherPlaceholder'=> __('Please specify...', 'propertyhive'),
+
+                'brokeSiteLabel' => __('Oh no! Can you tell us more? (optional)', 'propertyhive'),
+                'betterPluginLabel' => __('What\'s the plugin\'s name? (optional)', 'propertyhive'),
+                'otherLabel'      => __('Additional feedback or comments: (optional)', 'propertyhive'),
+
                 'anonymous'       => __('Anonymous feedback', 'propertyhive'),
             ));
         }
