@@ -115,6 +115,9 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	    	}
 	        echo '
 	        <div style="padding: 50px; text-align: center;">
+
+	        	<img style="max-width:400px; margin-bottom:45px;" src="' . PH()->plugin_url() . '/assets/images/no-properties.png" alt="' . esc_attr( __( 'Your property journey begins here!', 'propertyhive' ) ) . '">
+
 	            <h2 style="font-size:1.8em; color:#444; margin:0 0 1.5em">' . esc_html( __( 'Your property journey begins here!', 'propertyhive' ) ) . '</h2>
 	            <a href="' . admin_url('post-new.php?post_type=property&tutorial=yes') . '" class="button button-primary button-hero" style="font-size:1.2em; padding:0 24px;">
 	                ' . esc_html( __( 'Add Your First Property', 'propertyhive' ) ) . '
