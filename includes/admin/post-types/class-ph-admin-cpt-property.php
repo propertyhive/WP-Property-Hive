@@ -77,8 +77,73 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		// Download permissions
 		//add_action( 'propertyhive_process_product_file_download_paths', array( $this, 'process_product_file_download_paths' ), 10, 3 );*/
 
+		add_action( 'load-edit.php', array( $this, 'render_blank' ) );
+
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
+	}
+
+	public function render_blank()
+	{
+		// Check if we are on the 'property' post type listing page
+	    $screen = get_current_screen();
+	    if ($screen->post_type !== 'property') {
+	        return;
+	    }
+
+	    // Check if there are any properties
+	    $query = new WP_Query([
+	        'post_type'      => 'property',
+	        'post_status'    => 'any',
+	        'posts_per_page' => 1
+	    ]);
+
+	    if ($query->have_posts()) {
+	        return; // Let the default table load
+	    }
+
+	    // No properties found, replace the table with a custom splash screen
+	    add_filter('views_edit-property', function ($views) {
+	        // Clear default view filters (All, Published, etc.)
+	        return [];
+	    });
+
+	    add_action('manage_posts_extra_tablenav', function ($which) {
+	    	if ( $which == 'bottom' )
+	    	{
+	    		return;
+	    	}
+	        echo '
+	        <div style="padding: 50px; text-align: center;">
+	            <h2 style="font-size:1.8em; color:#444; margin:0 0 1.5em">' . esc_html( __( 'Your property journey begins here!', 'propertyhive' ) ) . '</h2>
+	            <a href="' . admin_url('post-new.php?post_type=property&tutorial=yes') . '" class="button button-primary button-hero" style="font-size:1.2em; padding:0 24px;">
+	                ' . esc_html( __( 'Add Your First Property', 'propertyhive' ) ) . '
+	            </a>
+	            <a href="' . admin_url('admin.php?page=ph-settings&tab=demo_data') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+	                ' . esc_html( __( 'Create Demo Data', 'propertyhive' ) ) . '
+	            </a>
+	            <a href="' . admin_url('post-new.php?post_type=property&tutorial=yes') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+	                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . '
+	            </a>
+	        </div>';
+	    }, 99);
+
+	    // Remove the filters
+	    remove_all_actions('restrict_manage_posts');
+
+	    // Hide the search box
+	    add_action('admin_head', function () {
+	        echo '<style>
+	        	.page-title-action,
+	        	.wrap .wp-list-table,
+	            .search-box { display: none !important; }
+	        </style>';
+	    });
+
+	    add_filter('bulk_actions-edit-property', function ($bulk_actions) {
+		    // Clear all bulk actions
+		    return [];
+		});
 	}
 
 	/**
