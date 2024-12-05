@@ -563,6 +563,12 @@ class PH_Admin {
         if ( ! is_ajax() ) {
             include( 'class-ph-admin-menus.php' );
             include( 'class-ph-admin-assets.php' );
+
+            // Help Tab
+            if ( apply_filters( 'propertyhive_enable_admin_help_tab', true ) ) 
+            {
+                include_once( 'class-ph-admin-help.php' );
+            }
         }
     }
 
