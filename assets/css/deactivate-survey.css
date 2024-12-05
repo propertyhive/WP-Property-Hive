@@ -15,18 +15,17 @@
 /* Modal inner container */
 #surveyModal .modal-container {
     background-color: #fff;
-    border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     overflow: hidden;
-    width: 500px;
+    width: 596px;
 }
 
 /* Modal header */
 #surveyModal .modal-header {
-    background-color: #f8f9fa;
-    border-bottom:1px solid #F3F3F3;
+    background-color: #fbfbfb;
+    border-bottom:1px solid #eee;
     padding: 15px 20px;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: bold;
     text-align: left;
     text-transform: uppercase;
@@ -40,18 +39,26 @@
 }
 #surveyModal .modal-content h3 {
     margin-top:0;
+    margin-bottom:1.2em;
+    font-size:16px;
 }
 #surveyModal .modal-content label {
     display:block;
-    margin-bottom:7px;
+    margin-bottom:8px;
 }
 
 /* Modal footer */
 #surveyModal .modal-footer {
-    background-color: #f8f9fa;
+    position:relative;
     border-top:1px solid #F3F3F3;
     padding: 10px 20px;
     text-align: right;
+}
+#surveyModal .anonymous {
+    position:absolute;
+    display:none;
+    left:20px;
+    top:11px;
 }
 
 /* Text area for "Other" reason */
