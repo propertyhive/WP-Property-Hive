@@ -18,7 +18,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="deactivateButton" class="button button-primary">${surveyModalTranslations.skipDeactivate}</button>
+                    <div class="anonymous" id="anonymous">
+                        <label><input type="checkbox" name="anonymous" value="yes"> ${surveyModalTranslations.anonymous}</label>
+                    </div>
+                    <button type="button" id="deactivateButton" class="button">${surveyModalTranslations.skipDeactivate}</button>&nbsp;
                     <button type="button" id="cancelButton" class="button">${surveyModalTranslations.cancel}</button>
                 </div>
             </div>
@@ -33,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deactivateButton = document.getElementById('deactivateButton');
     const cancelButton = document.getElementById('cancelButton');
     const otherReasonBox = document.getElementById('otherReasonBox');
+    const anonymous = document.getElementById('anonymous');
 
     // Show/hide "Other" text box and change button text
     document.querySelectorAll('input[name="reason"]').forEach((input) => {
@@ -45,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Change button text to "Deactivate"
             deactivateButton.textContent = surveyModalTranslations.deactivate;
+            deactivateButton.className = "button button-primary";
+
+            anonymous.style.display = 'block';
         });
     });
 
@@ -62,31 +69,37 @@ document.addEventListener('DOMContentLoaded', function () {
     deactivateButton.addEventListener('click', function () {
         const selectedReason = document.querySelector('input[name="reason"]:checked');
         const otherReason = otherReasonBox.value;
+        const anonymousCheckbox = document.querySelector('input[name="anonymous"]');
+        const isAnonymous = anonymousCheckbox && anonymousCheckbox.checked;
 
         // If a reason is selected, send data to the third-party URL
         if (selectedReason) {
             const reasonData = {
+                action: 'propertyhive_deactivate_survey',
+                nonce: surveyModalTranslations.nonce,
                 reason: selectedReason.value,
                 comments: selectedReason.value === 'Other' ? otherReason : null,
+                anonymous: isAnonymous ? 'yes' : 'no',
             };
 
-            fetch('https://test.com/deactivate', {
+            jQuery.ajax({
+                url: ajaxurl, // Provided by WordPress
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reasonData),
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        deactivatePlugin();
+                data: reasonData, // jQuery automatically converts this to x-www-form-urlencoded
+                dataType: 'json', // Expect JSON response from server
+                success: function (response) {
+                    if (response.success) {
+                        console.log('Success:', response.data);
                     } else {
-                        alert('Failed to submit survey. Deactivating without sending feedback.');
-                        deactivatePlugin();
+                        console.error('Error:', response.data);
                     }
-                })
-                .catch(() => {
-                    alert('Error sending survey data. Deactivating without sending feedback.');
                     deactivatePlugin();
-                });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('AJAX Error:', textStatus, errorThrown);
+                    deactivatePlugin();
+                },
+            });
         } else {
             // No reason selected, deactivate immediately
             deactivatePlugin();
@@ -104,6 +117,24 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to close modal
     function closeModal() {
         modal.style.display = 'none';
+        resetModal(); // Reset modal when closed
+    }
+
+    // Function to reset modal
+    function resetModal() {
+        // Clear selected options
+        const selectedOptions = document.querySelectorAll('input[name="reason"]:checked');
+        selectedOptions.forEach((option) => (option.checked = false));
+
+        // Hide the "Other" text box
+        otherReasonBox.style.display = 'none';
+        otherReasonBox.value = '';
+
+        // Reset the button text
+        deactivateButton.textContent = surveyModalTranslations.skipDeactivate;
+        deactivateButton.className = 'button';
+
+        anonymous.style.display = 'none';
     }
 
     // Attach event listener to your specified button

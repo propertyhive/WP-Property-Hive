@@ -340,17 +340,20 @@ class PH_Admin_Assets {
             );
 
             wp_localize_script('propertyhive_deactivate_survey', 'surveyModalTranslations', array(
+                'nonce'            => wp_create_nonce('deactivate-survey'),
+
                 'modalTitle'      => __('If you have a moment, please let us know why you are deactivating:', 'propertyhive'),
                 'modalHeader'     => __('Quick Feedback', 'propertyhive'),
                 'skipDeactivate'  => __('Skip & Deactivate', 'propertyhive'),
                 'cancel'          => __('Cancel', 'propertyhive'),
-                'deactivate'      => __('Deactivate', 'propertyhive'),
+                'deactivate'      => __('Submit & Deactivate', 'propertyhive'),
                 'notNeeded'       => __('Not needed anymore', 'propertyhive'),
                 'tooExpensive'    => __('Too expensive', 'propertyhive'),
                 'betterPlugin'    => __('Found a better plugin', 'propertyhive'),
                 'bugsIssues'      => __('Bugs/issues', 'propertyhive'),
                 'other'           => __('Other', 'propertyhive'),
                 'otherPlaceholder'=> __('Please specify...', 'propertyhive'),
+                'anonymous'       => __('Anonymous feedback', 'propertyhive'),
             ));
         }
     }
