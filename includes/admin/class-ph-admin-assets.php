@@ -247,7 +247,7 @@ class PH_Admin_Assets {
                             'element' => '#title',
                             'popover' => [
                                 'title' => __( 'Enter the Property\'s Display Address', 'propertyhive' ),
-                                'description' => __( 'This is the title or address that will be shown publicly. Make it clear and appealing for prospective buyers.', 'propertyhive' ),
+                                'description' => __( 'This is the title or address that will be shown publicly. Make it clear and appealing for your audience.', 'propertyhive' ),
                                 'side' => 'bottom',
                             ],
                         ],
@@ -267,6 +267,17 @@ class PH_Admin_Assets {
                                 'title' => __( 'Enter the Property Details', 'propertyhive' ),
                                 'description' => __( 'Use these fields to input essential property information like address, price, bedrooms, and more. You can also upload images to showcase the property.', 'propertyhive' ),
                                 'side' => 'top',
+                                'onNextClick' => 'revert_to_third_tab',
+                            ],
+                        ],
+                        [
+                            'element' => '#\\_on_market',
+                            'popover' => [
+                                'title' => __( 'Put it on the Market', 'propertyhive' ),
+                                'description' => __( 'For a property to show on your website it will need to be set to \'On Market\' under the \'Marketing\' tab.', 'propertyhive' ),
+                                'side' => 'top',
+                                'onPrevClick' => 'revert_to_first_tab',
+                                'onNextClick' => 'revert_to_first_tab',
                             ],
                         ],
                         [
@@ -275,6 +286,7 @@ class PH_Admin_Assets {
                                 'title' => __( 'Publish your Property', 'propertyhive' ),
                                 'description' => __( 'When you\'re done and are ready to save your changes, simply click \'Publish\'', 'propertyhive' ),
                                 'side' => 'left',
+                                'onPrevClick' => 'revert_to_third_tab',
                             ],
                         ],
                     ],
