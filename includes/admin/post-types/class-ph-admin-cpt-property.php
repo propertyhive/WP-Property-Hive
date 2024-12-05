@@ -121,14 +121,55 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	            <h2 style="font-size:1.8em; color:#444; margin:0 0 1.5em">' . esc_html( __( 'Your property journey begins here!', 'propertyhive' ) ) . '</h2>
 	            <a href="' . admin_url('post-new.php?post_type=property&tutorial=yes') . '" class="button button-primary button-hero" style="font-size:1.2em; padding:0 24px;">
 	                ' . esc_html( __( 'Add Your First Property', 'propertyhive' ) ) . '
-	            </a>
+	            </a>&nbsp;
 	            <a href="' . admin_url('admin.php?page=ph-settings&tab=demo_data') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
 	                ' . esc_html( __( 'Create Demo Data', 'propertyhive' ) ) . '
-	            </a>
-	            <a href="' . admin_url('post-new.php?post_type=property&tutorial=yes') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
-	                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . '
-	            </a>
-	        </div>';
+	            </a>&nbsp; ';
+
+	            $import_button_output = false;
+
+	            // Import add on already activated
+	            if ( !$import_button_output && class_exists('PH_Property_Import') )
+	            {
+		            echo '<a href="' . admin_url('admin.php?page=propertyhive_import_properties') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+		                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . '
+		            </a>';
+
+		            $import_button_output = true;
+		        }
+
+	            // free user/old style user, class not active
+	            $license = PH()->license->get_current_pro_license();
+	            if ( 
+	            	!$import_button_output && 
+	            	(
+	            		PH()->license->get_license_type() != 'pro' ||  
+	            		( PH()->license->get_license_type() == 'pro' && isset($license['success']) && $license['success'] !== true )
+	            	)
+	            )
+	            {
+	            	echo '<a href="' . admin_url('admin.php?page=ph-import-dummy') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+		                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . ' <span style="color:#FFF; font-size:10px; font-weight:500; border-radius:12px; padding:2px 8px;letter-spacing:1px; background:#00a32a;">PRO</span>
+		            </a>';
+
+		            $import_button_output = true;
+	            }
+
+	            // PRO subscription but not activated, class not active
+	            if ( !$import_button_output && PH()->license->get_license_type() == 'pro' )
+	            {
+	            	if ( isset($license['success']) && $license['success'] === true )
+	            	{
+	            		echo '<a href="' . admin_url('admin.php?page=ph-settings&tab=features&profilter=import') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+			                ' . esc_html( __( 'Activate Property Imports', 'propertyhive' ) ) . '
+			            </a>';
+
+		            	$import_button_output = true;
+	            	}
+	            }
+	            
+
+	        echo '</div>';
 	    }, 99);
 
 	    // Remove the filters
