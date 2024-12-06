@@ -126,48 +126,91 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	                ' . esc_html( __( 'Create Demo Data', 'propertyhive' ) ) . '
 	            </a>&nbsp; ';
 
-	            $import_button_output = false;
-
-	            // Import add on already activated
-	            if ( !$import_button_output && class_exists('PH_Property_Import') )
+	            if ( apply_filters( 'propertyhive_no_properties_property_import_button', true ) === true )
 	            {
-		            echo '<a href="' . admin_url('admin.php?page=propertyhive_import_properties') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
-		                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . '
-		            </a>';
+		            $button_to_output = false;
 
-		            $import_button_output = true;
-		        }
+		            if ( class_exists('PH_Property_Import') )
+					{
+						// Already activated. Check can be used
+						if ( apply_filters( 'propertyhive_add_on_can_be_used', true, 'propertyhive-property-import' ) === true )
+			        	{
+			        		$button_to_output = 'normal';
+						}
+					}
 
-	            // free user/old style user, class not active
-	            $license = PH()->license->get_current_pro_license();
-	            if ( 
-	            	!$import_button_output && 
-	            	(
-	            		PH()->license->get_license_type() != 'pro' ||  
-	            		( PH()->license->get_license_type() == 'pro' && isset($license['success']) && $license['success'] !== true )
-	            	)
-	            )
-	            {
-	            	echo '<a href="' . admin_url('admin.php?page=ph-import-dummy') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
-		                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . ' <span style="color:#FFF; font-size:10px; font-weight:500; border-radius:12px; padding:2px 8px;letter-spacing:1px; background:#00a32a;">PRO</span>
-		            </a>';
+					if ( !$button_to_output )
+					{
+						$license_type = get_option( 'propertyhive_license_type', '' );
+						
+						switch ( $license_type )
+						{
+							case "": { $button_to_output = 'dummy'; break; }
+							case "pro": 
+							{
+								if ( PH()->license->is_valid_pro_license_key() )
+								{
+									// It should never get this far if import add on already activated, that's why show activate page
+									$button_to_output = 'activate'; 
+								}
+								else
+								{
+									$button_to_output = 'dummy'; 
+								}
+								break; 
+							}
+						}
+					}
 
-		            $import_button_output = true;
+					// only show dummy button to administrators
+					if ( $button_to_output == 'dummy' || $button_to_output == 'activate' )
+					{
+						if ( !current_user_can( 'manage_options' ) ) 
+						{  
+							// not an admin
+							$button_to_output = false;
+						}
+					}
+
+					// only show dummy button to people with it installed eyond 1st nov 2023 (when PRO was introduced)
+					if ( $button_to_output == 'dummy' )
+					{
+						$propertyhive_install_timestamp = get_option( 'propertyhive_install_timestamp', '' );
+					    if ( !empty($propertyhive_install_timestamp) )
+					    {
+					    	$november_first_2023 = strtotime('2023-11-01 00:00:00');
+					    	if ( $propertyhive_install_timestamp < $november_first_2023 )
+					    	{
+					    		$button_to_output = false;
+					    	}
+					    }
+					}
+
+					switch ( $button_to_output )
+					{
+						case "normal":
+						{
+							echo '<a href="' . admin_url('admin.php?page=propertyhive_import_properties') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+				                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . '
+				            </a>';
+							break;
+						}
+						case "dummy":
+						{
+							echo '<a href="' . admin_url('admin.php?page=ph-import-properties-dummy') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+				                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . ' <span style="color:#FFF; font-size:10px; font-weight:500; border-radius:12px; padding:2px 8px; letter-spacing:1px; background:#00a32a;">PRO</span>
+				            </a>';
+							break;
+						}
+						case "activate":
+						{
+							echo '<a href="' . admin_url('admin.php?page=ph-settings&tab=features&profilter=import') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+				                ' . esc_html( __( 'Activate Property Imports', 'propertyhive' ) ) . '
+				            </a>';
+							break;
+						}
+					}
 	            }
-
-	            // PRO subscription but not activated, class not active
-	            if ( !$import_button_output && PH()->license->get_license_type() == 'pro' )
-	            {
-	            	if ( isset($license['success']) && $license['success'] === true )
-	            	{
-	            		echo '<a href="' . admin_url('admin.php?page=ph-settings&tab=features&profilter=import') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
-			                ' . esc_html( __( 'Activate Property Imports', 'propertyhive' ) ) . '
-			            </a>';
-
-		            	$import_button_output = true;
-	            	}
-	            }
-	            
 
 	        echo '</div>';
 	    }, 99);
