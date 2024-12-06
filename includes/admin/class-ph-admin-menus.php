@@ -23,6 +23,7 @@ class PH_Admin_Menus {
 	public function __construct() {
 		// Add menus
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
+		add_action( 'admin_menu', array( $this, 'import_properties_dummy_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'reports_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'settings_menu' ), 50 );
 		add_action( 'admin_menu', array( $this, 'crm_only_mode_menu' ), 99 );
@@ -265,6 +266,96 @@ class PH_Admin_Menus {
 	        add_submenu_page( null, __( 'Merge Duplicate Contacts', 'propertyhive'), __( 'Merge Duplicate Contacts', 'propertyhive' ), 'manage_propertyhive', 'ph-merge-duplicate-contacts', array($this, 'generate_merge_duplicate_contacts_page'));
 	    }
     }
+
+    /**
+	 * Add menu item
+	 */
+	public function import_properties_dummy_menu() 
+	{
+		// check clauses
+		if ( !current_user_can( 'manage_options' ) )
+		{
+			// Not an administrator
+			return;
+		}
+
+		if ( apply_filters( 'propertyhive_admin_menu_property_import_button', true ) !== true )
+	    {
+	    	// Manually turned off by filter
+	    	return;
+	    }
+
+		if ( class_exists('PH_Property_Import') )
+		{
+			// Already activated. Check can be used
+			if ( apply_filters( 'propertyhive_add_on_can_be_used', true, 'propertyhive-property-import' ) === true )
+        	{
+        		// Yes. Import add on is fine to use
+				return;
+			}
+		}
+
+		// check date installed more than when PRO went live 
+	    $propertyhive_install_timestamp = get_option( 'propertyhive_install_timestamp', '' );
+	    if ( !empty($propertyhive_install_timestamp) )
+	    {
+	    	$november_first_2023 = strtotime('2023-11-01 00:00:00');
+	    	if ( $propertyhive_install_timestamp < $november_first_2023 )
+	    	{
+	    		// Installed before 1st Nov 2023. Don't show anything
+	    		return;
+	    	}
+	    }
+
+	    $show_dummy_link = false;
+
+		$license_type = get_option( 'propertyhive_license_type', '' );
+		if ( $license_type == '' )
+		{
+			$show_dummy_link = true;
+		}
+
+		if ( !$show_dummy_link )
+		{
+			if ( $license_type == 'old' )
+			{
+				// Old user. Don't do anything
+				return;
+			}
+
+			if ( $license_type == 'pro' )
+			{
+				$license_key = get_option( 'propertyhive_pro_license_key', '' );
+				if ( empty($license_key) )
+				{
+					// No license key entered
+					$show_dummy_link = true;
+				}
+				else
+				{
+					if ( PH()->license->is_valid_pro_license_key() )
+					{
+						// valid license key. 
+						return;
+					}
+					else
+					{
+						$show_dummy_link = true;
+					}
+				}
+			}
+		}
+
+        if ( $show_dummy_link === true )
+        {
+			add_submenu_page( 'propertyhive', __( 'Import Properties', 'propertyhive' ),  __( 'Import Properties', 'propertyhive' ) . '<span class="update-plugins" style="padding:0 3px;"><span class="plugin-count">PRO</span></span>', 'manage_options', 'ph-import-properties-dummy', array( $this, 'import_properties_dummy_page' ) );
+		}
+	}
+
+	public function import_properties_dummy_page()
+	{
+		include_once( 'views/html-import-properties-dummy.php' );
+	}
 
 	/**
 	 * Add menu item
