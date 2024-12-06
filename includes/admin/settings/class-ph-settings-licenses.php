@@ -146,7 +146,10 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			'html' 		  => __( '<p>With a Pro license subscription you\'ll unlock a wide array of Property Hive functionality. We offer multiple packages to suit your needs. Your Pro subscription details and license key can be found within the \'<a href="https://wp-property-hive.com/my-account/" target="_blank">My Account</a>\' section of our website.</p>
 							' . ( (!$valid_pro_license) ? 
 									'<br><p><a href="https://wp-property-hive.com/pricing/?src=plugin-license-settings" class="button button-primary" target="_blank">Get PRO</a></p>' : 
-									'<br><p><a href="https://wp-property-hive.com/my-account/" class="button button-primary" target="_blank">Manage Subscription and Get License Key</a></p>' 
+									'<br><p>
+										<a href="' . admin_url('admin.php?page=ph-settings&tab=features') . '" class="button button-primary">Activate Features</a>
+										<a href="https://wp-property-hive.com/my-account/subscriptions/?src=wordpress-license-tab" class="button button" target="_blank">Manage Subscription</a>
+									</p>'
 								), 'propertyhive' ) . '
 			<input type="hidden" name="pro_license_key_action" value="' . ( $valid_pro_license ? 'deactivate' : 'activate' ) . '">',
 		);
