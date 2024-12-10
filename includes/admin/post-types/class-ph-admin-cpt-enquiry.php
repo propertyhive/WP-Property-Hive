@@ -152,14 +152,14 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                     {
                         if ( count($viewing_ids) == 1 )
                         {
-                            $enquiry_text = 'is an existing viewing';
+                            $enquiry_text = __( 'is an existing viewing', 'propertyhive' );
                         }
                         else
                         {
-                            $enquiry_text = 'are ' . count($viewing_ids) . ' existing viewings';
+                            $enquiry_text = sprintf( __( 'are %s existing viewings', 'propertyhive' ), count($viewing_ids) );
                         }
 
-                        $message = '<p>' . __( 'There ' . $enquiry_text . ' for this applicant at this property.', 'propertyhive' ) . '</p>';
+                        $message = '<p>' . sprintf( __( 'There %s for this applicant at this property.', 'propertyhive' ), $enquiry_text ) . '</p>';
                         foreach( $viewing_ids as $viewing_id )
                         {
                             $message .= '<p><a href="' . get_edit_post_link( $viewing_id ) . '" class="button">' . __( 'Edit Viewing', 'propertyhive' ) . '</a></p>';
