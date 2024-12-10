@@ -1,13 +1,10 @@
 {
     "plugins": [
         "https://downloads.wordpress.org/plugin/query-monitor.3.16.4.zip",
-        "https://github.com/propertyhive/WP-Property-Hive-Template-Assistant-Add-On/archive/refs/heads/master.zip",
-        "https://github.com/propertyhive/WP-Property-Hive-Demo-Data-Add-On/archive/refs/heads/master.zip",
         "."
     ],
     "themes": [ "https://github.com/propertyhive/honeycomb/archive/heads/master.zip" ],
     "lifecycleScripts": {
-        "afterStart": "wp-env run cli wp create-demo-data"
     }
 }
 
