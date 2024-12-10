@@ -133,7 +133,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
             {
                 $args[] = array(
-                    'title' => __( 'Telephone Number (' . $value . ')', 'propertyhive' ),
+                    'title' => sprintf( __( 'Telephone Number (%s)', 'propertyhive' ), $value ),
                     'id'        => '_office_telephone_number_' . str_replace("residential-", "", $key),
                     //'css'       => 'width:50px;',
                     'default'   => get_post_meta($current_id, '_office_telephone_number_' . str_replace("residential-", "", $key), TRUE),
@@ -142,7 +142,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 );
                 
                 $args[] = array(
-                    'title' => __( 'Email Address (' . $value . ')', 'propertyhive' ),
+                    'title' => sprintf( __( 'Email Address (%s)', 'propertyhive' ), $value ),
                     'id'        => '_office_email_address_' . str_replace("residential-", "", $key),
                     //'css'       => 'width:50px;',
                     'default'   => get_post_meta($current_id, '_office_email_address_' . str_replace("residential-", "", $key), TRUE),
