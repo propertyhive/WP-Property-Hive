@@ -774,8 +774,8 @@ class PH_Admin {
                             <p>' . __( 'The Property Hive email queue does not appear to be running', 'propertyhive' ) . '
                             </p>
                             <p>
-                                <a href="'. admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued') . '" class="button-primary">" . __( 'Go To Email Queue', 'propertyhive' ) . "</a>
-                                <!--<a href="" class="button" id="ph_dismiss_notice_email_cron_not_running">" . __( 'Dismiss', 'propertyhive' ) . "</a>-->
+                                <a href="'. admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued') . '" class="button-primary">' . __( 'Go To Email Queue', 'propertyhive' ) . '</a>
+                                <!--<a href="" class="button" id="ph_dismiss_notice_email_cron_not_running">' . __( 'Dismiss', 'propertyhive' ) . '</a>-->
                             </p>
                         </div>
                     ';
