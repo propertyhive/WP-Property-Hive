@@ -119,7 +119,7 @@ class PH_Admin {
 
     public function check_hide_demo_data_tab()
     {
-        if ( isset($_GET['tab']) && $_GET['tab'] == 'demodata' && isset($_GET['hidetab']) )
+        if ( isset($_GET['tab']) && $_GET['tab'] == 'demo_data' && isset($_GET['hidetab']) )
         {
             update_option( 'propertyhive_hide_demo_data_tab', 'yes' );
             wp_redirect( admin_url('admin.php?page=ph-settings') );
@@ -665,7 +665,7 @@ class PH_Admin {
                             " . __( '<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?', 'propertyhive' ) . "
                         </p>
                         <p>
-                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=demodata') . "\" class=\"button-primary\">Import Demo Data</a>
+                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=demo_data') . "\" class=\"button-primary\">Import Demo Data</a>
                             <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_demo_data\">Dismiss</a>
                         </p>
                         

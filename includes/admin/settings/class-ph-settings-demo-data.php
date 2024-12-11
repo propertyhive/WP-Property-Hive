@@ -24,12 +24,12 @@ class PH_Settings_Demo_Data extends PH_Settings_Page {
      */
     public function __construct()
     {
-        $this->id    = 'demodata';
+        $this->id    = 'demo_data';
         $this->label = __( 'Demo Data', 'propertyhive' );
 
         add_filter( 'propertyhive_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
         add_action( 'propertyhive_settings_' . $this->id, array( $this, 'output' ) );
-        add_action( 'propertyhive_admin_field_demodata', array( $this, 'demodata_setting' ) );
+        add_action( 'propertyhive_admin_field_demo_data', array( $this, 'demodata_setting' ) );
     }
 
     /**
@@ -46,7 +46,7 @@ class PH_Settings_Demo_Data extends PH_Settings_Page {
         return apply_filters( 'propertyhive_demo_data_settings', array(
 
             array(
-                'type'      => 'demodata',
+                'type'      => 'demo_data',
             ),
 
             array( 'type' => 'sectionend', 'id' => 'demo_data_options')
@@ -88,9 +88,9 @@ class PH_Settings_Demo_Data extends PH_Settings_Page {
                     </p>
                     <br>
                     <p>
-                        <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=features'); ?>" class="button button-primary">Activate Demo Data Feature</a>
+                        <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=features&profilter=free'); ?>" class="button button-primary">Activate Demo Data Feature</a>
                         &nbsp;
-                        <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=demodata&hidetab=1'); ?>">Hide This Page</a>
+                        <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=demo_data&hidetab=1'); ?>">Hide This Page</a>
                     </p>
                 </td>
             </tr>
