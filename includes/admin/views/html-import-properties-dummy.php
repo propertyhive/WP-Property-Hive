@@ -143,7 +143,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<p>Our step-by-step wizard makes setting up an import really easy. Simply choose your format and set your preferences to get up and running.</p>
 			</div>
 			<br>
-			<a href="https://wp-property-hive.com/addons/property-import/?src=wordpress-dummy-page" target="_blank" class="button button-primary button-hero">Get PRO →</a>
+			<a href="https://wp-property-hive.com/addons/property-import/?src=wordpress-dummy-page" target="_blank" class="button button-primary button-hero" style="text-align:center;">Get PRO →</a>
 
 		</div>
 
