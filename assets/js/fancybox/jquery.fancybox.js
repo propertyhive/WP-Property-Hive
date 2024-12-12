@@ -3609,6 +3609,12 @@
 	      }
       }
 
+      if (url.includes('youtube.com/shorts/')) 
+      {
+        var videoId = url.split('/shorts/')[1].split('?')[0];
+        url = 'https://youtube.com/watch?v=' + videoId;
+      }
+
       rez = url.match(providerOpts.matcher);
 
       if (!rez) {
