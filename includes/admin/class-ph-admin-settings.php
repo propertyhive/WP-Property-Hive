@@ -95,10 +95,10 @@ class PH_Admin_Settings {
 	public static function show_messages() {
 		if ( sizeof( self::$errors ) > 0 ) {
 			foreach ( self::$errors as $error )
-				echo '<div id="message" class="error fade"><p><strong>' . $error . '</strong></p></div>';
+				echo '<div id="message" class="error fade"><p><strong>' . esc_html($error) . '</strong></p></div>';
 		} elseif ( sizeof( self::$messages ) > 0 ) {
 			foreach ( self::$messages as $message )
-				echo '<div id="message" class="updated fade"><p><strong>' . $message . '</strong></p></div>';
+				echo '<div id="message" class="updated fade"><p><strong>' . esc_html($message) . '</strong></p></div>';
 		}
 	}
 
