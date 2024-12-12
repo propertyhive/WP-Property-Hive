@@ -148,7 +148,7 @@ class PH_Plugin_Updates {
 		echo '<tr class="plugin-update-tr' . $active_class . '">
 			<td colspan="3" class="plugin-update colspanchange">
 				<div class="update-message notice inline notice-warning notice-alt">
-					<p>An update is available for this plugin. It is recommended that you update to ensure you receive the latest features and bug fixes. You can access updates to plugins by <a href="https://wp-property-hive.com/pricing/plugin-update-notice" target="_blank">purchasing a pro package</a>.</p>
+					<p>An update is available for this plugin. It is recommended that you update to ensure you receive the latest features and bug fixes. You can access updates to plugins by <a href="https://wp-property-hive.com/pricing/?src=plugin-update-notice" target="_blank">purchasing a pro package</a>.</p>
 				</div>
 			</td>
 		</tr>';
