@@ -89,9 +89,8 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property-search-form' => 'background: {{VALUE}}',
@@ -138,7 +137,9 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'label_typography',
 				'label' => __( 'Label Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .property-search-form label',
 			]
 		);
@@ -148,9 +149,8 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Label Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property-search-form label' => 'color: {{VALUE}}',
@@ -214,7 +214,9 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'input_typography',
 				'label' => __( 'Input Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']',
 			]
 		);
@@ -224,9 +226,8 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Input Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']' => 'color: {{VALUE}}',
@@ -290,7 +291,9 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'button_typography',
 				'label' => __( 'Button Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .property-search-form input[type=\'submit\']',
 			]
 		);
@@ -300,9 +303,8 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Button Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property-search-form input[type=\'submit\']' => 'color: {{VALUE}}',
