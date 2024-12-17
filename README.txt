@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.7.1
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,13 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.1 - 2024-12-17 =
+* Added support for latest version of Elementor where they've deprecated schemes
+* Added support YouTube shorts when showing videos in lightbox
+* Run settings success/error messages through esc_html()
+* Corrected pricing link in update message
+* Added more options to deactivation survey
 
 = 2.1.0 - 2024-12-11 =
 * Add new splash screen when no properties exist
