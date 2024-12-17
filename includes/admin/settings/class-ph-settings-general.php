@@ -47,318 +47,13 @@ class PH_Settings_General extends PH_Settings_Page {
             'gdpr'          => __( 'GDPR', 'propertyhive' ),
             'captcha'       => __( 'CAPTCHA', 'propertyhive' ),
             'misc'          => __( 'Miscellaneous', 'propertyhive' ),
+            'SEO'           => __('SEO Settings', 'propertyhive')
         );
 
         return $sections;
     }
 
 	
-	/**
-	 * Get general settings array
-	 *
-	 * @return array
-	 */
-	public function get_settings() {
-		
-        $default_departments = ph_get_departments(true);
-        $departments = ph_get_departments();
-        $custom_departments = ph_get_custom_departments(false);
-
-		$settings = array(
-
-			array( 'title' => __( 'General Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'general_options' ),
-        
-        );
-
-        $active_departments_html = '<div id="active_departments">';
-        
-        foreach ( $departments as $key => $value )
-        {
-            if ( isset($custom_departments[$key]) )
-            {
-                
-            }
-            else
-            {
-                $active_departments_html .= '<fieldset>
-                    <legend class="screen-reader-text"><span>' . esc_html(__( 'Active Departments', 'propertyhive' )) . '</span></legend>
-                    <label for="propertyhive_active_departments_' . esc_attr(str_replace("residential-", "", $key)) . '">
-                        <input name="propertyhive_active_departments_' . esc_attr(str_replace("residential-", "", $key)) . '" id="propertyhive_active_departments_' . esc_attr(str_replace("residential-", "", $key)) . '" type="checkbox" value="1" ' . checked( get_option('propertyhive_active_departments_' . str_replace("residential-", "", $key)) , 'yes', false ) . '> ' . esc_html($value) . '
-                    </label>
-                </fieldset>';
-            }
-        }
-
-        if ( !empty($custom_departments) )
-        {
-            foreach ( $custom_departments as $key => $custom_department )
-            {
-                // key will be custom-0, for example
-                $active_departments_html .= '<fieldset id="propertyhive_active_department_fieldset_' . esc_attr($key) . '">
-                    <legend class="screen-reader-text"><span>' . esc_html(__( 'Active Departments', 'propertyhive' )) . '</span></legend>
-                    <label>
-                        <input name="propertyhive_active_departments_' . esc_attr($key) . '" type="checkbox" value="1" ' . checked( get_option('propertyhive_active_departments_' . $key), 'yes', false ) . '> 
-                        <input type="text" name="propertyhive_active_departments_name_' . esc_attr($key) . '" value="' . $custom_department['name'] . '">
-                        ' . __( 'based on', 'propertyhive' ) . '
-                        <select name="propertyhive_active_departments_based_on_' . esc_attr($key) . '">
-                            <option value=""></option>';
-                        foreach ( $default_departments as $dept_key => $value )
-                        {
-                            $active_departments_html .= '<option value="' . esc_attr($dept_key) . '"' . selected( $custom_department['based_on'], $dept_key, false ) . '>' . esc_html($value) . '</option>';
-                        }
-                        $active_departments_html .= '
-                        </select>
-                        <a href="" class="delete-department" data-department="' . esc_attr($key) . '">Delete</a>
-                    </label>
-                </fieldset>';
-            }
-        }
-
-        $active_departments_html .= '</div>
-        <a href="" id="add_department">+ ' . esc_html(__( 'Add Department', 'propertyhive' )) . '</a>
-        <input type="hidden" name="propertyhive_new_custom_departments" id="propertyhive_new_custom_departments" value="0">
-        <input type="hidden" name="propertyhive_custom_departments" id="propertyhive_custom_departments" value="' . esc_attr(implode(",", array_keys($custom_departments))) . '">
-        <input type="hidden" name="propertyhive_custom_departments_original" id="propertyhive_custom_departments_original" value="' . esc_attr(implode(",", array_keys($custom_departments))) . '">
-        ';
-
-        $active_departments_html .= '<div id="active_department_template" style="display:none">
-            <fieldset id="propertyhive_active_department_fieldset_template">
-                <legend class="screen-reader-text"><span>' . __( 'Active Departments', 'propertyhive' ) . '</span></legend>
-                <label>
-                    <input name="propertyhive_active_departments_template" type="checkbox" value="1" checked> 
-                    <input type="text" name="propertyhive_active_departments_name_template" value=""> 
-                    ' . __( 'based on', 'propertyhive' ) . '
-                    <select name="propertyhive_active_departments_based_on_template">
-                        <option value=""></option>';
-            foreach ( $default_departments as $key => $value )
-            {
-                $active_departments_html .= '<option value="' . esc_attr($key) . '">' . esc_html($value) . '</option>';
-            }
-            $active_departments_html .= '
-                    </select>
-                    <a href="" class="delete-department" data-department="template">Delete</a>
-                </label>
-            </fieldset>
-        </div>';
-
-        $settings[] = array(
-            'title'   => __( 'Active Departments', 'propertyhive' ),
-            'id'      => 'propertyhive_active_departments',
-            'type'    => 'html',
-            'html'    => $active_departments_html,
-        );
-
-        $settings[] = array(
-            'title'   => __( 'Primary Department', 'propertyhive' ),
-            'id'      => 'propertyhive_primary_department',
-            'type'    => 'radio',
-            'default' => 'residential-sales',
-            'options' => $departments,
-        );
-            
-        $settings[] = array(
-            'title' => __( 'Property Search Results Page', 'propertyhive' ),
-            'id'        => 'propertyhive_search_results_page_id',
-            'type'      => 'single_select_page',
-            'default'   => '',
-            'css'       => 'min-width:300px;',
-            'desc'  => __( 'This sets the page of your property search results', 'propertyhive' ),
-        );
-
-        $settings[] = array(
-            'title'   => __( 'Lettings Fees (Residential)', 'propertyhive' ),
-            'id'      => 'propertyhive_lettings_fees',
-            'type'    => 'textarea',
-            'css'	  => 'height:150px; width:100%; max-width:400px'
-        );
-
-        $settings[] = array(
-            'title'   => __( 'Lettings Fees (Commercial)', 'propertyhive' ),
-            'id'      => 'propertyhive_lettings_fees_commercial',
-            'type'    => 'textarea',
-            'css'     => 'height:150px; width:100%; max-width:400px'
-        );
-
-        $settings[] = array(
-            'title'   => __( 'Display Link To Lettings Fees Next To Price', 'propertyhive' ),
-            'desc'    => __( 'In Search Results', 'propertyhive' ),
-            'id'      => 'propertyhive_lettings_fees_display_search_results',
-            'type'    => 'checkbox',
-            'checkboxgroup' => 'start',
-        );
-
-        $settings[] = array(
-            'title'   => __( 'Display Link To Lettings Fees Next To Price', 'propertyhive' ),
-            'desc'    => __( 'On Property Details Page', 'propertyhive' ),
-            'id'      => 'propertyhive_lettings_fees_display_single_property',
-            'type'    => 'checkbox',
-            'checkboxgroup' => 'end',
-        );
-            
-		$settings[] = array( 'type' => 'sectionend', 'id' => 'general_options');
-
-        return apply_filters( 'propertyhive_general_settings', $settings );
-	}
-
-	/**
-	 * Get general modules settings array
-	 *
-	 * @return array
-	 */
-	public function get_general_modules_setting() {
-		    
-		return apply_filters( 'propertyhive_general_modules_settings', array(
-
-			array( 'title' => __( 'Disabled Modules', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'modules_options' ),
-
-			array(
-                'type'    => 'html',
-                'html'    => __( 'Here you can choose which modules are enabled or disabled within Property Hive. Check the modules you <strong>DO NOT</strong> wish to use from the list below', 'propertyhive' ) . ':',
-            ),
-            
-            array(
-                'title'   => __( 'Disabled Modules', 'propertyhive' ),
-                'desc'    => __( 'Contacts (Applicants, Owners/Landlords and Third Party Contacts)', 'propertyhive' ),
-                'id'      => 'propertyhive_module_disabled_contacts',
-                'type'    => 'checkbox',
-                'default' => '',
-                'checkboxgroup' => 'start'
-            ),
-
-            array(
-                'title'   => __( 'Disabled Modules', 'propertyhive' ),
-                'desc'    => __( 'Appraisals', 'propertyhive' ),
-                'id'      => 'propertyhive_module_disabled_appraisals',
-                'type'    => 'checkbox',
-                'default' => '',
-                'checkboxgroup' => 'middle'
-            ),
-            
-            array(
-                'title'   => __( 'Disabled Modules', 'propertyhive' ),
-                'desc'    => __( 'Viewings', 'propertyhive' ),
-                'id'      => 'propertyhive_module_disabled_viewings',
-                'type'    => 'checkbox',
-                'default' => '',
-                'checkboxgroup' => 'middle'
-            ),
-
-            array(
-                'title'   => __( 'Disabled Modules', 'propertyhive' ),
-                'desc'    => __( 'Offers and Sales', 'propertyhive' ),
-                'id'      => 'propertyhive_module_disabled_offers_sales',
-                'type'    => 'checkbox',
-                'default' => '',
-                'checkboxgroup' => 'middle'
-            ),
-
-            array(
-                'title'   => __( 'Disabled Modules', 'propertyhive' ),
-                'desc'    => __( 'Tenancies', 'propertyhive' ),
-                'id'      => 'propertyhive_module_disabled_tenancies',
-                'type'    => 'checkbox',
-                'default' => '',
-                'checkboxgroup' => 'middle'
-            ),
-
-            array(
-                'title'   => __( 'Disabled Modules', 'propertyhive' ),
-                'desc'    => __( 'Enquiries', 'propertyhive' ),
-                'id'      => 'propertyhive_module_disabled_enquiries',
-                'type'    => 'checkbox',
-                'default' => '',
-                'checkboxgroup' => 'end'
-            ),
-            
-			array( 'type' => 'sectionend', 'id' => 'modules_options'),
-
-		) ); // End general module settings
-	}
-
-	/**
-	 * Get international settings array
-	 *
-	 * @return array
-	 */
-	public function get_general_international_setting() {
-
-		$settings = array(
-
-			array( 'title' => __( 'International Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'international_options' ),
-
-			array(
-                'title'   => __( 'Default Country', 'propertyhive' ),
-                'id'      => 'propertyhive_default_country',
-                'type'    => 'single_select_country',
-                'css'       => 'min-width:300px;',
-            ),
-
-            array(
-                'title'   => __( 'Countries Where You Operate', 'propertyhive' ),
-                'id'      => 'propertyhive_countries',
-                'type'    => 'multi_select_countries',
-                'css'       => 'min-width:300px;',
-                'desc'	=> __( 'Hold ctrl/cmd whilst clicking to select multiple', 'propertyhive' )
-            ),
-
-            array(
-                'title'   => __( 'Price Thousand Separator', 'propertyhive' ),
-                'id'      => 'propertyhive_price_thousand_separator',
-                'type'    => 'text',
-                'default' => ',',
-                'css'       => 'width:50px;',
-                'desc'  => __( 'This only effects prices output on the frontend. Prices entered and displayed in the backend will use the comma character (,) as the thousand separator.', 'propertyhive' )
-            ),
-
-            array(
-                'title'   => __( 'Price Decimal Separator', 'propertyhive' ),
-                'id'      => 'propertyhive_price_decimal_separator',
-                'type'    => 'text',
-                'default' => '.',
-                'css'       => 'width:50px;',
-                'desc'  => __( 'This only effects prices output on the frontend. Prices entered and displayed in the backend will use the period character (.) as the decimal separator.', 'propertyhive' )
-            )
-        );
-
-        $ph_countries = new PH_Countries();
-        $ph_countries = $ph_countries->countries;
-
-        $currencies = array();
-        $countries = array();
-        if ( !empty($ph_countries) )
-        {
-            foreach ( $ph_countries as $country_code => $country )
-            {
-                $currencies[$country['currency_code']] = $country['currency_code'];
-                $countries[$country_code] = $country;
-            }
-        }
-        $currencies = array_unique($currencies);
-        ksort($currencies);
-
-        $settings[] =  array(
-            'title'   => __( 'Currency Used In Search Forms', 'propertyhive' ),
-            'id'      => 'propertyhive_search_form_currency',
-            'type'    => 'select',
-            'options' => $currencies,
-            'default' => 'GBP',
-            'desc'    => __( 'Please note that this doesn\'t change the currency symbol shown in price dropdowns within search forms. The easiest way to achieve that is to use our free <a href="https://wp-property-hive.com/addons/template-assistant/" target="_blank">Template Assistant add on</a>.', 'propertyhive' ),
-        );
-
-		$settings[] = array( 'type' => 'sectionend', 'id' => 'international_options');
-
-        $settings[] = array(
-            'type' => 'html',
-            'html' => '<script>
-
-                var countries = '. json_encode( $countries ) . ';
-
-            </script>'
-        );
-
-        return apply_filters( 'propertyhive_general_international_settings', $settings );
-	}
-
 	/**
 	 * Get map settings array
 	 *
@@ -765,6 +460,12 @@ class PH_Settings_General extends PH_Settings_Page {
 		) ); // End general misc settings
 	}
 
+    public function get_seo_settings() {
+        return apply_filters( 'propertyhive_general_seo_settings', array(
+
+        ));
+    }
+
 	/**
      * Output the settings
      */
@@ -782,6 +483,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 case "gdpr": { $settings = $this->get_general_gdpr_setting(); break; }
                 case "captcha": { $settings = $this->get_general_captcha_setting(); break; }
                 case "misc": { $settings = $this->get_general_misc_setting(); break; }
+                case "seo": { $settings = $this->get_seo_settings(); break;}
                 default: { die("Unknown setting section"); }
             }
         }
