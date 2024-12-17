@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <form id="deactivationSurvey">
                         <label><input type="radio" name="reason" value="Broke site"> ${deactivation_survey.brokeSite}</label>
                         <label><input type="radio" name="reason" value="Confusing"> ${deactivation_survey.confusing}</label>
+                        <label><input type="radio" name="reason" value="Poor performance"> ${deactivation_survey.poorPerformance}</label>
+                        <label><input type="radio" name="reason" value="Inadequate support documentation"> ${deactivation_survey.inadequateSupport}</label>
                         <label><input type="radio" name="reason" value="Not needed"> ${deactivation_survey.notNeeded}</label>
                         <label><input type="radio" name="reason" value="Found a better plugin"> ${deactivation_survey.betterPlugin}</label>
                         <label><input type="radio" name="reason" value="Temporary"> ${deactivation_survey.temporary}</label>
