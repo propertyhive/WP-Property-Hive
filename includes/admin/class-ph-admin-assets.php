@@ -426,6 +426,8 @@ class PH_Admin_Assets {
 
                 'brokeSite'       => __('The plugin broke my site', 'propertyhive'),
                 'confusing'       => __('The plugin is confusing', 'propertyhive'),
+                'inadequateSupport' => __('The support/documentation is inadequate', 'propertyhive'),
+                'poorPerformance' => __('The plugin is too slow/affects performance', 'propertyhive'),
                 'notNeeded'       => __('I no longer need the plugin', 'propertyhive'),
                 'betterPlugin'    => __('I found a better plugin', 'propertyhive'),
                 'temporary'       => __('It\'s a temporary deactivation', 'propertyhive'),
