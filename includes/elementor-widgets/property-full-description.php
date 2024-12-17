@@ -53,7 +53,9 @@ class Elementor_Property_Full_Description_Widget extends \Elementor\Widget_Base 
 			[
 				'name' => 'title_typography',
 				'label' => __( 'Title Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .description h4',
 				'condition' => [
 		            'show_title' => 'yes'
@@ -66,9 +68,8 @@ class Elementor_Property_Full_Description_Widget extends \Elementor\Widget_Base 
 			[
 				'label' => __( 'Title Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .description h4' => 'color: {{VALUE}}',
@@ -84,7 +85,9 @@ class Elementor_Property_Full_Description_Widget extends \Elementor\Widget_Base 
 			[
 				'name' => 'description_typography',
 				'label' => __( 'Description Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .description .description-contents',
 			]
 		);
@@ -94,9 +97,8 @@ class Elementor_Property_Full_Description_Widget extends \Elementor\Widget_Base 
 			[
 				'label' => __( 'Description Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .description .description-contents' => 'color: {{VALUE}}',

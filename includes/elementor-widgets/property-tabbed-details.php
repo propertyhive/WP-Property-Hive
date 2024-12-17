@@ -221,9 +221,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .elementor-tab-title' => 'color: {{VALUE}};',
 				],
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 			]
 		);
@@ -236,9 +235,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .elementor-tab-title.elementor-active' => 'color: {{VALUE}};',
 				],
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_4,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_ACCENT,
 				],
 			]
 		);
@@ -248,7 +246,9 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'tab_typography',
 				'selector' => '{{WRAPPER}} .elementor-tab-title',
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 			]
 		);
 
@@ -269,9 +269,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .elementor-tab-content' => 'color: {{VALUE}};',
 				],
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_3,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_TEXT,
 				],
 			]
 		);
@@ -281,7 +280,9 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'content_typography',
 				'selector' => '{{WRAPPER}} .elementor-tab-content',
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_3,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_TEXT,
+				],
 			]
 		);
 

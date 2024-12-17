@@ -53,7 +53,9 @@ class Elementor_Property_Summary_Description_Widget extends \Elementor\Widget_Ba
 			[
 				'name' => 'title_typography',
 				'label' => __( 'Title Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .summary h4',
 				'condition' => [
 		            'show_title' => 'yes'
@@ -66,9 +68,8 @@ class Elementor_Property_Summary_Description_Widget extends \Elementor\Widget_Ba
 			[
 				'label' => __( 'Title Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .summary h4' => 'color: {{VALUE}}',
@@ -84,7 +85,9 @@ class Elementor_Property_Summary_Description_Widget extends \Elementor\Widget_Ba
 			[
 				'name' => 'summary_typography',
 				'label' => __( 'Summary Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .summary .summary-contents',
 			]
 		);
@@ -94,9 +97,8 @@ class Elementor_Property_Summary_Description_Widget extends \Elementor\Widget_Ba
 			[
 				'label' => __( 'Summary Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .summary .summary-contents' => 'color: {{VALUE}}',

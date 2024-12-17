@@ -53,7 +53,9 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 			[
 				'name' => 'title_typography',
 				'label' => __( 'Title Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .embedded-virtual-tours h4',
 				'condition' => [
 		            'show_title' => 'yes'
@@ -66,9 +68,8 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 			[
 				'label' => __( 'Title Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .embedded-virtual-tours h4' => 'color: {{VALUE}}',
