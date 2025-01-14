@@ -376,7 +376,8 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'    => 'radio',
                 'options' => array(
                     '' => 'Google Maps',
-                    'osm' => 'OpenStreetMap'
+                    'mapbox' => 'Mapbox',
+                    'osm' => 'OpenStreetMap',
                 ),
             ),
 
@@ -388,12 +389,20 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title'   => __( 'Mapbox API Key', 'propertyhive' ),
+                'id'      => 'propertyhive_mapbox_api_key',
+                'type'    => 'text',
+                'desc'  => '<p>' . __( 'If you have a Mapbox API key you can enter it here. You can generate an API key <a href="https://account.mapbox.com/" target="_blank">here</a>.' ) . '</p>'
+            ),
+
+            array(
                 'title'   => __( 'Geocoding Provider', 'propertyhive' ),
                 'id'      => 'propertyhive_geocoding_provider',
                 'type'    => 'radio',
                 'options' => array(
                     '' => 'Google Maps',
-                    'osm' => 'OpenStreetMap'
+                    //'mapbox' => 'Mapbox',
+                    'osm' => 'OpenStreetMap',
                 ),
             ),
 
@@ -409,6 +418,13 @@ class PH_Settings_General extends PH_Settings_Page {
             $settings[] = array(
                 'title'   => __( 'Google Maps Geocoding API Key', 'propertyhive' ),
                 'id'      => 'propertyhive_google_maps_geocoding_api_key',
+                'type'    => 'text',
+                'desc'  => '<p>' . __( 'If you have referer restrictions applied to the main API key entered then server side geocoding requests will be blocked. To get around this you can setup a separate API key specifically for geocoding and enter it here, with IP restrictions applied instead if required.<br>More about this can be found <a href="https://docs.wp-property-hive.com/user-guide/maps-co-ordinates-and-geocoding/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
+            );
+
+            $settings[] = array(
+                'title'   => __( 'Mapbox Geocoding API Key', 'propertyhive' ),
+                'id'      => 'propertyhive_mapbox_geocoding_api_key',
                 'type'    => 'text',
                 'desc'  => '<p>' . __( 'If you have referer restrictions applied to the main API key entered then server side geocoding requests will be blocked. To get around this you can setup a separate API key specifically for geocoding and enter it here, with IP restrictions applied instead if required.<br>More about this can be found <a href="https://docs.wp-property-hive.com/user-guide/maps-co-ordinates-and-geocoding/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
             );
