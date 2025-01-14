@@ -401,7 +401,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'    => 'radio',
                 'options' => array(
                     '' => 'Google Maps',
-                    'mapbox' => 'Mapbox',
+                    //'mapbox' => 'Mapbox',
                     'osm' => 'OpenStreetMap',
                 ),
             ),
