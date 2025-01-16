@@ -346,31 +346,36 @@ class PH_Meta_Box_Contact_Relationships
             $countries = get_option('propertyhive_countries', array($default_country));
             $currencies = array();
 
-            foreach ($countries as $country) {
+            foreach ( $countries as $country ) 
+            {
                 $country = $ph_countries->get_country($country);
 
-                if (!isset($currencies[$country['currency_code']])) {
+                if ( !isset($currencies[$country['currency_code']]) ) 
+                {
                     $currencies[$country['currency_code']] = $country['currency_symbol'];
                 }
             }
 
-            if(isset($applicant_profile['applicant_currency'])) {
+            if ( isset($applicant_profile['applicant_currency']) )
+            {
                 $selected_currency = $applicant_profile['applicant_currency'];
             }
 
             // Cater for when no currency selected or currencies have been updated in settings so existing currency doesn't exist
 
-            if (empty($selected_currency) || !isset($currencies[$selected_currency])) {
+            if ( empty($selected_currency) || !isset($currencies[$selected_currency]) ) 
+            {
                 $country = $ph_countries->get_country($default_country);
                 $selected_currency = $country['currency_code'];
             }
 
             // echo("Selected Currency: " . $selected_currency);
 
-            echo '<p class="form-field">';
+            /*echo '<p class="form-field">';
             echo '<label for="_price">' . esc_html(__('Default Currency', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
 
-            if (count($currencies) > 1) {
+            if ( count($currencies) > 1 )
+            {
                 echo '<select id="applicant_currency_sales_' . $key . '" name="applicant_currency_sales_' . $key . '" class="select" style="width:50%; float:left;">';
                 foreach ($currencies as $currency_code => $currency_symbol) {
                     echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
@@ -379,21 +384,24 @@ class PH_Meta_Box_Contact_Relationships
             } else {
                 echo '<input type="hidden" name="applicant_currency_sales_' . $key .  '" id="applicant_currency_sales_' . $key .'" value="' . esc_attr($selected_currency) . '">';
             }
-            echo '</p>';
-
+            echo '</p>';*/
 
             // Price
-            propertyhive_wp_text_input(array(
-                'id' => '_applicant_maximum_price_' . $key,
-                'label' => __('Maximum Price', 'propertyhive'),
-                'desc_tip' => false,
-                'type' => 'text',
-                'class' => '',
-                'custom_attributes' => array(
-                    'style' => 'width:100%; max-width:150px;'
-                ),
-                'value' => ((isset($applicant_profile['max_price'])) ? ph_display_price_field($applicant_profile['max_price']) : '')
-            ));
+            echo '<p class="form-field">';
+            echo '<label for="_applicant_maximum_price_' . $key . '">' . esc_html(__('Maximum Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol maximum-price-currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
+
+            if ( count($currencies) > 1 )
+            {
+                echo '<select id="applicant_currency_sales_' . $key . '" name="applicant_currency_sales_' . $key . '" class="select" style="width:auto; float:left;">';
+                foreach ($currencies as $currency_code => $currency_symbol) {
+                    echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
+                }
+                echo '</select>';
+            } else {
+                echo '<input type="hidden" name="applicant_currency_sales_' . $key .  '" id="applicant_currency_sales_' . $key .'" value="' . esc_attr($selected_currency) . '">';
+            }
+            echo '<input type="text" class="" name="_applicant_maximum_price_' . $key . '" id="_applicant_maximum_price_' . $key . '" value="' . ( isset($applicant_profile['max_price']) ? ph_display_price_field($applicant_profile['max_price']) : '' ) . '" placeholder="" style="width:100%; max-width:150px;">';
+            echo '</p>';
 
             $percentage_lower = get_option('propertyhive_applicant_match_price_range_percentage_lower', '');
             $percentage_higher = get_option('propertyhive_applicant_match_price_range_percentage_higher', '');
@@ -427,15 +435,15 @@ class PH_Meta_Box_Contact_Relationships
 
                 echo '<p class="form-field applicant_match_price_range_field ">
                             
-                                <label for="_applicant_match_price_range_' . esc_attr($key) . '">' . esc_html(__('Match Price Range', 'propertyhive')) . '</label>
-                                
-                                <input type="text" class="" name="_applicant_match_price_range_lower_' . esc_attr($key) . '" id="_applicant_match_price_range_lower_' . esc_attr($key) . '" value="' . esc_attr(ph_display_price_field($match_price_range_lower)) . '" style="width:20%; max-width:150px;">
-                                <span style="float:left; margin:0 5px;">to</span>
-                                <input type="text" class="" name="_applicant_match_price_range_higher_' . esc_attr($key) . '" id="_applicant_match_price_range_higher_' . esc_attr($key) . '" value="' . esc_attr(ph_display_price_field($match_price_range_higher)) . '" style="width:20%; max-width:150px;">
-                                &nbsp;
-                                <a href="" id="match_price_range_shortcut_' . esc_attr($key) . '" style="display:none">' . esc_html(__('Update', 'propertyhive')) . '</a>
-                                
-                            </p>';
+                    <label for="_applicant_match_price_range_' . esc_attr($key) . '">' . esc_html(__('Match Price Range', 'propertyhive')) . ' (<span class="currency-symbol price-range-currency-symbol">' . $currencies[$selected_currency] . '</span>)</label>
+                    
+                    <input type="text" class="" name="_applicant_match_price_range_lower_' . esc_attr($key) . '" id="_applicant_match_price_range_lower_' . esc_attr($key) . '" value="' . esc_attr(ph_display_price_field($match_price_range_lower)) . '" style="width:20%; max-width:150px;">
+                    <span style="float:left; margin:0 5px;">to</span>
+                    <input type="text" class="" name="_applicant_match_price_range_higher_' . esc_attr($key) . '" id="_applicant_match_price_range_higher_' . esc_attr($key) . '" value="' . esc_attr(ph_display_price_field($match_price_range_higher)) . '" style="width:20%; max-width:150px;">
+                    &nbsp;
+                    <a href="" id="match_price_range_shortcut_' . esc_attr($key) . '" style="display:none">' . esc_html(__('Update', 'propertyhive')) . '</a>
+                    
+                </p>';
 
                 echo '<script>
 
