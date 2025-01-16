@@ -1189,10 +1189,16 @@ class PH_Query {
             isset( $_REQUEST['minimum_price'] ) && $_REQUEST['minimum_price'] != '' 
         )
         {
+        	$minimum_price = $_REQUEST['minimum_price'];
+
+        	if ( !is_numeric($minimum_price) )
+        	{
+        		return $meta_query;
+        	}
+
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
 
-        	$minimum_price = $_REQUEST['minimum_price'];
         	if ( $search_form_currency != 'GBP' )
         	{
         		// Convert $_REQUEST['minimum_price'] to GBP
@@ -1227,10 +1233,16 @@ class PH_Query {
             isset( $_REQUEST['maximum_price'] ) && $_REQUEST['maximum_price'] != '' 
         )
         {
+        	$maximum_price = $_REQUEST['maximum_price'];
+
+        	if ( !is_numeric($maximum_price) )
+        	{
+        		return $meta_query;
+        	}
+
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
 
-        	$maximum_price = $_REQUEST['maximum_price'];
         	if ( $search_form_currency != 'GBP' )
         	{
         		// Convert $_REQUEST['maximum_price'] to GBP
@@ -1274,6 +1286,11 @@ class PH_Query {
         	{
         		$minimum_price = $explode_price_range[0];
 
+        		if ( !is_numeric($minimum_price) )
+	        	{
+	        		return $meta_query;
+	        	}
+
 	        	if ( $search_form_currency != 'GBP' )
 	        	{
 	        		// Convert $explode_price_range[0] to GBP
@@ -1292,6 +1309,12 @@ class PH_Query {
 	        if ( isset($explode_price_range[1]) && $explode_price_range[1] != '' )
         	{
         		$maximum_price = $explode_price_range[1];
+
+        		if ( !is_numeric($maximum_price) )
+	        	{
+	        		return $meta_query;
+	        	}
+
 	        	if ( $search_form_currency != 'GBP' )
 	        	{
 	        		// Convert $explode_price_range[1] to GBP
@@ -1327,10 +1350,16 @@ class PH_Query {
             isset( $_REQUEST['minimum_rent'] ) && $_REQUEST['minimum_rent'] != '' 
         )
         {
+        	$minimum_rent = $_REQUEST['minimum_rent'];
+
+        	if ( !is_numeric($minimum_rent) )
+        	{
+        		return $meta_query;
+        	}
+
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
 
-        	$minimum_rent = $_REQUEST['minimum_rent'];
         	if ( $search_form_currency != 'GBP' )
         	{
         		// Convert $_REQUEST['minimum_rent'] to GBP
@@ -1374,10 +1403,16 @@ class PH_Query {
             isset( $_REQUEST['maximum_rent'] ) && $_REQUEST['maximum_rent'] != '' 
         )
         {
+        	$maximum_rent = $_REQUEST['maximum_rent'];
+
+        	if ( !is_numeric($maximum_rent) )
+        	{
+        		return $meta_query;
+        	}
+
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
 
-        	$maximum_rent = $_REQUEST['maximum_rent'];
         	if ( $search_form_currency != 'GBP' )
         	{
         		// Convert $_REQUEST['maximum_rent'] to GBP
@@ -1431,6 +1466,12 @@ class PH_Query {
         	if ( isset($explode_rent_range[0]) && $explode_rent_range[0] != '' )
         	{
         		$minimum_rent = $explode_rent_range[0];
+
+        		if ( !is_numeric($minimum_rent) )
+	        	{
+	        		return $meta_query;
+	        	}
+
 	        	if ( $search_form_currency != 'GBP' )
 	        	{
 	        		// Convert $explode_rent_range[0] to GBP
@@ -1457,6 +1498,12 @@ class PH_Query {
 	        if ( isset($explode_rent_range[1]) && $explode_rent_range[1] != '' )
         	{
         		$maximum_rent = $explode_rent_range[1];
+
+        		if ( !is_numeric($maximum_rent) )
+	        	{
+	        		return $meta_query;
+	        	}
+
 	        	if ( $search_form_currency != 'GBP' )
 	        	{
 	        		// Convert $explode_rent_range[1] to GBP
@@ -1987,10 +2034,16 @@ class PH_Query {
             isset( $_REQUEST['commercial_minimum_price'] ) && $_REQUEST['commercial_minimum_price'] != '' 
         )
         {
+        	$minimum_price = $_REQUEST['commercial_minimum_price'];
+
+        	if ( !is_numeric($minimum_price) )
+        	{
+        		return $meta_query;
+        	}
+
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
-
-        	$minimum_price = $_REQUEST['commercial_minimum_price'];
+        	
         	if ( $search_form_currency != 'GBP' )
         	{
         		// Convert $_REQUEST['minimum_price'] to GBP
@@ -2030,10 +2083,16 @@ class PH_Query {
             isset( $_REQUEST['commercial_maximum_price'] ) && $_REQUEST['commercial_maximum_price'] != '' 
         )
         {
+        	$maximum_price = $_REQUEST['commercial_maximum_price'];
+
+        	if ( !is_numeric($maximum_price) )
+        	{
+        		return $meta_query;
+        	}
+
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
 
-        	$maximum_price = $_REQUEST['commercial_maximum_price'];
         	if ( $search_form_currency != 'GBP' )
         	{
         		// Convert $_REQUEST['maximum_price'] to GBP
@@ -2073,10 +2132,16 @@ class PH_Query {
             isset( $_REQUEST['commercial_minimum_rent'] ) && $_REQUEST['commercial_minimum_rent'] != '' 
         )
         {
+        	$minimum_rent = $_REQUEST['commercial_minimum_rent'];
+
+        	if ( !is_numeric($minimum_rent) )
+        	{
+        		return $meta_query;
+        	}
+
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
 
-        	$minimum_rent = $_REQUEST['commercial_minimum_rent'];
         	if ( $search_form_currency != 'GBP' )
         	{
         		// Convert $_REQUEST['minimum_rent'] to GBP
@@ -2116,10 +2181,16 @@ class PH_Query {
             isset( $_REQUEST['commercial_maximum_rent'] ) && $_REQUEST['commercial_maximum_rent'] != '' 
         )
         {
+        	$maximum_rent = $_REQUEST['commercial_maximum_rent'];
+        	
+        	if ( !is_numeric($maximum_rent) )
+        	{
+        		return $meta_query;
+        	}
+
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
 
-        	$maximum_rent = $_REQUEST['commercial_maximum_rent'];
         	if ( $search_form_currency != 'GBP' )
         	{
         		// Convert $_REQUEST['maximum_rent'] to GBP
