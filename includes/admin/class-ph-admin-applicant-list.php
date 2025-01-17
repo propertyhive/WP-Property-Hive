@@ -334,7 +334,10 @@ class PH_Admin_Applicant_List {
                                             $output_types = array();
                                             foreach ( $result['profile']['property_types'] as $profile_type )
                                             {
-                                                $output_types[] = $property_types[$profile_type];
+                                                if ( isset($property_types[$profile_type]) )
+                                                {
+                                                    $output_types[] = $property_types[$profile_type];
+                                                }
                                             }
                                             $output[] = '<strong>Property Types:</strong> ' . esc_html(implode(", ", $output_types));
                                         }
@@ -343,7 +346,10 @@ class PH_Admin_Applicant_List {
                                             $output_locations = array();
                                             foreach ( $result['profile']['locations'] as $profile_location )
                                             {
-                                                $output_locations[] = $locations[$profile_location];
+                                                if ( isset($locations[$profile_location]) )
+                                                {
+                                                    $output_locations[] = $locations[$profile_location];
+                                                }
                                             }
                                             $output[] = '<strong>Locations:</strong> ' . esc_html(implode(", ", $output_locations));
                                         }
@@ -370,7 +376,10 @@ class PH_Admin_Applicant_List {
                                             $output_types = array();
                                             foreach ( $result['profile']['property_types'] as $profile_type )
                                             {
-                                                $output_types[] = $property_types[$profile_type];
+                                                if ( isset($property_types[$profile_type]) )
+                                                {
+                                                    $output_types[] = $property_types[$profile_type];
+                                                }
                                             }
                                             $output[] = '<strong>Property Types:</strong> ' . esc_html(implode(", ", $output_types));
                                         }
@@ -379,7 +388,10 @@ class PH_Admin_Applicant_List {
                                             $output_locations = array();
                                             foreach ( $result['profile']['locations'] as $profile_location )
                                             {
-                                                $output_locations[] = $locations[$profile_location];
+                                                if ( isset($locations[$profile_location]) )
+                                                {
+                                                    $output_locations[] = $locations[$profile_location];
+                                                }
                                             }
                                             $output[] = '<strong>Locations:</strong> ' . esc_html(implode(", ", $output_locations));
                                         }
