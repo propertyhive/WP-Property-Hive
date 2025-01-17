@@ -917,8 +917,8 @@ class PH_Rest_Api {
 			'office_address_3',
 			'office_address_4',
 			'office_address_postcode',
-			'latitude',
-			'longitude',
+			'office_latitude',
+			'office_longitude',
 		);
 
 		$departments = ph_get_departments();
