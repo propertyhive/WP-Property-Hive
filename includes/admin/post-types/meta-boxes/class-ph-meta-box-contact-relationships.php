@@ -342,7 +342,7 @@ class PH_Meta_Box_Contact_Relationships
             // Currency / Price
             $ph_countries = new PH_Countries();
             $default_country = get_option('propertyhive_default_country', 'GB');
-            $selected_currency = '';
+            $selected_currency = 'GBP';
             $countries = get_option('propertyhive_countries', array($default_country));
             $currencies = array();
 
@@ -361,13 +361,15 @@ class PH_Meta_Box_Contact_Relationships
                 $selected_currency = $applicant_profile['currency'];
             }
 
-            // Cater for when no currency selected or currencies have been updated in settings so existing currency doesn't exist
-
-            if ( empty($selected_currency) || !isset($currencies[$selected_currency]) ) 
+            if ( !isset($currencies[$selected_currency]) ) 
             {
-                $country = $ph_countries->get_country($default_country);
-                $selected_currency = $country['currency_code'];
-                $currencies[$country['currency_code']] = $country['currency_symbol'];
+                // currency set but not in list of active currencies. Get previously set currency
+
+                $current_currency = $ph_countries->get_currency( $selected_currency );
+                if ( $current_currency !== false )
+                {
+                    $currencies[$selected_currency] = $current_currency['currency_symbol'];
+                }
             }
 
             // Price
