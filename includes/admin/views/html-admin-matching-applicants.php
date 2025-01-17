@@ -61,6 +61,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 				foreach ( $applicants as $applicant )
 				{
 					$previously_sent = array();
+
+                    $currency = '&pound;';
+                    if ( isset($applicant['applicant_profile']['currency']) && !empty($applicant['applicant_profile']['currency']) )
+                    {
+                        $PH_Countries = new PH_Countries();
+                        $selected_currency = $PH_Countries->get_currency($applicant['applicant_profile']['currency']);
+                        if ( $selected_currency !== false )
+                        {
+                            $currency = $selected_currency['currency_symbol'];
+                        }
+                    }
                     
                     $applicant_profile_match_history = get_post_meta( $applicant['contact_id'], '_applicant_profile_' . $applicant['applicant_profile']['applicant_profile_id'] . '_match_history', TRUE );
 					if ( isset($applicant_profile_match_history[$property->id]) && is_array($applicant_profile_match_history[$property->id]) && !empty($applicant_profile_match_history[$property->id]) )
@@ -77,51 +88,80 @@ if ( ! defined( 'ABSPATH' ) ) {
                     }
 
                     $requirements = array();
-                    if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
+                    if ( 
+                        isset($applicant['applicant_profile']['department']) && 
+                        ( $applicant['applicant_profile']['department'] == 'residential-sales' || ph_get_custom_department_based_on($applicant['applicant_profile']['department']) == 'residential-sales' 
+                    )
+                    )
                     {
-                        $requirements[] = array(
-                            'label' => __( 'Maximum Price', 'propertyhive' ),
-                            'value' => '&pound;' . ph_display_price_field($applicant['applicant_profile']['max_price']),
-                        );
-                    }
-                    if ( $percentage_lower != '' && $percentage_higher != '' )
-                    {
-                        $match_price_range_lower = '';
-                        if ( !isset($applicant['applicant_profile']['match_price_range_lower_actual']) || ( isset($applicant['applicant_profile']['match_price_range_lower_actual']) && $applicant['applicant_profile']['match_price_range_lower_actual'] == '' ) )
-                        {
-                            if ( isset($applicant['applicant_profile']['max_price_actual']) && $applicant['applicant_profile']['max_price_actual'] != '' )
-                            {
-                                $match_price_range_lower = $applicant['applicant_profile']['max_price_actual'] - ( $applicant['applicant_profile']['max_price_actual'] * ( $percentage_lower / 100 ) );
-                            }
-                        }
-                        else
-                        {
-                            $match_price_range_lower = $applicant['applicant_profile']['match_price_range_lower_actual'];
-                        }
-
-                        $match_price_range_higher = '';
-                        if ( !isset($applicant['applicant_profile']['match_price_range_higher_actual']) || ( isset($applicant['applicant_profile']['match_price_range_higher_actual']) && $applicant['applicant_profile']['match_price_range_higher_actual'] == '' ) )
-                        {
-                            if ( isset($applicant['applicant_profile']['max_price_actual']) && $applicant['applicant_profile']['max_price_actual'] != '' )
-                            {
-                                $match_price_range_higher = $applicant['applicant_profile']['max_price_actual'] + ( $applicant['applicant_profile']['max_price_actual'] * ( $percentage_higher / 100 ) );
-                            }
-                        }
-                        else
-                        {
-                            $match_price_range_higher = $applicant['applicant_profile']['match_price_range_higher_actual'];
-                        }
-
-                        if ( 
-                            $match_price_range_lower != '' && $match_price_range_higher != ''
-                        )
+                        if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
                         {
                             $requirements[] = array(
-                                'label' => __( 'Maximum Price Range', 'propertyhive' ),
-                                'value' => '&pound;' . ph_display_price_field($match_price_range_lower) . ' to &pound;' . ph_display_price_field($match_price_range_higher),
+                                'label' => __( 'Maximum Price', 'propertyhive' ),
+                                'value' => $currency . ph_display_price_field($applicant['applicant_profile']['max_price']),
+                            );
+                        }
+                        if ( $percentage_lower != '' && $percentage_higher != '' )
+                        {
+                            $match_price_range_lower = '';
+                            if ( 
+                                !isset($applicant['applicant_profile']['match_price_range_lower_actual']) || 
+                                ( isset($applicant['applicant_profile']['match_price_range_lower_actual']) && $applicant['applicant_profile']['match_price_range_lower_actual'] == '' ) 
+                            )
+                            {
+                                if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
+                                {
+                                    $match_price_range_lower = $applicant['applicant_profile']['max_price'] - ( $applicant['applicant_profile']['max_price'] * ( $percentage_lower / 100 ) );
+                                }
+                            }
+                            else
+                            {
+                                $match_price_range_lower = $applicant['applicant_profile']['match_price_range_lower'];
+                            }
+
+                            $match_price_range_higher = '';
+                            if ( 
+                                !isset($applicant['applicant_profile']['match_price_range_higher_actual']) || 
+                                ( isset($applicant['applicant_profile']['match_price_range_higher_actual']) && $applicant['applicant_profile']['match_price_range_higher_actual'] == '' ) 
+                            )
+                            {
+                                if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
+                                {
+                                    $match_price_range_higher = $applicant['applicant_profile']['max_price'] + ( $applicant['applicant_profile']['max_price'] * ( $percentage_higher / 100 ) );
+                                }
+                            }
+                            else
+                            {
+                                $match_price_range_higher = $applicant['applicant_profile']['match_price_range_higher'];
+                            }
+
+                            if ( 
+                                $match_price_range_lower != '' && $match_price_range_higher != ''
+                            )
+                            {
+                                $requirements[] = array(
+                                    'label' => __( 'Maximum Price Range', 'propertyhive' ),
+                                    'value' => $currency . ph_display_price_field($match_price_range_lower) . ' to ' . $currency . ph_display_price_field($match_price_range_higher),
+                                );
+                            }
+                        }
+                    }
+
+                    if ( 
+                        isset($applicant['applicant_profile']['department']) && 
+                        ( $applicant['applicant_profile']['department'] == 'residential-lettings' || ph_get_custom_department_based_on($applicant['applicant_profile']['department']) == 'residential-lettings' 
+                    )
+                    )
+                    {
+                        if ( isset($applicant['applicant_profile']['max_rent']) && $applicant['applicant_profile']['max_rent'] != '' )
+                        {
+                            $requirements[] = array(
+                                'label' => __( 'Maximum Rent', 'propertyhive' ),
+                                'value' => $currency . ph_display_price_field($applicant['applicant_profile']['max_rent']) . ' ' . $applicant['applicant_profile']['rent_frequency']
                             );
                         }
                     }
+
                     if ( isset($applicant['applicant_profile']['min_beds']) && $applicant['applicant_profile']['min_beds'] != '' )
                     {
                         $requirements[] = array(
@@ -129,6 +169,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                             'value' => $applicant['applicant_profile']['min_beds'],
                         );
                     }
+
                     if ( isset($applicant['applicant_profile']['property_types']) && is_array($applicant['applicant_profile']['property_types']) && !empty($applicant['applicant_profile']['property_types']) )
                     {
                         //$requirements[] = 'Max Price: ' . $applicant['applicant_profile']['max_price'];
