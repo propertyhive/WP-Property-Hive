@@ -346,6 +346,16 @@ class PH_Meta_Box_Contact_Relationships
             $countries = get_option('propertyhive_countries', array($default_country));
             $currencies = array();
 
+            // default
+            $country = $ph_countries->get_country($default_country);
+
+            if ( !isset($currencies[$country['currency_code']]) ) 
+            {
+                $currencies[$country['currency_code']] = $country['currency_symbol'];
+                $selected_currency = $country['currency_code'];
+            }
+
+            // other countries
             foreach ( $countries as $country ) 
             {
                 $country = $ph_countries->get_country($country);
@@ -359,6 +369,11 @@ class PH_Meta_Box_Contact_Relationships
             if ( isset($applicant_profile['currency']) && !empty($applicant_profile['currency']) )
             {
                 $selected_currency = $applicant_profile['currency'];
+            }
+            else
+            {
+                // No currency. Must be existing applicant before the currency introduction
+                $selected_currency = 'GBP';
             }
 
             if ( !isset($currencies[$selected_currency]) ) 
