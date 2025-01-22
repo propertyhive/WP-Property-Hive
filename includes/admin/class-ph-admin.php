@@ -25,8 +25,6 @@ class PH_Admin {
         add_action( 'current_screen', array( $this, 'remove_propertyhive_meta_boxes_from_screen_options' ) );
         add_action( 'admin_notices', array( $this, 'review_admin_notices') );
         add_action( 'admin_notices', array( $this, 'archive_admin_notices' ) );
-        add_action( 'admin_menu', array( $this, 'admin_dashboard_pages' ) );
-        add_action( 'admin_head', array( $this, 'admin_head' ) );
         add_action( 'admin_init', array( $this, 'admin_redirects' ) );
         add_action( 'admin_init', array( $this, 'prevent_access_to_admin' ) );
         add_action( 'admin_init', array( $this, 'view_email' ) );
@@ -422,28 +420,6 @@ class PH_Admin {
             update_user_meta( get_current_user_id(), '_propertyhive_recently_viewed', $recently_viewed );
         }
     }
-    
-    public function admin_dashboard_pages()
-    {
-        if ( ! empty( $_GET['page'] ) ) 
-        {
-            switch ( sanitize_title($_GET['page']) ) 
-            {
-                case 'ph-installed':
-                {
-                    add_dashboard_page(
-                        __( 'Welcome to Property Hive', 'propertyhive'  ),
-                        __( 'Welcome to Property Hive', 'propertyhive'  ),
-                        'manage_propertyhive',
-                        sanitize_title($_GET['page']),
-                        array( $this, 'installed_screen' )
-                    );
-
-                    break;
-                }
-            }
-        }
-    }
 
     public function installed_screen()
     {
@@ -533,18 +509,6 @@ class PH_Admin {
 
     </div>
 <?php
-    }
-
-    /**
-     * Hide Individual Dashboard Pages
-     *
-     * @access public
-     * @since 1.0
-     * @return void
-     */
-    public function admin_head() 
-    {
-        remove_submenu_page( 'index.php', 'ph-installed' );
     }
 
     /**

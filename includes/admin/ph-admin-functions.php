@@ -35,7 +35,6 @@ function ph_get_screen_ids() {
         'sale',
         'tenancy',
         'edit-key_date',
-        'dashboard_page_ph-installed',
         'property-hive_page_ph-settings',
         'admin_page_ph-generate-applicant-list',
         'admin_page_ph-merge-duplicate-contacts',
