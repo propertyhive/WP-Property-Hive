@@ -169,6 +169,11 @@ class PH_Admin_Menus {
 
 	    add_menu_page( __( 'Property Hive', 'propertyhive' ), __( 'Property Hive', 'propertyhive' ), 'manage_propertyhive', 'propertyhive' , array( $this, 'settings_page' ), $this->get_menu_icon(), '54.5' );
 
+	    if ( apply_filters('propertyhive_show_home_admin_menu', true) === true )
+	    {
+	    	add_submenu_page( 'propertyhive', __( 'Home', 'propertyhive' ), __( 'Home', 'propertyhive' ), 'manage_propertyhive', 'ph-home', array( $this, 'home_page' ) );
+	    }
+
 	    add_submenu_page( 'propertyhive', __( 'Properties', 'propertyhive' ), __( 'Properties', 'propertyhive' ), 'manage_propertyhive', 'edit.php?post_type=property'/*, array( $this, 'attributes_page' )*/ );
 	    
 	    if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
@@ -355,6 +360,11 @@ class PH_Admin_Menus {
 	public function import_properties_dummy_page()
 	{
 		include_once( 'views/html-import-properties-dummy.php' );
+	}
+
+	public function home_page()
+	{
+		include_once( 'views/html-home.php' );
 	}
 
 	/**
