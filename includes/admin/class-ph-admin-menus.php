@@ -144,12 +144,12 @@ class PH_Admin_Menus {
 								}
 							}
 						}
-
 						if ( $class_name != '' && $function_name != '' )
 						{
 							$callback = array( $class_name(), $function_name );
 						}
 					}
+
 					add_menu_page( $submenuitem[3], $submenuitem[0], $submenuitem[1], $submenuitem[2], $callback, $this->get_menu_icon($submenuitem[2]), $position );
 					$position += 5;
 				}
@@ -348,7 +348,7 @@ class PH_Admin_Menus {
 
         if ( $show_dummy_link === true )
         {
-			add_submenu_page( 'propertyhive', __( 'Import Properties', 'propertyhive' ),  __( 'Import Properties', 'propertyhive' ) . '<span class="update-plugins" style="padding:0 3px;"><span class="plugin-count">PRO</span></span>', 'manage_options', 'ph-import-properties-dummy', array( $this, 'import_properties_dummy_page' ) );
+			add_submenu_page( 'propertyhive', __( 'Import Properties', 'propertyhive' ),  __( 'Import Properties', 'propertyhive' ) . '<span class="update-plugins" style="padding:0 3px;"><span class="plugin-count">PRO</span></span>', 'manage_options', 'ph-import_properties_dummy', array( $this, 'import_properties_dummy_page' ) );
 		}
 	}
 
