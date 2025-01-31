@@ -512,12 +512,14 @@ function get_property_street_view( $args = array() )
 			var streetView = new google.maps.StreetViewPanorama(document.getElementById("property_street_view_canvas"), streetViewOptions);
 			streetView.setVisible(true);
 		}
-			
+		
+		<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
 		if(window.addEventListener) {
 			window.addEventListener('load', initialize_property_street_view);
 		}else{
 			window.attachEvent('onload', initialize_property_street_view);
 		}
+		<?php } ?>
 
 	</script>
 	<?php

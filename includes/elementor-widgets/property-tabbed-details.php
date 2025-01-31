@@ -787,12 +787,12 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 									}
 									case "map":
 									{
-										echo do_shortcode('[property_map scrollwheel="false"]');
+										echo do_shortcode('[property_map scrollwheel="false"' . ( ( $tab_count > 1 ) ? ' init_on_load="false"' : '' ) . ']');
 										break;
 									}
 									case "street_view":
 									{
-										echo do_shortcode('[property_street_view]');
+										echo do_shortcode('[property_street_view' . ( ( $tab_count > 1 ) ? ' init_on_load="false"' : '' ) . ']');
 										break;
 									}
 									case "make_enquiry":
