@@ -284,7 +284,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -300,7 +301,8 @@ class PH_Post_types {
     	            'show_in_nav_menus' 	=> false,
     	            'query_var' 			=> is_admin(),
     	            'rewrite'				=> false,
-    	            'public'                => true
+    	            'public'                => true,
+                    'show_in_rest'          => true,
     	        )
             )
 	    );
@@ -316,7 +318,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -332,7 +335,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -348,7 +352,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -364,7 +369,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -380,7 +386,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -396,7 +403,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -412,7 +420,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -428,7 +437,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -444,7 +454,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -460,7 +471,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
@@ -476,7 +488,8 @@ class PH_Post_types {
                     'show_in_nav_menus'     => false,
                     'query_var'             => is_admin(),
                     'rewrite'               => false,
-                    'public'                => true
+                    'public'                => true,
+                    'show_in_rest'          => true,
                 )
             )
         );
