@@ -38,6 +38,7 @@ function ph_get_screen_ids() {
         'property-hive_page_ph-settings',
         'admin_page_ph-generate-applicant-list',
         'admin_page_ph-merge-duplicate-contacts',
+        'property-hive_page_ph-home',
     ) );
 }
 

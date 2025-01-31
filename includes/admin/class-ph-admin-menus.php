@@ -364,6 +364,21 @@ class PH_Admin_Menus {
 
 	public function home_page()
 	{
+		$widgets = array();
+
+		$widgets['intro'] =  array(
+			'title' => __( 'Welcome to Property Hive', 'propertyhive' ),
+			'template' => PH()->plugin_path() . '/includes/admin/views/html-home-intro.php'
+		);
+
+		// only show for new users
+		$widgets['checklist'] =  array(
+			'title' => __( 'Checklist', 'propertyhive' ),
+			'template' => PH()->plugin_path() . '/includes/admin/views/html-home-checklist.php'
+		);
+
+		$widgets = apply_filters( 'propertyhive_home_widgets', $widgets );
+
 		include_once( 'views/html-home.php' );
 	}
 
