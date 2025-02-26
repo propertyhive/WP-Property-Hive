@@ -575,6 +575,14 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title'   => __( 'Score Threshold', 'propertyhive' ),
+                'id'      => 'propertyhive_captcha_score_threshold',
+                'type'    => 'text',
+                'default' => 0.5,
+                'desc'    => __( 'Set the minimum score required to pass reCAPTCHA v3 verification (between 0 and 1). Lower values allow more submissions through but increase spam risk.', 'propertyhive' ),
+            ),
+
+            array(
                 //'title'   => __( 'CAPTCHA service', 'propertyhive' ),
                 'id'      => 'propertyhive_captcha_html',
                 'type'    => 'html',
@@ -593,6 +601,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     {
                         jQuery(\'#row_propertyhive_captcha_site_key\').hide();
                         jQuery(\'#row_propertyhive_captcha_secret\').hide();
+                        jQuery(\'#row_propertyhive_captcha_score_threshold\').hide();
 
                         var selected_captcha_service = jQuery(\'input[name=\\\'propertyhive_captcha_service\\\']:checked\').val();
 
@@ -600,6 +609,11 @@ class PH_Settings_General extends PH_Settings_Page {
                         {
                             jQuery(\'#row_propertyhive_captcha_site_key\').show();
                             jQuery(\'#row_propertyhive_captcha_secret\').show();
+
+                            if ( selected_captcha_service == \'recaptcha-v3\' )
+                            {
+                                jQuery(\'#row_propertyhive_captcha_score_threshold\').show();
+                            }
                         }
                     }
                 </script>',

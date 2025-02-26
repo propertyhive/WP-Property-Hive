@@ -360,23 +360,40 @@ class PH_AJAX {
             }
             else
             {
-                if (
-                    isset($response['success']) && $response['success'] == true
-                    &&
-                    (
-                        // If we're using Recaptcha V3, check the score
-                        // 1.0 is very likely a good interaction, 0.0 is very likely a bot
-                        $key == 'recaptcha'
-                        ||
-                        ( isset($response['score']) && $response['score'] >= 0.5 )
-                    )
-                )
+                if ( isset($response['success']) && $response['success'] == true )
                 {
+                    if ( $key == 'recaptcha' )
+                    {
+                        
+                    }
+                    elseif ( $key == 'recaptcha-v3' )
+                    {
+                        $score_threshold = round((float)get_option('propertyhive_captcha_score_threshold', 0.5), 1);
+                        if ( !is_numeric($score_threshold) || $score_threshold < 0 || $score_threshold > 1 )
+                        {
+                            $score_threshold = 0.5;
+                        }
+                        if ( isset($response['score']) && $response['score'] >= $score_threshold )
+                        {
 
+                        }
+                        else
+                        {
+                            $errors[] = 'Failed reCAPTCHA validation due to high spam score';
+                        }
+                    }
                 }
                 else
                 {
-                    $errors[] = 'Failed reCAPTCHA validation';
+                    $error_message = 'Failed reCAPTCHA validation';
+
+                    // Check if Google returned error codes
+                    if ( isset($response['error-codes']) && is_array($response['error-codes']) ) 
+                    {
+                        $error_message .= ' (' . implode(', ', $response['error-codes']) . ')';
+                    }
+
+                    $errors[] = $error_message;
                 }
             }
         }
