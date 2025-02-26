@@ -113,14 +113,23 @@ class PH_Frontend_Scripts {
 			) ) );
 		}
 
-		if ( wp_script_is( 'propertyhive_make_enquiry' ) ) {
-			wp_localize_script( 'propertyhive_make_enquiry', 'propertyhive_make_property_enquiry_params', apply_filters( 'propertyhive_make_property_enquiry_params', array(
-				'ajax_url'        => PH()->ajax_url()
-			) ) );
+		if ( wp_script_is( 'propertyhive_make_enquiry' ) ) 
+		{
+			$data = array(
+				'ajax_url' => PH()->ajax_url(),
+				'default_validation_error_message' => esc_html(__( 'Please ensure all required fields have been completed', 'propertyhive' )),
+			);
+			if ( get_option('propertyhive_captcha_service', '') != '' )
+			{
+				$data['captcha_service'] = get_option('propertyhive_captcha_service', '');
+				$data['recaptcha_site_key'] = get_option('propertyhive_captcha_site_key', 'recaptcha-v3');
+			}
+			wp_localize_script( 'propertyhive_make_enquiry', 'propertyhive_make_property_enquiry_params', apply_filters( 'propertyhive_make_property_enquiry_params', $data ) );
 		}
 
-		if ( wp_script_is( 'propertyhive_account' ) ) {
-			wp_localize_script( 'propertyhive_account', 'propertyhive_account_params', apply_filters( 'propertyhive_account_params', array(
+		if ( wp_script_is( 'propertyhive_account' ) ) 
+		{
+			$data = array(
 				'ajax_url'        		=> PH()->ajax_url(),
 				'my_account_url'  		=> get_permalink( ph_get_page_id('my_account') ),
 				'custom_departments'	=> ph_get_custom_departments(),
@@ -130,7 +139,15 @@ class PH_Frontend_Scripts {
 				'register_nonce'	  	=> wp_create_nonce( "ph_register" ),
 				'userdetails_nonce'	  		=> wp_create_nonce( "ph_userdetails" ),
 				'requirements_nonce'	=> wp_create_nonce( "ph_requirements" ),
-			) ) );
+				'default_validation_error_message' => esc_html(__( 'Please ensure all required fields have been completed', 'propertyhive' )),
+			);
+			if ( get_option('propertyhive_captcha_service', '') != '' )
+			{
+				$data['captcha_service'] = get_option('propertyhive_captcha_service', '');
+				$data['recaptcha_site_key'] = get_option('propertyhive_captcha_site_key', 'recaptcha-v3');
+			}
+
+			wp_localize_script( 'propertyhive_account', 'propertyhive_account_params', apply_filters( 'propertyhive_account_params', $data ) );
 		}
 
 		if ( wp_script_is( 'multiselect' ) ) {

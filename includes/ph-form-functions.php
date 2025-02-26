@@ -1379,7 +1379,7 @@ function ph_form_field( $key, $field )
                 <script src="https://www.google.com/recaptcha/api.js?render=' . $field['site_key'] . '"></script>
                 <script>
                     grecaptcha.ready(function() {
-                        grecaptcha.execute("' . $field['site_key'] . '", {action:\'validate_captcha\'})
+                        grecaptcha.execute("' . $field['site_key'] . '", {action:\'submit\'})
                                 .then(function(token) {
                             // add token value to form
                             document.querySelectorAll("#g-recaptcha-response").forEach(
@@ -1389,7 +1389,6 @@ function ph_form_field( $key, $field )
                     });
                 </script>
                 <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
-                <input type="hidden" name="action" value="validate_captcha">
             ';
             break;
         }
