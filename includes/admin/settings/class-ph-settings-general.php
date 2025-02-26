@@ -286,19 +286,19 @@ class PH_Settings_General extends PH_Settings_Page {
 
 			array( 'title' => __( 'International Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'international_options' ),
 
-			array(
-                'title'   => __( 'Default Country', 'propertyhive' ),
-                'id'      => 'propertyhive_default_country',
-                'type'    => 'single_select_country',
-                'css'       => 'min-width:300px;',
-            ),
-
             array(
                 'title'   => __( 'Countries Where You Operate', 'propertyhive' ),
                 'id'      => 'propertyhive_countries',
                 'type'    => 'multi_select_countries',
                 'css'       => 'min-width:300px;',
                 'desc'	=> __( 'Hold ctrl/cmd whilst clicking to select multiple', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Default Country', 'propertyhive' ),
+                'id'      => 'propertyhive_default_country',
+                'type'    => 'single_select_country',
+                'css'       => 'min-width:300px;',
             ),
 
             array(
