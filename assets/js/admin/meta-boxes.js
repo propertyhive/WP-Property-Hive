@@ -52,6 +52,28 @@ function ph_init_description_editors()
     });
 }
 
+function ph_set_match_price_currency_symbol()
+{
+    jQuery('#propertyhive-contact-relationships div[id^=\'tab_applicant_data_\']').each(function()
+    {
+        // loop through each relationship
+        var department = jQuery(this).find('input[name^=\'_applicant_department_\']').filter(':checked').val();
+
+        if ( department == 'residential-sales' )
+        {
+            var selected_currency = jQuery(this).find('select[name^=\'_applicant_currency_sales_\'] :selected').text();
+            if ( selected_currency != '' )
+            {
+                jQuery(this).find('label[for^=\'_applicant_match_price_range_\'] .currency-symbol').html(selected_currency);
+            }
+        }
+        if ( department == 'residential-lettings' )
+        {
+            // no match price in lettings
+        }
+    });
+}
+
 function show_other_material_information_rows()
 {
     jQuery('#propertyhive-property-material-information .form-field[class*=\'_other_field\']').hide();
@@ -74,7 +96,18 @@ jQuery( function($){
     
     ph_init_description_editors();
 
+    ph_set_match_price_currency_symbol();
+
     show_other_material_information_rows();
+
+    $('#propertyhive-contact-relationships input[name^=\'_applicant_department_\']').change(function()
+    {
+        ph_set_match_price_currency_symbol();
+    });
+    $('#propertyhive-contact-relationships select[name^=\'_applicant_currency_sales_\']').change(function()
+    {
+        ph_set_match_price_currency_symbol();
+    });
 
     $('#propertyhive-property-material-information .form-field:not([class*=\'_other_field\']) select').on('change', function()
     {

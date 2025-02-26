@@ -197,7 +197,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 						}
 						case "dummy":
 						{
-							echo '<a href="' . admin_url('admin.php?page=ph-import-properties-dummy') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+							echo '<a href="' . admin_url('admin.php?page=ph-import_properties_dummy') . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
 				                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . ' <span style="color:#FFF; font-size:10px; font-weight:500; border-radius:12px; padding:2px 8px; letter-spacing:1px; background:#00a32a;">PRO</span>
 				            </a>';
 							break;
