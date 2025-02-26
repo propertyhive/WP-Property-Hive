@@ -372,8 +372,12 @@ class PH_Meta_Box_Contact_Relationships
             }
             else
             {
-                // No currency. Must be existing applicant before the currency introduction
-                $selected_currency = 'GBP';
+                // No currency. Check if existing applicant and set selected currency accordingly
+                if ( isset($applicant_profile['max_price']) )
+                {
+                    // Existing applicant
+                    $selected_currency = 'GBP';
+                }
             }
 
             if ( !isset($currencies[$selected_currency]) ) 
