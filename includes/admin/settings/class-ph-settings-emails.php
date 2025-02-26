@@ -645,9 +645,9 @@ class PH_Settings_Emails extends PH_Settings_Page {
 				{
 					$settings = $this->get_property_match_settings();
 
-					PH_Admin_Settings::save_fields( $settings );
-
 					$previous_auto_property_match = get_option( 'propertyhive_auto_property_match', '' );
+
+					PH_Admin_Settings::save_fields( $settings );
 
 					if ( isset($_POST['propertyhive_auto_property_match']) && $_POST['propertyhive_auto_property_match'] == '1' )
 					{
