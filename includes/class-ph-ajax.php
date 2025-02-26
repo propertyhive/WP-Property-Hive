@@ -354,9 +354,10 @@ class PH_AJAX {
         else
         {
             $response = json_decode($response['body'], TRUE);
+
             if ( $response === FALSE )
             {
-                $errors[] = 'Error decoding response from reCAPTCHA check';
+                $errors[] = __( 'Error decoding response from reCAPTCHA check', 'propertyhive' );
             }
             else
             {
@@ -379,13 +380,13 @@ class PH_AJAX {
                         }
                         else
                         {
-                            $errors[] = 'Failed reCAPTCHA validation due to high spam score';
+                            $errors[] = __('Failed reCAPTCHA validation due to high spam score', 'propertyhive' ) . ': ' . $response['score'];
                         }
                     }
                 }
                 else
                 {
-                    $error_message = 'Failed reCAPTCHA validation';
+                    $error_message = __( 'Failed reCAPTCHA validation', 'propertyhive' );
 
                     // Check if Google returned error codes
                     if ( isset($response['error-codes']) && is_array($response['error-codes']) ) 
@@ -2137,7 +2138,7 @@ class PH_AJAX {
                     $response = json_decode($response['body'], TRUE);
                     if ( $response === FALSE )
                     {
-                        $errors[] = 'Error decoding response from hCaptcha check';
+                        $errors[] = __( 'Error decoding response from hCaptcha check', 'propertyhive' );
                     }
                     else
                     {
@@ -2147,7 +2148,7 @@ class PH_AJAX {
                         }
                         else
                         {
-                            $errors[] = 'Failed hCaptcha validation';
+                            $errors[] = __( 'Failed hCaptcha validation', 'propertyhive' );
                         }
                     }
                 }
@@ -2267,7 +2268,7 @@ class PH_AJAX {
 
             foreach ($form_controls as $key => $control)
             {
-                if ( isset($control['type']) && $control['type'] == 'html' ) { continue; }
+                if ( isset($control['type']) && in_array($control['type'], array('html', 'recaptcha', 'recaptcha-v3', 'hCaptcha')) ) { continue; }
 
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
                 $label = ( isset($control['email_label']) ) ? $control['email_label'] : $label;
