@@ -2,8 +2,8 @@
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.7.1
-Stable tag: 2.1.1
+Tested up to: 6.7.2
+Stable tag: 2.1.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,22 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.2 - 2025-02-26 =
+* Added new map provider option of 'Mapbox' to use Mapbox when outputting maps
+* Allow applicant price requirements to be entered in different currency(s) based on countries selected in international settings. Previously these were hardcoded to GBP regardless of which country the agent operates in
+* Don't load maps by default in Elementor 'Tabbed Details' widget if not the first tab. Maps hidden behind a tab were contributing to Google API usage and so are now only loaded when the map is clicked
+* Added new reCAPTCHA v3 score threshold setting (between 0 and 1) to customise how loose (0) or strict (1) the spam scoring should be. Previously this was hardcoded to 0.5.
+* Added negotiator details to REST API property requests
+* Made taxonomies available in the REST API. Can be accessed via https://yoursite.com/wp-json/wp/v2/property_type for example where 'property_type' is the taxonomy name
+* Swapped order of country options in international settings area to be more logical
+* Any errors occurred when making a property enquiry or registering as an applicant will now be shown instead of a generic 'Please ensure all required fields have been completed' message
+* If an error occurs whilst registering as an applicant, automatically scroll the window up to the error so it's visible. Previously it felt like nothing was happening
+* Corrected issue with automatic email matching setting not enabling
+* Corrected missing blank option from showing in availability search form dropdown
+* Corrected dummy property import page not working when 'Property Hive Only' mode is enabled in user settings
+* Corrected typo in automatic email matching settings tooltip
+* Declared compatibility for WordPress 6.7.2
 
 = 2.1.1 - 2024-12-17 =
 * Added support for latest version of Elementor where they've deprecated schemes
