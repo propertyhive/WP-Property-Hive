@@ -1792,7 +1792,7 @@ class PH_Shortcodes {
 	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 	    wp_enqueue_script('googlemaps');
 
-	    echo '<div id="office_map_canvas" style="height:' . str_replace( "px", "", ( ( isset($atts['height']) && !empty($atts['height']) ) ? $atts['height'] : '400' ) ) . 'px"></div>';
+	    echo '<div id="office_map_canvas" style="height:' . str_replace( "px", "", ( ( isset($atts['height']) && !empty($atts['height']) && is_numeric($atts['height']) ) ? (int)$atts['height'] : '400' ) ) . 'px"></div>';
 ?>
 <script>
 
@@ -1844,9 +1844,9 @@ class PH_Shortcodes {
 				$lng = '-0.118092';
 			}
 		?>
-		var myLatlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng; ?>);
+		var myLatlng = new google.maps.LatLng(<?php echo (float)$lat; ?>, <?php echo (float)$lng; ?>);
 		var map_options = {
-	  		zoom: <?php echo ( ( isset($atts['zoom']) && !empty($atts['zoom']) && $atts['zoom'] != 'auto' ) ? $atts['zoom'] : '14' ); ?>,
+	  		zoom: <?php echo ( ( isset($atts['zoom']) && !empty($atts['zoom']) && is_numeric($atts['zoom']) && $atts['zoom'] != 'auto' ) ? (int)$atts['zoom'] : '14' ); ?>,
 			center: myLatlng,
 	  		mapTypeId: google.maps.MapTypeId.ROADMAP,
 	  		scrollwheel: <?php echo ( ( isset($atts['scrollwheel']) && ($atts['scrollwheel'] === 'false' || $atts['scrollwheel'] === FALSE) ) ? 'false' : 'true' ); ?>
@@ -1891,7 +1891,7 @@ class PH_Shortcodes {
 					if ( $lat != '' && $lng != '' )
 					{
 		?>
-		var myLatlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng; ?>);
+		var myLatlng = new google.maps.LatLng(<?php echo (float)$lat; ?>, <?php echo (float)$lng; ?>);
 
 		var marker_options = {
 			map: office_map,
