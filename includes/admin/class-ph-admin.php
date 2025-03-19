@@ -30,6 +30,7 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'admin_redirects' ) );
         add_action( 'admin_init', array( $this, 'prevent_access_to_admin' ) );
         add_action( 'admin_init', array( $this, 'view_email' ) );
+        add_action( 'admin_init', array( $this, 'delete_queued_email' ) );
         add_action( 'admin_init', array( $this, 'preview_emails' ) );
         add_action( 'admin_init', array( $this, 'record_recently_viewed' ) );
         add_action( 'admin_init', array( $this, 'export_applicant_list' ) );
@@ -834,8 +835,6 @@ class PH_Admin {
      */
     public function view_email() {
 
-        global $wpdb;
-
         if ( isset( $_GET['view_propertyhive_email'] ) ) 
         {
             if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'view-email' ) ) 
@@ -843,8 +842,10 @@ class PH_Admin {
                 die( 'Security check' );
             }
 
-            if ( isset( $_GET['email_id'] ) )
+            if ( isset( $_GET['email_id'] ) && !empty((int)$_GET['email_id']) )
             {
+                global $wpdb;
+
                 $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . esc_sql( (int)$_GET['email_id'] ) . "'" );
                 if ( null !== $email_log ) 
                 {
@@ -865,6 +866,47 @@ class PH_Admin {
             }
             
             exit;
+        }
+    }
+
+    /**
+     * Delete queued email
+     *
+     * @return string
+     */
+    public function delete_queued_email() {
+
+        if ( isset( $_GET['delete_propertyhive_queued_email'] ) ) 
+        {
+            if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'delete-email' ) ) 
+            {
+                die( 'Security check' );
+            }
+
+            if ( isset( $_GET['email_id'] ) && !empty((int)$_GET['email_id']) )
+            {
+                global $wpdb;
+
+                $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . esc_sql( (int)$_GET['email_id'] ) . "' AND status = ''" );
+                if ( null !== $email_log ) 
+                {
+                    $wpdb->query("
+                        UPDATE " . $wpdb->prefix . "ph_email_log
+                        SET 
+                            status = 'clear'
+                        WHERE 
+                            status = ''
+                        AND
+                            email_id = '" . esc_sql( (int)$_GET['email_id'] ) . "'
+                    ");
+
+                    PH_Admin_Settings::add_message('Email removed from queue successfully');
+                }
+                else
+                {
+                    die("Email not found");
+                }
+            }
         }
     }
 

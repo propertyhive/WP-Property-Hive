@@ -458,6 +458,8 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	            		$emails = $wpdb->get_var("
 							SELECT COUNT(*)
 							FROM " . $wpdb->prefix . "ph_email_log
+							WHERE
+								status <> 'clear'
 						");
 	            	?>
 					<li class="all"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log' . $additional_query_string)); ?>"<?php if ( !isset($_GET['status']) || (isset($_GET['status']) && $_GET['status'] == '') ) { echo ' class="current"'; } ?>>All <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
@@ -548,7 +550,12 @@ class PH_Settings_Emails extends PH_Settings_Page {
 								case "queued": { $query .= " AND status = '' "; break; }
 								case "failed": { $query .= " AND status IN ('fail1', 'fail2') "; break; }
 								case "sent": { $query .= " AND status = 'sent' "; break; }
+								default: { $query .= " AND status <> 'clear' "; }
 							}
+						}
+						else
+						{
+							$query .= " AND status <> 'clear' ";
 						}
 						$query .= $additional_query;
 
@@ -577,6 +584,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	                        ?></td>
 	                        <td class="actions">
 	                        	<a href="<?php echo wp_nonce_url( admin_url('?view_propertyhive_email=' . $email->email_id . '&email_id=' . $email->email_id ), 'view-email' ) ?>" target="_blank" class="button">View Email</a>
+	                        	<?php if ( $email->status == '' ) { ?><a onclick='var confirmBox = confirm("Are you sure you wish to remove this email from the queue?\n\nPlease note it will still show on the applicant record that the match has been performed and that any properties included in this email have been sent to them."); return confirmBox;' href="<?php echo wp_nonce_url( admin_url('admin.php?page=ph-settings&tab=email&section=log&delete_propertyhive_queued_email=' . $email->email_id . '&email_id=' . $email->email_id . ( isset($_GET['status']) && in_array($_GET['status'], array('queued', 'failed', 'sent')) ? '&status=' . sanitize_text_field($_GET['status']) : '' ) ), 'delete-email' ) ?>" class="button">Remove From Queue</a><?php } ?>
 	                        </td>
 	                    </tr>
 						<?php

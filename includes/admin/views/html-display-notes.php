@@ -61,6 +61,11 @@ if ( !empty($notes) )
 							case 'fail2':
 								$email_status = '<b>' . __( 'failed', 'propertyhive' ) . '</b>';
 								break;
+							case 'clear':
+							{
+								$note_suffix   = '<em>(' . __( 'Mailout was manually cleared from email queue and not sent', 'propertyhive' ) . ')</em>';
+								break;
+							}
 						}
 						$note_body = '';
 						if ($section == 'property')
