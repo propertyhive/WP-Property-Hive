@@ -142,7 +142,7 @@ function get_property_map( $args = array() )
 	{
 		$id_suffix = ( ( isset($args['id']) && $args['id'] != '' ) ? '_' . $args['id'] : '' );
 
-	    echo '<div id="property_map_canvas' . $id_suffix . '" style="background:#EEE; height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
+	    echo '<div id="property_map_canvas' . $id_suffix . '" style="background:#EEE; height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px"></div>';
 		
 		if ( get_option('propertyhive_maps_provider') == 'mapbox' )
 		{
@@ -434,7 +434,7 @@ function get_property_static_map( $args = array() )
 
 		    $map_url = 'https://maps.googleapis.com/maps/api/staticmap?' .
 		    	'center=' . $property->latitude . ',' . $property->longitude .
-		    	'&size=1024x' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) .  
+		    	'&size=1024x' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) .  
 		    	'&zoom=' . ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ) . 
 		    	'&maptype=roadmap' . 
 		    	'&markers=%7C%7C' . $property->latitude . ',' . $property->longitude .
@@ -442,7 +442,7 @@ function get_property_static_map( $args = array() )
 
 		    echo '<style type="text/css">
 		    	#property_static_map' . $id_suffix . ' {
-		    		height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px;
+		    		height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px;
 		    		display: block;
 				    background-image: url("' . $map_url . '");
 				    background-repeat: no-repeat;
@@ -480,7 +480,7 @@ function get_property_street_view( $args = array() )
 		    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 		    wp_enqueue_script('googlemaps');
 
-		    echo '<div id="property_street_view_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
+		    echo '<div id="property_street_view_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px"></div>';
 	?>
 	<script>
 
