@@ -223,22 +223,38 @@ class PH_Licenses {
 			$data['email']       = get_bloginfo( 'admin_email' );
 
 			// Retrieve current plugin information
-			if( ! function_exists( 'get_plugins' ) ) {
+			if ( !function_exists( 'get_plugins' ) ) {
 				include ABSPATH . '/wp-admin/includes/plugin.php';
 			}
 
-			$plugins        = array_keys( get_plugins() );
-			$active_plugins = get_option( 'active_plugins', array() );
+			$plugins        = get_plugins(); // Fetch all plugins with details
+			$active_plugins = get_option('active_plugins', array());
 
-			foreach ( $plugins as $key => $plugin ) {
-				if ( in_array( $plugin, $active_plugins ) ) {
-					// Remove active plugins from list so we can show active and inactive separately
-					unset( $plugins[ $key ] );
-				}
+			$active_plugins_data = [];
+			$inactive_plugins_data = [];
+
+			// Loop through plugins to separate active and inactive along with version
+			foreach ($plugins as $plugin_path => $plugin_data) 
+			{
+			    $plugin_info = [
+			        'name'    => isset($plugin_data['Name']) ? $plugin_data['Name'] : '',
+			        'version' => isset($plugin_data['Version']) ? $plugin_data['Version'] : '',
+			        'path'    => $plugin_path,
+			    ];
+
+			    if (in_array($plugin_path, $active_plugins)) 
+			    {
+			        $active_plugins_data[] = $plugin_info;
+			    }
+			    else
+			    {
+			        $inactive_plugins_data[] = $plugin_info;
+			    }
 			}
 
-			$data['active_plugins']   = $active_plugins;
-			$data['inactive_plugins'] = $plugins;
+			$data['active_plugins']   = $active_plugins_data;
+			$data['inactive_plugins'] = $inactive_plugins_data;
+
 			$data['locale']           = get_locale();
 
 			$property_import = get_option( 'propertyhive_property_import', array() );
