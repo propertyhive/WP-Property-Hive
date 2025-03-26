@@ -1325,7 +1325,7 @@ class PH_Property {
             {
                 if ( $type == 'other' )
                 {
-                    $rights[] = $this->_restriction_other;
+                    $rights[] = $this->_right_other;
                 }
                 else
                 {
