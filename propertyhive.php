@@ -297,6 +297,7 @@ if ( ! class_exists( 'PropertyHive' ) )
         
             include_once( 'includes/class-ph-user-contacts.php' );          // Handles keeping contacts and users in sync
 
+            include_once( 'includes/class-ph-avada.php' );                  // Avada / Fusion Builder
             include_once( 'includes/class-ph-bricks-builder.php' );         // Bricks Builder
             include_once( 'includes/class-ph-divi.php' );                   // Divi
             include_once( 'includes/class-ph-elementor.php' );              // Elementor
