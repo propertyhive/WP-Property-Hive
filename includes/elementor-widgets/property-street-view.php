@@ -39,7 +39,7 @@ class Elementor_Property_Street_View_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'height',
 			[
-				'label' => __( 'Height', 'propertyhive' ),
+				'label' => __( 'Height', 'propertyhive' ) . ' (px)',
 				'type' => \Elementor\Controls_Manager::TEXT,
 				'input_type' => 'number',
 				'default' => 400
@@ -65,6 +65,8 @@ class Elementor_Property_Street_View_Widget extends \Elementor\Widget_Base {
 		{
 			$attributes['height'] = $settings['height'];
 		}
+
+		$attributes = apply_filters( 'propertyhive_elementor_property_street_view_attributes', $attributes );
 
 		get_property_street_view($attributes);
 

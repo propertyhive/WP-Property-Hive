@@ -39,7 +39,7 @@ class Elementor_Property_Map_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'height',
 			[
-				'label' => __( 'Map Height', 'propertyhive' ),
+				'label' => __( 'Map Height', 'propertyhive' ) . ' (px)',
 				'type' => \Elementor\Controls_Manager::TEXT,
 				'input_type' => 'number',
 				'default' => 400
