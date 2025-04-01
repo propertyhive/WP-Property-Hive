@@ -463,6 +463,12 @@ class PH_Install {
                 ),
                 array(
                     'name' => 'Leasehold'
+                ),
+                array(
+                    'name' => 'Share of Freehold'
+                ),
+                array(
+                    'name' => 'Commonhold'
                 )
             ),
             'commercial_tenure' => array(
@@ -471,6 +477,12 @@ class PH_Install {
                 ),
                 array(
                     'name' => 'Leasehold'
+                ),
+                array(
+                    'name' => 'Share of Freehold'
+                ),
+                array(
+                    'name' => 'Commonhold'
                 )
             ),
             'furnished' => array(
