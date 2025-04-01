@@ -17,6 +17,8 @@ class PH_Enquiry {
 
     /** @public int Enquiry (post) ID */
     public $id;
+    public $post_title;
+    public $post_status;
 
     /**
      * Get the enquiry if ID is passed, otherwise the enquiry is new and empty.
