@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.7.2
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,11 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.3 - 2025-04-01 =
+* Added support for Avada with a host of Avada Builder property widgets added allowing users to build the property details page
+* Corrected issue with wrong meta key field being referenced for 'Rights and Easements' in material information 
+* Security update whereby sanitization has been added to a few shortcode attributes
 
 = 2.1.2 - 2025-02-26 =
 * Added new map provider option of 'Mapbox' to use Mapbox when outputting maps
