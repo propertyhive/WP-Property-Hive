@@ -507,6 +507,21 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 								$tab_title_mobile_setting_key = $this->get_repeater_setting_key( 'tab_title_mobile', 'tabs', $tab_count );
 
+								$onclick = '';
+								if ( in_array('map', $item['tab_display']) )
+								{
+									$onclick .= 'setTimeout(function() { initialize_property_map(); }, 10);';
+								}
+								if ( in_array('street_view', $item['tab_display']) )
+								{
+									$onclick .= 'setTimeout(function() { initialize_property_street_view(); }, 10);';
+								}
+								if ( in_array('gallery', $item['tab_display']) )
+								{
+									$onclick .= 'setTimeout(function() { jQuery(window).trigger(\'resize\'); }, 10);';
+								}
+								$onclick = apply_filters( 'propertyhive_elementor_tabbed_details_tab_onclick', $onclick, $property, $item );
+
 								$this->add_render_attribute( $tab_content_setting_key, [
 									'id' => 'elementor-tab-content-' . $id_int . $tab_count,
 									'class' => [ 'elementor-tab-content', 'elementor-clearfix' ],
@@ -520,6 +535,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 									'tabindex' => $id_int . $tab_count,
 									'data-tab' => $tab_count,
 									'role' => 'tab',
+									'onclick' => $onclick
 								] );
 
 								$this->add_inline_editing_attributes( $tab_content_setting_key, 'advanced' );
