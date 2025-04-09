@@ -893,7 +893,27 @@ class PH_Admin {
                 $email_property_ids = explode(",", sanitize_text_field($_POST['email_property_id']));
             }
 
-            $body = stripslashes(sanitize_textarea_field($_POST['body']));
+            $allowed_tags = array(
+                'strong' => array(),
+                'span'   => array(),
+                'em'     => array(),
+                'h1'     => array(),
+                'h2'     => array(),
+                'h3'     => array(),
+                'h4'     => array(),
+                'h5'     => array(),
+                'h6'     => array(),
+                'i'      => array(),
+                'u'      => array(),
+                'b'      => array(),
+                'a'      => array(
+                    'href' => array(),
+                    'target' => array(),
+                ),
+            );
+            $allowed_tags = apply_filters( 'propertyhive_match_email_allowed_tags', $allowed_tags );
+
+            $body = wp_kses(wp_unslash($_POST['body']), $allowedposttags);
 
             if ( isset($_GET['contact_id']) )
             {
