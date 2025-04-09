@@ -425,6 +425,28 @@ class PH_Emails {
 			$default_subject = get_option( 'propertyhive_property_match_default_email_subject', '' );
             $default_body = get_option( 'propertyhive_property_match_default_email_body', '' );
 
+            $allowed_tags = array(
+                'strong' => array(),
+                'span'   => array(),
+                'em'     => array(),
+                'h1'     => array(),
+                'h2'     => array(),
+                'h3'     => array(),
+                'h4'     => array(),
+                'h5'     => array(),
+                'h6'     => array(),
+                'i'      => array(),
+                'u'      => array(),
+                'b'      => array(),
+                'a'      => array(
+                    'href' => array(),
+                    'target' => array(),
+                ),
+            );
+            $allowed_tags = apply_filters( 'propertyhive_match_email_allowed_tags', $allowed_tags );
+
+            $default_body = wp_kses($default_body, $allowedposttags);
+
 			while ( $contact_query->have_posts() )
 			{
 				$contact_query->the_post();
