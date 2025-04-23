@@ -260,10 +260,10 @@ class PH_Admin_Menus {
 
     	if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
 	    {
-	        add_submenu_page( null, __( 'Applicant Matching Properties', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-properties', array($this, 'matching_properties_page'));
-	        add_submenu_page( null, __( 'Generate Applicant List', 'propertyhive'), __( 'Generate Applicant List', 'propertyhive' ), 'manage_propertyhive', 'ph-generate-applicant-list', array($this, 'generate_applicant_list_page'));
-	        add_submenu_page( null, __( 'Applicant Matching Applicants', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-applicants', array($this, 'matching_applicants_page'));
-	        add_submenu_page( null, __( 'Merge Duplicate Contacts', 'propertyhive'), __( 'Merge Duplicate Contacts', 'propertyhive' ), 'manage_propertyhive', 'ph-merge-duplicate-contacts', array($this, 'generate_merge_duplicate_contacts_page'));
+	        add_submenu_page( '', __( 'Applicant Matching Properties', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-properties', array($this, 'matching_properties_page'));
+	        add_submenu_page( '', __( 'Generate Applicant List', 'propertyhive'), __( 'Generate Applicant List', 'propertyhive' ), 'manage_propertyhive', 'ph-generate-applicant-list', array($this, 'generate_applicant_list_page'));
+	        add_submenu_page( '', __( 'Applicant Matching Applicants', 'propertyhive'), __( 'Applicant Matching Properties', 'propertyhive' ), 'manage_propertyhive', 'ph-matching-applicants', array($this, 'matching_applicants_page'));
+	        add_submenu_page( '', __( 'Merge Duplicate Contacts', 'propertyhive'), __( 'Merge Duplicate Contacts', 'propertyhive' ), 'manage_propertyhive', 'ph-merge-duplicate-contacts', array($this, 'generate_merge_duplicate_contacts_page'));
 	    }
     }
 
