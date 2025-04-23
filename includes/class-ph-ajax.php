@@ -1552,7 +1552,7 @@ class PH_AJAX {
             $args = array(
                 'post_type' => 'contact',
                 'nopaging' => true,
-                'post_status' => array( 'publish' ),
+                'post_status' => array( 'publish', 'private' ),
                 'fields' => 'ids'
             );
             if ( isset($_POST['contact_type']) && $_POST['contact_type'] != '' )
@@ -1639,7 +1639,7 @@ class PH_AJAX {
             $args = array(
                 'post_type' => 'property',
                 'nopaging' => true,
-                'post_status' => array( 'publish', 'draft' ),
+                'post_status' => array( 'publish', 'draft', 'private' ),
                 'fields' => 'ids'
             );
 
