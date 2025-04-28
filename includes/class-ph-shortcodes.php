@@ -1263,6 +1263,7 @@ class PH_Shortcodes {
 			'matching_address_field'	=> '', // only return fields with matching address field. Options: address_two, address_three, address_four, location
 			'property_id'				=> '',
 			'availability_id'	=> '',
+			'property_type_id'	=> '',
 			'no_results_output' => '',
 			'carousel' 			=> '',
 		), $atts, 'similar_properties' );
@@ -1544,6 +1545,28 @@ class PH_Shortcodes {
 	                'terms' => explode(",", $atts['availability_id']),
 	                'compare' => 'IN',
 	            );
+			}
+
+			if ( isset($atts['property_type_id']) && $atts['property_type_id'] != '' )
+			{
+				// Change field to check when department is specified as commercial, or if commercial is the only active department
+				if ( $department != 'commercial' && ph_get_custom_department_based_on( $department ) != 'commercial' )
+				{
+					$tax_query[] = array(
+			            'taxonomy'  => 'property_type',
+			            'terms' => explode(",", $atts['property_type_id']),
+			            'compare' => 'IN',
+			        );
+					
+				}
+				else
+				{
+					$tax_query[] = array(
+			            'taxonomy'  => 'commercial_property_type',
+			            'terms' => explode(",", $atts['property_type_id']),
+			            'compare' => 'IN',
+			        );
+				}
 			}
 
 			if ( isset($atts['matching_address_field']) && $atts['matching_address_field'] == 'location' )
