@@ -1264,6 +1264,7 @@ class PH_Shortcodes {
 			'property_id'				=> '',
 			'availability_id'	=> '',
 			'property_type_id'	=> '',
+			'match_property_type'	=> '',
 			'no_results_output' => '',
 			'carousel' 			=> '',
 		), $atts, 'similar_properties' );
@@ -1547,23 +1548,40 @@ class PH_Shortcodes {
 	            );
 			}
 
+			$property_types = array();
 			if ( isset($atts['property_type_id']) && $atts['property_type_id'] != '' )
 			{
-				// Change field to check when department is specified as commercial, or if commercial is the only active department
+				$property_types = explode(",", $atts['property_type_id']);
+			}
+
+			if ( isset($atts['match_property_type']) && $atts['match_property_type'] != '' )
+			{
+				$term_list = wp_get_post_terms((int)$atts['property_id'], ( ( $department == 'commercial' || ph_get_custom_department_based_on( $department ) == 'commercial' ) ? 'commercial_' : '' ) . 'property_type', array("fields" => "ids"));
+        
+		        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+		        {
+		            $property_types = $term_list;
+		        }
+			}
+
+			if ( !empty($property_types) )
+			{
+				$property_types = array_unique($property_types);
+                $property_types = array_filter($property_types);
+
 				if ( $department != 'commercial' && ph_get_custom_department_based_on( $department ) != 'commercial' )
 				{
 					$tax_query[] = array(
 			            'taxonomy'  => 'property_type',
-			            'terms' => explode(",", $atts['property_type_id']),
+			            'terms' => $property_types,
 			            'compare' => 'IN',
 			        );
-					
 				}
 				else
 				{
 					$tax_query[] = array(
 			            'taxonomy'  => 'commercial_property_type',
-			            'terms' => explode(",", $atts['property_type_id']),
+			            'terms' => $property_types,
 			            'compare' => 'IN',
 			        );
 				}
