@@ -33,7 +33,7 @@ class PH_Meta_Box_Sale_Property {
             
                 <label>' . __('Address', 'propertyhive') . '</label>
                 
-                <a href="' . get_edit_post_link($property_id, '') . '">' . $property->get_formatted_full_address() . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . get_permalink($property_id) . '" target="_blank">View On Website</a>)' : '' ) . '
+                <a href="' . get_edit_post_link($property_id, '') . '">' . $property->get_formatted_full_address() . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . get_permalink($property_id) . '" target="_blank">'. __('View On Website', 'propertyhive') . '</a>)' : '' ) . '
                 
             </p>';
 
@@ -57,21 +57,21 @@ class PH_Meta_Box_Sale_Property {
                 {
                     $owner = new PH_Contact((int)$owner_contact_id);
                     echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '">' . get_the_title($owner_contact_id) . '</a><br>';
-                    echo 'Telephone: ' . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
-                    echo 'Email: ' . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
+                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
+                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
                     echo '<br><br>';
                 }
             }
             else
             {
-                echo 'No ' . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified';
+                echo __('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . __(' specified', 'propertyhive');
             }
                 
             echo '</p>';
         }
         else
         {
-            echo 'No property found';
+            echo __('No property found', 'propertyhive');
         }
 
         do_action('propertyhive_sale_property_fields');
