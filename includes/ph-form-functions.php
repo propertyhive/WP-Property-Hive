@@ -800,6 +800,7 @@ function ph_form_field( $key, $field )
         case "number":
         case "password":
         {
+            $field['id'] = isset( $field['id'] ) ? $field['id'] : $key;
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
@@ -841,7 +842,7 @@ function ph_form_field( $key, $field )
             $output .= '<input
                     type="' . esc_attr( $field['type'] ) . '"
                     name="' . esc_attr( $key ) . '"
-                    id="' . esc_attr( $key ) . '"
+                    id="' . esc_attr( $field['id'] ) . '"
                     value="' . esc_attr( $field['value'] ) . '"
                     placeholder="' . esc_attr( $field['placeholder'] ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
