@@ -92,6 +92,25 @@ function show_other_material_information_rows()
     });
 }
 
+function ph_check_duplicate_reference_number()
+{
+    var data = {
+        action:         'propertyhive_check_duplicate_reference_number',
+        post_id:        propertyhive_admin_meta_boxes.post_id,
+        reference_number: jQuery('#propertyhive-property-address input[name=\'_reference_number\']').val(),
+        security:       propertyhive_admin_meta_boxes.check_duplicate_reference_number_nonce
+    };
+
+    jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+    {
+        if ( response == '1' )
+        {
+            // exists already
+            jQuery('#propertyhive-property-address input[name=\'_reference_number\']').after('<span class="duplicate-reference-number-warning">&nbsp; <span class="dashicons dashicons-info" style="color:#72aee6; vertical-align:middle"></span> This reference number is already in use</span>');
+        }
+    });
+}
+
 jQuery( function($){
     
     ph_init_description_editors();
@@ -99,6 +118,18 @@ jQuery( function($){
     ph_set_match_price_currency_symbol();
 
     show_other_material_information_rows();
+
+    ph_check_duplicate_reference_number();
+
+    $('#propertyhive-property-address input[name=\'_reference_number\']').change(function()
+    {
+        ph_check_duplicate_reference_number();
+    });
+
+    $('#propertyhive-property-address input[name=\'_reference_number\']').keydown(function()
+    {
+        jQuery('#propertyhive-property-address .duplicate-reference-number-warning').remove();
+    });
 
     $('#propertyhive-contact-relationships input[name^=\'_applicant_department_\']').change(function()
     {
