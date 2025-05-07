@@ -1031,15 +1031,18 @@ class PH_Property {
         global $wpdb;
 
         $row = $wpdb->get_row(
-            "
-            SELECT meta_value 
-            FROM {$wpdb->prefix}postmeta 
-            WHERE 
-                meta_key LIKE '_imported_ref_%'
-            AND
-                post_id = '" . $this->id . "'
-            LIMIT 1
-            ",
+            $wpdb->prepare(
+                "
+                SELECT meta_value 
+                FROM {$wpdb->prefix}postmeta 
+                WHERE 
+                    meta_key LIKE %s
+                    AND post_id = %d
+                LIMIT 1
+                ",
+                '_imported_ref_%',
+                $this->id
+            ),
             ARRAY_A
         );
 

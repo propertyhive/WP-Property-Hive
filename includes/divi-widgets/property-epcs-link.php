@@ -53,7 +53,7 @@ class Divi_Property_Epcs_Link_Widget extends ET_Builder_Module
                     }
                     if ( $image )
                     {
-                        echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow">' . esc_html(( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) )) . '</a>';
+                        echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow">' . esc_html(( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) )) . '</a>';
                         ++$i;
                     }
                     else

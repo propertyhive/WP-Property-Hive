@@ -59,7 +59,7 @@ class PH_Meta_Box_Viewing_Applicant {
                 $fields = array(
                     'name' => array(
                         'label' => __('Name', 'propertyhive'),
-                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-viewing-applicant-id="' . esc_attr($applicant_contact_id) . '" data-viewing-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
+                        'value' => '<a href="' . esc_url(get_edit_post_link($applicant_contact_id, '')) . '" data-viewing-applicant-id="' . esc_attr($applicant_contact_id) . '" data-viewing-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
                     ),
                     'telephone_number' => array(
                         'label' => __('Telephone Number', 'propertyhive'),
@@ -178,7 +178,7 @@ class PH_Meta_Box_Viewing_Applicant {
                 foreach ($applicant_contact_ids as $applicant_contact_id)
                 {
                     ?>
-                    viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
+                    viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo esc_js(get_the_title((int)$_GET['applicant_contact_id'])); ?>' });
                     <?php
                 }
             }
@@ -286,11 +286,11 @@ class PH_Meta_Box_Viewing_Applicant {
             var data = {
                 action:         'propertyhive_search_contacts',
                 keyword:        keyword,
-                security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+                security:       '<?php echo esc_js(wp_create_nonce( 'search-contacts' )); ?>',
                 exclude_ids:    jQuery('#_applicant_contact_ids').val(),
             };
             viewing_search_applicants_xhr.abort(); // cancel previous request
-            viewing_search_applicants_xhr = jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response)
+            viewing_search_applicants_xhr = jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response)
             {
                 if (response == '' || response.length == 0)
                 {

@@ -195,10 +195,10 @@ class PH_Meta_Box_Property_Features {
                     // Do AJAX request
                     var data = {
                         action:         \'propertyhive_load_existing_features\',
-                        security:       \'' . wp_create_nonce("load-existing-features") . '\',
+                        security:       \'' . esc_js(wp_create_nonce("load-existing-features")) . '\',
                     };
         
-                    jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
+                    jQuery.post( \'' . esc_url(admin_url('admin-ajax.php')) . '\', data, function(response) {
                         
                         obtaining_features = false;
                         existing_features = response;

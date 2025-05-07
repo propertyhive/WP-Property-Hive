@@ -450,7 +450,7 @@ class PH_Admin {
 ?>
     <div class="wrap propertyhive-installed-screen">
 
-        <h1><?php _e( 'Welcome to Property Hive', 'propertyhive'  ); ?></h1>
+        <h1><?php echo esc_html(__( 'Welcome to Property Hive', 'propertyhive'  )); ?></h1>
 
         <div class="intro-text">
             <p>Thank you choosing Property Hive to power your next property website. Below you'll find useful links, tips on getting started, and more.</p>
@@ -464,11 +464,11 @@ class PH_Admin {
 
                 <p>Now that you've installed Property Hive you'll notice a new 'Property Hive' item in the left hand menu of WordPress.</p>
 
-                <img src="<?php echo PH()->plugin_url(); ?>/assets/images/admin/installed-screen/wordpress-menu.png" style="margin:0 auto; display:block; max-width:100%;" alt="Property Hive menu in WordPress">
+                <img src="<?php echo esc_url(PH()->plugin_url()); ?>/assets/images/admin/installed-screen/wordpress-menu.png" style="margin:0 auto; display:block; max-width:100%;" alt="Property Hive menu in WordPress">
 
-                <p><strong>Configure Property Hive:</strong> We recommend that you start by navigating to the '<a href="<?php echo admin_url( 'admin.php?page=ph-settings' ); ?>" target="_blank">Settings</a>' area of Property Hive and configuring the options available.</p>
+                <p><strong>Configure Property Hive:</strong> We recommend that you start by navigating to the '<a href="<?php echo esc_url(admin_url( 'admin.php?page=ph-settings' )); ?>" target="_blank">Settings</a>' area of Property Hive and configuring the options available.</p>
 
-                <p><strong>Add Your First Property:</strong> See for yourself how easy it is to use Property Hive by <a href="<?php echo admin_url( 'post-new.php?post_type=property' ); ?>" target="_blank">adding your first property</a>.</p>
+                <p><strong>Add Your First Property:</strong> See for yourself how easy it is to use Property Hive by <a href="<?php echo esc_url(admin_url( 'post-new.php?post_type=property' )); ?>" target="_blank">adding your first property</a>.</p>
 
             </div>
 
@@ -478,7 +478,7 @@ class PH_Admin {
 
                 <p>We have a <a href="https://wp-property-hive.com/add-ons/" target="_blank">wide range of add ons</a> available to add extra functionality to your website.</p>
 
-                <a href="https://wp-property-hive.com/add-ons/" target="_blank"><img src="<?php echo PH()->plugin_url(); ?>/assets/images/admin/installed-screen/add-ons.png" style="margin:0 auto; border:1px solid #CCC; display:block; max-width:100%;" alt="Property Hive Free Add Ons"></a>
+                <a href="https://wp-property-hive.com/add-ons/" target="_blank"><img src="<?php echo esc_url(PH()->plugin_url()); ?>/assets/images/admin/installed-screen/add-ons.png" style="margin:0 auto; border:1px solid #CCC; display:block; max-width:100%;" alt="Property Hive Free Add Ons"></a>
 
                 <p><strong style="font-size:14px;"><a href="https://wp-property-hive.com/add-ons/?category=free" target="_blank">Free Add Ons</a></strong><br>
                 From our template assistant add on to a variety of calculators, these free add ons are great additions to any property website.</p>
@@ -515,7 +515,7 @@ class PH_Admin {
                 <p><strong style="font-size:14px;">Need a Theme?</strong><br>
                 Property Hive does <a href="https://wp-property-hive.com/which-wordpress-themes-work-with-property-hive/" target="_blank">integrate with any new or existing theme</a>. If however you need to get up and running quickly, or just want to have a play before committing, then our free <a href="https://wp-property-hive.com/honeycomb" target="_blank">Honeycomb theme</a> might be right for you.</p>
 
-                <a href="https://wp-property-hive.com/honeycomb" target="_blank"><img src="<?php echo PH()->plugin_url(); ?>/assets/images/admin/installed-screen/honeycomb-screenshot.png" style="margin:0 auto; display:block; max-width:80%;" alt="Property Hive Free Honeycomb Theme"></a>
+                <a href="https://wp-property-hive.com/honeycomb" target="_blank"><img src="<?php echo esc_url(PH()->plugin_url()); ?>/assets/images/admin/installed-screen/honeycomb-screenshot.png" style="margin:0 auto; display:block; max-width:80%;" alt="Property Hive Free Honeycomb Theme"></a>
 
                 <p><strong style="font-size:14px;">Leave a Review</strong><br>
                 If you've found Property Hive useful we'd love it if you could spare a moment to tell others just how great we are by <a href="https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5" target="_blank">leaving a review</a>.</p>
@@ -665,7 +665,7 @@ class PH_Admin {
                             " . __( '<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?', 'propertyhive' ) . "
                         </p>
                         <p>
-                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=demo_data') . "\" class=\"button-primary\">Import Demo Data</a>
+                            <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data')) . "\" class=\"button-primary\">Import Demo Data</a>
                             <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_demo_data\">Dismiss</a>
                         </p>
                         
@@ -689,8 +689,8 @@ class PH_Admin {
                             " . __( 'We noticed that you haven\'t assigned a page to be your \'Search Results\' page yet. We recommend that you do this in order to display properties on your site.', 'propertyhive' ) . "
                         </p>
                         <p>
-                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=general') . "\" class=\"button-primary\">Go To Property Hive Settings</a>
-                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_missing_search_results\">Dismiss</a>
+                            <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=general')) . "\" class=\"button-primary\">" . esc_html(__( 'Go To Property Hive Settings', 'propertyhive' )) . "</a>
+                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_missing_search_results\">" . esc_html(__( 'Dismiss', 'propertyhive' )) . "</a>
                         </p>
                         
                     </div>";
@@ -715,8 +715,8 @@ class PH_Admin {
                             " . sprintf( __( 'We noticed that you haven\'t entered a Google Maps API key yet. If wishing to display a map on your website it\'s recommended that you <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">create one</a> and <a href="%s">enter it</a>.', 'propertyhive' ), admin_url('admin.php?page=ph-settings&tab=general&section=map') ) . "
                         </p>
                         <p>
-                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=general&section=map') . "\" class=\"button-primary\">" . __( 'Enter Google Maps API Key', 'propertyhive' ) . "</a>
-                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_missing_google_maps_api_key\">" . __( 'Dismiss', 'propertyhive' ) . "</a>
+                            <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=general&section=map')) . "\" class=\"button-primary\">" . esc_html(__( 'Enter Google Maps API Key', 'propertyhive' )) . "</a>
+                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_missing_google_maps_api_key\">" . esc_html(__( 'Dismiss', 'propertyhive' )) . "</a>
                         </p>
                         
                     </div>";
@@ -750,11 +750,11 @@ class PH_Admin {
                 {
                     echo "<div class=\"notice notice-info\" id=\"ph_notice_invalid_expired_license_key\">
                         <p>
-                            " . $output . "
+                            " . esc_html($output) . "
                         </p>
                         <p>
-                            <a href=\"". admin_url('admin.php?page=ph-settings&tab=licensekey') . "\" class=\"button-primary\">" . __( 'Go To License Key Settings', 'propertyhive' ) . "</a>
-                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_invalid_expired_license_key\">" . __( 'Dismiss', 'propertyhive' ) . "</a>
+                            <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=licensekey')) . "\" class=\"button-primary\">" . esc_html(__( 'Go To License Key Settings', 'propertyhive' )) . "</a>
+                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_invalid_expired_license_key\">" . esc_html(__( 'Dismiss', 'propertyhive' )) . "</a>
                         </p>
                         
                     </div>";
@@ -771,11 +771,10 @@ class PH_Admin {
     	        {
                     echo '
                         <div class="notice notice-error" id="ph_notice_email_cron_not_running">
-                            <p>' . __( 'The Property Hive email queue does not appear to be running', 'propertyhive' ) . '
+                            <p>' . esc_html(__( 'The Property Hive email queue does not appear to be running', 'propertyhive' )) . '
                             </p>
                             <p>
-                                <a href="'. admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued') . '" class="button-primary">' . __( 'Go To Email Queue', 'propertyhive' ) . '</a>
-                                <!--<a href="" class="button" id="ph_dismiss_notice_email_cron_not_running">' . __( 'Dismiss', 'propertyhive' ) . '</a>-->
+                                <a href="'. esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued')) . '" class="button-primary">' . __( 'Go To Email Queue', 'propertyhive' ) . '</a>
                             </p>
                         </div>
                     ';
@@ -787,7 +786,7 @@ class PH_Admin {
         {
             echo '
                 <div class="notice notice-info">
-                    <p>' . __( 'Contacts merged successfully', 'propertyhive' ) . '</p>
+                    <p>' . esc_html(__( 'Contacts merged successfully', 'propertyhive' )) . '</p>
                 </div>
                 ';
         }

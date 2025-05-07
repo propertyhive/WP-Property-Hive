@@ -12,5 +12,5 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 <p class="propertyhive-info"><?php 
-	_e( 'You must be logged in to view this.', 'propertyhive' ); 
+	echo esc_html(__( 'You must be logged in to view this.', 'propertyhive' )); 
 ?></p>

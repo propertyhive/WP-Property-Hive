@@ -264,7 +264,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 
 						echo '<li>
 							<a href="' . esc_url(get_edit_post_link($property_id)) . '">' . esc_html($property->get_formatted_full_address()) . '</a>
-							<div class="stat">' . $property_view_data[$property_id]['total_views'] . ' <span>';
+							<div class="stat">' . esc_html($property_view_data[$property_id]['total_views']) . ' <span>';
 						if ( $property_view_data[$property_id]['total_views'] == $property_view_data[$property_id]['previous_time_frame'] )
 						{
 							echo '<span style="color:#999" title="No views"><span class="dashicons dashicons-arrow-right" style="color:#999"></span>-</span>';

@@ -46,13 +46,13 @@ class PH_Meta_Box_Property_Marketing_Statistics {
             {
                 var data = {
                     action: \'propertyhive_get_property_marketing_statistics_meta_box\',
-                    post_id: ' . $post->ID . ',
+                    post_id: ' . (int)$post->ID . ',
                     statistics_date_from: jQuery(\'#statistics_date_from\').val(),
                     statistics_date_to: jQuery(\'#statistics_date_to\').val(),
-                    security: \'' . wp_create_nonce( 'get_property_marketing_statistics_meta_box' ) . '\'
+                    security: \'' . esc_js(wp_create_nonce( 'get_property_marketing_statistics_meta_box' )) . '\'
                 }
 
-                jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) 
+                jQuery.post( \'' . esc_url(admin_url('admin-ajax.php')) . '\', data, function(response) 
                 {
                     jQuery(\'#propertyhive_property_marketing_statistics_meta_box\').html(response);
                     

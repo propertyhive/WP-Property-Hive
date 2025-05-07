@@ -59,7 +59,7 @@ class PH_Admin_Settings {
 		global $current_section, $current_tab;
 
 		if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-settings' ) )
-	    		die( __( 'Action failed. Please refresh the page and retry.', 'propertyhive' ) );
+	    		die( esc_html(__( 'Action failed. Please refresh the page and retry.', 'propertyhive' )) );
 
 	    // Trigger actions
 	   	do_action( 'propertyhive_settings_save_' . $current_tab );

@@ -18,7 +18,7 @@ if ( $summary != '' )
 ?>
 <div class="summary">
     
-    <h4><?php _e( 'Property Summary', 'propertyhive' ); ?></h4>
+    <h4><?php echo esc_html(__( 'Property Summary', 'propertyhive' )); ?></h4>
     
     <div class="summary-contents"><?php echo apply_filters('propertyhive_summary_description_nl2br', true) ? ph_nl2br($summary) : $summary; ?></div>
 

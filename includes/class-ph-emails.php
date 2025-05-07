@@ -663,7 +663,7 @@ class PH_Emails {
 				$emogrifier = new Emogrifier( $content, $css );
 				$content    = $emogrifier->emogrify();
 			} catch ( Exception $e ) {
-				die("Error converting CSS styles to be inline. Error as follows: " . $e->getMessage());
+				die(esc_html("Error converting CSS styles to be inline. Error as follows: " . $e->getMessage()));
 			}
 		}
 		return $content;

@@ -42,12 +42,12 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'type',
 			[
-				'label' => __( 'Type', 'elementor' ),
+				'label' => __( 'Type', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SELECT,
 				'default' => 'horizontal',
 				'options' => [
-					'horizontal' => __( 'Horizontal', 'elementor' ),
-					'vertical' => __( 'Vertical', 'elementor' ),
+					'horizontal' => __( 'Horizontal', 'propertyhive' ),
+					'vertical' => __( 'Vertical', 'propertyhive' ),
 				],
 				'prefix_class' => 'elementor-widget-tabs elementor-tabs-view-',
 			]
@@ -95,15 +95,15 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 				'fields' => [
 					[
 						'name' => 'tab_title',
-						'label' => __( 'Title', 'elementor' ),
+						'label' => __( 'Title', 'propertyhive' ),
 						'type' => \Elementor\Controls_Manager::TEXT,
-						'default' => __( 'Tab Title', 'elementor' ),
-						'placeholder' => __( 'Tab Title', 'elementor' ),
+						'default' => __( 'Tab Title', 'propertyhive' ),
+						'placeholder' => __( 'Tab Title', 'propertyhive' ),
 						'label_block' => true,
 					],
 					[
 						'name' => 'tab_display',
-						'label' => __( 'Display', 'elementor' ),
+						'label' => __( 'Display', 'propertyhive' ),
 						'type' => \Elementor\Controls_Manager::SELECT2,
 						'multiple' => true,
 						'default' => array(),
@@ -133,7 +133,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'section_tabs_style',
 			[
-				'label' => __( 'Tabs', 'elementor' ),
+				'label' => __( 'Tabs', 'propertyhive' ),
 				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
 			]
 		);
@@ -141,7 +141,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'navigation_width',
 			[
-				'label' => __( 'Navigation Width', 'elementor' ),
+				'label' => __( 'Navigation Width', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
 				'default' => [
 					'unit' => '%',
@@ -164,7 +164,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'border_width',
 			[
-				'label' => __( 'Border Width', 'elementor' ),
+				'label' => __( 'Border Width', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
 				'default' => [
 					'size' => 1,
@@ -184,7 +184,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'border_color',
 			[
-				'label' => __( 'Border Color', 'elementor' ),
+				'label' => __( 'Border Color', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-tab-mobile-title, {{WRAPPER}} .elementor-tab-desktop-title.elementor-active, {{WRAPPER}} .elementor-tab-title:before, {{WRAPPER}} .elementor-tab-title:after, {{WRAPPER}} .elementor-tab-content, {{WRAPPER}} .elementor-tabs-content-wrapper' => 'border-color: {{VALUE}};',
@@ -195,7 +195,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'background_color',
 			[
-				'label' => __( 'Background Color', 'elementor' ),
+				'label' => __( 'Background Color', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-tab-desktop-title.elementor-active' => 'background-color: {{VALUE}};',
@@ -207,7 +207,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'heading_title',
 			[
-				'label' => __( 'Title', 'elementor' ),
+				'label' => __( 'Title', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::HEADING,
 				'separator' => 'before',
 			]
@@ -216,7 +216,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'tab_color',
 			[
-				'label' => __( 'Color', 'elementor' ),
+				'label' => __( 'Color', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-tab-title' => 'color: {{VALUE}};',
@@ -230,7 +230,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'tab_active_color',
 			[
-				'label' => __( 'Active Color', 'elementor' ),
+				'label' => __( 'Active Color', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-tab-title.elementor-active' => 'color: {{VALUE}};',
@@ -255,7 +255,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'heading_content',
 			[
-				'label' => __( 'Content', 'elementor' ),
+				'label' => __( 'Content', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::HEADING,
 				'separator' => 'before',
 			]
@@ -264,7 +264,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'content_color',
 			[
-				'label' => __( 'Color', 'elementor' ),
+				'label' => __( 'Color', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-tab-content' => 'color: {{VALUE}};',

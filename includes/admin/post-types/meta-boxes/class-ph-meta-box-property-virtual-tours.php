@@ -43,7 +43,7 @@ class PH_Meta_Box_Property_Virtual_Tours {
                         </p>
 
                         <p class="form-field virtual_tour_field ">
-                            <label for="">' . __( 'Virtual Tour Label', 'propertyhive' ) . '</label>
+                            <label for="">' . esc_html(__( 'Virtual Tour Label', 'propertyhive' )) . '</label>
                             <input type="text" class="short" name="virtual_tour_label[]" id="" value="' . esc_attr(( $label != '' ? $label : __( 'Virtual Tour', 'propertyhive' ) )) . '" placeholder="' . esc_attr(__( 'e.g. Virtual Tour', 'propertyhive' )) . '"> 
                         </p>
 

@@ -67,8 +67,8 @@ class PH_Meta_Box_Property_Owner {
             echo '<div id="search_propertyhive_contacts"' . ( !empty($owner_contact_ids) ? ' style="display:none"' : '' ) . '>';
 
                 echo '<p class="form-field search_propertyhive_contacts_keyword_field">
-                    <label for="search_propertyhive_contacts_keyword">' . __('Search Existing Contacts', 'propertyhive') . '</label>
-                    <input type="text" class="short" name="search_propertyhive_contacts_keyword" id="search_propertyhive_contacts_keyword" value="" placeholder="' . __( 'Start typing to search...' , 'propertyhive') . '">
+                    <label for="search_propertyhive_contacts_keyword">' . esc_html(__('Search Existing Contacts', 'propertyhive')) . '</label>
+                    <input type="text" class="short" name="search_propertyhive_contacts_keyword" id="search_propertyhive_contacts_keyword" value="" placeholder="' . esc_attr(__( 'Start typing to search...' , 'propertyhive')) . '">
                 </p>';
                 
                 echo '<p class="form-field search_propertyhive_contacts_results">
@@ -78,7 +78,7 @@ class PH_Meta_Box_Property_Owner {
                 
                 echo '<p class="form-field"><label>&nbsp;</label>';
                 
-                echo __('Or', 'propertyhive') . '<br><br>';
+                echo esc_html(__('Or', 'propertyhive')) . '<br><br>';
                 echo '<a href="#" class="button add-new-property-owner-contact">' . esc_html(__('Add New Contact', 'propertyhive')) . '</a>';
     
                 echo '</p>';
@@ -114,10 +114,10 @@ class PH_Meta_Box_Property_Owner {
                               var data = {
                                   action:         \'propertyhive_load_existing_owner_contact\',
                                   contact_id:     contact_id,
-                                  security:       \'' . wp_create_nonce("load-existing-owner-contact") . '\',
+                                  security:       \'' . esc_js(wp_create_nonce("load-existing-owner-contact")) . '\',
                               };
                     
-                              jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
+                              jQuery.post( \'' . esc_url(admin_url('admin-ajax.php')) . '\', data, function(response) {
                                   
                                   jQuery(\'#existing-owner-details\').append( response );
                                   
@@ -139,7 +139,7 @@ class PH_Meta_Box_Property_Owner {
                           {
                               foreach ( $owner_contact_ids as $owner_contact_id )
                               {
-                                echo 'load_existing_owner_contact(' . $owner_contact_id . ', true);';
+                                echo 'load_existing_owner_contact(' . (int)$owner_contact_id . ', true);';
                               }
                           }
                           
@@ -242,10 +242,10 @@ class PH_Meta_Box_Property_Owner {
                                         var data = {
                                             action:         \'propertyhive_search_contacts\',
                                             keyword:        keyword,
-                                            security:       \'' . wp_create_nonce("search-contacts") . '\',
+                                            security:       \'' . esc_js(wp_create_nonce("search-contacts")) . '\',
                                         };
                                 
-                                        jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) {
+                                        jQuery.post( \'' . esc_url(admin_url('admin-ajax.php')) . '\', data, function(response) {
                                             
                                             if (response.length > 0)
                                             {
@@ -258,13 +258,13 @@ class PH_Meta_Box_Property_Owner {
                                             }
                                             else
                                             {
-                                                jQuery(\'#search_propertyhive_contacts_results\').html(\'' . __( 'No contacts found', 'propertyhive' ) . '\');
+                                                jQuery(\'#search_propertyhive_contacts_results\').html(\'' . esc_html(__( 'No contacts found', 'propertyhive' )) . '\');
                                             }
                                         });
                                   }
                                   else
                                   {
-                                      jQuery(\'#search_propertyhive_contacts_results\').html(\'' . __( 'Keep on typing...', 'propertyhive' ) . '\');
+                                      jQuery(\'#search_propertyhive_contacts_results\').html(\'' . esc_html(__( 'Keep on typing...', 'propertyhive' )) . '\');
                                   }
                               }
                           });
@@ -273,9 +273,9 @@ class PH_Meta_Box_Property_Owner {
             
             echo '<div id="add_new_property_owner_contact" style="display:none;">';
             
-            echo '<a href="#" class="button right search-property-owner-contacts">&lt; ' . __('Search Existing Contacts', 'propertyhive') . '</a>';
+            echo '<a href="#" class="button right search-property-owner-contacts">&lt; ' . esc_html(__('Search Existing Contacts', 'propertyhive')) . '</a>';
             
-            echo '<h4>' . __('Name', 'propertyhive') . '</h4>';
+            echo '<h4>' . esc_html(__('Name', 'propertyhive')) . '</h4>';
             
             propertyhive_wp_text_input( array( 
                 'id' => '_owner_name', 
@@ -285,7 +285,7 @@ class PH_Meta_Box_Property_Owner {
                 'type' => 'text'
             ) );
             
-            echo '<h4>' . __('Correspondence Address', 'propertyhive') . ' (<a href="" class="use-property-address">Use Property Address</a>)</h4>';
+            echo '<h4>' . esc_html(__('Correspondence Address', 'propertyhive')) . ' (<a href="" class="use-property-address">Use Property Address</a>)</h4>';
             
             propertyhive_wp_text_input( array( 
                 'id' => '_owner_address_name_number', 
@@ -362,7 +362,7 @@ class PH_Meta_Box_Property_Owner {
                 ) );
             }
             
-            echo '<h4>' . __('Contact Details', 'propertyhive') . '</h4>';
+            echo '<h4>' . esc_html(__('Contact Details', 'propertyhive')) . '</h4>';
             
             propertyhive_wp_text_input( array( 
                 'id' => '_owner_telephone_number', 

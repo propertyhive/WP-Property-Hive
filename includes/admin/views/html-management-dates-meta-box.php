@@ -193,7 +193,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 $key_date = new PH_Key_Date( $key_date_post );
                 ?>
-                <tr id="post-<?php echo $key_date_post->ID; ?>" class="post-<?php echo esc_attr($key_date_post->ID); ?> key-date-row">
+                <tr id="post-<?php echo (int)$key_date_post->ID; ?>" class="post-<?php echo esc_attr($key_date_post->ID); ?> key-date-row">
                     <td class="description column-description" data-colname="Description">
                         <div class="cell-main-content"><?php echo $key_date->description(); ?></div>
                         <div class="row-actions">

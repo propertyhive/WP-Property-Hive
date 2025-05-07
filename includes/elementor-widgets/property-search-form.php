@@ -161,7 +161,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'label_width',
 			[
-				'label' => esc_html__( 'Label Width', 'textdomain' ),
+				'label' => esc_html__( 'Label Width', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SELECT,
 				'default' => '',
 				'options' => [
@@ -238,7 +238,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'input_width',
 			[
-				'label' => esc_html__( 'Input Width', 'textdomain' ),
+				'label' => esc_html__( 'Input Width', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SELECT,
 				'default' => '',
 				'options' => [

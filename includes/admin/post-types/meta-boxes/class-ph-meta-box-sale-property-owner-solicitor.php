@@ -32,7 +32,7 @@ class PH_Meta_Box_Sale_Property_Owner_Solicitor {
             $fields = array(
                 'name' => array(
                     'label' => __('Name', 'propertyhive'),
-                    'value' => '<a href="' . get_edit_post_link($property_owner_solicitor_contact_id, '') . '">' . esc_html(get_the_title($property_owner_solicitor_contact_id) . ( $contact->company_name != '' && $contact->company_name != get_the_title($property_owner_solicitor_contact_id) ? ' (' . $contact->company_name . ')' : '' )) . '</a>',
+                    'value' => '<a href="' . esc_url(get_edit_post_link($property_owner_solicitor_contact_id, '')) . '">' . esc_html(get_the_title($property_owner_solicitor_contact_id) . ( $contact->company_name != '' && $contact->company_name != get_the_title($property_owner_solicitor_contact_id) ? ' (' . $contact->company_name . ')' : '' )) . '</a>',
                 ),
                 'telephone_number' => array(
                     'label' => __('Telephone Number', 'propertyhive'),
@@ -61,7 +61,7 @@ class PH_Meta_Box_Sale_Property_Owner_Solicitor {
             
                 <label></label>
                 
-                <a class="button" href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit' ), '1', 'remove_property_owner_solicitor' ) . '">' .  __( 'Remove Solicitor', 'propertyhive' ) . '</a>
+                <a class="button" href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit' ), '1', 'remove_property_owner_solicitor' )) . '">' . esc_html(__( 'Remove Solicitor', 'propertyhive' )) . '</a>
                 
             </p>';
         }
@@ -125,9 +125,9 @@ jQuery(document).ready(function($)
             action:         'propertyhive_search_contacts',
             keyword:        keyword,
             contact_type:   'thirdparty',
-            security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-contacts' )); ?>',
         };
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
             if (response == '' || response.length == 0)
             {

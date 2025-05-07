@@ -62,7 +62,7 @@ class PH_Meta_Box_Property_Coordinates {
         
         echo '<p class="form-field">
             <label>&nbsp;</label>
-            <a href="#" onclick="do_address_lookup( true ); return false;">' . __( 'Obtain Co-ordinates', 'propertyhive' ) . '</a>
+            <a href="#" onclick="do_address_lookup( true ); return false;">' . esc_html(__( 'Obtain Co-ordinates', 'propertyhive' )) . '</a>
         </p>';
 
         do_action('propertyhive_property_coordinates_fields');
@@ -83,8 +83,8 @@ class PH_Meta_Box_Property_Coordinates {
             $markerSet = false;
         }
         
-        echo '<small id="help-marker-not-set" style="display:' . ( ($markerSet) ? 'none' : 'block') . ';">' . __('Manually enter the property\'s co-ordinates, or click on the map to specify the exact location.', 'propertyhive') . '</small>';
-        echo '<small id="help-marker-set" style="display:' . ( (!$markerSet) ? 'none' : 'block') . ';">' . __('Edit the co-ordinates by manually entering them, or click and drag the marker.', 'propertyhive') . '</small>';
+        echo '<small id="help-marker-not-set" style="display:' . ( ($markerSet) ? 'none' : 'block') . ';">' . esc_html(__('Manually enter the property\'s co-ordinates, or click on the map to specify the exact location.', 'propertyhive')) . '</small>';
+        echo '<small id="help-marker-set" style="display:' . ( (!$markerSet) ? 'none' : 'block') . ';">' . esc_html(__('Edit the co-ordinates by manually entering them, or click and drag the marker.', 'propertyhive')) . '</small>';
         
         echo '</div>';
         
@@ -245,7 +245,7 @@ class PH_Meta_Box_Property_Coordinates {
                                 \'action\': \'propertyhive_osm_geocoding_request\',
                                 \'address\': address,
                                 \'country\': jQuery(\'#_address_country\').val(),
-                                \'security\': \'' . wp_create_nonce( 'osm_geocoding_request' ) . '\'
+                                \'security\': \'' . esc_js(wp_create_nonce( 'osm_geocoding_request' )) . '\'
                             };
 
                             jQuery.post( ajaxurl, data, function(response) {
@@ -418,8 +418,8 @@ class PH_Meta_Box_Property_Coordinates {
                     mapboxgl.accessToken = \'' . get_option( 'propertyhive_mapbox_api_key', '' ) . '\';
                     map = new mapboxgl.Map({
                         container: "map_canvas", // container ID
-                        center: [' . $longitude . ', ' . $latitude . '], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-                        zoom: ' . $zoom . ' // starting zoom
+                        center: [' . (float)$longitude . ', ' . (float)$latitude . '], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+                        zoom: ' . (int)$zoom . ' // starting zoom
                     });
 
                     if (markerSet)
@@ -427,7 +427,7 @@ class PH_Meta_Box_Property_Coordinates {
                         marker = new mapboxgl.Marker({
                             //color: "#FFFFFF",
                             draggable: true
-                        }).setLngLat([' . $longitude . ', ' . $latitude . '])
+                        }).setLngLat([' . (float)$longitude . ', ' . (float)$latitude . '])
                             .addTo(map);
 
                         marker.on(\'dragend\', marker_move_end);
@@ -546,7 +546,7 @@ class PH_Meta_Box_Property_Coordinates {
                 ';
             }
             echo '
-                    map = L.map("map_canvas").setView([' . $latitude . ', ' . $longitude . '], ' . $zoom . ');
+                    map = L.map("map_canvas").setView([' . (float)$latitude . ', ' . (float)$longitude . '], ' . (int)$zoom . ');
 
                     L.tileLayer(\'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
                         attribution: \'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors\',
@@ -555,7 +555,7 @@ class PH_Meta_Box_Property_Coordinates {
 
                     if (markerSet)
                     {
-                        marker = L.marker([' . $latitude . ', ' . $longitude . '], { draggable:true }).addTo(map).on(\'moveend\', marker_move_end);
+                        marker = L.marker([' . (float)$latitude . ', ' . (float)$longitude . '], { draggable:true }).addTo(map).on(\'moveend\', marker_move_end);
                     }
 
                     map.on(\'click\', function(e){
@@ -662,10 +662,10 @@ class PH_Meta_Box_Property_Coordinates {
                 ';
             }
             echo '      
-                    var starting_lat_lng = new google.maps.LatLng(' . $latitude . ', ' . $longitude . ');
+                    var starting_lat_lng = new google.maps.LatLng(' . (float)$latitude . ', ' . (float)$longitude . ');
                     var mapOptions = {
                       center: starting_lat_lng,
-                      zoom: ' . $zoom . ',
+                      zoom: ' . (int)$zoom . ',
                       scrollwheel: false 
                     };
                     map = new google.maps.Map(document.getElementById(\'map_canvas\'), mapOptions);
@@ -673,7 +673,7 @@ class PH_Meta_Box_Property_Coordinates {
                     if (markerSet)
                     {
                         // To add the marker to the map, use the \'map\' property
-                        marker = ph_create_marker(' . $latitude . ', ' . $longitude . ');
+                        marker = ph_create_marker(' . (float)$latitude . ', ' . (float)$longitude . ');
                     }
 
                     google.maps.event.addListener(map, \'click\', function(event) 

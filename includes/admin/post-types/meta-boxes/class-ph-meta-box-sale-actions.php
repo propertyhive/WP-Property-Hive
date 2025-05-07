@@ -43,10 +43,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_sale_exchanged',
-		        sale_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'sale-actions' ); ?>',
+		        sale_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'sale-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_sale_actions();
 		    }, 'json');
@@ -57,10 +57,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_sale_completed',
-		        sale_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'sale-actions' ); ?>',
+		        sale_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'sale-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_sale_actions();
 		    }, 'json');
@@ -71,10 +71,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_sale_fallen_through',
-		        sale_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'sale-actions' ); ?>',
+		        sale_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'sale-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_sale_actions();
 		    }, 'json');
@@ -109,11 +109,11 @@ function redraw_sale_actions()
 
 	var data = {
         action:         'propertyhive_get_sale_actions',
-        sale_id:    	<?php echo $post->ID; ?>,
-        security:       '<?php echo wp_create_nonce( 'sale-actions' ); ?>',
+        sale_id:    	<?php echo (int)$post->ID; ?>,
+        security:       '<?php echo esc_js(wp_create_nonce( 'sale-actions' )); ?>',
     };
 
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
     {
     	jQuery('#propertyhive_sale_actions_meta_box_container').html(response);
 

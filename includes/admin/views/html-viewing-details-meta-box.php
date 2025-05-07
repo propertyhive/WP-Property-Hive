@@ -10,15 +10,15 @@ echo '<div class="propertyhive_meta_box">';
 
     echo '<p class="form-field">
     
-        <label for="">' . __('Status', 'propertyhive') . '</label>
+        <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
         
-        ' . __( ucwords(str_replace("_", " ", $viewing->status)), 'propertyhive' );
+        ' . esc_html(__( ucwords(str_replace("_", " ", $viewing->status)), 'propertyhive' ));
 
         // Add text if this a second, third etc viewing
         $related_viewings = get_post_meta( $viewing->id, '_related_viewings', TRUE );
         if ( isset($related_viewings['previous']) && count($related_viewings['previous']) > 0 )
         {
-            echo ' - ' . ph_ordinal_suffix(count($related_viewings['previous'])+1) . ' ' . __( 'Viewing', 'propertyhive' );
+            echo ' - ' . esc_html(ph_ordinal_suffix(count($related_viewings['previous'])+1) . ' ' . __( 'Viewing', 'propertyhive' ));
         }
 
     if ( $viewing->status == 'offer_made' )
@@ -33,7 +33,7 @@ echo '<div class="propertyhive_meta_box">';
 
             if ( $offer_id != '' )
             {
-                echo ' (<a href="' . get_edit_post_link($offer_id) . '">' . __('View Offer', 'propertyhive') . '</a>)';
+                echo ' (<a href="' . esc_url(get_edit_post_link($offer_id)) . '">' . esc_html(__('View Offer', 'propertyhive')) . '</a>)';
             }
         }
     }
@@ -46,7 +46,7 @@ echo '<div class="propertyhive_meta_box">';
         {
             echo '<p class="form-field">
     
-                <label for="">' . __('Reason Cancelled', 'propertyhive') . '</label>
+                <label for="">' . esc_html(__('Reason Cancelled', 'propertyhive')) . '</label>
 
                 ' . nl2br(esc_html($viewing->cancelled_reason)) . '
 
@@ -72,28 +72,28 @@ echo '<div class="propertyhive_meta_box">';
     {
         echo '<p class="form-field">
     
-            <label for="">' . __('Applicant Feedback', 'propertyhive') . '</label>';
+            <label for="">' . esc_html(__('Applicant Feedback', 'propertyhive')) . '</label>';
 
         switch ( $viewing->feedback_status )
         {
             case "interested":
             {
-                echo __( 'Interested', 'propertyhive' );
+                echo esc_html(__( 'Interested', 'propertyhive' ));
                 break;
             }
             case "not_interested":
             {
-                echo __( 'Not Interested', 'propertyhive' );
+                echo esc_html(__( 'Not Interested', 'propertyhive' ));
                 break;
             }
             case "not_required":
             {
-                echo __( 'Feedback Not Required', 'propertyhive' );
+                echo esc_html(__( 'Feedback Not Required', 'propertyhive' ));
                 break;
             }
             default:
             {
-                echo __( 'Awaiting Feedback', 'propertyhive' );
+                echo esc_html(__( 'Awaiting Feedback', 'propertyhive' ));
             }
         }
 
@@ -105,7 +105,7 @@ echo '<div class="propertyhive_meta_box">';
             {
                 echo '<p class="form-field">
         
-                    <label for="">' . __('Feedback', 'propertyhive') . '</label>
+                    <label for="">' . esc_html(__('Feedback', 'propertyhive')) . '</label>
 
                     ' . nl2br(esc_html($viewing->feedback)) . '
 
@@ -134,17 +134,17 @@ echo '<div class="propertyhive_meta_box">';
 
         echo '<p class="form-field">
 
-            <label for="">' . __('Date Feedback Received', 'propertyhive') . '</label>';
+            <label for="">' . esc_html(__('Date Feedback Received', 'propertyhive')) . '</label>';
 
-            echo ( !empty($viewing->feedback_received_date) ? date( $datetime_format, strtotime($viewing->feedback_received_date) ) : __( 'Unknown', 'propertyhive' ) );
+            echo esc_html( !empty($viewing->feedback_received_date) ? date( $datetime_format, strtotime($viewing->feedback_received_date) ) : __( 'Unknown', 'propertyhive' ) );
 
         echo '</p>';
 
         echo '<p class="form-field">
     
-            <label for="">' . __('Feedback Passed On', 'propertyhive') . '</label>';
+            <label for="">' . esc_html(__('Feedback Passed On', 'propertyhive')) . '</label>';
 
-            echo ( ($viewing->feedback_passed_on == 'yes') ? __( 'Yes', 'propertyhive' ) : __( 'No', 'propertyhive' ) );
+            echo esc_html( $viewing->feedback_passed_on == 'yes' ? __( 'Yes', 'propertyhive' ) : __( 'No', 'propertyhive' ) );
 
         echo '</p>';
     }

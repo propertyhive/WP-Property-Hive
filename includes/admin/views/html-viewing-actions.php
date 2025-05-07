@@ -279,7 +279,7 @@ echo '<div id="action_panel_success" class="propertyhive_meta_box propertyhive_m
 
         <div id="success_actions"></div>
 
-        <a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+        <a class="button action-cancel" style="width:100%;" href="#">' . esc_html(__( 'Back To Actions', 'propertyhive' )) . '</a>
 
     </div>
 
@@ -301,7 +301,7 @@ if ( $show_customise_confirmation_meta_boxes )
 
                 <label for="_owner_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
                 
-                <input id="_owner_confirmation_email_subject" name="_owner_confirmation_email_subject" style="width:100%;" value="' . $subject . '">
+                <input id="_owner_confirmation_email_subject" name="_owner_confirmation_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
 
             </div>
 
@@ -321,8 +321,8 @@ if ( $show_customise_confirmation_meta_boxes )
 
             </div>
 
-            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-            <a class="button button-primary owner-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+            <a class="button button-primary owner-booking-confirmation-action-submit" href="#">' . esc_html(__( 'Send', 'propertyhive' )) . '</a>
 
         </div>
 
@@ -337,15 +337,15 @@ if ( $show_customise_confirmation_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_applicant_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                <label for="_applicant_confirmation_email_subject">' . esc_html(__( 'Subject', 'propertyhive' )) . '</label>
                 
-                <input id="_applicant_confirmation_email_subject" name="_applicant_confirmation_email_subject" style="width:100%;" value="' . $subject . '">
+                <input id="_applicant_confirmation_email_subject" name="_applicant_confirmation_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
 
             </div>
 
             <div class="form-field">
 
-                <label for="_applicant_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                <label for="_applicant_confirmation_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                 
                 <textarea id="_applicant_confirmation_email_body" name="_applicant_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
 
@@ -353,14 +353,14 @@ if ( $show_customise_confirmation_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_applicant_confirmation_email_attachment">' . __( 'Attach File(s)', 'propertyhive' ) . '</label>
+                <label for="_applicant_confirmation_email_attachment">' . esc_html(__( 'Attach File(s)', 'propertyhive' )) . '</label>
                 
                 <input type="file" id="_applicant_confirmation_email_attachment" name="_applicant_confirmation_email_attachment" style="width:100%;" multiple>
 
             </div>
 
-            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-            <a class="button button-primary applicant-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+            <a class="button button-primary applicant-booking-confirmation-action-submit" href="#">' . esc_html(__( 'Send', 'propertyhive' )) . '</a>
 
         </div>
 
@@ -375,15 +375,15 @@ if ( $show_customise_confirmation_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_attending_negotiator_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                <label for="_attending_negotiator_confirmation_email_subject">' . esc_html(__( 'Subject', 'propertyhive' )) . '</label>
                 
-                <input id="_attending_negotiator_confirmation_email_subject" name="_attending_negotiator_confirmation_email_subject" style="width:100%;" value="' . $subject . '">
+                <input id="_attending_negotiator_confirmation_email_subject" name="_attending_negotiator_confirmation_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
 
             </div>
 
             <div class="form-field">
 
-                <label for="_attending_negotiator_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                <label for="_attending_negotiator_confirmation_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                 
                 <textarea id="_attending_negotiator_confirmation_email_body" name="_attending_negotiator_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
 
@@ -391,14 +391,14 @@ if ( $show_customise_confirmation_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_attending_negotiator_confirmation_email_attachment">' . __( 'Attach File(s)', 'propertyhive' ) . '</label>
+                <label for="_attending_negotiator_confirmation_email_attachment">' . esc_html(__( 'Attach File(s)', 'propertyhive' )) . '</label>
                 
                 <input type="file" id="_attending_negotiator_confirmation_email_attachment" name="_attending_negotiator_confirmation_email_attachment" style="width:100%;" multiple>
 
             </div>
 
-            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-            <a class="button button-primary attending-negotiator-booking-confirmation-action-submit" href="#">' . __( 'Send', 'propertyhive' ) . '</a>
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+            <a class="button button-primary attending-negotiator-booking-confirmation-action-submit" href="#">' . esc_html(__( 'Send', 'propertyhive' )) . '</a>
 
         </div>
 
@@ -413,14 +413,14 @@ if ( $show_cancelled_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_viewing_cancelled_reason">' . __( 'Reason Cancelled', 'propertyhive' ) . '</label>
+                <label for="_viewing_cancelled_reason">' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . '</label>
                 
                 <textarea id="_cancelled_reason" name="_cancelled_reason" style="width:100%;">' . get_post_meta( $post_id, '_cancelled_reason', TRUE ) . '</textarea>
 
             </div>
 
-            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-            <a class="button button-primary cancelled-reason-action-submit" href="#">' . __( 'Save', 'propertyhive' ) . '</a>
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+            <a class="button button-primary cancelled-reason-action-submit" href="#">' . esc_html(__( 'Save', 'propertyhive' )) . '</a>
 
         </div>
 
@@ -435,13 +435,13 @@ if ( $show_feedback_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_viewing_interested_feedback">' . __( 'Applicant Feedback', 'propertyhive' ) . '</label>
+                <label for="_viewing_interested_feedback">' . esc_html(__( 'Applicant Feedback', 'propertyhive' )) . '</label>
                 
                 <textarea id="_interested_feedback" name="_interested_feedback" style="width:100%;">' . get_post_meta( $post_id, '_feedback', TRUE ) . '</textarea>
 
             </div>
 
-            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
             <a class="button button-primary interested-feedback-action-submit" href="#">' . wp_kses_post( __( 'Save Feedback', 'propertyhive' ) ) . '</a>
 
         </div>
@@ -454,13 +454,13 @@ if ( $show_feedback_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_viewing_not_interested_feedback">' . __( 'Applicant Feedback', 'propertyhive' ) . '</label>
+                <label for="_viewing_not_interested_feedback">' . esc_html(__( 'Applicant Feedback', 'propertyhive' )) . '</label>
                 
                 <textarea id="_not_interested_feedback" name="_not_interested_feedback" style="width:100%;">' . get_post_meta( $post_id, '_feedback', TRUE ) . '</textarea>
 
             </div>
 
-            <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
             <a class="button button-primary not-interested-feedback-action-submit" href="#">' . wp_kses_post( __( 'Save Feedback', 'propertyhive' ) ) . '</a>
 
         </div>

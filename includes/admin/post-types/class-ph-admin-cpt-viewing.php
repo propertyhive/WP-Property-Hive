@@ -90,7 +90,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 				if ( count($related_viewings['previous']) > 0 )
 				{
 					$previous_viewing_id = end($related_viewings['previous']);
-					$message .= '<a href="' . get_edit_post_link( $previous_viewing_id, '' ) . '"><< '. __( 'Go to previous', 'propertyhive' ) . '</a>';
+					$message .= '<a href="' . esc_url(get_edit_post_link( $previous_viewing_id, '' )) . '"><< '. esc_html(__( 'Go to previous', 'propertyhive' )) . '</a>';
 				}
 
 				if ( count($related_viewings['next']) > 0 )
@@ -103,7 +103,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 						$message .= ' | ';
 					}
 
-					$message .= '<a href="' . get_edit_post_link( $next_viewing_id, '' ) . '">'. __( 'Go to next', 'propertyhive' ) . ' >></a>';
+					$message .= '<a href="' . esc_url(get_edit_post_link( $next_viewing_id, '' )) . '">'. esc_html(__( 'Go to next', 'propertyhive' )) . ' >></a>';
 				}
 
 				echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
@@ -189,14 +189,14 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
-				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title . '</a></strong>';
+				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . esc_html($title) . '</a></strong>';
 			 break;
             case 'property' :
                 
                 if ( $the_viewing->property_id != '' ) 
                 {
 	                $property = new PH_Property((int)$the_viewing->property_id);
-	                echo $property->get_formatted_full_address();
+	                echo esc_html($property->get_formatted_full_address());
                 }
                 else
                 {
@@ -210,7 +210,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
                     $applicants = array();
                     foreach ( $applicant_contact_ids as $applicant_contact_id )
                     {
-                        $applicants[] = get_the_title($applicant_contact_id);
+                        $applicants[] = esc_html(get_the_title($applicant_contact_id));
                     }
                     echo implode("<br>", $applicants);
                 }
@@ -222,18 +222,18 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
                 break;
             case 'status' :
                 
-                echo __( ucwords(str_replace("_", " ", $the_viewing->status)), 'propertyhive' );
+                echo esc_html(__( ucwords(str_replace("_", " ", $the_viewing->status)), 'propertyhive' ));
                 if ( $the_viewing->status == 'pending' )
                 {
                 	echo '<br>';
                 	// confirmation status
                 	if ( $the_viewing->all_confirmed == 'yes' )
                 	{
-                		echo __( 'All Parties Confirmed', 'propertyhive' );
+                		echo esc_html(__( 'All Parties Confirmed', 'propertyhive' ));
                 	}
                 	else
                 	{
-                		echo __( 'Awaiting Confirmation', 'propertyhive' );
+                		echo esc_html(__( 'Awaiting Confirmation', 'propertyhive' ));
                 	}
                 }
                 if ( $the_viewing->status == 'carried_out' )
@@ -241,15 +241,15 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
                     echo '<br>';
                     switch ( $the_viewing->feedback_status )
                     {
-                        case "interested": { echo __( 'Applicant Interested', 'propertyhive' ); break; }
-                        case "not_interested": { echo __( 'Applicant Not Interested', 'propertyhive' ); break; }
-                        case "not_required": { echo __( 'Feedback Not Required', 'propertyhive' ); break; }
-                        default: { echo __( 'Awaiting Feedback', 'propertyhive' ); }
+                        case "interested": { echo esc_html(__( 'Applicant Interested', 'propertyhive' )); break; }
+                        case "not_interested": { echo esc_html(__( 'Applicant Not Interested', 'propertyhive' )); break; }
+                        case "not_required": { echo esc_html(__( 'Feedback Not Required', 'propertyhive' )); break; }
+                        default: { echo esc_html(__( 'Awaiting Feedback', 'propertyhive' )); }
                     }
 
                     if ( $the_viewing->feedback_status == 'interested' || $the_viewing->feedback_status == 'not_interested' )
                     {
-                    	echo '<br>' . ( ($the_viewing->feedback_passed_on == 'yes') ? __( 'Feedback Passed On', 'propertyhive' ) : __( 'Feedback Not Passed On', 'propertyhive' ) );
+                    	echo '<br>' . esc_html( $the_viewing->feedback_passed_on == 'yes' ? __( 'Feedback Passed On', 'propertyhive' ) : __( 'Feedback Not Passed On', 'propertyhive' ) );
                     }
 				}
 
@@ -269,13 +269,13 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
             		foreach ( $negotiator_ids as $negotiator_id )
             		{
             			$user_info = get_userdata($negotiator_id);
-            			$negotiators[] = $user_info->display_name;
+            			$negotiators[] = esc_html($user_info->display_name);
             		}
             		echo implode(", ", $negotiators);
             	}
             	else
             	{
-            		echo '<em>- ' . __( 'Unaccompanied', 'propertyhive' ) . ' -</em>';
+            		echo '<em>- ' . esc_html(__( 'Unaccompanied', 'propertyhive' )) . ' -</em>';
             	}
             	break;
 			default :

@@ -49,7 +49,7 @@ class Elementor_Property_Map_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'zoom',
 			[
-				'label' => __( 'Zoom', 'elementor' ),
+				'label' => __( 'Zoom', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
 				'default' => [
 					'size' => 14,

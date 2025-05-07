@@ -36,11 +36,11 @@ function redraw_offer_details_meta_box()
 
     var data = {
         action:         'propertyhive_get_offer_details_meta_box',
-        offer_id:       <?php echo $post->ID; ?>,
-        security:       '<?php echo wp_create_nonce( 'offer-details-meta-box' ); ?>',
+        offer_id:       <?php echo (int)$post->ID; ?>,
+        security:       '<?php echo esc_js(wp_create_nonce( 'offer-details-meta-box' )); ?>',
     };
 
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
     {
         jQuery('#propertyhive_offer_details_meta_box_container').html(response);
         initialise_datepicker();

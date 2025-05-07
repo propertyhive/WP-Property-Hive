@@ -105,14 +105,14 @@ function propertyhive_wp_photo_upload( $field ) {
 		echo ' style="display:none;"';
 	}
 	echo '>
-	   <label for="' . esc_attr( $field['id'] ) . '">' . __( 'Uploaded', 'propertyhive' ) . ' ' . wp_kses_post( $field['label'] ) . '</label>
+	   <label for="' . esc_attr( $field['id'] ) . '">' . esc_html(__( 'Uploaded', 'propertyhive' )) . ' ' . wp_kses_post( $field['label'] ) . '</label>
 	   <span>';
 	if ( $field['value'] != '' )
 	{
 		$image = wp_get_attachment_image_src( $field['value'], 'thumbnail' );
 		if ($image !== FALSE)
 		{
-			echo '<img src="' . $image[0] . '" width="150" alt="">';
+			echo '<img src="' . esc_url($image[0]) . '" width="150" alt="">';
 		}
 		else
 		{
@@ -125,7 +125,7 @@ function propertyhive_wp_photo_upload( $field ) {
 	echo '
 	<p class="form-field ' . esc_attr( $field['id'] ) . '_field ' . esc_attr( $field['wrapper_class'] ) . '">
 	   <label for="' . esc_attr( $field['id'] ) . '">' . wp_kses_post( $field['label'] ) . '</label>
-	   <a href="" class="button button-primary ph_upload_photo_button' . $field['id'] . '">' . $field['button_label'] . '</a>';
+	   <a href="" class="button button-primary ph_upload_photo_button' . esc_attr($field['id']) . '">' . esc_html($field['button_label']) . '</a>';
 
 	if ( ! empty( $field['description'] ) ) {
 
@@ -140,22 +140,22 @@ function propertyhive_wp_photo_upload( $field ) {
 
 	echo '<script>
 
-		var file_frame' . $field['id'] . ';
+		var file_frame' . esc_js($field['id']) . ';
 
 		jQuery(document).ready(function()
         {
-        	jQuery(\'body\').on(\'click\', \'.ph_upload_photo_button' . $field['id'] . '\', function( event ){
+        	jQuery(\'body\').on(\'click\', \'.ph_upload_photo_button' . esc_js($field['id']) . '\', function( event ){
                  
 	            event.preventDefault();
 	         
 	            // If the media frame already exists, reopen it.
-	            if ( file_frame' . $field['id'] . ' ) {
-	              file_frame' . $field['id'] . '.open();
+	            if ( file_frame' . esc_js($field['id']) . ' ) {
+	              file_frame' . esc_js($field['id']) . '.open();
 	              return;
 	            }
 	         
 	            // Create the media frame.
-	            file_frame' . $field['id'] . ' = wp.media.frames.file_frame' . $field['id'] . ' = wp.media({
+	            file_frame' . esc_js($field['id']) . ' = wp.media.frames.file_frame' . esc_js($field['id']) . ' = wp.media({
 	              title: jQuery( this ).data( \'uploader_title\' ),
 	              button: {
 	                text: jQuery( this ).data( \'uploader_button_text\' ),
@@ -164,8 +164,8 @@ function propertyhive_wp_photo_upload( $field ) {
 	            });
 	         
 	            // When an image is selected, run a callback.
-	            file_frame' . $field['id'] . '.on( \'select\', function() {
-	                var selection = file_frame' . $field['id'] . '.state().get(\'selection\');
+	            file_frame' . esc_js($field['id']) . '.on( \'select\', function() {
+	                var selection = file_frame' . esc_js($field['id']) . '.state().get(\'selection\');
 
 	                selection.map( function( attachment ) {
 	             
@@ -174,14 +174,14 @@ function propertyhive_wp_photo_upload( $field ) {
 	                    // Do something with attachment.id and/or attachment.url here
 	                    console.log(attachment);
 	                    
-	                    jQuery(\'.form-field.' . esc_attr( $field['id'] ) . '_field\').show();
-	                    jQuery(\'.form-field.' . esc_attr( $field['id'] ) . '_field span\').html(\'<img src="\' + attachment.url + \'" width="150" alt="">\');
-	                    jQuery(\'#' . esc_attr( $field['id'] ) . '\').val(attachment.id);
+	                    jQuery(\'.form-field.' . esc_js( $field['id'] ) . '_field\').show();
+	                    jQuery(\'.form-field.' . esc_js( $field['id'] ) . '_field span\').html(\'<img src="\' + attachment.url + \'" width="150" alt="">\');
+	                    jQuery(\'#' . esc_js( $field['id'] ) . '\').val(attachment.id);
 	                });
 	            });
 	         
 	            // Finally, open the modal
-	            file_frame' . $field['id'] . '.open();
+	            file_frame' . esc_js($field['id']) . '.open();
 	        });
 		});
 
@@ -226,7 +226,7 @@ function propertyhive_wp_file_upload( $field ) {
 		echo ' style="display:none;"';
 	}
 	echo '>
-	   <label for="' . esc_attr( $field['id'] ) . '">' . __( 'Uploaded', 'propertyhive' ) . ' ' . wp_kses_post( $field['label'] ) . '</label>
+	   <label for="' . esc_attr( $field['id'] ) . '">' . esc_html(__( 'Uploaded', 'propertyhive' )) . ' ' . wp_kses_post( $field['label'] ) . '</label>
 	   <span>';
 	if ( $field['value'] != '' )
 	{
@@ -234,7 +234,7 @@ function propertyhive_wp_file_upload( $field ) {
 		if ( $file !== FALSE )
 		{
 			$filename = basename( $file );
-			echo '<a href="' . wp_get_attachment_url($field['value']) . '" target="_blank">' . $filename . '</a>';
+			echo '<a href="' . esc_url(wp_get_attachment_url($field['value'])) . '" target="_blank">' . esc_html($filename) . '</a>';
 		}
 		else
 		{
@@ -247,7 +247,7 @@ function propertyhive_wp_file_upload( $field ) {
 	echo '
 	<p class="form-field ' . esc_attr( $field['id'] ) . '_field ' . esc_attr( $field['wrapper_class'] ) . '">
 	   <label for="' . esc_attr( $field['id'] ) . '">' . wp_kses_post( $field['label'] ) . '</label>
-	   <a href="" class="button button-primary ph_upload_file_button' . $field['id'] . '">' . $field['button_label'] . '</a>';
+	   <a href="" class="button button-primary ph_upload_file_button' . esc_attr($field['id']) . '">' . esc_html($field['button_label']) . '</a>';
 
 	if ( ! empty( $field['description'] ) ) {
 
@@ -262,22 +262,22 @@ function propertyhive_wp_file_upload( $field ) {
 
 	echo '<script>
 
-		var file_frame' . $field['id'] . ';
+		var file_frame' . esc_js($field['id']) . ';
 
 		jQuery(document).ready(function()
         {
-        	jQuery(\'body\').on(\'click\', \'.ph_upload_file_button' . $field['id'] . '\', function( event ){
+        	jQuery(\'body\').on(\'click\', \'.ph_upload_file_button' . esc_js($field['id']) . '\', function( event ){
                  
 	            event.preventDefault();
 	         
 	            // If the media frame already exists, reopen it.
-	            if ( file_frame' . $field['id'] . ' ) {
-	              file_frame' . $field['id'] . '.open();
+	            if ( file_frame' . esc_js($field['id']) . ' ) {
+	              file_frame' . esc_js($field['id']) . '.open();
 	              return;
 	            }
 	         
 	            // Create the media frame.
-	            file_frame' . $field['id'] . ' = wp.media.frames.file_frame' . $field['id'] . ' = wp.media({
+	            file_frame' . esc_js($field['id']) . ' = wp.media.frames.file_frame' . esc_js($field['id']) . ' = wp.media({
 	              title: jQuery( this ).data( \'uploader_title\' ),
 	              button: {
 	                text: jQuery( this ).data( \'uploader_button_text\' ),
@@ -286,8 +286,8 @@ function propertyhive_wp_file_upload( $field ) {
 	            });
 	         
 	            // When an image is selected, run a callback.
-	            file_frame' . $field['id'] . '.on( \'select\', function() {
-	                var selection = file_frame' . $field['id'] . '.state().get(\'selection\');
+	            file_frame' . esc_js($field['id']) . '.on( \'select\', function() {
+	                var selection = file_frame' . esc_js($field['id']) . '.state().get(\'selection\');
 
 	                selection.map( function( attachment ) {
 	             
@@ -296,14 +296,14 @@ function propertyhive_wp_file_upload( $field ) {
 	                    // Do something with attachment.id and/or attachment.url here
 	                    console.log(attachment);
 	                    
-	                    jQuery(\'.form-field.' . esc_attr( $field['id'] ) . '_field\').show();
-	                    jQuery(\'.form-field.' . esc_attr( $field['id'] ) . '_field span\').html(\'<a href="\' + attachment.url + \'" target="_blank">\' + attachment.filename + \'</a>\');
-	                    jQuery(\'#' . esc_attr( $field['id'] ) . '\').val(attachment.id);
+	                    jQuery(\'.form-field.' . esc_js($field['id']) . '_field\').show();
+	                    jQuery(\'.form-field.' . esc_js($field['id']) . '_field span\').html(\'<a href="\' + attachment.url + \'" target="_blank">\' + attachment.filename + \'</a>\');
+	                    jQuery(\'#' . esc_js($field['id']) . '\').val(attachment.id);
 	                });
 	            });
 	         
 	            // Finally, open the modal
-	            file_frame' . $field['id'] . '.open();
+	            file_frame' . esc_js($field['id']) . '.open();
 	        });
 		});
 
@@ -419,7 +419,7 @@ function propertyhive_wp_checkboxes( $field ) {
 	echo '<fieldset class="form-field ' . esc_attr( $field['wrapper_class'] ) . '"><legend>' . wp_kses_post( $field['label'] ) . '</legend><ul class="ph-radios">';
 
 	foreach ( $field['options'] as $key => $value ) {
-		echo '<li><label><input type="checkbox" class="' . esc_attr( $field['class'] ) . '" name="' . esc_attr( $field['name'] ) . '[]" id="' . esc_attr( $field['name'] ) . '_' . $key . '" value="' . esc_attr( $key ) . '" ' . ( ( !empty($field['value']) && in_array( $key, $field['value'] ) ) ? 'checked' : '' ) . ' /> ' . $value . '</label></li>';
+		echo '<li><label><input type="checkbox" class="' . esc_attr( $field['class'] ) . '" name="' . esc_attr( $field['name'] ) . '[]" id="' . esc_attr( $field['name'] . '_' . $key ) . '" value="' . esc_attr( $key ) . '" ' . ( ( !empty($field['value']) && in_array( $key, $field['value'] ) ) ? 'checked' : '' ) . ' /> ' . esc_html($value) . '</label></li>';
 	}
 
 	echo '</ul>';

@@ -43,7 +43,7 @@ class PH_Admin_Header_Stripes {
 
 				echo propertyhive_get_property_thumbnail('thumbnail', 'alignleft');
 
-				echo '<h1>' . get_the_title($post->ID) . '</h1>';
+				echo '<h1>' . esc_html(get_the_title($post->ID)) . '</h1>';
 				echo '<h3>' . $property->get_formatted_price() . '</h3>';
 
 				echo '<div class="clear"></div>';

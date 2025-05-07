@@ -32,15 +32,15 @@ class PH_Meta_Box_Offer_Applicant_Solicitor {
             $fields = array(
                 'name' => array(
                     'label' => __('Name', 'propertyhive'),
-                    'value' => '<a href="' . get_edit_post_link($applicant_solicitor_contact_id, '') . '">' . get_the_title($applicant_solicitor_contact_id) . ( $contact->company_name != '' && $contact->company_name != get_the_title($applicant_solicitor_contact_id) ? ' (' . $contact->company_name . ')' : '' ) . '</a>',
+                    'value' => '<a href="' . esc_url(get_edit_post_link($applicant_solicitor_contact_id, '')) . '">' . esc_html(get_the_title($applicant_solicitor_contact_id) . ( $contact->company_name != '' && $contact->company_name != get_the_title($applicant_solicitor_contact_id) ? ' (' . $contact->company_name . ')' : '' )) . '</a>',
                 ),
                 'telephone_number' => array(
                     'label' => __('Telephone Number', 'propertyhive'),
-                    'value' => $contact->telephone_number,
+                    'value' => esc_html($contact->telephone_number),
                 ),
                 'email_address' => array(
                     'label' => __('Email Address', 'propertyhive'),
-                    'value' => '<a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>',
+                    'value' => '<a href="mailto:' . esc_attr($contact->email_address) . '">' . esc_html($contact->email_address) . '</a>',
                 ),
             );
 
@@ -61,7 +61,7 @@ class PH_Meta_Box_Offer_Applicant_Solicitor {
             
                 <label></label>
                 
-                <a class="button" href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit' ), '1', 'remove_applicant_solicitor' ) . '">' .  __( 'Remove Solicitor', 'propertyhive' ) . '</a>
+                <a class="button" href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit' ), '1', 'remove_applicant_solicitor' )) . '">' . esc_html(__( 'Remove Solicitor', 'propertyhive' )) . '</a>
                 
             </p>';
         }
@@ -69,11 +69,11 @@ class PH_Meta_Box_Offer_Applicant_Solicitor {
         {
             echo '<p class="form-field">
             
-                <label for="offer_applicant_solicitor_search">' . __('Search Solicitors', 'propertyhive') . '</label>
+                <label for="offer_applicant_solicitor_search">' . esc_html(__('Search Solicitors', 'propertyhive')) . '</label>
                 
                 <span style="position:relative;">
 
-                    <input type="text" name="offer_applicant_solicitor_search" id="offer_applicant_solicitor_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
+                    <input type="text" name="offer_applicant_solicitor_search" id="offer_applicant_solicitor_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Existing Contacts', 'propertyhive' )) . '..." autocomplete="false">
 
                     <div id="offer_search_applicant_solicitor_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -125,9 +125,9 @@ jQuery(document).ready(function($)
             action:         'propertyhive_search_contacts',
             keyword:        keyword,
             contact_type:   'thirdparty',
-            security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-contacts' )); ?>',
         };
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
             if (response == '' || response.length == 0)
             {

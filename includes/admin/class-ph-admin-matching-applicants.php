@@ -31,7 +31,7 @@ class PH_Admin_Matching_Applicants {
 		if ( isset($_POST['step']) )
 		{
 			if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-applicants' ) )
-	    		die( __( 'Action failed. Please refresh the page and retry.', 'propertyhive' ) );
+	    		die( esc_html(__( 'Action failed. Please refresh the page and retry.', 'propertyhive' )) );
 
 			switch ( $_POST['step'] )
 			{
@@ -123,7 +123,7 @@ class PH_Admin_Matching_Applicants {
     function showPreview()
     {
         jQuery('#mainform').attr('target', '_blank');
-        jQuery('#mainform').attr('action', '<?php echo admin_url( '?preview_propertyhive_email=true&property_id=' . (int)$_GET['property_id']); ?>');
+        jQuery('#mainform').attr('action', '<?php echo esc_url(admin_url( '?preview_propertyhive_email=true&property_id=' . (int)$_GET['property_id'])); ?>');
 
         jQuery('#mainform').submit();
         jQuery('#mainform').attr('target', '_self');
@@ -136,7 +136,7 @@ class PH_Admin_Matching_Applicants {
 
 					if ( $nothing_to_send == true )
                     {
-                        echo '<script>window.location.href = "' . get_edit_post_link( $property_id, 'url' ) . '&ph_message=2";</script>';
+                        echo '<script>window.location.href = "' . esc_url(get_edit_post_link( $property_id, 'url' )) . '&ph_message=2";</script>';
 
 						//header("Location: " . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2' ); // properties marked as not interested
                         //die();
@@ -148,7 +148,7 @@ class PH_Admin_Matching_Applicants {
 				{
                     if ( isset($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) )
                     {
-                        $email_contact_applicant_profile_id = explode(",", $_POST['email_contact_applicant_profile_id']);
+                        $email_contact_applicant_profile_id = explode(",", sanitize_text_field($_POST['email_contact_applicant_profile_id']));
 
                         foreach ( $email_contact_applicant_profile_id as $contact_applicant_profile_id )
                         {
@@ -222,7 +222,7 @@ class PH_Admin_Matching_Applicants {
 
                     do_action( 'propertyhive_applicant_match_step_send', $property_id );
 
-                    echo '<script>window.location.href = "' . get_edit_post_link( $property_id, 'url' ) . '&ph_message=1";</script>';
+                    echo '<script>window.location.href = "' . esc_url(get_edit_post_link( $property_id, 'url' )) . '&ph_message=1";</script>';
 				}
 			}
 		}

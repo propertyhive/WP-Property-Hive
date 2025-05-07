@@ -58,7 +58,7 @@ class Bricks_Builder_Property_Enquiry_Form_Link_Widget extends \Bricks\Element {
 		<a data-fancybox data-src="#makeEnquiry<?php echo (int)$property->id; ?>" href="javascript:;"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
 
 	    <!-- LIGHTBOX FORM -->
-	    <div id="makeEnquiry<?php echo $property->id; ?>" style="display:none;">
+	    <div id="makeEnquiry<?php echo (int)$property->id; ?>" style="display:none;">
 	        
 	        <h2><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></h2>
 	        

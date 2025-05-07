@@ -205,12 +205,12 @@ class PH_Admin_Post_Types {
 
         if ( !wp_verify_nonce($_GET['_wpnonce'], 'archive-post_' . $post_id) )
         {
-            wp_die(__('Security check failed.', 'propertyhive'));
+            wp_die(esc_html(__('Security check failed.', 'propertyhive')));
         }
 
         if ( !current_user_can('edit_post', $post_id) )
         {
-            wp_die(__('You do not have permission to edit this post.', 'propertyhive'));
+            wp_die(esc_html(__('You do not have permission to edit this post.', 'propertyhive')));
         }
 
         // Update the post status to 'archive'
@@ -223,7 +223,7 @@ class PH_Admin_Post_Types {
 
         if ( is_wp_error($result) ) 
         {
-            wp_die(__('An error occurred while archiving the post.', 'propertyhive'));
+            wp_die(esc_html(__('An error occurred while archiving the post.', 'propertyhive')));
         }
 
         // Redirect to the main list of contacts
@@ -242,12 +242,12 @@ class PH_Admin_Post_Types {
 
         if ( !wp_verify_nonce($_GET['_wpnonce'], 'unarchive-post_' . $post_id) )
         {
-            wp_die(__('Security check failed.', 'propertyhive'));
+            wp_die(esc_html(__('Security check failed.', 'propertyhive')));
         }
 
         if ( !current_user_can('edit_post', $post_id) )
         {
-            wp_die(__('You do not have permission to edit this post.', 'propertyhive'));
+            wp_die(esc_html(__('You do not have permission to edit this post.', 'propertyhive')));
         }
 
         // Update the post status to 'publish'
@@ -260,7 +260,7 @@ class PH_Admin_Post_Types {
 
         if ( is_wp_error($result) ) 
         {
-            wp_die(__('An error occurred while unarchiving the post.', 'propertyhive'));
+            wp_die(esc_html(__('An error occurred while unarchiving the post.', 'propertyhive')));
         }
 
         // Redirect to the main list of contacts
@@ -779,7 +779,7 @@ class PH_Admin_Post_Types {
         {
             $output  = '<select name="_contact_type" id="dropdown_contact_type">';
             
-                $output .= '<option value="">' . __( 'Show all contact types', 'propertyhive' ) . '</option>';
+                $output .= '<option value="">' . esc_html(__( 'Show all contact types', 'propertyhive' )) . '</option>';
 
                 $output .= implode("", $options);
             

@@ -34,8 +34,8 @@ class PH_Meta_Box_Appraisal_Property_Owner {
                 <label>' . __('Name', 'propertyhive') . '</label>
                 
                 <a 
-                    href="' . get_edit_post_link($property_owner_contact_id, '') . '" 
-                    data-appraisal-property-owner-id="' . $property_owner_contact_id . '" 
+                    href="' . esc_url(get_edit_post_link($property_owner_contact_id, '')) . '" 
+                    data-appraisal-property-owner-id="' . (int)$property_owner_contact_id . '" 
                     data-appraisal-property-owner-name="' . esc_attr( get_the_title($property_owner_contact_id) ) . '" 
                     data-appraisal-property-owner-address-name-number="' . esc_attr( $contact->address_name_number ) . '" 
                     data-appraisal-property-owner-address-street="' . esc_attr( $contact->address_street ) . '" 
@@ -50,23 +50,23 @@ class PH_Meta_Box_Appraisal_Property_Owner {
 
             echo '<p class="form-field">
             
-                <label>' . __('Telephone Number', 'propertyhive') . '</label>
+                <label>' . esc_html(__('Telephone Number', 'propertyhive')) . '</label>
                 
-                ' . $contact->telephone_number . '
-                
-            </p>';
-
-            echo '<p class="form-field">
-            
-                <label>' . __('Email Address', 'propertyhive') . '</label>
-                
-                <a href="mailto:' . $contact->email_address . '">' .  $contact->email_address  . '</a>
+                ' . esc_html($contact->telephone_number) . '
                 
             </p>';
 
             echo '<p class="form-field">
             
-                <label>' . __('Correspondence Address', 'propertyhive') . '</label>
+                <label>' . esc_html(__('Email Address', 'propertyhive')) . '</label>
+                
+                <a href="mailto:' . esc_attr($contact->email_address) . '">' . esc_html($contact->email_address) . '</a>
+                
+            </p>';
+
+            echo '<p class="form-field">
+            
+                <label>' . esc_html(__('Correspondence Address', 'propertyhive')) . '</label>
                 
                 ' . $contact->get_formatted_full_address('<br>') . '
                 
@@ -78,11 +78,11 @@ class PH_Meta_Box_Appraisal_Property_Owner {
 
                 echo '<p class="form-field">
                 
-                    <label for="appraisal_property_owner_search">' . __('Search Contacts', 'propertyhive') . '</label>
+                    <label for="appraisal_property_owner_search">' . esc_html(__('Search Contacts', 'propertyhive')) . '</label>
                     
                     <span style="position:relative;">
 
-                        <input type="text" name="appraisal_property_owner_search" id="appraisal_property_owner_search" style="width:100%;" placeholder="' . __( 'Search Existing Contacts', 'propertyhive' ) . '..." autocomplete="false">
+                        <input type="text" name="appraisal_property_owner_search" id="appraisal_property_owner_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Existing Contacts', 'propertyhive' )) . '..." autocomplete="false">
 
                         <div id="appraisal_search_property_owner_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -198,7 +198,7 @@ class PH_Meta_Box_Appraisal_Property_Owner {
 
 var appraisal_selected_property_owners = [];
 <?php if (isset($_GET['property_owner_contact_id']) && $_GET['property_owner_contact_id'] != '') { ?>
-appraisal_selected_property_owners.push({ id: <?php echo (int)$_GET['property_owner_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['property_owner_contact_id']); ?>' });
+appraisal_selected_property_owners.push({ id: <?php echo (int)$_GET['property_owner_contact_id']; ?>, post_title: '<?php echo esc_js(get_the_title((int)$_GET['property_owner_contact_id'])); ?>' });
 <?php } ?>
 
 jQuery(document).ready(function($)
@@ -258,9 +258,9 @@ jQuery(document).ready(function($)
         var data = {
             action:         'propertyhive_search_contacts',
             keyword:        keyword,
-            security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-contacts' )); ?>',
         };
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
             if (response == '' || response.length == 0)
             {

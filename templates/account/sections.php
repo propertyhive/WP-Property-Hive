@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 		$i = 0;
 		foreach ( $pages as $id => $page )
 		{
-			echo '<div id="my-account-' . $id . '"' . ( ( $i > 0 ) ? ' style="display:none;"' : '' ) . '>';
+			echo '<div id="my-account-' . esc_attr($id) . '"' . ( ( $i > 0 ) ? ' style="display:none;"' : '' ) . '>';
 
 				do_action( 'propertyhive_my_account_section_' . $id );
 
