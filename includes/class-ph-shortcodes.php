@@ -1760,7 +1760,7 @@ class PH_Shortcodes {
 
 				if ( $property->office_name != '' )
 				{
-					echo '<div class="office-name">' . $property->office_name . '</div>';
+					echo '<div class="office-name">' . esc_html($property->office_name) . '</div>';
 				}
 
 				if ( $property->get_office_address( $atts['address_separator'] ) != '' )
@@ -1770,12 +1770,12 @@ class PH_Shortcodes {
 
 				if ( $property->office_telephone_number != '' )
 				{
-					echo '<div class="office-telephone-number">' . ( ($atts['hyperlink_telephone_number'] === true) ? '<a href="tel:' . $property->office_telephone_number . '">' : '' ) . $property->office_telephone_number . ( ($atts['hyperlink_telephone_number'] === true) ? '</a>' : '' ) .  '</div>';
+					echo '<div class="office-telephone-number">' . ( ($atts['hyperlink_telephone_number'] === true) ? '<a href="tel:' . esc_attr($property->office_telephone_number) . '">' : '' ) . esc_html($property->office_telephone_number) . ( ($atts['hyperlink_telephone_number'] === true) ? '</a>' : '' ) .  '</div>';
 				}
 
 				if ( $property->office_email_address != '' )
 				{
-					echo '<div class="office-email-address">' . ( ($atts['hyperlink_email_address'] === true) ? '<a href="mailto:' . $property->office_email_address . '">' : '' ) . $property->office_email_address . ( ($atts['hyperlink_email_address'] === true) ? '</a>' : '' ) .  '</div>';
+					echo '<div class="office-email-address">' . ( ($atts['hyperlink_email_address'] === true) ? '<a href="mailto:' . esc_attr($property->office_email_address) . '">' : '' ) . esc_html($property->office_email_address) . ( ($atts['hyperlink_email_address'] === true) ? '</a>' : '' ) .  '</div>';
 				}
 
 			echo '</div>';
@@ -1950,7 +1950,7 @@ class PH_Shortcodes {
 		            $marker_icon_url = wp_get_attachment_url( $map_add_on_settings['custom_icon_attachment_id'] );
 		            if ( $marker_icon_url !== FALSE )
 		            {
-		                echo 'marker_options.icon = \'' . $marker_icon_url . '\';';
+		                echo 'marker_options.icon = \'' . esc_url($marker_icon_url) . '\';';
 		            }
 		        }
 		    }

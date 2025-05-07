@@ -78,7 +78,7 @@ class Elementor_Property_Negotiator_Name_Widget extends \Elementor\Widget_Base {
 
 		if ( $property->negotiator_name != '' )
 		{
-	        echo $property->negotiator_name;
+	        echo esc_html($property->negotiator_name);
 	    }
 
 	}

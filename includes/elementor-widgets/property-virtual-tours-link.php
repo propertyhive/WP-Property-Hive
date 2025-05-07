@@ -142,12 +142,12 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
         {
             foreach ($virtual_tours as $virtual_tour)
             {
-				echo '<a href="' . $virtual_tour['url'] . '" target="_blank" rel="nofollow"';
+				echo '<a href="' . esc_url($virtual_tour['url']) . '" target="_blank" rel="nofollow"';
 				if ( strpos($virtual_tour['url'], 'yout') !== FALSE || strpos($virtual_tour['url'], 'vimeo') !== FALSE )
                 {
                     echo ' data-fancybox=""';
                 }
-				echo '>' . __( $virtual_tour['label'], 'propertyhive' ) . '</a>';
+				echo '>' . esc_html(__( $virtual_tour['label'], 'propertyhive' )) . '</a>';
 			}
 		}
 

@@ -540,7 +540,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 								$this->add_inline_editing_attributes( $tab_content_setting_key, 'advanced' );
 						?>
-						<div <?php echo $this->get_render_attribute_string( $tab_title_mobile_setting_key ); ?>><?php echo $item['tab_title']; ?></div>
+						<div <?php echo $this->get_render_attribute_string( $tab_title_mobile_setting_key ); ?>><?php echo esc_html($item['tab_title']); ?></div>
 						<div <?php echo $this->get_render_attribute_string( $tab_content_setting_key ); ?>><?php
 							foreach ( $item['tab_display'] as $display )
 							{
@@ -590,7 +590,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 												foreach ( $photo_urls as $photo )
 												{
-													echo '<a href="' . $photo['url'] . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . $photo['url'] . '" alt=""></a>';
+													echo '<a href="' . esc_url($photo['url']) . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . esc_url($photo['url']) . '" alt=""></a>';
 												}
 
 												echo '</div>';
@@ -612,7 +612,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													{
 														$image_medium_url = $image[0];
 													}
-													echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . $image_medium_url . '" alt=""></a>';
+													echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . esc_url($image_medium_url) . '" alt=""></a>';
 												}
 
 												echo '</div>';
@@ -633,7 +633,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 												foreach ( $floorplan_urls as $floorplan )
 												{
-													echo '<a href="' . $floorplan['url'] . '" data-fancybox="floorplans" rel="nofollow"><img src="' . $floorplan['url'] . '" alt=""></a>';
+													echo '<a href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url($floorplan['url']) . '" alt=""></a>';
 												}
 
 												echo '</div>';
@@ -651,11 +651,11 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													{
 														if ( wp_attachment_is_image($attachment_id) )
 									                    {
-															echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
 														}
 														else
 														{
-															echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View Floorplan', 'propertyhive' ) . '</a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow">' . esc_html(__( 'View Floorplan', 'propertyhive' )) . '</a>';
 														}
 													}
 
@@ -677,7 +677,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 												foreach ( $brochure_urls as $brochure )
 												{
-													echo '<a href="' . $brochure['url']. '" target="_blank" rel="nofollow">' . __( 'View Brochure', 'propertyhive' ) . '</a>';
+													echo '<a href="' . esc_url($brochure['url']). '" target="_blank" rel="nofollow">' . esc_html(__( 'View Brochure', 'propertyhive' )) . '</a>';
 												}
 
 												echo '</div>';
@@ -695,11 +695,11 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													{
 														if ( wp_attachment_is_image($attachment_id) )
 									                    {
-															echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="brochures" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="brochures" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
 														}
 														else
 														{
-															echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View Brochure', 'propertyhive' ) . '</a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow">' . esc_html(__( 'View Brochure', 'propertyhive' )) . '</a>';
 														}
 													}
 
@@ -721,7 +721,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 												foreach ( $epc_urls as $epc )
 												{
-													echo '<a href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow"><img src="' . $epc['url'] . '" alt=""></a>';
+													echo '<a href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt=""></a>';
 												}
 
 												echo '</div>';
@@ -739,11 +739,11 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													{
 														if ( wp_attachment_is_image($attachment_id) )
 									                    {
-															echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="epcs" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
 														}
 														else
 														{
-															echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View EPC', 'propertyhive' ) . '</a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow">' . esc_html(__( 'View EPC', 'propertyhive' )) . '</a>';
 														}
 													}
 
@@ -762,7 +762,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 											foreach ( $virtual_tours as $virtual_tour )
 											{
-												echo '<a href="' . $virtual_tour['url'] . '" target="_blank" rel="nofollow">' . $virtual_tour['label'] . '</a>';
+												echo '<a href="' . esc_url($virtual_tour['url']) . '" target="_blank" rel="nofollow">' . esc_html($virtual_tour['label']) . '</a>';
 											}
 
 											echo '</div>';
@@ -794,7 +794,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 											    	);
 												}
 												
-												echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
+												echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
 											}
 
 											echo '</div>';

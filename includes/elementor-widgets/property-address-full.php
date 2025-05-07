@@ -115,7 +115,7 @@ class Elementor_Property_Address_Full_Widget extends \Elementor\Widget_Base {
 
         echo '<div class="elementor-widget-address-full">';
 
-        echo $property->get_formatted_full_address();
+        echo esc_html($property->get_formatted_full_address());
 
         echo '</div>';
 	}

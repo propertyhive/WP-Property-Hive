@@ -94,7 +94,7 @@ class Elementor_Property_Negotiator_Email_Address_Widget extends \Elementor\Widg
 			{
 				echo '<a href="mailto:' . esc_attr($property->negotiator_email_address) . '">';
 			}
-	        echo $property->negotiator_email_address;
+	        echo esc_html($property->negotiator_email_address);
 	        if ( isset($settings['hyperlink']) && $settings['hyperlink'] == 'yes' )
 			{
 				echo '</a>';

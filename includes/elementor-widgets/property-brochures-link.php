@@ -156,7 +156,7 @@ class Elementor_Property_Brochures_Link_Widget extends \Elementor\Widget_Base {
 			{
 				foreach ( $brochure_urls as $brochure )
 				{
-					echo '<a href="' . $brochure['url'] . '" target="_blank" rel="nofollow">' . $label . '</a>';
+					echo '<a href="' . esc_url($brochure['url']) . '" target="_blank" rel="nofollow">' . esc_html($label) . '</a>';
 				}
 			}
         }
@@ -168,7 +168,7 @@ class Elementor_Property_Brochures_Link_Widget extends \Elementor\Widget_Base {
 			{
 				foreach ( $brochure_attachment_ids as $attachment_id )
 				{
-					echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . $label . '</a>';
+					echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow">' . esc_html($label) . '</a>';
 				}
 			}
 		}

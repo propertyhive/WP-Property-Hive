@@ -94,7 +94,7 @@ class Elementor_Property_Office_Telephone_Number_Widget extends \Elementor\Widge
 			{
 				echo '<a href="tel:' . esc_attr($property->office_telephone_number) . '">';
 			}
-	        echo $property->office_telephone_number;
+	        echo esc_html($property->office_telephone_number);
 	        if ( isset($settings['hyperlink']) && $settings['hyperlink'] == 'yes' )
 			{
 				echo '</a>';

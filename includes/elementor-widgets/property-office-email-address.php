@@ -94,7 +94,7 @@ class Elementor_Property_Office_Email_Address_Widget extends \Elementor\Widget_B
 			{
 				echo '<a href="mailto:' . esc_attr($property->office_email_address) . '">';
 			}
-		    echo $property->office_email_address;
+		    echo esc_html($property->office_email_address);
 		    if ( isset($settings['hyperlink']) && $settings['hyperlink'] == 'yes' )
 			{
 				echo '</a>';

@@ -105,7 +105,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 
         if ( $property->property_type != '' )
 		{
-	        echo '<div class="elementor-widget-property-type">' . $property->property_type . '</div>';
+	        echo '<div class="elementor-widget-property-type">' . esc_html($property->property_type) . '</div>';
 	    }
 
 	}

@@ -167,7 +167,7 @@ class Elementor_Property_Council_Tax_Band_Widget extends \Elementor\Widget_Base 
 	        {
 	        	echo $settings['before'] . ' ';
 	        }
-			echo $property->council_tax_band;
+			echo esc_html($property->council_tax_band);
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
 	        	echo ' ' . $settings['after'];

@@ -108,7 +108,7 @@ class Elementor_Property_Address_Name_Number_Widget extends \Elementor\Widget_Ba
 		{
 	        echo '<div class="elementor-widget-address-name-number">';
 
-	        echo $property->address_name_number;
+	        echo esc_html($property->address_name_number);
 
 	        echo '</div>';
 	    }

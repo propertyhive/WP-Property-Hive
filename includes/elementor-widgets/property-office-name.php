@@ -78,7 +78,7 @@ class Elementor_Property_Office_Name_Widget extends \Elementor\Widget_Base {
 
 		if ( $property->office_name != '' )
 		{
-	        echo $property->office_name;
+	        echo esc_html($property->office_name);
 	    }
 
 	}

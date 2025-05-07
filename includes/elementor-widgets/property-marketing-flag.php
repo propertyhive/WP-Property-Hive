@@ -105,7 +105,7 @@ class Elementor_Property_Marketing_Flag_Widget extends \Elementor\Widget_Base {
 
 		if ( $property->marketing_flag != '' )
 		{
-	        echo '<div class="elementor-widget-marketing-flag">' . $property->marketing_flag . '</div>';
+	        echo '<div class="elementor-widget-marketing-flag">' . esc_html($property->marketing_flag) . '</div>';
 	    }
 
 	}

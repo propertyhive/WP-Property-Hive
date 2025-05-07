@@ -167,7 +167,7 @@ class Elementor_Property_Tenure_Widget extends \Elementor\Widget_Base {
 	        {
 	        	echo $settings['before'] . ' ';
 	        }
-			echo $property->tenure;
+			echo esc_html($property->tenure);
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
 	        	echo ' ' . $settings['after'];
