@@ -53,12 +53,12 @@ class Divi_Property_Epcs_Link_Widget extends ET_Builder_Module
                     }
                     if ( $image )
                     {
-                        echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow">' . ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
+                        echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow">' . esc_html(( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) )) . '</a>';
                         ++$i;
                     }
                     else
                     {
-                        echo '<a href="' . $epc['url'] . '" rel="nofollow" target="_blank">' . ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
+                        echo '<a href="' . esc_url($epc['url']) . '" rel="nofollow" target="_blank">' . esc_html(( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) )) . '</a>';
                     }
                 }
             }
@@ -72,7 +72,7 @@ class Divi_Property_Epcs_Link_Widget extends ET_Builder_Module
                 $i = 0;
                 foreach ( $epc_attachment_ids as $attachment_id )
                 {
-                    echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="epc" rel="nofollow">' . ( count($epc_attachment_ids) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
+                    echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="epc" rel="nofollow">' . esc_html(( count($epc_attachment_ids) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) )) . '</a>';
                     ++$i;
                 }
             }

@@ -61,15 +61,15 @@ add_shortcode( 'avada_property_image', function( $atts ) {
         
         if ( ! empty( $atts['image_link']['url'] ) ) 
         {
-            echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover;">';
+            echo '<div style="background:url(' . esc_url($url) . ') no-repeat center center; background-size:cover;">';
             $this->add_link_attributes( 'image_link', $atts['image_link'] );
-            ?><a <?php $this->print_render_attribute_string( 'image_link' ); ?> style="display:block; <?php echo 'padding-bottom:' . $percent; ?>"><?php
+            ?><a <?php $this->print_render_attribute_string( 'image_link' ); ?> style="display:block; <?php echo 'padding-bottom:' . esc_attr($percent); ?>"><?php
             echo '</a>';
             echo '</div>';
         }
         else
         {
-            echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover; padding-bottom:' . $percent . '"></div>';
+            echo '<div style="background:url(' . esc_url($url) . ') no-repeat center center; background-size:cover; padding-bottom:' . esc_attr($percent) . '"></div>';
         }
     }
     else
@@ -85,7 +85,7 @@ add_shortcode( 'avada_property_image', function( $atts ) {
                     $this->add_link_attributes( 'image_link', $atts['image_link'] );
                     ?><a <?php $this->print_render_attribute_string( 'image_link' ); ?>><?php
                 }
-                echo '<img src="' . $photos[$image_number-1]['url'] . '" alt="">';
+                echo '<img src="' . esc_url($photos[$image_number-1]['url']) . '" alt="">';
                 if ( ! empty( $atts['image_link']['url'] ) ) {
                     echo '</a>';
                 }

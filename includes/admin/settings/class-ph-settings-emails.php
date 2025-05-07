@@ -447,9 +447,9 @@ class PH_Settings_Emails extends PH_Settings_Page {
                     }
                     else
                     {
-                    	echo __( 'Next scheduled to run at', 'propertyhive' ) . ' ' . date("H:i jS F Y", $next_due);
+                    	echo esc_html(__( 'Next scheduled to run at', 'propertyhive' ) . ' ' . date("H:i jS F Y", $next_due));
                     }
-            	?></strong> <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&custom_email_log_cron=propertyhive_process_email_log' ); ?>" class="button">Run Now</a></p>
+            	?></strong> <a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&custom_email_log_cron=propertyhive_process_email_log' )); ?>" class="button">Run Now</a></p>
 
             	<br>
 
@@ -511,7 +511,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 									jQuery('#_wpnonce').remove();
 									jQuery('input[name=\'_wp_http_referer\']').remove();
 									jQuery('#mainform').attr('method', 'get');
-									jQuery('#mainform').attr('action', '<?php echo admin_url('admin.php'); ?>');
+									jQuery('#mainform').attr('action', '<?php echo esc_url(admin_url('admin.php')); ?>');
 								});
 							</script>
 						</div>
@@ -564,7 +564,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 						?>
 						<tr>
 	                    	<td class="date-time"><?php echo esc_html(date("jS M Y H:i", strtotime($email->send_at))); ?></td>
-	                    	<td class="recipient"><?php echo '<a href="' . get_edit_post_link($email->contact_id) . '">' . esc_html(get_the_title($email->contact_id)) . '</a><br>' . esc_html($email->to_email_address); ?></td>
+	                    	<td class="recipient"><?php echo '<a href="' . esc_url(get_edit_post_link($email->contact_id)) . '">' . esc_html(get_the_title($email->contact_id)) . '</a><br>' . esc_html($email->to_email_address); ?></td>
 	                        <td class="subject"><?php echo esc_html($email->subject); ?></td>
 	                        <td class="status"><?php
 	                        	switch ($email->status)
@@ -576,7 +576,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	                        	}
 	                        ?></td>
 	                        <td class="actions">
-	                        	<a href="<?php echo wp_nonce_url( admin_url('?view_propertyhive_email=' . $email->email_id . '&email_id=' . $email->email_id ), 'view-email' ) ?>" target="_blank" class="button">View Email</a>
+	                        	<a href="<?php echo esc_url(wp_nonce_url( admin_url('?view_propertyhive_email=' . $email->email_id . '&email_id=' . $email->email_id ), 'view-email' )); ?>" target="_blank" class="button">View Email</a>
 	                        </td>
 	                    </tr>
 						<?php

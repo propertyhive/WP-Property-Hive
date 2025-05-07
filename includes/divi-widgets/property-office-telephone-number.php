@@ -30,7 +30,7 @@ class Divi_Property_Office_Telephone_Number_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = $property->office_telephone_number;
+        $return = esc_html($property->office_telephone_number);
 
         return $this->_render_module_wrapper( $return, $render_slug );
     }

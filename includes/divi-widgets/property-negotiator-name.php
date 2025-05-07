@@ -30,7 +30,7 @@ class Divi_Property_Negotiator_Name_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = $property->negotiator_name;
+        $return = esc_html($property->negotiator_name);
 
         return $this->_render_module_wrapper( $return, $render_slug );
     }

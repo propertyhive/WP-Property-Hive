@@ -66,7 +66,7 @@ add_shortcode( 'avada_property_type', function( $atts ) {
         {
             echo $atts['before'] . ' ';
         }
-        echo $property->property_type;
+        echo esc_html($property->property_type);
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
             echo ' ' . $atts['after'];

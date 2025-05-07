@@ -50,7 +50,7 @@ class Divi_Property_Type_Widget extends ET_Builder_Module
 
         if ( isset($this->props['before']) && $this->props['before'] != '' ) { $return .= $this->props['before'] . ' '; }
 
-        $return .= $property->property_type;
+        $return .= esc_html($property->property_type);
 
         if ( isset($this->props['after']) && $this->props['after'] != '' ) { $return .= ' ' . $this->props['after']; }
 

@@ -59,7 +59,7 @@ class Bricks_Builder_Property_Price_Qualifier_Widget extends \Bricks\Element {
 
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-			echo $property->price_qualifier;
+			echo esc_html($property->price_qualifier);
 
 		echo '</div>';
 	}

@@ -29,6 +29,6 @@ if ( ! empty( $atts['font_container'] ) && isset($atts['font_container']) )
 
 echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
 
-	echo $property->availability;
+	echo esc_html($property->availability);
 
 echo '</div>';

@@ -66,7 +66,7 @@ add_shortcode( 'avada_property_reception_rooms', function( $atts ) {
         {
             echo $atts['before'] . ' ';
         }
-        echo $property->reception_rooms;
+        echo esc_html($property->reception_rooms);
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
             echo ' ' . $atts['after'];

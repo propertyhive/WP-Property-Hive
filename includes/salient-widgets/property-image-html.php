@@ -47,7 +47,7 @@ if ( $output_ratio != '' )
     $numbers = explode(':', $output_ratio);
     $percent = ( ( (int)$numbers[1] / (int)$numbers[0] ) * 100 ) . '%';
 
-    echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover; padding-bottom:' . $percent . '">';
+    echo '<div style="background:url(' . esc_url($url) . ') no-repeat center center; background-size:cover; padding-bottom:' . esc_attr($percent) . '">';
 }
 else
 {
@@ -57,7 +57,7 @@ else
     	$photos = $property->_photo_urls;
     	if ( isset($photos[$image_number-1]) )
     	{
-    		echo '<img src="' . $photos[$image_number-1]['url'] . '" alt="">';
+    		echo '<img src="' . esc_url($photos[$image_number-1]['url']) . '" alt="">';
     	}
     }
     else

@@ -38,7 +38,7 @@ class Divi_Property_Address_County_Widget extends ET_Builder_Module
 
         $return = '<div class="divi-widget-address-county">';
 
-        $return .= $property->address_four;
+        $return .= esc_html($property->address_four);
 
         $return .= '</div>';
 

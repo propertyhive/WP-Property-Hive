@@ -84,7 +84,7 @@ class Bricks_Builder_Property_Tenure_Widget extends \Bricks\Element {
 	        	echo $this->settings['before'] . ' ';
 	        }
 
-			echo $property->tenure;
+			echo esc_html($property->tenure);
 
 			if ( isset($this->settings['after']) && !empty($this->settings['after']) )
 	        {

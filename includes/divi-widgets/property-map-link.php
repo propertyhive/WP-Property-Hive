@@ -54,7 +54,7 @@ class Divi_Property_Map_Link_Widget extends ET_Builder_Module
         {
             case "_blank":
             {
-                echo '<a href="https://www.google.com/maps/?q=' . $property->latitude . ',' . $property->longitude . '&ll=' . $property->latitude . ',' . $property->longitude . '" target="_blank">' . __( 'View Map', 'propertyhive' ) . '</a>';
+                echo '<a href="https://www.google.com/maps/?q=' . (float)$property->latitude . ',' . (float)$property->longitude . '&ll=' . (float)$property->latitude . ',' . (float)$property->longitude . '" target="_blank">' . esc_html(__( 'View Map', 'propertyhive' )) . '</a>';
                 break;
             }
             case "embedded":
@@ -72,8 +72,8 @@ class Divi_Property_Map_Link_Widget extends ET_Builder_Module
                     href="#" 
                     data-fancybox 
                     data-type="iframe" 
-                    data-src="https://maps.google.com/?output=embed&amp;f=q&amp;q=' . $property->latitude . ',' . $property->longitude . '&amp;ll=' . $property->latitude . ',' . $property->longitude . '&amp;layer=t&amp;hq=&amp;t=m&amp;z=15"
-                >' . __( 'View Map', 'propertyhive' ) . '</a>';
+                    data-src="https://maps.google.com/?output=embed&amp;f=q&amp;q=' . (float)$property->latitude . ',' . (float)$property->longitude . '&amp;ll=' . (float)$property->latitude . ',' . (float)$property->longitude . '&amp;layer=t&amp;hq=&amp;t=m&amp;z=15"
+                >' . esc_html(__( 'View Map', 'propertyhive' )) . '</a>';
                 break;
             }
         }

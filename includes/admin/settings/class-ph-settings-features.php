@@ -76,7 +76,7 @@ class PH_Settings_Features extends PH_Settings_Page {
             $i = 0;
             foreach ( $categories as $key => $value )
             {
-                echo '<li ' . ( $selected_category == $key ? ' class="active"' : '' ) . '><a href="" data-filter="' . $key . '">' . $value . '</a></li>';
+                echo '<li ' . ( $selected_category == $key ? ' class="active"' : '' ) . '><a href="" data-filter="' . esc_attr($key) . '">' . esc_html($value) . '</a></li>';
                 ++$i;
             }
         echo '</ul>';
@@ -104,7 +104,7 @@ class PH_Settings_Features extends PH_Settings_Page {
             echo '<li style="visibility:hidden" class="';
             if ( isset($feature['categories']) && is_array($feature['categories']) && !empty($feature['categories']) )
             {
-                echo implode(" ", $feature['categories']);
+                echo esc_html(implode(" ", $feature['categories']));
             }
 
             $pro = false;
@@ -163,11 +163,11 @@ class PH_Settings_Features extends PH_Settings_Page {
                   <span class="slider round"></span>
                 </label>';
 
-                echo '<div class="loading"><img src="' . PH()->plugin_url() . '/assets/images/admin/loading.gif" alt=""></div>';
+                echo '<div class="loading"><img src="' . esc_url(PH()->plugin_url() . '/assets/images/admin/loading.gif') . '" alt=""></div>';
 
                 if ( !$can_use )
                 {
-                    echo '<div style="color:#900; font-size:0.9; margin-top:10px;">Disabled due to <a href="' . admin_url('admin.php?page=ph-settings&tab=licensekey') . '" style="color:inherit">invalid license</a></div>';
+                    echo '<div style="color:#900; font-size:0.9; margin-top:10px;">Disabled due to <a href="' . esc_url(admin_url('admin.php?page=ph-settings&tab=licensekey')) . '" style="color:inherit">invalid license</a></div>';
                 }
 
                 echo '</div>';

@@ -368,7 +368,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
-                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=offices&section=add' ); ?>" class="button alignright"><?php echo esc_html(__( 'Add New Office', 'propertyhive' )); ?></a>
+                <a href="<?php echo esc_url(admin_url( 'admin.php?page=ph-settings&tab=offices&section=add' )); ?>" class="button alignright"><?php echo esc_html(__( 'Add New Office', 'propertyhive' )); ?></a>
             </td>
         </tr>
         <tr valign="top">
@@ -444,11 +444,11 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                     do_action( 'propertyhive_office_table_row_columns', get_the_ID() );
                                     echo '
                                         <td class="settings">
-                                            <a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=edit&id=' . $post->ID ) . '">' . esc_html(__( 'Edit', 'propertyhive' )) . '</a>
+                                            <a class="button" href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=offices&section=edit&id=' . $post->ID )) . '">' . esc_html(__( 'Edit', 'propertyhive' )) . '</a>
                                             ';
                                     if ( $num_offices > 1 && get_post_meta($post->ID, 'primary', TRUE) != '1' )
                                     {
-                                        echo '<a class="button" href="' . admin_url( 'admin.php?page=ph-settings&tab=offices&section=delete&id=' . $post->ID ) . '">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>';    
+                                        echo '<a class="button" href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=offices&section=delete&id=' . $post->ID )) . '">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>';    
                                     }
                                     echo '
                                     </td>
@@ -466,7 +466,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 &nbsp;
             </th>
             <td class="forminp forminp-button">
-                <a href="<?php echo admin_url( 'admin.php?page=ph-settings&tab=offices&section=add' ); ?>" class="button alignright"><?php echo esc_html(__( 'Add New Office', 'propertyhive' )); ?></a>
+                <a href="<?php echo esc_url(admin_url( 'admin.php?page=ph-settings&tab=offices&section=add' )); ?>" class="button alignright"><?php echo esc_html(__( 'Add New Office', 'propertyhive' )); ?></a>
             </td>
         </tr>
         <?php
@@ -556,7 +556,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 
                         if ( $post_type != 'office' )
                         {
-                            die("New office isn't of type office. It's of type: " . $post_type);
+                            die("New office isn't of type office. It's of type: " . esc_html($post_type));
                         } 
                     }
                 

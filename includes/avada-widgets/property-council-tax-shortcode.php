@@ -66,7 +66,7 @@ add_shortcode( 'avada_property_council_tax', function( $atts ) {
         {
             echo $atts['before'] . ' ';
         }
-        echo $property->council_tax;
+        echo esc_html($property->council_tax);
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
             echo ' ' . $atts['after'];

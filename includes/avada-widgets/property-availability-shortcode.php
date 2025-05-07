@@ -53,7 +53,7 @@ add_shortcode( 'avada_property_availability', function( $atts ) {
 
     echo '<div ' . FusionBuilder::attributes( 'property-availability-shortcode' ) . '>
     	<div style="' . $style . '">';
-        echo $property->availability;
+        echo esc_html($property->availability);
     echo '
     	</div>
     </div>';
