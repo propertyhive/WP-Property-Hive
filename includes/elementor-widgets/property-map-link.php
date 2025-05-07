@@ -161,12 +161,12 @@ class Elementor_Property_Map_Link_Widget extends \Elementor\Widget_Base {
 		{
 			case "_blank":
 			{
-				echo '<a href="https://www.google.com/maps/?q=' . $property->latitude . ',' . $property->longitude . '&ll=' . $property->latitude . ',' . $property->longitude . '" target="_blank">' . __( 'View Map', 'propertyhive' ) . '</a>';
+				echo '<a href="https://www.google.com/maps/?q=' . (float)$property->latitude . ',' . (float)$property->longitude . '&ll=' . (float)$property->latitude . ',' . (float)$property->longitude . '" target="_blank">' . esc_html(__( 'View Map', 'propertyhive' )) . '</a>';
 				break;
 			}
 			case "embedded":
 			{
-				echo '<a href="#map_lightbox" data-fancybox>' . __( 'View Map', 'propertyhive' ) . '</a>';
+				echo '<a href="#map_lightbox" data-fancybox>' . esc_html(__( 'View Map', 'propertyhive' )) . '</a>';
 		
 				echo '<div id="map_lightbox" style="display:none; width:90%; max-width:800px;">';
 		   	 		echo do_shortcode('[property_map]');
@@ -179,8 +179,8 @@ class Elementor_Property_Map_Link_Widget extends \Elementor\Widget_Base {
 				    href="#" 
 				    data-fancybox 
 				    data-type="iframe" 
-				    data-src="https://maps.google.com/?output=embed&amp;f=q&amp;q=' . $property->latitude . ',' . $property->longitude . '&amp;ll=' . $property->latitude . ',' . $property->longitude . '&amp;layer=t&amp;hq=&amp;t=m&amp;z=15"
-				>' . __( 'View Map', 'propertyhive' ) . '</a>';
+				    data-src="https://maps.google.com/?output=embed&amp;f=q&amp;q=' . (float)$property->latitude . ',' . (float)$property->longitude . '&amp;ll=' . (float)$property->latitude . ',' . (float)$property->longitude . '&amp;layer=t&amp;hq=&amp;t=m&amp;z=15"
+				>' . esc_html(__( 'View Map', 'propertyhive' )) . '</a>';
 				break;
 			}
 		}

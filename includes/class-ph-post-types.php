@@ -61,12 +61,12 @@ class PH_Post_types {
     public static function register_post_statuses()
     {
         register_post_status('archive', array(
-            'label'                     => _x('Archived', 'post'),
+            'label'                     => _x('Archived', 'post', 'propertyhive'),
             'public'                    => false,
             'exclude_from_search'       => true,
             'show_in_admin_all_list'    => false,
             'show_in_admin_status_list' => true,
-            'label_count'               => _n_noop('Archived <span class="count">(%s)</span>', 'Archived <span class="count">(%s)</span>'),
+            'label_count'               => _n_noop('Archived <span class="count">(%s)</span>', 'Archived <span class="count">(%s)</span>', 'propertyhive'),
         ));
     }
 

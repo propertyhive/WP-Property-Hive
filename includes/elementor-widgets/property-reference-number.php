@@ -110,7 +110,7 @@ class Elementor_Property_Reference_Number_Widget extends \Elementor\Widget_Base 
 	        {
 	        	echo $settings['before'] . ' ';
 	        }
-	        echo $property->reference_number;
+	        echo esc_html($property->reference_number);
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
 	        	echo ' ' . $settings['after'];

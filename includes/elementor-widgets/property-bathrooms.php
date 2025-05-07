@@ -168,7 +168,7 @@ class Elementor_Property_Bathrooms_Widget extends \Elementor\Widget_Base {
 	        {
 	        	echo $settings['before'] . ' ';
 	        }
-	        echo $property->bathrooms;
+	        echo esc_html($property->bathrooms);
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
 	        	echo ' ' . $settings['after'];

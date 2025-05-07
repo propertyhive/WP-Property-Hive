@@ -121,7 +121,7 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 		{
 			echo '<div class="embedded-virtual-tours">';
 
-				echo '<h4>' . __( 'Virtual Tours', 'propertyhive' ) . '</h4>';
+				echo '<h4>' . esc_html(__( 'Virtual Tours', 'propertyhive' )) . '</h4>';
 
 				foreach ( $virtual_tours as $virtual_tour )
 				{
@@ -145,7 +145,7 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 				        	$virtual_tour['url']
 				    	);
 
-						echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
+						echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
 					}
 				}
 

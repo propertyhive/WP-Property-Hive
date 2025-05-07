@@ -151,13 +151,13 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 	        {
 	        	echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover;">';
 				$this->add_link_attributes( 'image_link', $settings['image_link'] );
-				?><a <?php $this->print_render_attribute_string( 'image_link' ); ?> style="display:block; <?php echo 'padding-bottom:' . $percent; ?>"><?php
+				?><a <?php $this->print_render_attribute_string( 'image_link' ); ?> style="display:block; <?php echo 'padding-bottom:' . esc_attr($percent); ?>"><?php
 				echo '</a>';
 				echo '</div>';
 			}
 	        else
 	        {
-	        	echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover; padding-bottom:' . $percent . '"></div>';
+	        	echo '<div style="background:url(' . esc_url($url) . ') no-repeat center center; background-size:cover; padding-bottom:' . esc_attr($percent) . '"></div>';
 	        }
 		}
 		else
@@ -173,7 +173,7 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 						$this->add_link_attributes( 'image_link', $settings['image_link'] );
 						?><a <?php $this->print_render_attribute_string( 'image_link' ); ?>><?php
 					}
-	        		echo '<img src="' . $photos[$image_number-1]['url'] . '" alt="">';
+	        		echo '<img src="' . esc_url($photos[$image_number-1]['url']) . '" alt="">';
 	        		if ( ! empty( $settings['image_link']['url'] ) ) {
 	        			echo '</a>';
 	        		}

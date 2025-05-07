@@ -150,18 +150,18 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 		echo '<div class="back-to-search">';
 			if ( isset($_SESSION['last_search']) && $_SESSION['last_search'] != '' ) 
 			{
-				echo '<a href="' . $_SESSION['last_search'] . '">';
+				echo '<a href="' . esc_url($_SESSION['last_search']) . '">';
 			}
 			else
 			{
-				echo '<a href="' . get_permalink(ph_get_page_id( 'search_results' )) . '">';
+				echo '<a href="' . esc_url(get_permalink(ph_get_page_id( 'search_results' ))) . '">';
 			}
 			if ( isset($settings['icon']) && !empty($settings['icon']) )
 	        {
 	        	\Elementor\Icons_Manager::render_icon( $settings['icon'], [ 'aria-hidden' => 'true' ] );
 	        	echo ' ';
 	        }
-			echo $settings['label'];
+			echo esc_html($settings['label']);
 		echo '</a>';
 		echo '</div>';
 

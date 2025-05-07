@@ -108,7 +108,7 @@ class Elementor_Property_Address_County_Widget extends \Elementor\Widget_Base {
 		{
 	        echo '<div class="elementor-widget-address-county">';
 
-	        echo $property->address_four;
+	        echo esc_html($property->address_four);
 
 	        echo '</div>';
 	    }

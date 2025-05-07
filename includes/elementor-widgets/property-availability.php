@@ -105,7 +105,7 @@ class Elementor_Property_Availability_Widget extends \Elementor\Widget_Base {
 
 		if ( $property->availability != '' )
 		{
-	        echo '<div class="elementor-widget-availability">' . $property->availability . '</div>';
+	        echo '<div class="elementor-widget-availability">' . esc_html($property->availability) . '</div>';
 	    }
 
 	}

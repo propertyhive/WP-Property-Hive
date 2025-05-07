@@ -94,7 +94,7 @@ class Elementor_Property_Negotiator_Telephone_Number_Widget extends \Elementor\W
 			{
 				echo '<a href="tel:' . esc_attr($property->negotiator_telephone_number) . '">';
 			}
-	        echo $property->negotiator_telephone_number;
+	        echo esc_html($property->negotiator_telephone_number);
 	        if ( isset($settings['hyperlink']) && $settings['hyperlink'] == 'yes' )
 			{
 				echo '</a>';

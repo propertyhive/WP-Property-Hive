@@ -108,7 +108,7 @@ class Elementor_Property_Address_Line_2_Widget extends \Elementor\Widget_Base {
 		{
 	        echo '<div class="elementor-widget-address-line-2">';
 
-	        echo $property->address_two;
+	        echo esc_html($property->address_two);
 
 	        echo '</div>';
 	    }

@@ -105,7 +105,7 @@ class Elementor_Property_Price_Qualifier_Widget extends \Elementor\Widget_Base {
 
         if ( $property->price_qualifier != '' )
 		{
-	        echo '<div class="elementor-widget-property-price-qualifier">' . $property->price_qualifier . '</div>';
+	        echo '<div class="elementor-widget-property-price-qualifier">' . esc_html($property->price_qualifier) . '</div>';
 	    }
 
 	}

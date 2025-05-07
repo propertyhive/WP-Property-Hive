@@ -108,7 +108,7 @@ class Elementor_Property_Address_Postcode_Widget extends \Elementor\Widget_Base 
 		{
 	        echo '<div class="elementor-widget-address-postcode">';
 
-	        echo $property->address_postcode;
+	        echo esc_html($property->address_postcode);
 
 	        echo '</div>';
 	    }

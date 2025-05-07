@@ -108,7 +108,7 @@ class Elementor_Property_Address_Street_Widget extends \Elementor\Widget_Base {
 		{
 	        echo '<div class="elementor-widget-address-street">';
 
-	        echo $property->address_street;
+	        echo esc_html($property->address_street);
 
 	        echo '</div>';
 	    }
