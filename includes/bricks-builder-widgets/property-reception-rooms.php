@@ -84,7 +84,7 @@ class Bricks_Builder_Property_Reception_Rooms_Widget extends \Bricks\Element {
 	        	echo $this->settings['before'] . ' ';
 	        }
 
-			echo $property->reception_rooms;
+			echo esc_html($property->reception_rooms);
 
 			if ( isset($this->settings['after']) && !empty($this->settings['after']) )
 	        {

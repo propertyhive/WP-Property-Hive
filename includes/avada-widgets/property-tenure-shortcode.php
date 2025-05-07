@@ -66,7 +66,7 @@ add_shortcode( 'avada_property_tenure', function( $atts ) {
         {
             echo $atts['before'] . ' ';
         }
-        echo $property->tenure;
+        echo esc_html($property->tenure);
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
             echo ' ' . $atts['after'];

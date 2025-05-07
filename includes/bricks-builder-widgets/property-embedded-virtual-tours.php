@@ -89,7 +89,7 @@ class Bricks_Builder_Property_Embedded_Virtual_Tours_Widget extends \Bricks\Elem
 			        	$virtual_tour['url']
 			    	);
 
-					echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
+					echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
 				}
 			}
 

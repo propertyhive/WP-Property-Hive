@@ -162,8 +162,8 @@ function get_property_map( $args = array() )
 	{
 		if ( property_map<?php echo esc_js($id_suffix); ?> != undefined ) { property_map<?php echo esc_js($id_suffix); ?>.remove(); }
 
-		mapboxgl.accessToken = '<?php echo get_option( 'propertyhive_mapbox_api_key', '' ); ?>';
-        property_map<?php echo $id_suffix; ?> = new mapboxgl.Map({
+		mapboxgl.accessToken = '<?php echo esc_js(get_option( 'propertyhive_mapbox_api_key', '' )); ?>';
+        property_map<?php echo esc_js($id_suffix); ?> = new mapboxgl.Map({
             container: "property_map_canvas<?php echo esc_js($id_suffix); ?>", // container ID
             center: [<?php echo (float)$property->longitude; ?>, <?php echo (float)$property->latitude; ?>], // starting position [lng, lat]. Note that lat must be set between -90 and 90
             zoom: <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? (int)$args['zoom'] : '14' ); ?> // starting zoom

@@ -33,7 +33,7 @@ echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
 		echo '<style type="text/css">';
 		echo '.property_actions ul { list-style-type:none; margin:0; padding:0; }';
 		echo '.property_actions ul li { display:inline-block; margin-right:5px; }';
-		echo '.property_actions ul li a { display:block; padding:7px 17px; text-decoration:none; background:' . $atts['button_background_color'] . '; color:' . $atts['button_text_color'] . ' }';
+		echo '.property_actions ul li a { display:block; padding:7px 17px; text-decoration:none; background:' . esc_attr($atts['button_background_color']) . '; color:' . esc_attr($atts['button_text_color']) . ' }';
 		echo '</style>';
 	}
 

@@ -33,7 +33,7 @@ class Divi_Property_Address_Full_Widget extends ET_Builder_Module
 
         $return = '<div class="divi-widget-address-full">';
 
-        $return .= $property->get_formatted_full_address();
+        $return .= esc_html($property->get_formatted_full_address());
 
         $return .= '</div>';
 

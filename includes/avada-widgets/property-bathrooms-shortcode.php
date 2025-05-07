@@ -66,7 +66,7 @@ add_shortcode( 'avada_property_bathrooms', function( $atts ) {
         {
             echo $atts['before'] . ' ';
         }
-        echo $property->bathrooms;
+        echo esc_html($property->bathrooms);
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
             echo ' ' . $atts['after'];

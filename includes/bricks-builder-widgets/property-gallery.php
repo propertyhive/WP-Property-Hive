@@ -88,7 +88,7 @@ class Bricks_Builder_Property_Gallery_Widget extends \Bricks\Element {
                     $images_hidden[] = array(
                         'title' => isset($photo['title']) ? $photo['title'] : '',
                         'url'  => isset($photo['url']) ? $photo['url'] : '',
-                        'image' => '<img src="' . ( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . ( isset($photo['title']) ? $photo['title'] : '' ) . '">',
+                        'image' => '<img src="' . ( isset($photo['url']) ? esc_url($photo['url']) : '' ) . '" alt="' . ( isset($photo['title']) ? esc_attr($photo['title']) : '' ) . '">',
                     );
                 }
             }
@@ -99,7 +99,7 @@ class Bricks_Builder_Property_Gallery_Widget extends \Bricks\Element {
                 $images[] = array(
                     'title' => isset($photo['title']) ? $photo['title'] : '',
                     'url'  => isset($photo['url']) ? $photo['url'] : '',
-                    'image' => '<img src="' . ( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . ( isset($photo['title']) ? $photo['title'] : '' ) . '">',
+                    'image' => '<img src="' . ( isset($photo['url']) ? esc_url($photo['url']) : '' ) . '" alt="' . ( isset($photo['title']) ? esc_attr($photo['title']) : '' ) . '">',
                 );
             }
         }
@@ -253,7 +253,7 @@ class Bricks_Builder_Property_Gallery_Widget extends \Bricks\Element {
             
             foreach ( $images_hidden as $image_hidden ) 
             {
-                echo '<a href="' . $image_hidden['url'] . '" data-fancybox="elementor-gallery"></a>';
+                echo '<a href="' . esc_url($image_hidden['url']) . '" data-fancybox="elementor-gallery"></a>';
                 ++$image_number;
             }
         ?>
@@ -272,7 +272,7 @@ class Bricks_Builder_Property_Gallery_Widget extends \Bricks\Element {
                     $id_text = $image_number == ($max_images - 1) ? 'id="more-images-link"' : '';
                     $id_text_mobile = $image_number == 1 ? 'id="more-images-link-mobile"' : '';
 
-                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . $images[$image_number]['url'] . '" data-fancybox="elementor-gallery" style="background-image:url(' . $images[$image_number]['url'] . ')"></a>';
+                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
 
                     if ( $image_number == 1 )
                     {
@@ -295,7 +295,7 @@ class Bricks_Builder_Property_Gallery_Widget extends \Bricks\Element {
 
             while ( count($images) > ($image_number) )
             {
-                echo '<a href="' . $images[$image_number]['url'] . '" data-fancybox="elementor-gallery"></a>';
+                echo '<a href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery"></a>';
                 ++$image_number;
             }
 

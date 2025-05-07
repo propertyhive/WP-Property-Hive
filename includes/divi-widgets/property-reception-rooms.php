@@ -148,7 +148,7 @@ class Divi_Property_Reception_Rooms_Widget extends ET_Builder_Module
 
         if ( isset($this->props['before']) && $this->props['before'] != '' ) { $return .= $this->props['before'] . ' '; }
 
-        $return .= $property->reception_rooms;
+        $return .= esc_html($property->reception_rooms);
         
         if ( isset($this->props['after']) && $this->props['after'] != '' ) { $return .= ' ' . $this->props['after']; }
 

@@ -59,7 +59,7 @@ class Bricks_Builder_Property_Address_Name_Number_Widget extends \Bricks\Element
 
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-			echo $property->address_name_number;
+			echo esc_html($property->address_name_number);
 
 		echo '</div>';
 	}

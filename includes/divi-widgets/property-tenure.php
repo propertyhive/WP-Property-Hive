@@ -50,7 +50,7 @@ class Divi_Property_Tenure_Widget extends ET_Builder_Module
 
         if ( isset($this->props['before']) && $this->props['before'] != '' ) { $return .= $this->props['before'] . ' '; }
 
-        $return .= $property->tenure;
+        $return .= esc_html($property->tenure);
 
         if ( isset($this->props['after']) && $this->props['after'] != '' ) { $return .= ' ' . $this->props['after']; }
 

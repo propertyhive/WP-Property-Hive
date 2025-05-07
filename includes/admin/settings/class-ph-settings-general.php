@@ -834,7 +834,7 @@ class PH_Settings_General extends PH_Settings_Page {
 	 * @return void
 	 */
 	function color_picker( $name, $id, $value, $desc = '' ) {
-		echo '<div class="color_box"><strong><img class="help_tip" data-tip="' . esc_attr( $desc ) . '" src="' . PH()->plugin_url() . '/assets/images/help.png" height="16" width="16" /> ' . esc_html( $name ) . '</strong>
+		echo '<div class="color_box"><strong><img class="help_tip" data-tip="' . esc_attr( $desc ) . '" src="' . esc_url(PH()->plugin_url() . '/assets/images/help.png') . '" height="16" width="16" /> ' . esc_html( $name ) . '</strong>
 			<input name="' . esc_attr( $id ). '" id="' . esc_attr( $id ) . '" type="text" value="' . esc_attr( $value ) . '" class="colorpick" /> <div id="colorPickerDiv_' . esc_attr( $id ) . '" class="colorpickdiv"></div>
 		</div>';
 	}

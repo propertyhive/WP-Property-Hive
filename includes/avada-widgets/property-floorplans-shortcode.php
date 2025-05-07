@@ -28,11 +28,11 @@ add_shortcode( 'avada_property_floorplans', function( $atts ) {
         {
             echo '<div class="floorplans">';
 
-            if ( $atts['show_title'] == 'yes' ) { echo '<h4>' . __( 'Floorplans', 'propertyhive' ) . '</h4>'; }
+            if ( $atts['show_title'] == 'yes' ) { echo '<h4>' . esc_html(__( 'Floorplans', 'propertyhive' )) . '</h4>'; }
 
             foreach ($floorplan_urls as $floorplan)
             {
-                echo '<a href="' . $floorplan['url'] . '" data-fancybox="floorplan" rel="nofollow"><img src="' . $floorplan['url'] . '" alt=""></a>';
+                echo '<a href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplan" rel="nofollow"><img src="' . esc_url($floorplan['url']) . '" alt=""></a>';
             }
 
             echo '</div>';
@@ -46,17 +46,17 @@ add_shortcode( 'avada_property_floorplans', function( $atts ) {
         {
             echo '<div class="floorplans">';
 
-            if ( $atts['show_title'] == 'yes' ) { echo '<h4>' . __( 'Floorplans', 'propertyhive' ) . '</h4>'; }
+            if ( $atts['show_title'] == 'yes' ) { echo '<h4>' . esc_html(__( 'Floorplans', 'propertyhive' )) . '</h4>'; }
 
             foreach ( $floorplan_attachment_ids as $attachment_id )
             {
                 if ( wp_attachment_is_image($attachment_id) )
                 {
-                    echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="floorplan" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
+                    echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplan" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
                 }
                 else
                 {
-                    echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View Floorplan', 'propertyhive' ) . '</a>';
+                    echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow">' . esc_html(__( 'View Floorplan', 'propertyhive' )) . '</a>';
                 }
             }
 

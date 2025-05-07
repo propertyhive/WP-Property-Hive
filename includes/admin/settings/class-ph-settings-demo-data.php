@@ -88,9 +88,9 @@ class PH_Settings_Demo_Data extends PH_Settings_Page {
                     </p>
                     <br>
                     <p>
-                        <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=features&profilter=free'); ?>" class="button button-primary">Activate Demo Data Feature</a>
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=features&profilter=free')); ?>" class="button button-primary">Activate Demo Data Feature</a>
                         &nbsp;
-                        <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=demo_data&hidetab=1'); ?>">Hide This Page</a>
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data&hidetab=1')); ?>">Hide This Page</a>
                     </p>
                 </td>
             </tr>

@@ -84,7 +84,7 @@ class Bricks_Builder_Property_Reference_Number_Widget extends \Bricks\Element {
 	        	echo $this->settings['before'] . ' ';
 	        }
 
-			echo $property->reference_number;
+			echo esc_html($property->reference_number);
 
 			if ( isset($this->settings['after']) && !empty($this->settings['after']) )
 	        {

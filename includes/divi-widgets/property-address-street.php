@@ -38,7 +38,7 @@ class Divi_Property_Address_Street_Widget extends ET_Builder_Module
 
         $return = '<div class="divi-widget-address-street">';
 
-        $return .= $property->address_street;
+        $return .= esc_html($property->address_street);
 
         $return .= '</div>';
 

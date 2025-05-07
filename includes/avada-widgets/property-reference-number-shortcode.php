@@ -66,7 +66,7 @@ add_shortcode( 'avada_property_reference_number', function( $atts ) {
         {
             echo $atts['before'] . ' ';
         }
-        echo $property->reference_number;
+        echo esc_html($property->reference_number);
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
             echo ' ' . $atts['after'];
