@@ -44,6 +44,7 @@ class PH_AJAX {
             'get_upcoming_overdue_key_dates' => false,
 
             // Property actions
+            'check_duplicate_reference_number' => false,
             'osm_geocoding_request'  => false,
             'get_property_marketing_statistics_meta_box' => false,
             'get_property_tenancies_grid' => false,
@@ -3062,6 +3063,48 @@ class PH_AJAX {
 
         echo json_encode($return);
 
+        die();
+    }
+
+    public function check_duplicate_reference_number()
+    {
+        check_ajax_referer( 'check-duplicate-reference-number', 'security' );
+
+        if ( !isset($_POST['reference_number']) || empty($_POST['reference_number']) )
+        {
+            echo '';
+            die();
+        }
+
+        $args = array(
+            'post_type' => 'property',
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_on_market',
+                    'value' => 'yes'
+                ),
+                array(
+                    'key' => '_reference_number',
+                    'value' => sanitize_text_field( wp_unslash( $_POST['reference_number'] ) )
+                ),
+            ),
+        );
+
+        if ( isset($_POST['post_id']) && !empty($_POST['post_id']) )
+        {
+            $args['post__not_in'] = array((int)$_POST['post_id']);
+        }
+
+        $property_query = new WP_Query($args);
+
+        if ( $property_query->have_posts() )
+        {
+            echo '1';
+            die();
+        }
+
+        echo '';
         die();
     }
 

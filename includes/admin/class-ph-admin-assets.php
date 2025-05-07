@@ -367,6 +367,7 @@ class PH_Admin_Assets {
                 'viewing_actions_nonce'         => wp_create_nonce( 'viewing-actions' ),
                 'save_key_date_nonce'         => wp_create_nonce( 'save-key-date' ),
                 'delete_key_date_nonce'         => wp_create_nonce( 'delete-key-date' ),
+                'check_duplicate_reference_number_nonce' => wp_create_nonce("check-duplicate-reference-number"),
                 'enable_description_editor'    => apply_filters('propertyhive_enable_description_editor', false),
                 'leasehold_tenures'             => apply_filters('propertyhive_leasehold_tenure_names', array( 'leasehold', 'share of freehold' ) ),
                 'disable_notes_mention'         => apply_filters('propertyhive_disable_notes_mention', false),
