@@ -45,7 +45,7 @@ function ph_properties_rss_feed() {
 
         $feed = get_post_type_archive_feed_link( 'property' );
 
-        echo '<link rel="alternate" type="application/rss+xml"  title="' . __( 'Latest Properties', 'propertyhive' ) . '" href="' . esc_attr( $feed ) . '" />';
+        echo '<link rel="alternate" type="application/rss+xml"  title="' . esc_attr(__( 'Latest Properties', 'propertyhive' )) . '" href="' . esc_url( $feed ) . '" />';
 
     }
 }

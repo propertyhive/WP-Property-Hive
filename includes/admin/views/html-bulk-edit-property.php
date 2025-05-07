@@ -143,6 +143,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php do_action( 'propertyhive_property_bulk_edit_end' ); ?>
 
 		<input type="hidden" name="propertyhive_bulk_edit" value="1" />
-		<input type="hidden" name="propertyhive_bulk_edit_nonce" value="<?php echo wp_create_nonce( 'propertyhive_bulk_edit_nonce' ); ?>" />
+		<input type="hidden" name="propertyhive_bulk_edit_nonce" value="<?php echo esc_attr(wp_create_nonce( 'propertyhive_bulk_edit_nonce' )); ?>" />
 	</div>
 </fieldset>

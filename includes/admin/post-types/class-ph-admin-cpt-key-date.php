@@ -129,14 +129,14 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 					$opening_link_tag = false;
 					if ( !empty($key_date->tenancy_id) ) 
 					{
-						echo '<a href="' . get_edit_post_link((int)$key_date->tenancy_id) . '#propertyhive-tenancy-management%7Cpropertyhive-management-dates">'; 
+						echo '<a href="' . esc_url(get_edit_post_link((int)$key_date->tenancy_id)) . '#propertyhive-tenancy-management%7Cpropertyhive-management-dates">'; 
 						$opening_link_tag = true; 
 					}
 					else
 					{ 
 						if ( !empty($key_date->property_id) ) 
 						{
-							echo '<a href="' . get_edit_post_link((int)$key_date->property_id) . '#propertyhive-property-tenancies%7Cpropertyhive-management-dates">'; 
+							echo '<a href="' . esc_url(get_edit_post_link((int)$key_date->property_id)) . '#propertyhive-property-tenancies%7Cpropertyhive-management-dates">'; 
 							$opening_link_tag = true; 
 						}
 					}
@@ -149,7 +149,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 					break;
 
 				case 'property' :
-					echo '<div class="cell-main-content">' . $property->get_formatted_full_address() . '</div>';
+					echo '<div class="cell-main-content">' . esc_html($property->get_formatted_full_address()) . '</div>';
 					break;
 
 				case 'tenants' :
@@ -164,11 +164,11 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 					break;
 
 				case 'date_due' :
-					echo '<div class="cell-main-content">' . $key_date->date_due()->format( 'jS F Y' ) . '</div>';
+					echo '<div class="cell-main-content">' . esc_html($key_date->date_due()->format( 'jS F Y' )) . '</div>';
 					break;
 
 				case 'status' :
-					echo '<div class="cell-main-content">' . ucwords( $key_date->status() ) . '</div>';
+					echo '<div class="cell-main-content">' . esc_html(ucwords( $key_date->status() )) . '</div>';
 					break;
 
 				default :

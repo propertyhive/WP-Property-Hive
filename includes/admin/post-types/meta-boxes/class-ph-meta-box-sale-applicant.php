@@ -44,7 +44,7 @@ class PH_Meta_Box_Sale_Applicant {
                 $fields = array(
                     'name' => array(
                         'label' => __('Name', 'propertyhive'),
-                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-sale-applicant-id="' . esc_attr($applicant_contact_id) . '" data-sale-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
+                        'value' => '<a href="' . esc_url(get_edit_post_link($applicant_contact_id, '')) . '" data-sale-applicant-id="' . esc_attr($applicant_contact_id) . '" data-sale-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
                     ),
                     'telephone_number' => array(
                         'label' => __('Telephone Number', 'propertyhive'),

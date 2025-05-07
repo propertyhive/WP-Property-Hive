@@ -59,7 +59,7 @@ class Divi_Property_Map_Link_Widget extends ET_Builder_Module
             }
             case "embedded":
             {
-                echo '<a href="#map_lightbox" data-fancybox>' . __( 'View Map', 'propertyhive' ) . '</a>';
+                echo '<a href="#map_lightbox" data-fancybox>' . esc_html(__( 'View Map', 'propertyhive' )) . '</a>';
         
                 echo '<div id="map_lightbox" style="display:none; width:90%; max-width:800px;">';
                     echo do_shortcode('[property_map]');

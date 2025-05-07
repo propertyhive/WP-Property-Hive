@@ -15,13 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 <form name="ph_account_details_form" class="propertyhive-form account-details-form" action="" method="post">
  	
 	<div id="detailsSuccess" style="display:none;" class="alert alert-success alert-box success">
-        <?php _e( 'Thank you. Your details have been updated successfully.', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'Thank you. Your details have been updated successfully.', 'propertyhive' )); ?>
     </div>
     <div id="detailsError" style="display:none;" class="alert alert-danger alert-box">
-        <?php _e( 'An error occurred whilst trying to update your details. Please try again.', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'An error occurred whilst trying to update your details. Please try again.', 'propertyhive' )); ?>
     </div>
     <div id="detailsValidation" style="display:none;" class="alert alert-danger alert-box">
-        <?php _e( 'Please ensure all required fields have been completed', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'Please ensure all required fields have been completed', 'propertyhive' )); ?>
     </div>
 
     <?php do_action( 'propertyhive_account_details_form_start' ); ?>
@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php do_action( 'propertyhive_account_details_form' ); ?>
 
-    <input type="submit" value="<?php _e( 'Update Details', 'propertyhive' ); ?>">
+    <input type="submit" value="<?php echo esc_html(__( 'Update Details', 'propertyhive' )); ?>">
 
     <?php do_action( 'propertyhive_account_details_form_end' ); ?>
 

@@ -28,7 +28,7 @@ class PH_Meta_Box_Property_Actions {
 	        	if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
             	{
 		        	$actions[] = '<a 
-			                href="' . admin_url('admin.php?page=ph-matching-applicants&property_id=' . $post->ID) . '" 
+			                href="' . esc_url(admin_url('admin.php?page=ph-matching-applicants&property_id=' . $post->ID)) . '" 
 			                class="button"
 			                style="width:100%; margin-bottom:7px; text-align:center" 
 			            >' . esc_html(__('View Matching Applicants', 'propertyhive')) . '</a>';
@@ -37,7 +37,7 @@ class PH_Meta_Box_Property_Actions {
 		        if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
             	{
             		$actions[] = '<a 
-			                href="' . admin_url('post-new.php?post_type=enquiry&property_id=' . $post->ID) . '" 
+			                href="' . esc_url(admin_url('post-new.php?post_type=enquiry&property_id=' . $post->ID)) . '" 
 			                class="button"
 			                style="width:100%; margin-bottom:7px; text-align:center" 
 			            >' . esc_html(__('Record Enquiry', 'propertyhive')) . '</a>';
@@ -80,7 +80,7 @@ class PH_Meta_Box_Property_Actions {
 					if ( get_post_meta( $post->ID, '_department', TRUE ) == 'residential-lettings' )
 					{
 						$actions[] = '<a
-								href="' . admin_url('post-new.php?post_type=tenancy&property_id=' . $post->ID) . '"
+								href="' . esc_url(admin_url('post-new.php?post_type=tenancy&property_id=' . $post->ID)) . '"
 								class="button"
 								style="width:100%; margin-bottom:7px; text-align:center"
 							>' . esc_html(__('Create Tenancy', 'propertyhive')) . '</a>';
@@ -283,7 +283,7 @@ class PH_Meta_Box_Property_Actions {
 var viewing_selected_applicants = {};
 var offer_selected_applicants = {};
 
-var viewing_selected_negotiators = {<?php echo get_current_user_id(); ?>: { post_title: '<?php $user_data = get_userdata(get_current_user_id()); echo $user_data->display_name; ?>' } };
+var viewing_selected_negotiators = {<?php echo get_current_user_id(); ?>: { post_title: '<?php $user_data = get_userdata(get_current_user_id()); echo esc_js($user_data->display_name); ?>' } };
 
 jQuery(document).ready(function($)
 {
@@ -332,7 +332,7 @@ jQuery(document).ready(function($)
 				});
 			});
 
-			$(this).text('<?php echo __( 'Search Existing Applicants', 'propertyhive' ); ?>');
+			$(this).text('<?php echo esc_html(__( 'Search Existing Applicants', 'propertyhive' )); ?>');
 		}
 		else
 		{
@@ -344,7 +344,7 @@ jQuery(document).ready(function($)
 				});
 			});
 
-			$(this).text('<?php echo addslashes(__( 'Applicant Doesn\'t Exist', 'propertyhive' )); ?>');
+			$(this).text('<?php echo esc_html(__( 'Applicant Doesn\'t Exist', 'propertyhive' )); ?>');
 		}
 	});
 
@@ -399,11 +399,11 @@ jQuery(document).ready(function($)
 		var data = {
             action:         'propertyhive_search_contacts',
             keyword:    	keyword,
-            security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-contacts' )); ?>',
             exclude_ids:    Object.keys(viewing_selected_applicants).join('|'),
         };
 
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response == '' || response.length == 0)
         	{
@@ -496,10 +496,10 @@ jQuery(document).ready(function($)
 		var data = {
             action:         'propertyhive_search_negotiators',
             keyword:    	keyword,
-            security:       '<?php echo wp_create_nonce( 'search-negotiators' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-negotiators' )); ?>',
         };
 
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response == '' || response.length == 0)
         	{
@@ -603,7 +603,7 @@ jQuery(document).ready(function($)
 		// Validation passed. Submit form
 		var data = {
             action:         'propertyhive_book_viewing_property',
-            property_id:    <?php echo $post->ID; ?>,
+            property_id:    <?php echo (int)$post->ID; ?>,
             start_date: 	$('#_viewing_start_date').val(),
             start_time: 	$('#_viewing_start_time_hours').val() + ':' + $('#_viewing_start_time_minutes').val() + ':00',
             applicant_name: ( (new_applicant) ? $('#viewing_applicant_name').val() : '' ),
@@ -612,11 +612,11 @@ jQuery(document).ready(function($)
             applicant_address: ( (new_applicant) ? $('#viewing_applicant_address').val() : '' ),
             applicant_ids: 	( (!new_applicant) ? Object.keys(viewing_selected_applicants) : '' ),
             negotiator_ids: Object.keys(viewing_selected_negotiators),
-            security:       '<?php echo wp_create_nonce( 'book-viewing' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'book-viewing' )); ?>',
         };
 
         var that = this;
-		$.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+		$.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response.error)
         	{
@@ -659,7 +659,7 @@ jQuery(document).ready(function($)
 				});
 			});
 
-			$(this).text('<?php echo __( 'Search Existing Applicants', 'propertyhive' ); ?>');
+			$(this).text('<?php echo esc_html(__( 'Search Existing Applicants', 'propertyhive' )); ?>');
 		}
 		else
 		{
@@ -671,7 +671,7 @@ jQuery(document).ready(function($)
 				});
 			});
 
-			$(this).text('<?php echo addslashes(__( 'Applicant Doesn\'t Exist', 'propertyhive' )); ?>');
+			$(this).text('<?php echo esc_html(__( 'Applicant Doesn\'t Exist', 'propertyhive' )); ?>');
 		}
 	});
 
@@ -736,10 +736,10 @@ jQuery(document).ready(function($)
 		var data = {
             action:         'propertyhive_search_contacts',
             keyword:    	keyword,
-            security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-contacts' )); ?>',
         };
 
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response == '' || response.length == 0)
         	{
@@ -848,7 +848,7 @@ jQuery(document).ready(function($)
 		// Validation passed. Submit form
 		var data = {
             action:         'propertyhive_record_offer_property',
-            property_id:    <?php echo $post->ID; ?>,
+            property_id:    <?php echo (int)$post->ID; ?>,
             offer_date: 	$('#_offer_date').val(),
             offer_time: 	$('#_offer_time_hours').val() + ':' + $('#_offer_time_minutes').val() + ':00',
             applicant_name: ( (new_applicant) ? $('#offer_applicant_name').val() : '' ),
@@ -857,11 +857,11 @@ jQuery(document).ready(function($)
             applicant_address: ( (new_applicant) ? $('#offer_applicant_address').val() : '' ),
             applicant_ids: 	( (!new_applicant) ? Object.keys(offer_selected_applicants) : '' ),
             amount: 		$('#_offer_amount').val(),
-            security:       '<?php echo wp_create_nonce( 'record-offer' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'record-offer' )); ?>',
         };
 
         var that = this;
-		$.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+		$.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response.error)
         	{

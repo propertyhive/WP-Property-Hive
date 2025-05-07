@@ -1476,7 +1476,7 @@ class PH_AJAX {
         {
             echo '<p class="form-field">';
                 echo '<label>' . esc_html(__('Name', 'propertyhive')) . '</label>';
-                echo '<a href="' . get_edit_post_link( $contact_id ) . '">' . esc_html(get_the_title($contact_id)) . '</a>';
+                echo '<a href="' . esc_url(get_edit_post_link( $contact_id )) . '">' . esc_html(get_the_title($contact_id)) . '</a>';
             echo '</p>';
             
             $address = array();
@@ -1512,7 +1512,7 @@ class PH_AJAX {
 
                 echo '<p class="form-field">';
                     echo '<label>' . esc_html(__('Solicitor', 'propertyhive')) . '</label>';
-                    echo '<a href="' . get_edit_post_link($contact_solicitor_contact_id, '') . '">' . esc_html(get_the_title($contact_solicitor_contact_id) . ( $solicitor_contact->company_name != '' && $solicitor_contact->company_name != get_the_title($contact_solicitor_contact_id) ? ' (' . $solicitor_contact->company_name . ')' : '' )) . '</a>';
+                    echo '<a href="' . esc_url(get_edit_post_link($contact_solicitor_contact_id, '')) . '">' . esc_html(get_the_title($contact_solicitor_contact_id) . ( $solicitor_contact->company_name != '' && $solicitor_contact->company_name != get_the_title($contact_solicitor_contact_id) ? ' (' . $solicitor_contact->company_name . ')' : '' )) . '</a>';
                 echo '</p>';
             }
         }
@@ -1811,7 +1811,7 @@ class PH_AJAX {
 		check_ajax_referer( 'add-note', 'security' );
 
         if ( ! current_user_can( 'manage_propertyhive' ) )
-            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+            wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
 		$post_id = (int)$_POST['post_id'];
 
@@ -1853,9 +1853,9 @@ class PH_AJAX {
                         <?php echo wpautop( wptexturize( wp_kses_post( $note ) ) ); ?>
                     </div>
                     <p class="meta">
-                        <abbr class="exact-date" title="<?php echo $comment->comment_date_gmt; ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
+                        <abbr class="exact-date" title="<?php echo esc_attr($comment->comment_date_gmt); ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
                         <?php if ( $comment->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $comment->comment_author ); ?>
-                        <a href="#" class="delete_note"><?php _e( 'Delete', 'propertyhive' ); ?></a>
+                        <a href="#" class="delete_note"><?php echo esc_html(__( 'Delete', 'propertyhive' )); ?></a>
                     </p>
                 </li>
 <?php
@@ -1931,7 +1931,7 @@ class PH_AJAX {
         check_ajax_referer( 'get-notes', 'security' );
 
         if ( ! current_user_can( 'manage_propertyhive' ) )
-            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+            wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
         $post = get_post((int)$_POST['post_id']);
 
@@ -1949,7 +1949,7 @@ class PH_AJAX {
         check_ajax_referer( 'get-notes', 'security' );
 
         if ( ! current_user_can( 'manage_propertyhive' ) )
-            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+            wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
         $post = get_post((int)$_POST['post_id']);
 
@@ -1967,7 +1967,7 @@ class PH_AJAX {
         check_ajax_referer( 'get-notes', 'security' );
 
         if ( ! current_user_can( 'manage_propertyhive' ) )
-            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+            wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
         $query = sanitize_text_field($_POST['query']);
 
@@ -3187,7 +3187,7 @@ class PH_AJAX {
                 }
             }
 
-            echo '<h3>' . __( 'Views On Website', 'propertyhive' ) . ' (' . number_format($total_views, 0) . ')</h3>';
+            echo '<h3>' . esc_html(__( 'Views On Website', 'propertyhive' )) . ' (' . esc_html(number_format($total_views, 0)) . ')</h3>';
 
             echo '<div id="marketing_statistics_website_view_graph" style="height:400px; width:100%;"></div>';
         
@@ -3279,7 +3279,7 @@ class PH_AJAX {
 
                 echo '<p class="form-field">
         
-                    <label for="">' . esc_html(__('Valued Rent', 'propertyhive')) . ' (' . $currency_symbol . ')</label>
+                    <label for="">' . esc_html(__('Valued Rent', 'propertyhive')) . ' (' . esc_html($currency_symbol) . ')</label>
 
                     <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . esc_attr(ph_display_price_field( $appraisal->valued_rent )) . '" placeholder="" style="width:10%; min-width:100px;">
                 
@@ -3445,7 +3445,7 @@ class PH_AJAX {
             $property_id = get_post_meta( $post_id, '_property_id', TRUE );
 
             $actions[] = '<a 
-                    href="' . get_edit_post_link($property_id) . '" 
+                    href="' . esc_url(get_edit_post_link($property_id)) . '" 
                     class="button"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . esc_html(__('View Instructed Property', 'propertyhive')) . '</a>';
@@ -5972,9 +5972,9 @@ class PH_AJAX {
         {
             echo '<p class="form-field">
             
-                <label for="">' . __('Status', 'propertyhive') . '</label>
+                <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
                 
-                ' . __( ucwords(str_replace("_", " ", $offer->status)), 'propertyhive' ) . '    
+                ' . esc_html(__( ucwords(str_replace("_", " ", $offer->status)), 'propertyhive' )) . '    
             
             </p>';
         }
@@ -5987,7 +5987,7 @@ class PH_AJAX {
 
         echo '<p class="form-field offer_date_time_field">
     
-            <label for="_offer_date">' . __('Offer Date / Time', 'propertyhive') . '</label>
+            <label for="_offer_date">' . esc_html(__('Offer Date / Time', 'propertyhive')) . '</label>
             
             <input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(date("Y-m-d", strtotime($offer_date_time))) . '" placeholder="">
             <select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="width:55px">';
@@ -6068,7 +6068,7 @@ class PH_AJAX {
 
                 <div id="success_actions"></div>
 
-                <a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+                <a class="button action-cancel" style="width:100%;" href="#">' . esc_html(__( 'Back To Actions', 'propertyhive' )) . '</a>
 
             </div>
 
@@ -6114,7 +6114,7 @@ class PH_AJAX {
             if ( $sale_id != '' )
             {
                 $actions[] = '<a 
-                        href="' . get_edit_post_link( $sale_id, '' ) . '" 
+                        href="' . esc_url(get_edit_post_link( $sale_id, '' )) . '" 
                         class="button"
                         style="width:100%; margin-bottom:7px; text-align:center" 
                     >' . wp_kses_post( __('View Sale', 'propertyhive') ) . '</a>';
@@ -6122,7 +6122,7 @@ class PH_AJAX {
             else
             {
                 $actions[] = '<a 
-                        href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' ) . '" 
+                        href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' )) . '" 
                         class="button button-success button-create-sale"
                         style="width:100%; margin-bottom:7px; text-align:center" 
                         onclick="setTimeout(function() { jQuery(\'.button-create-sale\').attr(\'href\', \'#\'); jQuery(\'.button-create-sale\').attr(\'disabled\', \'disabled\'); jQuery(\'.button-create-sale\').html(\'Creating...\'); }, 50);"
@@ -6153,7 +6153,7 @@ class PH_AJAX {
         }
         else
         {
-            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+            echo '<div style="text-align:center">' . esc_html(__( 'No actions to display', 'propertyhive' )) . '</div>';
         }
 
         echo '</div>
@@ -6322,9 +6322,9 @@ class PH_AJAX {
         {
             echo '<p class="form-field">
             
-                <label for="">' . __('Status', 'propertyhive') . '</label>
+                <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
                 
-                ' . __( ucwords(str_replace("_", " ", $sale->status)), 'propertyhive' ) . '    
+                ' . esc_html(__( ucwords(str_replace("_", " ", $sale->status)), 'propertyhive' )) . '    
             
             </p>';
         }
@@ -6337,9 +6337,9 @@ class PH_AJAX {
 
         echo '<p class="form-field sale_date_field">
     
-            <label for="_sale_date">' . __('Sale Date', 'propertyhive') . '</label>
+            <label for="_sale_date">' . esc_html(__('Sale Date', 'propertyhive')) . '</label>
 
-            <input type="date" class="small" name="_sale_date" id="_sale_date" value="' . date("Y-m-d", strtotime($sale_date_time)) . '" placeholder="">
+            <input type="date" class="small" name="_sale_date" id="_sale_date" value="' . esc_attr(date("Y-m-d", strtotime($sale_date_time))) . '" placeholder="">
             
         </p>';
 
@@ -6400,7 +6400,7 @@ class PH_AJAX {
                     href="#action_panel_sale_exchanged" 
                     class="button button-success sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Sale Exchanged', 'propertyhive') . '</a>';
+                >' . esc_html(__('Sale Exchanged', 'propertyhive')) . '</a>';
             
         }
 
@@ -6410,7 +6410,7 @@ class PH_AJAX {
                     href="#action_panel_sale_completed" 
                     class="button button-success sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Sale Completed', 'propertyhive') . '</a>';
+                >' . esc_html(__('Sale Completed', 'propertyhive')) . '</a>';
         }
 
         if ( $status == 'completed' )
@@ -6424,7 +6424,7 @@ class PH_AJAX {
                     href="#action_panel_sale_fallen_through" 
                     class="button sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Sale Fallen Through', 'propertyhive') . '</a>';
+                >' . esc_html(__('Sale Fallen Through', 'propertyhive')) . '</a>';
         }
 
         $actions = apply_filters( 'propertyhive_admin_sale_actions', $actions, $post_id );
@@ -6436,7 +6436,7 @@ class PH_AJAX {
         }
         else
         {
-            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+            echo '<div style="text-align:center">' . esc_html(__( 'No actions to display', 'propertyhive' )) . '</div>';
         }
 
         echo '</div>
@@ -6702,7 +6702,8 @@ class PH_AJAX {
 
         if ( isset($recurrence_rules[$key_date_type]) && isset( $recurrence_rules[$key_date_type]['recurrence_rule'] ) )
         {
-            foreach (explode(';', $recurrence_rules[$key_date_type]['recurrence_rule']) as $key_value_pair){
+            foreach ( explode(';', $recurrence_rules[$key_date_type]['recurrence_rule']) as $key_value_pair )
+            {
                 list($key, $value) = explode('=', $key_value_pair);
                 $recurrence[strtolower($key)] = $value;
             }
@@ -6734,7 +6735,7 @@ class PH_AJAX {
             }
         }
 
-        echo $next_key_date;
+        echo esc_html($next_key_date);
 
         // Quit out
         die();

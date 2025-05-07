@@ -15,13 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 <form name="ph_applicant_registration_form" class="propertyhive-form applicant-registration-form" action="" method="post">
  	
 	<div id="registrationSuccess" style="display:none;" class="alert alert-success alert-box success">
-        <?php _e( 'Thank you. You have registered successfully.', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'Thank you. You have registered successfully.', 'propertyhive' )); ?>
     </div>
     <div id="registrationError" style="display:none;" class="alert alert-danger alert-box">
-        <?php _e( 'An error occurred whilst trying to register. Please try again.', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'An error occurred whilst trying to register. Please try again.', 'propertyhive' )); ?>
     </div>
     <div id="registrationValidation" style="display:none;" class="alert alert-danger alert-box">
-        <?php _e( 'Please ensure all required fields have been completed', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'Please ensure all required fields have been completed', 'propertyhive' )); ?>
     </div>
 
     <?php do_action( 'propertyhive_registration_form_start' ); ?>
@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php do_action( 'propertyhive_registration_form' ); ?>
 
-    <input type="submit" value="<?php _e( 'Register', 'propertyhive' ); ?>">
+    <input type="submit" value="<?php echo esc_html(__( 'Register', 'propertyhive' )); ?>">
 
     <?php do_action( 'propertyhive_registration_form_end' ); ?>
 

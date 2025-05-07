@@ -136,7 +136,7 @@ class PH_Admin_Merge_Contacts {
             ?>
             <p class="form-field">
                 <input type="button" value="<?php echo esc_attr(__( 'Merge Contacts', 'propertyhive' )); ?>" class="button-primary" id="merge_contacts_button">
-                <a href="<?php echo wp_get_raw_referer(); ?>" class="button" id="cancel_merge_button"><?php echo esc_html(__( 'Cancel', 'propertyhive' )); ?></a>
+                <a href="<?php echo esc_url(wp_get_raw_referer()); ?>" class="button" id="cancel_merge_button"><?php echo esc_html(__( 'Cancel', 'propertyhive' )); ?></a>
             </p>
 
             <script>
@@ -161,11 +161,11 @@ class PH_Admin_Merge_Contacts {
 
                         var data = {
                             action:             'propertyhive_merge_contact_records',
-                            contact_ids :       '<?php echo ph_clean($_GET['merge_ids']); ?>',
+                            contact_ids :       '<?php echo esc_js(ph_clean($_GET['merge_ids'])); ?>',
                             primary_contact_id: selected_primary,
                         };
 
-                        jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
+                        jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) {
 
                             if (response.error)
                             {
@@ -177,7 +177,7 @@ class PH_Admin_Merge_Contacts {
                             if (response.success)
                             {
                                 // Redirect to referrer, adding message in admin_notices
-                                window.location.href = '<?php echo admin_url('edit.php?post_type=contact&propertyhive_contacts_merged=1') ?>';
+                                window.location.href = '<?php echo esc_url(admin_url('edit.php?post_type=contact&propertyhive_contacts_merged=1')); ?>';
                             }
                         });
                     }
@@ -190,7 +190,7 @@ class PH_Admin_Merge_Contacts {
         else
         {
             ?>
-            <p>Could not find multiple contacts to merge. Please <a href="<?php echo wp_get_raw_referer(); ?>">return to the contact list</a> and try again.</p>
+            <p>Could not find multiple contacts to merge. Please <a href="<?php echo esc_url(wp_get_raw_referer()); ?>">return to the contact list</a> and try again.</p>
             <?php
         }
 

@@ -53,7 +53,7 @@ class PH_Meta_Box_Property_Commercial_Units {
                     $the_property = new PH_Property(get_the_ID());
 
                     echo '<tr>';
-                        echo '<td style="text-align:left;"><a href="' . get_edit_post_link( get_the_ID() ) . '">' . $the_property->get_formatted_summary_address() . '</a></td>';
+                        echo '<td style="text-align:left;"><a href="' . esc_url(get_edit_post_link( get_the_ID() )) . '">' . esc_html($the_property->get_formatted_summary_address()) . '</a></td>';
                         echo '<td style="text-align:left;">';
                         $floor_area = $the_property->get_formatted_floor_area();
                         if ( $floor_area != '' )
@@ -111,11 +111,11 @@ class PH_Meta_Box_Property_Commercial_Units {
             }
             else
             {
-                echo '<p>' . __( 'No units currently exist for this property', 'propertyhive') . '</p>';
+                echo '<p>' . esc_html(__( 'No units currently exist for this property', 'propertyhive')) . '</p>';
             }
             wp_reset_postdata();
 
-            echo '<a href="' . admin_url('post-new.php?post_type=property&post_parent=' . $post->ID) . '" class="button">' . __( 'Add New Unit', 'propertyhive' ) . '</a>';
+            echo '<a href="' . esc_url(admin_url('post-new.php?post_type=property&post_parent=' . $post->ID)) . '" class="button">' . esc_html(__( 'Add New Unit', 'propertyhive' )) . '</a>';
 
         do_action('propertyhive_property_commercial_units_fields');
         

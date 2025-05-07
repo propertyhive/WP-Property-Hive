@@ -39,7 +39,7 @@ class PH_Meta_Box_Appraisal_Event {
 
         echo '<p class="form-field event_start_time_field">
         
-            <label for="_start_date">' . __('Appraisal Date / Time', 'propertyhive') . '</label>
+            <label for="_start_date">' . esc_html(__('Appraisal Date / Time', 'propertyhive')) . '</label>
 
             <input type="date" class="small" name="_start_date" id="_start_date" value="' . esc_attr(date("Y-m-d", strtotime($start_date_time))) . '" placeholder="">
             <select id="_start_time_hours" name="_start_time_hours" class="select short" style="width:55px">';
@@ -106,7 +106,7 @@ class PH_Meta_Box_Appraisal_Event {
 
         echo '<p class="form-field">
         
-            <label for="_duration">' . __('Duration', 'propertyhive') . '</label>
+            <label for="_duration">' . esc_html(__('Duration', 'propertyhive')) . '</label>
             
             <select id="_duration" name="_duration" class="select short">';
 
@@ -129,8 +129,8 @@ class PH_Meta_Box_Appraisal_Event {
         </p>';
 
         echo '
-        <p class="form-field"><label for="_negotiator_ids">' . __( 'Attending Negotiator(s)', 'propertyhive' ) . '</label>
-        <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . __( 'Please select a negotiator', 'propertyhive' ) . '" class="multiselect attribute_values">';
+        <p class="form-field"><label for="_negotiator_ids">' . esc_html(__( 'Attending Negotiator(s)', 'propertyhive' )) . '</label>
+        <select id="_negotiator_ids" name="_negotiator_ids[]" multiple="multiple" data-placeholder="' . esc_attr(__( 'Please select a negotiator', 'propertyhive' )) . '" class="multiselect attribute_values">';
         
         $negotiator_ids = get_post_meta( $post->ID, '_negotiator_id' );
         if ( $pagenow == 'post-new.php' )

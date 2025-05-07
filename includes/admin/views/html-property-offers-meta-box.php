@@ -59,7 +59,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <a href="" name="export_action" id="export-property-offers-grid" class="button">Export</a>
     </div>
     <div class='tablenav-pages one-page'>
-        <span class="displaying-num"><?php echo $offers_count; ?> item<?php echo $offers_count != 1 ? 's' : ''; ?></span>
+        <span class="displaying-num"><?php echo esc_html($offers_count); ?> item<?php echo $offers_count != 1 ? 's' : ''; ?></span>
     </div>
     <br class="clear" />
 </div>

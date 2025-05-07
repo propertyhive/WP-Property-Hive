@@ -72,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <input type="button" name="filter_action" id="filter-contact-enquiries-grid" class="button" value="Filter">
     </div>
     <div class='tablenav-pages one-page'>
-        <span class="displaying-num"><?php echo $enquiries_count; ?> item<?php echo $enquiries_count != 1 ? 's' : ''; ?></span>
+        <span class="displaying-num"><?php echo esc_html($enquiries_count); ?> item<?php echo $enquiries_count != 1 ? 's' : ''; ?></span>
     </div>
     <br class="clear" />
 </div>

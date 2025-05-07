@@ -203,7 +203,7 @@ class PH_Meta_Box_Contact_Relationships
         }
 
         echo '<li class="property_tab' . (($tab == 0) ? ' active' : '') . '">
-                        <a href="#tab_add_relationship">' . __('Add Relationship', 'propertyhive') . '</a>
+                        <a href="#tab_add_relationship">' . esc_html(__('Add Relationship', 'propertyhive')) . '</a>
                     </li>';
 
         echo '</ul>';
@@ -233,7 +233,7 @@ class PH_Meta_Box_Contact_Relationships
             echo '</p>';
 
             echo '<p class="form-field">';
-            echo '<label>' . __('Status', 'propertyhive') . '</label>';
+            echo '<label>' . esc_html(__('Status', 'propertyhive')) . '</label>';
             echo (($the_property->_on_market == 'yes') ? esc_html(__('On Market', 'propertyhive')) : esc_html(__('Not On Market', 'propertyhive')));
             echo '</p>';
 
@@ -393,11 +393,11 @@ class PH_Meta_Box_Contact_Relationships
 
             // Price
             echo '<p class="form-field">';
-            echo '<label for="_applicant_maximum_price_' . $key . '">' . esc_html(__('Maximum Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol maximum-price-currency-symbol">' . ( isset($currencies[$selected_currency]) ? $currencies[$selected_currency] : '' ) . '</span>)' : '' ) . '</label>';
+            echo '<label for="_applicant_maximum_price_' . esc_attr($key) . '">' . esc_html(__('Maximum Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol maximum-price-currency-symbol">' . ( isset($currencies[$selected_currency]) ? $currencies[$selected_currency] : '' ) . '</span>)' : '' ) . '</label>';
 
             if ( count($currencies) > 1 )
             {
-                echo '<select id="_applicant_currency_sales_' . $key . '" name="_applicant_currency_sales_' . $key . '" class="select" style="width:auto; float:left;">';
+                echo '<select id="_applicant_currency_sales_' . esc_attr($key) . '" name="_applicant_currency_sales_' . esc_attr($key) . '" class="select" style="width:auto; float:left;">';
                 foreach ( $currencies as $currency_code => $currency_symbol ) 
                 {
                     echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
@@ -406,9 +406,9 @@ class PH_Meta_Box_Contact_Relationships
             }
             else
             {
-                echo '<input type="hidden" name="_applicant_currency_sales_' . $key .  '" id="_applicant_currency_sales_' . $key .'" value="' . esc_attr($selected_currency) . '">';
+                echo '<input type="hidden" name="_applicant_currency_sales_' . esc_attr($key) .  '" id="_applicant_currency_sales_' . esc_attr($key) .'" value="' . esc_attr($selected_currency) . '">';
             }
-            echo '<input type="text" class="" name="_applicant_maximum_price_' . $key . '" id="_applicant_maximum_price_' . $key . '" value="' . ( isset($applicant_profile['max_price']) ? ph_display_price_field($applicant_profile['max_price']) : '' ) . '" placeholder="" style="width:100%; max-width:150px;">';
+            echo '<input type="text" class="" name="_applicant_maximum_price_' . esc_attr($key) . '" id="_applicant_maximum_price_' . esc_attr($key) . '" value="' . ( isset($applicant_profile['max_price']) ? ph_display_price_field($applicant_profile['max_price']) : '' ) . '" placeholder="" style="width:100%; max-width:150px;">';
             echo '</p>';
 
             $percentage_lower = get_option('propertyhive_applicant_match_price_range_percentage_lower', '');
@@ -468,59 +468,59 @@ class PH_Meta_Box_Contact_Relationships
 
                 echo '<script>
 
-                                var previous_max_price_' . $key . ' = ' . ((isset($applicant_profile['max_price']) && $applicant_profile['max_price'] != '') ? $applicant_profile['max_price'] : '\'\'') . ';
+                                var previous_max_price_' . esc_js($key) . ' = ' . ((isset($applicant_profile['max_price']) && $applicant_profile['max_price'] != '') ? $applicant_profile['max_price'] : '\'\'') . ';
 
                                 jQuery(document).ready(function()
                                 {
-                                    jQuery(\'#match_price_range_shortcut_' . $key . '\').click(function(e)
+                                    jQuery(\'#match_price_range_shortcut_' . esc_js($key) . '\').click(function(e)
                                     {
                                         e.preventDefault();
 
-                                        if ( jQuery(\'#_applicant_maximum_price_' . $key . '\').val().replace(/[^\d.-]/g, \'\') != \'\' )
+                                        if ( jQuery(\'#_applicant_maximum_price_' . esc_js($key) . '\').val().replace(/[^\d.-]/g, \'\') != \'\' )
                                         {
-                                            var max_price = jQuery(\'#_applicant_maximum_price_' . $key . '\').val().replace(/[^\d.-]/g, \'\');
+                                            var max_price = jQuery(\'#_applicant_maximum_price_' . esc_js($key) . '\').val().replace(/[^\d.-]/g, \'\');
 
-                                            max_price = parseFloat(max_price) - parseFloat( max_price * ( ' . $percentage_lower . ' / 100 ) );
+                                            max_price = parseFloat(max_price) - parseFloat( max_price * ( ' . esc_js($percentage_lower) . ' / 100 ) );
 
-                                            jQuery(\'#_applicant_match_price_range_lower_' . $key . '\').val(max_price.toFixed(0));
+                                            jQuery(\'#_applicant_match_price_range_lower_' . esc_js($key) . '\').val(max_price.toFixed(0));
                                         }
 
-                                        if ( jQuery(\'#_applicant_maximum_price_' . $key . '\').val().replace(/[^\d.-]/g, \'\') != \'\' )
+                                        if ( jQuery(\'#_applicant_maximum_price_' . esc_js($key) . '\').val().replace(/[^\d.-]/g, \'\') != \'\' )
                                         {
-                                            var max_price = jQuery(\'#_applicant_maximum_price_' . $key . '\').val().replace(/[^\d.-]/g, \'\');
+                                            var max_price = jQuery(\'#_applicant_maximum_price_' . esc_js($key) . '\').val().replace(/[^\d.-]/g, \'\');
 
-                                            max_price = parseFloat(max_price) + parseFloat( max_price * ( ' . $percentage_higher . ' / 100 ) );
+                                            max_price = parseFloat(max_price) + parseFloat( max_price * ( ' . esc_js($percentage_higher) . ' / 100 ) );
 
-                                            jQuery(\'#_applicant_match_price_range_higher_' . $key . '\').val(max_price.toFixed(0));
+                                            jQuery(\'#_applicant_match_price_range_higher_' . esc_js($key) . '\').val(max_price.toFixed(0));
                                         }
                                     });
 
-                                    jQuery(\'#_applicant_maximum_price_' . $key . '\').change(function()
+                                    jQuery(\'#_applicant_maximum_price_' . esc_js($key) . '\').change(function()
                                     {
-                                        if ( previous_max_price_' . $key . ' == \'\' )
+                                        if ( previous_max_price_' . esc_js($key) . ' == \'\' )
                                         {
                                             if ( jQuery(this).val().replace(/\D/g, \'\') != \'\' && jQuery(\'#_applicant_match_price_range_lower_' . $key . '\').val().replace(/[^\d.-]/g, \'\') == \'\' )
                                             {
                                                 var max_price = jQuery(this).val().replace(/[^\d.-]/g, \'\');
 
-                                                max_price = parseFloat(max_price) - parseFloat( max_price * ( ' . $percentage_lower . ' / 100 ) );
+                                                max_price = parseFloat(max_price) - parseFloat( max_price * ( ' . esc_js($percentage_lower) . ' / 100 ) );
 
-                                                jQuery(\'#_applicant_match_price_range_lower_' . $key . '\').val(max_price.toFixed(0));
+                                                jQuery(\'#_applicant_match_price_range_lower_' . esc_js($key) . '\').val(max_price.toFixed(0));
                                             }
 
                                             if ( jQuery(this).val().replace(/\D/g, \'\') != \'\' && jQuery(\'#_applicant_match_price_range_higher_' . $key . '\').val().replace(/[^\d.-]/g, \'\') == \'\' )
                                             {
                                                 var max_price = jQuery(this).val().replace(/[^\d.-]/g, \'\');
 
-                                                max_price = parseFloat(max_price) + parseFloat( max_price * ( ' . $percentage_higher . ' / 100 ) );
+                                                max_price = parseFloat(max_price) + parseFloat( max_price * ( ' . esc_js($percentage_higher) . ' / 100 ) );
 
-                                                jQuery(\'#_applicant_match_price_range_higher_' . $key . '\').val(max_price.toFixed(0));
+                                                jQuery(\'#_applicant_match_price_range_higher_' . esc_js($key) . '\').val(max_price.toFixed(0));
                                             }
                                         }
 
-                                        jQuery(\'#match_price_range_shortcut_' . $key . '\').css(\'display\', \'inline\');
+                                        jQuery(\'#match_price_range_shortcut_' . esc_js($key) . '\').css(\'display\', \'inline\');
 
-                                        previous_max_price_' . $key . ' = jQuery(this).val();
+                                        previous_max_price_' . esc_js($key) . ' = jQuery(this).val();
                                     });
                                 });
 
@@ -565,15 +565,15 @@ class PH_Meta_Box_Contact_Relationships
             $rent_frequency = ((isset($applicant_profile['rent_frequency'])) ? $applicant_profile['rent_frequency'] : '');
             echo '<p class="form-field rent_field ">
                         
-                <label for="_applicant_maximum_rent_' . esc_attr($key) . '">' . esc_html(__('Maximum Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol maximum-rent-currency-symbol">' . ( isset($currencies[$selected_currency]) ? $currencies[$selected_currency] : '' ) . '</span>)' : '' ) . '</label>';
+                <label for="_applicant_maximum_rent_' . esc_attr($key) . '">' . esc_html(__('Maximum Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol maximum-rent-currency-symbol">' . ( isset($currencies[$selected_currency]) ? esc_html($currencies[$selected_currency]) : '' ) . '</span>)' : '' ) . '</label>';
                 if (count($currencies) > 1) {
-                    echo '<select id="_applicant_currency_' . $key . '" name="_applicant_currency_lettings_' . $key . '" class="select" style="width:auto; float:left;">';
+                    echo '<select id="_applicant_currency_' .  esc_attr($key) . '" name="_applicant_currency_lettings_' .  esc_attr($key) . '" class="select" style="width:auto; float:left;">';
                     foreach ($currencies as $currency_code => $currency_symbol) {
                         echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
                     }
                     echo '</select>';
                 } else {
-                    echo '<input type="hidden" name="_applicant_currency_lettings_' . $key . '" id="_applicant_currency_letting_' . $key .'" value="' . esc_attr($selected_currency) . '">';
+                    echo '<input type="hidden" name="_applicant_currency_lettings_' .  esc_attr($key) . '" id="_applicant_currency_letting_' .  esc_attr($key) .'" value="' . esc_attr($selected_currency) . '">';
                 }
                 
                 echo '<input type="text" class="" name="_applicant_maximum_rent_' . esc_attr($key) . '" id="_applicant_maximum_rent_' . esc_attr($key) . '" value="' . ((isset($applicant_profile['max_rent'])) ? esc_attr(ph_display_price_field($applicant_profile['max_rent'])) : '') . '" placeholder="" style="width:20%; max-width:150px;">
@@ -917,15 +917,15 @@ class PH_Meta_Box_Contact_Relationships
                         <div class="actions">
 
                             <a 
-                                href="' . admin_url('admin.php?page=ph-matching-properties&contact_id=' . $contact_id . '&applicant_profile=' . $key) . '" 
+                                href="' . esc_url(admin_url('admin.php?page=ph-matching-properties&contact_id=' . (int)$contact_id . '&applicant_profile=' . $key)) . '" 
                                 class="button view-matching-properties-' . esc_attr($key) . '" 
                                 ' . ((isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == '') ? ' disabled title="Send Matching Properties not selected"' : '') . '
                             >' . __('View Matching Properties', 'propertyhive') . '</a>
 
                             <a 
-                                href="' . wp_nonce_url(admin_url('post.php?post=' . $contact_id . '&action=edit#propertyhive-contact-relationships'), $key, 'delete_applicant_relationship') . '" 
+                                href="' . esc_url(wp_nonce_url(admin_url('post.php?post=' . (int)$contact_id . '&action=edit#propertyhive-contact-relationships'), $key, 'delete_applicant_relationship')) . '" 
                                 class="button"
-                                onclick="var confirmBox = confirm(\'' . __('Are you sure you wish to delete this applicant relationship?', 'propertyhive') . '\'); return confirmBox;"
+                                onclick="var confirmBox = confirm(\'' . esc_js(__('Are you sure you wish to delete this applicant relationship?', 'propertyhive')) . '\'); return confirmBox;"
                             >' . __('Delete Relationship', 'propertyhive') . '</a>
 
                             <div id="view_matching_properties_' . esc_attr($key) . '" style="display:none;">
@@ -946,25 +946,25 @@ class PH_Meta_Box_Contact_Relationships
 
                     <script>
 
-                        var applicant_details_changed_' . $key . ' = false;
+                        var applicant_details_changed_' . esc_js($key) . ' = false;
                         var custom_departments = ' . json_encode(ph_get_custom_departments()) . ';
                         jQuery(document).ready(function()
                         {
-                            showHideApplicantDepartmentMetaBox_' . $key . '();
+                            showHideApplicantDepartmentMetaBox_' . esc_js($key) . '();
 
-                            jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . $key . '\\\']\').change(function()
+                            jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . esc_js($key) . '\\\']\').change(function()
                             {
                                  showHideApplicantDepartmentMetaBox_' . $key . '();
                             });
 
-                            jQuery(\'.applicant-fields-' . $key . ' input, .applicant-fields-' . $key . ' select, .applicant-fields-' . $key . ' textarea\').change(function()
+                            jQuery(\'.applicant-fields-' . esc_js($key) . ' input, .applicant-fields-' . esc_js($key) . ' select, .applicant-fields-' . $key . ' textarea\').change(function()
                             {
-                                applicant_details_changed_' . $key . ' = true;
+                                applicant_details_changed_' . esc_js($key) . ' = true;
                             });
 
-                            jQuery(\'a.view-matching-properties-' . $key . '\').click(function(e)
+                            jQuery(\'a.view-matching-properties-' . esc_js($key) . '\').click(function(e)
                             {
-                                if (applicant_details_changed_' . $key . ')
+                                if (applicant_details_changed_' . esc_js($key) . ')
                                 {
                                     alert(\'You\\\'ve made changes to the requirements. Please save the changes before viewing matching properties\');
                                     return false;
@@ -974,28 +974,28 @@ class PH_Meta_Box_Contact_Relationships
                             });
                         });
                         
-                        function showHideApplicantDepartmentMetaBox_' . $key . '()
+                        function showHideApplicantDepartmentMetaBox_' . esc_js($key) . '()
                         {
-                            jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').hide();
-                            jQuery(\'.propertyhive-applicant-residential-sales-details-' . $key . '\').hide();
-                            jQuery(\'.propertyhive-applicant-residential-lettings-details-' . $key . '\').hide();
-                            jQuery(\'.propertyhive-applicant-commercial-details-' . $key . '\').hide();
+                            jQuery(\'.propertyhive-applicant-residential-details-' . esc_js($key) . '\').hide();
+                            jQuery(\'.propertyhive-applicant-residential-sales-details-' . esc_js($key) . '\').hide();
+                            jQuery(\'.propertyhive-applicant-residential-lettings-details-' . esc_js($key) . '\').hide();
+                            jQuery(\'.propertyhive-applicant-commercial-details-' . esc_js($key) . '\').hide();
                             
-                            var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . $key . '\\\']:checked\').val();
+                            var selectedDepartment = jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . esc_js($key) . '\\\']:checked\').val();
                             
                             if ( selectedDepartment == \'residential-sales\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'residential-sales\' ) )
                             {
-                                jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').show();
-                                jQuery(\'.propertyhive-applicant-residential-sales-details-' . $key . '\').show();
+                                jQuery(\'.propertyhive-applicant-residential-details-' . esc_js($key) . '\').show();
+                                jQuery(\'.propertyhive-applicant-residential-sales-details-' . esc_js($key) . '\').show();
                             }
                             else if ( selectedDepartment == \'residential-lettings\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'residential-lettings\' ) )
                             {
-                                jQuery(\'.propertyhive-applicant-residential-details-' . $key . '\').show();
-                                jQuery(\'.propertyhive-applicant-residential-lettings-details-' . $key . '\').show();
+                                jQuery(\'.propertyhive-applicant-residential-details-' . esc_js($key) . '\').show();
+                                jQuery(\'.propertyhive-applicant-residential-lettings-details-' . esc_js($key) . '\').show();
                             }
                             else if ( selectedDepartment == \'commercial\' || ( custom_departments[selectedDepartment] && custom_departments[selectedDepartment].based_on == \'commercial\' ) )
                             {
-                                jQuery(\'.propertyhive-applicant-commercial-details-' . $key . '\').show();
+                                jQuery(\'.propertyhive-applicant-commercial-details-' . esc_js($key) . '\').show();
                             }                            
                         }
                         
@@ -1039,9 +1039,9 @@ class PH_Meta_Box_Contact_Relationships
 
         echo '<p class="form-field">';
         echo '<label>' . esc_html(__('New Relationship Type', 'propertyhive')) . '</label>';
-        echo '<a href="' . wp_nonce_url(admin_url('post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships'), '1', 'add_applicant_relationship') . '" class="button">' . __('New Applicant Profile', 'propertyhive') . '</a><br><br>';
-        echo '<a href="' . admin_url('post-new.php?post_type=property&owner_contact_id=' . $thepostid) . '" class="button">' . __('New Property Owner / Landlord', 'propertyhive') . '</a><br><br>';
-        echo '<a href="' . wp_nonce_url(admin_url('post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships'), '1', 'add_third_party_relationship') . '" class="button">' . __('New Third Party Contact', 'propertyhive') . '</a>';
+        echo '<a href="' . esc_url(wp_nonce_url(admin_url('post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships'), '1', 'add_applicant_relationship')) . '" class="button">' . esc_html(__('New Applicant Profile', 'propertyhive')) . '</a><br><br>';
+        echo '<a href="' . esc_url(admin_url('post-new.php?post_type=property&owner_contact_id=' . $thepostid)) . '" class="button">' . esc_html(__('New Property Owner / Landlord', 'propertyhive')) . '</a><br><br>';
+        echo '<a href="' . esc_url(wp_nonce_url(admin_url('post.php?post=' . $thepostid . '&action=edit#propertyhive-contact-relationships'), '1', 'add_third_party_relationship')) . '" class="button">' . esc_html(__('New Third Party Contact', 'propertyhive')) . '</a>';
         echo '</p>';
 
         echo '

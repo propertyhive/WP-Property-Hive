@@ -142,9 +142,9 @@ class PH_Meta_Box_Property_Epcs {
                         }
                         
                         
-                        echo '<li id="epc_' . $epcs_attachment_id . '">';
+                        echo '<li id="epc_' . (int)$epcs_attachment_id . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
-                            echo '<a href="' . wp_get_attachment_url( $epcs_attachment_id ) . '" target="_blank"><img src="' . $image . '" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></a>';
+                            echo '<a href="' . esc_url(wp_get_attachment_url( $epcs_attachment_id )) . '" target="_blank"><img src="' . esc_url($image) . '" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a>';
                         echo '</li>';
                     }
                 }
@@ -155,10 +155,10 @@ class PH_Meta_Box_Property_Epcs {
                 
                 echo '</ul></div>';
                 
-                echo '<a href="" class="button button-primary ph_upload_epc_button">' . __('Add EPCs', 'propertyhive') . '</a>';
+                echo '<a href="" class="button button-primary ph_upload_epc_button">' . esc_html(__('Add EPCs', 'propertyhive')) . '</a>';
     	        
-                echo '<input type="hidden" name="previous_epc_attachment_ids" id="previous_epc_attachment_ids" value="' . $input_value . '">';
-                echo '<input type="hidden" name="epc_attachment_ids" id="epc_attachment_ids" value="' . $input_value . '">';
+                echo '<input type="hidden" name="previous_epc_attachment_ids" id="previous_epc_attachment_ids" value="' . esc_attr($input_value) . '">';
+                echo '<input type="hidden" name="epc_attachment_ids" id="epc_attachment_ids" value="' . esc_attr($input_value) . '">';
 
                 echo '<script>
                     // Uploading files
@@ -388,12 +388,12 @@ class PH_Meta_Box_Property_Epcs {
                                     }
                                 }
                                 
-                                var image = \'' . PH()->plugin_url() . '/assets/images/filetypes/\' + icon;
+                                var image = \'' . esc_url(PH()->plugin_url()) . '/assets/images/filetypes/\' + icon;
                             }
                             
                             mediaHTML += \'<li id="epc_\' + attachment.id + \'">\';
                             mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>\';
-                            mediaHTML += \'<a href="\' + image + \'" target="_blank"><img src="\' + image + \'" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></a></li>\';
+                            mediaHTML += \'<a href="\' + image + \'" target="_blank"><img src="\' + image + \'" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a></li>\';
                             
                             jQuery(\'#property_epcs_grid ul\').append(mediaHTML);
                         }

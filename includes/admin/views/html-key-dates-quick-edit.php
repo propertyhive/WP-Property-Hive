@@ -108,7 +108,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 {
                     ?>
                     <p id="next_key_date_checkbox" class="form-field hidden">
-                        <label for="book_next_key_date"><?php echo __('Book Next ' . ( isset( $_POST['description'] ) ? esc_html(ph_clean($_POST['description'])) : 'Key Date' ) . '?', 'propertyhive'); ?></label>
+                        <label for="book_next_key_date"><?php echo esc_html(__('Book Next ' . ( isset( $_POST['description'] ) ? esc_html(ph_clean($_POST['description'])) : 'Key Date' ) . '?', 'propertyhive')); ?></label>
                         <input type="checkbox" id="book_next_key_date" >
                     </p>
                     <?php

@@ -106,7 +106,7 @@ class PH_Meta_Box_Property_Floorplans {
                     
                     foreach ($floorplans as $floorplan_attachment_id)
                     {
-                        echo '<li id="floorplan_' . $floorplan_attachment_id . '">';
+                        echo '<li id="floorplan_' . (int)$floorplan_attachment_id . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
                             if ( wp_attachment_is_image( $floorplan_attachment_id ) )
                             {
@@ -140,7 +140,7 @@ class PH_Meta_Box_Property_Floorplans {
                                     }
                                 }
 
-                                echo '<a href="' . wp_get_attachment_url( $floorplan_attachment_id ) . '" target="_blank"><img src="' . PH()->plugin_url() . '/assets/images/filetypes/' . $icon . '" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></a>';
+                                echo '<a href="' . esc_url(wp_get_attachment_url( $floorplan_attachment_id )) . '" target="_blank"><img src="' . esc_url(PH()->plugin_url() . '/assets/images/filetypes/' . $icon) . '" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a>';
                             }
                         echo '</li>';
                     }
@@ -152,12 +152,12 @@ class PH_Meta_Box_Property_Floorplans {
                 
                 echo '</ul></div>';
                 
-                echo '<a href="" class="button button-primary ph_upload_floorplan_button">' . __('Add Floorplans', 'propertyhive') . '</a>';
+                echo '<a href="" class="button button-primary ph_upload_floorplan_button">' . esc_html(__('Add Floorplans', 'propertyhive')) . '</a>';
     
                 do_action('propertyhive_property_floorplans_fields');
     	           
-                echo '<input type="hidden" name="previous_floorplan_attachment_ids" id="previous_floorplan_attachment_ids" value="' . $input_value . '">';
-                echo '<input type="hidden" name="floorplan_attachment_ids" id="floorplan_attachment_ids" value="' . $input_value . '">';
+                echo '<input type="hidden" name="previous_floorplan_attachment_ids" id="previous_floorplan_attachment_ids" value="' . esc_attr($input_value) . '">';
+                echo '<input type="hidden" name="floorplan_attachment_ids" id="floorplan_attachment_ids" value="' . esc_attr($input_value) . '">';
 
                 echo '<script>
                     // Uploading files

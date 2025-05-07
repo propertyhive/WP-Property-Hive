@@ -122,7 +122,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 	    if ( $message != '' )
 	    {
 	        echo "<div class=\"notice notice-success\">
-	            <p>" . $message . "</p>
+	            <p>" . esc_html($message) . "</p>
 	        </div>";
 	    }
     }
@@ -223,10 +223,10 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
-				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title . '</a>';
+				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . esc_html($title) . '</a>';
 				if ( isset( $_GET['_contact_type'] ) && strpos( ph_clean($_GET['_contact_type']), 'applicant' ) !== FALSE && is_array($contact_types) && in_array('applicant', $contact_types) && $the_contact->_hot_applicant == 'yes' )
 				{
-					echo ' <span style="color:#C00;">(' . __( 'Hot Applicant', 'propertyhive' ) . ')</span>';
+					echo ' <span style="color:#C00;">(' . esc_html(__( 'Hot Applicant', 'propertyhive' )) . ')</span>';
 				}
 				echo '</strong>';
 
@@ -251,13 +251,13 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 			 break;
             case 'address' :
                 
-                echo $the_contact->get_formatted_full_address();
+                echo esc_html($the_contact->get_formatted_full_address());
                 
                 break;
             case 'contact_details' :
                 
-                echo 'T: ' . $the_contact->_telephone_number . '<br>';
-                echo 'E: ' . $the_contact->_email_address;
+                echo 'T: ' . esc_html($the_contact->_telephone_number) . '<br>';
+                echo 'E: ' . esc_html($the_contact->_email_address);
                 
                 break;
 			default :
@@ -549,7 +549,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 
 		if ( $which == 'top' && isset($_GET['_contact_type']) && $_GET['_contact_type'] == 'applicant' )
 		{
-			echo '<div class="alignleft actions"><a href="' . admin_url('admin.php?page=ph-generate-applicant-list') . '" id="generate_applicant_list_button" class="button">' . __( 'Generate Applicant List', 'propertyhive' ) . '</a></div>';
+			echo '<div class="alignleft actions"><a href="' . esc_url(admin_url('admin.php?page=ph-generate-applicant-list')) . '" id="generate_applicant_list_button" class="button">' . esc_html(__( 'Generate Applicant List', 'propertyhive' )) . '</a></div>';
 		}
 	}
 }

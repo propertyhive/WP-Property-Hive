@@ -131,7 +131,7 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
 				$property = new PH_Property( (int) $the_tenancy->property_id );
-				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) . '">' . $property->get_formatted_full_address() . '</a></strong>';
+				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) . '">' . esc_html($property->get_formatted_full_address()) . '</a></strong>';
 				break;
 			case 'property_owner' :
 
@@ -149,12 +149,12 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 
 					foreach ( $owner_contact_ids as $owner_contact_id )
 					{
-						echo get_the_title( $owner_contact_id ) . '<br>';
+						echo esc_html(get_the_title( $owner_contact_id )) . '<br>';
 						if ( count( $owner_contact_ids ) == 1 )
 						{
 							echo '<div class="row-actions">';
-							echo 'T: ' . get_post_meta( $owner_contact_id, '_telephone_number', true ) . '<br>';
-							echo 'E: ' . get_post_meta( $owner_contact_id, '_email_address', true );
+							echo 'T: ' . esc_html(get_post_meta( $owner_contact_id, '_telephone_number', true )) . '<br>';
+							echo 'E: ' . esc_html(get_post_meta( $owner_contact_id, '_email_address', true ));
 							echo '</div>';
 						}
 					}
@@ -171,11 +171,11 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 
 				break;
 			case 'start_date' :
-				echo ( $the_tenancy->_start_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_start_date ) ) : '-' );
+				echo ( $the_tenancy->_start_date != '' ? esc_html(date( "d/m/Y", strtotime( $the_tenancy->_start_date ) )) : '-' );
 
 				break;
 			case 'end_date' :
-				echo ( $the_tenancy->_end_date != '' ? date( "d/m/Y", strtotime( $the_tenancy->_end_date ) ) : '-' );
+				echo ( $the_tenancy->_end_date != '' ? esc_html(date( "d/m/Y", strtotime( $the_tenancy->_end_date ) )) : '-' );
 
 				break;
 			case 'rent' :

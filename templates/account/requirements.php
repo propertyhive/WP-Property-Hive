@@ -15,13 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 <form name="ph_account_requirements_form" class="propertyhive-form account-requirements-form" action="" method="post">
  	
 	<div id="requirementsSuccess" style="display:none;" class="alert alert-success alert-box success">
-        <?php _e( 'Thank you. Your requirements have been updated successfully.', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'Thank you. Your requirements have been updated successfully.', 'propertyhive' )); ?>
     </div>
     <div id="requirementsError" style="display:none;" class="alert alert-danger alert-box">
-        <?php _e( 'An error occurred whilst trying to update your requirements. Please try again.', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'An error occurred whilst trying to update your requirements. Please try again.', 'propertyhive' )); ?>
     </div>
     <div id="requirementsValidation" style="display:none;" class="alert alert-danger alert-box">
-        <?php _e( 'Please ensure all required fields have been completed', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'Please ensure all required fields have been completed', 'propertyhive' )); ?>
     </div>
 
     <?php do_action( 'propertyhive_account_requirements_form_start' ); ?>
@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php do_action( 'propertyhive_account_requirements_form' ); ?>
 
-    <input type="submit" value="<?php _e( 'Update Requirements', 'propertyhive' ); ?>">
+    <input type="submit" value="<?php echo esc_attr(__( 'Update Requirements', 'propertyhive' ); ?>">
 
     <?php do_action( 'propertyhive_account_requirements_form_end' ); ?>
 

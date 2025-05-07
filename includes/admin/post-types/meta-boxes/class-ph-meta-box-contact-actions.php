@@ -100,7 +100,7 @@ class PH_Meta_Box_Contact_Actions {
 
 		    		<div class="form-field">
 
-			            <label for="_viewing_start_date">' . __( 'Viewing Date/Time', 'propertyhive' ) . '</label>
+			            <label for="_viewing_start_date">' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</label>
 
 		            	<input type="date" class="small" name="_viewing_start_date" id="_viewing_start_date" value="' . esc_attr(date("Y-m-d")) . '" placeholder="" style="width:55%">
 						<select id="_viewing_start_time_hours" name="_viewing_start_time_hours" class="select short" style="max-width:20%">';
@@ -126,10 +126,10 @@ class PH_Meta_Box_Contact_Actions {
 			        <div class="form-field" style="position:relative;">
 
 			            <label for="viewing_property_search">
-			            	' . __( 'Property', 'propertyhive' ) . '
+			            	' . esc_html(__( 'Property', 'propertyhive' )) . '
 			            </label>
 
-		            	<input type="text" name="viewing_property_search" id="viewing_property_search" style="width:100%;" placeholder="' . __( 'Search Properties', 'propertyhive' ) . '..." autocomplete="false">
+		            	<input type="text" name="viewing_property_search" id="viewing_property_search" style="width:100%;" placeholder="' . esc_html(__( 'Search Properties', 'propertyhive' )) . '..." autocomplete="false">
 
 		            	<div id="viewing_search_property_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -141,9 +141,9 @@ class PH_Meta_Box_Contact_Actions {
 
 			        <div class="form-field" style="position:relative">
 
-			            <label for="viewing_negotiator_search">' . __( 'Attending Negotiator(s)', 'propertyhive' ) . '</label>
+			            <label for="viewing_negotiator_search">' . esc_html(__( 'Attending Negotiator(s)', 'propertyhive' )) . '</label>
 
-			            <input type="text" name="viewing_negotiator_search" id="viewing_negotiator_search" style="width:100%;" placeholder="' . __( 'Search Negotiators', 'propertyhive' ) . '..." autocomplete="false">
+			            <input type="text" name="viewing_negotiator_search" id="viewing_negotiator_search" style="width:100%;" placeholder="' . esc_html(__( 'Search Negotiators', 'propertyhive' )) . '..." autocomplete="false">
 
 			            <div id="viewing_search_negotiator_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -151,8 +151,8 @@ class PH_Meta_Box_Contact_Actions {
 
 			        </div>
 
-			        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-			        <a class="button button-primary viewing-action-submit" href="#">' . __( 'Book Viewing', 'propertyhive' ) . '</a>
+			        <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+			        <a class="button button-primary viewing-action-submit" href="#">' . esc_html(__( 'Book Viewing', 'propertyhive' )) . '</a>
 
 				</div>
 
@@ -165,7 +165,7 @@ class PH_Meta_Box_Contact_Actions {
 
 		    		<div class="form-field">
 
-			            <label for="_offer_date">' . __( 'Offer Date/Time', 'propertyhive' ) . '</label>
+			            <label for="_offer_date">' . esc_html(__( 'Offer Date/Time', 'propertyhive' )) . '</label>
 
 		            	<input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(date("Y-m-d")) . '" placeholder="" style="width:55%">
 						<select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="max-width:20%">';
@@ -191,10 +191,10 @@ class PH_Meta_Box_Contact_Actions {
 			        <div class="form-field" style="position:relative;">
 
 			            <label for="offer_property_search">
-			            	' . __( 'Property', 'propertyhive' ) . '
+			            	' . esc_html(__( 'Property', 'propertyhive' )) . '
 			            </label>
 
-		            	<input type="text" name="offer_property_search" id="offer_property_search" style="width:100%;" placeholder="' . __( 'Search Properties', 'propertyhive' ) . '..." autocomplete="false">
+		            	<input type="text" name="offer_property_search" id="offer_property_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Properties', 'propertyhive' )) . '..." autocomplete="false">
 
 		            	<div id="offer_search_property_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -206,14 +206,14 @@ class PH_Meta_Box_Contact_Actions {
 
 			        <div class="form-field" style="position:relative">
 
-			            <label for="_offer_amount">' . __( 'Offer Amount', 'propertyhive' ) . ' (&pound;)</label>
+			            <label for="_offer_amount">' . esc_html(__( 'Offer Amount', 'propertyhive' )) . ' (&pound;)</label>
 
 			            <input type="text" name="_offer_amount" id="_offer_amount" style="width:100%;">
 
 			        </div>
 
-			        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-			        <a class="button button-primary offer-action-submit" href="#">' . __( 'Record Offer', 'propertyhive' ) . '</a>
+			        <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+			        <a class="button button-primary offer-action-submit" href="#">' . esc_html(__( 'Record Offer', 'propertyhive' )) . '</a>
 
 				</div>
 
@@ -250,14 +250,14 @@ class PH_Meta_Box_Contact_Actions {
 
 	    		<div class="form-field">
 
-		            <label for="_password">' . __( 'Password', 'propertyhive' ) . '</label>
+		            <label for="_password">' . esc_html(__( 'Password', 'propertyhive' )) . '</label>
 		            
 	            	<input type="text" id="_password" name="_password" style="width:100%;" value="' . esc_attr( wp_generate_password( 16 ) ) . '">
 	            	
 		        </div>
 
-		        <a class="button action-cancel" href="#">' . __( 'Cancel', 'propertyhive' ) . '</a>
-		        <a class="button button-primary login-action-submit" href="#">' . __( 'Create Login', 'propertyhive' ) . '</a>
+		        <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+		        <a class="button button-primary login-action-submit" href="#">' . esc_html(__( 'Create Login', 'propertyhive' )) . '</a>
 
 			</div>
 
@@ -270,7 +270,7 @@ class PH_Meta_Box_Contact_Actions {
 
     			<div id="success_actions"></div>
 
-    			<a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+    			<a class="button action-cancel" style="width:100%;" href="#">' . esc_html(__( 'Back To Actions', 'propertyhive' )) . '</a>
 
     		</div>
 
@@ -305,7 +305,7 @@ class PH_Meta_Box_Contact_Actions {
 var viewing_selected_properties = {};
 var offer_selected_properties = {};
 
-var viewing_selected_negotiators = {<?php echo get_current_user_id(); ?>: { post_title: '<?php $user_data = get_userdata(get_current_user_id()); echo $user_data->display_name; ?>' } };
+var viewing_selected_negotiators = {<?php echo get_current_user_id(); ?>: { post_title: '<?php $user_data = get_userdata(get_current_user_id()); echo esc_js($user_data->display_name); ?>' } };
 
 jQuery(document).ready(function($)
 {
@@ -360,13 +360,13 @@ jQuery(document).ready(function($)
 		// Validation passed. Submit form
 		var data = {
             action:         'propertyhive_create_contact_login',
-            contact_id:     <?php echo $post->ID; ?>,
+            contact_id:     <?php echo (int)$post->ID; ?>,
             password: 		$('#_password').val(),
-            security:       '<?php echo wp_create_nonce( 'create-login' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'create-login' )); ?>',
         };
 
         var that = this;
-		$.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+		$.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response.error)
         	{
@@ -433,10 +433,10 @@ jQuery(document).ready(function($)
 		var data = {
             action:         'propertyhive_search_properties',
             keyword:    	keyword,
-            security:       '<?php echo wp_create_nonce( 'search-properties' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-properties' )); ?>',
         };
 
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response == '' || response.length == 0)
         	{
@@ -515,10 +515,10 @@ jQuery(document).ready(function($)
 		var data = {
             action:         'propertyhive_search_negotiators',
             keyword:    	keyword,
-            security:       '<?php echo wp_create_nonce( 'search-negotiators' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-negotiators' )); ?>',
         };
 
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response == '' || response.length == 0)
         	{
@@ -616,16 +616,16 @@ jQuery(document).ready(function($)
 		// Validation passed. Submit form
 		var data = {
             action:         'propertyhive_book_viewing_contact',
-            contact_id:     <?php echo $post->ID; ?>,
+            contact_id:     <?php echo (int)$post->ID; ?>,
             start_date: 	$('#_viewing_start_date').val(),
             start_time: 	$('#_viewing_start_time_hours').val() + ':' + $('#_viewing_start_time_minutes').val() + ':00',
             property_ids: 	Object.keys(viewing_selected_properties),
             negotiator_ids: Object.keys(viewing_selected_negotiators),
-            security:       '<?php echo wp_create_nonce( 'book-viewing' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'book-viewing' )); ?>',
         };
 
         var that = this;
-		$.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+		$.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response.error)
         	{
@@ -703,10 +703,10 @@ jQuery(document).ready(function($)
 		var data = {
             action:         'propertyhive_search_properties',
             keyword:    	keyword,
-            security:       '<?php echo wp_create_nonce( 'search-properties' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-properties' )); ?>',
         };
 
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response == '' || response.length == 0)
         	{
@@ -784,16 +784,16 @@ jQuery(document).ready(function($)
 		// Validation passed. Submit form
 		var data = {
             action:         'propertyhive_record_offer_contact',
-            contact_id:     <?php echo $post->ID; ?>,
+            contact_id:     <?php echo (int)$post->ID; ?>,
             offer_date: 	$('#_offer_date').val(),
             offer_time: 	$('#_offer_time_hours').val() + ':' + $('#_offer_time_minutes').val() + ':00',
             property_ids: 	Object.keys(offer_selected_properties),
             amount: 		$('#_offer_amount').val(),
-            security:       '<?php echo wp_create_nonce( 'record-offer' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'record-offer' )); ?>',
         };
 
         var that = this;
-		$.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+		$.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response.error)
         	{

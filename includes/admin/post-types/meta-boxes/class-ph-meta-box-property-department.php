@@ -148,7 +148,7 @@ class PH_Meta_Box_Property_Department {
         foreach ( $departments as $key => $value )
         {
             echo '
-                jQuery(\'#propertyhive-property-' . $key . '-details\').hide();
+                jQuery(\'#propertyhive-property-' . esc_attr($key) . '-details\').hide();
             ';
         }
 

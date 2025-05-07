@@ -18,14 +18,14 @@ if ( !empty($features) )
 ?>
 <div class="features">
     
-    <h4><?php _e( 'Property Features', 'propertyhive' ); ?></h4>
+    <h4><?php echo esc_html(__( 'Property Features', 'propertyhive' )); ?></h4>
     
     <ul>
 <?php
     foreach ($features as $feature)
     {
 ?>
-        <li><?php echo $feature; ?></li>
+        <li><?php echo esc_html($feature); ?></li>
 <?php
     }
 ?>
