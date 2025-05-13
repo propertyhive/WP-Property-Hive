@@ -104,7 +104,7 @@ class PH_Settings_Features extends PH_Settings_Page {
             echo '<li style="visibility:hidden" class="';
             if ( isset($feature['categories']) && is_array($feature['categories']) && !empty($feature['categories']) )
             {
-                echo esc_html(implode(" ", $feature['categories']));
+                echo esc_attr(implode(" ", $feature['categories']));
             }
 
             $pro = false;

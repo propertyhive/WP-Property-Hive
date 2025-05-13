@@ -2418,7 +2418,7 @@ class PH_AJAX {
         $enquiry_post_id = ( (isset($_POST['post_id'])) ? (int)$_POST['post_id'] : '' );
         $nonce = ( (isset($_POST['security'])) ? ph_clean($_POST['security']) : '' );
 
-        if ( ! wp_verify_nonce( $nonce, 'create-content-from-enquiry-nonce-' . $enquiry_post_id ) ) 
+        if ( ! wp_verify_nonce( $nonce, 'create-contact-from-enquiry-nonce-' . $enquiry_post_id ) ) 
         {
             // This nonce is not valid.
             die( json_encode( array('error' => 'Invalid nonce. Please refresh and try again') ) ); 

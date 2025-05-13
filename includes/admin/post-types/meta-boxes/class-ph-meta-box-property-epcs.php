@@ -81,7 +81,7 @@ class PH_Meta_Box_Property_Epcs {
                             return false;
                         });
                         
-                        jQuery(\'.remove_epc_url\').click(function()
+                        jQuery(\'#property_epc_urls\').on(\'click\', \'.remove_epc_url\', function()
                         {
                             jQuery(this).parent().fadeOut(\'slow\', function()
                             {

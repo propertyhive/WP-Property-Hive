@@ -205,7 +205,14 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
             		foreach ( $negotiator_ids as $negotiator_id )
             		{
             			$user_info = get_userdata($negotiator_id);
-            			$negotiators[] = $user_info->display_name;
+            			if ( $user_info === false )
+            			{
+            				$negotiators[] = __( 'Unknown negotiator', 'propertyhive' );
+            			}
+            			else
+            			{
+	            			$negotiators[] = $user_info->display_name;
+            			}
             		}
             		echo esc_html(implode(", ", $negotiators));
             	}

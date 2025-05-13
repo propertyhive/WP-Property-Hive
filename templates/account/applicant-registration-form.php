@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php do_action( 'propertyhive_registration_form' ); ?>
 
-    <input type="submit" value="<?php echo esc_html(__( 'Register', 'propertyhive' )); ?>">
+    <input type="submit" value="<?php echo esc_attr(__( 'Register', 'propertyhive' )); ?>">
 
     <?php do_action( 'propertyhive_registration_form_end' ); ?>
 

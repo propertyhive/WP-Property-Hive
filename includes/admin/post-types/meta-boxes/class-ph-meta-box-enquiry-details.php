@@ -354,7 +354,7 @@ function viewing_update_selected_properties()
                                     var data = {
                                         action:         'propertyhive_create_contact_from_enquiry',
                                         post_id:        <?php echo (int)$enquiry_post_id; ?>,
-                                        security:       '<?php echo esc_js(wp_create_nonce( 'create-content-from-enquiry-nonce-' . $enquiry_post_id )); ?>',
+                                        security:       '<?php echo esc_js(wp_create_nonce( 'create-contact-from-enquiry-nonce-' . $enquiry_post_id )); ?>',
                                     };
 
                                     var that = this;
