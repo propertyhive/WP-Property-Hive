@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php do_action( 'propertyhive_account_requirements_form' ); ?>
 
-    <input type="submit" value="<?php echo esc_attr(__( 'Update Requirements', 'propertyhive' ); ?>">
+    <input type="submit" value="<?php echo esc_attr(__( 'Update Requirements', 'propertyhive' )); ?>">
 
     <?php do_action( 'propertyhive_account_requirements_form_end' ); ?>
 
