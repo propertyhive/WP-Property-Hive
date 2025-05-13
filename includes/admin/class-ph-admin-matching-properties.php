@@ -307,9 +307,16 @@ class PH_Admin_Matching_Properties {
 
             if ( $date_added_from != '' )
             {
+                // Convert stored UTC date to site timezone
+                $timezone = wp_timezone(); // Returns DateTimeZone object based on site settings
+
+                $datetime = new DateTime($date_added_from, new DateTimeZone('UTC'));
+                $datetime->setTimezone($timezone);
+                $local_date = $datetime->format('Y-m-d H:i:s');
+
                 $args['date_query'] = array(
                     array(
-                        'after' => $date_added_from,
+                        'after' => $local_date,
                         'inclusive' => true,
                     )
                 );

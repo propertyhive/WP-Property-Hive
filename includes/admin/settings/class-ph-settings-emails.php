@@ -653,8 +653,8 @@ class PH_Settings_Emails extends PH_Settings_Page {
 					{
 						if ( $previous_auto_property_match != 'yes' )
 						{
-							// it's been activated
-							update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
+							// it's been activated. Stored in UTC
+							update_option( 'propertyhive_auto_property_match_enabled_date', gmdate("Y-m-d H:i:s"), FALSE);
 						}
 
 						$timestamp = wp_next_scheduled( 'propertyhive_auto_email_match' );
