@@ -4031,7 +4031,7 @@ class PH_AJAX {
                         'meta_query' => array(
                             array(
                                 'key' => '_property_owner_contact_id',
-                                'value' => $post->ID,
+                                'value' => $owner_contact_id,
                                 'compare' => '='
                             ),
                             array(
