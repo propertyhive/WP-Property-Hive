@@ -81,7 +81,7 @@ class PH_Meta_Box_Property_Floorplans {
                             return false;
                         });
                         
-                        jQuery(\'.remove_floorplan_url\').click(function()
+                        jQuery(\'#property_floorplan_urls\').on(\'click\', \'.remove_floorplan_url\', function()
                         {
                             jQuery(this).parent().fadeOut(\'slow\', function()
                             {

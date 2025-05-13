@@ -81,7 +81,7 @@ class PH_Meta_Box_Property_Brochures {
                             return false;
                         });
                         
-                        jQuery(\'.remove_brochure_url\').click(function()
+                        jQuery(\'#property_brochure_urls\').on(\'click\', \'.remove_brochure_url\', function()
                         {
                             jQuery(this).parent().fadeOut(\'slow\', function()
                             {

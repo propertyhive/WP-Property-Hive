@@ -177,7 +177,7 @@ class PH_Admin_Merge_Contacts {
                             if (response.success)
                             {
                                 // Redirect to referrer, adding message in admin_notices
-                                window.location.href = '<?php echo esc_url(admin_url('edit.php?post_type=contact&propertyhive_contacts_merged=1')); ?>';
+                                window.location.href = '<?php echo admin_url('edit.php?post_type=contact&propertyhive_contacts_merged=1'); ?>';
                             }
                         });
                     }

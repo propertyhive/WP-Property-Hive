@@ -28,6 +28,6 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php endforeach; ?>
 
-    <input type="submit" value="<?php echo esc_html(__( 'Submit', 'propertyhive' )); ?>">
+    <input type="submit" value="<?php echo esc_attr(__( 'Submit', 'propertyhive' )); ?>">
 
 </form>

@@ -774,7 +774,7 @@ class PH_Admin {
                             <p>' . esc_html(__( 'The Property Hive email queue does not appear to be running', 'propertyhive' )) . '
                             </p>
                             <p>
-                                <a href="'. esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued')) . '" class="button-primary">' . __( 'Go To Email Queue', 'propertyhive' ) . '</a>
+                                <a href="'. esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued')) . '" class="button-primary">' . esc_html(__( 'Go To Email Queue', 'propertyhive' )) . '</a>
                             </p>
                         </div>
                     ';

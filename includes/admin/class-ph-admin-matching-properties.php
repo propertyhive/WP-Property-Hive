@@ -131,7 +131,7 @@ class PH_Admin_Matching_Properties {
     function showPreview()
     {
         jQuery('#mainform').attr('target', '_blank');
-        jQuery('#mainform').attr('action', '<?php echo esc_url(admin_url( '?preview_propertyhive_email=true&contact_id=' . (int)$_GET['contact_id'] . '&applicant_profile=' . (int)$_GET['applicant_profile'] )); ?>');
+        jQuery('#mainform').attr('action', '<?php echo admin_url( '?preview_propertyhive_email=true&contact_id=' . (int)$_GET['contact_id'] . '&applicant_profile=' . (int)$_GET['applicant_profile'] ); ?>');
 
         jQuery('#mainform').submit();
         jQuery('#mainform').attr('target', '_self');
@@ -144,7 +144,7 @@ class PH_Admin_Matching_Properties {
 
 					if ( $nothing_to_send == true )
                     {
-                        echo '<script>window.location.href = "' . esc_url(get_edit_post_link( $contact_id, 'url' )) . '&ph_message=2";</script>';
+                        echo '<script>window.location.href = "' . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2";</script>';
 
 						//header("Location: " . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2' ); // properties marked as not interested
                         //die();
@@ -219,7 +219,7 @@ class PH_Admin_Matching_Properties {
 
                     do_action( 'propertyhive_property_match_step_send', $contact_id, $applicant_profile_id );
 
-                    echo '<script>window.location.href = "' . esc_url(get_edit_post_link( $contact_id, 'url' )) . '&ph_message=1";</script>';
+                    echo '<script>window.location.href = "' . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=1";</script>';
 				}
 			}
 		}

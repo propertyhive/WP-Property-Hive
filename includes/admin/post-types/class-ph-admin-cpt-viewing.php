@@ -269,7 +269,14 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
             		foreach ( $negotiator_ids as $negotiator_id )
             		{
             			$user_info = get_userdata($negotiator_id);
-            			$negotiators[] = esc_html($user_info->display_name);
+            			if ( $user_info === false )
+            			{
+            				$negotiators[] = __( 'Unknown negotiator', 'propertyhive' );
+            			}
+            			else
+            			{
+	            			$negotiators[] = $user_info->display_name;
+            			}
             		}
             		echo implode(", ", $negotiators);
             	}

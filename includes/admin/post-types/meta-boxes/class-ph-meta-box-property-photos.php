@@ -76,7 +76,7 @@ class PH_Meta_Box_Property_Photos {
                             return false;
                         });
                         
-                        jQuery(\'.remove_photo_url\').click(function()
+                        jQuery(\'#property_photo_urls\').on(\'click\', \'.remove_photo_url\', function()
                         {
                             jQuery(this).parent().fadeOut(\'slow\', function()
                             {
