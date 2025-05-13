@@ -2,8 +2,8 @@
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.7.2
-Stable tag: 2.1.3
+Tested up to: 6.8.1
+Stable tag: 2.1.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,25 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.4 - 2025-05-13 =
+* Added new default tenures when installing Property Hive for the first time; Share of Freehold and Commonhold
+* Allow basic HTML in body of match emails
+* Include 'private' properties and contacts in CRM searches, for example when adding a viewing and searching for applicants
+* Added ability to pass 'match_property_type' attribute to [similar_properties] shortcode. This will return properties with the same property type as the property in question
+* Added ability to pass 'property_type_id' attribute to [similar_properties] shortcode. This will return properties of a specific property type
+* Show a warning if the reference number being entered already exists
+* Lots of escaping and sanitization throughout entire plugin
+* Ensure auto match respects timezones when checking the date it was enabled
+* Added filter 'propertyhive_use_propertyhive_templates' to turn off the use of Property Hive templates. Not recommended but handy if using Property Hive alongside a plugin that also registers the 'property' custom post type
+* Apply 'propertyhive_taxonomy_hide_empty_args' filter to child terms too
+* Ensure SQL is properly sanitized when performing query on address polygon coordinates table
+* Corrected issue with links in errors/messages being escaped when saving settings
+* Corrected Elementor tabbed details widget onclick event from not working on mobile
+* Corrected typo and the setting of contact type when instructing appraisal
+* Corrected PHP 8.1 warnings due to trying to assign submenu pages to null
+* Corrected PHP 8.3 deprecation warnings when declaring PH_Enquiry class
+* Declared compatibility for WordPress 6.8.1
 
 = 2.1.3 - 2025-04-01 =
 * Added support for Avada with a host of Avada Builder property widgets added allowing users to build the property details page
