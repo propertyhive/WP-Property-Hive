@@ -150,14 +150,14 @@ class PH_Meta_Box_Tenancy_Details {
 
         echo '<p class="form-field rent_field ">
         
-            <label for="_rent">' . esc_html(__('Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>';
+            <label for="_rent">' . esc_html(__('Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . esc_html($currencies[$selected_currency]) . '</span>)' : '' ) . '</label>';
         
         if ( count($currencies) > 1 )
         {
             echo '<select id="_rent_currency" name="_rent_currency" class="select" style="width:auto; float:left;">';
-            foreach ($currencies as $currency_code => $currency_sybmol)
+            foreach ($currencies as $currency_code => $currency_symbol)
             {
-                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_currency) ? ' selected' : '') . '>' . esc_html($currency_symbol) . '</option>';
             }
             echo '</select>';
         }
@@ -179,7 +179,7 @@ class PH_Meta_Box_Tenancy_Details {
 
 		echo '<p class="form-field deposit_field ">
         
-            <label for="_summary_deposit">' . esc_html(__('Deposit', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_currency] . '</span>)' : '' ) . '</label>
+            <label for="_summary_deposit">' . esc_html(__('Deposit', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . esc_html($currencies[$selected_currency]) . '</span>)' : '' ) . '</label>
 			<input type="text" class="" name="_deposit" id="_summary_deposit" value="' . esc_attr(ph_display_price_field( get_post_meta( $post->ID, '_deposit', true ) )) . '" placeholder="" style="width:70px">           
         </p>';
 

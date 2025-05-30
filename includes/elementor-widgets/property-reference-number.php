@@ -68,7 +68,9 @@ class Elementor_Property_Reference_Number_Widget extends \Elementor\Widget_Base 
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .elementor-widget-reference-number',
 			]
 		);
@@ -78,9 +80,8 @@ class Elementor_Property_Reference_Number_Widget extends \Elementor\Widget_Base 
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-widget-reference-number' => 'color: {{VALUE}}',
@@ -109,7 +110,7 @@ class Elementor_Property_Reference_Number_Widget extends \Elementor\Widget_Base 
 	        {
 	        	echo $settings['before'] . ' ';
 	        }
-	        echo $property->reference_number;
+	        echo esc_html($property->reference_number);
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
 	        	echo ' ' . $settings['after'];

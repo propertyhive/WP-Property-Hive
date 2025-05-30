@@ -38,7 +38,7 @@ class Divi_Property_Address_Line_2_Widget extends ET_Builder_Module
 
         $return = '<div class="divi-widget-addreess-line-2">';
 
-        $return .= $property->address_two;
+        $return .= esc_html($property->address_two);
 
         $return .= '</div>';
 

@@ -48,7 +48,7 @@ class Divi_Property_Negotiator_Email_Address_Widget extends ET_Builder_Module
             $return .= '<a href="mailto:' . esc_attr($property->negotiator_email_address) . '">';
         }
 
-        $return .= $property->negotiator_email_address;
+        $return .= esc_html($property->negotiator_email_address);
 
         if ( isset($this->props['hyperlink']) && $this->props['hyperlink'] == 'yes' ) 
         { 

@@ -205,12 +205,12 @@ class PH_Admin_Post_Types {
 
         if ( !wp_verify_nonce($_GET['_wpnonce'], 'archive-post_' . $post_id) )
         {
-            wp_die(__('Security check failed.', 'propertyhive'));
+            wp_die(esc_html(__('Security check failed.', 'propertyhive')));
         }
 
         if ( !current_user_can('edit_post', $post_id) )
         {
-            wp_die(__('You do not have permission to edit this post.', 'propertyhive'));
+            wp_die(esc_html(__('You do not have permission to edit this post.', 'propertyhive')));
         }
 
         // Update the post status to 'archive'
@@ -223,7 +223,7 @@ class PH_Admin_Post_Types {
 
         if ( is_wp_error($result) ) 
         {
-            wp_die(__('An error occurred while archiving the post.', 'propertyhive'));
+            wp_die(esc_html(__('An error occurred while archiving the post.', 'propertyhive')));
         }
 
         // Redirect to the main list of contacts
@@ -242,12 +242,12 @@ class PH_Admin_Post_Types {
 
         if ( !wp_verify_nonce($_GET['_wpnonce'], 'unarchive-post_' . $post_id) )
         {
-            wp_die(__('Security check failed.', 'propertyhive'));
+            wp_die(esc_html(__('Security check failed.', 'propertyhive')));
         }
 
         if ( !current_user_can('edit_post', $post_id) )
         {
-            wp_die(__('You do not have permission to edit this post.', 'propertyhive'));
+            wp_die(esc_html(__('You do not have permission to edit this post.', 'propertyhive')));
         }
 
         // Update the post status to 'publish'
@@ -260,7 +260,7 @@ class PH_Admin_Post_Types {
 
         if ( is_wp_error($result) ) 
         {
-            wp_die(__('An error occurred while unarchiving the post.', 'propertyhive'));
+            wp_die(esc_html(__('An error occurred while unarchiving the post.', 'propertyhive')));
         }
 
         // Redirect to the main list of contacts
@@ -779,14 +779,16 @@ class PH_Admin_Post_Types {
         {
             $output  = '<select name="_contact_type" id="dropdown_contact_type">';
             
-                $output .= '<option value="">' . __( 'Show all contact types', 'propertyhive' ) . '</option>';
+                $output .= '<option value="">' . esc_html(__( 'Show all contact types', 'propertyhive' )) . '</option>';
 
                 $output .= implode("", $options);
             
             $output .= '</select>';
         }
 
-        echo $output;
+        $output .= $this->date_range_filter('Date Created');
+
+        echo apply_filters( 'propertyhive_contact_filters', $output );
     }
     
     /**
@@ -1249,7 +1251,7 @@ class PH_Admin_Post_Types {
 
 	public function key_date_status_filter() {
 
-		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending') ) ? ph_clean($_GET['status']) : '';
+		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending', 'on_hold', 'cancelled') ) ? ph_clean($_GET['status']) : '';
 
 		$output  = '<select name="status" id="dropdown_key_date_status">';
 
@@ -1274,6 +1276,14 @@ class PH_Admin_Post_Types {
 		$output .= '<option value="pending"';
 		$output .= selected( 'pending', $selected_status, false );
 		$output .= '> ' . esc_html(__( 'Pending', 'propertyhive' )) . '</option>';
+
+        $output .= '<option value="on_hold"';
+        $output .= selected( 'on_hold', $selected_status, false );
+        $output .= '> ' . esc_html(__( 'On Hold', 'propertyhive' )) . '</option>';
+
+        $output .= '<option value="cancelled"';
+        $output .= selected( 'cancelled', $selected_status, false );
+        $output .= '> ' . esc_html(__( 'Cancelled', 'propertyhive' )) . '</option>';
 
 		$output .= '</select>';
 
@@ -1370,6 +1380,8 @@ class PH_Admin_Post_Types {
                     'compare' => 'LIKE'
                 );
             }
+
+            $vars = $this->filter_by_date_range($vars, 'date_query');
         }
         elseif ( 'enquiry' === $typenow )
         {
@@ -1573,6 +1585,8 @@ class PH_Admin_Post_Types {
                 switch ($value) {
                     case 'booked':
                     case 'complete':
+                    case 'on_hold':
+                    case 'cancelled':
                         $vars['meta_query'][] = array(
                             'key' => '_key_date_status',
                             'value' => $value,

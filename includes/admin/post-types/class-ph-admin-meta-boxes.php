@@ -2467,12 +2467,12 @@ class PH_Admin_Meta_Boxes {
             {
                 if (isset($tab['post_type']) && $post->post_type == $tab['post_type'])
                 {
-                    echo '<a href="#' . implode("|#", $tab['metabox_ids']) . '" id="' . $tab_id . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '"';
+                    echo '<a href="#' . implode("|#", $tab['metabox_ids']) . '" id="' . esc_attr($tab_id) . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '"';
                     if ( isset($tab['ajax_actions']) )
                     {
                         echo ' data-ajax-actions="' . esc_attr(implode("|", $tab['ajax_actions'])) . '"';
                     }
-                    echo '>' . $tab['name'] . '</a> ';
+                    echo '>' . esc_html($tab['name']) . '</a> ';
                     
                     $meta_boxes_under_tabs[] = $tab['metabox_ids'];
                     
@@ -2546,11 +2546,11 @@ class PH_Admin_Meta_Boxes {
                                     {
                                         var data = {
                                             action: \'propertyhive_\' + ajax_action[0],
-                                            post_id: ' . $post->ID . ',
+                                            post_id: ' . (int)$post->ID . ',
                                             security: ajax_action[1]
                                         }
 
-                                        jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) 
+                                        jQuery.post( \'' . esc_url(admin_url('admin-ajax.php')) . '\', data, function(response) 
                                         {
                                             jQuery(\'#\' + ajax_action[0].replace(\'get_\', \'propertyhive_\')).html(response);
                                             activateTipTip();
@@ -2601,11 +2601,11 @@ class PH_Admin_Meta_Boxes {
                                     {
                                         var data = {
                                             action: \'propertyhive_\' + ajax_action[0],
-                                            post_id: ' . $post->ID . ',
+                                            post_id: ' . (int)$post->ID . ',
                                             security: ajax_action[1]
                                         }
 
-                                        jQuery.post( \'' . admin_url('admin-ajax.php') . '\', data, function(response) 
+                                        jQuery.post( \'' . esc_url(admin_url('admin-ajax.php')) . '\', data, function(response) 
                                         {
                                             jQuery(\'#\' + ajax_action[0].replace(\'get_\', \'propertyhive_\')).html(response);
                                             activateTipTip();

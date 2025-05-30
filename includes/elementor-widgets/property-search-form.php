@@ -39,7 +39,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		$description = '';
 		if ( class_exists('PH_Template_Assistant') )
 		{
-			$description = __( 'Search forms can be managed from within \'<a href="' . admin_url('/admin.php?page=ph-settings&tab=template-assistant&section=search-forms') . '" target="_blank">Property Hive > Settings > Template Assistant > Search Forms</a>\'', 'propertyhive' );
+			$description = sprintf( __( 'Search forms can be managed from within \'<a href="%s" target="_blank">Property Hive > Settings > Template Assistant > Search Forms</a>\'', 'propertyhive' ), admin_url('/admin.php?page=ph-settings&tab=template-assistant&section=search-forms') );
 		}
 
 		$this->add_control(
@@ -89,9 +89,8 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property-search-form' => 'background: {{VALUE}}',
@@ -138,7 +137,9 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'label_typography',
 				'label' => __( 'Label Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .property-search-form label',
 			]
 		);
@@ -148,9 +149,8 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Label Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property-search-form label' => 'color: {{VALUE}}',
@@ -161,7 +161,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'label_width',
 			[
-				'label' => esc_html__( 'Label Width', 'textdomain' ),
+				'label' => esc_html__( 'Label Width', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SELECT,
 				'default' => '',
 				'options' => [
@@ -214,7 +214,9 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'input_typography',
 				'label' => __( 'Input Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']',
 			]
 		);
@@ -224,9 +226,8 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Input Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property-search-form select, {{WRAPPER}} .property-search-form input[type=\'text\']' => 'color: {{VALUE}}',
@@ -237,7 +238,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'input_width',
 			[
-				'label' => esc_html__( 'Input Width', 'textdomain' ),
+				'label' => esc_html__( 'Input Width', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SELECT,
 				'default' => '',
 				'options' => [
@@ -290,7 +291,9 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'button_typography',
 				'label' => __( 'Button Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .property-search-form input[type=\'submit\']',
 			]
 		);
@@ -300,9 +303,8 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Button Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property-search-form input[type=\'submit\']' => 'color: {{VALUE}}',
@@ -373,7 +375,7 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 		if ( isset($settings['stack_controls_px']) && !empty($settings['stack_controls_px']) )
 		{
 			echo '<style type="text/css">
-				@media(max-width:' . $settings['stack_controls_px'] . 'px) {
+				@media(max-width:' . (int)$settings['stack_controls_px'] . 'px) {
 					.property-search-form { display:block }
 					.property-search-form .control { display:block; margin-bottom:8px; }
 					.property-search-form input[type=\'submit\'] { width:100%; }
@@ -381,12 +383,34 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			</style>';
 		}
 
-		if ( isset($settings['default_department']) && !empty($settings['default_department']) && !isset($_GET['department']) )
+		$original_department = isset($_GET['department']) ? sanitize_text_field($_GET['department']) : false;
+		$changed_department = false;
+		if ( 
+			isset($settings['default_department']) && !empty($settings['default_department']) && 
+			( 
+				!isset($_GET['department']) ||
+				( isset($_GET['department']) && empty($_GET['department']) )
+			)
+		)
 		{
 			$_GET['department'] = $settings['default_department'];
 			$_REQUEST['department'] = $settings['default_department'];
+
+			$changed_department = true;
 		}
 		ph_get_search_form( ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) );
-
+		if ( $changed_department === true )
+		{
+			if ( $original_department === false )
+			{
+				unset($_GET['department']);
+				unset($_REQUEST['department']);
+			}
+			else
+			{
+				$_GET['department'] = $original_department;
+				$_REQUEST['department'] = $original_department;
+			}
+		}
 	}
 }

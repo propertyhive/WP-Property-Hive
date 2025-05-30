@@ -13,6 +13,6 @@ global $property;
 ?>
 <div class="actions">
 
-    <a href="<?php echo get_permalink(); ?>" class="button"><?php echo __( 'More Details', 'propertyhive' ); ?></a>	
+    <a href="<?php echo esc_url(get_permalink()); ?>" class="button"><?php echo esc_html(__( 'More Details', 'propertyhive' )); ?></a>	
 
 </div>

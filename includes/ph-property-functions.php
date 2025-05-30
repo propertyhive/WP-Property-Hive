@@ -142,9 +142,104 @@ function get_property_map( $args = array() )
 	{
 		$id_suffix = ( ( isset($args['id']) && $args['id'] != '' ) ? '_' . $args['id'] : '' );
 
-	    echo '<div id="property_map_canvas' . $id_suffix . '" style="background:#EEE; height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
+	    echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
 		
-		if ( get_option('propertyhive_maps_provider') == 'osm' )
+		if ( get_option('propertyhive_maps_provider') == 'mapbox' )
+		{
+			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/mapbox/';
+
+			wp_register_style('mapbox', $assets_path . 'mapbox-gl.css', array(), '3.8.0');
+		    wp_enqueue_style('mapbox');
+
+			wp_register_script('mapbox', $assets_path . 'mapbox-gl.js', array(), '3.8.0', false);
+		    wp_enqueue_script('mapbox');
+?>
+<script>
+
+	var property_map<?php echo esc_js($id_suffix); ?>;
+
+	function initialize_property_map<?php echo esc_js($id_suffix); ?>() 
+	{
+		if ( property_map<?php echo esc_js($id_suffix); ?> != undefined ) { property_map<?php echo esc_js($id_suffix); ?>.remove(); }
+
+		mapboxgl.accessToken = '<?php echo esc_js(get_option( 'propertyhive_mapbox_api_key', '' )); ?>';
+        property_map<?php echo esc_js($id_suffix); ?> = new mapboxgl.Map({
+            container: "property_map_canvas<?php echo esc_js($id_suffix); ?>", // container ID
+            center: [<?php echo (float)$property->longitude; ?>, <?php echo (float)$property->latitude; ?>], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+            zoom: <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? (int)$args['zoom'] : '14' ); ?> // starting zoom
+        });
+
+		<?php
+			$marker_set = false;
+			if ( class_exists( 'PH_Map_Search' ) )
+  			{
+  				$map_add_on_settings = get_option( 'propertyhive_map_search', array() );
+
+				if ( isset($map_add_on_settings['icon_type']) && $map_add_on_settings['icon_type'] == 'custom_single' && isset($map_add_on_settings['custom_icon_attachment_id']) && $map_add_on_settings['custom_icon_attachment_id'] != '' )
+		        {
+		            $marker_icon_url = wp_get_attachment_url( $map_add_on_settings['custom_icon_attachment_id'] );
+		            if ( $marker_icon_url !== FALSE )
+		            {
+						$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
+						if ( $size !== FALSE && !empty($size) )
+						{
+							$icon_anchor_width = $size[0];
+							$icon_anchor_height = $size[1];
+
+							/*if (isset($map_add_on_settings['custom_icon_anchor_position']) && $map_add_on_settings['custom_icon_anchor_position'] == 'center')
+							{
+								$icon_anchor_width = floor($size[0] / 2);
+								$icon_anchor_height = floor($size[1] / 2);
+							}
+							else
+							{
+								$icon_anchor_width = floor($size[0] / 2);
+								$icon_anchor_height = $size[1];
+							}*/
+		?>
+		const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.backgroundImage = 'url(<?php echo esc_url($marker_icon_url); ?>)';
+        el.style.width = '<?php echo (int)$icon_anchor_width; ?>px';
+        el.style.height = '<?php echo (int)$icon_anchor_height; ?>px';
+        el.style.backgroundSize = '100%';
+
+        new mapboxgl.Marker(el, {<?php if (isset($map_add_on_settings['custom_icon_anchor_position']) && $map_add_on_settings['custom_icon_anchor_position'] == 'center') { echo 'anchor:\'center\''; }else{ echo 'anchor:\'bottom\''; } ?>})
+            .setLngLat([<?php echo (float)$property->longitude; ?>, <?php echo (float)$property->latitude; ?>])
+            .addTo(property_map<?php echo esc_js($id_suffix); ?>);
+		<?php
+							$marker_set = true;
+						}
+		            }
+		        }
+		    }
+		    if ( !$marker_set )
+		    {
+		?>
+		marker = new mapboxgl.Marker({
+            //color: "#FFFFFF",
+            draggable: false
+        }).setLngLat([<?php echo (float)$property->longitude; ?>, <?php echo (float)$property->latitude; ?>])
+            .addTo(property_map<?php echo esc_js($id_suffix); ?>);
+		<?php
+		    }
+		    do_action( 'propertyhive_property_map_actions', $property, $args, $id_suffix );
+		?>
+
+	}
+
+	<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
+	if (window.addEventListener) {
+		window.addEventListener('load', initialize_property_map<?php echo esc_js($id_suffix); ?>);
+	}else{
+		window.attachEvent('onload', initialize_property_map<?php echo esc_js($id_suffix); ?>);
+	}
+	<?php } ?>
+
+</script>
+<?php
+		}
+		elseif ( get_option('propertyhive_maps_provider') == 'osm' )
 		{
 			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/leaflet/';
 
@@ -156,19 +251,19 @@ function get_property_map( $args = array() )
 ?>
 <script>
 
-	var property_map<?php echo $id_suffix; ?>;
+	var property_map<?php echo esc_js($id_suffix); ?>;
 
-	function initialize_property_map<?php echo $id_suffix; ?>() 
+	function initialize_property_map<?php echo esc_js($id_suffix); ?>() 
 	{
-		if ( property_map<?php echo $id_suffix; ?> != undefined ) { property_map<?php echo $id_suffix; ?>.remove(); }
+		if ( property_map<?php echo esc_js($id_suffix); ?> != undefined ) { property_map<?php echo esc_js($id_suffix); ?>.remove(); }
 
-		L.Icon.Default.imagePath = '<?php echo $assets_path; ?>/images/';
+		L.Icon.Default.imagePath = '<?php echo esc_url($assets_path); ?>/images/';
 
-		property_map<?php echo $id_suffix; ?> = L.map("property_map_canvas<?php echo $id_suffix; ?>"<?php echo ( ( isset($args['scrollwheel']) && ($args['scrollwheel'] === 'false' || $args['scrollwheel'] === FALSE) ) ? ', { scrollWheelZoom: false, dragging: !L.Browser.mobile }' : '' ); ?>).setView([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>], <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?>);
+		property_map<?php echo esc_js($id_suffix); ?> = L.map("property_map_canvas<?php echo esc_js($id_suffix); ?>"<?php echo ( ( isset($args['scrollwheel']) && ($args['scrollwheel'] === 'false' || $args['scrollwheel'] === FALSE) ) ? ', { scrollWheelZoom: false, dragging: !L.Browser.mobile }' : '' ); ?>).setView([<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>], <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? (int)$args['zoom'] : '14' ); ?>);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-		}).addTo(property_map<?php echo $id_suffix; ?>);
+		}).addTo(property_map<?php echo esc_js($id_suffix); ?>);
 
 		<?php
 			$icon_code = '';
@@ -182,7 +277,7 @@ function get_property_map( $args = array() )
 		            if ( $marker_icon_url !== FALSE )
 		            {
 		?>
-		var icon_options = { iconUrl: '<?php echo $marker_icon_url; ?>' }
+		var icon_options = { iconUrl: '<?php echo esc_url($marker_icon_url); ?>' }
 		<?php
 						$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
 						if ( $size !== FALSE && !empty($size) )
@@ -199,8 +294,8 @@ function get_property_map( $args = array() )
 							}
 
 		?>
-		icon_options.iconSize = [<?php echo $size[0]; ?>, <?php echo $size[1]; ?>];
-		icon_options.iconAnchor = [<?php echo $icon_anchor_width; ?>, <?php echo $icon_anchor_height; ?>];
+		icon_options.iconSize = [<?php echo (int)$size[0]; ?>, <?php echo (int)$size[1]; ?>];
+		icon_options.iconAnchor = [<?php echo (int)$icon_anchor_width; ?>, <?php echo (int)$icon_anchor_height; ?>];
 		<?php
 						}
 		?>
@@ -213,14 +308,14 @@ function get_property_map( $args = array() )
 		    do_action( 'propertyhive_property_map_actions', $property, $args, $id_suffix );
 		?>
 
-		L.marker([<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>]<?php echo $icon_code; ?>).addTo(property_map<?php echo $id_suffix; ?>);
+		L.marker([<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>]<?php echo $icon_code; ?>).addTo(property_map<?php echo esc_js($id_suffix); ?>);
 	}
 
 	<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
 	if (window.addEventListener) {
-		window.addEventListener('load', initialize_property_map<?php echo $id_suffix; ?>);
+		window.addEventListener('load', initialize_property_map<?php echo esc_js($id_suffix); ?>);
 	}else{
-		window.attachEvent('onload', initialize_property_map<?php echo $id_suffix; ?>);
+		window.attachEvent('onload', initialize_property_map<?php echo esc_js($id_suffix); ?>);
 	}
 	<?php } ?>
 
@@ -235,14 +330,14 @@ function get_property_map( $args = array() )
 ?>
 <script>
 
-	var property_map<?php echo $id_suffix; ?>;
-	var property_marker<?php echo $id_suffix; ?>;
+	var property_map<?php echo esc_js($id_suffix); ?>;
+	var property_marker<?php echo esc_js($id_suffix); ?>;
 			
-	function initialize_property_map<?php echo $id_suffix; ?>() {
+	function initialize_property_map<?php echo esc_js($id_suffix); ?>() {
 				
-		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
+		var myLatlng = new google.maps.LatLng(<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>);
 		var map_options = {
-	  		zoom: <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ); ?>,
+	  		zoom: <?php echo ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? (int)$args['zoom'] : '14' ); ?>,
 			center: myLatlng,
 	  		mapTypeId: google.maps.MapTypeId.ROADMAP,
 	  		scrollwheel: <?php echo ( ( isset($args['scrollwheel']) && ($args['scrollwheel'] === 'false' || $args['scrollwheel'] === FALSE) ) ? 'false' : 'true' ); ?>
@@ -260,12 +355,12 @@ function get_property_map( $args = array() )
 
   			do_action( 'propertyhive_property_map_options', $property, $args, $id_suffix );
   		?>
-		property_map<?php echo $id_suffix; ?> = new google.maps.Map(document.getElementById("property_map_canvas<?php echo $id_suffix; ?>"), map_options);
+		property_map<?php echo esc_js($id_suffix); ?> = new google.maps.Map(document.getElementById("property_map_canvas<?php echo esc_js($id_suffix); ?>"), map_options);
 				
-		var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
+		var myLatlng = new google.maps.LatLng(<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>);
 			
 		var marker_options = {
-			map: property_map<?php echo $id_suffix; ?>,
+			map: property_map<?php echo esc_js($id_suffix); ?>,
 			position: myLatlng		
 		};
 
@@ -280,13 +375,13 @@ function get_property_map( $args = array() )
 		            if ( $marker_icon_url !== FALSE )
 		            {
 		            	echo 'var ph_map_icon = {
-						    url: \'' . $marker_icon_url . '\'';
+						    url: \'' . esc_url($marker_icon_url) . '\'';
 						if ( isset($map_add_on_settings['custom_icon_anchor_position']) && $map_add_on_settings['custom_icon_anchor_position'] == 'center' )
 						{
 							$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
 							if ( $size !== FALSE && !empty($size) )
 							{
-								echo ', anchor: new google.maps.Point(' . floor( $size[0] / 2 ) . ', ' . floor( $size[1] / 2 ) . ')';
+								echo ', anchor: new google.maps.Point(' . floor( (int)$size[0] / 2 ) . ', ' . floor( (int)$size[1] / 2 ) . ')';
 							}
 						}   
 						echo '};';
@@ -298,16 +393,16 @@ function get_property_map( $args = array() )
 
 		<?php do_action( 'propertyhive_property_map_marker_options' ); ?>
 
-		property_marker<?php echo $id_suffix; ?> = new google.maps.Marker(marker_options);
+		property_marker<?php echo esc_js($id_suffix); ?> = new google.maps.Marker(marker_options);
 
 		<?php do_action( 'propertyhive_property_map_actions' ); ?>
 	}
 	
 	<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
 	if(window.addEventListener) {
-		window.addEventListener('load', initialize_property_map<?php echo $id_suffix; ?>);
+		window.addEventListener('load', initialize_property_map<?php echo esc_js($id_suffix); ?>);
 	}else{
-		window.attachEvent('onload', initialize_property_map<?php echo $id_suffix; ?>);
+		window.attachEvent('onload', initialize_property_map<?php echo esc_js($id_suffix); ?>);
 	}
 	<?php } ?>
 
@@ -338,18 +433,18 @@ function get_property_static_map( $args = array() )
 		    $link = ( ( isset($args['link']) && ($args['link'] === 'false' || $args['link'] === FALSE) ) ? 'false' : 'true' );
 
 		    $map_url = 'https://maps.googleapis.com/maps/api/staticmap?' .
-		    	'center=' . $property->latitude . ',' . $property->longitude .
-		    	'&size=1024x' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) .  
-		    	'&zoom=' . ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? $args['zoom'] : '14' ) . 
+		    	'center=' . (float)$property->latitude . ',' . (float)$property->longitude .
+		    	'&size=1024x' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) .  
+		    	'&zoom=' . ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? (int)$args['zoom'] : '14' ) . 
 		    	'&maptype=roadmap' . 
-		    	'&markers=%7C%7C' . $property->latitude . ',' . $property->longitude .
+		    	'&markers=%7C%7C' . (float)$property->latitude . ',' . (float)$property->longitude .
 		    	'&key=' . urlencode($api_key);
 
 		    echo '<style type="text/css">
-		    	#property_static_map' . $id_suffix . ' {
-		    		height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px;
+		    	#property_static_map' . esc_attr($id_suffix) . ' {
+		    		height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px;
 		    		display: block;
-				    background-image: url("' . $map_url . '");
+				    background-image: url("' . esc_url($map_url) . '");
 				    background-repeat: no-repeat;
 				    background-position: 50% 50%;
 				    line-height: 0;
@@ -358,11 +453,11 @@ function get_property_static_map( $args = array() )
 		    
 		    if ( $link === true )
 		    {
-		    	echo '<a id="property_static_map' . $id_suffix . '" href="https://maps.google.com?q=' . $property->latitude . ',' . $property->longitude . '" target="_blank" rel="nofollow"></a>';
+		    	echo '<a id="property_static_map' . esc_attr($id_suffix) . '" href="https://maps.google.com?q=' . (float)$property->latitude . ',' . (float)$property->longitude . '" target="_blank" rel="nofollow"></a>';
 			}
 			else
 			{
-				echo '<div id="property_static_map' . $id_suffix . '" ></div>';
+				echo '<div id="property_static_map' . esc_attr($id_suffix) . '" ></div>';
 			}
 		}
 	}
@@ -385,7 +480,7 @@ function get_property_street_view( $args = array() )
 		    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 		    wp_enqueue_script('googlemaps');
 
-		    echo '<div id="property_street_view_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) ) ? $args['height'] : '400' ) ) . 'px"></div>';
+		    echo '<div id="property_street_view_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px"></div>';
 	?>
 	<script>
 
@@ -394,7 +489,7 @@ function get_property_street_view( $args = array() )
 				
 		function initialize_property_street_view() {
 					
-			var myLatlng = new google.maps.LatLng(<?php echo $property->latitude; ?>, <?php echo $property->longitude; ?>);
+			var myLatlng = new google.maps.LatLng(<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>);
 			var map_options = {
 				center: myLatlng
 		  	}
@@ -417,12 +512,14 @@ function get_property_street_view( $args = array() )
 			var streetView = new google.maps.StreetViewPanorama(document.getElementById("property_street_view_canvas"), streetViewOptions);
 			streetView.setVisible(true);
 		}
-			
+		
+		<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
 		if(window.addEventListener) {
 			window.addEventListener('load', initialize_property_street_view);
 		}else{
 			window.attachEvent('onload', initialize_property_street_view);
 		}
+		<?php } ?>
 
 	</script>
 	<?php
@@ -554,7 +651,7 @@ function get_heating_types()
 
 function get_heating_type( $type )
 {
-	$types = get_broadband_types();
+	$types = get_heating_types();
 
 	if ( isset($types[$type]) )
 	{
@@ -640,6 +737,8 @@ function get_accessibility_types()
 	$types = apply_filters( 'propertyhive_accessibility_types', $types );
 
 	asort($types);
+
+	$types['other'] = __( 'Other', 'propertyhive' );
 
 	return $types;
 }

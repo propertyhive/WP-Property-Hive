@@ -59,7 +59,7 @@ class Bricks_Builder_Property_Address_Postcode_Widget extends \Bricks\Element {
 
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-			echo $property->address_postcode;
+			echo esc_html($property->address_postcode);
 
 		echo '</div>';
 	}

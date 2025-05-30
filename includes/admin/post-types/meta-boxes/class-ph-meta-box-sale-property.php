@@ -31,15 +31,15 @@ class PH_Meta_Box_Sale_Property {
 
             echo '<p class="form-field">
             
-                <label>' . __('Address', 'propertyhive') . '</label>
+                <label>' . esc_html(__('Address', 'propertyhive')) . '</label>
                 
-                <a href="' . get_edit_post_link($property_id, '') . '">' . $property->get_formatted_full_address() . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . get_permalink($property_id) . '" target="_blank">'. __('View On Website', 'propertyhive') . '</a>)' : '' ) . '
+                <a href="' . esc_url(get_edit_post_link($property_id, '')) . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . esc_url(get_permalink($property_id)) . '" target="_blank">'. __('View On Website', 'propertyhive') . '</a>)' : '' ) . '
                 
             </p>';
 
             echo '<p class="form-field">
             
-                <label>' . ( ( $property->department == 'residential-lettings' ) ? __('Landlord', 'propertyhive') : __('Owner', 'propertyhive') ) . '</label>';
+                <label>' . esc_html( ( $property->department == 'residential-lettings' ) ? __('Landlord', 'propertyhive') : __('Owner', 'propertyhive') ) . '</label>';
 
             $owner_contact_ids = $property->_owner_contact_id;
             if ( 
@@ -56,15 +56,15 @@ class PH_Meta_Box_Sale_Property {
                 foreach ( $owner_contact_ids as $owner_contact_id )
                 {
                     $owner = new PH_Contact((int)$owner_contact_id);
-                    echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '">' . get_the_title($owner_contact_id) . '</a><br>';
-                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
-                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
+                    echo '<a href="' . esc_url(get_edit_post_link($owner_contact_id, '')) . '">' . esc_html(get_the_title($owner_contact_id)) . '</a><br>';
+                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? esc_html($owner->telephone_number) : '-' ) . '<br>';
+                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . esc_attr($owner->email_address) . '">' . esc_html($owner->email_address) . '</a>' : '-' );
                     echo '<br><br>';
                 }
             }
             else
             {
-                echo __('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . __(' specified', 'propertyhive');
+                echo esc_html(__('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified');
             }
                 
             echo '</p>';

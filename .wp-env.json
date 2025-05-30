@@ -1,0 +1,10 @@
+{
+    "plugins": [
+        "https://downloads.wordpress.org/plugin/query-monitor.3.16.4.zip",
+        "."
+    ],
+    "themes": [ "https://github.com/propertyhive/honeycomb/archive/heads/master.zip" ],
+    "lifecycleScripts": {
+    }
+}
+

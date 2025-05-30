@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 		echo '<p>';
 
-		echo '<a href="' . get_permalink( ph_get_page_id( 'my_account' ) ) . '">' . __( 'Go To My Account', 'propertyhive' ) . '</a>';
+		echo '<a href="' . esc_url(get_permalink( ph_get_page_id( 'my_account' ) )) . '">' . esc_html(__( 'Go To My Account', 'propertyhive' )) . '</a>';
 
 		echo '</p>';
 	}

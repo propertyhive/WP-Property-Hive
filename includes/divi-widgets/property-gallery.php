@@ -231,7 +231,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
             
             foreach ( $images_hidden as $image_hidden ) 
             {
-                echo '<a href="' . $image_hidden['url'] . '" data-fancybox="divi-gallery"></a>';
+                echo '<a href="' . esc_url($image_hidden['url']) . '" data-fancybox="divi-gallery"></a>';
                 ++$image_number;
             }
         ?>
@@ -250,7 +250,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                     $id_text = $image_number == ($max_images - 1) ? 'id="more-images-link"' : '';
                     $id_text_mobile = $image_number == 1 ? 'id="more-images-link-mobile"' : '';
 
-                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . $images[$image_number]['url'] . '" data-fancybox="divi-gallery" style="background-image:url(' . $images[$image_number]['url'] . ')"></a>';
+                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="divi-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
 
                     if ( $image_number == 1 )
                     {
@@ -273,7 +273,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
 
             while ( count($images) > ($image_number) )
             {
-                echo '<a href="' . $images[$image_number]['url'] . '" data-fancybox="divi-gallery"></a>';
+                echo '<a href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="divi-gallery"></a>';
                 ++$image_number;
             }
 

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php
                     $output = '<select id="key_date_status" name="key_date_status">';
 
-                    foreach ( array( 'pending', 'booked', 'complete' ) as $status )
+                    foreach ( array( 'pending', 'booked', 'complete', 'on_hold', 'cancelled' ) as $status )
                     {
                         $selected_value = isset( $_POST['status'] ) ? strtolower($_POST['status']) : '';
                         if ( in_array($selected_value, array('overdue', 'upcoming') ) )
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         }
                         $output .= '<option value="' . esc_attr($status) . '"';
                         $output .= selected($status, $selected_value, false );
-                        $output .=  '>' . esc_html(ucwords($status)) . '</option>';
+                        $output .=  '>' . esc_html(ucwords(str_replace("_", " ", $status))) . '</option>';
                     }
 
                     $output .= '</select>';
@@ -108,7 +108,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 {
                     ?>
                     <p id="next_key_date_checkbox" class="form-field hidden">
-                        <label for="book_next_key_date"><?php echo __('Book Next ' . ( isset( $_POST['description'] ) ? esc_html(ph_clean($_POST['description'])) : 'Key Date' ) . '?', 'propertyhive'); ?></label>
+                        <label for="book_next_key_date"><?php echo esc_html(__('Book Next ' . ( isset( $_POST['description'] ) ? esc_html(ph_clean($_POST['description'])) : 'Key Date' ) . '?', 'propertyhive')); ?></label>
                         <input type="checkbox" id="book_next_key_date" >
                     </p>
                     <?php

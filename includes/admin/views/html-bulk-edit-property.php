@@ -36,6 +36,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="inline-edit-group">
 			<label class="alignleft">
+				<span class="title"><?php echo esc_html(__( 'Featured', 'propertyhive' )); ?></span>
+				<span class="input-text-wrap">
+					<select class="featured" name="_featured">
+					<?php
+						$options = array(
+							'' 	=> __( '— No Change —', 'propertyhive' ),
+							'yes' => __( 'Yes', 'propertyhive' ),
+							'no' => __( 'No', 'propertyhive' ),
+						);
+						foreach ($options as $key => $value) {
+							echo '<option value="' . esc_attr( $key ) . '">' . esc_html($value) . '</option>';
+						}
+					?>
+					</select>
+				</span>
+			</label>
+		</div>
+
+		<div class="inline-edit-group">
+			<label class="alignleft">
 				<span class="title"><?php echo esc_html(__( 'Availability', 'propertyhive' )); ?></span>
 				<span class="input-text-wrap">
 					<select class="availability" name="_availability">
@@ -123,6 +143,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php do_action( 'propertyhive_property_bulk_edit_end' ); ?>
 
 		<input type="hidden" name="propertyhive_bulk_edit" value="1" />
-		<input type="hidden" name="propertyhive_bulk_edit_nonce" value="<?php echo wp_create_nonce( 'propertyhive_bulk_edit_nonce' ); ?>" />
+		<input type="hidden" name="propertyhive_bulk_edit_nonce" value="<?php echo esc_attr(wp_create_nonce( 'propertyhive_bulk_edit_nonce' )); ?>" />
 	</div>
 </fieldset>

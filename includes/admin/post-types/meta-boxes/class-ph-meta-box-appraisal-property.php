@@ -29,23 +29,23 @@ class PH_Meta_Box_Appraisal_Property {
         {
             $appraisal = new PH_Appraisal((int)$thepostid);
 
-            echo '<p class="form-field"><label for="">Address</label>' . $appraisal->get_formatted_full_address('<br>') . '<br><a href="' . get_edit_post_link( $appraisal->property_id ) . '">View Property</a></p>';
+            echo '<p class="form-field"><label for="">Address</label>' . $appraisal->get_formatted_full_address('<br>') . '<br><a href="' . esc_url(get_edit_post_link( $appraisal->property_id )) . '">View Property</a></p>';
 
-            echo '<p class="form-field"><label for="">Department</label>' . ucwords(str_replace("-", " ", $appraisal->department)) . '</p>';
+            echo '<p class="form-field"><label for="">Department</label>' . esc_html(ucwords(str_replace("-", " ", $appraisal->department))) . '</p>';
 
-            echo '<p class="form-field"><label for="">Bedrooms</label>' . $appraisal->bedrooms . '</p>';
+            echo '<p class="form-field"><label for="">Bedrooms</label>' . esc_html($appraisal->bedrooms) . '</p>';
 
-            echo '<p class="form-field"><label for="">Bathrooms</label>' . $appraisal->bathrooms . '</p>';
+            echo '<p class="form-field"><label for="">Bathrooms</label>' . esc_html($appraisal->bathrooms) . '</p>';
 
-            echo '<p class="form-field"><label for="">Reception Rooms</label>' . $appraisal->reception_rooms . '</p>';
+            echo '<p class="form-field"><label for="">Reception Rooms</label>' . esc_html($appraisal->reception_rooms) . '</p>';
 
-            echo '<p class="form-field"><label for="">Property Type</label>' . $appraisal->property_type . '</p>';
+            echo '<p class="form-field"><label for="">Property Type</label>' . esc_html($appraisal->property_type) . '</p>';
 
-            echo '<p class="form-field"><label for="">Parking</label>' . $appraisal->parking . '</p>';
+            echo '<p class="form-field"><label for="">Parking</label>' . esc_html($appraisal->parking) . '</p>';
 
-            echo '<p class="form-field"><label for="">Outside Space</label>' . $appraisal->outside_space . '</p>';
+            echo '<p class="form-field"><label for="">Outside Space</label>' . esc_html($appraisal->outside_space) . '</p>';
 
-            echo '<p class="form-field"><label for="">Council Tax Band</label>' . $appraisal->council_tax_band . '</p>';
+            echo '<p class="form-field"><label for="">Council Tax Band</label>' . esc_html($appraisal->council_tax_band) . '</p>';
 
             echo '<p class="form-field"><label for="">Additional Information</label>' . $appraisal->additional_property_information . '</p>';
         }
@@ -252,8 +252,8 @@ class PH_Meta_Box_Appraisal_Property {
                 }
             }
 ?>
-        <p class="form-field property_type_id_field"><label for="property_type_id"><?php _e( 'Property Type', 'propertyhive' ); ?></label>
-        <select id="property_type_id" name="property_type_id[]" multiple="multiple" data-placeholder="<?php _e( 'Select property type(s)', 'propertyhive' ); ?>" class="multiselect attribute_values">
+        <p class="form-field property_type_id_field"><label for="property_type_id"><?php echo esc_html(__( 'Property Type', 'propertyhive' )); ?></label>
+        <select id="property_type_id" name="property_type_id[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select property type(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
             <?php
                 $options = array( '' => '' );
                 $args = array(

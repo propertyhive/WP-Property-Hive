@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 <form name="ph_login_form" class="propertyhive-form login-form" action="" method="post">
  	
     <div id="loginError" style="display:none;" class="alert alert-danger alert-box">
-        <?php _e( 'Invalid details provided. Please try again', 'propertyhive' ); ?>
+        <?php echo esc_html(__( 'Invalid details provided. Please try again', 'propertyhive' )); ?>
     </div>
 
     <?php 
@@ -40,10 +40,10 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
         do_action( 'propertyhive_login_form' );
     ?>
 
-    <input type="submit" value="<?php _e( 'Login', 'propertyhive' ); ?>">
+    <input type="submit" value="<?php echo esc_attr(__( 'Login', 'propertyhive' )); ?>">
 
     <?php if ( !empty( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) ) ) { ?>
-    <div class="ph-forgot-password-link"><a href="" class="ph-forgot-password"><?php echo __( 'Forgot your password?', 'propertyhive' ); ?></a></div>
+    <div class="ph-forgot-password-link"><a href="" class="ph-forgot-password"><?php echo esc_html(__( 'Forgot your password?', 'propertyhive' )); ?></a></div>
     <?php } ?>
 
     <?php do_action( 'propertyhive_login_form_end' ); ?>

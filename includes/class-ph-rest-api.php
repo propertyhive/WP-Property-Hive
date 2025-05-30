@@ -405,6 +405,7 @@ class PH_Rest_Api {
 			'price_actual',
 			'price',
 			'price_formatted',
+			'rent_frequency',
 			'currency',
 			'price_qualifier',
 			'sale_by',
@@ -427,6 +428,7 @@ class PH_Rest_Api {
 			'features',
 			'description',
 			'office',
+			'negotiator',
 			'images',
 			'floorplans',
 			'brochures',
@@ -475,6 +477,15 @@ class PH_Rest_Api {
 		            				'address' => $property->office_address,
 		            				'telephone_number' => $property->office_telephone_number,
 		            				'email_address' => $property->office_email_address,
+		            			); 
+		            			break; 
+							}
+							case "negotiator": 
+		            		{ 
+		            			$return = array(
+		            				'name' => $property->negotiator_name,
+		            				'telephone_number' => $property->negotiator_telephone_number,
+		            				'email_address' => $property->negotiator_email_address,
 		            			); 
 		            			break; 
 							}
@@ -916,8 +927,8 @@ class PH_Rest_Api {
 			'office_address_3',
 			'office_address_4',
 			'office_address_postcode',
-			'latitude',
-			'longitude',
+			'office_latitude',
+			'office_longitude',
 		);
 
 		$departments = ph_get_departments();

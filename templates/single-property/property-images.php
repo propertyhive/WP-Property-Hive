@@ -22,7 +22,7 @@ global $post, $propertyhive, $property;
 
             foreach ($images as $image)
             {
-                echo '<li>' . apply_filters( 'propertyhive_single_property_image_html', sprintf( '<a href="%s" class="propertyhive-main-image" title="%s" data-fancybox="gallery">%s</a>', esc_attr( $image['url'] ), esc_attr( $image['title'] ), $image['image'] ), $post->ID ) . '</li>';
+                echo '<li>' . apply_filters( 'propertyhive_single_property_image_html', sprintf( '<a href="%s" class="propertyhive-main-image" title="%s" data-fancybox="gallery-' . (int)$post->ID . '">%s</a>', esc_attr( $image['url'] ), esc_attr( $image['title'] ), $image['image'] ), $post->ID ) . '</li>';
             }
 
             echo '</ul></div>';

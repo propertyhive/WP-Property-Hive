@@ -32,19 +32,21 @@ function ph_populate_subsequent_dropdowns(init)
 					jQuery(this).find('select[data-dynamic-population-level=\'' + ( i + 1 ) + '\']').html('');
 					jQuery(this).find('select[data-dynamic-population-level=\'' + ( i + 1 ) + '\']').append(jQuery('<option>', { 
 				        value: '',
-				        text : ''
+				        text : 'Any'
 				    }));
 
-					for ( j in propertyhive_dynamic_population_params.options ) 
-					{
-						if ( parseInt(propertyhive_dynamic_population_params.options[j].parent) == value )
-						{
-						    jQuery(this).find('select[data-dynamic-population-level=\'' + ( i + 1 ) + '\']').append(jQuery('<option>', { 
-						        value: j,
-						        text : propertyhive_dynamic_population_params.options[j].label 
-						    }));
-						}
-					};
+					// Sort options by label
+		            var sortedOptions = Object.entries(propertyhive_dynamic_population_params.options)
+		                .filter(([key, option]) => parseInt(option.parent) === value)
+		                .sort(([, a], [, b]) => a.label.localeCompare(b.label));
+
+		            // Populate the dropdown with sorted options
+		            sortedOptions.forEach(([key, option]) => {
+		                jQuery(this).find('select[data-dynamic-population-level=\'' + (i + 1) + '\']').append(jQuery('<option>', {
+		                    value: key,
+		                    text: option.label
+		                }));
+		            });
 
 					if ( !init && previous_value != '' )
 					{

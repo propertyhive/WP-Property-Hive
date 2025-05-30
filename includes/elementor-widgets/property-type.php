@@ -41,7 +41,9 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .elementor-widget-property-type',
 			]
 		);
@@ -51,9 +53,8 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-widget-property-type' => 'color: {{VALUE}}',
@@ -104,7 +105,7 @@ class Elementor_Property_Type_Widget extends \Elementor\Widget_Base {
 
         if ( $property->property_type != '' )
 		{
-	        echo '<div class="elementor-widget-property-type">' . $property->property_type . '</div>';
+	        echo '<div class="elementor-widget-property-type">' . esc_html($property->property_type) . '</div>';
 	    }
 
 	}

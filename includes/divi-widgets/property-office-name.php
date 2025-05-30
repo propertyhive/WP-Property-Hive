@@ -30,7 +30,7 @@ class Divi_Property_Office_Name_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = $property->office_name;
+        $return = esc_html($property->office_name);
 
         return $this->_render_module_wrapper( $return, $render_slug );
     }

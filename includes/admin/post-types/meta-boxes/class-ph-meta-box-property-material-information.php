@@ -115,7 +115,7 @@ class PH_Meta_Box_Property_Material_Information {
                 'id' => '_' . $utility_key . '_type_other', 
                 'label' => '', 
                 'desc_tip' => false, 
-                'placeholder' => __( 'Enter ' . strtolower($utility_key) . ' type', 'propertyhive' ), 
+                'placeholder' => sprintf( __( 'Enter %s type', 'propertyhive' ), strtolower($utility_key) ), 
                 'type' => 'text'
             );
             propertyhive_wp_text_input( $args );

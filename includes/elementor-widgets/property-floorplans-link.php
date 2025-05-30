@@ -41,7 +41,9 @@ class Elementor_Property_Floorplans_Link_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} a',
 			]
 		);
@@ -51,9 +53,8 @@ class Elementor_Property_Floorplans_Link_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'color: {{VALUE}}',
@@ -93,9 +94,8 @@ class Elementor_Property_Floorplans_Link_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_2,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_SECONDARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'background: {{VALUE}}',
@@ -146,7 +146,7 @@ class Elementor_Property_Floorplans_Link_Widget extends \Elementor\Widget_Base {
 				$i = 0;
 				foreach ( $floorplan_urls as $floorplan )
 				{
-					echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . $floorplan['url'] . '" data-fancybox="floorplans" rel="nofollow">' . ( count($floorplan_urls) > 1 ? __( 'Floorplans', 'propertyhive' ) : __( 'Floorplan', 'propertyhive' ) ) . '</a>';
+					echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow">' . esc_html( ( count($floorplan_urls) > 1 ? __( 'Floorplans', 'propertyhive' ) : __( 'Floorplan', 'propertyhive' ) ) ) . '</a>';
 					++$i;
 				}
 			}
@@ -160,7 +160,7 @@ class Elementor_Property_Floorplans_Link_Widget extends \Elementor\Widget_Base {
 				$i = 0;
 				foreach ( $floorplan_attachment_ids as $attachment_id )
 				{
-					echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="floorplans" rel="nofollow">' . ( count($floorplan_attachment_ids) > 1 ? __( 'Floorplans', 'propertyhive' ) : __( 'Floorplan', 'propertyhive' ) ) . '</a>';
+					echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplans" rel="nofollow">' . esc_html( ( count($floorplan_attachment_ids) > 1 ? __( 'Floorplans', 'propertyhive' ) : __( 'Floorplan', 'propertyhive' ) ) ) . '</a>';
 					++$i;
 				}
 			}

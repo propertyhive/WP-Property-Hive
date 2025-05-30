@@ -38,7 +38,7 @@ class Divi_Property_Address_Name_Number_Widget extends ET_Builder_Module
 
         $return = '<div class="divi-widget-address-name-number">';
 
-        $return .= $property->address_name_number;
+        $return .= esc_html($property->address_name_number);
 
         $return .= '</div>';
 

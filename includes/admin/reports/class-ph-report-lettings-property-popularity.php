@@ -174,7 +174,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 
 		<div class="chart-panel">
 			
-			<h3>Most Popular Properties - <?php echo $label; ?></h3>
+			<h3>Most Popular Properties - <?php echo esc_html($label); ?></h3>
 
 			<?php
 				if ( !empty($order) )
@@ -194,8 +194,8 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 							$property = new PH_Property($property_id);
 
 							echo '<li>
-								<a href="' . get_edit_post_link($property_id) . '">' . $property->get_formatted_full_address() . '</a>
-								<div class="stat">' . $property_view_data[$property_id]['total_views'] . ' <span>';
+								<a href="' . esc_url(get_edit_post_link($property_id)) . '">' . esc_html($property->get_formatted_full_address()) . '</a>
+								<div class="stat">' . esc_html($property_view_data[$property_id]['total_views']) . ' <span>';
 							if ( $property_view_data[$property_id]['total_views'] == $property_view_data[$property_id]['previous_time_frame'] )
 							{
 								echo '<span style="color:#999" title="No views"><span class="dashicons dashicons-arrow-right" style="color:#999"></span>-</span>';
@@ -213,7 +213,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 									if ( $percentage_difference < 0 ) { $percentage_difference = $percentage_difference * -1; }
 									$percentage_difference = number_format($percentage_difference, 1);
 
-									echo '<span style="color:#090" title="' . $property_view_data[$property_id]['previous_time_frame'] . ' views in previous timeframe"><span class="dashicons dashicons-arrow-up" style="color:#090"></span>' . $percentage_difference . '%</span>';
+									echo '<span style="color:#090" title="' . esc_attr($property_view_data[$property_id]['previous_time_frame']) . ' views in previous timeframe"><span class="dashicons dashicons-arrow-up" style="color:#090"></span>' . esc_html($percentage_difference) . '%</span>';
 								}
 								else
 								{
@@ -222,7 +222,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 									if ( $percentage_difference < 0 ) { $percentage_difference = $percentage_difference * -1; }
 									$percentage_difference = number_format($percentage_difference, 1);
 
-									echo '<span style="color:#900" title="' . $property_view_data[$property_id]['previous_time_frame'] . ' views in previous timeframe"><span class="dashicons dashicons-arrow-down" style="color:#900"></span>' . $percentage_difference . '%</span>';
+									echo '<span style="color:#900" title="' . esc_attr($property_view_data[$property_id]['previous_time_frame']) . ' views in previous timeframe"><span class="dashicons dashicons-arrow-down" style="color:#900"></span>' . esc_html($percentage_difference) . '%</span>';
 								}
 							}
 							echo '</span></div>
@@ -235,7 +235,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 				}
 				else
 				{
-					echo '<p>No view statistics available for ' . $label . '</p>';
+					echo '<p>No view statistics available for ' . esc_html($label) . '</p>';
 				}
 			?>
 
@@ -243,7 +243,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 
 		<div class="chart-panel">
 			
-			<h3>Least Popular Properties - <?php echo $label; ?></h3>
+			<h3>Least Popular Properties - <?php echo esc_html($label); ?></h3>
 
 			<?php
 				if ( !empty($order) )
@@ -263,8 +263,8 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 						$property = new PH_Property($property_id);
 
 						echo '<li>
-							<a href="' . get_edit_post_link($property_id) . '">' . $property->get_formatted_full_address() . '</a>
-							<div class="stat">' . $property_view_data[$property_id]['total_views'] . ' <span>';
+							<a href="' . esc_url(get_edit_post_link($property_id)) . '">' . esc_html($property->get_formatted_full_address()) . '</a>
+							<div class="stat">' . esc_html($property_view_data[$property_id]['total_views']) . ' <span>';
 						if ( $property_view_data[$property_id]['total_views'] == $property_view_data[$property_id]['previous_time_frame'] )
 						{
 							echo '<span style="color:#999" title="No views"><span class="dashicons dashicons-arrow-right" style="color:#999"></span>-</span>';
@@ -282,7 +282,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 								if ( $percentage_difference < 0 ) { $percentage_difference = $percentage_difference * -1; }
 								$percentage_difference = number_format($percentage_difference, 1);
 
-								echo '<span style="color:#090" title="' . $property_view_data[$property_id]['previous_time_frame'] . ' views in previous timeframe"><span class="dashicons dashicons-arrow-up" style="color:#090"></span>' . $percentage_difference . '%</span>';
+								echo '<span style="color:#090" title="' . esc_attr($property_view_data[$property_id]['previous_time_frame']) . ' views in previous timeframe"><span class="dashicons dashicons-arrow-up" style="color:#090"></span>' . esc_html($percentage_difference) . '%</span>';
 							}
 							else
 							{
@@ -291,7 +291,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 								if ( $percentage_difference < 0 ) { $percentage_difference = $percentage_difference * -1; }
 								$percentage_difference = number_format($percentage_difference, 1);
 
-								echo '<span style="color:#900" title="' . $property_view_data[$property_id]['previous_time_frame'] . ' views in previous timeframe"><span class="dashicons dashicons-arrow-down" style="color:#900"></span>' . $percentage_difference . '%</span>';
+								echo '<span style="color:#900" title="' . esc_attr($property_view_data[$property_id]['previous_time_frame']) . ' views in previous timeframe"><span class="dashicons dashicons-arrow-down" style="color:#900"></span>' . esc_html($percentage_difference) . '%</span>';
 							}
 						}
 						echo '</span></div>
@@ -303,7 +303,7 @@ class PH_Report_Lettings_Property_Popularity extends PH_Admin_Report {
 				}
 				else
 				{
-					echo '<p>No view statistics available ' . $label . '</p>';
+					echo '<p>No view statistics available ' . esc_html($label) . '</p>';
 				}
 			?>
 

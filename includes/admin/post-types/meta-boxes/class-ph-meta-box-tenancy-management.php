@@ -44,9 +44,9 @@ class PH_Meta_Box_Tenancy_Management {
 		echo '<input type="text" class="" name="_management_fee" id="_management_fee" value="' . esc_attr(get_post_meta( $post->ID, '_management_fee', true )) . '" placeholder="" style="width:70px">
             
             <select id="_management_fee_units" name="_management_fee_units" class="select" style="width:auto">
-                <option value=""' . ( ($management_fee_units == 'percentage' || $management_fee_units == '') ? ' selected' : '') . '>' . __('%', 'propertyhive') . '</option>
-                <option value="percentage"' . ( ($management_fee_units == 'percentage' || $management_fee_units == '') ? ' selected' : '') . '>' . __('%', 'propertyhive') . '</option>
-                <option value="fixed"' . ( $management_fee_units == 'fixed' ? ' selected' : '') . '>' . __('Fixed', 'propertyhive') . '</option>
+                <option value=""' . ( ($management_fee_units == 'percentage' || $management_fee_units == '') ? ' selected' : '') . '>' . esc_html(__('%', 'propertyhive')) . '</option>
+                <option value="percentage"' . ( ($management_fee_units == 'percentage' || $management_fee_units == '') ? ' selected' : '') . '>' . esc_html(__('%', 'propertyhive')) . '</option>
+                <option value="fixed"' . ( $management_fee_units == 'fixed' ? ' selected' : '') . '>' . esc_html(__('Fixed', 'propertyhive')) . '</option>
             </select>
             
         </p>';

@@ -44,10 +44,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_appraisal_won',
-		        appraisal_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+		        appraisal_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_appraisal_actions();
 		    }, 'json');
@@ -58,10 +58,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_appraisal_email_owner_booking_confirmation',
-		        appraisal_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+		        appraisal_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	if (!response.success)
 	        	{
@@ -77,10 +77,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_appraisal_revert_pending',
-		        appraisal_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+		        appraisal_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_appraisal_actions();
 		    }, 'json');
@@ -91,10 +91,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_appraisal_revert_carried_out',
-		        appraisal_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+		        appraisal_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_appraisal_actions();
 		    }, 'json');
@@ -126,12 +126,12 @@ jQuery(document).ready(function($)
 
         var data = {
             action:         'propertyhive_appraisal_email_owner_booking_confirmation',
-            appraisal_id:    	<?php echo $post->ID; ?>,
+            appraisal_id:    	<?php echo (int)$post->ID; ?>,
             subject:        $('#_owner_confirmation_email_subject').val(),
             body:           $('#_owner_confirmation_email_body').val(),
-            security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
         };
-        jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
         	if (response.success)
         	{
@@ -154,12 +154,12 @@ jQuery(document).ready(function($)
 		// Submit interested feedback
 		var data = {
 	        action:         'propertyhive_appraisal_cancelled',
-	        appraisal_id:    	<?php echo $post->ID; ?>,
+	        appraisal_id:    	<?php echo (int)$post->ID; ?>,
 	        cancelled_reason: $('#_cancelled_reason').val(),
-	        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+	        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
 	    };
 
-	    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+	    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 	    {
 	    	redraw_appraisal_actions();
 	    }, 'json');
@@ -174,14 +174,14 @@ jQuery(document).ready(function($)
 		// Submit interested feedback
 		var data = {
 	        action:         'propertyhive_appraisal_carried_out',
-	        appraisal_id:   <?php echo $post->ID; ?>,<?php if ($department == 'residential-sales' || ph_get_custom_department_based_on($department) == 'residential-sales' ) { ?>
+	        appraisal_id:   <?php echo (int)$post->ID; ?>,<?php if ($department == 'residential-sales' || ph_get_custom_department_based_on($department) == 'residential-sales' ) { ?>
 	        price: 			$('#_price').val(),<?php }else{ ?>
 	        rent: 			$('#_price').val(),
 	    	rent_frequency: $('#_rent_frequency').val(),<?php } ?>
-	        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+	        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
 	    };
 
-	    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+	    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 	    {
 	    	redraw_appraisal_actions();
 	    }, 'json');
@@ -196,11 +196,11 @@ jQuery(document).ready(function($)
 		// Submit interested feedback
 		var data = {
 	        action:         'propertyhive_appraisal_instructed',
-	        appraisal_id:   <?php echo $post->ID; ?>,
-	        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+	        appraisal_id:   <?php echo (int)$post->ID; ?>,
+	        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
 	    };
 
-	    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+	    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 	    {
 	    	redraw_appraisal_actions();
 	    }, 'json');
@@ -215,12 +215,12 @@ jQuery(document).ready(function($)
 		// Submit interested feedback
 		var data = {
 	        action:         'propertyhive_appraisal_lost_reason',
-	        appraisal_id:    	<?php echo $post->ID; ?>,
+	        appraisal_id:    	<?php echo (int)$post->ID; ?>,
 	        lost_reason:    $('#_lost_reason').val(),
-	        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+	        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
 	    };
 
-	    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+	    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 	    {
 	    	redraw_appraisal_actions();
 	    }, 'json');
@@ -238,11 +238,11 @@ function redraw_appraisal_actions()
 
 	var data = {
         action:         'propertyhive_get_appraisal_actions',
-        appraisal_id:    	<?php echo $post->ID; ?>,
-        security:       '<?php echo wp_create_nonce( 'appraisal-actions' ); ?>',
+        appraisal_id:    	<?php echo (int)$post->ID; ?>,
+        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-actions' )); ?>',
     };
 
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
     {
     	jQuery('#propertyhive_appraisal_actions_meta_box_container').html(response);
 

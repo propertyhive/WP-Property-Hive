@@ -76,7 +76,7 @@ class PH_Meta_Box_Property_Photos {
                             return false;
                         });
                         
-                        jQuery(\'.remove_photo_url\').click(function()
+                        jQuery(\'#property_photo_urls\').on(\'click\', \'.remove_photo_url\', function()
                         {
                             jQuery(this).parent().fadeOut(\'slow\', function()
                             {
@@ -101,7 +101,7 @@ class PH_Meta_Box_Property_Photos {
                     
                     foreach ($photos as $photo_attachment_id)
                     {
-                        echo '<li id="photo_' . $photo_attachment_id . '">';
+                        echo '<li id="photo_' . (int)$photo_attachment_id . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
                             echo wp_get_attachment_image( $photo_attachment_id, 'thumbnail' );
                         echo '</li>';
@@ -114,12 +114,12 @@ class PH_Meta_Box_Property_Photos {
                 
                 echo '</ul></div>';
                 
-                echo '<a href="" class="button button-primary ph_upload_photo_button">' . __('Add Photos', 'propertyhive') . '</a>';
+                echo '<a href="" class="button button-primary ph_upload_photo_button">' . esc_html(__('Add Photos', 'propertyhive')) . '</a>';
     
                 do_action('propertyhive_property_photos_fields');
     	          
-                echo '<input type="hidden" name="previous_photo_attachment_ids" id="previous_photo_attachment_ids" value="' . $input_value . '">';
-                echo '<input type="hidden" name="photo_attachment_ids" id="photo_attachment_ids" value="' . $input_value . '">';
+                echo '<input type="hidden" name="previous_photo_attachment_ids" id="previous_photo_attachment_ids" value="' . esc_attr($input_value) . '">';
+                echo '<input type="hidden" name="photo_attachment_ids" id="photo_attachment_ids" value="' . esc_attr($input_value) . '">';
 
                 echo '<script>
                     // Uploading files

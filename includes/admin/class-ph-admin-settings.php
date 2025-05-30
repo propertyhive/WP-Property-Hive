@@ -59,24 +59,16 @@ class PH_Admin_Settings {
 		global $current_section, $current_tab;
 
 		if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-settings' ) )
-	    		die( __( 'Action failed. Please refresh the page and retry.', 'propertyhive' ) );
+	    		die( esc_html(__( 'Action failed. Please refresh the page and retry.', 'propertyhive' )) );
 
 	    // Trigger actions
 	   	do_action( 'propertyhive_settings_save_' . $current_tab );
 	    do_action( 'propertyhive_update_options_' . $current_tab );
 	    do_action( 'propertyhive_update_options' );
 
-    	// Clear any unwanted data
-		//ph_delete_property_transients();
-		//delete_transient( 'propertyhive_cache_excluded_uris' );
-
 		self::add_message( __( 'Your settings have been saved.', 'propertyhive' ) );
-		//self::check_download_folder_protection();
 
-		// Re-add endpoints and flush rules
-		//PH()->query->init_query_vars();
-		//PH()->query->add_endpoints();
-		flush_rewrite_rules();
+		update_option( 'propertyhive_queue_flush_rewrite_rules', 'yes' );
 
 		do_action( 'propertyhive_settings_saved' );
 	}
@@ -103,10 +95,30 @@ class PH_Admin_Settings {
 	public static function show_messages() {
 		if ( sizeof( self::$errors ) > 0 ) {
 			foreach ( self::$errors as $error )
+			{
+				$allowed_tags = array(
+				    'a'      => array(
+				        'href' => array(),
+				    ),
+				);
+
+				$error = wp_kses($error, $allowed_tags);
+
 				echo '<div id="message" class="error fade"><p><strong>' . $error . '</strong></p></div>';
+			}
 		} elseif ( sizeof( self::$messages ) > 0 ) {
 			foreach ( self::$messages as $message )
+			{
+				$allowed_tags = array(
+				    'a'      => array(
+				        'href' => array(),
+				    ),
+				);
+
+				$message = wp_kses($message, $allowed_tags);
+
 				echo '<div id="message" class="updated fade"><p><strong>' . $message . '</strong></p></div>';
+			}
 		}
 	}
 

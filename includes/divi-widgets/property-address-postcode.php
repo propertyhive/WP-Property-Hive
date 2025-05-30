@@ -38,7 +38,7 @@ class Divi_Property_Address_Postcode_Widget extends ET_Builder_Module
 
         $return = '<div class="divi-widget-address-postcode">';
 
-        $return .= $property->address_postcode;
+        $return .= esc_html($property->address_postcode);
 
         $return .= '</div>';
 

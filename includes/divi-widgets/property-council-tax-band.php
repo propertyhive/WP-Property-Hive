@@ -148,7 +148,7 @@ class Divi_Property_Council_Tax_Band_Widget extends ET_Builder_Module
 
         if ( isset($this->props['before']) && $this->props['before'] != '' ) { $return .= $this->props['before'] . ' '; }
 
-        $return = $property->council_tax_band;
+        $return .= esc_html($property->council_tax_band);
 
         if ( isset($this->props['after']) && $this->props['after'] != '' ) { $return .= ' ' . $this->props['after']; }
 

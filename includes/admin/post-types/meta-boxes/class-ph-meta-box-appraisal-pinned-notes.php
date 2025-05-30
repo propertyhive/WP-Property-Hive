@@ -23,6 +23,6 @@ class PH_Meta_Box_Appraisal_Pinned_Notes {
 
         $section = 'appraisal';
 
-        echo '<div class="propertyhive-pinned-notes-container" id="propertyhive_' . $section . '_pinned_notes_container">' . __( 'Loading', 'propertyhive' ) . '...</div>';
+        echo '<div class="propertyhive-pinned-notes-container" id="propertyhive_' . esc_attr($section) . '_pinned_notes_container">' . esc_html(__( 'Loading', 'propertyhive' )) . '...</div>';
     }
 }

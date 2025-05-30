@@ -130,14 +130,14 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
-				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title . '</a></strong>';
+				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . esc_html($title) . '</a></strong>';
 			 break;
             case 'property' :
                 
                 if ( $the_offer->property_id != '' )
                 {
 	                $property = new PH_Property((int)$the_offer->property_id);
-	                echo $property->get_formatted_full_address();
+	                echo esc_html($property->get_formatted_full_address());
 	            }
             	else
             	{
@@ -162,12 +162,12 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
 
                 	foreach ( $owner_contact_ids as $owner_contact_id )
                 	{
-	                	echo get_the_title($owner_contact_id) . '<br>';
+	                	echo esc_html(get_the_title($owner_contact_id)) . '<br>';
 	                	if ( count($owner_contact_ids) == 1 )
 		                {
 			                echo '<div class="row-actions">';
-			                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
-			                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+			                echo 'T: ' . esc_html(get_post_meta($owner_contact_id, '_telephone_number', TRUE)) . '<br>';
+			                echo 'E: ' . esc_html(get_post_meta($owner_contact_id, '_email_address', TRUE));
 			                echo '</div>';
 			            }
 			        }
@@ -189,7 +189,7 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
                 
                 break;
             case 'status' :
-                echo __( ucwords(str_replace("_", " ", $the_offer->status)), 'propertyhive' );
+                echo esc_html(__( ucwords(str_replace("_", " ", $the_offer->status)), 'propertyhive' ));
                 break;
 			default :
 				break;

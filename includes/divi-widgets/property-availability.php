@@ -30,7 +30,7 @@ class Divi_Property_Availability_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = $property->availability;
+        $return = esc_html($property->availability);
 
         return $this->_render_module_wrapper( $return, $render_slug );
     }

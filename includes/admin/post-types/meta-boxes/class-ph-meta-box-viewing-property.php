@@ -31,15 +31,15 @@ class PH_Meta_Box_Viewing_Property {
 
             echo '<p class="form-field">
             
-                <label>' . __('Address', 'propertyhive') . '</label>
+                <label>' . esc_html(__('Address', 'propertyhive')) . '</label>
                 
-                <a href="' . get_edit_post_link($property_id, '') . '">' . $property->get_formatted_full_address() . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . get_permalink($property_id) . '" target="_blank">View On Website</a>)' : '' ) . '
+                <a href="' . esc_url(get_edit_post_link($property_id, '')) . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . esc_url(get_permalink($property_id)) . '" target="_blank">View On Website</a>)' : '' ) . '
                 
             </p>';
 
             echo '<p class="form-field">
             
-                <label>' . ( ( $property->department == 'residential-lettings' ) ? __('Landlord', 'propertyhive') : __('Owner', 'propertyhive') ) . '</label>';
+                <label>' . esc_html( ( $property->department == 'residential-lettings' ) ? __('Landlord', 'propertyhive') : __('Owner', 'propertyhive') ) . '</label>';
 
             $owner_contact_ids = $property->_owner_contact_id;
             if ( 
@@ -56,15 +56,15 @@ class PH_Meta_Box_Viewing_Property {
                 foreach ( $owner_contact_ids as $owner_contact_id )
                 {
                     $owner = new PH_Contact((int)$owner_contact_id);
-                    echo '<a href="' . get_edit_post_link($owner_contact_id, '') . '" data-viewing-owner-id="' . $owner_contact_id . '" data-viewing-owner-name="' . get_the_title($owner_contact_id, '') . '">' . get_the_title($owner_contact_id) . '</a><br>';
-                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? $owner->telephone_number : '-' ) . '<br>';
-                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . $owner->email_address . '">' . $owner->email_address . '</a>' : '-' );
+                    echo '<a href="' . esc_url(get_edit_post_link($owner_contact_id, '')) . '" data-viewing-owner-id="' . (int)$owner_contact_id . '" data-viewing-owner-name="' . esc_attr(get_the_title($owner_contact_id, '')) . '">' . esc_html(get_the_title($owner_contact_id)) . '</a><br>';
+                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? esc_html($owner->telephone_number) : '-' ) . '<br>';
+                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . esc_attr($owner->email_address) . '">' . esc_html($owner->email_address) . '</a>' : '-' );
                     echo '<br><br>';
                 }
             }
             else
             {
-                echo __('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . __(' specified', 'propertyhive');
+                echo esc_html(__('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified');
             }
                 
             echo '</p>';
@@ -73,11 +73,11 @@ class PH_Meta_Box_Viewing_Property {
         {
 echo '<p class="form-field">
             
-                <label for="viewing_property_search">' . __('Search Properties', 'propertyhive') . '</label>
+                <label for="viewing_property_search">' . esc_html(__('Search Properties', 'propertyhive')) . '</label>
                 
                 <span style="position:relative;">
 
-                    <input type="text" name="viewing_property_search" id="viewing_property_search" style="width:100%;" placeholder="' . __( 'Search Properties', 'propertyhive' ) . '..." autocomplete="false">
+                    <input type="text" name="viewing_property_search" id="viewing_property_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Properties', 'propertyhive' )) . '..." autocomplete="false">
 
                     <div id="viewing_search_property_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -93,7 +93,7 @@ echo '<p class="form-field">
 
 var viewing_selected_properties = [];
 <?php if (isset($_GET['property_id']) && $_GET['property_id'] != '') { $property = new PH_Property((int)$_GET['property_id']); ?>
-viewing_selected_properties.push({ id: <?php echo (int)$_GET['property_id']; ?>, post_title: '<?php echo addslashes($property->get_formatted_full_address()); ?>' });
+viewing_selected_properties.push({ id: <?php echo (int)$_GET['property_id']; ?>, post_title: '<?php echo esc_js($property->get_formatted_full_address()); ?>' });
 <?php } ?>
 var viewing_search_properties_timeout;
 var viewing_search_properties_xhr = jQuery.ajax({});
@@ -179,10 +179,10 @@ function viewing_perform_property_search()
     var data = {
         action:         'propertyhive_search_properties',
         keyword:        keyword,
-        security:       '<?php echo wp_create_nonce( 'search-properties' ); ?>',
+        security:       '<?php echo esc_js(wp_create_nonce( 'search-properties' )); ?>',
     };
     viewing_search_properties_xhr.abort(); // cancel previous request
-    viewing_search_properties_xhr = jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    viewing_search_properties_xhr = jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
     {
         if (response == '' || response.length == 0)
         {

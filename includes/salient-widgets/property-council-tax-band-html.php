@@ -29,6 +29,6 @@ if ( ! empty( $atts['font_container'] ) && isset($atts['font_container']) )
 
 echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
 
-	echo $property->council_tax_band;
+	echo esc_html($property->council_tax_band);
 
 echo '</div>';

@@ -52,6 +52,28 @@ function ph_init_description_editors()
     });
 }
 
+function ph_set_match_price_currency_symbol()
+{
+    jQuery('#propertyhive-contact-relationships div[id^=\'tab_applicant_data_\']').each(function()
+    {
+        // loop through each relationship
+        var department = jQuery(this).find('input[name^=\'_applicant_department_\']').filter(':checked').val();
+
+        if ( department == 'residential-sales' )
+        {
+            var selected_currency = jQuery(this).find('select[name^=\'_applicant_currency_sales_\'] :selected').text();
+            if ( selected_currency != '' )
+            {
+                jQuery(this).find('label[for^=\'_applicant_match_price_range_\'] .currency-symbol').html(selected_currency);
+            }
+        }
+        if ( department == 'residential-lettings' )
+        {
+            // no match price in lettings
+        }
+    });
+}
+
 function show_other_material_information_rows()
 {
     jQuery('#propertyhive-property-material-information .form-field[class*=\'_other_field\']').hide();
@@ -70,11 +92,53 @@ function show_other_material_information_rows()
     });
 }
 
+function ph_check_duplicate_reference_number()
+{
+    var data = {
+        action:         'propertyhive_check_duplicate_reference_number',
+        post_id:        propertyhive_admin_meta_boxes.post_id,
+        reference_number: jQuery('#propertyhive-property-address input[name=\'_reference_number\']').val(),
+        security:       propertyhive_admin_meta_boxes.check_duplicate_reference_number_nonce
+    };
+
+    jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
+    {
+        if ( response == '1' )
+        {
+            // exists already
+            jQuery('#propertyhive-property-address input[name=\'_reference_number\']').after('<span class="duplicate-reference-number-warning">&nbsp; <span class="dashicons dashicons-info" style="color:#72aee6; vertical-align:middle"></span> This reference number is already in use</span>');
+        }
+    });
+}
+
 jQuery( function($){
     
     ph_init_description_editors();
 
+    ph_set_match_price_currency_symbol();
+
     show_other_material_information_rows();
+
+    ph_check_duplicate_reference_number();
+
+    $('#propertyhive-property-address input[name=\'_reference_number\']').change(function()
+    {
+        ph_check_duplicate_reference_number();
+    });
+
+    $('#propertyhive-property-address input[name=\'_reference_number\']').keydown(function()
+    {
+        jQuery('#propertyhive-property-address .duplicate-reference-number-warning').remove();
+    });
+
+    $('#propertyhive-contact-relationships input[name^=\'_applicant_department_\']').change(function()
+    {
+        ph_set_match_price_currency_symbol();
+    });
+    $('#propertyhive-contact-relationships select[name^=\'_applicant_currency_sales_\']').change(function()
+    {
+        ph_set_match_price_currency_symbol();
+    });
 
     $('#propertyhive-property-material-information .form-field:not([class*=\'_other_field\']) select').on('change', function()
     {
@@ -941,6 +1005,68 @@ function ph_open_details_lightbox(post_id, section)
             {
                 jQuery('.propertyhive-lightbox-buttons a.button-next').show();
             }
+
+            if ( propertyhive_admin_meta_boxes.disable_notes_mention != true ) 
+            {
+                tinymce.remove('.propertyhive-lightbox-notes textarea#add_note');
+
+                tinymce.init({
+                    selector: '.propertyhive-lightbox-notes textarea#add_note',
+                    menubar: false,
+                    toolbar: false,
+                    statusbar: false,
+                    forced_root_block: '', // Disable the <p> tags
+                    force_br_newlines: true,
+                    force_p_newlines: false,
+                    external_plugins: 
+                    {
+                        'mention' : propertyhive_admin_meta_boxes.plugin_url + '/assets/js/tinymce-mention-plugin/tinymce-mention-plugin.js',
+                        'placeholder' : propertyhive_admin_meta_boxes.plugin_url + '/assets/js/tinymce-placeholder/mce.placeholder.js'
+                    },
+                    setup: function(editor) 
+                    {
+                        editor.on('init', function() 
+                        {
+                            editor.getContainer().style.border = '1px solid #ccc';
+                        });
+                    },
+                    mentions: 
+                    {
+                        source: function (query, process, delimiter) 
+                        {
+                            // Do your ajax call
+                            jQuery.ajax({
+                                url: ajaxurl, // Use WordPress AJAX URL
+                                method: 'POST',
+                                data: {
+                                    action: 'propertyhive_fetch_note_mentions',
+                                    query: query,
+                                    security: propertyhive_admin_meta_boxes.get_notes_nonce
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                    process(response);
+                                }
+                            });
+                        }
+                    },
+                    content_style: `
+                      html, body {
+          height: 100%; /* Set both html and body to 100% height */
+          margin: 0;
+          padding: 0;
+          overflow: hidden; /* Prevent scrolling issues */
+        }
+        .mce-content-body {
+          margin: 0; /* Replace margin with padding */
+          padding: 1rem; /* Add padding */
+          box-sizing: border-box; /* Include padding in height calculation */
+          height: 100%;
+          overflow-y: auto; /* Allow vertical scrolling within the body */
+        }
+                    `
+                });
+            }
         },
         beforeClose: function()
         {
@@ -1413,14 +1539,18 @@ function ph_redraw_notes_grid(section)
 
     jQuery.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response)
     {
-        if ( propertyhive_admin_meta_boxes.disable_notes_mention != true ) { tinymce.remove('textarea#add_note'); }
+        if ( propertyhive_admin_meta_boxes.disable_notes_mention != true ) 
+        { 
+            tinymce.remove('.propertyhive-lightbox-notes textarea#add_note'); 
+            tinymce.remove('#propertyhive-' + section + '-history-notes textarea#add_note'); 
+        }
 
         jQuery('#propertyhive_' +  section + '_notes_container').html(response);
 
         if ( propertyhive_admin_meta_boxes.disable_notes_mention != true ) 
         { 
             tinymce.init({
-                selector: 'textarea#add_note',
+                selector: ( ph_lightbox_open ? '.propertyhive-lightbox-notes' : '#propertyhive-' + section + '-history-notes' ) + ' textarea#add_note',
                 menubar: false,
                 toolbar: false,
                 statusbar: false,

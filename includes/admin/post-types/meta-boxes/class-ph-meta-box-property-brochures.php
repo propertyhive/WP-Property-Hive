@@ -81,7 +81,7 @@ class PH_Meta_Box_Property_Brochures {
                             return false;
                         });
                         
-                        jQuery(\'.remove_brochure_url\').click(function()
+                        jQuery(\'#property_brochure_urls\').on(\'click\', \'.remove_brochure_url\', function()
                         {
                             jQuery(this).parent().fadeOut(\'slow\', function()
                             {
@@ -134,7 +134,7 @@ class PH_Meta_Box_Property_Brochures {
                         
                         echo '<li id="brochure_' . esc_attr($brochures_attachment_id) . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
-                            echo '<a href="' . wp_get_attachment_url( $brochures_attachment_id ) . '" target="_blank"><img src="' . PH()->plugin_url() . '/assets/images/filetypes/' . $icon . '" alt="" width="' . esc_attr($thumbnail_width) . '" height="' . esc_attr($thumbnail_height) . '"></a>';
+                            echo '<a href="' . esc_url(wp_get_attachment_url( $brochures_attachment_id )) . '" target="_blank"><img src="' . esc_url(PH()->plugin_url() . '/assets/images/filetypes/' . $icon) . '" alt="" width="' . esc_attr($thumbnail_width) . '" height="' . esc_attr($thumbnail_height) . '"></a>';
                         echo '</li>';
                     }
                 }
@@ -376,7 +376,7 @@ class PH_Meta_Box_Property_Brochures {
                             
                             mediaHTML += \'<li id="brochure_\' + attachment.id + \'">\';
                             mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>\';
-                            mediaHTML += \'<img src="' . PH()->plugin_url() . '/assets/images/filetypes/\' + icon + \'" alt="" width="' . $thumbnail_width . '" height="' . $thumbnail_height . '"></li>\';
+                            mediaHTML += \'<img src="' . esc_url(PH()->plugin_url()) . '/assets/images/filetypes/\' + icon + \'" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></li>\';
                             
                             jQuery(\'#property_brochures_grid ul\').append(mediaHTML);
                         }

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="icon32 icon32-propertyhive-settings" id="icon-propertyhive"><br /></div><h2 class="nav-tab-wrapper">
 			<?php
 				foreach ( $tabs as $name => $label )
-					echo '<a href="' . admin_url( 'admin.php?page=ph-settings&tab=' . $name ) . '" class="nav-tab nav-tab-' . sanitize_title($name) . ' ' . ( $current_tab == $name ? 'nav-tab-active' : '' ) . '">' . $label . '</a>';
+					echo '<a href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=' . $name )) . '" class="nav-tab nav-tab-' . esc_attr(sanitize_title($name)) . ' ' . ( $current_tab == $name ? 'nav-tab-active' : '' ) . '">' . esc_html($label) . '</a>';
 
 				do_action( 'propertyhive_settings_tabs' );
 			?>
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                        $cancel_href = $GLOBALS['cancel_button_href'];
                    }
         	?>
-                <a href="<?php echo $cancel_href; ?>" class="button"><?php _e( 'Cancel', 'propertyhive' ); ?></a>
+                <a href="<?php echo esc_url($cancel_href); ?>" class="button"><?php echo esc_html(__( 'Cancel', 'propertyhive' )); ?></a>
             <?php
                 }
             ?>

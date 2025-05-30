@@ -1,9 +1,9 @@
-=== PropertyHive ===
+=== Property Hive ===
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.6
-Stable tag: 2.0.18
+Tested up to: 6.8.1
+Stable tag: 2.1.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,121 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.4 - 2025-05-13 =
+* Added new default tenures when installing Property Hive for the first time; Share of Freehold and Commonhold
+* Allow basic HTML in body of match emails
+* Include 'private' properties and contacts in CRM searches, for example when adding a viewing and searching for applicants
+* Added ability to pass 'match_property_type' attribute to [similar_properties] shortcode. This will return properties with the same property type as the property in question
+* Added ability to pass 'property_type_id' attribute to [similar_properties] shortcode. This will return properties of a specific property type
+* Show a warning if the reference number being entered already exists
+* Lots of escaping and sanitization throughout entire plugin
+* Ensure auto match respects timezones when checking the date it was enabled
+* Added filter 'propertyhive_use_propertyhive_templates' to turn off the use of Property Hive templates. Not recommended but handy if using Property Hive alongside a plugin that also registers the 'property' custom post type
+* Apply 'propertyhive_taxonomy_hide_empty_args' filter to child terms too
+* Ensure SQL is properly sanitized when performing query on address polygon coordinates table
+* Corrected issue with links in errors/messages being escaped when saving settings
+* Corrected Elementor tabbed details widget onclick event from not working on mobile
+* Corrected typo and the setting of contact type when instructing appraisal
+* Corrected PHP 8.1 warnings due to trying to assign submenu pages to null
+* Corrected PHP 8.3 deprecation warnings when declaring PH_Enquiry class
+* Declared compatibility for WordPress 6.8.1
+
+= 2.1.3 - 2025-04-01 =
+* Added support for Avada with a host of Avada Builder property widgets added allowing users to build the property details page
+* Corrected issue with wrong meta key field being referenced for 'Rights and Easements' in material information 
+* Security update whereby sanitization has been added to a few shortcode attributes
+
+= 2.1.2 - 2025-02-26 =
+* Added new map provider option of 'Mapbox' to use Mapbox when outputting maps
+* Allow applicant price requirements to be entered in different currency(s) based on countries selected in international settings. Previously these were hardcoded to GBP regardless of which country the agent operates in
+* Don't load maps by default in Elementor 'Tabbed Details' widget if not the first tab. Maps hidden behind a tab were contributing to Google API usage and so are now only loaded when the map is clicked
+* Added new reCAPTCHA v3 score threshold setting (between 0 and 1) to customise how loose (0) or strict (1) the spam scoring should be. Previously this was hardcoded to 0.5.
+* Added negotiator details to REST API property requests
+* Made taxonomies available in the REST API. Can be accessed via https://yoursite.com/wp-json/wp/v2/property_type for example where 'property_type' is the taxonomy name
+* Swapped order of country options in international settings area to be more logical
+* Any errors occurred when making a property enquiry or registering as an applicant will now be shown instead of a generic 'Please ensure all required fields have been completed' message
+* If an error occurs whilst registering as an applicant, automatically scroll the window up to the error so it's visible. Previously it felt like nothing was happening
+* Corrected issue with automatic email matching setting not enabling
+* Corrected missing blank option from showing in availability search form dropdown
+* Corrected dummy property import page not working when 'Property Hive Only' mode is enabled in user settings
+* Corrected typo in automatic email matching settings tooltip
+* Declared compatibility for WordPress 6.7.2
+
+= 2.1.1 - 2024-12-17 =
+* Added support for latest version of Elementor where they've deprecated schemes
+* Added support YouTube shorts when showing videos in lightbox
+* Run settings success/error messages through esc_html()
+* Corrected pricing link in update message
+* Added more options to deactivation survey
+
+= 2.1.0 - 2024-12-11 =
+* Add new splash screen when no properties exist
+* Add tutorial when adding first property
+* Add dummy 'Import Properties' screen linked from menu for free users promoting the import add on
+* Add temporary deactivation survey when plugin is deactivated
+* Add new 'Help' tab to all Property Hive pages
+* Tweak buttons on license page adding a direct link to activate features as it's the next step after adding a license key
+* Set license type to 'pro' by default on installation
+* New animated WordPress repo plugin icon
+* Add filter on property list where ref is shown so import add on can show CRM ID
+* Add Netherlands to list of supported countries
+* Show viewing as cancelled in applicant/owner accounts
+* Add new filter 'propertyhive_countries_with_material_information' so material information can be applied to more countries
+* Set department accordingly in Elementor department-specific queries
+* Correct various text translations
+* Correct PHP error in form functions when radio field used but no options passed
+* Correct material information lightbox on frontend
+* Rename plugin 'PropertyHive' to 'Property Hive'
+* Declared compatibility for WordPress 6.7.1
+
+= 2.0.22 - 2024-10-18 =
+* Search form sliders tweaked to work when multiple search forms are included on one page
+* Added 'On Hold' and 'Cancelled' statuses to Key Dates
+* Corrected notes box from not formatting WYSIWYG in viewings lightbox
+* Corrected restriction types not displaying on frontend in 'Utilities & More' lightbox
+* Corrected obtaining available date  causing it to be returned as formatted string
+
+= 2.0.21 - 2024-10-08 =
+* Added options in Elementor 'Property Images' widget to specify click action
+* Added ability to bulk mark properties as featured
+* Cater for multiple slideshows on one page in the event they're used in search results
+* Give property images a unique fancybox ID for when used in search to ensure you only see images for the property in question
+* Simplify __get() magic call on PH_Property class
+* Corrected rent calculation causing fatal error in newer PHP versions when no rent is set
+* Corrected Elementor 'Tabbed Details' styling by ensuring dependancy is declared
+* Corrected issues with post classes array breaking REST API after they introduced this into the data recently
+* Corrected integration with Yoast Duplicate Post plugin
+* Added wp-env
+* Improved handling of license key failed requests to ensure features don't get deactivated if license server is ever inaccessible or the request fails
+
+= 2.0.20 - 2024-09-16 =
+* Added rent frequency to list of REST API fields
+* Added filters to customise commercial price/rent output
+* Set default label of cascading dropdowns (location and property type) to 'Any'
+* Sort cascading search dropdowns (location and property type) by name
+* Ignore meta keys with 'property' in when creating new contact from enquiry to prevent contact name containing property name
+* Minimum and maximum price shortcode attributes to also work for lettings
+* Performing an applicant match from a property to take into account 'From Email Address' setting
+* Added Nonce validation to details and registration account forms
+* Corrected heating function calling broadband related function
+* Corrected issue with not being able to delete commercial tenures
+* Added 'src' querstring parameter to Property Hive dashboard news URLs for better analytics
+* Corrected issue with undefined variable warnings on upcoming appointments when no property
+* PHP8.2 compatibility
+* Declared compatibility for WordPress 6.6.2
+
+= 2.0.19 - 2024-08-06 =
+* Added 'Date Created' column to main contacts list
+* Added 'Date Created' filter to main contacts list
+* Added ability to create an enquiry against multiple properties at once when creating enquiry through backend
+* Improve efficiency of searching for properties when adding enquiry
+* Added option of adding 'Gallery' to Elementor Tabbed Details widget
+* Further tweaks to slideshow, inparticular calculation of thumbnail heights
+* Added new filter 'propertyhive_enquiry_list_property_display_parts' to customise property data shown in enquiry grids
+* Corrected rent not showing in property tenancies grids
+* Corrected department getting overwritten when two Elementor search forms are used on same page with different default departments
+* Declared compatibility for WordPress 6.6.1
 
 = 2.0.18 - 2024-07-18 =
 * Added new 'Archive' ability to all Property Hive records. Once a record is archived it will no longer show in searches or lists and are then only available by filtering by 'Archived' from the main posts list

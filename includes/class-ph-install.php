@@ -200,7 +200,7 @@ class PH_Install {
     {
         $schedules['every_fifteen_minutes'] = array(
             'interval'  => 900,
-            'display'   => __( 'Every 15 Minutes', 'textdomain' )
+            'display'   => __( 'Every 15 Minutes', 'propertyhive' )
         );
          
         return $schedules;
@@ -463,6 +463,12 @@ class PH_Install {
                 ),
                 array(
                     'name' => 'Leasehold'
+                ),
+                array(
+                    'name' => 'Share of Freehold'
+                ),
+                array(
+                    'name' => 'Commonhold'
                 )
             ),
             'commercial_tenure' => array(
@@ -471,6 +477,12 @@ class PH_Install {
                 ),
                 array(
                     'name' => 'Leasehold'
+                ),
+                array(
+                    'name' => 'Share of Freehold'
+                ),
+                array(
+                    'name' => 'Commonhold'
                 )
             ),
             'furnished' => array(
@@ -617,17 +629,19 @@ class PH_Install {
         add_option( 'propertyhive_applicant_match_price_range_percentage_lower', 20, '', 'no' );
         add_option( 'propertyhive_applicant_match_price_range_percentage_higher', 5, '', 'no' );
 
+        add_option( 'propertyhive_license_type', 'pro', '', 'yes' );
+
         add_option( 'propertyhive_install_timestamp', time(), '', 'no' );
         add_option( 'propertyhive_review_prompt_due_timestamp', strtotime('+30 days'), '', 'no' );
 
         add_option( 'propertyhive_enquiry_auto_responder_email_subject', __( 'Thank you for your enquiry', 'propertyhive' ), '', 'no' );
-        add_option( 'propertyhive_enquiry_auto_responder_email_body', __( "Thank you for your recent property enquiry about [property_address_hyperlinked]. A member of our team will be in touch shortly.
+        add_option( 'propertyhive_enquiry_auto_responder_email_body', sprintf( __( "Thank you for your recent property enquiry about [property_address_hyperlinked]. A member of our team will be in touch shortly.
 
 Kind regards, 
 
-" . get_bloginfo('name') . "
+%s
 
-[similar_properties]", 'propertyhive' ), '', 'no' );
+[similar_properties]", 'propertyhive' ), get_bloginfo('name') ), '', 'no' );
 
         add_option( 'propertyhive_property_match_default_email_subject', __( 'We found [property_count] that might be of interest to you', 'propertyhive' ), '', 'no' );
         add_option( 'propertyhive_property_match_default_email_body', __( "Hi [contact_dear],
@@ -640,28 +654,28 @@ If you have any questions or require more information about any of the propertie
 
 Kind regards, 
 
-" . get_bloginfo('name'), 'propertyhive' ), '', 'no' );
+", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
-        add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', 'Your Viewing On [property_address]', '', 'no' );
-        add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', "Dear [applicant_dear],
+        add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', __( 'Your Viewing On [property_address]', 'propertyhive' ), '', 'no' );
+        add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', __( "Dear [applicant_dear],
 
 This is confirmation that your viewing on [property_address] has been booked for [viewing_time] on [viewing_date].
 
 Should you need to cancel or amend your booking please do not hesitate to contact us.
 
-" . get_bloginfo('name'), '', 'no' );
+", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
-        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', 'Viewing Booked On [property_address]', '', 'no' );
-        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', "Dear [owner_dear],
+        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', __( 'Viewing Booked On [property_address]', 'propertyhive' ), '', 'no' );
+        add_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', __( "Dear [owner_dear],
 
 This is confirmation that a viewing has been booked at your property, [property_address], for [viewing_time] on [viewing_date].
 
 Should you need to cancel or amend this viewing please do not hesitate to contact us.
 
-" . get_bloginfo('name'), '', 'no' );
+", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
-        add_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', 'Viewing Booked On [property_address]', '', 'no' );
-        add_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', "This is confirmation you've been assigned to attend a viewing at property, [property_address], for [viewing_time] on [viewing_date].
+        add_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', __( 'Viewing Booked On [property_address]', 'propertyhive' ), '', 'no' );
+        add_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', __( "This is confirmation you've been assigned to attend a viewing at property, [property_address], for [viewing_time] on [viewing_date].
 
 Applicant Details:
 [applicant_details]
@@ -669,16 +683,16 @@ Applicant Details:
 Owner Details:
 [owner_details]
 
-" . get_bloginfo('name'), '', 'no' );
+", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
-        add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', 'Appraisal Booked On [property_address]', '', 'no' );
-        add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', "Dear [owner_dear],
+        add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', __( 'Appraisal Booked On [property_address]', 'propertyhive' ), '', 'no' );
+        add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', __( "Dear [owner_dear],
 
 This is confirmation that an appraisal has been booked for your property, [property_address], for [appraisal_time] on [appraisal_date].
 
 Should you need to cancel or amend this appraisal, please do not hesitate to contact us.
 
-" . get_bloginfo('name'), '', 'no' );
+", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
 	}
 

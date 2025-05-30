@@ -69,11 +69,11 @@ class PH_Meta_Box_Enquiry_Details {
 
 echo '<p class="form-field">
             
-                <label for="viewing_property_search">' . __('Search Properties', 'propertyhive') . '</label>
+                <label for="viewing_property_search">' . esc_html(__('Search Properties', 'propertyhive')) . '</label>
                 
                 <span style="position:relative;">
 
-                    <input type="text" name="viewing_property_search" id="viewing_property_search" style="width:100%;" placeholder="' . __( 'Search Properties', 'propertyhive' ) . '..." autocomplete="false">
+                    <input type="text" name="viewing_property_search" id="viewing_property_search" style="width:100%;" placeholder="' . esc_attr(__( 'Search Properties', 'propertyhive' )) . '..." autocomplete="false">
 
                     <div id="viewing_search_property_results" style="display:none; position:absolute; z-index:99; background:#EEE; left:0; width:100%; border:1px solid #999; overflow-y:auto; max-height:150px;"></div>
 
@@ -91,10 +91,11 @@ var viewing_selected_properties = [<?php
     if ( isset($_GET['property_id']) && ph_clean($_GET['property_id']) != '' ) 
     { 
         $property = new PH_Property( (int)$_GET['property_id'] );
-        echo '{ id: ' . (int)$_GET['property_id'] . ', post_title: "' . $property->get_formatted_full_address() . '" }';
+        echo '{ id: ' . (int)$_GET['property_id'] . ', post_title: "' . esc_js($property->get_formatted_full_address()) . '" }';
     } 
 ?>];
 var viewing_search_properties_timeout;
+var viewing_search_properties_xhr = jQuery.ajax({});
 
 jQuery(document).ready(function($)
 {
@@ -120,7 +121,7 @@ jQuery(document).ready(function($)
     {
         e.preventDefault();
 
-        viewing_selected_properties = []; // reset to only allow one property for now
+        //viewing_selected_properties = []; // reset to only allow one property for now
         viewing_selected_properties.push({ id: $(this).attr('href'), post_title: $(this).text(), owner_id: $(this).attr('data-viewing-owner-id'), owner_name: $(this).attr('data-viewing-owner-name') });
 
         $('#viewing_search_property_results').html('');
@@ -170,9 +171,10 @@ function viewing_perform_property_search()
     var data = {
         action:         'propertyhive_search_properties',
         keyword:        keyword,
-        security:       '<?php echo wp_create_nonce( 'search-properties' ); ?>',
+        security:       '<?php echo esc_js(wp_create_nonce( 'search-properties' )); ?>',
     };
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    viewing_search_properties_xhr.abort(); // cancel previous request
+    viewing_search_properties_xhr = jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
     {
         if (response == '' || response.length == 0)
         {
@@ -197,13 +199,17 @@ function viewing_update_selected_properties()
     if ( viewing_selected_properties.length > 0 )
     {
         jQuery('#viewing_selected_properties').html('<ul></ul>');
+        var hidden_field_values = new Array();
         for ( var i in viewing_selected_properties )
         {
             jQuery('#viewing_selected_properties ul').append('<li><a href="' + viewing_selected_properties[i].id + '" class="viewing-remove-property" style="color:inherit; text-decoration:none;" data-viewing-owner-id="' + viewing_selected_properties[i].owner_id + '" data-viewing-owner-name="' + viewing_selected_properties[i].owner_name + '"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_properties[i].post_title + '</li>');
-
-            jQuery('#property_id').val(viewing_selected_properties[i].id);
+            if (hidden_field_values.indexOf(viewing_selected_properties[i].id) === -1) 
+            {
+                hidden_field_values.push(viewing_selected_properties[i].id);
+            }
         }
         jQuery('#viewing_selected_properties').show();
+        jQuery('#property_id').val(hidden_field_values.join("|"));
     }
     else
     {
@@ -246,7 +252,7 @@ function viewing_update_selected_properties()
                         {
                             if ( !empty($sub_value) )
                             {
-                                $property_links[] = '<a href="' . get_edit_post_link( $sub_value ) . '">' . get_the_title( $sub_value ) . '</a>';
+                                $property_links[] = '<a href="' . esc_url(get_edit_post_link( $sub_value )) . '">' . esc_html(get_the_title( $sub_value )) . '</a>';
                                 $property_post_id = $sub_value;
                             }
                         }
@@ -265,7 +271,7 @@ function viewing_update_selected_properties()
                     }
                     if ( strpos($key, 'email') !== false && $value != '-' )
                     {
-                        $value = '<a href="mailto:' . $value . '">' . $value . '</a>';
+                        $value = '<a href="mailto:' . esc_attr($value) . '">' . esc_html($value) . '</a>';
                         $email = $value;
                     }
 
@@ -322,16 +328,16 @@ function viewing_update_selected_properties()
                             'property_id'          => $property_post_id,
                         );
                         $url_args = apply_filters('propertyhive_enquiry_book_viewing_link_args', $url_args);
-                        echo '<a href="' . add_query_arg( array( $url_args ), admin_url('post-new.php?post_type=viewing') ) . '" class="button" style="position:absolute; top:0; right:00;">' . __( 'Book Viewing', 'propertyhive' ) . '</a>';
+                        echo '<a href="' . esc_url(add_query_arg( array( $url_args ), admin_url('post-new.php?post_type=viewing') )) . '" class="button" style="position:absolute; top:0; right:00;">' . esc_html(__( 'Book Viewing', 'propertyhive' )) . '</a>';
                         $right_padding = '105px';
                     }
 
-                    echo '<a href="' . get_edit_post_link($enquiry_contact_id, '') . '" class="button" style="position:absolute; top:0; right:' . $right_padding . ';">' . __( 'View ', 'propertyhive' ) . $enquiry_contact_type . '</a>';
+                    echo '<a href="' . esc_url(get_edit_post_link($enquiry_contact_id, '')) . '" class="button" style="position:absolute; top:0; right:' . esc_attr($right_padding) . ';">' . esc_html(__( 'View ', 'propertyhive' )) . $enquiry_contact_type . '</a>';
                 }
                 else
                 {
                 ?>
-                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo __( 'Create ', 'propertyhive' ) . $enquiry_contact_type; ?></a>
+                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo esc_html(__( 'Create ', 'propertyhive' )) . $enquiry_contact_type; ?></a>
 
                     <script>
                         jQuery(document).ready(function($)
@@ -347,12 +353,12 @@ function viewing_update_selected_properties()
 
                                     var data = {
                                         action:         'propertyhive_create_contact_from_enquiry',
-                                        post_id:        <?php echo $enquiry_post_id; ?>,
-                                        security:       '<?php echo wp_create_nonce( 'create-content-from-enquiry-nonce-' . $enquiry_post_id ); ?>',
+                                        post_id:        <?php echo (int)$enquiry_post_id; ?>,
+                                        security:       '<?php echo esc_js(wp_create_nonce( 'create-contact-from-enquiry-nonce-' . $enquiry_post_id )); ?>',
                                     };
 
                                     var that = this;
-                                    $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
+                                    $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) {
                                         if (response.error)
                                         {
                                             $(that).attr('disabled', false);
@@ -396,7 +402,16 @@ function viewing_update_selected_properties()
             update_post_meta( $post_id, 'email', ph_clean($_POST['email']) );
             update_post_meta( $post_id, 'telephone', ph_clean($_POST['telephone']) );
             update_post_meta( $post_id, 'body', sanitize_textarea_field($_POST['body']) );
-            if ( isset($_POST['property_id']) && $_POST['property_id'] != '' ) { update_post_meta( $post_id, 'property_id', (int)$_POST['property_id'] ); }
+
+            delete_post_meta( $post_id, 'property_id' );
+            if ( isset($_POST['property_id']) && $_POST['property_id'] != '' ) 
+            {
+                $explode_property_id = explode("|", sanitize_text_field($_POST['property_id']));
+                foreach ( $explode_property_id as $property_id )
+                {
+                    add_post_meta( $post_id, 'property_id', (int)$property_id ); 
+                }
+            }
         }
     }
 

@@ -77,8 +77,160 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		// Download permissions
 		//add_action( 'propertyhive_process_product_file_download_paths', array( $this, 'process_product_file_download_paths' ), 10, 3 );*/
 
+		add_action( 'load-edit.php', array( $this, 'render_blank' ) );
+
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
+	}
+
+	public function render_blank()
+	{
+		// Check if we are on the 'property' post type listing page
+	    $screen = get_current_screen();
+	    if ($screen->post_type !== 'property') {
+	        return;
+	    }
+
+	    // Check if there are any properties
+	    $query = new WP_Query([
+	        'post_type'      => 'property',
+	        'post_status'    => 'any',
+	        'posts_per_page' => 1
+	    ]);
+
+	    if ($query->have_posts()) {
+	        return; // Let the default table load
+	    }
+
+	    // No properties found, replace the table with a custom splash screen
+	    add_filter('views_edit-property', function ($views) {
+	        // Clear default view filters (All, Published, etc.)
+	        return [];
+	    });
+
+	    add_action('manage_posts_extra_tablenav', function ($which) {
+	    	if ( $which == 'bottom' )
+	    	{
+	    		return;
+	    	}
+	        echo '
+	        <div style="padding: 50px; text-align: center;">
+
+	        	<img style="max-width:400px; margin-bottom:45px;" src="' . esc_url(PH()->plugin_url()) . '/assets/images/no-properties.png" alt="' . esc_attr( __( 'Your property journey begins here!', 'propertyhive' ) ) . '">
+
+	            <h2 style="font-size:1.8em; color:#444; margin:0 0 1.5em">' . esc_html( __( 'Your property journey begins here!', 'propertyhive' ) ) . '</h2>
+	            <a href="' . esc_url(admin_url('post-new.php?post_type=property&tutorial=yes')) . '" class="button button-primary button-hero" style="font-size:1.2em; padding:0 24px;">
+	                ' . esc_html( __( 'Add Your First Property', 'propertyhive' ) ) . '
+	            </a>&nbsp;
+	            <a href="' . esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data')) . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+	                ' . esc_html( __( 'Create Demo Data', 'propertyhive' ) ) . '
+	            </a>&nbsp; ';
+
+	            if ( apply_filters( 'propertyhive_no_properties_property_import_button', true ) === true )
+	            {
+		            $button_to_output = false;
+
+		            if ( class_exists('PH_Property_Import') )
+					{
+						// Already activated. Check can be used
+						if ( apply_filters( 'propertyhive_add_on_can_be_used', true, 'propertyhive-property-import' ) === true )
+			        	{
+			        		$button_to_output = 'normal';
+						}
+					}
+
+					if ( !$button_to_output )
+					{
+						$license_type = get_option( 'propertyhive_license_type', '' );
+						
+						switch ( $license_type )
+						{
+							case "": { $button_to_output = 'dummy'; break; }
+							case "pro": 
+							{
+								if ( PH()->license->is_valid_pro_license_key() )
+								{
+									// It should never get this far if import add on already activated, that's why show activate page
+									$button_to_output = 'activate'; 
+								}
+								else
+								{
+									$button_to_output = 'dummy'; 
+								}
+								break; 
+							}
+						}
+					}
+
+					// only show dummy button to administrators
+					if ( $button_to_output == 'dummy' || $button_to_output == 'activate' )
+					{
+						if ( !current_user_can( 'manage_options' ) ) 
+						{  
+							// not an admin
+							$button_to_output = false;
+						}
+					}
+
+					// only show dummy button to people with it installed eyond 1st nov 2023 (when PRO was introduced)
+					if ( $button_to_output == 'dummy' )
+					{
+						$propertyhive_install_timestamp = get_option( 'propertyhive_install_timestamp', '' );
+					    if ( !empty($propertyhive_install_timestamp) )
+					    {
+					    	$november_first_2023 = strtotime('2023-11-01 00:00:00');
+					    	if ( $propertyhive_install_timestamp < $november_first_2023 )
+					    	{
+					    		$button_to_output = false;
+					    	}
+					    }
+					}
+
+					switch ( $button_to_output )
+					{
+						case "normal":
+						{
+							echo '<a href="' . esc_url(admin_url('admin.php?page=propertyhive_import_properties')) . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+				                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . '
+				            </a>';
+							break;
+						}
+						case "dummy":
+						{
+							echo '<a href="' . esc_url(admin_url('admin.php?page=ph-import_properties_dummy')) . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+				                ' . esc_html( __( 'Automatically Import Properties', 'propertyhive' ) ) . ' <span style="color:#FFF; font-size:10px; font-weight:500; border-radius:12px; padding:2px 8px; letter-spacing:1px; background:#00a32a;">PRO</span>
+				            </a>';
+							break;
+						}
+						case "activate":
+						{
+							echo '<a href="' . esc_url(admin_url('admin.php?page=ph-settings&tab=features&profilter=import')) . '" class="button button-hero" style="font-size:1.2em; padding:0 24px;">
+				                ' . esc_html( __( 'Activate Property Imports', 'propertyhive' ) ) . '
+				            </a>';
+							break;
+						}
+					}
+	            }
+
+	        echo '</div>';
+	    }, 99);
+
+	    // Remove the filters
+	    remove_all_actions('restrict_manage_posts');
+
+	    // Hide the search box
+	    add_action('admin_head', function () {
+	        echo '<style>
+	        	.page-title-action,
+	        	.wrap .wp-list-table,
+	            .search-box { display: none !important; }
+	        </style>';
+	    });
+
+	    add_filter('bulk_actions-edit-property', function ($bulk_actions) {
+		    // Clear all bulk actions
+		    return [];
+		});
 	}
 
 	/**
@@ -92,7 +244,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
         if ($screen->id == 'property' && $post->post_type == 'property' && $post->post_parent != 0 && $post->post_parent != '')
         {
         	$property = new PH_Property((int)$post->post_parent);
-            $message = __( "This property is a unit belonging to", 'propertyhive' ) . ' <a href="' . get_edit_post_link( $post->post_parent ) . '">' . $property->get_formatted_full_address() . '</a>';
+            $message = __( "This property is a unit belonging to", 'propertyhive' ) . ' <a href="' . esc_url(get_edit_post_link( $post->post_parent )) . '">' . esc_html($property->get_formatted_full_address()) . '</a>';
             echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
         }
     }
@@ -221,10 +373,10 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 
                 $thumb_src = $the_property->get_main_photo_src();
                 
-				echo '<a href="' . get_edit_post_link( $post->ID ) . '">';
+				echo '<a href="' . esc_url(get_edit_post_link( $post->ID )) . '">';
 				if ($thumb_src !== FALSE)
 				{
-				    echo '<img src="' . $thumb_src . '" alt="" width="50">';
+				    echo '<img src="' . esc_url($thumb_src) . '" alt="" width="50">';
                 }
                 else
                 {
@@ -244,7 +396,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
-				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title . '</a>';
+				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . esc_html($title) . '</a>';
 
 				$post_status = get_post_status( $post->ID );
 				$post_title_output = '';
@@ -255,7 +407,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 				$post_title_output = apply_filters( 'propertyhive_admin_property_column_post_address_output', $post_title_output );
 				if ( $post_title_output != '' )	
 				{
-					echo ' - ' . $post_title_output;
+					echo ' - ' . esc_html($post_title_output);
 				}
 
 				echo '</strong>';
@@ -283,14 +435,16 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 								)
 								&& 
 								$the_property->bedrooms != '' 
-							) ? $the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' ) . ' ' : '' 
-						) . $the_property->property_type;
+							) ? esc_html($the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' )) . ' ' : '' 
+						) . esc_html($the_property->property_type);
 					}
 
 					if ( $the_property->reference_number )
 					{
-						$details[] = '<span style="opacity:0.6">' . __( 'Ref', 'propertyhive' ) . ': ' . $the_property->reference_number . '</span>';
+						$details[] = '<span style="opacity:0.6">' . esc_html(__( 'Ref', 'propertyhive' )) . ': ' . esc_html($the_property->reference_number) . '</span>';
 					}
+
+					$details = apply_filters( 'propertyhive_admin_property_column_address_details', $details, $post->ID );
 
 					echo implode("<br>", $details);
 				}
@@ -340,7 +494,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 		$the_property->price_qualifier != '' 
                 	)
                 	{
-                		$price .= '<br>' . $the_property->price_qualifier;
+                		$price .= '<br>' . esc_html($the_property->price_qualifier);
                 	}
                 }
                 echo $price;
@@ -352,27 +506,27 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
             
 	            if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
 	            {
-	               echo $term_list[0]. '<br>';
+	               echo esc_html($term_list[0]). '<br>';
 	            }
 
             	if (isset($the_property->_on_market) && $the_property->_on_market == 'yes')
             	{
-            		echo __( 'On The Market', 'propertyhive' );
+            		echo esc_html(__( 'On The Market', 'propertyhive' ));
             	}
             	else
             	{
-            		echo __( 'Not On The Market', 'propertyhive' );
+            		echo esc_html(__( 'Not On The Market', 'propertyhive' ));
             	}
             	
             	if (isset($the_property->_featured) && $the_property->_featured == 'yes')
             	{
-            		echo '<br>' . __( 'Featured', 'propertyhive' );
+            		echo '<br>' . esc_html(__( 'Featured', 'propertyhive' ));
             	}
 
             	$marketing_flags = $the_property->marketing_flag;
             	if ( $marketing_flags != '' )
             	{
-            		echo '<br>' . implode( "<br>", explode( ",", $marketing_flags ) );
+            		echo '<br>' . implode( "<br>", explode( ",", esc_html($marketing_flags) ) );
             	}
                 
 				break;
@@ -392,12 +546,12 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
                 	foreach ( $owner_contact_ids as $owner_contact_id )
                 	{
-		                echo get_the_title($owner_contact_id) . '<br>';
+		                echo esc_html(get_the_title($owner_contact_id)) . '<br>';
 		                if ( count($owner_contact_ids) == 1 )
 		                {
 			                echo '<div class="row-actions">';
-			                echo 'T: ' . get_post_meta($owner_contact_id, '_telephone_number', TRUE) . '<br>';
-			                echo 'E: ' . get_post_meta($owner_contact_id, '_email_address', TRUE);
+			                echo 'T: ' . esc_html(get_post_meta($owner_contact_id, '_telephone_number', TRUE)) . '<br>';
+			                echo 'E: ' . esc_html(get_post_meta($owner_contact_id, '_email_address', TRUE));
 			                echo '</div>';
 			            }
 		            }
@@ -413,12 +567,12 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 
                 if ($user_info !== FALSE)
                 {
-                    echo $user_info->display_name . '<br>';
+                    echo esc_html($user_info->display_name) . '<br>';
                 }
                 
                 if ($the_property->_office_id != '')
                 {
-                    echo get_the_title($the_property->_office_id);
+                    echo esc_html(get_the_title($the_property->_office_id));
                 }
                 
                 break;
@@ -670,6 +824,13 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 			$on_market = ph_clean( $_REQUEST['_on_market'] );
 			if ( $_REQUEST['_on_market'] != 'yes' ) { $on_market = ''; } // can only be 'yes' or blank
 			update_post_meta( $post_id, '_on_market', ph_clean( $on_market ) );
+		}
+
+		if ( ! empty( $_REQUEST['_featured'] ) ) 
+		{
+			$featured = ph_clean( $_REQUEST['_featured'] );
+			if ( $_REQUEST['_featured'] != 'yes' ) { $featured = ''; } // can only be 'yes' or blank
+			update_post_meta( $post_id, '_featured', ph_clean( $featured ) );
 		}
 
 		if ( ! empty( $_REQUEST['_availability'] ) && is_numeric( $_REQUEST['_availability'] ) ) 

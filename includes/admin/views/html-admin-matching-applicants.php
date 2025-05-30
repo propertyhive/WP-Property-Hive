@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="wrap propertyhive">
 
-	<h1>Matching Applicants For <?php echo $property->get_formatted_full_address(); ?> (<?php echo count($applicants); ?>)</h1>
+	<h1>Matching Applicants For <?php echo esc_html($property->get_formatted_full_address()); ?> (<?php echo count($applicants); ?>)</h1>
 
 	<form method="post" id="mainform" action="" enctype="multipart/form-data">
 
@@ -23,10 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                 $select_all_actions = apply_filters( 'propertyhive_matching_select_all_actions', $select_all_actions );
         ?>
         <div class="select-actions" style="padding-bottom:15px">
-            <span style="display:inline-block; vertical-align:middle;"><?php echo __( 'Select', 'propertyhive' ); ?>:</span> <?php
+            <span style="display:inline-block; vertical-align:middle;"><?php echo esc_html(__( 'Select', 'propertyhive' )); ?>:</span> <?php
                 foreach ( $select_all_actions as $key => $value )
                 {
-                    echo '<a href="javascript:;" class="button" id="select_all_' . esc_attr(sanitize_title($key)) . '" style="display:inline-block; vertical-align:middle;">All - ' . $value . '</a> ';
+                    echo '<a href="javascript:;" class="button" id="select_all_' . esc_attr(sanitize_title($key)) . '" style="display:inline-block; vertical-align:middle;">All - ' . esc_html($value) . '</a> ';
                 }
             ?>
             <a href="javascript:;" class="button" id="select_none" style="display:inline-block; vertical-align:middle;">None</a>
@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <tr>';
                 foreach ( $columns as $key => $column )
                 {
-                    echo '<th style="text-align:left">' . $column . '</th>';
+                    echo '<th style="text-align:left">' . esc_html($column) . '</th>';
                 }
                 echo '
                         <th style="text-align:left">Actions</th>
@@ -61,6 +61,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 				foreach ( $applicants as $applicant )
 				{
 					$previously_sent = array();
+
+                    $currency = '&pound;';
+                    if ( isset($applicant['applicant_profile']['currency']) && !empty($applicant['applicant_profile']['currency']) )
+                    {
+                        $PH_Countries = new PH_Countries();
+                        $selected_currency = $PH_Countries->get_currency($applicant['applicant_profile']['currency']);
+                        if ( $selected_currency !== false )
+                        {
+                            $currency = $selected_currency['currency_symbol'];
+                        }
+                    }
                     
                     $applicant_profile_match_history = get_post_meta( $applicant['contact_id'], '_applicant_profile_' . $applicant['applicant_profile']['applicant_profile_id'] . '_match_history', TRUE );
 					if ( isset($applicant_profile_match_history[$property->id]) && is_array($applicant_profile_match_history[$property->id]) && !empty($applicant_profile_match_history[$property->id]) )
@@ -77,51 +88,80 @@ if ( ! defined( 'ABSPATH' ) ) {
                     }
 
                     $requirements = array();
-                    if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
+                    if ( 
+                        isset($applicant['applicant_profile']['department']) && 
+                        ( $applicant['applicant_profile']['department'] == 'residential-sales' || ph_get_custom_department_based_on($applicant['applicant_profile']['department']) == 'residential-sales' 
+                    )
+                    )
                     {
-                        $requirements[] = array(
-                            'label' => __( 'Maximum Price', 'propertyhive' ),
-                            'value' => '&pound;' . ph_display_price_field($applicant['applicant_profile']['max_price']),
-                        );
-                    }
-                    if ( $percentage_lower != '' && $percentage_higher != '' )
-                    {
-                        $match_price_range_lower = '';
-                        if ( !isset($applicant['applicant_profile']['match_price_range_lower_actual']) || ( isset($applicant['applicant_profile']['match_price_range_lower_actual']) && $applicant['applicant_profile']['match_price_range_lower_actual'] == '' ) )
-                        {
-                            if ( isset($applicant['applicant_profile']['max_price_actual']) && $applicant['applicant_profile']['max_price_actual'] != '' )
-                            {
-                                $match_price_range_lower = $applicant['applicant_profile']['max_price_actual'] - ( $applicant['applicant_profile']['max_price_actual'] * ( $percentage_lower / 100 ) );
-                            }
-                        }
-                        else
-                        {
-                            $match_price_range_lower = $applicant['applicant_profile']['match_price_range_lower_actual'];
-                        }
-
-                        $match_price_range_higher = '';
-                        if ( !isset($applicant['applicant_profile']['match_price_range_higher_actual']) || ( isset($applicant['applicant_profile']['match_price_range_higher_actual']) && $applicant['applicant_profile']['match_price_range_higher_actual'] == '' ) )
-                        {
-                            if ( isset($applicant['applicant_profile']['max_price_actual']) && $applicant['applicant_profile']['max_price_actual'] != '' )
-                            {
-                                $match_price_range_higher = $applicant['applicant_profile']['max_price_actual'] + ( $applicant['applicant_profile']['max_price_actual'] * ( $percentage_higher / 100 ) );
-                            }
-                        }
-                        else
-                        {
-                            $match_price_range_higher = $applicant['applicant_profile']['match_price_range_higher_actual'];
-                        }
-
-                        if ( 
-                            $match_price_range_lower != '' && $match_price_range_higher != ''
-                        )
+                        if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
                         {
                             $requirements[] = array(
-                                'label' => __( 'Maximum Price Range', 'propertyhive' ),
-                                'value' => '&pound;' . ph_display_price_field($match_price_range_lower) . ' to &pound;' . ph_display_price_field($match_price_range_higher),
+                                'label' => __( 'Maximum Price', 'propertyhive' ),
+                                'value' => $currency . ph_display_price_field($applicant['applicant_profile']['max_price']),
+                            );
+                        }
+                        if ( $percentage_lower != '' && $percentage_higher != '' )
+                        {
+                            $match_price_range_lower = '';
+                            if ( 
+                                !isset($applicant['applicant_profile']['match_price_range_lower_actual']) || 
+                                ( isset($applicant['applicant_profile']['match_price_range_lower_actual']) && $applicant['applicant_profile']['match_price_range_lower_actual'] == '' ) 
+                            )
+                            {
+                                if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
+                                {
+                                    $match_price_range_lower = $applicant['applicant_profile']['max_price'] - ( $applicant['applicant_profile']['max_price'] * ( $percentage_lower / 100 ) );
+                                }
+                            }
+                            else
+                            {
+                                $match_price_range_lower = $applicant['applicant_profile']['match_price_range_lower'];
+                            }
+
+                            $match_price_range_higher = '';
+                            if ( 
+                                !isset($applicant['applicant_profile']['match_price_range_higher_actual']) || 
+                                ( isset($applicant['applicant_profile']['match_price_range_higher_actual']) && $applicant['applicant_profile']['match_price_range_higher_actual'] == '' ) 
+                            )
+                            {
+                                if ( isset($applicant['applicant_profile']['max_price']) && $applicant['applicant_profile']['max_price'] != '' )
+                                {
+                                    $match_price_range_higher = $applicant['applicant_profile']['max_price'] + ( $applicant['applicant_profile']['max_price'] * ( $percentage_higher / 100 ) );
+                                }
+                            }
+                            else
+                            {
+                                $match_price_range_higher = $applicant['applicant_profile']['match_price_range_higher'];
+                            }
+
+                            if ( 
+                                $match_price_range_lower != '' && $match_price_range_higher != ''
+                            )
+                            {
+                                $requirements[] = array(
+                                    'label' => __( 'Maximum Price Range', 'propertyhive' ),
+                                    'value' => $currency . ph_display_price_field($match_price_range_lower) . ' to ' . $currency . ph_display_price_field($match_price_range_higher),
+                                );
+                            }
+                        }
+                    }
+
+                    if ( 
+                        isset($applicant['applicant_profile']['department']) && 
+                        ( $applicant['applicant_profile']['department'] == 'residential-lettings' || ph_get_custom_department_based_on($applicant['applicant_profile']['department']) == 'residential-lettings' 
+                    )
+                    )
+                    {
+                        if ( isset($applicant['applicant_profile']['max_rent']) && $applicant['applicant_profile']['max_rent'] != '' )
+                        {
+                            $requirements[] = array(
+                                'label' => __( 'Maximum Rent', 'propertyhive' ),
+                                'value' => $currency . ph_display_price_field($applicant['applicant_profile']['max_rent']) . ' ' . $applicant['applicant_profile']['rent_frequency']
                             );
                         }
                     }
+
                     if ( isset($applicant['applicant_profile']['min_beds']) && $applicant['applicant_profile']['min_beds'] != '' )
                     {
                         $requirements[] = array(
@@ -129,6 +169,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                             'value' => $applicant['applicant_profile']['min_beds'],
                         );
                     }
+
                     if ( isset($applicant['applicant_profile']['property_types']) && is_array($applicant['applicant_profile']['property_types']) && !empty($applicant['applicant_profile']['property_types']) )
                     {
                         //$requirements[] = 'Max Price: ' . $applicant['applicant_profile']['max_price'];
@@ -173,26 +214,26 @@ if ( ! defined( 'ABSPATH' ) ) {
                     }
 
                     $columns = array(
-                        'name' => '<strong><a href="' . get_edit_post_link($applicant['contact_id']) . '" target="_blank">' . get_the_title($applicant['contact_id']) . '</a>' . ( ( isset($applicant['applicant_profile']['grading']) && $applicant['applicant_profile']['grading'] == 'hot' ) ? '<br><span style="color:#C00;">('. __( 'Hot Applicant', 'propertyhive' ) . ')</span>' : '' ) . '</strong>',
-                        'contact_details' => 'T: ' . get_post_meta( $applicant['contact_id'], '_telephone_number', TRUE ) . '<br>E: ' . $email_address,
+                        'name' => '<strong><a href="' . esc_url(get_edit_post_link($applicant['contact_id'])) . '" target="_blank">' . esc_html(get_the_title($applicant['contact_id'])) . '</a>' . ( ( isset($applicant['applicant_profile']['grading']) && $applicant['applicant_profile']['grading'] == 'hot' ) ? '<br><span style="color:#C00;">('. esc_html(__( 'Hot Applicant', 'propertyhive' )) . ')</span>' : '' ) . '</strong>',
+                        'contact_details' => 'T: ' . esc_html(get_post_meta( $applicant['contact_id'], '_telephone_number', TRUE )) . '<br>E: ' . esc_html($email_address),
                         'requirements' => $requirements_output,
                     );
 
                     $columns = apply_filters( 'propertyhive_matching_applicants_row_data', $columns, $applicant, $property->id );
 
-                    echo '<tr id="matching_contact_' . $applicant['contact_id'] . '_applicant_profile_' . $applicant['applicant_profile']['applicant_profile_id'] . '">';
+                    echo '<tr id="matching_contact_' . (int)$applicant['contact_id'] . '_applicant_profile_' . (int)$applicant['applicant_profile']['applicant_profile_id'] . '">';
                     foreach ( $columns as $key => $column )
                     {
                         echo '<td style="border-bottom:1px solid #CCC; padding:5px 0;">' . $column . '</td>';
                     }
                     echo '<td style="border-bottom:1px solid #CCC; padding:5px 0;">';
 
-                        echo '<label><input type="checkbox" name="email_contact_applicant_profile_id[]" value="' . $applicant['contact_id'] . '|' . $applicant['applicant_profile']['applicant_profile_id'] . '" ';
+                        echo '<label><input type="checkbox" name="email_contact_applicant_profile_id[]" value="' . (int)$applicant['contact_id'] . '|' . (int)$applicant['applicant_profile']['applicant_profile_id'] . '" ';
 
                         $post_tip = '';
                         if ( strpos($email_address, '@') === FALSE )
                         {
-                            echo ' disabled title="Invalid email address: ' . $email_address . '"';
+                            echo ' disabled title="Invalid email address: ' . esc_attr($email_address) . '"';
                             //$post_tip = 'Invalid email address: ' . $email_address;
                         }
                         elseif ( $do_not_email )
@@ -228,13 +269,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                             }
                         }
 
-                        echo '> Email Property To Applicant<span style="font-weight:400;">' . ( ($post_tip != '') ? ' - ' . $post_tip : '' ) . '</span></label>
+                        echo '> Email Property To Applicant<span style="font-weight:400;">' . ( ($post_tip != '') ? ' - ' . esc_html($post_tip) : '' ) . '</span></label>
 
                             <br>';
 
                         do_action( 'propertyhive_property_match_send_methods', $applicant['contact_id'], $applicant['applicant_profile']['applicant_profile_id'], $property->id );
 
-                        echo '<label><input type="checkbox" name="not_interested_contact_applicant_profile_id[]" value="' . $applicant['contact_id'] . '|' . $applicant['applicant_profile']['applicant_profile_id'] . '"> Property Not Suitable</label>';
+                        echo '<label><input type="checkbox" name="not_interested_contact_applicant_profile_id[]" value="' . (int)$applicant['contact_id'] . '|' . (int)$applicant['applicant_profile']['applicant_profile_id'] . '"> Property Not Suitable</label>';
 
                     echo '</td>';
                     echo '</tr>';
@@ -253,9 +294,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <p class="submit">
 
-        	<input name="save" class="button-primary" type="submit" value="<?php echo __( 'Continue', 'propertyhive' ); ?>" />
+        	<input name="save" class="button-primary" type="submit" value="<?php echo esc_html(__( 'Continue', 'propertyhive' )); ?>" />
 
-            <a href="<?php echo get_edit_post_link((int)$_GET['property_id']); ?>" class="button"><?php _e( 'Cancel', 'propertyhive' ); ?></a>
+            <a href="<?php echo esc_url(get_edit_post_link((int)$_GET['property_id'])); ?>" class="button"><?php echo esc_html(__( 'Cancel', 'propertyhive' )); ?></a>
 
         	<input type="hidden" name="step" value="one" />
         	<?php wp_nonce_field( 'propertyhive-matching-applicants' ); ?>
@@ -263,7 +304,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         </p>
 
         <p>
-        	<?php echo __( "If you've opted to email any of the applicants you'll have the ability to edit the contents of the email in the next step.", 'propertyhive' ); ?>
+        	<?php echo esc_html(__( "If you've opted to email any of the applicants you'll have the ability to edit the contents of the email in the next step.", 'propertyhive' )); ?>
         </p>
 
         </div>

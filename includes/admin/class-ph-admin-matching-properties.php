@@ -39,7 +39,7 @@ class PH_Admin_Matching_Properties {
 		if ( isset($_POST['step']) )
 		{
 			if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-properties' ) )
-	    		die( __( 'Action failed. Please refresh the page and retry.', 'propertyhive' ) );
+	    		die( esc_html(__( 'Action failed. Please refresh the page and retry.', 'propertyhive' )) );
 
 			switch ( $_POST['step'] )
 			{
@@ -177,15 +177,37 @@ class PH_Admin_Matching_Properties {
                             $new_bcc_email_addresses[] = sanitize_email($bcc_email_address);
                         }
 
+                        $allowed_tags = array(
+                            'strong' => array(),
+                            'span'   => array(),
+                            'em'     => array(),
+                            'h1'     => array(),
+                            'h2'     => array(),
+                            'h3'     => array(),
+                            'h4'     => array(),
+                            'h5'     => array(),
+                            'h6'     => array(),
+                            'i'      => array(),
+                            'u'      => array(),
+                            'b'      => array(),
+                            'a'      => array(
+                                'href' => array(),
+                                'target' => array(),
+                            ),
+                        );
+                        $allowed_tags = apply_filters( 'propertyhive_match_email_allowed_tags', $allowed_tags );
+
+                        $body = wp_kses(wp_unslash($_POST['body']), $allowedposttags);
+
     					// Email info entered. Time to send emails
                         $this->send_emails(
                             (int)$_GET['contact_id'], 
                             (int)$_GET['applicant_profile'], 
                             explode(",", ph_clean($_POST['email_property_id'])),
-                            ph_clean($_POST['from_name']),
-                            sanitize_email($_POST['from_email_address']),
-                            ph_clean($_POST['subject']),
-                            sanitize_textarea_field($_POST['body']),
+                            ph_clean(wp_unslash($_POST['from_name'])),
+                            sanitize_email(wp_unslash($_POST['from_email_address'])),
+                            ph_clean(wp_unslash($_POST['subject'])),
+                            $body,
                             implode(",", $new_to_email_addresses),
                             implode(",", $new_cc_email_addresses),
                             implode(",", $new_bcc_email_addresses)
@@ -285,9 +307,16 @@ class PH_Admin_Matching_Properties {
 
             if ( $date_added_from != '' )
             {
+                // Convert stored UTC date to site timezone
+                $timezone = wp_timezone(); // Returns DateTimeZone object based on site settings
+
+                $datetime = new DateTime($date_added_from, new DateTimeZone('UTC'));
+                $datetime->setTimezone($timezone);
+                $local_date = $datetime->format('Y-m-d H:i:s');
+
                 $args['date_query'] = array(
                     array(
-                        'after' => $date_added_from,
+                        'after' => $local_date,
                         'inclusive' => true,
                     )
                 );

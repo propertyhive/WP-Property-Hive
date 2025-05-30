@@ -41,7 +41,9 @@ class Elementor_Property_EPCs_Link_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} a',
 			]
 		);
@@ -51,9 +53,8 @@ class Elementor_Property_EPCs_Link_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'color: {{VALUE}}',
@@ -93,9 +94,8 @@ class Elementor_Property_EPCs_Link_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_2,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_SECONDARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'background: {{VALUE}}',
@@ -157,12 +157,12 @@ class Elementor_Property_EPCs_Link_Widget extends \Elementor\Widget_Base {
 					}
 					if ( $image )
 					{
-						echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow">' . ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
+						echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow">' . esc_html( ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) ) . '</a>';
 						++$i;
 					}
 					else
 					{
-						echo '<a href="' . $epc['url'] . '" rel="nofollow" target="_blank">' . ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
+						echo '<a href="' . esc_url($epc['url']) . '" rel="nofollow" target="_blank">' . esc_html( ( count($epc_urls) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) ) . '</a>';
 					}
 				}
 			}
@@ -176,7 +176,7 @@ class Elementor_Property_EPCs_Link_Widget extends \Elementor\Widget_Base {
 				$i = 0;
 				foreach ( $epc_attachment_ids as $attachment_id )
 				{
-					echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="epc" rel="nofollow">' . ( count($epc_attachment_ids) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) . '</a>';
+					echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="epc" rel="nofollow">' . esc_html( ( count($epc_attachment_ids) > 1 ? __( 'EPCs', 'propertyhive' ) : __( 'EPC', 'propertyhive' ) ) ) . '</a>';
 					++$i;
 				}
 			}

@@ -84,7 +84,7 @@ class Bricks_Builder_Property_Bedrooms_Widget extends \Bricks\Element {
 	        	echo $this->settings['before'] . ' ';
 	        }
 
-			echo $property->bedrooms;
+			echo esc_html($property->bedrooms);
 
 			if ( isset($this->settings['after']) && !empty($this->settings['after']) )
 	        {

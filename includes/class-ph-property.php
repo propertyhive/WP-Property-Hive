@@ -18,6 +18,15 @@ class PH_Property {
     /** @public int Property (post) ID */
     public $id;
 
+    /** @public string Property (post) Title */
+    public $post_title;
+
+    /** @public string Property (post) Status */
+    public $post_status;
+
+    /** @public string Property (post) Excerpt */
+    public $post_excerpt;
+
     /**
      * Get the property if ID is passed, otherwise the property is new and empty.
      *
@@ -82,89 +91,23 @@ class PH_Property {
      */
     public function __get( $key ) {
 
-        if ( 'property_type' == $key ) 
-        {
-            return $this->get_property_type();
-        }
-        if ( 'availability' == $key ) 
-        {
-            return $this->get_availability();
-        }
-        if ( 'location' == $key ) 
-        {
-            return $this->get_location();
-        }
-        if ( 'price_qualifier' == $key ) 
-        {
-            return $this->get_price_qualifier();
-        }
-        if ( 'tenure' == $key ) 
-        {
-            return $this->get_tenure();
-        }
-        if ( 'sale_by' == $key ) 
-        {
-            return $this->get_sale_by();
-        }
-        if ( 'furnished' == $key ) 
-        {
-            return $this->get_furnished();
-        }
-        if ( 'parking' == $key ) 
-        {
-            return $this->get_parking();
-        }
-        if ( 'outside_space' == $key ) 
-        {
-            return $this->get_outside_space();
-        }
-        if ( 'marketing_flag' == $key ) 
-        {
-            return $this->get_marketing_flag();
-        }
-        if ( 'imported_id' == $key ) 
-        {
-            return $this->get_imported_id();
-        }
-        if ( 'office_name' == $key ) 
-        {
-            return $this->get_office_name();
-        }
-        if ( 'office_address' == $key ) 
-        {
-            return $this->get_office_address();
-        }
-        if ( 'office_telephone_number' == $key ) 
-        {
-            return $this->get_office_telephone_number();
-        }
-        if ( 'office_email_address' == $key ) 
-        {
-            return $this->get_office_email_address();
-        }
-        if ( 'negotiator_name' == $key ) 
-        {
-            return $this->get_negotiator_name();
-        }
-        if ( 'negotiator_telephone_number' == $key ) 
-        {
-            return $this->get_negotiator_telephone_number();
-        }
-        if ( 'negotiator_email_address' == $key ) 
-        {
-            return $this->get_negotiator_email_address();
-        }
-        if ( 'negotiator_photo' == $key ) 
-        {
-            return $this->get_negotiator_photo();
-        }
+        $value = '';
 
-        // Get values or default if not set
-        $value = get_post_meta( $this->id, $key, true );
-        if ($value == '')
+        if ( method_exists($this, 'get_' . $key) && 'available_date' != $key ) 
         {
-            $value = get_post_meta( $this->id, '_' . $key, true );
+            $value = $this->{'get_' . $key}();
         }
+        else
+        {
+            $value = get_post_meta( $this->id, $key, true );
+            if ($value == '')
+            {
+                $value = get_post_meta( $this->id, '_' . $key, true );
+            }
+        }
+        
+        $value = apply_filters( 'propertyhive_get_detail', $value, $key, $this );
+
         return $value;
     }
     
@@ -581,7 +524,7 @@ class PH_Property {
             }
         }
 
-        return $price;
+        return apply_filters( 'propertyhive_commercial_price_output', $price, $this );
     }
 
     /**
@@ -636,7 +579,7 @@ class PH_Property {
             }
         }
 
-        return $rent;
+        return apply_filters( 'propertyhive_commercial_rent_output', $rent, $this );
     }
 
     public function get_formatted_floor_area( ) {
@@ -1088,15 +1031,18 @@ class PH_Property {
         global $wpdb;
 
         $row = $wpdb->get_row(
-            "
-            SELECT meta_value 
-            FROM {$wpdb->prefix}postmeta 
-            WHERE 
-                meta_key LIKE '_imported_ref_%'
-            AND
-                post_id = '" . $this->id . "'
-            LIMIT 1
-            ",
+            $wpdb->prepare(
+                "
+                SELECT meta_value 
+                FROM {$wpdb->prefix}postmeta 
+                WHERE 
+                    meta_key LIKE %s
+                    AND post_id = %d
+                LIMIT 1
+                ",
+                '_imported_ref_%',
+                $this->id
+            ),
             ARRAY_A
         );
 
@@ -1353,7 +1299,7 @@ class PH_Property {
                 }
                 else
                 {
-                    $function_name = "get_restriction_type";
+                    $function_name = "get_restriction";
 
                     if ( function_exists($function_name) )
                     {
@@ -1382,7 +1328,7 @@ class PH_Property {
             {
                 if ( $type == 'other' )
                 {
-                    $rights[] = $this->_restriction_other;
+                    $rights[] = $this->_right_other;
                 }
                 else
                 {

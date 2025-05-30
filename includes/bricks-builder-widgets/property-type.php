@@ -84,7 +84,7 @@ class Bricks_Builder_Property_Type_Widget extends \Bricks\Element {
 	        	echo $this->settings['before'] . ' ';
 	        }
 
-			echo $property->property_type;
+			echo esc_html($property->property_type);
 
 			if ( isset($this->settings['after']) && !empty($this->settings['after']) )
 	        {

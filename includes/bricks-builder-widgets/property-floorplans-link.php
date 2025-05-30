@@ -64,7 +64,7 @@ class Bricks_Builder_Property_Floorplans_Link_Widget extends \Bricks\Element {
 					$i = 0;
 					foreach ( $floorplan_urls as $floorplan )
 					{
-						echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . $floorplan['url'] . '" data-fancybox="floorplans" rel="nofollow">' . ( count($floorplan_urls) > 1 ? __( 'Floorplans', 'propertyhive' ) : __( 'Floorplan', 'propertyhive' ) ) . '</a>';
+						echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow">' . esc_html( ( count($floorplan_urls) > 1 ? __( 'Floorplans', 'propertyhive' ) : __( 'Floorplan', 'propertyhive' ) ) ) . '</a>';
 						++$i;
 					}
 				}
@@ -78,7 +78,7 @@ class Bricks_Builder_Property_Floorplans_Link_Widget extends \Bricks\Element {
 					$i = 0;
 					foreach ( $floorplan_attachment_ids as $attachment_id )
 					{
-						echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="floorplans" rel="nofollow">' . ( count($floorplan_attachment_ids) > 1 ? __( 'Floorplans', 'propertyhive' ) : __( 'Floorplan', 'propertyhive' ) ) . '</a>';
+						echo '<a' . ( $i > 0 ? ' style="display:none"' : '' ) . ' href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplans" rel="nofollow">' . esc_html( ( count($floorplan_attachment_ids) > 1 ? __( 'Floorplans', 'propertyhive' ) : __( 'Floorplan', 'propertyhive' ) ) ) . '</a>';
 						++$i;
 					}
 				}

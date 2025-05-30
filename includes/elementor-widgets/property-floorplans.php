@@ -53,7 +53,9 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'title_typography',
 				'label' => __( 'Title Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .floorplans h4',
 				'condition' => [
 		            'show_title' => 'yes'
@@ -66,9 +68,8 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Title Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .floorplans h4' => 'color: {{VALUE}}',
@@ -109,11 +110,11 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
             {
             	echo '<div class="floorplans">';
 
-                    echo '<h4>' . __( 'Floorplans', 'propertyhive' ) . '</h4>';
+                    echo '<h4>' . esc_html(__( 'Floorplans', 'propertyhive' )) . '</h4>';
 
 	                foreach ($floorplan_urls as $floorplan)
 	                {
-	                	echo '<a href="' . $floorplan['url'] . '" data-fancybox="floorplans" rel="nofollow"><img src="' . $floorplan['url'] . '" alt=""></a>';
+	                	echo '<a href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url($floorplan['url']) . '" alt=""></a>';
 	                }
 
 	            echo '</div>';
@@ -127,17 +128,17 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
 			{
 				echo '<div class="floorplans">';
 
-					echo '<h4>' . __( 'Floorplans', 'propertyhive' ) . '</h4>';
+					echo '<h4>' . esc_html(__( 'Floorplans', 'propertyhive' )) . '</h4>';
 
 					foreach ( $floorplan_attachment_ids as $attachment_id )
 					{
 						if ( wp_attachment_is_image($attachment_id) )
 	                    {
-							echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
+							echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
 						}
 						else
 						{
-							echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View Floorplan', 'propertyhive' ) . '</a>';
+							echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow">' . esc_html(__( 'View Floorplan', 'propertyhive' )) . '</a>';
 						}
 					}
 
