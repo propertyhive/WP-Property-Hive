@@ -71,7 +71,9 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'back_to_search_typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .back-to-search',
 			]
 		);
@@ -81,9 +83,8 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .back-to-search' => 'color: {{VALUE}}',
@@ -96,9 +97,8 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Icon Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .back-to-search i' => 'color: {{VALUE}}',
@@ -150,18 +150,18 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 		echo '<div class="back-to-search">';
 			if ( isset($_SESSION['last_search']) && $_SESSION['last_search'] != '' ) 
 			{
-				echo '<a href="' . $_SESSION['last_search'] . '">';
+				echo '<a href="' . esc_url($_SESSION['last_search']) . '">';
 			}
 			else
 			{
-				echo '<a href="' . get_permalink(ph_get_page_id( 'search_results' )) . '">';
+				echo '<a href="' . esc_url(get_permalink(ph_get_page_id( 'search_results' ))) . '">';
 			}
 			if ( isset($settings['icon']) && !empty($settings['icon']) )
 	        {
 	        	\Elementor\Icons_Manager::render_icon( $settings['icon'], [ 'aria-hidden' => 'true' ] );
 	        	echo ' ';
 	        }
-			echo $settings['label'];
+			echo esc_html($settings['label']);
 		echo '</a>';
 		echo '</div>';
 

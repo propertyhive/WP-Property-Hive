@@ -94,14 +94,14 @@ class PH_Meta_Box_Property_Commercial_Details {
 
         echo '<p class="form-field price_field">
         
-            <label for="_price_from">' . esc_html(__('Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_sale_currency] . '</span>)' : '' ) . '</label>';
+            <label for="_price_from">' . esc_html(__('Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . esc_html($currencies[$selected_sale_currency]) . '</span>)' : '' ) . '</label>';
          
         if ( count($currencies) > 1 )
         {
             echo '<select id="_commercial_price_currency" name="_commercial_price_currency" class="select" style="width:auto; float:left;">';
-            foreach ($currencies as $currency_code => $currency_sybmol)
+            foreach ($currencies as $currency_code => $currency_symbol)
             {
-                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_sale_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_sale_currency) ? ' selected' : '') . '>' . esc_html($currency_symbol) . '</option>';
             }
             echo '</select>';
         }
@@ -221,14 +221,14 @@ class PH_Meta_Box_Property_Commercial_Details {
 
         echo '<p class="form-field price_field">
         
-            <label for="_rent_from">' . esc_html(__('Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . $currencies[$selected_rent_currency] . '</span>)' : '' ) . '</label>';
+            <label for="_rent_from">' . esc_html(__('Rent', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol">' . esc_html($currencies[$selected_rent_currency]) . '</span>)' : '' ) . '</label>';
          
         if ( count($currencies) > 1 )
         {
             echo '<select id="_commercial_rent_currency" name="_commercial_rent_currency" class="select" style="width:auto; float:left;">';
-            foreach ($currencies as $currency_code => $currency_sybmol)
+            foreach ($currencies as $currency_code => $currency_symbol)
             {
-                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_rent_currency) ? ' selected' : '') . '>' . $currency_sybmol . '</option>';
+                echo '<option value="' . esc_attr($currency_code) . '"' . ( ($currency_code == $selected_rent_currency) ? ' selected' : '') . '>' . esc_html($currency_symbol) . '</option>';
             }
             echo '</select>';
         }

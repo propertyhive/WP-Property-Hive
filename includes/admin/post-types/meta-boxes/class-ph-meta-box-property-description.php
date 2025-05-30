@@ -36,9 +36,9 @@ class PH_Meta_Box_Property_Description {
                     echo '<div class="room">';
                 
                         echo '<h3>
-                            <button type="button" class="remove_description button">' . __( 'Remove', 'propertyhive' ) . '</button>
-                            <div class="handlediv" title="' . __( 'Click to toggle', 'propertyhive' ) . '"></div>
-                            <strong>' . ( ($description_name != '') ? $description_name : '(' . __('untitled', 'propertyhive') . ')' ) . '</strong>
+                            <button type="button" class="remove_description button">' . esc_html(__( 'Remove', 'propertyhive' )) . '</button>
+                            <div class="handlediv" title="' . esc_attr(__( 'Click to toggle', 'propertyhive' )) . '"></div>
+                            <strong>' . esc_html( ($description_name != '') ? $description_name : '(' . __('untitled', 'propertyhive') . ')' ) . '</strong>
                         </h3>';
                         
                         echo '<div class="room-details">';
@@ -78,8 +78,8 @@ class PH_Meta_Box_Property_Description {
                 echo '<div class="room">';
                 
                     echo '<h3>
-                        <button type="button" class="remove_description button">' . __( 'Remove', 'propertyhive' ) . '</button>
-                        <div class="handlediv" title="' . __( 'Click to toggle', 'propertyhive' ) . '"></div>
+                        <button type="button" class="remove_description button">' . esc_html(__( 'Remove', 'propertyhive' )) . '</button>
+                        <div class="handlediv" title="' . esc_attr(__( 'Click to toggle', 'propertyhive' )) . '"></div>
                         <strong>Description Title Here</strong>
                     </h3>';
                     
@@ -135,7 +135,7 @@ class PH_Meta_Box_Property_Description {
                     var description_name = jQuery(this).val();
                     if (description_name == \'\')
                     {
-                        description_name = \'(' . __('untitled', 'propertyhive') . ')\';
+                        description_name = \'(' . esc_js(__('untitled', 'propertyhive')) . ')\';
                     }
                     jQuery(this).parent().parent().parent().children(\'h3\').children(\'strong\').html(description_name);
                 });

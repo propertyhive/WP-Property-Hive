@@ -110,6 +110,7 @@ function toggleDepartmentFields()
 
                             var this_availability_departments = [];
                             var availability_departments_exist = true;
+
                             if ( typeof availability_departments[availability_id] !== 'undefined' )
                             {
                                 this_availability_departments = availability_departments[availability_id];
@@ -119,7 +120,7 @@ function toggleDepartmentFields()
                                 availability_departments_exist = false;
                             }
 
-                            if ( jQuery.inArray( selectedDepartment, this_availability_departments ) > -1 || !availability_departments_exist )
+                            if ( availability_id == '' || jQuery.inArray( selectedDepartment, this_availability_departments ) > -1 || !availability_departments_exist )
                             {
                                 jQuery(this).find('[name=\'availability\']').append( jQuery("<option />").val(availability_id).text(availability_text) );
                             }

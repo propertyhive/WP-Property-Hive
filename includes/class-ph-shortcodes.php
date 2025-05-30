@@ -221,7 +221,7 @@ class PH_Shortcodes {
 			$base_department = ph_get_custom_department_based_on($base_department);
 		}
 
-		if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
+		if ( isset($atts['department']) && ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' ) && isset($atts['minimum_price']) && $atts['minimum_price'] != '' )
         {
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
@@ -242,7 +242,7 @@ class PH_Shortcodes {
             );
         }
 
-        if ( isset($atts['department']) && $base_department == 'residential-sales' && isset($atts['maximum_price']) && $atts['maximum_price'] != '' )
+        if ( isset($atts['department']) && ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' ) && isset($atts['maximum_price']) && $atts['maximum_price'] != '' )
         {
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
 
@@ -1263,6 +1263,8 @@ class PH_Shortcodes {
 			'matching_address_field'	=> '', // only return fields with matching address field. Options: address_two, address_three, address_four, location
 			'property_id'				=> '',
 			'availability_id'	=> '',
+			'property_type_id'	=> '',
+			'match_property_type'	=> '',
 			'no_results_output' => '',
 			'carousel' 			=> '',
 		), $atts, 'similar_properties' );
@@ -1546,6 +1548,45 @@ class PH_Shortcodes {
 	            );
 			}
 
+			$property_types = array();
+			if ( isset($atts['property_type_id']) && $atts['property_type_id'] != '' )
+			{
+				$property_types = explode(",", $atts['property_type_id']);
+			}
+
+			if ( isset($atts['match_property_type']) && $atts['match_property_type'] != '' )
+			{
+				$term_list = wp_get_post_terms((int)$atts['property_id'], ( ( $department == 'commercial' || ph_get_custom_department_based_on( $department ) == 'commercial' ) ? 'commercial_' : '' ) . 'property_type', array("fields" => "ids"));
+        
+		        if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
+		        {
+		            $property_types = $term_list;
+		        }
+			}
+
+			if ( !empty($property_types) )
+			{
+				$property_types = array_unique($property_types);
+                $property_types = array_filter($property_types);
+
+				if ( $department != 'commercial' && ph_get_custom_department_based_on( $department ) != 'commercial' )
+				{
+					$tax_query[] = array(
+			            'taxonomy'  => 'property_type',
+			            'terms' => $property_types,
+			            'compare' => 'IN',
+			        );
+				}
+				else
+				{
+					$tax_query[] = array(
+			            'taxonomy'  => 'commercial_property_type',
+			            'terms' => $property_types,
+			            'compare' => 'IN',
+			        );
+				}
+			}
+
 			if ( isset($atts['matching_address_field']) && $atts['matching_address_field'] == 'location' )
 			{
 				$term_list = wp_get_post_terms($atts['property_id'], 'location', array("fields" => "ids"));
@@ -1681,6 +1722,7 @@ class PH_Shortcodes {
 
 		$atts = shortcode_atts( array(
 			'height'        => '400',
+			'init_on_load'  => 'true'
 		), $atts, 'property_street_view' );
 
 		ob_start();
@@ -1718,7 +1760,7 @@ class PH_Shortcodes {
 
 				if ( $property->office_name != '' )
 				{
-					echo '<div class="office-name">' . $property->office_name . '</div>';
+					echo '<div class="office-name">' . esc_html($property->office_name) . '</div>';
 				}
 
 				if ( $property->get_office_address( $atts['address_separator'] ) != '' )
@@ -1728,12 +1770,12 @@ class PH_Shortcodes {
 
 				if ( $property->office_telephone_number != '' )
 				{
-					echo '<div class="office-telephone-number">' . ( ($atts['hyperlink_telephone_number'] === true) ? '<a href="tel:' . $property->office_telephone_number . '">' : '' ) . $property->office_telephone_number . ( ($atts['hyperlink_telephone_number'] === true) ? '</a>' : '' ) .  '</div>';
+					echo '<div class="office-telephone-number">' . ( ($atts['hyperlink_telephone_number'] === true) ? '<a href="tel:' . esc_attr($property->office_telephone_number) . '">' : '' ) . esc_html($property->office_telephone_number) . ( ($atts['hyperlink_telephone_number'] === true) ? '</a>' : '' ) .  '</div>';
 				}
 
 				if ( $property->office_email_address != '' )
 				{
-					echo '<div class="office-email-address">' . ( ($atts['hyperlink_email_address'] === true) ? '<a href="mailto:' . $property->office_email_address . '">' : '' ) . $property->office_email_address . ( ($atts['hyperlink_email_address'] === true) ? '</a>' : '' ) .  '</div>';
+					echo '<div class="office-email-address">' . ( ($atts['hyperlink_email_address'] === true) ? '<a href="mailto:' . esc_attr($property->office_email_address) . '">' : '' ) . esc_html($property->office_email_address) . ( ($atts['hyperlink_email_address'] === true) ? '</a>' : '' ) .  '</div>';
 				}
 
 			echo '</div>';
@@ -1791,7 +1833,7 @@ class PH_Shortcodes {
 	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 	    wp_enqueue_script('googlemaps');
 
-	    echo '<div id="office_map_canvas" style="height:' . str_replace( "px", "", ( ( isset($atts['height']) && !empty($atts['height']) ) ? $atts['height'] : '400' ) ) . 'px"></div>';
+	    echo '<div id="office_map_canvas" style="height:' . str_replace( "px", "", ( ( isset($atts['height']) && !empty($atts['height']) && is_numeric($atts['height']) ) ? (int)$atts['height'] : '400' ) ) . 'px"></div>';
 ?>
 <script>
 
@@ -1843,9 +1885,9 @@ class PH_Shortcodes {
 				$lng = '-0.118092';
 			}
 		?>
-		var myLatlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng; ?>);
+		var myLatlng = new google.maps.LatLng(<?php echo (float)$lat; ?>, <?php echo (float)$lng; ?>);
 		var map_options = {
-	  		zoom: <?php echo ( ( isset($atts['zoom']) && !empty($atts['zoom']) && $atts['zoom'] != 'auto' ) ? $atts['zoom'] : '14' ); ?>,
+	  		zoom: <?php echo ( ( isset($atts['zoom']) && !empty($atts['zoom']) && is_numeric($atts['zoom']) && $atts['zoom'] != 'auto' ) ? (int)$atts['zoom'] : '14' ); ?>,
 			center: myLatlng,
 	  		mapTypeId: google.maps.MapTypeId.ROADMAP,
 	  		scrollwheel: <?php echo ( ( isset($atts['scrollwheel']) && ($atts['scrollwheel'] === 'false' || $atts['scrollwheel'] === FALSE) ) ? 'false' : 'true' ); ?>
@@ -1890,7 +1932,7 @@ class PH_Shortcodes {
 					if ( $lat != '' && $lng != '' )
 					{
 		?>
-		var myLatlng = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $lng; ?>);
+		var myLatlng = new google.maps.LatLng(<?php echo (float)$lat; ?>, <?php echo (float)$lng; ?>);
 
 		var marker_options = {
 			map: office_map,
@@ -1908,7 +1950,7 @@ class PH_Shortcodes {
 		            $marker_icon_url = wp_get_attachment_url( $map_add_on_settings['custom_icon_attachment_id'] );
 		            if ( $marker_icon_url !== FALSE )
 		            {
-		                echo 'marker_options.icon = \'' . $marker_icon_url . '\';';
+		                echo 'marker_options.icon = \'' . esc_url($marker_icon_url) . '\';';
 		            }
 		        }
 		    }

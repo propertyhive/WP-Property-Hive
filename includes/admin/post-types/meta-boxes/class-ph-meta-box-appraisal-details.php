@@ -36,11 +36,11 @@ function redraw_appraisal_details_meta_box()
 
     var data = {
         action:         'propertyhive_get_appraisal_details_meta_box',
-        appraisal_id:     <?php echo $post->ID; ?>,
-        security:       '<?php echo wp_create_nonce( 'appraisal-details-meta-box' ); ?>',
+        appraisal_id:     <?php echo (int)$post->ID; ?>,
+        security:       '<?php echo esc_js(wp_create_nonce( 'appraisal-details-meta-box' )); ?>',
     };
 
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
     {
         jQuery('#propertyhive_appraisal_details_meta_box_container').html(response);
     }, 'html');

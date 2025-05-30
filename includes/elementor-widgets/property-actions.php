@@ -39,15 +39,15 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'display',
 			[
-				'label' => __( 'Display As', 'plugin-domain' ),
+				'label' => __( 'Display As', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::CHOOSE,
 				'options' => [
 					'list' => [
-						'title' => __( 'List', 'plugin-domain' ),
+						'title' => __( 'List', 'propertyhive' ),
 						'icon' => 'eicon-editor-list-ul',
 					],
 					'buttons' => [
-						'title' => __( 'Buttons', 'plugin-domain' ),
+						'title' => __( 'Buttons', 'propertyhive' ),
 						'icon' => 'eicon-button',
 					],
 				],
@@ -61,9 +61,8 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Button Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property_actions ul li a' => 'background: {{VALUE}}',
@@ -79,9 +78,8 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Button Text Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .property_actions ul li a' => 'color: {{VALUE}}',

@@ -38,9 +38,17 @@ class PH_Form_Handler {
 		switch ( $captcha_service )
 		{
 			case "recaptcha":
-			case "recaptcha-v3":
 			{
 				$fields['recaptcha'] = array(
+			        'type' => $captcha_service,
+			        'site_key' => get_option( 'propertyhive_captcha_site_key', '' ),
+			        'secret' => get_option( 'propertyhive_captcha_secret', '' ),
+			    );
+				break;
+			}
+			case "recaptcha-v3":
+			{
+				$fields['recaptcha-v3'] = array(
 			        'type' => $captcha_service,
 			        'site_key' => get_option( 'propertyhive_captcha_site_key', '' ),
 			        'secret' => get_option( 'propertyhive_captcha_secret', '' ),

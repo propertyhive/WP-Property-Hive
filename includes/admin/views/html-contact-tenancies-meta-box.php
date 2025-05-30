@@ -104,7 +104,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <input type="button" name="filter_action" id="filter-contact-tenancies-grid" class="button" value="Filter">
     </div>
     <div class='tablenav-pages one-page'>
-        <span class="displaying-num"><?php echo $tenancies_count; ?> item<?php echo $tenancies_count != 1 ? 's' : ''; ?></span>
+        <span class="displaying-num"><?php echo esc_html($tenancies_count); ?> item<?php echo $tenancies_count != 1 ? 's' : ''; ?></span>
     </div>
     <br class="clear" />
 </div>

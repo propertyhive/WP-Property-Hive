@@ -53,7 +53,9 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 			[
 				'name' => 'title_typography',
 				'label' => __( 'Title Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .embedded-virtual-tours h4',
 				'condition' => [
 		            'show_title' => 'yes'
@@ -66,9 +68,8 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 			[
 				'label' => __( 'Title Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .embedded-virtual-tours h4' => 'color: {{VALUE}}',
@@ -120,7 +121,7 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 		{
 			echo '<div class="embedded-virtual-tours">';
 
-				echo '<h4>' . __( 'Virtual Tours', 'propertyhive' ) . '</h4>';
+				echo '<h4>' . esc_html(__( 'Virtual Tours', 'propertyhive' )) . '</h4>';
 
 				foreach ( $virtual_tours as $virtual_tour )
 				{
@@ -144,7 +145,7 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 				        	$virtual_tour['url']
 				    	);
 
-						echo '<iframe src="' . $virtual_tour['url'] . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
+						echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
 					}
 				}
 

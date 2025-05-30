@@ -121,7 +121,7 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 
 			foreach ( $show_fields as $fieldset_key => $fieldset ) :
 				?>
-				<h2><?php echo $fieldset['title']; ?></h2>
+				<h2><?php echo esc_html($fieldset['title']); ?></h2>
 				<table class="form-table" id="<?php echo esc_attr( 'fieldset-' . $fieldset_key ); ?>">
 					<?php foreach ( $fieldset['fields'] as $key => $field ) : ?>
 						<?php
@@ -160,7 +160,7 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 				                        <?php if ( !empty($this->get_user_meta( $user->ID, $key )) ) { echo wp_get_attachment_image( $this->get_user_meta( $user->ID, $key ), 'thumbnail'); } ?>
 				                    </div>
 									<div class="wp-media-buttons">
-				                        <button class="button propertyhive-add-media" id="propertyhive-add-media"><?php _e('Select', 'propertyhive'); ?></button>
+				                        <button class="button propertyhive-add-media" id="propertyhive-add-media"><?php echo esc_html(__('Select', 'propertyhive')); ?></button>
 				                    </div>
                     				<script>
 

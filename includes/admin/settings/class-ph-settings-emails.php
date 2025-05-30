@@ -248,7 +248,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
             'title'   => __( 'Automatically Send Matching Properties To Applicants', 'propertyhive' ),
             'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent properties.<br><br>
             	- This will only apply to properties added from the moment this option is activated.<br>
-            	- When enabled, this can disabled on a per-applicant basis by going into their record<br>
+            	- When enabled, this can be disabled on a per-applicant basis by going into their record.<br>
             	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ) . ( ( get_option( 'propertyhive_auto_property_match', '' ) == 'yes' && get_option( 'propertyhive_auto_property_match_enabled_date', '' ) != '' ) ? '<br><br>Enabled on ' . date("jS F Y H:i", strtotime(get_option( 'propertyhive_auto_property_match_enabled_date', '' )) + $time_offset) : '' ),
             'id'      => 'propertyhive_auto_property_match',
             'type'    => 'checkbox',
@@ -447,9 +447,9 @@ class PH_Settings_Emails extends PH_Settings_Page {
                     }
                     else
                     {
-                    	echo __( 'Next scheduled to run at', 'propertyhive' ) . ' ' . date("H:i jS F Y", $next_due);
+                    	echo esc_html(__( 'Next scheduled to run at', 'propertyhive' ) . ' ' . date("H:i jS F Y", $next_due));
                     }
-            	?></strong> <a href="<?php echo admin_url('admin.php?page=ph-settings&tab=email&section=log&custom_email_log_cron=propertyhive_process_email_log' ); ?>" class="button">Run Now</a></p>
+            	?></strong> <a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&custom_email_log_cron=propertyhive_process_email_log' )); ?>" class="button">Run Now</a></p>
 
             	<br>
 
@@ -511,7 +511,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 									jQuery('#_wpnonce').remove();
 									jQuery('input[name=\'_wp_http_referer\']').remove();
 									jQuery('#mainform').attr('method', 'get');
-									jQuery('#mainform').attr('action', '<?php echo admin_url('admin.php'); ?>');
+									jQuery('#mainform').attr('action', '<?php echo esc_url(admin_url('admin.php')); ?>');
 								});
 							</script>
 						</div>
@@ -564,7 +564,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 						?>
 						<tr>
 	                    	<td class="date-time"><?php echo esc_html(date("jS M Y H:i", strtotime($email->send_at))); ?></td>
-	                    	<td class="recipient"><?php echo '<a href="' . get_edit_post_link($email->contact_id) . '">' . esc_html(get_the_title($email->contact_id)) . '</a><br>' . esc_html($email->to_email_address); ?></td>
+	                    	<td class="recipient"><?php echo '<a href="' . esc_url(get_edit_post_link($email->contact_id)) . '">' . esc_html(get_the_title($email->contact_id)) . '</a><br>' . esc_html($email->to_email_address); ?></td>
 	                        <td class="subject"><?php echo esc_html($email->subject); ?></td>
 	                        <td class="status"><?php
 	                        	switch ($email->status)
@@ -576,7 +576,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	                        	}
 	                        ?></td>
 	                        <td class="actions">
-	                        	<a href="<?php echo wp_nonce_url( admin_url('?view_propertyhive_email=' . $email->email_id . '&email_id=' . $email->email_id ), 'view-email' ) ?>" target="_blank" class="button">View Email</a>
+	                        	<a href="<?php echo esc_url(wp_nonce_url( admin_url('?view_propertyhive_email=' . $email->email_id . '&email_id=' . $email->email_id ), 'view-email' )); ?>" target="_blank" class="button">View Email</a>
 	                        </td>
 	                    </tr>
 						<?php
@@ -645,16 +645,16 @@ class PH_Settings_Emails extends PH_Settings_Page {
 				{
 					$settings = $this->get_property_match_settings();
 
-					PH_Admin_Settings::save_fields( $settings );
-
 					$previous_auto_property_match = get_option( 'propertyhive_auto_property_match', '' );
+
+					PH_Admin_Settings::save_fields( $settings );
 
 					if ( isset($_POST['propertyhive_auto_property_match']) && $_POST['propertyhive_auto_property_match'] == '1' )
 					{
 						if ( $previous_auto_property_match != 'yes' )
 						{
-							// it's been activated
-							update_option( 'propertyhive_auto_property_match_enabled_date', date("Y-m-d H:i:s"), FALSE);
+							// it's been activated. Stored in UTC
+							update_option( 'propertyhive_auto_property_match_enabled_date', gmdate("Y-m-d H:i:s"), FALSE);
 						}
 
 						$timestamp = wp_next_scheduled( 'propertyhive_auto_email_match' );

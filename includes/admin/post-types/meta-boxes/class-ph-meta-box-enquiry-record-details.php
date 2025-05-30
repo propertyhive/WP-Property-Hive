@@ -45,7 +45,7 @@ class PH_Meta_Box_Enquiry_Record_Details {
         
         echo '<p class="form-field negotiator_id_field">
         
-            <label for="_negotiator_id">' . __('Negotiator', 'propertyhive') . '</label>';
+            <label for="_negotiator_id">' . esc_html(__('Negotiator', 'propertyhive')) . '</label>';
             
             $args = array(
                 'show_option_none' => '-- ' . __( 'Unassigned', 'propertyhive' ) . ' --',

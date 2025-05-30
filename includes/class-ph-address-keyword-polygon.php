@@ -70,12 +70,16 @@ class PH_Address_Keyword_Polygon {
         $address_keyword = trim($address_keyword);
 
         // see if it exists in the table
-        $results = $wpdb->get_results("
-            SELECT polygon_coordinates
-            FROM " . $wpdb->prefix . "ph_address_keyword_polygon
-            WHERE 
-                address_keyword = '" . $address_keyword . "'
-        ");
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "
+                SELECT polygon_coordinates
+                FROM {$wpdb->prefix}ph_address_keyword_polygon
+                WHERE address_keyword = %s
+                ",
+                $address_keyword
+            )
+        );
 
         foreach ( $results as $result ) 
         {

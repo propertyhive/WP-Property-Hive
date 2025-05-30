@@ -160,11 +160,11 @@ table.ph_offices .primary input {
 .applicant-list-results table {  }
 .applicant-list-results table td { border-bottom:1px solid #DDD; }
 
-.ph-recently-viewed-popup { display:none; position:absolute; z-index:1; max-width:260px; right:162px; top:28px; background:#FFF; border:1px solid #DDD; box-shadow:0px 0px 8px 2px rgba(0, 0, 0, 0.1); }
+.ph-recently-viewed-popup { display:none; position:absolute; z-index:1; max-width:300px; right:162px; top:28px; background:#FFF; border:1px solid #DDD; box-shadow:0px 0px 8px 2px rgba(0, 0, 0, 0.1); }
 .ph-recently-viewed-popup .none { padding:20px; }
 .ph-recently-viewed-popup ul { margin:0; padding:0; }
 .ph-recently-viewed-popup ul li { margin:0; padding:0; }
-.ph-recently-viewed-popup ul li a { display:block; padding:10px 15px; }
+.ph-recently-viewed-popup ul li a { display:block; padding:8px 15px; }
 .ph-recently-viewed-popup ul li a:hover { background:#F1F1F2; }
 
 .propertyhive-lightbox-details { white-space:nowrap; }

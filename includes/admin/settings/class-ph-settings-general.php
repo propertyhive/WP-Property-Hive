@@ -286,19 +286,19 @@ class PH_Settings_General extends PH_Settings_Page {
 
 			array( 'title' => __( 'International Options', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'international_options' ),
 
-			array(
-                'title'   => __( 'Default Country', 'propertyhive' ),
-                'id'      => 'propertyhive_default_country',
-                'type'    => 'single_select_country',
-                'css'       => 'min-width:300px;',
-            ),
-
             array(
                 'title'   => __( 'Countries Where You Operate', 'propertyhive' ),
                 'id'      => 'propertyhive_countries',
                 'type'    => 'multi_select_countries',
                 'css'       => 'min-width:300px;',
                 'desc'	=> __( 'Hold ctrl/cmd whilst clicking to select multiple', 'propertyhive' )
+            ),
+
+            array(
+                'title'   => __( 'Default Country', 'propertyhive' ),
+                'id'      => 'propertyhive_default_country',
+                'type'    => 'single_select_country',
+                'css'       => 'min-width:300px;',
             ),
 
             array(
@@ -376,7 +376,8 @@ class PH_Settings_General extends PH_Settings_Page {
                 'type'    => 'radio',
                 'options' => array(
                     '' => 'Google Maps',
-                    'osm' => 'OpenStreetMap'
+                    'mapbox' => 'Mapbox',
+                    'osm' => 'OpenStreetMap',
                 ),
             ),
 
@@ -388,12 +389,20 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title'   => __( 'Mapbox API Key', 'propertyhive' ),
+                'id'      => 'propertyhive_mapbox_api_key',
+                'type'    => 'text',
+                'desc'  => '<p>' . __( 'If you have a Mapbox API key you can enter it here. You can generate an API key <a href="https://account.mapbox.com/" target="_blank">here</a>.' ) . '</p>'
+            ),
+
+            array(
                 'title'   => __( 'Geocoding Provider', 'propertyhive' ),
                 'id'      => 'propertyhive_geocoding_provider',
                 'type'    => 'radio',
                 'options' => array(
                     '' => 'Google Maps',
-                    'osm' => 'OpenStreetMap'
+                    //'mapbox' => 'Mapbox',
+                    'osm' => 'OpenStreetMap',
                 ),
             ),
 
@@ -409,6 +418,13 @@ class PH_Settings_General extends PH_Settings_Page {
             $settings[] = array(
                 'title'   => __( 'Google Maps Geocoding API Key', 'propertyhive' ),
                 'id'      => 'propertyhive_google_maps_geocoding_api_key',
+                'type'    => 'text',
+                'desc'  => '<p>' . __( 'If you have referer restrictions applied to the main API key entered then server side geocoding requests will be blocked. To get around this you can setup a separate API key specifically for geocoding and enter it here, with IP restrictions applied instead if required.<br>More about this can be found <a href="https://docs.wp-property-hive.com/user-guide/maps-co-ordinates-and-geocoding/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
+            );
+
+            $settings[] = array(
+                'title'   => __( 'Mapbox Geocoding API Key', 'propertyhive' ),
+                'id'      => 'propertyhive_mapbox_geocoding_api_key',
                 'type'    => 'text',
                 'desc'  => '<p>' . __( 'If you have referer restrictions applied to the main API key entered then server side geocoding requests will be blocked. To get around this you can setup a separate API key specifically for geocoding and enter it here, with IP restrictions applied instead if required.<br>More about this can be found <a href="https://docs.wp-property-hive.com/user-guide/maps-co-ordinates-and-geocoding/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
             );
@@ -559,6 +575,14 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
+                'title'   => __( 'Score Threshold', 'propertyhive' ),
+                'id'      => 'propertyhive_captcha_score_threshold',
+                'type'    => 'text',
+                'default' => 0.5,
+                'desc'    => __( 'Set the minimum score required to pass reCAPTCHA v3 verification (between 0 and 1). Lower values allow more submissions through but increase spam risk.', 'propertyhive' ),
+            ),
+
+            array(
                 //'title'   => __( 'CAPTCHA service', 'propertyhive' ),
                 'id'      => 'propertyhive_captcha_html',
                 'type'    => 'html',
@@ -577,6 +601,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     {
                         jQuery(\'#row_propertyhive_captcha_site_key\').hide();
                         jQuery(\'#row_propertyhive_captcha_secret\').hide();
+                        jQuery(\'#row_propertyhive_captcha_score_threshold\').hide();
 
                         var selected_captcha_service = jQuery(\'input[name=\\\'propertyhive_captcha_service\\\']:checked\').val();
 
@@ -584,6 +609,11 @@ class PH_Settings_General extends PH_Settings_Page {
                         {
                             jQuery(\'#row_propertyhive_captcha_site_key\').show();
                             jQuery(\'#row_propertyhive_captcha_secret\').show();
+
+                            if ( selected_captcha_service == \'recaptcha-v3\' )
+                            {
+                                jQuery(\'#row_propertyhive_captcha_score_threshold\').show();
+                            }
                         }
                     }
                 </script>',
@@ -804,7 +834,7 @@ class PH_Settings_General extends PH_Settings_Page {
 	 * @return void
 	 */
 	function color_picker( $name, $id, $value, $desc = '' ) {
-		echo '<div class="color_box"><strong><img class="help_tip" data-tip="' . esc_attr( $desc ) . '" src="' . PH()->plugin_url() . '/assets/images/help.png" height="16" width="16" /> ' . esc_html( $name ) . '</strong>
+		echo '<div class="color_box"><strong><img class="help_tip" data-tip="' . esc_attr( $desc ) . '" src="' . esc_url(PH()->plugin_url() . '/assets/images/help.png') . '" height="16" width="16" /> ' . esc_html( $name ) . '</strong>
 			<input name="' . esc_attr( $id ). '" id="' . esc_attr( $id ) . '" type="text" value="' . esc_attr( $value ) . '" class="colorpick" /> <div id="colorPickerDiv_' . esc_attr( $id ) . '" class="colorpickdiv"></div>
 		</div>';
 	}
@@ -980,8 +1010,6 @@ class PH_Settings_General extends PH_Settings_Page {
                     }
                 }
             }
-
-			flush_rewrite_rules();
 		}
 	}
 

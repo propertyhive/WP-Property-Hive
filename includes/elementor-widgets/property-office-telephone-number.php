@@ -41,7 +41,9 @@ class Elementor_Property_Office_Telephone_Number_Widget extends \Elementor\Widge
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}}',
 			]
 		);
@@ -51,9 +53,8 @@ class Elementor_Property_Office_Telephone_Number_Widget extends \Elementor\Widge
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}}' => 'color: {{VALUE}}',
@@ -93,7 +94,7 @@ class Elementor_Property_Office_Telephone_Number_Widget extends \Elementor\Widge
 			{
 				echo '<a href="tel:' . esc_attr($property->office_telephone_number) . '">';
 			}
-	        echo $property->office_telephone_number;
+	        echo esc_html($property->office_telephone_number);
 	        if ( isset($settings['hyperlink']) && $settings['hyperlink'] == 'yes' )
 			{
 				echo '</a>';

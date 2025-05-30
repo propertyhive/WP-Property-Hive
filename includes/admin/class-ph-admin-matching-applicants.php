@@ -31,7 +31,7 @@ class PH_Admin_Matching_Applicants {
 		if ( isset($_POST['step']) )
 		{
 			if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-applicants' ) )
-	    		die( __( 'Action failed. Please refresh the page and retry.', 'propertyhive' ) );
+	    		die( esc_html(__( 'Action failed. Please refresh the page and retry.', 'propertyhive' )) );
 
 			switch ( $_POST['step'] )
 			{
@@ -51,6 +51,17 @@ class PH_Admin_Matching_Applicants {
 
                         $subject = get_option( 'propertyhive_property_match_default_email_subject', '' );
                         $body = get_option( 'propertyhive_property_match_default_email_body', '' );
+
+                        $from_email_option = get_option( 'propertyhive_property_match_default_from', '' );
+                        if( $from_email_option == 'default_from_email' )
+                        {
+                            $from_email_address = get_option('propertyhive_email_from_address', '');
+                        }
+                        else
+                        {
+                            $current_user = wp_get_current_user();
+                            $from_email_address = $current_user->user_email;
+                        }
 					}
 
                     $nothing_to_send = apply_filters( 'propertyhive_applicant_match_nothing_to_send', $nothing_to_send );
@@ -137,7 +148,7 @@ class PH_Admin_Matching_Applicants {
 				{
                     if ( isset($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) )
                     {
-                        $email_contact_applicant_profile_id = explode(",", $_POST['email_contact_applicant_profile_id']);
+                        $email_contact_applicant_profile_id = explode(",", sanitize_text_field($_POST['email_contact_applicant_profile_id']));
 
                         foreach ( $email_contact_applicant_profile_id as $contact_applicant_profile_id )
                         {
@@ -168,15 +179,37 @@ class PH_Admin_Matching_Applicants {
                                 $new_bcc_email_addresses[] = sanitize_email($bcc_email_address);
                             }
 
+                            $allowed_tags = array(
+                                'strong' => array(),
+                                'span'   => array(),
+                                'em'     => array(),
+                                'h1'     => array(),
+                                'h2'     => array(),
+                                'h3'     => array(),
+                                'h4'     => array(),
+                                'h5'     => array(),
+                                'h6'     => array(),
+                                'i'      => array(),
+                                'u'      => array(),
+                                'b'      => array(),
+                                'a'      => array(
+                                    'href' => array(),
+                                    'target' => array(),
+                                ),
+                            );
+                            $allowed_tags = apply_filters( 'propertyhive_match_email_allowed_tags', $allowed_tags );
+
+                            $body = wp_kses(wp_unslash($_POST['body']), $allowedposttags);
+
         					// Email info entered. Time to send emails
                             $this->send_emails(
                                 (int)$contact_id, 
                                 (int)$applicant_profile_id, 
                                 array($property_id),
-                                ph_clean($_POST['from_name']),
-                                sanitize_email($_POST['from_email_address']),
-                                ph_clean($_POST['subject']),
-                                sanitize_textarea_field($_POST['body']),
+                                ph_clean(wp_unslash($_POST['from_name'])),
+                                sanitize_email(wp_unslash($_POST['from_email_address'])),
+                                ph_clean(wp_unslash($_POST['subject'])),
+                                $body,
                                 implode(",", $new_to_email_addresses),
                                 implode(",", $new_cc_email_addresses),
                                 implode(",", $new_bcc_email_addresses)

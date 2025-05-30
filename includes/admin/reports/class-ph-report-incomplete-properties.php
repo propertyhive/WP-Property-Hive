@@ -312,7 +312,7 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					{
 						echo '<tr>';
 
-						echo '<td><a href="' . get_edit_post_link( get_the_ID() ) . '">' . esc_html($property->get_formatted_full_address()) . '</a></td>';
+						echo '<td><a href="' . esc_url(get_edit_post_link( get_the_ID() )) . '">' . esc_html($property->get_formatted_full_address()) . '</a></td>';
 						
 						echo '<td>' . esc_html(implode(", ", $missing)) . '</td>';
 

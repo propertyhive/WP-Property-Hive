@@ -56,7 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <a href="" name="export_action" id="export-contact-viewings-grid" class="button">Export</a>
     </div>
     <div class='tablenav-pages one-page'>
-        <span class="displaying-num"><?php echo $viewings_count; ?> item<?php echo $viewings_count != 1 ? 's' : ''; ?></span>
+        <span class="displaying-num"><?php echo esc_html($viewings_count); ?> item<?php echo $viewings_count != 1 ? 's' : ''; ?></span>
     </div>
     <br class="clear" />
 </div>

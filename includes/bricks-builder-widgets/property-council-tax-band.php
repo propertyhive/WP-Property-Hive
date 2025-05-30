@@ -84,7 +84,7 @@ class Bricks_Builder_Property_Council_Tax_Band_Widget extends \Bricks\Element {
 	        	echo $this->settings['before'] . ' ';
 	        }
 
-			echo $property->council_tax_band;
+			echo esc_html($property->council_tax_band);
 
 			if ( isset($this->settings['after']) && !empty($this->settings['after']) )
 	        {

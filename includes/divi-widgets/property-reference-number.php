@@ -50,7 +50,7 @@ class Divi_Property_Reference_Number_Widget extends ET_Builder_Module
 
         if ( isset($this->props['before']) && $this->props['before'] != '' ) { $return .= $this->props['before'] . ' '; }
 
-        $return .= $property->reference_number;
+        $return .= esc_html($property->reference_number);
 
         if ( isset($this->props['after']) && $this->props['after'] != '' ) { $return .= ' ' . $this->props['after']; }
 

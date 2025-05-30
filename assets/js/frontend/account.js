@@ -82,77 +82,22 @@ jQuery(document).ready(function($)
     // Registration form being submitted
     $('body').on('submit', 'form[name=\'ph_applicant_registration_form\']', function()
     {
-        if (!is_submitting)
+        if ( !is_submitting )
         {
-            is_submitting = true;
-            
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_applicant_registration', 'security': propertyhive_account_params.register_nonce });
-            
-            var form_obj = $(this);
+            form_obj = jQuery(this);
 
-            form_obj.find('#registrationSuccess').hide();
-            form_obj.find('#registrationValidation').hide();
-            form_obj.find('#registrationError').hide();
-
-            $.post( propertyhive_account_params.ajax_url, data, function(response)
+            if ( propertyhive_account_params.captcha_service == 'recaptcha-v3' && typeof grecaptcha !== 'undefined' )
             {
-                if (response.success == true)
+                grecaptcha.execute(propertyhive_account_params.recaptcha_site_key, { action: 'submit' }).then(function(token) 
                 {
-                    if ( propertyhive_account_params.redirect_url && propertyhive_account_params.redirect_url != '' )
-                    {
-                        window.location.href = propertyhive_account_params.redirect_url;
-                    }
-                    else
-                    {
-                        if ( propertyhive_account_params.my_account_url && propertyhive_account_params.my_account_url != '' )
-                        {
-                            window.location.href = propertyhive_account_params.my_account_url;
-                        }
-                        else
-                        {
-                            form_obj.find('#registrationSuccess').fadeIn();
-
-                            $('html,body').animate({
-                                scrollTop: form_obj.find('#registrationSuccess').offset().top - 200
-                            });
-                            
-                            form_obj.trigger("reset");
-                        }
-                    }
-                }
-                else
-                {
-                    form_obj.find('#registrationValidation').html('Please ensure all required fields have been completed');
-                    if (response.reason == 'validation')
-                    {
-                        if ( response.errors.length > 0 )
-                        {
-                            var error_html = '';
-                            for ( var i in response.errors )
-                            {
-                                error_html += response.errors[i] + '<br>';
-                            }
-                            if ( error_html != '' )
-                            {
-                                form_obj.find('#registrationValidation').html(error_html);
-                            }
-                        }
-                        form_obj.find('#registrationValidation').fadeIn();
-                    }
-                    else
-                    {
-                        form_obj.find('#registrationError').fadeIn();
-                    }
-                }
-                
-                is_submitting = false;
-
-                if ( typeof grecaptcha != 'undefined' && $( "div.g-recaptcha" ).length > 0 )
-                {
-                    grecaptcha.reset();
-                }
-                
-            });
+                    jQuery('#g-recaptcha-response').val(token);
+                    ph_submit_applicant_registration_form(form_obj); // Submit form after getting the new token
+                });
+            }
+            else
+            {
+                ph_submit_applicant_registration_form(form_obj); // If reCAPTCHA is undefined, still submit
+            }
         }
 
         return false;
@@ -165,7 +110,7 @@ jQuery(document).ready(function($)
         {
             is_submitting = true;
             
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_details', 'security': propertyhive_account_params.details_nonce });
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_details', 'ph_account_details_security': propertyhive_account_params.userdetails_nonce });
             
             var form_obj = $(this);
 
@@ -190,6 +135,11 @@ jQuery(document).ready(function($)
                         form_obj.find('#detailsError').fadeIn();
                     }
                 }
+
+                if (response.new_details_nonce) 
+                {
+                    propertyhive_account_params.userdetails_nonce = response.new_details_nonce;
+                }
                 
                 is_submitting = false;
                 
@@ -206,7 +156,7 @@ jQuery(document).ready(function($)
         {
             is_submitting = true;
             
-            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_requirements', 'security': propertyhive_account_params.requirements_nonce });
+            var data = $(this).serialize() + '&'+$.param({ 'action': 'propertyhive_save_account_requirements', 'ph_account_requirements_security': propertyhive_account_params.requirements_nonce });
             
             var form_obj = $(this);
 
@@ -230,6 +180,11 @@ jQuery(document).ready(function($)
                     {
                         form_obj.find('#requirementsError').fadeIn();
                     }
+                }
+
+                if (response.new_requirements_nonce) 
+                {
+                    propertyhive_account_params.requirements_nonce = response.new_requirements_nonce;
                 }
                 
                 is_submitting = false;
@@ -337,6 +292,80 @@ jQuery(document).ready(function($)
         return false;
     });
 });
+
+function ph_submit_applicant_registration_form(form_obj)
+{
+    is_submitting = true;
+            
+    var data = form_obj.serialize() + '&' + jQuery.param({ 'action': 'propertyhive_applicant_registration', 'security': propertyhive_account_params.register_nonce });
+    
+    form_obj.find('#registrationSuccess').hide();
+    form_obj.find('#registrationValidation').hide().text(propertyhive_account_params.default_validation_error_message);
+    form_obj.find('#registrationError').hide();
+
+    jQuery.post( propertyhive_account_params.ajax_url, data, function(response)
+    {
+        if (response.success == true)
+        {
+            if ( propertyhive_account_params.redirect_url && propertyhive_account_params.redirect_url != '' )
+            {
+                window.location.href = propertyhive_account_params.redirect_url;
+            }
+            else
+            {
+                if ( propertyhive_account_params.my_account_url && propertyhive_account_params.my_account_url != '' )
+                {
+                    window.location.href = propertyhive_account_params.my_account_url;
+                }
+                else
+                {
+                    form_obj.find('#registrationSuccess').fadeIn();
+
+                    jQuery('html,body').animate({
+                        scrollTop: form_obj.find('#registrationSuccess').offset().top - 200
+                    });
+                    
+                    form_obj.trigger("reset");
+                }
+            }
+        }
+        else
+        {
+            if (response.reason == 'validation')
+            {
+                if ( response.errors.length > 0 )
+                {
+                    let error_html = '';
+                    for ( var i in response.errors )
+                    {
+                        if ( error_html != '' ) { error_html += ', '; }
+                        error_html += response.errors[i];
+                    }
+                    if ( error_html != '' )
+                    {
+                        form_obj.find('#registrationValidation').text(error_html);
+                    }
+                }
+                form_obj.find('#registrationValidation').fadeIn();
+                jQuery('html,body').scrollTop( form_obj.find('#registrationValidation').offset().top );
+            }
+            else
+            {
+                form_obj.find('#registrationError').fadeIn();
+            }
+        }
+        
+        is_submitting = false;
+
+        if ( propertyhive_account_params.captcha_service == 'recaptcha' )
+        {
+            // Reset reCAPTCHA for v2 (checkbox version)
+            if (typeof grecaptcha !== 'undefined' && typeof grecaptcha.reset === 'function') {
+                grecaptcha.reset();
+            }
+        }
+    });
+}
 
 jQuery(window).on('load', function() {
 

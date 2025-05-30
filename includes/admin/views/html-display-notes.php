@@ -319,18 +319,18 @@ if ($section != 'enquiry')
 
 			$note_classes[] = 'note-type-' . $note['type'];
 			?>
-			<li rel="<?php echo absint( $note['id'] ) ; ?>" class="<?php echo implode( ' ', $note_classes ); ?>">
+			<li rel="<?php echo absint( $note['id'] ) ; ?>" class="<?php echo esc_attr(implode( ' ', $note_classes )); ?>">
 				<div class="note_content<?php echo ($note['pinned'] == '1') ? ' pinned' : '' ?>">
 					<?php echo wp_kses_post( $note['body'] ); ?>
 				</div>
 				<p class="meta">
-					<abbr class="exact-date" title="<?php echo date("Y-m-d H:i:s", $note['timestamp']); ?>">
+					<abbr class="exact-date" title="<?php echo esc_attr(date("Y-m-d H:i:s", $note['timestamp'])); ?>">
 						<?php 
 							
 							$time_diff =  current_time( 'timestamp', 1 ) - $note['timestamp'];
 
 							if ($time_diff > 86400) {
-								echo date( $datetime_format, $note['timestamp'] );
+								echo esc_html(date( $datetime_format, $note['timestamp'] ));
 							} else {
 								printf( __( '%s ago', 'propertyhive' ), human_time_diff( $note['timestamp'], current_time( 'timestamp', 1 ) ) );
 							}
@@ -338,15 +338,15 @@ if ($section != 'enquiry')
 					</abbr>
 					<?php if ( $note['author'] !== __( 'Property Hive', 'propertyhive' ) && $note['author'] != '' ) printf( ' ' . __( 'by %s', 'propertyhive' ), $note['author'] );?>
 
-					<a href="#" data-section="<?php echo $section; ?>" class="toggle_note_pinned"><?php _e( ( $note['pinned'] == '0' ) ? 'Pin To Top' : 'Unpin', 'propertyhive' ); ?></a>
+					<a href="#" data-section="<?php echo esc_attr($section); ?>" class="toggle_note_pinned"><?php echo esc_html(__( ( $note['pinned'] == '0' ) ? 'Pin To Top' : 'Unpin', 'propertyhive' )); ?></a>
 
-					<?php if ( $note['type'] == 'note' ) { ?><a href="#" data-section="<?php echo $section; ?>" class="delete_note"><?php _e( 'Delete', 'propertyhive' ); ?></a><?php } ?>
+					<?php if ( $note['type'] == 'note' ) { ?><a href="#" data-section="<?php echo $section; ?>" class="delete_note"><?php echo esc_html(__( 'Delete', 'propertyhive' )); ?></a><?php } ?>
 					<?php
 						if ( $post->ID != $note['post_id'] )
 						{
 					?>
 					<br>
-					<?php echo __( 'Note originally entered on', 'propertyhive' ); ?> <a href="<?php echo get_edit_post_link($note['post_id']); ?>" style="color:inherit;"><?php echo __( ucfirst(get_post_type($note['post_id'])), 'propertyhive' ); ?></a>
+					<?php echo esc_html(__( 'Note originally entered on', 'propertyhive' )); ?> <a href="<?php echo esc_url(get_edit_post_link($note['post_id'])); ?>" style="color:inherit;"><?php echo esc_html(__( ucfirst(get_post_type($note['post_id'])), 'propertyhive' )); ?></a>
 					<?php
 						}
 					?>
@@ -356,7 +356,7 @@ if ($section != 'enquiry')
 		}
 	}
 	?>
-	<li id="no_notes" style="text-align:center;<?php echo (!empty($note_output)) ? 'display:none;' : '';  ?>"><?php if ( isset($_POST['pinned']) && (int)$_POST['pinned'] == 1 ) { echo __( 'There are no pinned notes to display', 'propertyhive' ); }else{ echo __( 'There are no notes to display', 'propertyhive' ); } ?></li>
+	<li id="no_notes" style="text-align:center;<?php echo (!empty($note_output)) ? 'display:none;' : '';  ?>"><?php if ( isset($_POST['pinned']) && (int)$_POST['pinned'] == 1 ) { echo esc_html(__( 'There are no pinned notes to display', 'propertyhive' )); }else{ echo esc_html(__( 'There are no notes to display', 'propertyhive' )); } ?></li>
 </ul>
 
 <?php if ( !isset($_POST['pinned']) ) { ?>
@@ -365,10 +365,10 @@ if ($section != 'enquiry')
 	<p>
 		<textarea type="text" name="note" id="add_note" class="input-text" cols="20" rows="6" placeholder="Enter your note<?php if ( apply_filters('propertyhive_disable_notes_mention', false) === false ) { ?><br>Type <code style='background:#f9f9f9; border:1px solid #DDD; padding:0 2px; border-radius:5px; vertical-align:middle'>@</code> to tag a contact and property<?php } ?>"></textarea>
 		<br>
-		<input type="checkbox" name="pinned" id="pinned" value="1"> <?php _e( 'Pin Note', 'propertyhive' ); ?>
+		<input type="checkbox" name="pinned" id="pinned" value="1"> <?php echo esc_html(__( 'Pin Note', 'propertyhive' )); ?>
 	</p>
 	<p>
-		<a href="#" class="add_note button-primary" data-section="<?php echo $section; ?>"><?php _e( 'Save Note', 'propertyhive' ); ?></a>
+		<a href="#" class="add_note button-primary" data-section="<?php echo esc_attr($section); ?>"><?php echo esc_html(__( 'Save Note', 'propertyhive' )); ?></a>
 	</p>
 </div>
 <?php } ?>

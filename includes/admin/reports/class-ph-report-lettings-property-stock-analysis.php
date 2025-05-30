@@ -786,8 +786,8 @@ jQuery.fn.useTooltip = function () {
 <script>
 var average_data = <?php echo json_encode($average_data); ?>;
 
-var metric_one = '<?php echo $metric_one; ?>';
-var metric_two = '<?php echo $metric_two; ?>';
+var metric_one = '<?php echo esc_js($metric_one); ?>';
+var metric_two = '<?php echo esc_js($metric_two); ?>';
 
 var metric_one_labels = false;
 <?php

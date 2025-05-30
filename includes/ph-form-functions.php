@@ -800,6 +800,7 @@ function ph_form_field( $key, $field )
         case "number":
         case "password":
         {
+            $field['id'] = isset( $field['id'] ) ? $field['id'] : $key;
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
             $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . $key . '">';
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
@@ -841,7 +842,7 @@ function ph_form_field( $key, $field )
             $output .= '<input
                     type="' . esc_attr( $field['type'] ) . '"
                     name="' . esc_attr( $key ) . '"
-                    id="' . esc_attr( $key ) . '"
+                    id="' . esc_attr( $field['id'] ) . '"
                     value="' . esc_attr( $field['value'] ) . '"
                     placeholder="' . esc_attr( $field['placeholder'] ) . '"
                     class="' . esc_attr( $field['class'] ) . '"
@@ -960,6 +961,7 @@ function ph_form_field( $key, $field )
             $field['after_input'] = isset( $field['after_input'] ) ? $field['after_input'] : '';
             $field['show_label'] = isset( $field['show_label'] ) ? $field['show_label'] : false;
             $field['label'] = isset( $field['label'] ) ? $field['label'] : '';
+            $field['options'] = ( isset( $field['options'] ) && is_array( $field['options'] ) ) ? $field['options'] : array();
 
             $field['value'] = isset( $field['value'] ) ? $field['value'] : '';
             if ( isset( $_GET[$key] ) && ! empty( $_GET[$key] ) )
@@ -1261,15 +1263,15 @@ function ph_form_field( $key, $field )
             if ($field['show_label'])
             {
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
-                $output .= ' - <span id="search-form-slider-value-' . $key . '" class="search-form-slider-value"></span>';
+                $output .= ' - <span id="search-form-slider-value-' . $key . '" class="search-form-slider-value search-form-slider-value-' . $key . '"></span>';
                 $output .= '</label>';
             }
 
-            $output .= '<div id="search-form-slider-' . $key . '" class="search-form-slider" style="min-width:150px;"></div>';
+            $output .= '<div id="search-form-slider-' . $key . '" class="search-form-slider search-form-slider-' . $key . '" style="min-width:150px;"></div>';
 
             $field_name = str_replace("_slider", "", $key);
-            $output .= '<input type="hidden" name="minimum_' . $field_name . '" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_' . $field_name]) ? ph_clean($_GET['minimum_' . $field_name]) : '' ) . '">';
-            $output .= '<input type="hidden" name="maximum_' . $field_name . '" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_' . $field_name]) ? ph_clean($_GET['maximum_' . $field_name]) : '' ) . '">';
+            $output .= '<input type="hidden" name="minimum_' . $field_name . '" class="min_slider_value-' . $key . '" id="min_slider_value-' . $key . '" value="' . ( isset($_GET['minimum_' . $field_name]) ? ph_clean($_GET['minimum_' . $field_name]) : '' ) . '">';
+            $output .= '<input type="hidden" name="maximum_' . $field_name . '" class="max_slider_value-' . $key . '" id="max_slider_value-' . $key . '" value="' . ( isset($_GET['maximum_' . $field_name]) ? ph_clean($_GET['maximum_' . $field_name]) : '' ) . '">';
 
             $output .= $field['after'];
 
@@ -1313,19 +1315,26 @@ function ph_form_field( $key, $field )
             $output .= '<script>
                 jQuery(document).ready(function()
                 {
-                    jQuery( "#search-form-slider-' . $key . '" ).slider({
-                        range: ' . ( ( $field['min'] != '' && $field['max'] != '' ) ? 'true' : 'false' ) . ',
-                        step: ' . $field['step'] . ',
-                        ' . ( $field['min'] != '' ? 'min: ' . $field['min'] . ',' : '' ) . '
-                        ' . ( $field['max'] != '' ? 'max: ' . $field['max'] . ',' : '' ) . '
-                        ' . $value . '
-                        slide: function( event, ui ) {
-                            jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + ui.values[ 0 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + ui.values[ 1 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
-                            jQuery( "#min_slider_value-' . $key . '" ).val( ui.values[0] );
-                            jQuery( "#max_slider_value-' . $key . '" ).val( ui.values[1] );
-                        }
+                    jQuery( ".search-form-slider-' . $key . '" ).each(function(index) 
+                    {
+                        jQuery(this).slider({
+                            range: ' . ( ( $field['min'] != '' && $field['max'] != '' ) ? 'true' : 'false' ) . ',
+                            step: ' . $field['step'] . ',
+                            ' . ( $field['min'] != '' ? 'min: ' . $field['min'] . ',' : '' ) . '
+                            ' . ( $field['max'] != '' ? 'max: ' . $field['max'] . ',' : '' ) . '
+                            ' . $value . '
+                            slide: function( event, ui ) {
+                                //jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + ui.values[ 0 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + ui.values[ 1 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
+                                //jQuery( "#min_slider_value-' . $key . '" ).val( ui.values[0] );
+                                //jQuery( "#max_slider_value-' . $key . '" ).val( ui.values[1] );
+
+                                jQuery(this).closest("form").find(".search-form-slider-value-' . $key . '").html( "' . $prefix . '" + ui.values[ 0 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + ui.values[ 1 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
+                                jQuery(this).closest("form").find(".min_slider_value-' . $key . '").val( ui.values[0] );
+                                jQuery(this).closest("form").find(".max_slider_value-' . $key . '").val( ui.values[1] );
+                            }
+                        });
+                        jQuery(this).closest("form").find(".search-form-slider-value-' . $key . '").html( "' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 0 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 1 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
                     });
-                    jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 0 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 1 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
                 });
             </script>';
 
@@ -1371,7 +1380,7 @@ function ph_form_field( $key, $field )
                 <script src="https://www.google.com/recaptcha/api.js?render=' . $field['site_key'] . '"></script>
                 <script>
                     grecaptcha.ready(function() {
-                        grecaptcha.execute("' . $field['site_key'] . '", {action:\'validate_captcha\'})
+                        grecaptcha.execute("' . $field['site_key'] . '", {action:\'submit\'})
                                 .then(function(token) {
                             // add token value to form
                             document.querySelectorAll("#g-recaptcha-response").forEach(
@@ -1381,7 +1390,6 @@ function ph_form_field( $key, $field )
                     });
                 </script>
                 <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
-                <input type="hidden" name="action" value="validate_captcha">
             ';
             break;
         }
@@ -1545,6 +1553,9 @@ function ph_form_field( $key, $field )
                                                 ),
                                             ),
                                         );
+
+                                        $empty_check_args = apply_filters( 'propertyhive_taxonomy_hide_empty_args', $empty_check_args, $field, $subterm->term_id );
+
                                         $empty_check_query = new WP_Query( $empty_check_args );
 
                                         if ( !$empty_check_query->have_posts() )
@@ -1589,6 +1600,9 @@ function ph_form_field( $key, $field )
                                                         ),
                                                     ),
                                                 );
+
+                                                $empty_check_args = apply_filters( 'propertyhive_taxonomy_hide_empty_args', $empty_check_args, $field, $subsubterm->term_id );
+                                                
                                                 $empty_check_query = new WP_Query( $empty_check_args );
 
                                                 if ( !$empty_check_query->have_posts() )

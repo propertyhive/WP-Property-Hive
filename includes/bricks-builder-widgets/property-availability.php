@@ -59,7 +59,7 @@ class Bricks_Builder_Property_Availability_Widget extends \Bricks\Element {
 
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-			echo $property->availability;
+			echo esc_html($property->availability);
 
 		echo '</div>';
 	}

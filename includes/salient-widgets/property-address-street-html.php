@@ -27,7 +27,7 @@ if ( $property->address_street != '' )
 
 	echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
 
-		echo $property->address_street;
+		echo esc_html($property->address_street);
 
 	echo '</div>';
 }

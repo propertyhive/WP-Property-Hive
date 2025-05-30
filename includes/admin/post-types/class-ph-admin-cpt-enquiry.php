@@ -152,17 +152,17 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                     {
                         if ( count($viewing_ids) == 1 )
                         {
-                            $enquiry_text = 'is an existing viewing';
+                            $enquiry_text = __( 'is an existing viewing', 'propertyhive' );
                         }
                         else
                         {
-                            $enquiry_text = 'are ' . count($viewing_ids) . ' existing viewings';
+                            $enquiry_text = sprintf( __( 'are %s existing viewings', 'propertyhive' ), count($viewing_ids) );
                         }
 
-                        $message = '<p>' . __( 'There ' . $enquiry_text . ' for this applicant at this property.', 'propertyhive' ) . '</p>';
+                        $message = '<p>' . sprintf( __( 'There %s for this applicant at this property.', 'propertyhive' ), $enquiry_text ) . '</p>';
                         foreach( $viewing_ids as $viewing_id )
                         {
-                            $message .= '<p><a href="' . get_edit_post_link( $viewing_id ) . '" class="button">' . __( 'Edit Viewing', 'propertyhive' ) . '</a></p>';
+                            $message .= '<p><a href="' . esc_url(get_edit_post_link( $viewing_id )) . '" class="button">' . esc_html(__( 'Edit Viewing', 'propertyhive' )) . '</a></p>';
                         }
                         echo "<div class=\"notice notice-info\">$message</div>";
                     }
@@ -269,7 +269,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 $edit_link        = get_edit_post_link( $post->ID );
                 $title = _draft_or_post_title();
                 
-                echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . $title . '</a></strong>';
+                echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . esc_html($title) . '</a></strong>';
                 
                 break;
             case 'status' :
@@ -284,7 +284,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
 
                 $sources = apply_filters( 'propertyhive_enquiry_sources', $sources );
 
-                echo ( ( isset($sources[$the_enquiry->source]) ) ? $sources[$the_enquiry->source] : $the_enquiry->source );
+                echo esc_html( ( isset($sources[$the_enquiry->source]) ) ? $sources[$the_enquiry->source] : $the_enquiry->source );
                 break;
             case 'properties' :
                 $property_ids = $the_enquiry->get_properties();
@@ -306,14 +306,14 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
             case 'negotiator' :
                 if ($the_enquiry->_negotiator_id == '' || $the_enquiry->_negotiator_id == 0)
                 {
-                    echo '<em>-- ' . __( 'Unassigned', 'propertyhive' ) . ' --</em>';
+                    echo '<em>-- ' . esc_html(__( 'Unassigned', 'propertyhive' )) . ' --</em>';
                 }
                 else
                 {
                     $userdata = get_userdata( $the_enquiry->_negotiator_id );
                     if ( $userdata !== FALSE )
                     {
-                        echo $userdata->display_name;
+                        echo esc_html($userdata->display_name);
                     }
                     else
                     {
@@ -325,7 +325,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 $office_id = $the_enquiry->_office_id;
                 if ( !empty($office_id) )
                 {
-                    echo get_the_title( $office_id );
+                    echo esc_html(get_the_title( $office_id ));
                 }
                 else
                 {

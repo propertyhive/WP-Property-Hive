@@ -41,7 +41,9 @@ class Elementor_Property_Marketing_Flag_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .elementor-widget-marketing-flag',
 			]
 		);
@@ -51,9 +53,8 @@ class Elementor_Property_Marketing_Flag_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-widget-marketing-flag' => 'color: {{VALUE}}',
@@ -104,7 +105,7 @@ class Elementor_Property_Marketing_Flag_Widget extends \Elementor\Widget_Base {
 
 		if ( $property->marketing_flag != '' )
 		{
-	        echo '<div class="elementor-widget-marketing-flag">' . $property->marketing_flag . '</div>';
+	        echo '<div class="elementor-widget-marketing-flag">' . esc_html($property->marketing_flag) . '</div>';
 	    }
 
 	}

@@ -45,7 +45,7 @@ function ph_properties_rss_feed() {
 
         $feed = get_post_type_archive_feed_link( 'property' );
 
-        echo '<link rel="alternate" type="application/rss+xml"  title="' . __( 'Latest Properties', 'propertyhive' ) . '" href="' . esc_attr( $feed ) . '" />';
+        echo '<link rel="alternate" type="application/rss+xml"  title="' . esc_attr(__( 'Latest Properties', 'propertyhive' )) . '" href="' . esc_url( $feed ) . '" />';
 
     }
 }
@@ -160,6 +160,8 @@ function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
     $classes[] = 'property';
     $classes[] = 'department-' . $property->department;
     $classes[] = 'office-' . $property->office_id;
+
+    $classes = array_values($classes);
 
     return $classes;
 }
@@ -1145,10 +1147,13 @@ if ( ! function_exists( 'propertyhive_get_template_single_material_information_a
         }
 
         $actions[] = array(
-            'href' => '#ph_material_information',
+            'href' => 'javascript:;',
             'label' => __( 'Utilities & More', 'propertyhive' ),
             'class' => 'action-material-information',
-            'attributes' => array( 'data-fancybox' => '' ),
+            'attributes' => array( 
+                'data-fancybox' => '', 
+                'data-src' => '#ph_material_information' 
+            ),
         );
 
         echo '<div id="ph_material_information" style="display:none;">';

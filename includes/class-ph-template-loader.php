@@ -23,13 +23,19 @@ class PH_Template_Loader {
 
 	public function init()
 	{
+		$use_propertyhive_templates = apply_filters( 'propertyhive_use_propertyhive_templates', true );
+		if ( $use_propertyhive_templates === false )
+		{
+			return;
+		}
+
 		$priority = 10;
 		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 		if ( is_plugin_active( 'oxygen/functions.php' ) )
         {
         	$priority = 99;
         }
-		add_filter( 'template_include', array( $this, 'template_loader' ), $priority );
+        add_filter( 'template_include', array( $this, 'template_loader' ), $priority );
 	}
 
 	/**

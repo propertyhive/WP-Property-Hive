@@ -27,7 +27,7 @@ if ( $property->address_postcode != '' )
 
 	echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
 
-		echo $property->address_postcode;
+		echo esc_html($property->address_postcode);
 
 	echo '</div>';
 }

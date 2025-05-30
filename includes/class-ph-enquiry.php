@@ -17,6 +17,8 @@ class PH_Enquiry {
 
     /** @public int Enquiry (post) ID */
     public $id;
+    public $post_title;
+    public $post_status;
 
     /**
      * Get the enquiry if ID is passed, otherwise the enquiry is new and empty.
@@ -198,6 +200,10 @@ class PH_Enquiry {
 
         $display_parts[] = $property_status;
 
-        return implode( '<br>', array_filter($display_parts) );
+        $display_parts = array_filter($display_parts);
+
+        $display_parts = apply_filters( 'propertyhive_enquiry_list_property_display_parts', $display_parts, $property_id );
+
+        return implode( '<br>', $display_parts );
     }
 }

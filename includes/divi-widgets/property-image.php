@@ -98,7 +98,7 @@ class Divi_Property_Image_Widget extends ET_Builder_Module
             $numbers = explode(':', $output_ratio);
             $percent = ( ( (int)$numbers[1] / (int)$numbers[0] ) * 100 ) . '%';
 
-            $return .= '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover; padding-bottom:' . $percent . '">';
+            $return .= '<div style="background:url(' . esc_url($url) . ') no-repeat center center; background-size:cover; padding-bottom:' . esc_attr($percent) . '">';
         }
         else
         {
@@ -108,7 +108,7 @@ class Divi_Property_Image_Widget extends ET_Builder_Module
                 $photos = $property->_photo_urls;
                 if ( isset($photos[$image_number-1]) )
                 {
-                    $return .= '<img src="' . $photos[$image_number-1]['url'] . '" alt="">';
+                    $return .= '<img src="' . esc_url($photos[$image_number-1]['url']) . '" alt="">';
                 }
             }
             else

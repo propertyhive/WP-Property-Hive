@@ -30,7 +30,7 @@ class Divi_Property_Office_Email_Address_Widget extends ET_Builder_Module
             return;
         }
 
-        $return = $property->office_email_address;
+        $return = esc_html($property->office_email_address);
 
         return $this->_render_module_wrapper( $return, $render_slug );
     }

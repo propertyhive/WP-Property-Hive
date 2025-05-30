@@ -41,7 +41,9 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} a',
 			]
 		);
@@ -51,9 +53,8 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'color: {{VALUE}}',
@@ -93,9 +94,8 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
 			[
 				'label' => __( 'Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_2,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_SECONDARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'background: {{VALUE}}',
@@ -142,12 +142,12 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
         {
             foreach ($virtual_tours as $virtual_tour)
             {
-				echo '<a href="' . $virtual_tour['url'] . '" target="_blank" rel="nofollow"';
+				echo '<a href="' . esc_url($virtual_tour['url']) . '" target="_blank" rel="nofollow"';
 				if ( strpos($virtual_tour['url'], 'yout') !== FALSE || strpos($virtual_tour['url'], 'vimeo') !== FALSE )
                 {
                     echo ' data-fancybox=""';
                 }
-				echo '>' . __( $virtual_tour['label'], 'propertyhive' ) . '</a>';
+				echo '>' . esc_html(__( $virtual_tour['label'], 'propertyhive' )) . '</a>';
 			}
 		}
 

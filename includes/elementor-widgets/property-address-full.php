@@ -51,7 +51,9 @@ class Elementor_Property_Address_Full_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .elementor-widget-address-full',
 			]
 		);
@@ -61,9 +63,8 @@ class Elementor_Property_Address_Full_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-widget-address-full' => 'color: {{VALUE}}',
@@ -114,7 +115,7 @@ class Elementor_Property_Address_Full_Widget extends \Elementor\Widget_Base {
 
         echo '<div class="elementor-widget-address-full">';
 
-        echo $property->get_formatted_full_address();
+        echo esc_html($property->get_formatted_full_address());
 
         echo '</div>';
 	}

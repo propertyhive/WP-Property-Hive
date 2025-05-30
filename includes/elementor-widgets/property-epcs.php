@@ -53,7 +53,9 @@ class Elementor_Property_EPCs_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'title_typography',
 				'label' => __( 'Title Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} .epcs h4',
 				'condition' => [
 		            'show_title' => 'yes'
@@ -66,9 +68,8 @@ class Elementor_Property_EPCs_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => __( 'Title Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} .epcs h4' => 'color: {{VALUE}}',
@@ -109,7 +110,7 @@ class Elementor_Property_EPCs_Widget extends \Elementor\Widget_Base {
             {
                 foreach ($epc_urls as $epc)
                 {
-                	echo '<a href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow"><img src="' . $epc['url'] . '" alt=""></a>';
+                	echo '<a href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt=""></a>';
                 }
             }
         }
@@ -121,17 +122,17 @@ class Elementor_Property_EPCs_Widget extends \Elementor\Widget_Base {
 			{
 				echo '<div class="epcs">';
 
-					echo '<h4>' . __( 'EPCs', 'propertyhive' ) . '</h4>';
+					echo '<h4>' . esc_html(__( 'EPCs', 'propertyhive' )) . '</h4>';
 
 					foreach ( $epc_attachment_ids as $attachment_id )
 					{
 						if ( wp_attachment_is_image($attachment_id) )
 	                    {
-							echo '<a href="' . wp_get_attachment_url($attachment_id) . '" data-fancybox="epc" rel="nofollow"><img src="' . wp_get_attachment_url($attachment_id) . '" alt=""></a>';
+							echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="epc" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
 						}
 						else
 						{
-							echo '<a href="' . wp_get_attachment_url($attachment_id) . '" target="_blank" rel="nofollow">' . __( 'View EPC', 'propertyhive' ) . '</a>';
+							echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow">' . esc_html(__( 'View EPC', 'propertyhive' )) . '</a>';
 						}
 					}
 

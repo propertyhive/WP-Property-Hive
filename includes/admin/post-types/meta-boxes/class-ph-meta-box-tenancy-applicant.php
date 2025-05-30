@@ -59,7 +59,7 @@ class PH_Meta_Box_Tenancy_Applicant {
                 $fields = array(
                     'name' => array(
                         'label' => __('Name', 'propertyhive'),
-                        'value' => '<a href="' . get_edit_post_link($applicant_contact_id, '') . '" data-tenancy-applicant-id="' . esc_attr($applicant_contact_id) . '" data-tenancy-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
+                        'value' => '<a href="' . esc_url(get_edit_post_link($applicant_contact_id, '')) . '" data-tenancy-applicant-id="' . esc_attr($applicant_contact_id) . '" data-tenancy-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
                     ),
                     'telephone_number' => array(
                         'label' => __('Telephone Number', 'propertyhive'),
@@ -173,7 +173,7 @@ class PH_Meta_Box_Tenancy_Applicant {
                 foreach ($applicant_contact_ids as $applicant_contact_id)
                 {
                     ?>
-                    tenancy_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo get_the_title((int)$_GET['applicant_contact_id']); ?>' });
+                    tenancy_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo esc_js(get_the_title((int)$_GET['applicant_contact_id'])); ?>' });
                     <?php
                 }
             }
@@ -235,10 +235,10 @@ jQuery(document).ready(function($)
         var data = {
             action:         'propertyhive_search_contacts',
             keyword:        keyword,
-            security:       '<?php echo wp_create_nonce( 'search-contacts' ); ?>',
+            security:       '<?php echo esc_js(wp_create_nonce( 'search-contacts' )); ?>',
             exclude_ids:    jQuery('#_applicant_contact_ids').val(),
         };
-        $.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+        $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
         {
             if (response == '' || response.length == 0)
             {

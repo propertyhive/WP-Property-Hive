@@ -48,7 +48,7 @@ class Divi_Property_Negotiator_Telephone_Number_Widget extends ET_Builder_Module
             $return .= '<a href="tel:' . esc_attr($property->negotiator_telephone_number) . '">';
         }
 
-        $return .= $property->negotiator_telephone_number;
+        $return .= esc_html($property->negotiator_telephone_number);
 
         if ( isset($this->props['hyperlink']) && $this->props['hyperlink'] == 'yes' ) 
         { 

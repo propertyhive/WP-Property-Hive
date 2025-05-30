@@ -43,10 +43,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_offer_accepted',
-		        offer_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'offer-actions' ); ?>',
+		        offer_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'offer-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_offer_actions();
 		    }, 'json');
@@ -57,10 +57,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_offer_declined',
-		        offer_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'offer-actions' ); ?>',
+		        offer_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'offer-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_offer_actions();
 		    }, 'json');
@@ -71,10 +71,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_offer_withdrawn',
-		        offer_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'offer-actions' ); ?>',
+		        offer_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'offer-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_offer_actions();
 		    }, 'json');
@@ -85,10 +85,10 @@ jQuery(document).ready(function($)
 		{
 			var data = {
 		        action:         'propertyhive_offer_revert_pending',
-		        offer_id:    	<?php echo $post->ID; ?>,
-		        security:       '<?php echo wp_create_nonce( 'offer-actions' ); ?>',
+		        offer_id:    	<?php echo (int)$post->ID; ?>,
+		        security:       '<?php echo esc_js(wp_create_nonce( 'offer-actions' )); ?>',
 		    };
-			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+			jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
 		    {
 		    	redraw_offer_actions();
 		    }, 'json');
@@ -123,11 +123,11 @@ function redraw_offer_actions()
 
 	var data = {
         action:         'propertyhive_get_offer_actions',
-        offer_id:    	<?php echo $post->ID; ?>,
-        security:       '<?php echo wp_create_nonce( 'offer-actions' ); ?>',
+        offer_id:    	<?php echo (int)$post->ID; ?>,
+        security:       '<?php echo esc_js(wp_create_nonce( 'offer-actions' )); ?>',
     };
 
-    jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) 
+    jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) 
     {
     	jQuery('#propertyhive_offer_actions_meta_box_container').html(response);
 

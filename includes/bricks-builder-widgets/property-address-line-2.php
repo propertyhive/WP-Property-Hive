@@ -59,7 +59,7 @@ class Bricks_Builder_Property_Address_Line_2_Widget extends \Bricks\Element {
 
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-			echo $property->address_two;
+			echo esc_html($property->address_two);
 
 		echo '</div>';
 	}

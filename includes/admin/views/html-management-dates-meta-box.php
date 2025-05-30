@@ -147,6 +147,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         <option value="booked" <?php echo ( isset($selected_status) && $selected_status == 'booked' ) ? 'selected' : ''; ?>> Booked</option>
         <option value="complete" <?php echo ( isset($selected_status) && $selected_status == 'complete' ) ? 'selected' : ''; ?>> Complete</option>
         <option value="pending" <?php echo ( isset($selected_status) && $selected_status == 'pending' ) ? 'selected' : ''; ?>> Pending</option>
+        <option value="on_hold" <?php echo ( isset($selected_status) && $selected_status == 'on_hold' ) ? 'selected' : ''; ?>> On Hold</option>
+        <option value="cancelled" <?php echo ( isset($selected_status) && $selected_status == 'cancelled' ) ? 'selected' : ''; ?>> Cancelled</option>
     </select>
 
     <input type="button" name="filter_action" id="filter-key-dates-grid" class="button" value="Filter">
@@ -191,7 +193,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 $key_date = new PH_Key_Date( $key_date_post );
                 ?>
-                <tr id="post-<?php echo $key_date_post->ID; ?>" class="post-<?php echo esc_attr($key_date_post->ID); ?> key-date-row">
+                <tr id="post-<?php echo (int)$key_date_post->ID; ?>" class="post-<?php echo esc_attr($key_date_post->ID); ?> key-date-row">
                     <td class="description column-description" data-colname="Description">
                         <div class="cell-main-content"><?php echo $key_date->description(); ?></div>
                         <div class="row-actions">
@@ -237,7 +239,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <div class="cell-main-content"><?php echo esc_html($key_date->date_due()->format( $date_format )); ?></div>
                     </td>
                     <td class="status column-status" data-colname="Status">
-                        <div class="cell-main-content"><?php echo esc_html(ucwords( $key_date->status() )); ?></div>
+                        <div class="cell-main-content"><?php echo esc_html(ucwords( str_replace("_", " ", $key_date->status() ) )); ?></div>
                         <div class="hidden hidden-date-type-id"><?php echo esc_html($key_date->key_date_type_id()); ?></div>
                     </td>
                 </tr>

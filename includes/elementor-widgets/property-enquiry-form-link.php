@@ -41,7 +41,9 @@ class Elementor_Property_Enquiry_Form_Link_Widget extends \Elementor\Widget_Base
 			[
 				'name' => 'typography',
 				'label' => __( 'Typography', 'propertyhive' ),
-				'scheme' => \Elementor\Core\Schemes\Typography::TYPOGRAPHY_1,
+				'global' => [
+					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
+				],
 				'selector' => '{{WRAPPER}} a',
 			]
 		);
@@ -51,9 +53,8 @@ class Elementor_Property_Enquiry_Form_Link_Widget extends \Elementor\Widget_Base
 			[
 				'label' => __( 'Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_1,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'color: {{VALUE}}',
@@ -93,9 +94,8 @@ class Elementor_Property_Enquiry_Form_Link_Widget extends \Elementor\Widget_Base
 			[
 				'label' => __( 'Background Colour', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::COLOR,
-				'scheme' => [
-					'type' => \Elementor\Core\Schemes\Color::get_type(),
-					'value' => \Elementor\Core\Schemes\Color::COLOR_2,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_SECONDARY,
 				],
 				'selectors' => [
 					'{{WRAPPER}} a' => 'background: {{VALUE}}',
@@ -137,14 +137,14 @@ class Elementor_Property_Enquiry_Form_Link_Widget extends \Elementor\Widget_Base
 		}
 
 ?>
-	<a data-fancybox data-src="#makeEnquiry<?php echo $property->id; ?>" href="javascript:;"><?php _e( 'Make Enquiry', 'propertyhive' ); ?></a>
+	<a data-fancybox data-src="#makeEnquiry<?php echo (int)$property->id; ?>" href="javascript:;"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
 
     <!-- LIGHTBOX FORM -->
-    <div id="makeEnquiry<?php echo $property->id; ?>" style="display:none;">
+    <div id="makeEnquiry<?php echo (int)$property->id; ?>" style="display:none;">
         
-        <h2><?php _e( 'Make Enquiry', 'propertyhive' ); ?></h2>
+        <h2><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></h2>
         
-        <p><?php _e( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' ); ?></p>
+        <p><?php echo esc_html(__( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' )); ?></p>
         
         <?php propertyhive_enquiry_form(); ?>
         

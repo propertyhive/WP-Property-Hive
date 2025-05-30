@@ -265,7 +265,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             
             foreach ( $images_hidden as $image_hidden ) 
             {
-                echo '<a href="' . $image_hidden['url'] . '" data-fancybox="elementor-gallery"></a>';
+                echo '<a href="' . esc_url($image_hidden['url']) . '" data-fancybox="elementor-gallery"></a>';
                 ++$image_number;
             }
         ?>
@@ -284,7 +284,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                     $id_text = $image_number == ($max_images - 1) ? 'id="more-images-link"' : '';
                     $id_text_mobile = $image_number == 1 ? 'id="more-images-link-mobile"' : '';
 
-                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . $images[$image_number]['url'] . '" data-fancybox="elementor-gallery" style="background-image:url(' . $images[$image_number]['url'] . ')"></a>';
+                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
 
                     if ( $image_number == 1 )
                     {
@@ -307,7 +307,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
 
             while ( count($images) > ($image_number) )
             {
-                echo '<a href="' . $images[$image_number]['url'] . '" data-fancybox="elementor-gallery"></a>';
+                echo '<a href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery"></a>';
                 ++$image_number;
             }
 

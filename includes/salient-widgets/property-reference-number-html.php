@@ -29,6 +29,6 @@ if ( ! empty( $atts['font_container'] ) && isset($atts['font_container']) )
 
 echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
 
-	echo $property->reference_number;
+	echo esc_html($property->reference_number);
 
 echo '</div>';

@@ -44,6 +44,7 @@ class PH_AJAX {
             'get_upcoming_overdue_key_dates' => false,
 
             // Property actions
+            'check_duplicate_reference_number' => false,
             'osm_geocoding_request'  => false,
             'get_property_marketing_statistics_meta_box' => false,
             'get_property_tenancies_grid' => false,
@@ -144,9 +145,12 @@ class PH_AJAX {
             // PRO features activate/deactivate
             'activate_pro_feature' => false,
             'deactivate_pro_feature' => false,
+
+            'deactivate_survey' => false,
 		);
 
-		foreach ( $ajax_events as $ajax_event => $nopriv ) {
+		foreach ( $ajax_events as $ajax_event => $nopriv ) 
+        {
 			add_action( 'wp_ajax_propertyhive_' . $ajax_event, array( $this, $ajax_event ) );
 
 			if ( $nopriv ) {
@@ -154,6 +158,93 @@ class PH_AJAX {
 			}
 		}
 	}
+
+    public function deactivate_survey()
+    {
+        // Verify the nonce
+        if ( !isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'deactivate-survey') ) 
+        {
+            wp_send_json_error('Invalid nonce', 403);
+            die();
+        }
+
+        if ( !isset($_POST['reason']) || empty($_POST['reason']) ) 
+        {
+            wp_send_json_error('Reason is required', 400);
+            die();
+        }
+
+        $reason = sanitize_text_field($_POST['reason']);
+        $comments = isset($_POST['comments']) ? sanitize_textarea_field($_POST['comments']) : '';
+        $anonymous = isset($_POST['anonymous']) && $_POST['anonymous'] === 'yes';
+
+        $license_type = get_option('propertyhive_license_type');
+        if ( $license_type == 'pro' )
+        {
+            $license_key = get_option('propertyhive_pro_license_key');
+        }
+        else
+        {
+            $license_key = get_option('propertyhive_license_key');
+        }
+        $propertyhive_install_timestamp = get_option('propertyhive_install_timestamp');
+        $active_plugins = get_option('active_plugins');
+        $all_plugins = get_plugins(); // Fetch detailed data for all plugins
+
+        $active_plugins_with_versions = array();
+
+        foreach ( $active_plugins as $plugin ) 
+        {
+            if ( isset($all_plugins[$plugin]) ) 
+            {
+                $active_plugins_with_versions[] = array(
+                    'name'    => $all_plugins[$plugin]['Name'],
+                    'version' => $all_plugins[$plugin]['Version'],
+                    'path'    => $plugin,
+                );
+            }
+        }
+        $server_software = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
+
+        // Prepare data for third-party POST
+        $third_party_data = array(
+            'reason'    => $reason,
+            'comments'  => $comments,
+            'anonymous' => $anonymous ? 'yes' : 'no',
+        );
+
+        if (!$anonymous) 
+        {
+            $third_party_data['site_url'] = get_site_url();
+            $third_party_data['admin_email'] = get_option('admin_email');
+            $third_party_data['license_type'] = $license_type;
+            $third_party_data['license_key'] = $license_key;
+            $third_party_data['active_plugins'] = $active_plugins_with_versions;
+            $third_party_data['active_theme'] = wp_get_theme()->get('Name');
+            $third_party_data['wordpress_version'] = get_bloginfo('version');
+            $third_party_data['php_version'] = phpversion();
+            $third_party_data['server_software'] = $server_software;
+        }
+
+        //wp_send_json_success(json_encode($third_party_data, true));
+
+        // Make the remote POST request
+        $response = wp_remote_post('https://wp-property-hive.com/deactivate-survey.php', array(
+            'method'  => 'POST',
+            'body'    => $third_party_data
+        ));
+
+        if ( is_wp_error($response) ) 
+        {
+            wp_send_json_error($response->get_error_message(), 500);
+            die();
+        }
+
+        $response_body = wp_remote_retrieve_body($response);
+        wp_send_json_success(json_decode($response_body, true));
+
+        die();
+    }
 
     public function save_term_order()
     {
@@ -264,29 +355,47 @@ class PH_AJAX {
         else
         {
             $response = json_decode($response['body'], TRUE);
+
             if ( $response === FALSE )
             {
-                $errors[] = 'Error decoding response from reCAPTCHA check';
+                $errors[] = __( 'Error decoding response from reCAPTCHA check', 'propertyhive' );
             }
             else
             {
-                if (
-                    isset($response['success']) && $response['success'] == true
-                    &&
-                    (
-                        // If we're using Recaptcha V3, check the score
-                        // 1.0 is very likely a good interaction, 0.0 is very likely a bot
-                        $key == 'recaptcha'
-                        ||
-                        ( isset($response['score']) && $response['score'] >= 0.5 )
-                    )
-                )
+                if ( isset($response['success']) && $response['success'] == true )
                 {
+                    if ( $key == 'recaptcha' )
+                    {
+                        
+                    }
+                    elseif ( $key == 'recaptcha-v3' )
+                    {
+                        $score_threshold = round((float)get_option('propertyhive_captcha_score_threshold', 0.5), 1);
+                        if ( !is_numeric($score_threshold) || $score_threshold < 0 || $score_threshold > 1 )
+                        {
+                            $score_threshold = 0.5;
+                        }
+                        if ( isset($response['score']) && $response['score'] >= $score_threshold )
+                        {
 
+                        }
+                        else
+                        {
+                            $errors[] = __('Failed reCAPTCHA validation due to high spam score', 'propertyhive' ) . ': ' . $response['score'];
+                        }
+                    }
                 }
                 else
                 {
-                    $errors[] = 'Failed reCAPTCHA validation';
+                    $error_message = __( 'Failed reCAPTCHA validation', 'propertyhive' );
+
+                    // Check if Google returned error codes
+                    if ( isset($response['error-codes']) && is_array($response['error-codes']) ) 
+                    {
+                        $error_message .= ' (' . implode(', ', $response['error-codes']) . ')';
+                    }
+
+                    $errors[] = $error_message;
                 }
             }
         }
@@ -982,11 +1091,12 @@ class PH_AJAX {
         $return = array(
             'success' => false,
             'errors' => array(),
+            'new_details_nonce' => wp_create_nonce( "ph_userdetails" ),
         );
 
         // Got an issue with nonce being declined on second submission.
         // Need to sort before putting this back in
-        /*if ( check_ajax_referer( 'ph_details', 'security', false ) === FALSE )
+        if ( check_ajax_referer( 'ph_userdetails', 'ph_account_details_security', false ) === FALSE )
         {
             $return['errors'][] = 'Invalid nonce';
 
@@ -995,7 +1105,7 @@ class PH_AJAX {
             
             // Quit out
             die();
-        }*/
+        }
         
         // Validate
         $errors = array();
@@ -1133,11 +1243,12 @@ class PH_AJAX {
         $return = array(
             'success' => false,
             'errors' => array(),
+            'new_requirements_nonce' => wp_create_nonce( "ph_requirements" ),
         );
 
         // Got an issue with nonce being declined on second submission.
         // Need to sort before putting this back in
-        /*if ( check_ajax_referer( 'ph_requirements', 'security', false ) === FALSE )
+        if ( check_ajax_referer( 'ph_requirements', 'ph_account_requirements_security', false ) === FALSE )
         {
             $return['errors'][] = 'Invalid nonce';
 
@@ -1146,7 +1257,7 @@ class PH_AJAX {
             
             // Quit out
             die();
-        }*/
+        }
         
         // Validate
         $errors = array();
@@ -1365,7 +1476,7 @@ class PH_AJAX {
         {
             echo '<p class="form-field">';
                 echo '<label>' . esc_html(__('Name', 'propertyhive')) . '</label>';
-                echo '<a href="' . get_edit_post_link( $contact_id ) . '">' . esc_html(get_the_title($contact_id)) . '</a>';
+                echo '<a href="' . esc_url(get_edit_post_link( $contact_id )) . '">' . esc_html(get_the_title($contact_id)) . '</a>';
             echo '</p>';
             
             $address = array();
@@ -1401,7 +1512,7 @@ class PH_AJAX {
 
                 echo '<p class="form-field">';
                     echo '<label>' . esc_html(__('Solicitor', 'propertyhive')) . '</label>';
-                    echo '<a href="' . get_edit_post_link($contact_solicitor_contact_id, '') . '">' . esc_html(get_the_title($contact_solicitor_contact_id) . ( $solicitor_contact->company_name != '' && $solicitor_contact->company_name != get_the_title($contact_solicitor_contact_id) ? ' (' . $solicitor_contact->company_name . ')' : '' )) . '</a>';
+                    echo '<a href="' . esc_url(get_edit_post_link($contact_solicitor_contact_id, '')) . '">' . esc_html(get_the_title($contact_solicitor_contact_id) . ( $solicitor_contact->company_name != '' && $solicitor_contact->company_name != get_the_title($contact_solicitor_contact_id) ? ' (' . $solicitor_contact->company_name . ')' : '' )) . '</a>';
                 echo '</p>';
             }
         }
@@ -1442,7 +1553,7 @@ class PH_AJAX {
             $args = array(
                 'post_type' => 'contact',
                 'nopaging' => true,
-                'post_status' => array( 'publish' ),
+                'post_status' => array( 'publish', 'private' ),
                 'fields' => 'ids'
             );
             if ( isset($_POST['contact_type']) && $_POST['contact_type'] != '' )
@@ -1529,7 +1640,7 @@ class PH_AJAX {
             $args = array(
                 'post_type' => 'property',
                 'nopaging' => true,
-                'post_status' => array( 'publish', 'draft' ),
+                'post_status' => array( 'publish', 'draft', 'private' ),
                 'fields' => 'ids'
             );
 
@@ -1700,7 +1811,7 @@ class PH_AJAX {
 		check_ajax_referer( 'add-note', 'security' );
 
         if ( ! current_user_can( 'manage_propertyhive' ) )
-            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+            wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
 		$post_id = (int)$_POST['post_id'];
 
@@ -1742,9 +1853,9 @@ class PH_AJAX {
                         <?php echo wpautop( wptexturize( wp_kses_post( $note ) ) ); ?>
                     </div>
                     <p class="meta">
-                        <abbr class="exact-date" title="<?php echo $comment->comment_date_gmt; ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
+                        <abbr class="exact-date" title="<?php echo esc_attr($comment->comment_date_gmt); ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
                         <?php if ( $comment->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $comment->comment_author ); ?>
-                        <a href="#" class="delete_note"><?php _e( 'Delete', 'propertyhive' ); ?></a>
+                        <a href="#" class="delete_note"><?php echo esc_html(__( 'Delete', 'propertyhive' )); ?></a>
                     </p>
                 </li>
 <?php
@@ -1820,7 +1931,7 @@ class PH_AJAX {
         check_ajax_referer( 'get-notes', 'security' );
 
         if ( ! current_user_can( 'manage_propertyhive' ) )
-            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+            wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
         $post = get_post((int)$_POST['post_id']);
 
@@ -1838,7 +1949,7 @@ class PH_AJAX {
         check_ajax_referer( 'get-notes', 'security' );
 
         if ( ! current_user_can( 'manage_propertyhive' ) )
-            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+            wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
         $post = get_post((int)$_POST['post_id']);
 
@@ -1856,7 +1967,7 @@ class PH_AJAX {
         check_ajax_referer( 'get-notes', 'security' );
 
         if ( ! current_user_can( 'manage_propertyhive' ) )
-            wp_die( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
+            wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
         $query = sanitize_text_field($_POST['query']);
 
@@ -2028,7 +2139,7 @@ class PH_AJAX {
                     $response = json_decode($response['body'], TRUE);
                     if ( $response === FALSE )
                     {
-                        $errors[] = 'Error decoding response from hCaptcha check';
+                        $errors[] = __( 'Error decoding response from hCaptcha check', 'propertyhive' );
                     }
                     else
                     {
@@ -2038,7 +2149,7 @@ class PH_AJAX {
                         }
                         else
                         {
-                            $errors[] = 'Failed hCaptcha validation';
+                            $errors[] = __( 'Failed hCaptcha validation', 'propertyhive' );
                         }
                     }
                 }
@@ -2158,7 +2269,7 @@ class PH_AJAX {
 
             foreach ($form_controls as $key => $control)
             {
-                if ( isset($control['type']) && $control['type'] == 'html' ) { continue; }
+                if ( isset($control['type']) && in_array($control['type'], array('html', 'recaptcha', 'recaptcha-v3', 'hCaptcha')) ) { continue; }
 
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
                 $label = ( isset($control['email_label']) ) ? $control['email_label'] : $label;
@@ -2307,7 +2418,7 @@ class PH_AJAX {
         $enquiry_post_id = ( (isset($_POST['post_id'])) ? (int)$_POST['post_id'] : '' );
         $nonce = ( (isset($_POST['security'])) ? ph_clean($_POST['security']) : '' );
 
-        if ( ! wp_verify_nonce( $nonce, 'create-content-from-enquiry-nonce-' . $enquiry_post_id ) ) 
+        if ( ! wp_verify_nonce( $nonce, 'create-contact-from-enquiry-nonce-' . $enquiry_post_id ) ) 
         {
             // This nonce is not valid.
             die( json_encode( array('error' => 'Invalid nonce. Please refresh and try again') ) ); 
@@ -2324,7 +2435,7 @@ class PH_AJAX {
 
         foreach ($enquiry_meta as $key => $value)
         {
-            if ( strpos(strtolower($key), 'name') !== false && $value[0] != '' )
+            if ( strpos(strtolower($key), 'name') !== false && strpos(strtolower($key), 'property') === false && $value[0] != '' )
             {
                 if ( $name === false )
                 {
@@ -2672,7 +2783,7 @@ class PH_AJAX {
             {
                 $return[] = array(
                     'title' => esc_html( $item->get_title() ),
-                    'permalink' => esc_url( $item->get_permalink() ),
+                    'permalink' => esc_url( $item->get_permalink() ) . '?src=dashboard',
                     'date' => $item->get_date('F d, Y')
                 );
             }
@@ -2910,8 +3021,14 @@ class PH_AJAX {
                 $key_date = new PH_Key_Date( get_post( get_the_ID() ) );
 
                 $property_id = get_post_meta( get_the_ID(), '_property_id', TRUE );
-                $property = new PH_Property((int)$property_id);
-                $property_edit_link = get_edit_post_link( $property_id );
+                $property_edit_link = '';
+                $property_address = '';
+                if ( !empty($property_id) )
+                {
+                    $property = new PH_Property((int)$property_id);
+                    $property_edit_link = get_edit_post_link( $property_id );
+                    $property_address = $property->get_formatted_full_address();
+                }
 
                 $tenancy_id = get_post_meta( get_the_ID(), '_tenancy_id', TRUE );
                 if ( !empty($tenancy_id) )
@@ -2936,7 +3053,7 @@ class PH_AJAX {
                     'description' => $key_date->description(),
                     'upcoming_overdue_status' => $key_date->status(),
                     'property_edit_link' => $property_edit_link,
-                    'property_address' => $property->get_formatted_full_address(),
+                    'property_address' => $property_address,
                     'due_date_time_formatted' => $due_date->format($date_format),
                 );
             }
@@ -2946,6 +3063,48 @@ class PH_AJAX {
 
         echo json_encode($return);
 
+        die();
+    }
+
+    public function check_duplicate_reference_number()
+    {
+        check_ajax_referer( 'check-duplicate-reference-number', 'security' );
+
+        if ( !isset($_POST['reference_number']) || empty($_POST['reference_number']) )
+        {
+            echo '';
+            die();
+        }
+
+        $args = array(
+            'post_type' => 'property',
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_on_market',
+                    'value' => 'yes'
+                ),
+                array(
+                    'key' => '_reference_number',
+                    'value' => sanitize_text_field( wp_unslash( $_POST['reference_number'] ) )
+                ),
+            ),
+        );
+
+        if ( isset($_POST['post_id']) && !empty($_POST['post_id']) )
+        {
+            $args['post__not_in'] = array((int)$_POST['post_id']);
+        }
+
+        $property_query = new WP_Query($args);
+
+        if ( $property_query->have_posts() )
+        {
+            echo '1';
+            die();
+        }
+
+        echo '';
         die();
     }
 
@@ -3028,7 +3187,7 @@ class PH_AJAX {
                 }
             }
 
-            echo '<h3>' . __( 'Views On Website', 'propertyhive' ) . ' (' . number_format($total_views, 0) . ')</h3>';
+            echo '<h3>' . esc_html(__( 'Views On Website', 'propertyhive' )) . ' (' . esc_html(number_format($total_views, 0)) . ')</h3>';
 
             echo '<div id="marketing_statistics_website_view_graph" style="height:400px; width:100%;"></div>';
         
@@ -3120,7 +3279,7 @@ class PH_AJAX {
 
                 echo '<p class="form-field">
         
-                    <label for="">' . esc_html(__('Valued Rent', 'propertyhive')) . ' (' . $currency_symbol . ')</label>
+                    <label for="">' . esc_html(__('Valued Rent', 'propertyhive')) . ' (' . esc_html($currency_symbol) . ')</label>
 
                     <input type="text" class="" name="_valued_rent" id="_valued_rent" value="' . esc_attr(ph_display_price_field( $appraisal->valued_rent )) . '" placeholder="" style="width:10%; min-width:100px;">
                 
@@ -3286,7 +3445,7 @@ class PH_AJAX {
             $property_id = get_post_meta( $post_id, '_property_id', TRUE );
 
             $actions[] = '<a 
-                    href="' . get_edit_post_link($property_id) . '" 
+                    href="' . esc_url(get_edit_post_link($property_id)) . '" 
                     class="button"
                     style="width:100%; margin-bottom:7px; text-align:center" 
                 >' . esc_html(__('View Instructed Property', 'propertyhive')) . '</a>';
@@ -3872,7 +4031,7 @@ class PH_AJAX {
                         'meta_query' => array(
                             array(
                                 'key' => '_property_owner_contact_id',
-                                'value' => $post->ID,
+                                'value' => $owner_contact_id,
                                 'compare' => '='
                             ),
                             array(
@@ -3949,15 +4108,36 @@ class PH_AJAX {
 
             $negotiator_names = array();
             $negotiator_names_string = '';
+            
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
             $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
             if ( !empty($negotiator_ids) )
             {
                 foreach ( $negotiator_ids as $negotiator_id )
                 {
                     $negotiator = get_user_by( 'id', $negotiator_id );
-                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    if ( $negotiator !== false )
                     {
-                        $negotiator_names[] = $negotiator->display_name;
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
                     }
                 }
             }
@@ -3967,6 +4147,20 @@ class PH_AJAX {
                 $first = join(', ', array_slice($negotiator_names, 0, -1));
                 $both  = array_filter(array_merge(array($first), $last), 'strlen');
                 $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
             }
 
             $to = implode(",", $owner_emails);
@@ -3981,6 +4175,8 @@ class PH_AJAX {
             $subject = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $subject);
             $subject = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
             $subject = apply_filters( 'appraisal_owner_booking_confirmation_email_subject', $subject, $post_id );
 
@@ -3990,6 +4186,8 @@ class PH_AJAX {
             $body = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $body);
             $body = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -4451,6 +4649,8 @@ class PH_AJAX {
 
     public function get_viewing_lightbox()
     {
+        global $post;
+        
         $post_id = $_GET['post_id'];
 
         $post = get_post((int)$post_id);
@@ -4591,15 +4791,36 @@ class PH_AJAX {
 
             $negotiator_names = array();
             $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
             $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
             if ( !empty($negotiator_ids) )
             {
                 foreach ( $negotiator_ids as $negotiator_id )
                 {
                     $negotiator = get_user_by( 'id', $negotiator_id );
-                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    if ( $negotiator !== false )
                     {
-                        $negotiator_names[] = $negotiator->display_name;
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
                     }
                 }
             }
@@ -4610,12 +4831,28 @@ class PH_AJAX {
                 $both  = array_filter(array_merge(array($first), $last), 'strlen');
                 $negotiator_names_string = join(' and ', $both);
             }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
+            }
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
             $subject = apply_filters( 'viewing_applicant_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
@@ -4625,6 +4862,8 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -4791,15 +5030,36 @@ class PH_AJAX {
 
             $negotiator_names = array();
             $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
             $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
             if ( !empty($negotiator_ids) )
             {
                 foreach ( $negotiator_ids as $negotiator_id )
                 {
                     $negotiator = get_user_by( 'id', $negotiator_id );
-                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    if ( $negotiator !== false )
                     {
-                        $negotiator_names[] = $negotiator->display_name;
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
                     }
                 }
             }
@@ -4809,6 +5069,20 @@ class PH_AJAX {
                 $first = join(', ', array_slice($negotiator_names, 0, -1));
                 $both  = array_filter(array_merge(array($first), $last), 'strlen');
                 $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
             }
 
             $property = new PH_Property((int)$property_id);
@@ -4824,6 +5098,8 @@ class PH_AJAX {
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
             $subject = apply_filters( 'viewing_owner_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
@@ -4835,6 +5111,8 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -5024,15 +5302,36 @@ class PH_AJAX {
 
             $negotiator_names = array();
             $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
             $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
             if ( !empty($negotiator_ids) )
             {
                 foreach ( $negotiator_ids as $negotiator_id )
                 {
                     $negotiator = get_user_by( 'id', $negotiator_id );
-                    if ( $negotiator !== false && isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                    if ( $negotiator !== false )
                     {
-                        $negotiator_names[] = $negotiator->display_name;
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
                     }
                 }
             }
@@ -5042,6 +5341,20 @@ class PH_AJAX {
                 $first = join(', ', array_slice($negotiator_names, 0, -1));
                 $both  = array_filter(array_merge(array($first), $last), 'strlen');
                 $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
             }
 
             $property = new PH_Property((int)$property_id);
@@ -5055,6 +5368,8 @@ class PH_AJAX {
             $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
             $subject = apply_filters( 'viewing_attending_negotiator_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
@@ -5068,6 +5383,8 @@ class PH_AJAX {
             $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
@@ -5655,9 +5972,9 @@ class PH_AJAX {
         {
             echo '<p class="form-field">
             
-                <label for="">' . __('Status', 'propertyhive') . '</label>
+                <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
                 
-                ' . __( ucwords(str_replace("_", " ", $offer->status)), 'propertyhive' ) . '    
+                ' . esc_html(__( ucwords(str_replace("_", " ", $offer->status)), 'propertyhive' )) . '    
             
             </p>';
         }
@@ -5670,7 +5987,7 @@ class PH_AJAX {
 
         echo '<p class="form-field offer_date_time_field">
     
-            <label for="_offer_date">' . __('Offer Date / Time', 'propertyhive') . '</label>
+            <label for="_offer_date">' . esc_html(__('Offer Date / Time', 'propertyhive')) . '</label>
             
             <input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(date("Y-m-d", strtotime($offer_date_time))) . '" placeholder="">
             <select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="width:55px">';
@@ -5751,7 +6068,7 @@ class PH_AJAX {
 
                 <div id="success_actions"></div>
 
-                <a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+                <a class="button action-cancel" style="width:100%;" href="#">' . esc_html(__( 'Back To Actions', 'propertyhive' )) . '</a>
 
             </div>
 
@@ -5797,7 +6114,7 @@ class PH_AJAX {
             if ( $sale_id != '' )
             {
                 $actions[] = '<a 
-                        href="' . get_edit_post_link( $sale_id, '' ) . '" 
+                        href="' . esc_url(get_edit_post_link( $sale_id, '' )) . '" 
                         class="button"
                         style="width:100%; margin-bottom:7px; text-align:center" 
                     >' . wp_kses_post( __('View Sale', 'propertyhive') ) . '</a>';
@@ -5805,7 +6122,7 @@ class PH_AJAX {
             else
             {
                 $actions[] = '<a 
-                        href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' ) . '" 
+                        href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' )) . '" 
                         class="button button-success button-create-sale"
                         style="width:100%; margin-bottom:7px; text-align:center" 
                         onclick="setTimeout(function() { jQuery(\'.button-create-sale\').attr(\'href\', \'#\'); jQuery(\'.button-create-sale\').attr(\'disabled\', \'disabled\'); jQuery(\'.button-create-sale\').html(\'Creating...\'); }, 50);"
@@ -5836,7 +6153,7 @@ class PH_AJAX {
         }
         else
         {
-            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+            echo '<div style="text-align:center">' . esc_html(__( 'No actions to display', 'propertyhive' )) . '</div>';
         }
 
         echo '</div>
@@ -6005,9 +6322,9 @@ class PH_AJAX {
         {
             echo '<p class="form-field">
             
-                <label for="">' . __('Status', 'propertyhive') . '</label>
+                <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
                 
-                ' . __( ucwords(str_replace("_", " ", $sale->status)), 'propertyhive' ) . '    
+                ' . esc_html(__( ucwords(str_replace("_", " ", $sale->status)), 'propertyhive' )) . '    
             
             </p>';
         }
@@ -6020,9 +6337,9 @@ class PH_AJAX {
 
         echo '<p class="form-field sale_date_field">
     
-            <label for="_sale_date">' . __('Sale Date', 'propertyhive') . '</label>
+            <label for="_sale_date">' . esc_html(__('Sale Date', 'propertyhive')) . '</label>
 
-            <input type="date" class="small" name="_sale_date" id="_sale_date" value="' . date("Y-m-d", strtotime($sale_date_time)) . '" placeholder="">
+            <input type="date" class="small" name="_sale_date" id="_sale_date" value="' . esc_attr(date("Y-m-d", strtotime($sale_date_time))) . '" placeholder="">
             
         </p>';
 
@@ -6083,7 +6400,7 @@ class PH_AJAX {
                     href="#action_panel_sale_exchanged" 
                     class="button button-success sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Sale Exchanged', 'propertyhive') . '</a>';
+                >' . esc_html(__('Sale Exchanged', 'propertyhive')) . '</a>';
             
         }
 
@@ -6093,7 +6410,7 @@ class PH_AJAX {
                     href="#action_panel_sale_completed" 
                     class="button button-success sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Sale Completed', 'propertyhive') . '</a>';
+                >' . esc_html(__('Sale Completed', 'propertyhive')) . '</a>';
         }
 
         if ( $status == 'completed' )
@@ -6107,7 +6424,7 @@ class PH_AJAX {
                     href="#action_panel_sale_fallen_through" 
                     class="button sale-action"
                     style="width:100%; margin-bottom:7px; text-align:center" 
-                >' . __('Sale Fallen Through', 'propertyhive') . '</a>';
+                >' . esc_html(__('Sale Fallen Through', 'propertyhive')) . '</a>';
         }
 
         $actions = apply_filters( 'propertyhive_admin_sale_actions', $actions, $post_id );
@@ -6119,7 +6436,7 @@ class PH_AJAX {
         }
         else
         {
-            echo '<div style="text-align:center">' . __( 'No actions to display', 'propertyhive' ) . '</div>';
+            echo '<div style="text-align:center">' . esc_html(__( 'No actions to display', 'propertyhive' )) . '</div>';
         }
 
         echo '</div>
@@ -6385,7 +6702,8 @@ class PH_AJAX {
 
         if ( isset($recurrence_rules[$key_date_type]) && isset( $recurrence_rules[$key_date_type]['recurrence_rule'] ) )
         {
-            foreach (explode(';', $recurrence_rules[$key_date_type]['recurrence_rule']) as $key_value_pair){
+            foreach ( explode(';', $recurrence_rules[$key_date_type]['recurrence_rule']) as $key_value_pair )
+            {
                 list($key, $value) = explode('=', $key_value_pair);
                 $recurrence[strtolower($key)] = $value;
             }
@@ -6417,7 +6735,7 @@ class PH_AJAX {
             }
         }
 
-        echo $next_key_date;
+        echo esc_html($next_key_date);
 
         // Quit out
         die();

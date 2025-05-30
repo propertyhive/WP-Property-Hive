@@ -123,12 +123,12 @@ class PH_Meta_Box_Property_Marketing {
         {
 ?>
 <script>
-var selected_availability = '<?php echo $selected_availability; ?>';
+var selected_availability = '<?php echo esc_js($selected_availability); ?>';
 var availability_departments = <?php echo json_encode($availability_departments); ?>;
 
 let availabilities = new Map();
 <?php foreach ( $department_options as $term_id => $name ) { ?>
-availabilities.set("<?php echo $term_id; ?>", "<?php echo $name; ?>");
+availabilities.set("<?php echo (int)$term_id; ?>", "<?php echo esc_js($name); ?>");
 <?php } ?>
 
 jQuery(document).ready(function()
@@ -146,7 +146,7 @@ function fill_availability_dropdown()
     var department = jQuery('[name=\'_department\']:checked').val();
     if ( department == '' )
     {
-        department = '<?php echo get_option( 'propertyhive_primary_department', 'residential-sales' ); ?>';
+        department = '<?php echo esc_js(get_option( 'propertyhive_primary_department', 'residential-sales' )); ?>';
     }
 
     if ( Object.keys(availability_departments).length > 0 )
