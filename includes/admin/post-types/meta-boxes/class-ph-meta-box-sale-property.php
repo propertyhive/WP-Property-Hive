@@ -64,7 +64,7 @@ class PH_Meta_Box_Sale_Property {
             }
             else
             {
-                echo esc_html(__('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified');
+                echo esc_html(__('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . __(' specified', 'propertyhive'));
             }
                 
             echo '</p>';
