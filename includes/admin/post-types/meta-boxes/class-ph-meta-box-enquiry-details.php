@@ -332,12 +332,12 @@ function viewing_update_selected_properties()
                         $right_padding = '105px';
                     }
 
-                    echo '<a href="' . esc_url(get_edit_post_link($enquiry_contact_id, '')) . '" class="button" style="position:absolute; top:0; right:' . esc_attr($right_padding) . ';">' . esc_html(__( 'View ', 'propertyhive' )) . $enquiry_contact_type . '</a>';
+                    echo '<a href="' . esc_url(get_edit_post_link($enquiry_contact_id, '')) . '" class="button" style="position:absolute; top:0; right:' . esc_attr($right_padding) . ';">' . esc_html(__( 'View ', 'propertyhive' ) . $enquiry_contact_type) . '</a>';
                 }
                 else
                 {
                 ?>
-                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo esc_html(__( 'Create ', 'propertyhive' )) . $enquiry_contact_type; ?></a>
+                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo esc_html(__( 'Create ', 'propertyhive' ) . $enquiry_contact_type); ?></a>
 
                     <script>
                         jQuery(document).ready(function($)
