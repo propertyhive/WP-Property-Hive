@@ -33,6 +33,16 @@ class PH_Duplicate_Post {
 		delete_post_meta( $new_post_id, '_descriptions_concatenated' );
 		delete_post_meta( $new_post_id, '_owner_details' );
 
+		$prefix = '_imported_ref_';
+		$all_meta = get_post_meta($new_post_id);
+		foreach ($all_meta as $meta_key => $meta_values) 
+		{
+		    if ( strpos($meta_key, $prefix ) === 0 ) 
+		    {
+		        delete_post_meta($new_post_id, $meta_key);
+		    }
+		}
+
 		$post = get_post( $new_post_id );
 		do_action( "save_post", $new_post_id, $post, false );
 	}
