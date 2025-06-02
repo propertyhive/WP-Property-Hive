@@ -36,6 +36,9 @@ class PH_Query {
 	/** @public array The meta query for the page */
 	public $meta_query 		= '';
 
+	/** @public array The tax query for the page */
+	public $tax_query 		= '';
+
 	/** @public array Post IDs matching layered nav only */
 	public $layered_nav_post__in 	= array();
 
