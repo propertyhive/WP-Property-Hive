@@ -45,6 +45,11 @@ if ( !empty($virtual_tours) )
 					$virtual_tour['url']
 				);
 
+				$virtual_tour['url'] = preg_replace(
+					'#https?://(www\.)?youtube\.com/shorts/([^/?]+)#', 
+					'//www.youtube.com/embed/$2', 
+					$virtual_tour['url']
+				);
 
 				$virtual_tour['url'] = preg_replace(
 		        	'/(https?:\/\/)?(www\.)?(player\.)?vimeo\.com\/?(showcase\/)*([0-9))([a-z]*\/)*([0-9]{6,11})[?]?.*/i',

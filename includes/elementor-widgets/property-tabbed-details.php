@@ -785,6 +785,12 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													$virtual_tour['url']
 												);
 
+												$virtual_tour['url'] = preg_replace(
+													'#https?://(www\.)?youtube\.com/shorts/([^/?]+)#', 
+													'//www.youtube.com/embed/$2', 
+													$virtual_tour['url']
+												);
+
 												if ( strpos($virtual_tour['url'], 'vimeo') !== FALSE && strpos($virtual_tour['url'], 'player.') === FALSE )
 												{
 													$virtual_tour['url'] = preg_replace(
