@@ -376,7 +376,7 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<strong>User login created successfully.</strong><br>This contact can now login using their email address and password.<br><br>');
+        		$('#success_actions').append('<strong><?php echo esc_html__( 'User login created successfully.', 'propertyhive' ); ?></strong><br><?php echo esc_html__( 'This contact can now login using their email address and password.', 'propertyhive' ); ?><br><br>');
 
         		$('#action_panel_create_login').stop().fadeOut(300, function()
 				{
@@ -387,7 +387,7 @@ jQuery(document).ready(function($)
         	}
 
         	$(that).attr('disabled', false);
-        	$(that).text('Create Login');
+        	$(that).text('<?php echo __( 'Create Login', 'propertyhive' ); ?>');
         });
 	})
 
@@ -424,7 +424,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#viewing_search_property_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+			$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
 			$('#viewing_search_property_results').show();
 			return false;
 		}
@@ -440,7 +440,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_property_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+	        	$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
 	        }
 	        else
 	        {
@@ -506,7 +506,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#viewing_search_negotiator_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+			$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
 			$('#viewing_search_negotiator_results').show();
 			return false;
 		}
@@ -522,7 +522,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_negotiator_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+	        	$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
 	        }
 	        else
 	        {
@@ -635,11 +635,11 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Viewing</a>');
+        		$('#success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Viewing', 'propertyhive' ); ?></a>');
         		
         		for ( var i in response.success.properties )
         		{
-        			$('#success_actions').append('<a href="' + response.success.properties[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Property</a>');
+        			$('#success_actions').append('<a href="' + response.success.properties[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Property', 'propertyhive' ); ?></a>');
         		}
 
         		$('#action_panel_book_viewing').stop().fadeOut(300, function()
@@ -649,7 +649,7 @@ jQuery(document).ready(function($)
         	}
 
         	$(that).attr('disabled', false);
-        	$(that).text('Book Viewing');
+        	$(that).text('<?php echo __( 'Book Viewing', 'propertyhive' ); ?>');
         });
 	});
 
@@ -694,7 +694,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#offer_search_property_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+			$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
 			$('#offer_search_property_results').show();
 			return false;
 		}
@@ -710,7 +710,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#offer_search_property_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+	        	$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
 	        }
 	        else
 	        {
@@ -803,11 +803,11 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<a href="' + response.success.offer.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Offer</a>');
+        		$('#success_actions').append('<a href="' + response.success.offer.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Offer', 'propertyhive' ); ?></a>');
         		
         		for ( var i in response.success.properties )
         		{
-        			$('#success_actions').append('<a href="' + response.success.properties[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;">Edit Property</a>');
+        			$('#success_actions').append('<a href="' + response.success.properties[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Property', 'propertyhive' ); ?></a>');
         		}
 
         		$('#action_panel_record_offer').stop().fadeOut(300, function()
@@ -817,7 +817,7 @@ jQuery(document).ready(function($)
         	}
 
         	$(that).attr('disabled', false);
-        	$(that).text('Record Offer');
+        	$(that).text('<?php echo __( 'Record Offer', 'propertyhive' ); ?>');
         });
 	});
 
@@ -855,7 +855,7 @@ function viewing_update_selected_negotiators()
 	}
 	else
 	{
-		jQuery('#viewing_selected_negotiators').html('<ul><li><em>Unattended</em></li></ul>');
+		jQuery('#viewing_selected_negotiators').html('<ul><li><em><?php echo esc_html__( 'Unattended', 'propertyhive' ); ?></em></li></ul>');
 		jQuery('#viewing_selected_negotiators').show();
 	}
 }

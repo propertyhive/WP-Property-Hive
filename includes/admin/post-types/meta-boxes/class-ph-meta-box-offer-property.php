@@ -33,7 +33,7 @@ class PH_Meta_Box_Offer_Property {
             
                 <label>' . esc_html(__('Address', 'propertyhive')) . '</label>
                 
-                <a href="' . esc_url(get_edit_post_link($property_id, '')) . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . esc_url(get_permalink($property_id)) . '" target="_blank">View On Website</a>)' : '' ) . '
+                <a href="' . esc_url(get_edit_post_link($property_id, '')) . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . esc_url(get_permalink($property_id)) . '" target="_blank">'. __('View On Website', 'propertyhive') . '</a>)' : '' ) . '
                 
             </p>';
 
@@ -57,14 +57,14 @@ class PH_Meta_Box_Offer_Property {
                 {
                     $owner = new PH_Contact((int)$owner_contact_id);
                     echo '<a href="' . esc_url(get_edit_post_link($owner_contact_id, '')) . '">' . esc_html(get_the_title($owner_contact_id)) . '</a><br>';
-                    echo 'Telephone: ' . ( ( $owner->telephone_number != '' ) ? esc_html($owner->telephone_number) : '-' ) . '<br>';
-                    echo 'Email: ' . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . esc_attr($owner->email_address) . '">' . esc_html($owner->email_address) . '</a>' : '-' );
+                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? esc_html($owner->telephone_number) : '-' ) . '<br>';
+                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . esc_attr($owner->email_address) . '">' . esc_html($owner->email_address) . '</a>' : '-' );
                     echo '<br><br>';
                 }
             }
             else
             {
-                echo esc_html('No ' . ( ( $property->department == 'residential-lettings' || ph_get_custom_department_based_on($property->department) == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' specified');
+                echo esc_html(__('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' || ph_get_custom_department_based_on($property->department) == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . __(' specified', 'propertyhive'));
             }
                 
             echo '</p>';
@@ -123,7 +123,7 @@ jQuery(document).ready(function($)
 
         if (keyword.length < 3)
         {
-            $('#offer_search_property_results').html('<div style="padding:10px;">Enter ' + (3 - keyword.length ) + ' more characters...</div>');
+            $('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
             $('#offer_search_property_results').show();
             return false;
         }
@@ -138,7 +138,7 @@ jQuery(document).ready(function($)
         {
             if (response == '' || response.length == 0)
             {
-                $('#offer_search_property_results').html('<div style="padding:10px;">No results found for \'' + keyword + '\'</div>');
+                $('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
             }
             else
             {
