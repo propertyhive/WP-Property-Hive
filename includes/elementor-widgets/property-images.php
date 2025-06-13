@@ -66,6 +66,7 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 					'' => esc_html__( 'Image In Lightbox', 'propertyhive' ),
 					'blank' => esc_html__( 'Image In New Window', 'propertyhive' ),
 					'property'  => esc_html__( 'Property URL', 'propertyhive' ),
+					'none'  => esc_html__( 'None', 'propertyhive' ),
 				],
             ]
         );
@@ -105,6 +106,11 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 					add_filter( 'propertyhive_single_property_image_html', array( $this, 'customise_property_images_html_blank' ), 10, 2 );
 					break;
 				}
+				case "none":
+				{
+					add_filter( 'propertyhive_single_property_image_html', array( $this, 'customise_property_images_html_none' ), 10, 2 );
+					break;
+				}
 				case "property":
 				{
 					add_filter( 'propertyhive_single_property_image_html', array( $this, 'customise_property_images_html_property' ), 10, 2 );
@@ -135,6 +141,12 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 			<?php
 		}
 
+	}
+
+	public function customise_property_images_html_none( $html, $post_id )
+	{
+		$html = strip_tags($html, '<img>');
+		return $html;
 	}
 
 	public function customise_property_images_html_blank( $html, $post_id )
