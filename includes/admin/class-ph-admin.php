@@ -648,6 +648,24 @@ class PH_Admin {
             }
 
             if ( 
+                class_exists('Easy_Property_Listings') && 
+                !isset($_GET['plugin_status']) && 
+                get_option( 'epl_notice_dismissed', '' ) != 'yes'
+            )
+            {
+                echo "<div class=\"notice notice-error\" id=\"ph_notice_epl\">
+                        <p>
+                            " . __( '<strong>It looks like you\'re also running Easy Property Listings.</strong> This will cause conflicts with Property Hive and should be deactivated.', 'propertyhive' ) . "
+                        </p>
+                        <p>
+                            <a href=\"". esc_url(admin_url('plugins.php?s=easy%20property%20listings&plugin_status=all')) . "\" class=\"button-primary\">Deactivate Easy Property Listings</a>
+                            <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_epl\">Dismiss</a>
+                        </p>
+                        
+                    </div>";
+            }
+
+            if ( 
                 !class_exists('PH_Demo_Data') && 
                 get_option( 'propertyhive_install_timestamp', '' ) >= 1618268400 &&
                 get_option( 'propertyhive_hide_demo_data_tab', '' ) != 'yes' && 
