@@ -26,6 +26,19 @@ jQuery( function ( $ ) {
 		});
 	});
 
+	$( '#ph_dismiss_notice_epl' ).click(function(e)
+	{
+		e.preventDefault();
+
+		var data = {
+			'action': 'propertyhive_dismiss_notice_epl'
+		};
+
+		$.post( ajaxurl, data, function(response) {
+			$( '#ph_notice_epl' ).fadeOut();
+		});
+	});
+
 	$( '#ph_dismiss_notice_demo_data' ).click(function(e)
 	{
 		e.preventDefault();

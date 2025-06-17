@@ -134,6 +134,7 @@ class PH_AJAX {
             // Dismissing notices
             'dismiss_notice_leave_review' => false,
             'dismiss_notice_demo_data' => false,
+            'dismiss_notice_epl' => false,
             'dismiss_notice_missing_search_results' => false,
             'dismiss_notice_missing_google_maps_api_key' => false,
             'dismiss_notice_invalid_expired_license_key' => false,
@@ -277,6 +278,14 @@ class PH_AJAX {
     public function dismiss_notice_demo_data()
     {
         update_option( 'propertyhive_hide_demo_data_tab', 'yes' );
+        
+        // Quit out
+        die();
+    }
+
+    public function dismiss_notice_epl()
+    {
+        update_option( 'epl_notice_dismissed', 'yes' );
         
         // Quit out
         die();
