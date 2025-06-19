@@ -37,6 +37,11 @@ class PH_User_Contacts {
 	 */
 	public static function redirect_to_my_account_if_logged_in() {
 
+		if ( is_admin() || ( defined('DOING_AJAX') && DOING_AJAX ) || isset($_GET['et_fb']) )
+		{
+			return;
+		}
+
 		$login_page_id = get_option( 'propertyhive_applicant_login_page_id', '' );
 		$register_page_id = get_option( 'propertyhive_applicant_registration_page_id', '' );
 
