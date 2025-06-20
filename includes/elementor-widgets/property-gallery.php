@@ -69,6 +69,21 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             ]
         );
 
+        $this->add_control(
+            'output_ratio',
+            [
+                'label' => __( 'Image Ratio', 'propertyhive' ),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => [
+                    '3:2' => __( '3:2', 'propertyhive' ),
+                    '4:3' => __( '4:3', 'propertyhive' ),
+                    '16:9' => __( '16:9', 'propertyhive' ),
+                    '1:1' => __( 'Square', 'propertyhive' ),
+                ],
+                'default' => '4:3'
+            ]
+        );
+
         $this->end_controls_section();
     }
 
@@ -197,7 +212,23 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             }
             <?php } ?>
             
-            .gallery-column > a { display:block; height:100%; padding-top:75%; background:center center no-repeat; background-size:cover; }
+            <?php
+                $output_ratio = ( isset($settings['output_ratio']) && !empty($settings['output_ratio'])) ? $settings['output_ratio'] : '4:3';
+                $padding_top = '75%';
+                switch ($output_ratio)
+                {
+                    case "3:2": { $padding_top = '66.67%'; break; }
+                    case "16:9": { $padding_top = '56.25%'; break; }
+                    case "1:1": { $padding_top = '100%'; break; }
+                }
+            ?>
+            .gallery-column > a { 
+                display:block;
+                height:100%; 
+                padding-top:<?php echo $padding_top; ?>; 
+                background:center center no-repeat; 
+                background-size:cover; 
+            }
 
             .more-images-container {
                 position: absolute;
