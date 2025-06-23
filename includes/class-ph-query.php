@@ -964,6 +964,15 @@ class PH_Query {
 		        		// Remove country code from end (i.e. ', UK')
 	        			$address_keyword = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $address_keyword);
 
+	        			// Extract postcode and use that if exists
+						$postcode_pattern = '/\b([A-Z]{1,2}[0-9][0-9A-Z]? ?[0-9]?[A-Z]{0,2})\b/i';
+						if ( preg_match($postcode_pattern, $address_keyword, $matches) ) 
+						{
+						    $address_keyword = $matches[1];
+						}
+
+						$address_keyword = trim($address_keyword);
+
 	        			$address_keywords[] = ph_clean($address_keyword);
 
 			        	if ( strpos( $address_keyword, ' ' ) !== FALSE )
@@ -2274,6 +2283,15 @@ class PH_Query {
 
         	// Remove country code from end (i.e. ', UK')
         	$_REQUEST['keyword'] = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $_REQUEST['keyword']);
+
+        	// Extract postcode and use that if exists
+			$postcode_pattern = '/\b([A-Z]{1,2}[0-9][0-9A-Z]? ?[0-9]?[A-Z]{0,2})\b/i';
+			if ( preg_match($postcode_pattern, $_REQUEST['keyword'], $matches) ) 
+			{
+			    $_REQUEST['keyword'] = $matches[1];
+			}
+
+			$_REQUEST['keyword'] = trim($_REQUEST['keyword']);
 
         	$keywords = array( $_REQUEST['keyword'] );
 
