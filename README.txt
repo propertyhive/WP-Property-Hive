@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.8.1
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,18 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.5 - 2025-06-26 =
+* Added ability to send viewing cancellation notification emails to involved parties, plus the ability to customise contents of emails sent in settings area
+* Catered for YouTube shorts when embedding virtual tours
+* Added ability to choose 'None' in Elementor Images widget regarding where images link to
+* Added 'Image Ratio' option to Elementor Gallery widget
+* Added warning if Easy Property Listings already installed to avoid confusion
+* Extracted the postcode from searched address keyword and use that if present. Previously a search for 'NW1 London' wouldn't return any results
+* Don't copy across imported ref when duplicating post via Yoast
+* Don't redirect users to the account page if editing register or login page in page builder
+* Enhancements to string translation
+* Declare tax_query property in PH_Query class to prevent PHP warning
 
 = 2.1.4 - 2025-05-13 =
 * Added new default tenures when installing Property Hive for the first time; Share of Freehold and Commonhold
