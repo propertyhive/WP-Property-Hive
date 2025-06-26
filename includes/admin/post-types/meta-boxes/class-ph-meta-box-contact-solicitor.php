@@ -117,7 +117,7 @@ jQuery(document).ready(function($)
 
         if (keyword.length < 3)
         {
-            $('#search_contact_solicitor_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
+            $('#search_contact_solicitor_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
             $('#search_contact_solicitor_results').show();
             return false;
         }
@@ -132,7 +132,7 @@ jQuery(document).ready(function($)
         {
             if (response == '' || response.length == 0)
             {
-                $('#search_contact_solicitor_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
+                $('#search_contact_solicitor_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
             }
             else
             {

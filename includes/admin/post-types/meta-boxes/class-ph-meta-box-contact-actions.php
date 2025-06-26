@@ -355,7 +355,7 @@ jQuery(document).ready(function($)
 		}
 
 		$(this).attr('disabled', 'disabled');
-		$(this).text('Saving...');
+		$(this).text('<?php echo esc_js(__( 'Saving', 'propertyhive' )); ?>...');
 
 		// Validation passed. Submit form
 		var data = {
@@ -387,7 +387,7 @@ jQuery(document).ready(function($)
         	}
 
         	$(that).attr('disabled', false);
-        	$(that).text('<?php echo __( 'Create Login', 'propertyhive' ); ?>');
+        	$(that).text('<?php echo esc_js(__( 'Create Login', 'propertyhive' )); ?>');
         });
 	})
 
@@ -424,7 +424,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
+			$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
 			$('#viewing_search_property_results').show();
 			return false;
 		}
@@ -440,7 +440,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
+	        	$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
 	        }
 	        else
 	        {
@@ -506,7 +506,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
+			$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
 			$('#viewing_search_negotiator_results').show();
 			return false;
 		}
@@ -522,7 +522,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
+	        	$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
 	        }
 	        else
 	        {
@@ -611,7 +611,7 @@ jQuery(document).ready(function($)
 		}*/
 
 		$(this).attr('disabled', 'disabled');
-		$(this).text('Booking...');
+		$(this).text('<?php echo esc_js(__( 'Booking', 'propertyhive' )); ?>...');
 
 		// Validation passed. Submit form
 		var data = {
@@ -649,17 +649,9 @@ jQuery(document).ready(function($)
         	}
 
         	$(that).attr('disabled', false);
-        	$(that).text('<?php echo __( 'Book Viewing', 'propertyhive' ); ?>');
+        	$(that).text('<?php echo esc_js(__( 'Book Viewing', 'propertyhive' )); ?>');
         });
 	});
-
-
-
-
-
-
-
-
 
 	// Offer events
 	$('#offer_property_search').on('keyup keypress', function(e)
@@ -694,7 +686,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
+			$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
 			$('#offer_search_property_results').show();
 			return false;
 		}
@@ -710,7 +702,7 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
+	        	$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
 	        }
 	        else
 	        {
@@ -779,7 +771,7 @@ jQuery(document).ready(function($)
 		}
 
 		$(this).attr('disabled', 'disabled');
-		$(this).text('Saving...');
+		$(this).text('<?php echo esc_js(__( 'Saving', 'propertyhive' )); ?>...');
 
 		// Validation passed. Submit form
 		var data = {
@@ -817,7 +809,7 @@ jQuery(document).ready(function($)
         	}
 
         	$(that).attr('disabled', false);
-        	$(that).text('<?php echo __( 'Record Offer', 'propertyhive' ); ?>');
+        	$(that).text('<?php echo esc_js(__( 'Record Offer', 'propertyhive' )); ?>');
         });
 	});
 
