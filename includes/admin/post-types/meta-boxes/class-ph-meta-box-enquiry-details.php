@@ -163,7 +163,7 @@ function viewing_perform_property_search()
 
     if (keyword.length < 3)
     {
-        jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter ', 'propertyhive' ); ?>' + (3 - keyword.length ) + '<?php echo esc_html__( ' more characters...', 'propertyhive' ); ?></div>');
+        jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
         jQuery('#viewing_search_property_results').show();
         return false;
     }
@@ -178,7 +178,7 @@ function viewing_perform_property_search()
     {
         if (response == '' || response.length == 0)
         {
-            jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for ', 'propertyhive' ); ?>\'' + keyword + '\'</div>');
+            jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
         }
         else
         {
@@ -285,7 +285,7 @@ function viewing_update_selected_properties()
                 }
             }
 
-            $enquiry_contact_type = !empty($property_post_id) ? 'Applicant' : 'Contact';
+            $enquiry_contact_type = !empty($property_post_id) ? __( 'Applicant', 'propertyhive' ) : __( 'Contact', 'propertyhive' );
             $enquiry_contact_id = get_post_meta( $enquiry_post_id, '_contact_id', true );
 
             if ( !empty($enquiry_contact_id) || ( $name !== false || $email !== false ) )
@@ -332,12 +332,12 @@ function viewing_update_selected_properties()
                         $right_padding = '105px';
                     }
 
-                    echo '<a href="' . esc_url(get_edit_post_link($enquiry_contact_id, '')) . '" class="button" style="position:absolute; top:0; right:' . esc_attr($right_padding) . ';">' . esc_html(__( 'View ', 'propertyhive' ) . $enquiry_contact_type) . '</a>';
+                    echo '<a href="' . esc_url(get_edit_post_link($enquiry_contact_id, '')) . '" class="button" style="position:absolute; top:0; right:' . esc_attr($right_padding) . ';">' . esc_html(__( 'View', 'propertyhive' ) . ' ' . $enquiry_contact_type) . '</a>';
                 }
                 else
                 {
                 ?>
-                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo esc_html(__( 'Create ', 'propertyhive' ) . $enquiry_contact_type); ?></a>
+                    <a href="" id="create_contact_from_enquiry_button" class="button" style="position:absolute; top:0; right:0;"><?php echo esc_html(__( 'Create', 'propertyhive' ) . ' ' . $enquiry_contact_type); ?></a>
 
                     <script>
                         jQuery(document).ready(function($)
@@ -349,7 +349,7 @@ function viewing_update_selected_properties()
                                     e.preventDefault();
 
                                     $(this).attr('disabled', 'disabled');
-                                    $(this).html('<?php echo __( 'Creating ', 'propertyhive' ) . $enquiry_contact_type . '...'; ?>');
+                                    $(this).html('<?php echo __( 'Creating', 'propertyhive' ) . ' ' . $enquiry_contact_type . '...'; ?>');
 
                                     var data = {
                                         action:         'propertyhive_create_contact_from_enquiry',

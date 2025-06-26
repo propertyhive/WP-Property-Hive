@@ -57,14 +57,14 @@ class PH_Meta_Box_Sale_Property {
                 {
                     $owner = new PH_Contact((int)$owner_contact_id);
                     echo '<a href="' . esc_url(get_edit_post_link($owner_contact_id, '')) . '">' . esc_html(get_the_title($owner_contact_id)) . '</a><br>';
-                    echo __('Telephone: ', 'propertyhive') . ( ( $owner->telephone_number != '' ) ? esc_html($owner->telephone_number) : '-' ) . '<br>';
-                    echo __('Email: ', 'propertyhive') . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . esc_attr($owner->email_address) . '">' . esc_html($owner->email_address) . '</a>' : '-' );
+                    echo esc_html(__('Telephone', 'propertyhive')) . ': ' . ( ( $owner->telephone_number != '' ) ? esc_html($owner->telephone_number) : '-' ) . '<br>';
+                    echo esc_html(__('Email', 'propertyhive')) . ': ' . ( ( $owner->email_address != '' ) ? '<a href="mailto:' . esc_attr($owner->email_address) . '">' . esc_html($owner->email_address) . '</a>' : '-' );
                     echo '<br><br>';
                 }
             }
             else
             {
-                echo esc_html(__('No ', 'propertyhive') . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . __(' specified', 'propertyhive'));
+                echo esc_html(__('No', 'propertyhive') . ' ' . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' ' . __('specified', 'propertyhive'));
             }
                 
             echo '</p>';
