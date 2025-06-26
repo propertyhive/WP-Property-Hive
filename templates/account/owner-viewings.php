@@ -40,6 +40,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$date_prefix = ( ( $viewing->status == 'cancelled' ) ? '<span style="text-decoration:line-through">' : '' );
 				$date_suffix = ( ( $viewing->status == 'cancelled' ) ? '</span> (' . esc_html(__( 'Cancelled', 'propertyhive' )) . ')' : '' );
 
+				if ( $viewing->status == 'cancelled' && $viewing->cancelled_reason_public == 'yes' && $viewing->cancelled_reason != '' )
+				{
+					$date_suffix .= '<br>' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . ':<br>' . nl2br(esc_html($viewing->cancelled_reason));
+				}
+
 				$image = $property->get_main_photo_src();
 
 				echo '<tr>
@@ -78,6 +83,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				$date_prefix = ( ( $viewing->status == 'cancelled' ) ? '<span style="text-decoration:line-through">' : '' );
 				$date_suffix = ( ( $viewing->status == 'cancelled' ) ? '</span> (' . esc_html(__( 'Cancelled', 'propertyhive' )) . ')' : '' );
+
+				if ( $viewing->status == 'cancelled' && $viewing->cancelled_reason_public == 'yes' && $viewing->cancelled_reason != '' )
+				{
+					$date_suffix .= '<br>' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . ':<br>' . nl2br(esc_html($viewing->cancelled_reason));
+				}
 
 				$image = $property->get_main_photo_src();
 

@@ -656,6 +656,7 @@ Kind regards,
 
 ", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
+        // Applicant Viewing Booking Confirmation
         add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', __( 'Your Viewing On [property_address]', 'propertyhive' ), '', 'no' );
         add_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', __( "Dear [applicant_dear],
 
@@ -665,6 +666,17 @@ Should you need to cancel or amend your booking please do not hesitate to contac
 
 ", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
+        // Applicant Viewing Cancellation Notification
+        add_option( 'propertyhive_viewing_applicant_cancellation_notification_email_subject', __( 'Your Viewing On [property_address] Has Been Cancelled', 'propertyhive' ), '', 'no' );
+        add_option( 'propertyhive_viewing_applicant_cancellation_notification_email_body', __( "Dear [applicant_dear],
+
+This is confirmation that a viewing on [property_address] that was booked for [viewing_time] on [viewing_date] has been cancelled. [cancelled_reason]
+
+Should you have any questions please do not hesitate to contact us.
+
+", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
+
+        // Owner/Landlord Viewing Booking Confirmation
         add_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', __( 'Viewing Booked On [property_address]', 'propertyhive' ), '', 'no' );
         add_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', __( "Dear [owner_dear],
 
@@ -674,6 +686,17 @@ Should you need to cancel or amend this viewing please do not hesitate to contac
 
 ", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
+        // Owner/Landlord Viewing Cancellation Notification
+        add_option( 'propertyhive_viewing_owner_cancellation_notification_email_subject', __( 'Viewing Cancelled On [property_address]', 'propertyhive' ), '', 'no' );
+        add_option( 'propertyhive_viewing_owner_cancellation_notification_email_body', __( "Dear [owner_dear],
+
+This is confirmation that a viewing on [property_address] that was booked for [viewing_time] on [viewing_date] has been cancelled. [cancelled_reason]
+
+Should you have any questions please do not hesitate to contact us.
+
+", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
+
+        // Attending Negotiator Viewing Booking Confirmation
         add_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', __( 'Viewing Booked On [property_address]', 'propertyhive' ), '', 'no' );
         add_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', __( "This is confirmation you've been assigned to attend a viewing at property, [property_address], for [viewing_time] on [viewing_date].
 
@@ -685,6 +708,19 @@ Owner Details:
 
 ", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
 
+        // Attending Negotiator Viewing Cancellation Notification
+        add_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_subject', __( 'Viewing Cancelled On [property_address]', 'propertyhive' ), '', 'no' );
+        add_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_body', __( "This is confirmation that a viewing you were assigned to carry out on [property_address] that was booked for [viewing_time] on [viewing_date] has been cancelled. [cancelled_reason]
+
+Applicant Details:
+[applicant_details]
+
+Owner Details:
+[owner_details]
+
+", 'propertyhive' ) . get_bloginfo('name'), '', 'no' );
+
+        // Owner/Landlord Appraisal Booking Confirmation
         add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', __( 'Appraisal Booked On [property_address]', 'propertyhive' ), '', 'no' );
         add_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', __( "Dear [owner_dear],
 
