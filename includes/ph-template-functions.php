@@ -1318,6 +1318,8 @@ function propertyhive_my_account_pages()
                 }
             }
 
+            $buy_rent = array_unique($buy_rent);
+
             // Check viewing module is active and that viewings exist, either future or past
             if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
             {
@@ -1396,6 +1398,8 @@ function propertyhive_my_account_pages()
                 );
             }
             wp_reset_postdata();
+
+            $sell_let = array_unique($sell_let);
 
             // Check viewing module is active and that viewings exist, either future or past
             if ( get_option('propertyhive_module_disabled_viewings', '') != 'yes' )

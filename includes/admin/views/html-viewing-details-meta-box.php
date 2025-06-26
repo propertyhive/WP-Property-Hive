@@ -51,6 +51,14 @@ echo '<div class="propertyhive_meta_box">';
                 ' . nl2br(esc_html($viewing->cancelled_reason)) . '
 
             </p>';
+
+            echo '<p class="form-field">
+    
+                <label for="">' . esc_html(__('Make Reason Public?', 'propertyhive')) . '</label>
+
+                ' . ( $viewing->cancelled_reason_public == 'yes' ? esc_html(__('Yes', 'propertyhive')) : esc_html(__('No', 'propertyhive')) ) . '
+
+            </p>';
         }
         else
         {
@@ -65,6 +73,14 @@ echo '<div class="propertyhive_meta_box">';
                 )
             );
             propertyhive_wp_textarea_input( $args );
+
+            $args = array( 
+                'id' => '_cancelled_reason_public', 
+                'label' => __( 'Make Reason Public?', 'propertyhive' ),
+                'description' => __( 'If checked, the reason for cancellation entered will be visible to applicants and owners/landlords in their login area and any cancellation emails sent.', 'propertyhive' ),
+                'value' => $viewing->_cancelled_reason_public,
+            );
+            propertyhive_wp_checkbox( $args );
         }
     }
 

@@ -1226,6 +1226,66 @@ jQuery(document).ready(function($)
             return;
         }
 
+        if ( this_href == '#action_panel_viewing_email_applicant_cancellation_notification' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_email_applicant_cancellation_notification',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                if ( !response.success )
+                {
+                    alert('Error: ' + response.data);
+                }
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_email_owner_cancellation_notification' )
+        {
+            var data = {
+                action:         'propertyhive_viewing_email_owner_cancellation_notification',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                if ( !response.success )
+                {
+                    alert('Error: ' + response.data);
+                }
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
+        if ( this_href == '#action_panel_viewing_email_attending_negotiator_cancellation_notification' )
+        {
+            if ( ph_viewing_negotiators_changed )
+            {
+                alert("The negotiators have changed since the viewing was last saved. Please save the viewing then try again");
+                return;
+            }
+
+            var data = {
+                action:         'propertyhive_viewing_email_attending_negotiator_cancellation_notification',
+                viewing_id:     ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ),
+                security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
+            };
+            jQuery.post( ajaxurl, data, function(response) 
+            {
+                if ( !response.success )
+                {
+                    alert('Error: ' + response.data);
+                }
+                redraw_viewing_actions();
+            }, 'json');
+            return;
+        }
+
         if ( this_href == '#action_panel_viewing_feedback_not_required' )
         {
             var data = {
@@ -1467,6 +1527,176 @@ jQuery(document).ready(function($)
         return;
     });
 
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.owner-cancellation-notification-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        var ph_action_button = $(this);
+        ph_action_button.attr('disabled', 'disabled');
+
+        // Create FormData object and append data
+        var form_data = new FormData();
+        form_data.append('action', 'propertyhive_viewing_email_owner_cancellation_notification');
+        form_data.append('viewing_id', ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ));
+        form_data.append('subject', $('#_owner_cancellation_notification_email_subject').val());
+        form_data.append('body', $('#_owner_cancellation_notification_email_body').val());
+        form_data.append('security', propertyhive_admin_meta_boxes.viewing_actions_nonce);
+
+        // Get the file input element and the selected files
+        var file_input = $('#_owner_cancellation_notification_email_attachment');
+        var files = file_input.prop('files');   
+
+        // Check if at least one file has been selected
+        if (files.length !== 0) 
+        {
+            // Append each file to the FormData object
+            $.each(files, function(index, file) 
+            {
+                form_data.append('attachments[]', file);
+            });
+        }
+
+        $.ajax({
+            url: ajaxurl, // WordPress AJAX URL
+            type: 'POST',
+            data: form_data,
+            contentType: false,
+            processData: false,
+            dataType: 'json', // Expect JSON response
+            success: function(response) 
+            {
+                if (response.success) 
+                {
+                    redraw_viewing_actions();
+                }
+                else
+                {
+                    alert('Error: ' + response.data);
+                    ph_action_button.attr('disabled', false);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('AJAX error: ' + textStatus + ' : ' + errorThrown);
+                alert('An unexpected error occurred: ' + textStatus + ' : ' + errorThrown);
+            }
+        });
+        return;
+    });
+
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.applicant-cancellation-notification-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        var ph_action_button = $(this);
+        ph_action_button.attr('disabled', 'disabled');
+
+        // Create FormData object and append data
+        var form_data = new FormData();
+        form_data.append('action', 'propertyhive_viewing_email_applicant_cancellation_notification');
+        form_data.append('viewing_id', ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ));
+        form_data.append('subject', $('#_applicant_cancellation_notification_email_subject').val());
+        form_data.append('body', $('#_applicant_cancellation_notification_email_body').val());
+        form_data.append('security', propertyhive_admin_meta_boxes.viewing_actions_nonce);
+
+        // Get the file input element and the selected files
+        var file_input = $('#_applicant_cancellation_notification_email_attachment');
+        var files = file_input.prop('files');   
+
+        // Check if at least one file has been selected
+        if (files.length !== 0) 
+        {
+            // Append each file to the FormData object
+            $.each(files, function(index, file) 
+            {
+                form_data.append('attachments[]', file);
+            });
+        }
+
+        $.ajax({
+            url: ajaxurl, // WordPress AJAX URL
+            type: 'POST',
+            data: form_data,
+            contentType: false,
+            processData: false,
+            dataType: 'json', // Expect JSON response
+            success: function(response) 
+            {
+                if (response.success) 
+                {
+                    redraw_viewing_actions();
+                }
+                else
+                {
+                    alert('Error: ' + response.data);
+                    ph_action_button.attr('disabled', false);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('AJAX error: ' + textStatus + ' : ' + errorThrown);
+                alert('An unexpected error occurred: ' + textStatus + ' : ' + errorThrown);
+            }
+        });
+        return;
+    });
+
+    $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.attending-negotiator-cancellation-notification-action-submit', function(e)
+    {
+        e.preventDefault();
+
+        var ph_action_button = $(this);
+        ph_action_button.attr('disabled', 'disabled');
+
+        // Create FormData object and append data
+        var form_data = new FormData();
+        form_data.append('action', 'propertyhive_viewing_email_attending_negotiator_cancellation_notification');
+        form_data.append('viewing_id', ( ph_lightbox_open ? ph_lightbox_post_id : propertyhive_admin_meta_boxes.post_id ));
+        form_data.append('subject', $('#_attending_negotiator_cancellation_notification_email_subject').val());
+        form_data.append('body', $('#_attending_negotiator_cancellation_notification_email_body').val());
+        form_data.append('security', propertyhive_admin_meta_boxes.viewing_actions_nonce);
+
+        // Get the file input element and the selected files
+        var file_input = $('#_attending_negotiator_cancellation_notification_email_attachment');
+        var files = file_input.prop('files');   
+
+        // Check if at least one file has been selected
+        if (files.length !== 0) 
+        {
+            // Append each file to the FormData object
+            $.each(files, function(index, file) 
+            {
+                form_data.append('attachments[]', file);
+            });
+        }
+
+        $.ajax({
+            url: ajaxurl, // WordPress AJAX URL
+            type: 'POST',
+            data: form_data,
+            contentType: false,
+            processData: false,
+            dataType: 'json', // Expect JSON response
+            success: function(response) 
+            {
+                if (response.success) 
+                {
+                    redraw_viewing_actions();
+                }
+                else
+                {
+                    alert('Error: ' + response.data);
+                    ph_action_button.attr('disabled', false);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('AJAX error: ' + textStatus + ' : ' + errorThrown);
+                alert('An unexpected error occurred: ' + textStatus + ' : ' + errorThrown);
+            }
+        });
+
+        return;
+    });
+
+
     $(document).on('click', '#propertyhive_viewing_actions_meta_box_container a.cancelled-reason-action-submit', function(e)
     {
         e.preventDefault();
@@ -1480,6 +1710,11 @@ jQuery(document).ready(function($)
             cancelled_reason: $('#_cancelled_reason').val(),
             security:       propertyhive_admin_meta_boxes.viewing_actions_nonce,
         };
+
+        if ($('#_cancelled_reason_public').is(':checked')) 
+        {
+            data.cancelled_reason_public = $('#_cancelled_reason_public').val();
+        }
 
         jQuery.post( ajaxurl, data, function(response) 
         {

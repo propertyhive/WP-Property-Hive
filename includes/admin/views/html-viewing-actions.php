@@ -12,6 +12,7 @@ echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="prope
 $show_cancelled_meta_boxes = false;
 $show_feedback_meta_boxes = false;
 $show_customise_confirmation_meta_boxes = false;
+$show_customise_cancellation_notification_meta_boxes = false;
 
 $actions = array();
 
@@ -35,7 +36,7 @@ if ( $status == 'pending' )
         $owner_booking_confirmation_sent_at = get_post_meta( $post_id, '_owner_booking_confirmation_sent_at', TRUE );
         $attending_negotiator_booking_confirmation_sent_at = get_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', TRUE );
         
-        //Applicant
+        // Applicant
         if ( apply_filters( 'propertyhive_show_viewing_email_applicant_booking_confirmation', true ) === true )
         {
             if ( get_option( 'propertyhive_customise_confirmation_emails', '' ) == 'yes' )
@@ -247,6 +248,115 @@ if ( $status == 'offer_made' )
     }
 }
 
+if ( $status == 'cancelled' )
+{
+    $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+    $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
+    $applicant_email_addresses = array();
+    foreach ($applicant_contact_ids as $applicant_contact_id)
+    {
+        $applicant_email_addresses[] = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+    }
+
+    if ( in_array((int)$property_id, array(0, '')) || !is_array($applicant_contact_ids) || count($applicant_contact_ids) == 0 || count($applicant_email_addresses) == 0 )
+    {
+
+    }
+    else
+    {
+        $applicant_cancellation_notification_sent_at = get_post_meta( $post_id, '_applicant_cancellation_notification_sent_at', TRUE );
+        $owner_cancellation_notification_sent_at = get_post_meta( $post_id, '_owner_cancellation_notification_sent_at', TRUE );
+        $attending_negotiator_cancellation_notification_sent_at = get_post_meta( $post_id, '_attending_negotiator_cancellation_notification_sent_at', TRUE );
+        
+        // Applicant
+        if ( apply_filters( 'propertyhive_show_viewing_email_applicant_cancellation_notification', true ) === true )
+        {
+            if ( get_option( 'propertyhive_customise_confirmation_emails', '' ) == 'yes' )
+            {
+                $actions[] = '<a 
+                        href="#action_panel_viewing_email_applicant_cancellation_notification_customise" 
+                        class="button viewing-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . ( ( $applicant_cancellation_notification_sent_at == '' ) ? __('Email Applicant Cancellation Notification', 'propertyhive') : __('Re-Email Applicant Cancellation Notification', 'propertyhive') ) . '</a>';
+
+                $show_customise_cancellation_notification_meta_boxes = true;
+            }
+            else
+            {
+                $actions[] = '<a 
+                        href="#action_panel_viewing_email_applicant_cancellation_notification" 
+                        class="button viewing-action"
+                        style="width:100%; margin-bottom:7px; text-align:center" 
+                    >' . ( ( $applicant_cancellation_notification_sent_at == '' ) ? __('Email Applicant Cancellation Notification', 'propertyhive') : __('Re-Email Applicant Cancellation Notification', 'propertyhive') ) . '</a>';
+            }
+
+            $actions[] = '<div id="viewing_applicant_cancellation_notification_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $applicant_cancellation_notification_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $applicant_cancellation_notification_sent_at != '' ) ? 'Previously sent to applicant on <span title="' . $applicant_cancellation_notification_sent_at . '">' . date("jS F", strtotime($applicant_cancellation_notification_sent_at)) : '' ) . '</span></div>';
+        }
+
+        // Owner/Landlord
+        if ( apply_filters( 'propertyhive_show_viewing_email_owner_cancellation_notification', true ) === true )
+        {
+            $property_department = get_post_meta( $property_id, '_department', TRUE );
+            $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
+            $owner_or_landlord = ( $property_department == 'residential-lettings' ? 'Landlord' : 'Owner' );
+
+            if ( is_array($owner_contact_ids) && count($owner_contact_ids) > 0) {
+
+                if ( get_option( 'propertyhive_customise_confirmation_emails', '' ) == 'yes' )
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_owner_cancellation_notification_customise" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $owner_cancellation_notification_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Cancellation Notification', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Cancellation Notification', 'propertyhive') ) . '</a>';
+
+                    $show_customise_cancellation_notification_meta_boxes = true;
+                }
+                else
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_owner_cancellation_notification" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $owner_cancellation_notification_sent_at == '' ) ? __('Email ' . $owner_or_landlord . ' Cancellation Notification', 'propertyhive') : __('Re-Email ' . $owner_or_landlord . ' Cancellation Notification', 'propertyhive') ) . '</a>';
+                }
+                $actions[] = '<div id="viewing_owner_cancellation_notification_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_cancellation_notification_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_cancellation_notification_sent_at != '' ) ? 'Previously sent to ' . strtolower($owner_or_landlord) . ' on <span title="' . $owner_cancellation_notification_sent_at . '">' . date("jS F", strtotime($owner_cancellation_notification_sent_at)) : '' ) . '</span></div>';
+            }
+        }
+
+        // Attending Negotiators
+        if ( apply_filters( 'propertyhive_show_viewing_email_attending_negotiator_cancellation_notification', true ) === true )
+        {
+            $attending_negotiators = get_post_meta( $property_id, '_negotiator_id' );
+            if ( !empty($attending_negotiators) )
+            {
+                if ( get_option( 'propertyhive_customise_confirmation_emails', '' ) == 'yes' )
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_attending_negotiator_cancellation_notification_customise" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $attending_negotiator_cancellation_notification_sent_at == '' ) ? __('Email Negotiator Cancellation Notification', 'propertyhive') : __('Re-Email Negotiator Cancellation Notification', 'propertyhive') ) . '</a>';
+
+                    $show_customise_cancellation_notification_meta_boxes = true;
+                }
+                else
+                {
+                    $actions[] = '<a 
+                            href="#action_panel_viewing_email_attending_negotiator_cancellation_notification" 
+                            class="button viewing-action"
+                            style="width:100%; margin-bottom:7px; text-align:center" 
+                        >' . ( ( $attending_negotiator_cancellation_notification_sent_at == '' ) ? __('Email Negotiator Cancellation Notification', 'propertyhive') : __('Re-Email Negotiator Cancellation Notification', 'propertyhive') ) . '</a>';
+                }
+
+                $actions[] = '<div id="viewing_attending_negotiator_cancellation_notification_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $attending_negotiator_cancellation_notification_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $attending_negotiator_cancellation_notification_sent_at != '' ) ? 'Previously sent to attending negotiators on <span title="' . $attending_negotiator_cancellation_notification_sent_at . '">' . date("jS F", strtotime($attending_negotiator_cancellation_notification_sent_at)) : '' ) . '</span></div>';
+            }
+        }
+
+        $actions[] = '<hr>';
+    }
+}
+
 if ( ( $status == 'carried_out' && $feedback_status == '' ) || in_array( $status, array('cancelled', 'no_show') ) )
 {
     $actions[] = '<a 
@@ -405,6 +515,123 @@ if ( $show_customise_confirmation_meta_boxes )
     </div>';
 }
 
+if ( $show_customise_cancellation_notification_meta_boxes )
+{
+    $subject = get_option( 'propertyhive_viewing_owner_cancellation_notification_email_subject', '' );
+    $body = get_option( 'propertyhive_viewing_owner_cancellation_notification_email_body', '' );
+
+    echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_email_owner_cancellation_notification_customise" style="display:none;">
+
+        <div class="options_group" style="padding-top:8px;">
+
+            <div class="form-field">
+
+                <label for="_owner_cancellation_notification_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                
+                <input id="_owner_cancellation_notification_email_subject" name="_owner_cancellation_notification_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_owner_cancellation_notification_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                
+                <textarea id="_owner_cancellation_notification_email_body" name="_owner_cancellation_notification_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_owner_cancellation_notification_email_attachment">' . __( 'Attach File(s)', 'propertyhive' ) . '</label>
+                
+                <input type="file" id="_owner_cancellation_notification_email_attachment" name="_owner_cancellation_notification_email_attachment" style="width:100%;" multiple>
+
+            </div>
+
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+            <a class="button button-primary owner-cancellation-notification-action-submit" href="#">' . esc_html(__( 'Send', 'propertyhive' )) . '</a>
+
+        </div>
+
+    </div>';
+
+    $subject = get_option( 'propertyhive_viewing_applicant_cancellation_notification_email_subject', '' );
+    $body = get_option( 'propertyhive_viewing_applicant_cancellation_notification_email_body', '' );
+
+    echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_email_applicant_cancellation_notification_customise" style="display:none;">
+
+        <div class="options_group" style="padding-top:8px;">
+
+            <div class="form-field">
+
+                <label for="_applicant_cancellation_notification_email_subject">' . esc_html(__( 'Subject', 'propertyhive' )) . '</label>
+                
+                <input id="_applicant_cancellation_notification_email_subject" name="_applicant_cancellation_notification_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_applicant_cancellation_notification_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
+                
+                <textarea id="_applicant_cancellation_notification_email_body" name="_applicant_cancellation_notification_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_applicant_cancellation_notification_email_attachment">' . esc_html(__( 'Attach File(s)', 'propertyhive' )) . '</label>
+                
+                <input type="file" id="_applicant_cancellation_notification_email_attachment" name="_applicant_cancellation_notification_email_attachment" style="width:100%;" multiple>
+
+            </div>
+
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+            <a class="button button-primary applicant-cancellation-notification-action-submit" href="#">' . esc_html(__( 'Send', 'propertyhive' )) . '</a>
+
+        </div>
+
+    </div>';
+
+    $subject = get_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_subject', '' );
+    $body = get_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_body', '' );
+
+    echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_email_attending_negotiator_cancellation_notification_customise" style="display:none;">
+
+        <div class="options_group" style="padding-top:8px;">
+
+            <div class="form-field">
+
+                <label for="_attending_negotiator_cancellation_notification_email_subject">' . esc_html(__( 'Subject', 'propertyhive' )) . '</label>
+                
+                <input id="_attending_negotiator_cancellation_notification_email_subject" name="_attending_negotiator_cancellation_notification_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_attending_negotiator_cancellation_notification_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
+                
+                <textarea id="_attending_negotiator_cancellation_notification_email_body" name="_attending_negotiator_cancellation_notification_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+
+            </div>
+
+            <div class="form-field">
+
+                <label for="_attending_negotiator_cancellation_notification_email_attachment">' . esc_html(__( 'Attach File(s)', 'propertyhive' )) . '</label>
+                
+                <input type="file" id="_attending_negotiator_cancellation_notification_email_attachment" name="_attending_negotiator_cancellation_notification_email_attachment" style="width:100%;" multiple>
+
+            </div>
+
+            <a class="button action-cancel" href="#">' . esc_html(__( 'Cancel', 'propertyhive' )) . '</a>
+            <a class="button button-primary attending-negotiator-cancellation-notification-action-submit" href="#">' . esc_html(__( 'Send', 'propertyhive' )) . '</a>
+
+        </div>
+
+    </div>';
+}
+
 if ( $show_cancelled_meta_boxes )
 {
     echo '<div class="propertyhive_meta_box propertyhive_meta_box_actions" id="action_panel_viewing_cancelled" style="display:none;">
@@ -413,9 +640,16 @@ if ( $show_cancelled_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_viewing_cancelled_reason">' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . '</label>
+                <label for="_cancelled_reason">' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . '</label>
                 
                 <textarea id="_cancelled_reason" name="_cancelled_reason" style="width:100%;">' . get_post_meta( $post_id, '_cancelled_reason', TRUE ) . '</textarea>
+
+            </div>
+
+            <div class="form-field">
+
+                <label><input type="checkbox" id="_cancelled_reason_public" name="_cancelled_reason_public" value="yes"> ' . esc_html(__( 'Make Reason Public?', 'propertyhive' )) . '</label>
+                <em><small>' . esc_html( __( 'If checked, the reason for cancellation entered will be visible to applicants and owners/landlords in their login area and any cancellation emails sent.', 'propertyhive' ) ) . '</small></em>
 
             </div>
 

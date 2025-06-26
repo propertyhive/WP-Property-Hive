@@ -31,6 +31,7 @@ class PH_Meta_Box_Viewing_Details {
         global $wpdb;
     
         if ( isset($_POST['_cancelled_reason']) ) { update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field($_POST['_cancelled_reason']) ); }
+        if ( isset($_POST['_cancelled_reason_public']) && $_POST['_cancelled_reason_public'] == 'yes' ) { update_post_meta( $post_id, '_cancelled_reason_public', 'yes' ); }else{ update_post_meta( $post_id, '_cancelled_reason_public', 'no' ); }
         if ( isset($_POST['_feedback']) ) { update_post_meta( $post_id, '_feedback', sanitize_textarea_field($_POST['_feedback']) ); }
 
         do_action( 'propertyhive_save_viewing_details', $post_id );

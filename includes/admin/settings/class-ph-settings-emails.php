@@ -55,7 +55,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	    	get_option('propertyhive_module_disabled_appraisals', '') != 'yes'
 	    )
 	    {
-	    	$sections['booking-confirmation'] = __( 'Booking Confirmation', 'propertyhive' );
+	    	$sections['booking-confirmation'] = __( 'Booking Confirmations & Cancellations', 'propertyhive' );
 	    }
 
 	    if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
@@ -290,6 +290,24 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
 	        $settings[] = array( 'type' => 'sectionend', 'id' => 'applicant_viewing_booking_confirmation_email_options' );
 
+	        $settings[] = array( 'title' => __( 'Applicant Viewing Cancellation Notifications', 'propertyhive' ), 'type' => 'title', 'id' => 'applicant_viewing_cancellation_notification_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_applicant_cancellation_notification_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_applicant_cancellation_notification_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'applicant_viewing_cancellation_notification_email_options' );
+
 	        // Owner
 	        $settings[] = array( 'title' => __( 'Owner/Landlord Viewing Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'owner_viewing_booking_confirmation_email_options' );
 
@@ -309,6 +327,24 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
 	        $settings[] = array( 'type' => 'sectionend', 'id' => 'owner_viewing_booking_confirmation_email_options' );
 
+	        $settings[] = array( 'title' => __( 'Owner/Landlord Viewing Cancellation Notifications', 'propertyhive' ), 'type' => 'title', 'id' => 'owner_viewing_cancellation_notification_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_owner_cancellation_notification_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_owner_cancellation_notification_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'owner_viewing_cancellation_notification_email_options' );
+
 	        // Attending Negotiator
 	        $settings[] = array( 'title' => __( 'Attending Negotiator Viewing Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'attending_negotiator_viewing_booking_confirmation_email_options' );
 
@@ -327,6 +363,24 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	        );
 
 	        $settings[] = array( 'type' => 'sectionend', 'id' => 'attending_negotiator_viewing_booking_confirmation_email_options' );
+
+	        $settings[] = array( 'title' => __( 'Attending Negotiator Viewing Cancellation Notifications', 'propertyhive' ), 'type' => 'title', 'id' => 'attending_negotiator_viewing_cancellation_notifications_email_options' );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Subject', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_subject',
+	            'type'    => 'text',
+	            'css'         => 'min-width:300px;',
+	        );
+
+	        $settings[] = array(
+	            'title'   => __( 'Default Email Body', 'propertyhive' ),
+	            'id'      => 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_body',
+	            'type'    => 'textarea',
+	            'css'         => 'min-width:300px; height:110px;',
+	        );
+
+	        $settings[] = array( 'type' => 'sectionend', 'id' => 'attending_negotiator_viewing_cancellation_notifications_email_options' );
 	    }
 
 	    if ( get_option('propertyhive_module_disabled_appraisals', '') != 'yes' )
@@ -354,7 +408,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	    if ( get_option('propertyhive_module_disabled_appraisals', '') != 'yes' || get_option('propertyhive_module_disabled_viewings', '') != 'yes' )
 	    {
 	    	// Owner
-	        $settings[] = array( 'title' => __( 'Booking Confirmations', 'propertyhive' ), 'type' => 'title', 'id' => 'booking_confirmation_email_options' );
+	        $settings[] = array( 'title' => __( 'Booking Confirmations & Cancellations', 'propertyhive' ), 'type' => 'title', 'id' => 'booking_confirmation_email_options' );
 
 	        $settings[] = array(
 				'title'   => __( 'Sent From Email Address', 'propertyhive' ),
@@ -367,14 +421,14 @@ class PH_Settings_Emails extends PH_Settings_Page {
 					'office' => __( 'Office Email Address', 'propertyhive' ),
 					'user' => __( 'User Email Address', 'propertyhive' ),
 				),
-				'desc'    => '<p>' . __( 'This sets the email address that booking confirmations come from and that will receive the response should someone reply.', 'propertyhive' ) . '</p>',
+				'desc'    => '<p>' . __( 'This sets the email address that booking confirmations and cancellation notifications come from and that will receive the response should someone reply.', 'propertyhive' ) . '</p>',
 			);
 
 	        $settings[] = array(
-	            'title'   => __( 'Customise Confirmation Emails Before Sending', 'propertyhive' ),
+	            'title'   => __( 'Customise Emails Before Sending', 'propertyhive' ),
 	            'id'      => 'propertyhive_customise_confirmation_emails',
 	            'type'    => 'checkbox',
-	            'desc' 	  => 'With this ticked you\'ll be able to customise the email subject and body of any notifications before they get sent. This can be useful for adding any appraisal/viewing-specific details to the confirmation. If left unticked, the default subject and body set above will be used.'
+	            'desc' 	  => 'With this ticked you\'ll be able to customise the subject and body of any emails before they get sent. This can be useful for adding any appraisal/viewing-specific details to the email. If left unticked, the default subject and body set above will be used.'
 	        );
 
 	        $settings[] = array( 'type' => 'sectionend', 'id' => 'booking_confirmation_email_options' );

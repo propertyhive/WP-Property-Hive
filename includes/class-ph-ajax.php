@@ -79,6 +79,9 @@ class PH_AJAX {
             'viewing_email_applicant_booking_confirmation' => false,
             'viewing_email_owner_booking_confirmation' => false,
             'viewing_email_attending_negotiator_booking_confirmation' => false,
+            'viewing_email_applicant_cancellation_notification' => false,
+            'viewing_email_owner_cancellation_notification' => false,
+            'viewing_email_attending_negotiator_cancellation_notification' => false,
             'viewing_interested_feedback' => false,
             'viewing_not_interested_feedback' => false,
             'viewing_feedback_not_required' => false,
@@ -4735,6 +4738,7 @@ class PH_AJAX {
         {
             update_post_meta( $post_id, '_status', 'cancelled' );
             update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field( $_POST['cancelled_reason'] ) );
+            update_post_meta( $post_id, '_cancelled_reason_public', isset($_POST['cancelled_reason_public']) && $_POST['cancelled_reason_public'] == 'yes' ? 'yes' : '' );
 
             // Add note/comment to viewing
             $comment = array(
@@ -5491,6 +5495,788 @@ class PH_AJAX {
             }
 
             update_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+
+            wp_send_json_success();
+        }
+        else
+        {
+            wp_send_json_error('No attending negotiator recipients');
+        }
+
+        wp_die();
+    }
+
+    public function viewing_email_applicant_cancellation_notification()
+    {
+        check_ajax_referer( 'viewing-actions', 'security' );
+
+        $post_id = (int)$_POST['viewing_id'];
+
+        $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
+        $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+
+        if ( !is_array($applicant_contact_ids) || (int)$property_id == '' || count($applicant_contact_ids) == 0 || (int)$property_id == 0 )
+        {
+            wp_send_json_error('Missing contact or property');
+        }
+
+        $property = new PH_Property((int)$property_id);
+
+        $to = array();
+        foreach ($applicant_contact_ids as $applicant_contact_id)
+        {
+            $applicant_email_address = get_post_meta( $applicant_contact_id, '_email_address', TRUE );
+            $explode_applicant_email_address = explode( ",", $applicant_email_address );
+            foreach ( $explode_applicant_email_address as $email_address )
+            {
+                $to[] = sanitize_email($email_address);
+            }
+        }
+
+        $to = array_filter($to);
+
+        if ( !empty(implode($to)) )
+        {
+            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_applicant_cancellation_notification_email_subject', '' );
+            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_applicant_cancellation_notification_email_body', '' );
+
+            $applicant_names = array();
+            $applicant_dears = array();
+            foreach ($applicant_contact_ids as $applicant_contact_id)
+            {
+                $applicant_contact = new PH_Contact($applicant_contact_id);
+                $applicant_names[] = $applicant_contact->post_title;
+                $applicant_dears[] = $applicant_contact->dear();
+            }
+            $applicant_names = array_filter($applicant_names);
+            $applicant_dears = array_filter($applicant_dears);
+
+            $applicant_names_string = $this->get_list_string($applicant_names);
+            $applicant_dears_string = $this->get_list_string($applicant_dears);
+
+            $negotiator_names = array();
+            $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
+            $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+            if ( !empty($negotiator_ids) )
+            {
+                foreach ( $negotiator_ids as $negotiator_id )
+                {
+                    $negotiator = get_user_by( 'id', $negotiator_id );
+                    if ( $negotiator !== false )
+                    {
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
+                    }
+                }
+            }
+            if ( !empty($negotiator_names) )
+            {
+                $last  = array_slice($negotiator_names, -1);
+                $first = join(', ', array_slice($negotiator_names, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
+            }
+
+            $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
+            $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
+            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
+
+            $subject = apply_filters( 'viewing_applicant_cancellation_notification_email_subject', $subject, $post_id, $property_id );
+
+            $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
+            $body = str_replace('[applicant_name]', $applicant_names_string, $body);
+            $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
+            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
+
+            $cancelled_reason = '';
+            if ( 
+                get_post_meta( $post_id, '_cancelled_reason_public', true ) == 'yes' && 
+                get_post_meta( $post_id, '_cancelled_reason', true ) != '' 
+            )
+            {
+                $cancelled_reason .= "\n\nReason: " . get_post_meta( $post_id, '_cancelled_reason', true );
+            }
+            $body = str_replace('[cancelled_reason]', $cancelled_reason, $body);
+
+            $body = html_entity_decode($body);
+
+            $body = apply_filters( 'viewing_applicant_cancellation_notification_email_body', $body, $post_id, $property_id );
+
+            $from = '';
+            $from_setting = get_option( 'propertyhive_confirmations_default_from', '' );
+            if ( $from_setting == 'user' )
+            {
+                $current_user = wp_get_current_user();
+                $from = ( isset($current_user->user_email) ? $current_user->user_email : '' );
+
+                if ( $from == '' )
+                {
+                    $from = $property->office_email_address;
+                }
+            }
+            if ( $from_setting == 'office' )
+            {
+                $from = $property->office_email_address;
+            }
+            if ( $from == '' )
+            {
+                $from = get_option('propertyhive_email_from_address', '');
+            }
+            if ( $from == '' )
+            {
+                $from = get_bloginfo('admin_email');
+            }
+
+            $attachments = array();
+            if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
+            {
+                $uploaded_files = $_FILES['attachments'];
+
+                // Handle each file upload
+                foreach ($uploaded_files['name'] as $key => $value) 
+                {
+                    if ($uploaded_files['name'][$key]) 
+                    {
+                        $file = array(
+                            'name'     => $uploaded_files['name'][$key],
+                            'type'     => $uploaded_files['type'][$key],
+                            'tmp_name' => $uploaded_files['tmp_name'][$key],
+                            'error'    => $uploaded_files['error'][$key],
+                            'size'     => $uploaded_files['size'][$key]
+                        );
+
+                        // Move the file to a temporary location
+                        $upload_overrides = array('test_form' => false);
+                        $movefile = wp_handle_upload($file, $upload_overrides);
+
+                        if ($movefile && !isset($movefile['error'])) 
+                        {
+                            // Add the file path to attachments array
+                            $attachments[] = $movefile['file'];
+                        } 
+                        else
+                        {
+                            // Handle error in file upload
+                            wp_send_json_error($movefile['error']);
+                        }
+                    }
+                }
+            }
+
+            $headers = array();
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
+            $headers[] = 'Reply-To: ' . sanitize_email($from);
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            $headers = apply_filters( 'propertyhive_viewing_applicant_cancellation_notification_email_headers', $headers );
+
+            $sent = wp_mail($to, $subject, $body, $headers, $attachments);
+
+            foreach ($attachments as $temp_file) 
+            {
+                @unlink($temp_file);
+            }
+
+            if ( !$sent )
+            {
+                wp_send_json_error('Failed to send email');
+            }
+
+            update_post_meta( $post_id, '_applicant_cancellation_notification_sent_at', date("Y-m-d H:i:s") );
+
+            if ( apply_filters( 'propertyhive_log_cancellation_notification_emails', false ) === true )
+            {
+                // Add note/comment to viewing
+                $comment = array(
+                    'note_type' => 'action',
+                    'action' => 'viewing_applicant_cancellation_notification_email',
+                );
+
+                PH_Comments::insert_note( $post_id, $comment );
+            }
+
+            wp_send_json_success();
+        }
+        else
+        {
+            wp_send_json_error('No valid recipient email addresses');
+        }
+
+        wp_die();
+    }
+
+    public function viewing_email_owner_cancellation_notification()
+    {
+        check_ajax_referer( 'viewing-actions', 'security' );
+
+        $post_id = (int)$_POST['viewing_id'];
+
+        $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+        $property_department = get_post_meta( $property_id, '_department' );
+
+        $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
+        $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
+ 
+        if ( $owner_contact_ids > 0 ) {
+
+            $owner_emails = array();
+            $owner_names = array();
+            $owner_dears = array();
+    
+            foreach ($owner_contact_ids as $owner_id) 
+            {
+                $owner_contact = new PH_Contact($owner_id);
+
+                $owner_name = $owner_contact->post_title;
+                $owner_dear = $owner_contact->dear();
+
+                if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
+                if( ! empty($owner_dear) ) array_push($owner_dears, $owner_dear);
+
+                $owner_email = $owner_contact->email_address;
+                $explode_owner_email = explode( ",", $owner_email );
+                foreach ( $explode_owner_email as $email_address )
+                {
+                    $owner_emails[] = sanitize_email($email_address);
+                }
+            }
+
+            $owner_names_string = $this->get_list_string($owner_names);
+            $owner_dears_string = $this->get_list_string($owner_dears);
+
+            if ( !empty($applicant_contact_ids) ) 
+            {
+                $applicant_names = array();
+                $applicant_dears = array();
+                foreach ($applicant_contact_ids as $applicant_contact_id)
+                {
+                    $applicant_contact = new PH_Contact($applicant_contact_id);
+                    $applicant_names[] = $applicant_contact->post_title;
+                    $applicant_dears[] = $applicant_contact->dear();
+                }
+                $applicant_names = array_filter($applicant_names);
+                $applicant_dears = array_filter($applicant_dears);
+            }
+            
+            $applicant_names_string = $this->get_list_string($applicant_names);
+            $applicant_dears_string = $this->get_list_string($applicant_dears);
+
+            $negotiator_names = array();
+            $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
+            $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+            if ( !empty($negotiator_ids) )
+            {
+                foreach ( $negotiator_ids as $negotiator_id )
+                {
+                    $negotiator = get_user_by( 'id', $negotiator_id );
+                    if ( $negotiator !== false )
+                    {
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
+                    }
+                }
+            }
+            if ( !empty($negotiator_names) )
+            {
+                $last  = array_slice($negotiator_names, -1);
+                $first = join(', ', array_slice($negotiator_names, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
+            }
+
+            $property = new PH_Property((int)$property_id);
+
+            $to = implode(",", $owner_emails);
+
+            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_owner_cancellation_notification_email_subject', '' );
+            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_owner_cancellation_notification_email_body', '' );
+
+            $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
+            $subject = str_replace('[owner_name]', $owner_names_string, $subject);
+            $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
+            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
+
+            $subject = apply_filters( 'viewing_owner_cancellation_notification_email_subject', $subject, $post_id, $property_id );
+
+            $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
+            $body = str_replace('[owner_name]', $owner_names_string, $body);
+            $body = str_replace('[owner_dear]', $owner_dears_string, $body);
+            $body = str_replace('[applicant_name]', $applicant_names_string, $body);
+            $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
+            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
+
+            $cancelled_reason = '';
+            if ( 
+                get_post_meta( $post_id, '_cancelled_reason_public', true ) == 'yes' && 
+                get_post_meta( $post_id, '_cancelled_reason', true ) != '' 
+            )
+            {
+                $cancelled_reason .= "\n\nReason: " . get_post_meta( $post_id, '_cancelled_reason', true );
+            }
+            $body = str_replace('[cancelled_reason]', $cancelled_reason, $body);
+
+            $body = html_entity_decode($body);
+
+            $body = apply_filters( 'viewing_owner_cancellation_notification_email_body', $body, $post_id, $property_id );
+
+            $from = '';
+            $from_setting = get_option( 'propertyhive_confirmations_default_from', '' );
+            if ( $from_setting == 'user' )
+            {
+                $current_user = wp_get_current_user();
+                $from = ( isset($current_user->user_email) ? $current_user->user_email : '' );
+
+                if ( $from == '' )
+                {
+                    $from = $property->office_email_address;
+                }
+            }
+            if ( $from_setting == 'office' )
+            {
+                $from = $property->office_email_address;
+            }
+            if ( $from == '' )
+            {
+                $from = get_option('propertyhive_email_from_address', '');
+            }
+            if ( $from == '' )
+            {
+                $from = get_bloginfo('admin_email');
+            }
+
+            $attachments = array();
+            if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
+            {
+                $uploaded_files = $_FILES['attachments'];
+
+                // Handle each file upload
+                foreach ($uploaded_files['name'] as $key => $value) 
+                {
+                    if ($uploaded_files['name'][$key]) 
+                    {
+                        $file = array(
+                            'name'     => $uploaded_files['name'][$key],
+                            'type'     => $uploaded_files['type'][$key],
+                            'tmp_name' => $uploaded_files['tmp_name'][$key],
+                            'error'    => $uploaded_files['error'][$key],
+                            'size'     => $uploaded_files['size'][$key]
+                        );
+
+                        // Move the file to a temporary location
+                        $upload_overrides = array('test_form' => false);
+                        $movefile = wp_handle_upload($file, $upload_overrides);
+
+                        if ($movefile && !isset($movefile['error'])) 
+                        {
+                            // Add the file path to attachments array
+                            $attachments[] = $movefile['file'];
+                        } 
+                        else
+                        {
+                            // Handle error in file upload
+                            wp_send_json_error($movefile['error']);
+                        }
+                    }
+                }
+            }
+
+            $headers = array();
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
+            $headers[] = 'Reply-To: ' . sanitize_email($from);
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            $headers = apply_filters( 'propertyhive_viewing_owner_cancellation_notification_email_headers', $headers );
+
+            $sent = wp_mail($to, $subject, $body, $headers, $attachments);
+
+            foreach ($attachments as $temp_file) 
+            {
+                @unlink($temp_file);
+            }
+
+            if ( !$sent )
+            {
+                wp_send_json_error('Failed to send email');
+            }
+
+            if ( apply_filters( 'propertyhive_log_cancellation_notification_emails', false ) === true )
+            {
+                // Add note/comment to viewing
+                $comment = array(
+                    'note_type' => 'action',
+                    'action' => 'viewing_owner_cancellation_notification_email',
+                );
+
+                PH_Comments::insert_note( $post_id, $comment );
+            }
+
+            update_post_meta( $post_id, '_owner_cancellation_notification_sent_at', date("Y-m-d H:i:s") );
+
+            wp_send_json_success();
+        }
+        else
+        {
+            wp_send_json_error('No owner recipients');
+        }
+
+        wp_die();
+    }
+
+    public function viewing_email_attending_negotiator_cancellation_notification()
+    {
+        check_ajax_referer( 'viewing-actions', 'security' );
+
+        $post_id = (int)$_POST['viewing_id'];
+        $property_id = get_post_meta( $post_id, '_property_id', TRUE );
+
+        $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+
+        $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
+        $owner_contact_ids = get_post_meta( $property_id, '_owner_contact_id', TRUE );
+ 
+        if ( !empty($negotiator_ids) ) {
+
+            $tos = array();
+            foreach ($negotiator_ids as $negotiator_id) 
+            {
+                $user_info = get_userdata((int)$negotiator_id);
+                $tos[] = sanitize_email($user_info->user_email);
+            }
+            $to = implode(",", $tos);
+
+            $owner_emails = array();
+            $owner_names = array();
+            $owner_dears = array();
+            $owner_details = array();
+            
+            if ( !empty($owner_contact_ids) ) 
+            {
+                foreach ($owner_contact_ids as $owner_id) 
+                {
+                    $owner_contact = new PH_Contact($owner_id);
+
+                    $owner_name = $owner_contact->post_title;
+                    $owner_dear = $owner_contact->dear();
+
+                    if( ! empty($owner_name) ) array_push($owner_names, $owner_name);
+                    if( ! empty($owner_dear) ) array_push($owner_dears, $owner_dear);
+
+                    $owner_email = $owner_contact->email_address;
+                    $explode_owner_email = explode( ",", $owner_email );
+                    foreach ( $explode_owner_email as $email_address )
+                    {
+                        $owner_emails[] = sanitize_email($email_address);
+                    }
+
+                    $owner_details[] = $owner_contact->post_title . "\nT: " . $owner_contact->telephone_number . "\nE: " . $owner_contact->email_address;
+                }
+            }
+
+            $owner_details = implode("\n\n", $owner_details);
+
+            $owner_names_string = $this->get_list_string($owner_names);
+            $owner_dears_string = $this->get_list_string($owner_dears);
+
+            $applicant_names = array();
+            $applicant_dears = array();
+            $applicant_details = array();
+
+            if ( !empty($applicant_contact_ids) ) 
+            {
+                foreach ($applicant_contact_ids as $applicant_contact_id)
+                {
+                    $applicant_contact = new PH_Contact($applicant_contact_id);
+                    $applicant_names[] = $applicant_contact->post_title;
+                    $applicant_dears[] = $applicant_contact->dear();
+
+                    $applicant_details[] = $applicant_contact->post_title . "\nT: " . $applicant_contact->telephone_number . "\nE: " . $applicant_contact->email_address;
+                }
+            }
+
+            $applicant_details = implode("\n\n", $applicant_details);
+
+            $applicant_names = array_filter($applicant_names);
+            $applicant_dears = array_filter($applicant_dears);
+
+            $applicant_names_string = $this->get_list_string($applicant_names);
+            $applicant_dears_string = $this->get_list_string($applicant_dears);
+
+            $negotiator_names = array();
+            $negotiator_names_string = '';
+
+            $negotiator_email_addresses = array();
+            $negotiator_email_addresses_string = '';
+
+            $negotiator_telephone_numbers = array();
+            $negotiator_telephone_numbers_string = '';
+
+            $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
+            if ( !empty($negotiator_ids) )
+            {
+                foreach ( $negotiator_ids as $negotiator_id )
+                {
+                    $negotiator = get_user_by( 'id', $negotiator_id );
+                    if ( $negotiator !== false )
+                    {
+                        if ( isset($negotiator->display_name) && !empty($negotiator->display_name) )
+                        {
+                            $negotiator_names[] = $negotiator->display_name;
+                        }
+                        
+                        if ( isset($negotiator->user_email) && !empty($negotiator->user_email) )
+                        {
+                            $negotiator_email_addresses[] = $negotiator->user_email;
+                        }
+
+                        $telephone_number = get_user_meta( $negotiator_id, 'telephone_number', true );
+                        if ( !empty($telephone_number) )
+                        {
+                            $negotiator_telephone_numbers[] = $telephone_number;
+                        }
+                    }
+                }
+            }
+            if ( !empty($negotiator_names) )
+            {
+                $last  = array_slice($negotiator_names, -1);
+                $first = join(', ', array_slice($negotiator_names, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_names_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_email_addresses) )
+            {
+                $last  = array_slice($negotiator_email_addresses, -1);
+                $first = join(', ', array_slice($negotiator_email_addresses, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_email_addresses_string = join(' and ', $both);
+            }
+            if ( !empty($negotiator_telephone_numbers) )
+            {
+                $last  = array_slice($negotiator_telephone_numbers, -1);
+                $first = join(', ', array_slice($negotiator_telephone_numbers, 0, -1));
+                $both  = array_filter(array_merge(array($first), $last), 'strlen');
+                $negotiator_telephone_numbers_string = join(' and ', $both);
+            }
+
+            $property = new PH_Property((int)$property_id);
+
+            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_subject', '' );
+            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_body', '' );
+
+            $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
+            $subject = str_replace('[owner_name]', $owner_names_string, $subject);
+            $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
+            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
+            $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
+            $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
+
+            $subject = apply_filters( 'viewing_attending_negotiator_cancellation_notification_email_subject', $subject, $post_id, $property_id );
+
+            $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
+            $body = str_replace('[owner_name]', $owner_names_string, $body);
+            $body = str_replace('[owner_dear]', $owner_dears_string, $body);
+            $body = str_replace('[owner_details]', $owner_details, $body);
+            $body = str_replace('[applicant_name]', $applicant_names_string, $body);
+            $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
+            $body = str_replace('[applicant_details]', $applicant_details, $body);
+            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
+            $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
+            $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
+
+            $cancelled_reason = '';
+            if ( 
+                get_post_meta( $post_id, '_cancelled_reason_public', true ) == 'yes' && 
+                get_post_meta( $post_id, '_cancelled_reason', true ) != '' 
+            )
+            {
+                $cancelled_reason .= "\n\nReason: " . get_post_meta( $post_id, '_cancelled_reason', true );
+            }
+            $body = str_replace('[cancelled_reason]', $cancelled_reason, $body);
+
+            $body = html_entity_decode($body);
+
+            $body = apply_filters( 'viewing_attending_negotiator_cancellation_notification_email_body', $body, $post_id, $property_id );
+
+            $from = '';
+            $from_setting = get_option( 'propertyhive_confirmations_default_from', '' );
+            if ( $from_setting == 'user' )
+            {
+                $current_user = wp_get_current_user();
+                $from = ( isset($current_user->user_email) ? $current_user->user_email : '' );
+
+                if ( $from == '' )
+                {
+                    $from = $property->office_email_address;
+                }
+            }
+            if ( $from_setting == 'office' )
+            {
+                $from = $property->office_email_address;
+            }
+            if ( $from == '' )
+            {
+                $from = get_option('propertyhive_email_from_address', '');
+            }
+            if ( $from == '' )
+            {
+                $from = get_bloginfo('admin_email');
+            }
+
+            $attachments = array();
+            if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
+            {
+                $uploaded_files = $_FILES['attachments'];
+
+                // Handle each file upload
+                foreach ($uploaded_files['name'] as $key => $value) 
+                {
+                    if ($uploaded_files['name'][$key]) 
+                    {
+                        $file = array(
+                            'name'     => $uploaded_files['name'][$key],
+                            'type'     => $uploaded_files['type'][$key],
+                            'tmp_name' => $uploaded_files['tmp_name'][$key],
+                            'error'    => $uploaded_files['error'][$key],
+                            'size'     => $uploaded_files['size'][$key]
+                        );
+
+                        // Move the file to a temporary location
+                        $upload_overrides = array('test_form' => false);
+                        $movefile = wp_handle_upload($file, $upload_overrides);
+
+                        if ($movefile && !isset($movefile['error'])) 
+                        {
+                            // Add the file path to attachments array
+                            $attachments[] = $movefile['file'];
+                        } 
+                        else
+                        {
+                            // Handle error in file upload
+                            wp_send_json_error($movefile['error']);
+                        }
+                    }
+                }
+            }
+
+            $headers = array();
+            $headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . sanitize_email($from) . '>';
+            $headers[] = 'Reply-To: ' . sanitize_email($from);
+            $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+
+            $headers = apply_filters( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_headers', $headers );
+
+            $sent = wp_mail($to, $subject, $body, $headers, $attachments);
+
+            foreach ($attachments as $temp_file) 
+            {
+                @unlink($temp_file);
+            }
+
+            if ( !$sent )
+            {
+                wp_send_json_error('Failed to send email');
+            }
+
+            // Add note/comment to viewing
+            if ( apply_filters( 'propertyhive_log_cancellation_notification_emails', false ) === true )
+            {
+                $comment = array(
+                    'note_type' => 'action',
+                    'action' => 'viewing_attending_negotiator_cancellation_notification_email',
+                );
+
+                PH_Comments::insert_note( $post_id, $comment );
+            }
+
+            update_post_meta( $post_id, '_attending_negotiator_cancellation_notification_sent_at', date("Y-m-d H:i:s") );
 
             wp_send_json_success();
         }
