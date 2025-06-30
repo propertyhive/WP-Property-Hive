@@ -105,6 +105,8 @@ class Elementor_Property_Availability_Widget extends \Elementor\Widget_Base {
 
 		if ( $property->availability != '' )
 		{
+			$this->add_render_attribute( '_wrapper', 'data-availability', esc_attr($property->availability) );
+
 	        echo '<div class="elementor-widget-availability">' . esc_html($property->availability) . '</div>';
 	    }
 
