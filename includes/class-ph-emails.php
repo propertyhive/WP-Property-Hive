@@ -315,6 +315,10 @@ class PH_Emails {
 	{
 		global $post;
 
+		$dry_run = isset($_GET['dry_run']) ? true : false;
+
+		if ( $dry_run === true ) { echo 'Running auto-match in dry run mode. Logging will be output and no emails will be sent.' . "<br>\n"; }
+
 		// Auto emails enabled in settings
 		// Auto emails not disabled in applicant record
 		// Property added more recently that setting enabled in settings
@@ -324,12 +328,16 @@ class PH_Emails {
 
 		$auto_property_match_enabled = get_option( 'propertyhive_auto_property_match', '' );
 
+		if ( $dry_run === true ) { echo 'Auto-match setting enabled: ' . $auto_property_match_enabled . "<br>\n"; }
+
 		if ( $auto_property_match_enabled == '' )
 		{
 			return false;
 		}
 		
 		$auto_property_match_enabled_date = get_option( 'propertyhive_auto_property_match_enabled_date', '' );
+
+		if ( $dry_run === true ) { echo 'Auto-match setting enabled date: ' . $auto_property_match_enabled_date . "<br>\n"; }
 
 		if ( $auto_property_match_enabled_date == '' )
 		{
@@ -418,7 +426,11 @@ class PH_Emails {
 			'fields' => 'ids'
 		);
 
+		if ( $dry_run === true ) { echo 'Running query to get contacts with args: ' . print_r($args, true) . "<br>\n"; }
+
 		$contact_query = new WP_Query( $args );
+
+		if ( $dry_run === true ) { echo 'Found ' . $contact_query->found_posts . ' contacts' . "<br>\n"; }
 
 		if ( $contact_query->have_posts() )
 		{
@@ -453,9 +465,13 @@ class PH_Emails {
 
 				$contact_id = get_the_ID();
 
+				if ( $dry_run === true ) { echo 'Doing contact: ' . get_the_title() . "<br>\n"; }
+
 				// invalid email address
 				if ( strpos( get_post_meta( $contact_id, '_email_address', TRUE ), '@' ) === FALSE )
 				{
+					if ( $dry_run === true ) { echo 'Invalid email address. Skipping' . "<br>\n"; }
+
 					continue;
 				}
 
@@ -463,6 +479,8 @@ class PH_Emails {
 				$forbidden_contact_methods = get_post_meta( $contact_id, '_forbidden_contact_methods', TRUE );
 				if ( is_array($forbidden_contact_methods) && in_array('email', $forbidden_contact_methods) )
 				{
+					if ( $dry_run === true ) { echo 'Email communication forbidden in contact preferences. Skipping' . "<br>\n"; }
+
 					continue;
 				}
 
@@ -476,26 +494,35 @@ class PH_Emails {
 						$dismissed_properties = array();
 					}
 
+					if ( $dry_run === true ) { if ( !empty($dismissed_properties) ) { echo 'Dismissed properties: ' . print_r($dismissed_properties, true) . "<br>\n"; } }
+
 					for ( $i = 0; $i < $applicant_profiles; ++$i )
 					{
 						$applicant_profile = get_post_meta( $contact_id, '_applicant_profile_' . $i, TRUE );
 
 						if ( $applicant_profile == '' || !is_array($applicant_profile) || !isset($applicant_profile['department']) )
 						{
+							if ( $dry_run === true ) { echo 'Applicant relationship empty or no department set' . "<br>\n"; }
 							continue;
 						}
 
 						if ( !isset($applicant_profile['send_matching_properties']) || ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] != 'yes' ) )
 						{
+							if ( $dry_run === true ) { echo 'Send matching properties disabled' . "<br>\n"; }
 							continue;
 						}
 
 						if ( isset($applicant_profile['auto_match_disabled']) && $applicant_profile['auto_match_disabled'] == 'yes' )
 						{
+							if ( $dry_run === true ) { echo 'Auto match disabled' . "<br>\n"; }
 							continue;
 						}
 
+						if ( $dry_run === true ) { echo 'Getting matching properties' . "<br>\n"; }
+
 						$matching_properties = $ph_admin_matching_properties->get_matching_properties( $contact_id, $i, $auto_property_match_enabled_date );
+
+						if ( $dry_run === true ) { echo 'Found ' . count($matching_properties) . ' matching properties' . "<br>\n"; }
 
 						if ( !empty($matching_properties) )
 						{
@@ -537,6 +564,8 @@ class PH_Emails {
 							{
 								$new_matching_properties = array_slice($new_matching_properties, 0, (int)$max_results);
 							}
+
+							if ( $dry_run === true ) { echo 'Found ' . count($new_matching_properties) . ' matching properties after removing already sent and dismissed' . "<br>\n"; }
 
 							if ( !empty($new_matching_properties) )
 							{
@@ -614,21 +643,34 @@ class PH_Emails {
 
 								$highest_office_email_address = apply_filters( 'propertyhive_auto_match_from_email_address', $highest_office_email_address );
 
-								$ph_admin_matching_properties->send_emails(
-									$contact_id,
-									$i,
-									$new_matching_properties,
-									get_bloginfo('name'),
-									$highest_office_email_address,
-									$subject,
-									$body
-								);
+								if ( !$dry_run )
+								{
+									$ph_admin_matching_properties->send_emails(
+										$contact_id,
+										$i,
+										$new_matching_properties,
+										get_bloginfo('name'),
+										$highest_office_email_address,
+										$subject,
+										$body
+									);
+								}
+								else
+								{
+									echo 'Would\'ve sent email. Not sending due to being ran in dry run mode' . "<br>\n";
+								}
 							}
 						}
 					}
 				}
+				else
+				{
+					if ( $dry_run === true ) { echo 'No applicant profiles found. Skipping' . "<br>\n"; }
+				}
 			}
 		}
+
+		if ( $dry_run === true ) { echo 'Finished auto-match process' . "<br>\n"; die(); }
 
 		wp_reset_postdata();
 	}
