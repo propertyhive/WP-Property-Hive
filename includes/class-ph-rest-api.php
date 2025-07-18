@@ -63,12 +63,157 @@ class PH_Rest_Api {
 		add_filter( 'rest_property_collection_params', array( $this, 'modify_rest_order_by' ), 10, 1 );
 		add_action( "rest_after_insert_property", array( $this, 'ensure_key_property_fields_set' ), 10, 3 );
 
-		// Enquiry
+		// Enquiry - Create
 		add_action( 'rest_api_init', array( $this, 'register_enquiry_rest_route' ), 11 );
 		add_action( "rest_after_insert_enquiry", array( $this, 'ensure_key_enquiry_fields_set' ), 10, 3 );
 
+		// Enquiry - Read
+		add_filter( 'pre_get_posts', array( $this, 'restrict_enquiry_rest_listing' ));
+		add_filter( 'rest_pre_dispatch', array( $this, 'block_enquiry_rest_listing' ), 10, 3);
+		add_action( 'rest_api_init', array( $this, 'register_rest_api_enquiry_fields' ), 99 );
+
 		// Office
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_office_fields' ), 99 );
+	}
+
+	// Restrict listing of enquiries via REST API
+	public function restrict_enquiry_rest_listing(WP_Query $query) 
+	{
+	    if ( !is_admin() && defined('REST_REQUEST') && REST_REQUEST ) 
+	    {
+	        $post_type = $query->get('post_type');
+
+	        // Check if it's the 'enquiry' CPT
+	        if ( $post_type === 'enquiry' ) 
+	        {
+	            if ( !current_user_can('manage_propertyhive') ) 
+	        	{
+	                // Force an empty result
+	                $query->set('post__in', [0]);
+	            }
+	        }
+	    }
+	}
+
+	public function block_enquiry_rest_listing($response, $server, $request) 
+	{
+	    if ( $request->get_route() === '/wp/v2/enquiry' ) 
+	    {
+	    	$current_user = wp_get_current_user();
+
+	        if ( !current_user_can('manage_propertyhive') ) 
+	        {
+	            return new WP_Error(
+	                'rest_forbidden',
+	                __('You are not allowed to list enquiries.'),
+	                ['status' => 403]
+	            );
+	        }
+	    }
+	    return $response;
+	}
+
+	public function register_rest_api_enquiry_fields()
+	{
+		$field_array = array(
+			'office',
+			'negotiator',
+			'status',
+			'source',
+			'properties',
+			'details',
+		);
+
+		$field_array = apply_filters( 'propertyhive_rest_api_enquiry_fields', $field_array );
+
+		foreach ( $field_array as $field )
+		{
+			register_rest_field( 'enquiry',
+		        $field,
+		        array(
+		            'get_callback'  => function( $object, $field_name, $request )
+		            {
+		            	$enquiry = new PH_Enquiry($object['id']);
+
+		            	$return = '';
+
+		            	switch ($field_name)
+		            	{
+		            		case "office": 
+		            		{ 
+		            			$return = array(
+		            				'name' => get_the_title($enquiry->_office_id),
+		            			); 
+		            			break; 
+							}
+							case "negotiator": 
+		            		{ 
+		            			$user = get_userdata( $enquiry->_negotiator_id );
+
+		            			$return = array(
+		            				'name' => ( $user !== false ) ? $user->display_name : '',
+		            			); 
+		            			break; 
+							}
+							case "properties": 
+		            		{ 
+		            			$return = array();
+
+		            			$property_ids = $enquiry->get_properties();
+
+		            			if ( !empty($property_ids) )
+		            			{
+		            				foreach ( $property_ids as $property_id )
+		            				{
+		            					$property = new PH_Property((int)$property_id);
+
+		            					$return[] = array(
+		            						'id' => (int)$property_id,
+		            						'address' => $property->get_formatted_full_address()
+		            					);
+		            				}
+		            			}
+		            			break; 
+							}
+							case "details": 
+		            		{ 
+		            			$ignore_keys = array(
+					                '_status',
+					                '_source',
+					                '_negotiator_id',
+					                '_office_id',
+					                '_action',
+					                '_contact_id',
+					                '_property_id',
+					                'property_id',
+					            );
+
+		            			$enquiry_meta = get_metadata( 'post', $object['id'] );
+
+		            			$return = array();
+
+		            			foreach ($enquiry_meta as $key => $value)
+					            {
+					                if ( !in_array( $key, $ignore_keys ) && substr( $key, 0, 1 ) != '_' && strpos($key, 'captcha') === FALSE )
+					                {
+					                	$return[trim($key, "_")] = $value;
+					                }
+					            }
+		            			break; 
+							}
+		            		default:
+		            		{
+		            			$return = $enquiry->{$field_name};			            	
+				            }
+				        }
+
+				        $return = apply_filters( 'propertyhive_rest_api_enquiry_field_callback', $return, $field_name, $enquiry );
+				        return $return;
+		            },
+		            'schema' => null,
+		        )
+		    );
+		}
 	}
 
 	public function register_enquiry_rest_route()
