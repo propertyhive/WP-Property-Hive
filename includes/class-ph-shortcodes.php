@@ -190,10 +190,14 @@ class PH_Shortcodes {
 
 		if ( isset($atts['department']) && in_array($atts['department'], array_keys( ph_get_departments() )) )
 		{
+			$departments = explode(",", $atts['department']);
+			$departments = array_map('trim', $departments);
+            $departments = array_filter($departments);
+
 			$meta_query[] = array(
 				'key' => '_department',
-				'value' => $atts['department'],
-				'compare' => '='
+				'value' => $departments,
+				'compare' => 'IN'
 			);
 		}
 
@@ -764,10 +768,14 @@ class PH_Shortcodes {
 
 		if ( isset($atts['department']) && $atts['department'] != '' )
 		{
+			$departments = explode(",", $atts['department']);
+			$departments = array_map('trim', $departments);
+            $departments = array_filter($departments);
+
 			$meta_query[] = array(
 				'key' => '_department',
-				'value' => $atts['department'],
-				'compare' => '='
+				'value' => $departments,
+				'compare' => 'IN'
 			);
 		}
 
@@ -1068,10 +1076,14 @@ class PH_Shortcodes {
 
 		if ( isset($atts['department']) && $atts['department'] != '' )
 		{
+			$departments = explode(",", $atts['department']);
+			$departments = array_map('trim', $departments);
+            $departments = array_filter($departments);
+
 			$meta_query[] = array(
 				'key' => '_department',
-				'value' => $atts['department'],
-				'compare' => '='
+				'value' => $departments,
+				'compare' => 'IN'
 			);
 		}
 
