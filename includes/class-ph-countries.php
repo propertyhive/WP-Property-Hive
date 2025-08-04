@@ -158,7 +158,7 @@ class PH_Countries {
 				'name' => 'Bulgaria',
 				'currency_code' => 'BGN',
 				'currency_symbol' => 'лв',
-				'currency_prefix' => true
+				'currency_prefix' => false
 			),
 			'CA' => array(
 				'name' => 'Canada',
