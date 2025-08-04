@@ -175,7 +175,7 @@ class PH_Elementor {
 		// Set the custom post type 
 		$query->set( 'post_type', [ 'property' ] );
 
-		$new_meta_query = $this->remove_department_from_query( $query );
+		$meta_query = $this->remove_department_from_query( $query );
 
 		$new_meta_query = $meta_query;
 		
