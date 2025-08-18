@@ -690,7 +690,7 @@ class PH_Shortcodes {
 
 		<?php else: ?>
 
-            <p class="propertyhive-info no-results-message"><?php echo $atts['no_results_output']; ?></p>
+            <p class="propertyhive-info no-results-message"><?php echo wp_kses_post($atts['no_results_output']); ?></p>
 
 		<?php endif;
 
@@ -979,7 +979,7 @@ class PH_Shortcodes {
 
 		<?php else: ?>
 
-            <p class="propertyhive-info no-results-message"><?php echo $atts['no_results_output']; ?></p>
+            <p class="propertyhive-info no-results-message"><?php echo wp_kses_post($atts['no_results_output']); ?></p>
 
 		<?php endif;
 
@@ -1259,7 +1259,7 @@ class PH_Shortcodes {
 
 		<?php else: ?>
 
-            <p class="propertyhive-info no-results-message"><?php echo $atts['no_results_output']; ?></p>
+            <p class="propertyhive-info no-results-message"><?php echo wp_kses_post($atts['no_results_output']); ?></p>
 
 		<?php endif;
 
@@ -1674,7 +1674,7 @@ class PH_Shortcodes {
 
 			<?php else: ?>
 
-            	<p class="propertyhive-info no-results-message"><?php echo $atts['no_results_output']; ?></p>
+            	<p class="propertyhive-info no-results-message"><?php echo wp_kses_post($atts['no_results_output']); ?></p>
 
 			<?php endif;
 
