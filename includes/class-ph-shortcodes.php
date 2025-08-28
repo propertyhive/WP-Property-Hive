@@ -129,6 +129,7 @@ class PH_Shortcodes {
 			'order'  			=> 'desc',
 			'meta_key' 			=> '_price_actual',
 			'ids'     			=> '',
+			'exclude'     		=> '',
 			'department'		=> '', // residential-sales / residential-lettings / commercial / any custom department
 			'minimum_price'		=> '',
 			'maximum_price'		=> '',
@@ -624,8 +625,22 @@ class PH_Shortcodes {
 			$args['meta_key'] = $atts['meta_key'];
 		}
 
-		if ( ! empty( $atts['ids'] ) ) {
-			$args['post__in'] = array_map( 'trim', explode( ',', $atts['ids'] ) );
+		if ( ! empty( $atts['ids'] ) ) 
+		{
+			$include_ids = array_map( 'absint', explode( ',', $atts['ids'] ) );
+		    $include_ids = array_filter( $include_ids );
+		    if ( ! empty( $include_ids ) ) 
+		    {
+		        $args['post__in'] = $include_ids;
+		    }
+		}
+		if ( ! empty( $atts['exclude'] ) ) 
+		{
+			$exclude_ids = array_map( 'absint', explode( ',', $atts['exclude'] ) );
+		    $exclude_ids = array_filter( $exclude_ids );
+		    if ( ! empty( $exclude_ids ) ) {
+		        $args['post__not_in'] = $exclude_ids;
+		    }
 		}
 		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
 		{
@@ -730,6 +745,7 @@ class PH_Shortcodes {
 			'location_id'		=> '',
 			'commercial_for_sale' => '',
 			'commercial_to_rent' => '',
+			'exclude'     		=> '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
 			'no_results_output' => '',
@@ -925,6 +941,15 @@ class PH_Shortcodes {
 			'has_password' 			=> false,
 		);
 
+		if ( ! empty( $atts['exclude'] ) ) 
+		{
+			$exclude_ids = array_map( 'absint', explode( ',', $atts['exclude'] ) );
+		    $exclude_ids = array_filter( $exclude_ids );
+		    if ( ! empty( $exclude_ids ) ) {
+		        $args['post__not_in'] = $exclude_ids;
+		    }
+		}
+
 		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
 		{
 			$args['orderby'] = 'meta_value';
@@ -1014,6 +1039,7 @@ class PH_Shortcodes {
 			'office_id'	=> '',
 			'negotiator_id'		=> '',
 			'availability_id'	=> '',
+			'exclude'     		=> '',
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
 			'meta_key' 	=> '',
@@ -1213,6 +1239,15 @@ class PH_Shortcodes {
 
 		$args['orderby'] .= ' post_title';
 
+		if ( ! empty( $atts['exclude'] ) ) 
+		{
+			$exclude_ids = array_map( 'absint', explode( ',', $atts['exclude'] ) );
+		    $exclude_ids = array_filter( $exclude_ids );
+		    if ( ! empty( $exclude_ids ) ) {
+		        $args['post__not_in'] = $exclude_ids;
+		    }
+		}
+
 		ob_start();
 
 		if ( isset($atts['show_order']) && $atts['show_order'] != '' )
@@ -1297,6 +1332,7 @@ class PH_Shortcodes {
 			'availability_id'	=> '',
 			'property_type_id'	=> '',
 			'match_property_type'	=> '',
+			'exclude'     		=> '',
 			'no_results_output' => '',
 			'carousel' 			=> '',
 		), $atts, 'similar_properties' );
@@ -1644,6 +1680,15 @@ class PH_Shortcodes {
 			}
 
 			$args['orderby'] .= ' post_title';
+
+			if ( ! empty( $atts['exclude'] ) ) 
+			{
+				$exclude_ids = array_map( 'absint', explode( ',', $atts['exclude'] ) );
+			    $exclude_ids = array_filter( $exclude_ids );
+			    if ( ! empty( $exclude_ids ) ) {
+			        $args['post__not_in'] = $exclude_ids;
+			    }
+			}
 
 			ob_start();
 
