@@ -1,0 +1,68 @@
+<?php
+
+add_shortcode( 'avada_property_address_town_city', function( $atts ) {
+    $atts = shortcode_atts( array(
+        'content_align'    => 'left',
+        'fusion_font_family_address_town_city_font' => '',
+        'fusion_font_variant_address_town_city_font' => '',
+        'font_size'  => '',
+        'letter_spacing'  => '',
+        'text_transform'  => '',
+        'line_height'  => '',
+        'text_color'       => '',
+    ), $atts );
+
+    if ( get_post_type( get_the_ID() ) != 'property' )
+    {
+    	return '';
+    }
+
+    fusion_element_rendering_elements( true );
+
+    global $property;
+    
+    if ( empty($property) )
+    {
+        $property = new PH_Property(get_the_ID());
+    }
+
+    if ( $property->address_three == '' )
+    {
+        return '';
+    }
+
+    $style = Fusion_Builder_Element_Helper::get_font_styling( $atts, 'address_town_city_font' );
+
+	if ( $atts['font_size'] ) {
+		$style .= 'font-size:' . fusion_library()->sanitize->get_value_with_unit( $atts['font_size'] ) . ';';
+	}
+
+	if ( $atts['letter_spacing'] ) {
+		$style .= 'letter-spacing:' . fusion_library()->sanitize->get_value_with_unit( $atts['letter_spacing'] ) . ';';
+	}
+
+	if ( ! empty( $atts['text_transform'] ) ) {
+		$style .= 'text-transform:' . $atts['text_transform'] . ';';
+	}
+
+	if ( ! empty( $atts['content_align'] ) ) {
+		$style .= 'text-align:' . $atts['content_align'] . ';';
+	}
+
+    ob_start();
+
+    echo '<div ' . FusionBuilder::attributes( 'property-address-town-city-shortcode' ) . '>
+    	<div style="' . $style . '">';
+
+        echo esc_html($property->address_three);
+
+    echo '
+    	</div>
+    </div>';
+
+    $html = ob_get_clean();
+
+    fusion_element_rendering_elements( false );
+
+    return $html;
+});

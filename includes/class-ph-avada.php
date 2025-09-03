@@ -8,6 +8,13 @@ class PH_Avada {
 
 	private $widgets = array(
 		'Property Actions',
+		'Property Address Name Number',
+		'Property Address Street',
+		'Property Address Line 2',
+		'Property Address Town City',
+		'Property Address County',
+		'Property Address Postcode',
+		'Property Address Full',
 		'Property Availability',
 		'Property Bathrooms',
 		'Property Bedrooms',
