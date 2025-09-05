@@ -1799,7 +1799,8 @@ class PH_Shortcodes {
 
 		$atts = shortcode_atts( array(
 			'height'        => '400',
-			'init_on_load'  => 'true'
+			'init_on_load'  => 'true',
+			'embed'  		=> 'false'
 		), $atts, 'property_street_view' );
 
 		ob_start();
