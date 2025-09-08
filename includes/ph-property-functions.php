@@ -142,10 +142,10 @@ function get_property_map( $args = array() )
 	{
 		$id_suffix = ( ( isset($args['id']) && $args['id'] != '' ) ? '_' . $args['id'] : '' );
 
-	    echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
-		
 		if ( get_option('propertyhive_maps_provider') == 'mapbox' )
 		{
+			echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
+
 			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/mapbox/';
 
 			wp_register_style('mapbox', $assets_path . 'mapbox-gl.css', array(), '3.8.0');
@@ -241,6 +241,8 @@ function get_property_map( $args = array() )
 		}
 		elseif ( get_option('propertyhive_maps_provider') == 'osm' )
 		{
+			echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
+
 			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/leaflet/';
 
 			wp_register_style('leaflet', $assets_path . 'leaflet.css', array(), '1.9.4');
@@ -325,8 +327,24 @@ function get_property_map( $args = array() )
 		else
 		{
 			$api_key = get_option('propertyhive_google_maps_api_key');
-		    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
-		    wp_enqueue_script('googlemaps');
+			if ( isset($args['embed']) && ($args['embed'] === 'true' || $args['embed'] === TRUE) ) 
+			{
+				echo '<iframe
+				  width="100%"
+				  height="' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . '"
+				  style="border:0"
+				  loading="lazy"
+				  allowfullscreen
+				  referrerpolicy="no-referrer-when-downgrade"
+				  src="' . esc_url( 'https://www.google.com/maps/embed/v1/place?key=' . $api_key . '&q=' . $property->latitude . ',' . $property->longitude ) . '">
+				</iframe>';
+			}
+			else
+			{
+				echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
+				
+			    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+			    wp_enqueue_script('googlemaps');
 ?>
 <script>
 
@@ -408,6 +426,7 @@ function get_property_map( $args = array() )
 
 </script>
 <?php
+			}
 		}
 		do_action( 'propertyhive_property_map_after' );
 	}
@@ -491,7 +510,6 @@ function get_property_street_view( $args = array() )
 			}
 			else
 			{
-				
 			    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 			    wp_enqueue_script('googlemaps');
 

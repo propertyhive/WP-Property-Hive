@@ -1751,7 +1751,8 @@ class PH_Shortcodes {
 			'height'        => '400',
 			'zoom'          => '14',
 			'scrollwheel'   => 'true',
-			'init_on_load'  => 'true'
+			'init_on_load'  => 'true',
+			'embed'  		=> 'false'
 		), $atts, 'property_map' );
 
 		ob_start();
