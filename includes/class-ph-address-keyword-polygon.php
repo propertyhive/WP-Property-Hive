@@ -90,7 +90,14 @@ class PH_Address_Keyword_Polygon {
 
         $url = 'https://nominatim.openstreetmap.org/search.php?q=' . urlencode($address_keyword) . '&polygon_geojson=1&format=json';
 
-        $response = wp_remote_get( $url );
+        $response = wp_remote_get( 
+            $url,
+            array(
+                'headers' => array(
+                    'Referer' => home_url(),
+                ),
+            )
+        );
 
         if ( is_array( $response ) && ! is_wp_error( $response ) ) 
         {
