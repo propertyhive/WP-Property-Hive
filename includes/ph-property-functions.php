@@ -342,7 +342,7 @@ function get_property_map( $args = array() )
 			else
 			{
 				echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
-				
+
 			    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 			    wp_enqueue_script('googlemaps');
 ?>
@@ -486,7 +486,7 @@ function get_property_street_view( $args = array() )
 {
 	global $property;
 
-	if ( get_option('propertyhive_maps_provider') == 'osm' )
+	if ( get_option('propertyhive_maps_provider') == 'osm' || get_option('propertyhive_maps_provider') == 'mapbox' )
 	{
 
 
