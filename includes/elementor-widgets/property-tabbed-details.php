@@ -777,6 +777,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 										{
 											echo '<div class="virtual-tours">';
 
+											$fb_sdk_printed = false;
+
 											foreach ( $virtual_tours as $virtual_tour )
 											{
 												$virtual_tour['url'] = preg_replace(
@@ -798,6 +800,24 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 											        	"//player.vimeo.com/video/$6",
 											        	$virtual_tour['url']
 											    	);
+												}
+
+												if ( preg_match('#^https?://(www\.)?facebook\.com/reel/[^?\s]+#i', $virtual_tour['url']) ) 
+												{
+													// Print SDK once (uses en_GB locale to match your site)
+													if ( ! $fb_sdk_printed ) 
+													{
+														$fb_sdk_printed = true;
+														echo '<div id="fb-root"></div>';
+														// Use the standard SDK include; id prevents double-loading
+														echo '<script async defer crossorigin="anonymous" id="facebook-jssdk" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v20.0"></script>';
+													}
+
+													// Output the Reel embed container; the SDK converts it into a player
+													echo '<div class="fb-video" data-href="' . esc_url( $virtual_tour['url'] ) . '" data-allowfullscreen="true" data-width="auto" style="max-width:100%;"></div>';
+
+													// Skip the generic iframe path for FB Reels
+													continue;
 												}
 												
 												echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
