@@ -1472,6 +1472,7 @@ function ph_form_field( $key, $field )
                     'hide_empty' => $field['hide_empty'],
                     'parent' => 0
                 );
+                $args = apply_filters( 'propertyhive_form_taxonomy_terms_args', $args, $field );
                 $terms = get_terms( $field['type'], $args );
 
                 $levels_of_taxonomy = 1;
@@ -1529,6 +1530,8 @@ function ph_form_field( $key, $field )
                                 'hide_empty' => $field['hide_empty'],
                                 'parent' => $term->term_id,
                             );
+                            $args = apply_filters( 'propertyhive_form_taxonomy_terms_args', $args, $field );
+                            $args = apply_filters( 'propertyhive_form_taxonomy_subterms_args', $args, $field );
                             $subterms = get_terms( $field['type'], $args );
 
                             if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
@@ -1576,6 +1579,8 @@ function ph_form_field( $key, $field )
                                         'hide_empty' => $field['hide_empty'],
                                         'parent' => (int)$subterm->term_id
                                     );
+                                    $args = apply_filters( 'propertyhive_form_taxonomy_terms_args', $args, $field );
+                                    $args = apply_filters( 'propertyhive_form_taxonomy_subsubterms_args', $args, $field );
                                     $subsubterms = get_terms( $field['type'], $args );
 
                                     if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
