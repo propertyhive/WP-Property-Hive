@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.8.2
-Stable tag: 2.1.6
+Stable tag: 2.1.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,17 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.7 - 2025-09-08 =
+* Added ability to pass 'embed="true"' to Map shortcode [property_map] so it uses the Google Embed API instead of the Google JS API. Good for reducing Google API costs
+* Added ability to pass 'embed="true"' to Street View shortcode [property_street_view] so it uses the Google Embed API instead of the Google JS API. Good for reducing Google API costs
+* Added a 'Referer' header to OSM geocoding requests to get around being blocked
+* Added ability to pass new 'exclude' attribute to property shortcodes to exclude certain IDs
+* Added support for Facebook Reels when embedding virtual tours in Elementor
+* Added new individual address widgets to Avada builder
+* Added new filter 'propertyhive_form_taxonomy_terms_args' to customise args passed to get_terms() when drawing taxonomy dropdowns in forms
+* Updated enquiry autoresponder email to cater for multiple property IDs, such as when using Property Shortlist add on to enquire about all shortlisted enquiries
+* Updated Google street view output to not show if maps provider is MapBox
 
 = 2.1.6 - 2025-08-26 =
 * Added ability to get enquiries via authenticated REST API requests
