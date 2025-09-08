@@ -756,9 +756,11 @@ class PH_Emails {
 
 	public function send_enquiry_auto_responder( $data = array() )
 	{
-		if ( isset($data['property_id']) && sanitize_text_field($data['property_id']) != '' )
+		if ( isset($data['property_id']) && !empty(ph_clean($data['property_id'])) )
 		{
-			$property_id = $data['property_id'];
+			$property_ids = ph_clean(explode("|", $data['property_id']));
+			if ( !is_array($property_ids) ) { $property_ids = array($property_ids); }
+
 			$to = sanitize_email( $_POST['email_address'] );
 			$subject = get_option( 'propertyhive_enquiry_auto_responder_email_subject', '' );
 			$body = get_option( 'propertyhive_enquiry_auto_responder_email_body', '' );
@@ -771,123 +773,133 @@ class PH_Emails {
 
 				$body = str_replace( "[name]", ( isset($_POST['name']) ? ph_clean($_POST['name']) : '' ), $body );
 
-				$body = str_replace( "[property_address_hyperlinked]", '<a href="' . get_permalink($property_id) . '">' . get_the_title($property_id) . '</a>', $body );
+				$property_address_hyperlinked = array();
+				foreach ( $property_ids as $property_id )
+				{
+					$property_address_hyperlinked[] = '<a href="' . get_permalink($property_id) . '">' . get_the_title($property_id) . '</a>';
+				}
+				$body = str_replace( "[property_address_hyperlinked]", implode(' and ', array_filter(array_merge(array(join(', ', array_slice($property_address_hyperlinked, 0, -1))), array_slice($property_address_hyperlinked, -1)), 'strlen')), $body );
 
 				if ( strpos( $body, '[similar_properties]' ) !== FALSE )
 				{
 					$similar_html = '';
 
-					$department = get_post_meta( $property_id, '_department', TRUE );					
-
-					// Get three similar properties
-					$args = array(
-						'post_type' => 'property',
-						'post_status' => 'publish',
-						'posts_per_page' => 3,
-						'orderby' => 'rand',
-						'post__not_in' => array($property_id),
-					);
-
-					$meta_query = array();
-
-					$meta_query[] = array(
-						'key' 		=> '_department',
-						'value' 	=> $department,
-					);
-
-					$meta_query[] = array(
-						'key' 		=> '_on_market',
-						'value' 	=> 'yes',
-					);
-
-					if ( $department != 'commercial' && ph_get_custom_department_based_on( $department ) != 'commercial' )
+					foreach ( $property_ids as $property_id )
 					{
-						$bedrooms = get_post_meta( $property_id, '_bedrooms', TRUE );
+						$department = get_post_meta( $property_id, '_department', TRUE );					
 
-						$meta_query[] = array(
-							'key' 		=> '_bedrooms',
-							'value' 	=> $bedrooms,
-							'type'      => 'NUMERIC'
+						// Get three similar properties
+						$args = array(
+							'post_type' => 'property',
+							'post_status' => 'publish',
+							'posts_per_page' => 3,
+							'orderby' => 'rand',
+							'post__not_in' => array($property_id),
 						);
 
-
-						$price = get_post_meta( $property_id, '_price_actual', true );
-						$lower_price = $price - ($price / 10);
-						$higher_price = $price + ($price / 10);
+						$meta_query = array();
 
 						$meta_query[] = array(
-							'key' 		=> '_price_actual',
-							'value' 	=> $lower_price,
-							'compare'   => '>=',
-							'type'      => 'NUMERIC'
+							'key' 		=> '_department',
+							'value' 	=> $department,
 						);
 
 						$meta_query[] = array(
-							'key' 		=> '_price_actual',
-							'value' 	=> $higher_price,
-							'compare'   => '<=',
-							'type'      => 'NUMERIC'
+							'key' 		=> '_on_market',
+							'value' 	=> 'yes',
 						);
-					}
-					else
-					{
-						$for_sale = get_post_meta( $property_id, '_for_sale', true );
-						$to_rent = get_post_meta( $property_id, '_to_rent', true );
 
-						if ( $for_sale == 'yes' )
+						if ( $department != 'commercial' && ph_get_custom_department_based_on( $department ) != 'commercial' )
 						{
+							$bedrooms = get_post_meta( $property_id, '_bedrooms', TRUE );
+
 							$meta_query[] = array(
-								'key' 		=> '_for_sale',
-								'value' 	=> 'yes',
+								'key' 		=> '_bedrooms',
+								'value' 	=> $bedrooms,
+								'type'      => 'NUMERIC'
+							);
+
+
+							$price = get_post_meta( $property_id, '_price_actual', true );
+							$lower_price = $price - ($price / 10);
+							$higher_price = $price + ($price / 10);
+
+							$meta_query[] = array(
+								'key' 		=> '_price_actual',
+								'value' 	=> $lower_price,
+								'compare'   => '>=',
+								'type'      => 'NUMERIC'
+							);
+
+							$meta_query[] = array(
+								'key' 		=> '_price_actual',
+								'value' 	=> $higher_price,
+								'compare'   => '<=',
+								'type'      => 'NUMERIC'
 							);
 						}
-						elseif ( $to_rent == 'yes' )
+						else
 						{
-							$meta_query[] = array(
-								'key' 		=> '_to_rent',
-								'value' 	=> 'yes',
+							$for_sale = get_post_meta( $property_id, '_for_sale', true );
+							$to_rent = get_post_meta( $property_id, '_to_rent', true );
+
+							if ( $for_sale == 'yes' )
+							{
+								$meta_query[] = array(
+									'key' 		=> '_for_sale',
+									'value' 	=> 'yes',
+								);
+							}
+							elseif ( $to_rent == 'yes' )
+							{
+								$meta_query[] = array(
+									'key' 		=> '_to_rent',
+									'value' 	=> 'yes',
+								);
+							}
+						}
+
+						$args['meta_query'] = $meta_query;
+
+						$property_match_statuses = get_option( 'propertyhive_property_match_statuses', '' );
+						if ( $property_match_statuses != '' && is_array($property_match_statuses) && !empty($property_match_statuses) )
+						{
+							$args['tax_query'] = array(
+								array(
+									'taxonomy' => 'availability',
+									'field'    => 'term_id',
+									'terms'    => $property_match_statuses,
+									'operator' => 'IN',
+								)
 							);
 						}
-					}
 
-					$args['meta_query'] = $meta_query;
+						$properties_query = new WP_Query( apply_filters( 'propertyhive_auto_responder_similar_properties_query', $args, $property_id ) );
 
-					$property_match_statuses = get_option( 'propertyhive_property_match_statuses', '' );
-					if ( $property_match_statuses != '' && is_array($property_match_statuses) && !empty($property_match_statuses) )
-					{
-						$args['tax_query'] = array(
-							array(
-								'taxonomy' => 'availability',
-								'field'    => 'term_id',
-								'terms'    => $property_match_statuses,
-								'operator' => 'IN',
-							)
-						);
-					}
-
-					$properties_query = new WP_Query( apply_filters( 'propertyhive_auto_responder_similar_properties_query', $args, $property_id ) );
-
-					if ( $properties_query->have_posts() )
-					{
-						$similar_html = '<br><hr><br><h3>Similar Properties You Might Like:</h3>';
-
-						while ( $properties_query->have_posts() )
+						if ( $properties_query->have_posts() )
 						{
-							$properties_query->the_post();
+							while ( $properties_query->have_posts() )
+							{
+								$properties_query->the_post();
 
-							$property = new PH_Property( get_the_ID() );
+								$property = new PH_Property( get_the_ID() );
 
-							ob_start();
+								ob_start();
 
-							ph_get_template( 'emails/enquiry-autoresponder-similar-property.php', array( 'property' => $property ) );
+								ph_get_template( 'emails/enquiry-autoresponder-similar-property.php', array( 'property' => $property ) );
 
-							$similar_html .= ob_get_clean();
+								$similar_html .= ob_get_clean();
+							}
 						}
+					}
+					if ( !empty($similar_html) )
+					{
+						$similar_html = '<br><hr><br><h3>Similar Properties You Might Like:</h3>' . $similar_html;
 					}
 					$body = str_replace( "[similar_properties]", $similar_html, $body );
 				}
 
-				$body = apply_filters( 'propertyhive_enquiry_auto_responder_body', $body, $property_id );
+				$body = apply_filters( 'propertyhive_enquiry_auto_responder_body', $body, $property_ids[0] );
 	        	$body = apply_filters( 'propertyhive_mail_content', $this->style_inline( $this->wrap_message( $body ) ) );
 
 				wp_mail( $to, $subject, $body, $headers );
