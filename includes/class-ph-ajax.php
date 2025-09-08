@@ -3132,7 +3132,14 @@ class PH_AJAX {
 
         $request_url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=" . strtolower(ph_clean($_POST['country'])) . "&addressdetails=1&q=" . urlencode(ph_clean($_POST['address']));
         
-        $response = wp_remote_get($request_url);
+        $response = wp_remote_get(
+            $request_url,
+            array(
+                'headers' => array(
+                    'Referer' => home_url(),
+                ),
+            )
+        );
 
         if ( !is_wp_error( $response ))
         {
@@ -3916,7 +3923,14 @@ class PH_AJAX {
                     if ( get_option('propertyhive_geocoding_provider') == 'osm' )
                     {
                         $request_url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=" . strtolower($country) . "&addressdetails=1&q=" . urlencode(implode( ", ", $address_to_geocode ));
-                        $response = wp_remote_get($request_url);
+                        $response = wp_remote_get(
+                            $request_url,
+                            array(
+                                'headers' => array(
+                                    'Referer' => home_url(),
+                                ),
+                            )
+                        );
                         if ( is_array( $response ) )
                         {
                             $body = wp_remote_retrieve_body( $response );
