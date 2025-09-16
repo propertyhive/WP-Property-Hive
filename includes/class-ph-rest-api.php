@@ -105,7 +105,7 @@ class PH_Rest_Api {
 	        {
 	            return new WP_Error(
 	                'rest_forbidden',
-	                __('You are not allowed to list enquiries.'),
+	                __('You are not allowed to list enquiries.', 'propertyhive'),
 	                ['status' => 403]
 	            );
 	        }
