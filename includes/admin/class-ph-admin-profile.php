@@ -64,7 +64,7 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 					'label'       => __( 'Office', 'propertyhive' ),
 					'description' => '',
 					'type'        => 'select',
-					'options'     => array( '' => __( 'Select an office', 'property' ) ) + $offices,
+					'options'     => array( '' => __( 'Select an office', 'propertyhive' ) ) + $offices,
 				),
 				'telephone_number'    => array(
 					'label'       => __( 'Telephone Number', 'propertyhive' ),
