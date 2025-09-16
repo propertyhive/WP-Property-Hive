@@ -392,7 +392,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 'title'   => __( 'Mapbox API Key', 'propertyhive' ),
                 'id'      => 'propertyhive_mapbox_api_key',
                 'type'    => 'text',
-                'desc'  => '<p>' . __( 'If you have a Mapbox API key you can enter it here. You can generate an API key <a href="https://account.mapbox.com/" target="_blank">here</a>.' ) . '</p>'
+                'desc'  => '<p>' . __( 'If you have a Mapbox API key you can enter it here. You can generate an API key <a href="https://account.mapbox.com/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
             ),
 
             array(
