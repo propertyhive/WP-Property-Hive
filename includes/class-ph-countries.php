@@ -130,6 +130,12 @@ class PH_Countries {
 	 */
 	private function get_countries() {
 		$countries = array(
+			'AR' => array(
+				'name' => 'Argentina',
+				'currency_code' => 'ARS',
+				'currency_symbol' => '$',
+				'currency_prefix' => true
+			),
 			'AU' => array(
 				'name' => 'Australia',
 				'currency_code' => 'AUD',
