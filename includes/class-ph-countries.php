@@ -180,8 +180,8 @@ class PH_Countries {
 			),
 			'HR' => array(
 				'name' => 'Croatia',
-				'currency_code' => 'HRK',
-				'currency_symbol' => 'kn',
+				'currency_code' => 'EUR',
+				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
 			'CY' => array(
