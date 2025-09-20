@@ -1,6 +1,6 @@
 <?php
 
-add_shortcode( 'avada_property_actions', function( $atts ) {
+add_shortcode( 'avada_property_enquiry_form', function( $atts ) {
     $atts = shortcode_atts( array(
 
     ), $atts );
@@ -21,8 +21,8 @@ add_shortcode( 'avada_property_actions', function( $atts ) {
 
     ob_start();
 
-    echo '<div ' . FusionBuilder::attributes( 'property-actions-shortcode' ) . '>';
-        propertyhive_template_single_actions();
+    echo '<div ' . FusionBuilder::attributes( 'property-enquiry-form-shortcode' ) . '>';
+        propertyhive_enquiry_form();
     echo '</div>';
 
     $html = ob_get_clean();
