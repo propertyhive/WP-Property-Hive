@@ -391,7 +391,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 $title            = $the_property->get_formatted_summary_address();
                 if ( empty($title) )
                 {
-                    $title = __( '(no address entered)', 'propertyhive' );
+                    $title = '(' . __( 'no address entered', 'propertyhive' ) . ')';
                 }
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
