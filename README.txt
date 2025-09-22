@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.8.2
-Stable tag: 2.1.7
+Stable tag: 2.1.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,14 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.8 - 2025-09-22 =
+* Added support for more countries: Argentina, Brazil, China, Hong Kong, Mexico, Poland, Saudi Arabia, South Korea, Vietnam
+* Updated Croatia currency to EU
+* Updated order of enquiry filters called
+* Updated various __() calls
+* Corrected issue with 'Property Hive Only Mode' causing fatal error when menu callback doesn't exist
+* Corrected Avada property enquiry widget
 
 = 2.1.7 - 2025-09-08 =
 * Added ability to pass 'embed="true"' to Map shortcode [property_map] so it uses the Google Embed API instead of the Google JS API. Good for reducing Google API costs
