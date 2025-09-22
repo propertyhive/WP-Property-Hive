@@ -2332,9 +2332,9 @@ class PH_AJAX {
 
             $to = apply_filters( 'propertyhive_property_enquiry_to', $to, $property_ids );
             $subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, $property_ids );
-            $message = apply_filters( 'propertyhive_property_enquiry_body', $message, $property_ids );
             $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, $property_ids );
-
+            $message = apply_filters( 'propertyhive_property_enquiry_body', $message, $property_ids );
+            
             do_action( 'propertyhive_before_property_enquiry_sent' );
 
             $sent = wp_mail( $to, $subject, $message, $headers );
