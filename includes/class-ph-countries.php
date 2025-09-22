@@ -160,6 +160,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'BR' => array(
+	            'name' => 'Brazil',
+	            'currency_code' => 'BRL',
+	            'currency_symbol' => 'R$',
+	            'currency_prefix' => true
+	        ),
 			'BG' => array(
 				'name' => 'Bulgaria',
 				'currency_code' => 'BGN',
@@ -172,6 +178,12 @@ class PH_Countries {
 				'currency_symbol' => '$',
 				'currency_prefix' => true
 			),
+			'CN' => array(
+	            'name' => 'China',
+	            'currency_code' => 'CNY',
+	            'currency_symbol' => '¥',
+	            'currency_prefix' => true
+	        ),
 			'CO' => array(
 				'name' => 'Colombia',
 				'currency_code' => 'COP',
@@ -232,6 +244,12 @@ class PH_Countries {
 				'currency_symbol' => '&euro;',
 				'currency_prefix' => false
 			),
+			'HK' => array(
+	            'name' => 'Hong Kong',
+	            'currency_code' => 'HKD',
+	            'currency_symbol' => '$',
+	            'currency_prefix' => true
+	        ),
 			'IN' => array(
 				'name' => 'India',
 				'currency_code' => 'INR',
@@ -298,6 +316,12 @@ class PH_Countries {
 				'currency_symbol' => 'Rs',
 				'currency_prefix' => false
 			),
+			'MX' => array(
+	            'name' => 'Mexico',
+	            'currency_code' => 'MXN',
+	            'currency_symbol' => '$',
+	            'currency_prefix' => true
+	        ),
 			'MA' => array(
 				'name' => 'Morocco',
 				'currency_code' => 'MAD',
@@ -328,6 +352,12 @@ class PH_Countries {
 				'currency_symbol' => 'Rs',
 				'currency_prefix' => false
 			),
+			'PL' => array(
+	            'name' => 'Poland',
+	            'currency_code' => 'PLN',
+	            'currency_symbol' => 'zł',
+	            'currency_prefix' => false
+	        ),
 			'PT' => array(
 				'name' => 'Portugal',
 				'currency_code' => 'EUR',
@@ -352,6 +382,12 @@ class PH_Countries {
 				'currency_symbol' => '$',
 				'currency_prefix' => true
 			),
+			'SA' => array(
+	            'name' => 'Saudi Arabia',
+	            'currency_code' => 'SAR',
+	            'currency_symbol' => '﷼',
+	            'currency_prefix' => false
+	        ),
 			'SG' => array(
 			    'name' => 'Singapore',
 			    'currency_code' => 'SGD',
@@ -364,6 +400,12 @@ class PH_Countries {
 				'currency_symbol' => 'R',
 				'currency_prefix' => true
 			),
+			'KR' => array(
+	            'name' => 'South Korea',
+	            'currency_code' => 'KRW',
+	            'currency_symbol' => '₩',
+	            'currency_prefix' => true
+	        ),
 			'ES' => array(
 				'name' => 'Spain',
 				'currency_code' => 'EUR',
@@ -412,6 +454,12 @@ class PH_Countries {
 				'currency_symbol' => '$',
 				'currency_prefix' => true
 			),
+			'VN' => array(
+	            'name' => 'Vietnam',
+	            'currency_code' => 'VND',
+	            'currency_symbol' => '₫',
+	            'currency_prefix' => true
+	        ),
 		);
 		
 		return apply_filters( 'propertyhive_countries', $countries );
