@@ -144,7 +144,12 @@ class PH_Admin_Menus {
 								}
 							}
 						}
+
 						if ( class_exists($class_name) && $class_name != '' && $function_name != '' )
+						{
+							$callback = array( $class_name(), $function_name );
+						}
+						elseif ( function_exists($class_name) && $class_name != '' && $function_name != '' )
 						{
 							$callback = array( $class_name(), $function_name );
 						}
