@@ -270,6 +270,7 @@ if ( ! class_exists( 'PropertyHive' ) )
     
             if ( is_admin() ) {
                 include_once( 'includes/admin/class-ph-admin.php' );
+                include_once( 'includes/admin/class-ph-admin-feature-updates.php' );
                 include_once( 'includes/class-ph-third-party-contacts.php' );
             }
     
