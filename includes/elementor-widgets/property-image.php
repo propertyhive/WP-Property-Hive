@@ -149,7 +149,7 @@ class Elementor_Property_Image_Widget extends \Elementor\Widget_Base {
 	        
 	        if ( ! empty( $settings['image_link']['url'] ) ) 
 	        {
-	        	echo '<div style="background:url(' . $url . ') no-repeat center center; background-size:cover;">';
+	        	echo '<div style="background:url(' . esc_url($url) . ') no-repeat center center; background-size:cover;">';
 				$this->add_link_attributes( 'image_link', $settings['image_link'] );
 				?><a <?php $this->print_render_attribute_string( 'image_link' ); ?> style="display:block; <?php echo 'padding-bottom:' . esc_attr($percent); ?>"><?php
 				echo '</a>';
