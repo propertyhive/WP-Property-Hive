@@ -15,6 +15,8 @@ class PH_Admin_Feature_Updates {
 			{
 				add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_updates'));
 			}
+
+            add_filter('pre_http_request', array($this, 'block_add_on_update_info_requests'), 10, 3 );
 		});
 	}
 
@@ -150,6 +152,94 @@ class PH_Admin_Feature_Updates {
         return $transient;
 	}
 
+    public function block_add_on_update_info_requests( $pre, $r, $url )
+    {
+        // If this were a real download, WP would set 'stream' => true; let those pass.
+        if ( !empty( $r['stream'] ) ) 
+        {
+            return $pre;
+        }
+
+        $parts = wp_parse_url($url);
+        if ( 
+            isset($parts['host']) && isset($parts['path']) && 
+            stripos($parts['host'], 'wp-property-hive.com') !== false &&
+            stripos($parts['path'], '/add-on-store/') !== false &&
+            substr($parts['path'], -15) === 'update-info.php'
+        ) 
+        {
+            // This is an old call from the individual add ons. Stop it now as we'll handle this centrally now as of version 2.1.9
+            $slug = str_replace("/add-on-store/", "", $parts['path']);
+            $slug = str_replace("/update-info.php", "", $slug);
+            $slug = explode("-", $slug);
+
+            if ( count($slug) > 1 && $slug[0] == 'propertyhive' )
+            {
+                // Looking like an addon update request
+
+                array_pop($slug); // remove weird number/code off the end of the URL
+
+                // At this built $slug' should be, for example 'propertyhive-blm-export'
+                // Need to get installed plugin of the same slug and return false data if we find one (same slug, same version)
+
+                // Rebuild slug like "propertyhive-blm-export" from the path
+                $slug_str = implode("-", $slug);
+
+                // Find installed plugin with matching folder slug
+                if ( ! function_exists('get_plugins') ) 
+                {
+                    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+                }
+                $plugins = get_plugins();
+
+                $installed_basename = '';
+                $installed_version  = '';
+
+                foreach ( $plugins as $file => $data ) 
+                {
+                    // Match folder name to our slug: e.g.
+                    // /wp-content/plugins/propertyhive-blm-export/propertyhive-blm-export.php
+                    $folder = dirname( $file );
+
+                    if ( stripos($folder, '/' . $slug_str . '.php') )
+                    {
+                        $installed_basename = $file;
+                        $installed_version  = isset($data['Version']) ? (string)$data['Version'] : '';
+                        break;
+                    }
+                }
+
+                // If we didn't find a matching installed add-on, don't interfere
+                if ( ! $installed_basename ) {
+                    return $pre;
+                }
+
+                // Return a legacy-shaped "no update" response
+                $payload = [
+                    'slug'        => $slug_str,
+                    'new_version' => $installed_version ?: false, // mirrors "no update" semantics
+                    'package'     => '',
+                    'requires'    => '',
+                    'tested'      => '',
+                    // Add any other keys your legacy scripts expect, e.g. 'last_updated', 'sections', etc.
+                ];
+
+                return [
+                    'headers'  => [ 'Content-Type' => 'application/json' ],
+                    'body'     => wp_json_encode( $payload ),
+                    'response' => [ 'code' => 200, 'message' => 'OK' ],
+                    'cookies'  => [],
+                    'filename' => null,
+                ];
+            }
+            else
+            {
+                return $pre;
+            }
+        }
+
+        return $pre;
+    }
 }
 
 new PH_Admin_Feature_Updates();
