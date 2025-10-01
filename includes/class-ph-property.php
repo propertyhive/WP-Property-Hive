@@ -819,7 +819,12 @@ class PH_Property {
             {
                 if ( !$plain_text )
                 {
-                    $return .= '<p class="description-section">';
+                    $return .= '<p class="description-section';
+                    if ($this->{'_description_name_' . $i} != '')
+                    {
+                        $return .= ' description-section-' . esc_attr(sanitize_title($this->{'_description_name_' . $i}));
+                    }
+                    $return .= '">';
                     if ($this->{'_description_name_' . $i} != '')
                     {
                         $return .= '<strong class="description-title">' . $this->{'_description_name_' . $i} . '</strong><br>';
