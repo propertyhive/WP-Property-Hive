@@ -59,6 +59,7 @@ class PH_Rest_Api {
 	public function __construct() {
 		// Property
 		add_filter( 'rest_property_query', array( $this, 'modify_rest_property_query' ), 10, 2 );
+		add_filter( 'rest_prepare_property', array( $this, 'rest_prepare_property' ), 10, 3 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_property_fields' ), 99 );
 		add_filter( 'rest_property_collection_params', array( $this, 'modify_rest_order_by' ), 10, 1 );
 		add_action( "rest_after_insert_property", array( $this, 'ensure_key_property_fields_set' ), 10, 3 );
@@ -549,6 +550,12 @@ class PH_Rest_Api {
 			'longitude',
 			'price_actual',
 			'price',
+			'price_from',
+			'price_to',
+			'price_units',
+			'rent_from',
+			'rent_to',
+			'rent_units',
 			'price_formatted',
 			'rent_frequency',
 			'currency',
@@ -565,6 +572,14 @@ class PH_Rest_Api {
 			'property_type',
 			'parking',
 			'outside_space',
+			'for_sale',
+			'to_rent',
+			'floor_area_from',
+			'floor_area_to',
+			'floor_area_units',
+			'site_area_from',
+			'site_area_to',
+			'site_area_units',
 			'on_market',
 			'featured',
 			'location',
@@ -601,14 +616,33 @@ class PH_Rest_Api {
 		            	switch ($field_name)
 		            	{
 		            		case "price":
-		            		{ 
+		            		{
 		            			if ( $property->_poa != 'yes' )
 		            			{
-		            				if ( $property->_department == 'residential-lettings' ) { $return = $property->_rent; }else{ $return = $property->_price; } 
+		            				$department = $property->_department;
+								    if ( ph_get_custom_department_based_on( $department ) !== false )
+							        {
+							        	$department = ph_get_custom_department_based_on( $department );
+							        }
+		            				if ( $department == 'residential-lettings' ) { $return = $property->_rent; }else{ $return = $property->_price; } 
 		            			}
-		            			else
+		            			break;
+		            		}
+		            		case "price_from":
+		            		case "price_to":
+		            		{
+		            			if ( $property->_price_poa != 'yes' )
 		            			{
-		            				$return = '';
+		            				$return = $property->{'_' . $field_name};
+		            			}
+		            			break;
+		            		}
+		            		case "rent_from":
+		            		case "rent_to":
+		            		{
+		            			if ( $property->_rent_poa != 'yes' )
+		            			{
+		            				$return = $property->{'_' . $field_name};
 		            			}
 		            			break;
 		            		}
@@ -1061,6 +1095,52 @@ class PH_Rest_Api {
 		        )
 		    );
 		}
+	}
+
+	public function rest_prepare_property($response, $post, $request) 
+	{
+		// Hide/show fields dynamically per item before it's returned
+
+	    $data = $response->get_data();
+
+	    // Get the department
+	    $department = $data['department'] ?? get_post_meta($post->ID, '_department', true);
+	    if ( ph_get_custom_department_based_on( $department ) !== false )
+        {
+        	$department = ph_get_custom_department_based_on( $department );
+        }
+
+	    // Define the "not applicable" fields per department
+	    $remove_for = [
+	        'residential-sales' => [
+	        	// specify non-sales fields
+	            'available_date', 'deposit', 'furnished', 'rent_frequency', 
+	            'commercial_tenure', 'commercial_property_type', 'for_sale', 'to_rent', 'price_from', 'price_to', 'price_units', 'rent_from', 'rent_to', 'rent_units', 'floor_area_from', 'floor_area_to', 'floor_area_units', 'site_area_from', 'site_area_to', 'site_area_units'
+	        ],
+	        'residential-lettings' => [
+	            // specify non-lettings fields
+	            'sale_by', 'tenure',
+	            'commercial_tenure', 'commercial_property_type', 'for_sale', 'to_rent', 'price_from', 'price_to', 'price_units', 'rent_from', 'rent_to', 'rent_units', 'floor_area_from', 'floor_area_to', 'floor_area_units', 'site_area_from', 'site_area_to', 'site_area_units',
+	        ],
+	        'commercial' => [
+	        	// specify non-commercial fields
+	        	'price', 'price_actual', 'bedrooms', 'bathrooms', 'reception_rooms', 'tenure', 'outside_space', 'parking',
+	            'tenure',
+	            'available_date', 'deposit', 'furnished', 'rent_frequency',
+	        ],
+	    ];
+
+	    if ( !empty($remove_for[$department]) ) 
+	    {
+	        foreach ( $remove_for[$department] as $k ) 
+	        {
+	            unset($data[$k]);
+	        }
+	    }
+
+	    $response->set_data($data);
+
+	    return $response;
 	}
 
 	public function register_rest_api_office_fields()
