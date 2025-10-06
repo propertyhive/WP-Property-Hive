@@ -82,7 +82,7 @@ class PH_Yoast_SEO {
 		// Core listing bits
 		$department   = $property->_department;
 
-		$data['datePosted'] = date("Y-m-d\TH:i:s", strtotime(get_post_meta( $post_id, '_on_market_change_date', true ))) . "+00:00";
+		$data['datePosted'] = date("Y-m-d\TH:i:s", strtotime($property->_on_market_change_date)) . "+00:00";
 
 		// Attach an Offer (price, currency, availability) that points at the Residence
 		if ( $department == 'residential-sales' || ph_get_custom_department_based_on($department) == 'residential-sales' ) 
@@ -140,6 +140,8 @@ class PH_Yoast_SEO {
 
 		$url     = get_permalink( $post_id );
 
+		$department   = $property->_department;
+
 		$residence_id = $url . '#/residence/' . $post_id;
 
 		// Collect property meta
@@ -188,8 +190,13 @@ class PH_Yoast_SEO {
         }
 		$images = array_values( array_unique( array_filter( $images ) ) );
 
+		$types = array( 'Residence' );
+		if ( $department != 'commercial' && ph_get_custom_department_based_on($department) != 'commercial' )
+		{
+			$types[] = 'SingleFamilyResidence';
+		}
 		$residence = [
-			'@type' => [ 'Residence' ], // Swap 'House' for 'Apartment', 'SingleFamilyResidence', etc.
+			'@type' => $types,
 			'@id'   => $residence_id,
 			'url'   => $url,
 			'name'  => get_the_title( $post_id ),
@@ -217,8 +224,8 @@ class PH_Yoast_SEO {
 		}
 
 		// Rooms & size
-		if ( $bedrooms )  { $residence['numberOfBedrooms']      = $bedrooms; }
-		if ( $bathrooms ) { $residence['numberOfBathroomsTotal'] = $bathrooms; }
+		if ( $bedrooms && $department != 'commercial' && ph_get_custom_department_based_on($department) != 'commercial' )  { $residence['numberOfBedrooms']      = $bedrooms; }
+		if ( $bathrooms && $department != 'commercial' && ph_get_custom_department_based_on($department) != 'commercial' ) { $residence['numberOfBathroomsTotal'] = $bathrooms; }
 
 		// Photos / primary image
 		if ( $images ) {
