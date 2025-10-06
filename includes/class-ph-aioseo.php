@@ -29,7 +29,7 @@ class PH_AIOSEO {
 		add_filter( 'aioseo_schema_output', [ __CLASS__, 'add_real_estate_listing_schema' ] );
 	}
 
-	public static function meta_box_to_bottom( $priority) 
+	public static function meta_box_to_bottom( $priority ) 
 	{
 	   return 'low';
 	}
