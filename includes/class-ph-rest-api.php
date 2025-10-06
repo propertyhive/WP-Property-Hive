@@ -1124,8 +1124,7 @@ class PH_Rest_Api {
 	        ],
 	        'commercial' => [
 	        	// specify non-commercial fields
-	        	'price', 'price_actual', 'bedrooms', 'bathrooms', 'reception_rooms', 'tenure', 'outside_space', 'parking',
-	            'tenure',
+	        	'price', 'price_actual', 'bedrooms', 'bathrooms', 'reception_rooms', 'outside_space', 'parking',
 	            'available_date', 'deposit', 'furnished', 'rent_frequency',
 	        ],
 	    ];
