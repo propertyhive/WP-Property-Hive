@@ -204,14 +204,14 @@ class PH_Yoast_SEO {
 
 		// Address
 		if ( $street || $locality || $region || $postcode || $country ) {
-			$residence['address'] = [
+			$residence['address'] = array_filter( [
 				'@type'           => 'PostalAddress',
 				'streetAddress'   => $street,
 				'addressLocality' => $locality,
 				'addressRegion'   => $region,
 				'postalCode'      => $postcode,
 				'addressCountry'  => $country,
-			];
+			] );
 		}
 
 		// Geo
@@ -223,7 +223,7 @@ class PH_Yoast_SEO {
 			];
 		}
 
-		// Rooms & size
+		// Rooms
 		if ( $bedrooms && $department != 'commercial' && ph_get_custom_department_based_on($department) != 'commercial' )  { $residence['numberOfBedrooms']      = $bedrooms; }
 		if ( $bathrooms && $department != 'commercial' && ph_get_custom_department_based_on($department) != 'commercial' ) { $residence['numberOfBathroomsTotal'] = $bathrooms; }
 
