@@ -285,6 +285,26 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 $sources = apply_filters( 'propertyhive_enquiry_sources', $sources );
 
                 echo esc_html( ( isset($sources[$the_enquiry->source]) ) ? $sources[$the_enquiry->source] : $the_enquiry->source );
+
+                $utm_keys = array(
+                    'utm_source',
+                    'utm_medium',
+                    'utm_term',
+                    'utm_content',
+                    'utm_campaign',
+                    'gclid',
+                    'fbclid'
+                );
+
+                foreach ( $utm_keys as $utm_key )
+                {
+                    $value = $the_enquiry->{$utm_key};
+                    if ( !empty($value) )
+                    {
+                        echo '<br><em>' . esc_html($utm_key) . ': ' . esc_html($value) . '</em>';
+                    }
+                }
+
                 break;
             case 'properties' :
                 $property_ids = $the_enquiry->get_properties();

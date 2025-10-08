@@ -306,6 +306,15 @@ function propertyhive_enquiry_form( $property_id = '' )
         'value' => ( $property_id != '' ? $property_id : $post->ID )
     );
 
+    $utm_fields = array( 'utm_source', 'utm_medium', 'utm_term', 'utm_content', 'utm_campaign', 'gclid', 'fbclid' );
+    foreach ( $utm_fields as $utm_field )
+    {
+        $form_controls[$utm_field] = array(
+            'type' => 'hidden',
+            'value' =>''
+        );
+    }
+
     if ( get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) != '' )
     {
         $disclaimer = get_option( 'propertyhive_property_enquiry_form_disclaimer', '' );
