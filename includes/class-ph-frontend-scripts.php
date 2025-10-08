@@ -89,6 +89,8 @@ class PH_Frontend_Scripts {
         
         wp_register_script( 'propertyhive_dynamic_population', $assets_path . 'js/frontend/dynamic-population' . /*$suffix .*/ '.js', array('jquery'), '1.0.0', true );
 
+        wp_enqueue_script( 'propertyhive_utm_tracker', $assets_path . 'js/frontend/utm-tracker' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
+
 		// CSS Styles
 		$enqueue_styles = self::get_styles();
 
