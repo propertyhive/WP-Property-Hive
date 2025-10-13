@@ -7,6 +7,8 @@ function toggleDepartmentFields()
         {
             var selectedDepartment = "residential-sales"; // TODO: Use default from settings
 
+            var selected;
+
             var departmentEl = jQuery(this).find('[name=\'department\']')
             if (departmentEl.length > 0)
             {
@@ -14,18 +16,18 @@ function toggleDepartmentFields()
                 {
                     case "select":
                     {
-                        var selected = departmentEl;
+                        selected = departmentEl;
                         break;
                     }
                     default:
                     {
                         if ( departmentEl.attr('type') == 'hidden' )
                         {
-                            var selected = departmentEl;
+                            selected = departmentEl;
                         }
                         else
                         {
-                            var selected = departmentEl.filter(':checked');
+                            selected = departmentEl.filter(':checked');
                         }
                     }
                 }
@@ -38,7 +40,7 @@ function toggleDepartmentFields()
             jQuery(this).find('.commercial-sales-only').hide();
             jQuery(this).find('.commercial-lettings-only').hide();
             
-            if (selected.length > 0)
+            if (selected && selected.length > 0)
             {
                 selectedDepartment = selected.val();
 
