@@ -82,11 +82,68 @@ class PH_Settings_Features extends PH_Settings_Page {
         echo '</ul>';
         echo '</div>';
 
+        // Check if AI Property Search is in list. If not, it can't have been launched yet and to show promo instead
+        $ai_property_search_found = false;
+        foreach ( $features as $feature )
+        {
+            $slug = explode("/", $feature['wordpress_plugin_file']);
+            $slug = $slug[0];
+
+            if ( strpos($slug, 'propertyhive-ai-property-search') !== false )
+            {
+                $ai_property_search_found = true;
+                break;
+            }
+        }
+
         // list of features
         echo '<div class="pro-features">';
         echo '<ul>';
+        $i = 0;
         foreach ( $features as $feature )
         {
+            if ( $i == 0 && $ai_property_search_found === false )
+            {
+                // Show ad
+                $feature_status = false;
+
+                if ( is_dir( WP_PLUGIN_DIR . '/' . $slug ) )
+                {
+                    $feature_status = 'installed';
+                }
+                if ( is_plugin_active( $feature['wordpress_plugin_file'] ) ) 
+                {
+                    $feature_status = 'active';
+                }
+
+                echo '<li style="visibility:hidden" class="website">
+                    <div class="inner" style="background:#0c2442; color:#FFF">
+                        <h3><img src="' . esc_url(PH()->plugin_url() . '/assets/images/admin/settings/ai-property-search.png') . '" style="height:28px;" alt="AI Property Search - Coming Soon"></h3>';
+
+                    $links = array();
+                    
+                    $links[] = '<span style="color:#999;" class="help_tip" data-tip="' . esc_attr( __('Integrate with ai-property-search.com and add natural language search to your website.', 'propertyhive') ) . '"><span class="dashicons dashicons-info-outline"></span></span>';
+
+                    $links[] = '<a href="https://ai-property-search.com/?src=plugin-feature-settings" target="_blank" style="text-decoration:none; color:#FFF;">' . esc_html(__( 'Coming Soon', 'propertyhive' )) . '</a>';
+
+                    $links[] = '<a href="https://ai-property-search.com/?src=plugin-feature-settings" target="_blank" style="text-decoration:none; color:#FFF;">' . esc_html(__( 'More Info', 'propertyhive' )) . '</a>';
+                    
+
+                    echo '<div style="float:right; padding-top:6px;">';
+                    echo implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links);
+                    echo '</div>';
+
+                    echo '<label class="switch">
+                      <input type="checkbox" name="" disabled value="">
+                      <span class="slider round" style="pointer-events:none; opacity:0.5"></span>
+                    </label>';
+
+                    echo '</div>';
+                echo '</li>';
+
+                ++$i;
+            }
+
             $slug = explode("/", $feature['wordpress_plugin_file']);
             $slug = $slug[0];
 
@@ -172,6 +229,8 @@ class PH_Settings_Features extends PH_Settings_Page {
 
                 echo '</div>';
             echo '</li>';
+
+            ++$i;
         }
         echo '</ul><div style="clear:both"></div></div>';
 
