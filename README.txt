@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.8.2
-Stable tag: 2.1.10
+Stable tag: 2.1.11
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,12 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.11 - 2025-10-14 =
+* Added Lead Tracking information to property enquiries. Records UTM/FB tags when a visitor lands on the page and records them against an enquiry
+* Added WordPress actions before and after search forms ('propertyhive_before_search_form' and 'propertyhive_after_search_form')
+* Added promo to features dashboard promoting AI Property Search whereby agents will be able to add natural language property search functionality (e.g. "I want a 3 bed house within 2 miles of Manchester"). Set to disappear when feature goes live
+* Corrected JS error when a search form existed with no department field
 
 = 2.1.10 - 2025-10-06 =
 * Added RealEstateListing schema support if using Yoast SEO
