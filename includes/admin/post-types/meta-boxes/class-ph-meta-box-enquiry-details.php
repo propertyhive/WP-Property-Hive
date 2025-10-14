@@ -232,6 +232,13 @@ function viewing_update_selected_properties()
                 '_office_id',
                 '_action',
                 '_contact_id',
+                'utm_source',
+                'utm_medium',
+                'utm_term',
+                'utm_content',
+                'utm_campaign',
+                'gclid', 
+                'fbclid'
             );
             
             $enquiry_post_id = $post->ID;

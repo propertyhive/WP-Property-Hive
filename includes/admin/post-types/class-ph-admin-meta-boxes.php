@@ -1726,11 +1726,22 @@ class PH_Admin_Meta_Boxes {
         $meta_boxes[10] = array(
             'id' => 'propertyhive-enquiry-details',
             'title' => __( 'Enquiry Details', 'propertyhive' ),
-            'callback' => 'PH_Meta_Box_Enquiry_details::output',
+            'callback' => 'PH_Meta_Box_Enquiry_Details::output',
             'screen' => 'enquiry',
             'context' => 'normal',
             'priority' => 'high'
         );
+        if ( $pagenow != 'post-new.php' && get_post_type($post->ID) == 'enquiry' )
+        {
+            $meta_boxes[15] = array(
+                'id' => 'propertyhive-enquiry-lead-tracking',
+                'title' => __( 'Lead Tracking', 'propertyhive' ),
+                'callback' => 'PH_Meta_Box_Enquiry_Lead_Tracking::output',
+                'screen' => 'enquiry',
+                'context' => 'normal',
+                'priority' => 'high'
+            );
+        }
 
         $meta_boxes = apply_filters( 'propertyhive_enquiry_details_meta_boxes', $meta_boxes );
         ksort($meta_boxes);
