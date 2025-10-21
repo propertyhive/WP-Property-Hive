@@ -65,6 +65,30 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         {
             $commercial_active  = true;
         }
+
+        $default_departments = ph_get_departments(true);
+        $custom_departments = ph_get_custom_departments(false);
+        if ( $custom_departments )
+        {
+            foreach ( $custom_departments as  $key => $custom_department )
+            {
+                if ( isset($custom_department['based_on']) && get_option('propertyhive_active_departments_' . $key) == 'yes' )
+                {
+                    foreach ( $default_departments as $dept_key => $value )
+                    {
+                        if ( $custom_department['based_on'] == $dept_key )
+                        {
+                            switch ( $custom_department['based_on'] )
+                            {
+                                case "residential-sales": { $residential_active  = true; $residential_sales_active  = true; }
+                                case "residential-lettings": { $residential_active  = true; $residential_lettings_active  = true; }
+                                case "commercial": { $commercial_active  = true; }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         
         // Residential Custom Fields
         $sections[ 'availability' ] = __( 'Availabilities', 'propertyhive' );
