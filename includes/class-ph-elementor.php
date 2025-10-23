@@ -295,6 +295,7 @@ class PH_Elementor {
 			'Property Negotiator Telephone Number',
 			'Property Negotiator Email Address',
 			'Property Negotiator Photo',
+			'Property Not On Market Message',
 			'Back To Search',
 			'Property Search Result Count',
 			'Property Search Order',
