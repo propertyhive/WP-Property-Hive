@@ -110,6 +110,25 @@ class PH_Rest_Api {
 	                ['status' => 403]
 	            );
 	        }
+
+	        if ( get_option( 'propertyhive_module_disabled_enquiries', '' ) == 'yes' )
+	        {
+	        	return new WP_Error(
+	                'rest_forbidden',
+	                __('The enquiries module is currently disabled.', 'propertyhive'),
+	                ['status' => 403]
+	            );
+	        }
+
+	        if ( get_option( 'propertyhive_store_property_enquiries', 'yes' ) != 'yes' )
+	        {
+	        	return new WP_Error(
+	                'rest_forbidden',
+	                __('Storing of property enquiries has been disabled in the GDPR settings.', 'propertyhive'),
+	                ['status' => 403]
+	            );
+	        }
+
 	    }
 	    return $response;
 	}
