@@ -121,7 +121,24 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 							'map' => __( 'Map View', 'propertyhive' ),
 							'street_view' => __( 'Street View', 'propertyhive' ),
 							'make_enquiry' => __( 'Make Enquiry Form', 'propertyhive' ),
+							'content' => __( 'Other Content', 'propertyhive' ),
 						) )
+					],
+					[
+						'name'        => 'tab_content',
+						'label'       => __( 'Other Content', 'propertyhive' ),
+						'type'        => \Elementor\Controls_Manager::WYSIWYG,
+						'dynamic'     => [ 'active' => true ],
+						'label_block' => true,
+						'conditions'  => [
+							'terms' => [
+								[
+									'name'     => 'tab_display',
+									'operator' => 'contains',
+									'value'    => 'content',
+								],
+							],
+						],
 					],
 				],
 				'title_field' => '{{{ tab_title }}}',
@@ -424,6 +441,14 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
                     if ( !empty($property->get_features()) )
                     {
                         return true;
+                    }
+                    break;
+                }
+                case "content":
+                {
+                	if ( ! empty( $item['tab_content'] ) ) 
+                	{
+                    	return true;
                     }
                     break;
                 }
@@ -840,6 +865,16 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 									case "make_enquiry":
 									{
 										propertyhive_enquiry_form();
+										break;
+									}
+									case "content": 
+									{
+										if ( ! empty( $item['tab_content'] ) ) 
+										{
+											echo '<div class="tabbed-custom-content">';
+											echo $this->parse_text_editor( $item['tab_content'] );
+											echo '</div>';
+										}
 										break;
 									}
 								}
