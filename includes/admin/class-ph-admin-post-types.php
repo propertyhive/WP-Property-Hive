@@ -1218,6 +1218,7 @@ class PH_Admin_Post_Types {
 
 		$output .= $this->key_date_type_filter();
 		$output .= $this->key_date_status_filter();
+        $output .= $this->date_range_filter();
 
 		echo apply_filters( 'propertyhive_tenancy_filters', $output );
 	}
@@ -1635,6 +1636,8 @@ class PH_Admin_Post_Types {
                     'value' => (int)$_GET['_key_date_type_id'],
                 );
             }
+
+            $vars = $this->filter_by_date_range($vars, '_date_due');
         }
 
         $vars = apply_filters( 'propertyhive_property_filter_query', $vars, $typenow );
