@@ -7,6 +7,7 @@ class Divi_Property_Image_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_image_widget';
     public $vb_support = 'partial';
+    public $icon = '';
 
     public function init() {
         $this->name = esc_html__( 'Property Image', 'propertyhive' );

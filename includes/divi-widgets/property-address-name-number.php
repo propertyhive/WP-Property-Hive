@@ -7,6 +7,7 @@ class Divi_Property_Address_Name_Number_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_address_name_number_widget';
     public $vb_support = 'partial';
+    public $icon = '';
 
     public function init() {
         $this->name = esc_html__( 'Property Address Name/Number', 'propertyhive' );

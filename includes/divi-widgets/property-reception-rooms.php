@@ -7,6 +7,7 @@ class Divi_Property_Reception_Rooms_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_reception_rooms_widget';
     public $vb_support = 'partial';
+    public $icon = '';
 
     public function init() {
         $this->name = esc_html__( 'Property Reception Rooms', 'propertyhive' );
