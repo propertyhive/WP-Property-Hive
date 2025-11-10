@@ -7,6 +7,7 @@ class Divi_Property_Address_Line_2_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_address_line_2_widget';
     public $vb_support = 'partial';
+    public $icon = '';
 
     public function init() {
         $this->name = esc_html__( 'Property Address Line 2', 'propertyhive' );

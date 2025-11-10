@@ -7,6 +7,7 @@ class Divi_Property_Council_Tax_Band_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_council_tax_band_widget';
     public $vb_support = 'partial';
+    public $icon = '';
 
     public function init() {
         $this->name = esc_html__( 'Property Council Tax Band', 'propertyhive' );

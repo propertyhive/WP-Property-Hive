@@ -7,6 +7,7 @@ class Divi_Property_Let_Available_Date_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_let_available_date_widget';
     public $vb_support = 'partial';
+    public $icon = '';
 
     public function init() {
         $this->name = esc_html__( 'Property Let Available Date', 'propertyhive' );

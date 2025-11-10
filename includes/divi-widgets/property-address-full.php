@@ -7,6 +7,7 @@ class Divi_Property_Address_Full_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_address_full_widget';
     public $vb_support = 'partial';
+    public $icon = '';
 
     public function init() {
         $this->name = esc_html__( 'Property Full Address', 'propertyhive' );

@@ -7,6 +7,7 @@ class Divi_Property_Office_Name_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_office_name_widget';
     public $vb_support = 'partial';
+    public $icon = '';
 
     public function init() {
         $this->name = esc_html__( 'Property Office Name', 'propertyhive' );
