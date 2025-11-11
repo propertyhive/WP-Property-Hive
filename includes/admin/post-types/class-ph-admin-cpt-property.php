@@ -53,6 +53,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		add_filter( 'post_row_actions', array( $this, 'remove_actions' ), 10, 2 );
 		add_filter( 'manage_edit-property_sortable_columns', array( $this, 'custom_columns_sort' ) );
 		add_filter( 'request', array( $this, 'custom_columns_orderby' ) );
+		add_filter( 'display_post_states', array( $this, 'flag_search_results_page' ), 10, 2 );
 
 		// Sort link
 		add_filter( 'views_edit-property', array( $this, 'remove_mine' ) );
@@ -81,6 +82,20 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 		// Call PH_Admin_CPT constructor
 		parent::__construct();
+	}
+
+	public function flag_search_results_page( $post_states, $post )
+	{
+		// Get the page ID set in your option
+		$search_results_page_id = get_option( 'propertyhive_search_results_page_id' );
+
+	    // Check if this is that page
+		if ( $post->ID == $search_results_page_id ) 
+		{
+			$post_states['property_search_results'] = __( 'Property Search Results', 'propertyhive' );
+		}
+
+		return $post_states;
 	}
 
 	public function render_blank()
