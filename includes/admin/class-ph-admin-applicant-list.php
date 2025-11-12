@@ -35,6 +35,7 @@ class PH_Admin_Applicant_List {
 	<form method="post" id="mainform" action="" class="applicant-list-form">
 
         <input type="hidden" name="submitted_applicant_list" value="1">
+        <?php wp_nonce_field( 'ph_applicant_export', 'ph_applicant_export_nonce' ); ?>
 
 		<div id="poststuff" class="propertyhive_meta_box">
 
@@ -1059,6 +1060,16 @@ jQuery(window).resize(function() {
 
     public function export()
     {
+        if ( !isset( $_POST['ph_applicant_export_nonce'] ) || ! check_admin_referer( 'ph_applicant_export', 'ph_applicant_export_nonce', false ) ) 
+        {
+            wp_die( esc_html__( 'Invalid request (nonce failure)', 'propertyhive' ), 403 );
+        }
+
+        if ( !current_user_can( 'manage_propertyhive' ) ) 
+        {
+            wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), 403 );
+        }
+
         $filename = 'applicant-list-' . date("YmdHis") . '.csv';
 
         // disable caching
