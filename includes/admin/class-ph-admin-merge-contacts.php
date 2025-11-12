@@ -163,6 +163,7 @@ class PH_Admin_Merge_Contacts {
                             action:             'propertyhive_merge_contact_records',
                             contact_ids :       '<?php echo esc_js(ph_clean($_GET['merge_ids'])); ?>',
                             primary_contact_id: selected_primary,
+                            nonce:              '<?php echo wp_create_nonce( 'propertyhive_merge_contact' ); ?>',
                         };
 
                         jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) {

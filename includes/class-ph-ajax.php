@@ -2730,15 +2730,23 @@ class PH_AJAX {
     {
         $this->json_headers();
 
-        if ( !isset( $_POST['contact_ids'] ) || !isset( $_POST['primary_contact_id'] ) )
+        if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( 'propertyhive_merge_contact', 'nonce', false ) ) 
+        {
+            $return = array('error' => 'Invalid nonce');
+            echo json_encode( $return );
+            die();
+        }
+
+        if ( !isset( $_POST['contact_ids'] ) || empty( $_POST['contact_ids'] ) || !isset( $_POST['primary_contact_id'] ) || empty( $_POST['primary_contact_id'] ) )
         {
             $return = array('error' => 'Invalid parameters received');
             echo json_encode( $return );
             die();
         }
 
-        $contacts_to_merge = explode('|', $_POST['contact_ids']);
-        $primary_contact_id = $_POST['primary_contact_id'];
+        $contacts_to_merge = array_filter( array_map( 'absint', explode( '|', $_POST['contact_ids'] ) ) );
+
+        $primary_contact_id = absint( wp_unslash( $_POST['primary_contact_id'] ) );
 
         if ( !is_array($contacts_to_merge) || !in_array( $primary_contact_id, $contacts_to_merge )  )
         {
@@ -2747,12 +2755,33 @@ class PH_AJAX {
             die();
         }
 
+        if ( get_post_type( $primary_contact_id ) !== 'contact' ) 
+        {
+            $return = array('error' => 'Primary contact ' . $primary_contact_id . ' is not a contact');
+            echo json_encode( $return );
+            die();
+        }
+
+        if ( !current_user_can( 'edit_post', $primary_contact_id ) ) 
+        {
+            $return = array('error' => 'Insufficient permissions for primary contact');
+            echo json_encode( $return );
+            die();
+        }
+
         // Check each post ID passed through is in fact of post type 'contact'
         foreach ( $contacts_to_merge as $child_contact_id )
         {
-            if ( get_post_type((int)$child_contact_id) != 'contact' )
+            if ( get_post_type((int)$child_contact_id) !== 'contact' )
             {
-                $return = array('error' => 'Contact ID ' . $child_contact_id . ' received which is not a contact');
+                $return = array('error' => 'Contact ID ' . $child_contact_id . ' is not a contact');
+                echo json_encode( $return );
+                die();
+            }
+
+            if ( !current_user_can( 'edit_post', $child_contact_id ) ) 
+            {
+                $return = array('error' => 'Insufficient permissions for contact ID ' . $child_contact_id );
                 echo json_encode( $return );
                 die();
             }
