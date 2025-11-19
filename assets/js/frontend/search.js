@@ -176,3 +176,44 @@ jQuery( function(jQuery){
 jQuery(window).resize(function() {
     toggleDepartmentFields();
 });
+
+let ph_turnstile_widgets = {}; // store widget IDs so we can reset later
+function ph_init_turnstile() 
+{
+    const widgets = document.querySelectorAll('.turnstile');
+
+    widgets.forEach(el => {
+        // If the widget has already been rendered once:
+        if ( ph_turnstile_widgets[el.dataset.tsId] ) 
+        {
+            // Only reset if element is visible
+            if ( el.offsetParent !== null ) 
+            {
+                turnstile.reset(ph_turnstile_widgets[el.dataset.tsId]);
+            }
+            return;
+        }
+
+        // Only render if the element is actually visible
+        if ( el.offsetParent === null ) 
+        {
+            return; // skip hidden ones (e.g., in closed modal)
+        }
+
+        // Create a unique ID for this element
+        const id = Math.random().toString(36).substring(2);
+        el.dataset.tsId = id;
+
+        // Render Turnstile widget
+        ph_turnstile_widgets[id] = turnstile.render(el, {
+            sitekey: el.dataset.sitekey,
+            callback: (token) => {
+                console.log("Turnstile token:", token);
+            }
+        });
+    });
+}
+
+jQuery(document).on('afterShow.fb', function(e, instance, slide) {
+    ph_init_turnstile();
+});

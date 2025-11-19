@@ -850,6 +850,47 @@ class PH_AJAX {
                     }
                 }
             }
+
+            if ( $key == 'turnstile' )
+            {
+                $secret = isset( $control['secret'] ) ? $control['secret'] : '';
+                $response = isset( $_POST['cf-turnstile-response'] ) ? ph_clean($_POST['cf-turnstile-response']) : '';
+
+                $response = wp_remote_post(
+                    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                    array(
+                        'method' => 'POST',
+                        'headers' => array(
+                            'Content-Type' => 'application/x-www-form-urlencoded',
+                        ),
+                        'body' => array( 'secret' => $secret, 'response' => $response ),
+                    )
+                );
+
+                if ( is_wp_error( $response ) )
+                {
+                    $errors[] = $response->get_error_message();
+                }
+                else
+                {
+                    $response = json_decode($response['body'], TRUE);
+                    if ( $response === FALSE )
+                    {
+                        $errors[] = 'Error decoding response from turnstile check';
+                    }
+                    else
+                    {
+                        if ( isset($response['success']) && $response['success'] == true )
+                        {
+
+                        }
+                        else
+                        {
+                            $errors[] = 'Failed turnstile validation';
+                        }
+                    }
+                }
+            }
         }
 
         // Check password and password2 match
@@ -2166,6 +2207,46 @@ class PH_AJAX {
                     }
                 }
             }
+            if ( $key == 'turnstile' )
+            {
+                $secret = isset( $control['secret'] ) ? $control['secret'] : '';
+                $response = isset( $_POST['cf-turnstile-response'] ) ? ph_clean($_POST['cf-turnstile-response']) : '';
+
+                $response = wp_remote_post(
+                    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                    array(
+                        'method' => 'POST',
+                        'headers' => array(
+                            'Content-Type' => 'application/x-www-form-urlencoded',
+                        ),
+                        'body' => array( 'secret' => $secret, 'response' => $response ),
+                    )
+                );
+
+                if ( is_wp_error( $response ) )
+                {
+                    $errors[] = $response->get_error_message();
+                }
+                else
+                {
+                    $response = json_decode($response['body'], TRUE);
+                    if ( $response === FALSE )
+                    {
+                        $errors[] = 'Error decoding response from turnstile check';
+                    }
+                    else
+                    {
+                        if ( isset($response['success']) && $response['success'] == true )
+                        {
+
+                        }
+                        else
+                        {
+                            $errors[] = 'Failed turnstile validation';
+                        }
+                    }
+                }
+            }
         }
 
         if ( 
@@ -2281,7 +2362,7 @@ class PH_AJAX {
 
             foreach ($form_controls as $key => $control)
             {
-                if ( isset($control['type']) && in_array($control['type'], array('html', 'recaptcha', 'recaptcha-v3', 'hCaptcha')) ) { continue; }
+                if ( isset($control['type']) && in_array($control['type'], array('html', 'recaptcha', 'recaptcha-v3', 'hCaptcha', 'turnstile')) ) { continue; }
 
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
                 $label = ( isset($control['email_label']) ) ? $control['email_label'] : $label;
