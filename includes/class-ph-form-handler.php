@@ -23,7 +23,7 @@ class PH_Form_Handler {
 
 	public function add_captcha_to_forms()
 	{
-		if ( in_array(get_option( 'propertyhive_captcha_service', '' ), array('recaptcha', 'recaptcha-v3', 'hCaptcha')) )
+		if ( in_array(get_option( 'propertyhive_captcha_service', '' ), array('recaptcha', 'recaptcha-v3', 'hCaptcha', 'turnstile')) )
 		{
 			add_filter( 'propertyhive_property_enquiry_form_fields', array( $this, 'add_captcha_to_form' ) );
 			add_filter( 'propertyhive_applicant_registration_form_fields', array( $this, 'add_captcha_to_form' ) );
@@ -58,6 +58,15 @@ class PH_Form_Handler {
 			case "hCaptcha":
 			{
 				$fields['hCaptcha'] = array(
+			        'type' => $captcha_service,
+			        'site_key' => get_option( 'propertyhive_captcha_site_key', '' ),
+			        'secret' => get_option( 'propertyhive_captcha_secret', '' ),
+			    );
+				break;
+			}
+			case "turnstile":
+			{
+				$fields['turnstile'] = array(
 			        'type' => $captcha_service,
 			        'site_key' => get_option( 'propertyhive_captcha_site_key', '' ),
 			        'secret' => get_option( 'propertyhive_captcha_secret', '' ),

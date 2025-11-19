@@ -559,6 +559,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     'recaptcha' => __( 'Google reCaptcha v2', 'propertyhive' ) . ' (<a href="https://www.google.com/recaptcha/admin/create" target="_blank">register</a>)',
                     'recaptcha-v3' => __( 'Google reCaptcha v3', 'propertyhive' ) . ' (<a href="https://www.google.com/recaptcha/admin/create" target="_blank">register</a>)',
                     'hCaptcha' => __( 'hCaptcha', 'propertyhive' ) . ' (<a href="https://www.hcaptcha.com/" target="_blank">register</a>)',
+                    'turnstile' => __( 'Cloudflare Turnstile', 'propertyhive' ) . ' (<a href="https://www.cloudflare.com/en-gb/application-services/products/turnstile/" target="_blank">register</a>)',
                 ),
             ),
 
