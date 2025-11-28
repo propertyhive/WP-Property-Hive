@@ -274,6 +274,7 @@ class PH_Elementor {
 			'Property Council Tax Band',
 			'Property Let Available Date',
 			'Property Deposit',
+			'Property Furnished',
 			'Property Marketing Flag',
 			'Property Map',
 			'Property Map Link',
