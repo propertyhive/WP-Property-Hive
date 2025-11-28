@@ -1411,6 +1411,13 @@ function ph_form_field( $key, $field )
             <div class="h-captcha" data-sitekey="' . $field['site_key'] . '"></div>';
             break;
         }
+        case "turnstile":
+        {
+            $field['site_key'] = isset( $field['site_key'] ) ? $field['site_key'] : '';
+
+            $output .= '<div class="turnstile" data-sitekey="' . $field['site_key'] . '"></div>';
+            break;
+        }
         case "daterange":
         {
             wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
