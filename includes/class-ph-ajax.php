@@ -3247,32 +3247,45 @@ class PH_AJAX {
             array(
                 'headers' => array(
                     'Referer' => home_url(),
+                    'User-Agent' => 'Property-Hive/' . PH_VERSION . ' (+https://wp-property-hive.com)',
                 ),
             )
         );
 
-        if ( !is_wp_error( $response ))
+        if ( is_wp_error( $response ))
         {
-            if ( is_array( $response ) )
-            {
-                $body = wp_remote_retrieve_body( $response );
-                $json = json_decode($body, true);
+            $error = $response->get_error_message();
+            echo json_encode(array('error' => $error, 'lat' => $lat, 'lng' => $lng));
+            die();
+        }
 
-                if ( !empty($json) && isset($json[0]['lat']) && isset($json[0]['lon']) )
-                {
-                    $lat = $json[0]['lat'];
-                    $lng = $json[0]['lon'];
-                }
-                else
-                {
-                    $error = 'No co-ordinates returned for the address provided: ' . ph_clean($_POST['address']);
-                }
+        if ( wp_remote_retrieve_response_code($response) !== 200 )
+        {
+            $error =  wp_remote_retrieve_response_code($response) . ' response received when geocoding address ' . ph_clean($_POST['address']) . '. Error message: ' . wp_remote_retrieve_response_message($response);
+            echo json_encode(array('error' => $error, 'lat' => $lat, 'lng' => $lng));
+            die();
+        }
+
+        if ( is_array( $response ) )
+        {
+            $body = wp_remote_retrieve_body( $response );
+            $json = json_decode($body, true);
+
+            if ( !empty($json) && isset($json[0]['lat']) && isset($json[0]['lon']) )
+            {
+                $lat = $json[0]['lat'];
+                $lng = $json[0]['lon'];
+            }
+            else
+            {
+                $error = 'No co-ordinates returned for the address provided ' . ph_clean($_POST['address']) . ': ' . print_r($body, true);
             }
         }
         else
         {
-            $error = $response->get_error_message();
+            $error = 'Failed to parse JSON response from OSM Geocoding service: ' . print_r($response, true);
         }
+
         echo json_encode(array('error' => $error, 'lat' => $lat, 'lng' => $lng));
 
         die();
@@ -4038,6 +4051,7 @@ class PH_AJAX {
                             array(
                                 'headers' => array(
                                     'Referer' => home_url(),
+                                    'User-Agent' => 'Property-Hive/' . PH_VERSION . ' (+https://wp-property-hive.com)',
                                 ),
                             )
                         );

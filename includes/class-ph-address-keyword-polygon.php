@@ -95,6 +95,7 @@ class PH_Address_Keyword_Polygon {
             array(
                 'headers' => array(
                     'Referer' => home_url(),
+                    'User-Agent' => 'Property-Hive/' . PH_VERSION . ' (+https://wp-property-hive.com)',
                 ),
             )
         );
