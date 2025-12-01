@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.8.3
-Stable tag: 2.1.13
+Stable tag: 2.1.14
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,11 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.1.14 - 2025-12-01 =
+* Added support for Cloudflare Turnstile as a CAPTCHA service
+* Added new 'Furnished' Elementor widget
+* Updated geocoding requests to OSM to pass in User-Agent header to reduce chance of receiving a 403 response back
 
 = 2.1.13 - 2025-11-12 =
 * Created search page and assign to 'Search Results Page' setting by default upon installation. This is one of the main sticking points when using Property Hive for the first time.
