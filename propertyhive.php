@@ -299,7 +299,8 @@ if ( ! class_exists( 'PropertyHive' ) )
 
             include_once( 'includes/class-ph-avada.php' );                  // Avada / Fusion Builder
             include_once( 'includes/class-ph-bricks-builder.php' );         // Bricks Builder
-            include_once( 'includes/class-ph-divi.php' );                   // Divi
+            //include_once( 'includes/class-ph-divi.php' );                   // Divi. Removed since doing full compatibility react widgets
+            include_once( 'includes/divi-extensions/ph-divi-extension.php' );  // Divi
             include_once( 'includes/class-ph-elementor.php' );              // Elementor
             include_once( 'includes/class-ph-salient.php' );                // Salient / WPBakery
             include_once( 'includes/class-ph-yoast-seo.php' );              // Yoast SEO
