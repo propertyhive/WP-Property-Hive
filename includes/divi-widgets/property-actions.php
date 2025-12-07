@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 class Divi_Property_Actions_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_actions_widget';
-    public $vb_support = 'partial';
+    public $vb_support = 'on';
     public $icon = '';
 
     public function init() {
