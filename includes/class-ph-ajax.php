@@ -7953,12 +7953,37 @@ class PH_AJAX {
         if ( !is_dir(WP_PLUGIN_DIR . '/' . $slug) && strpos($feature['download_url'], 'wordpress.org') === false )
         {
             // not a public WP plugin. Must be hosted privately
-            $response = wp_remote_get(
-                $feature['download_url'],
-                array(
-                    'timeout' => 30
-                )
-            );
+            if ( !$pro )
+            {
+                // It's free, just let them have it
+                $response = wp_remote_get(
+                    $feature['download_url'],
+                    array(
+                        'timeout' => 60,
+                        'sslverify' => true,
+                    )
+                );
+            }
+            else
+            {
+                // Run through server check to ensure only the genuinely lovely humans get this Pro feature
+                $response = wp_remote_get(
+                    'https://wp-property-hive.com/activate-pro-feature.php',
+                    array(
+                        'timeout' => 60,
+                        'sslverify' => true,
+                        'headers' => array(
+                            'Content-Type'        => 'application/json',
+                            'X-PH-License-Key'    => get_option( 'propertyhive_license_key', '' ),
+                            'X-PH-License-Type'   => PH()->license->get_license_type(),
+                            'X-PH-Plugin-Version' => PH_VERSION,
+                        ),
+                        'body' => wp_json_encode(array(
+                            'slug' => $slug,
+                        ),
+                    )
+                );
+            }
 
             if ( is_wp_error( $response ) )
             {
