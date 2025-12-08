@@ -7974,12 +7974,13 @@ class PH_AJAX {
                         'sslverify' => true,
                         'headers' => array(
                             'Content-Type'        => 'application/json',
-                            'X-PH-License-Key'    => get_option( 'propertyhive_license_key', '' ),
+                            'X-PH-License-Key'    => get_option( 'propertyhive_pro_license_key', '' ),
                             'X-PH-License-Type'   => PH()->license->get_license_type(),
+                            'X-PH-Instance-Id'   => get_option( 'propertyhive_pro_instance_id', '' ),
                             'X-PH-Plugin-Version' => PH_VERSION,
                         ),
                         'body' => wp_json_encode(array(
-                            'slug' => $slug,
+                            'wordpress_plugin_file' => $feature['wordpress_plugin_file'],
                         ),
                     )
                 );
