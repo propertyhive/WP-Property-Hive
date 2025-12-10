@@ -7967,7 +7967,7 @@ class PH_AJAX {
             else
             {
                 // Run through server check to ensure only the genuinely lovely humans get this Pro feature
-                $response = wp_remote_get(
+                $response = wp_remote_post(
                     'https://wp-property-hive.com/activate-pro-feature.php',
                     array(
                         'timeout' => 60,
@@ -7981,7 +7981,7 @@ class PH_AJAX {
                         ),
                         'body' => wp_json_encode(array(
                             'wordpress_plugin_file' => $feature['wordpress_plugin_file'],
-                        ),
+                        )),
                     )
                 );
             }
