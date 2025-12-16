@@ -132,25 +132,37 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 					}
 					else
 					{
-						$virtual_tour['url'] = preg_replace(
-							"/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i",
-							"//www.youtube.com/embed/$2",
-							$virtual_tour['url']
-						);
+						if ( strpos($virtual_tour['url'], 'instagram.com/reel') !== false )
+						{
+							echo '
+								<blockquote class="instagram-media"
+								  data-instgrm-permalink="' . esc_url($virtual_tour['url']) . '"
+								  data-instgrm-version="14"></blockquote>
+								<script async src="https://www.instagram.com/embed.js"></script>
+								';
+						}
+						else
+						{
+							$virtual_tour['url'] = preg_replace(
+								"/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i",
+								"//www.youtube.com/embed/$2",
+								$virtual_tour['url']
+							);
 
-						$virtual_tour['url'] = preg_replace(
-							'#https?://(www\.)?youtube\.com/shorts/([^/?]+)#', 
-							'//www.youtube.com/embed/$2', 
-							$virtual_tour['url']
-						);
+							$virtual_tour['url'] = preg_replace(
+								'#https?://(www\.)?youtube\.com/shorts/([^/?]+)#', 
+								'//www.youtube.com/embed/$2', 
+								$virtual_tour['url']
+							);
 
-						$virtual_tour['url'] = preg_replace(
-				        	'/(https?:\/\/)?(www\.)?(player\.)?vimeo\.com\/?(showcase\/)*([0-9))([a-z]*\/)*([0-9]{6,11})[?]?.*/i',
-				        	"//player.vimeo.com/video/$6",
-				        	$virtual_tour['url']
-				    	);
+							$virtual_tour['url'] = preg_replace(
+					        	'/(https?:\/\/)?(www\.)?(player\.)?vimeo\.com\/?(showcase\/)*([0-9))([a-z]*\/)*([0-9]{6,11})[?]?.*/i',
+					        	"//player.vimeo.com/video/$6",
+					        	$virtual_tour['url']
+					    	);
 
-						echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
+							echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
+						}
 					}
 				}
 
