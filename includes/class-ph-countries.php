@@ -214,6 +214,12 @@ class PH_Countries {
 				'currency_symbol' => 'kr',
 				'currency_prefix' => false
 			),
+			'EG' => array(
+				'name' => 'Egypt',
+				'currency_code' => 'EGP',
+				'currency_symbol' => 'E&pound;',
+				'currency_prefix' => true
+			),
 			'FI' => array(
 				'name' => 'Finland',
 				'currency_code' => 'EUR',
