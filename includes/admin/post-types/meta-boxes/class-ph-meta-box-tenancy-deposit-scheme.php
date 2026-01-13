@@ -23,19 +23,25 @@ class PH_Meta_Box_Tenancy_Deposit_Scheme {
         
         echo '<div class="options_group">';
 
+        $deposit_schemes = apply_filters(
+            'propertyhive_tenancy_deposit_schemes',
+            array(
+                'dps'          => 'Deposit Protection Service',
+                'mydeposits'   => 'MyDeposits',
+                'mydepositsscotland'   => 'MyDeposits Scotland',
+                'tds'          => 'Tenancy Deposit Scheme',
+                'lps'          => 'Letting Protection Service (Scotland / NI)',
+                'safedeposits' => 'Safe Deposits (Scotland)',
+            )
+        );
+
+        $deposit_schemes['none'] = 'No Scheme Required';
+
         $args = array(
             'id' => '_deposit_scheme', 
             'label' => __( 'Deposit Scheme', 'propertyhive' ), 
             'desc_tip' => false, 
-            'options' => array(
-            	// TODO: User managed list
-                'dps' => 'Deposit Protection Service',
-                'mydeposits' => 'MyDeposits',
-                'tds' => 'Tenancy Deposit Scheme',
-                'lps' => 'Letting Protection Service (Scotland / NI)',
-                'safedeposits' => 'Safe Deposits (Scotland)',
-                'none' => 'No Scheme Required',
-            ),
+            'options' => $deposit_schemes,
         );
         propertyhive_wp_select( $args );
 
