@@ -207,7 +207,8 @@ class PH_Shortcodes {
 			$meta_query[] = array(
 				'key' => '_bedrooms',
 				'value' => sanitize_text_field( $atts['bedrooms'] ),
-				'compare' => '='
+				'compare' => '=',
+				'type'    => 'NUMERIC'
 			);
 		}
 
@@ -216,7 +217,8 @@ class PH_Shortcodes {
 			$meta_query[] = array(
 				'key' => '_bedrooms',
 				'value' => sanitize_text_field( $atts['minimum_bedrooms'] ),
-				'compare' => '>='
+				'compare' => '>=',
+				'type'    => 'NUMERIC'
 			);
 		}
 
