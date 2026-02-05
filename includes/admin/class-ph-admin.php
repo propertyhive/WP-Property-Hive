@@ -25,6 +25,7 @@ class PH_Admin {
         add_action( 'current_screen', array( $this, 'remove_propertyhive_meta_boxes_from_screen_options' ) );
         add_action( 'admin_notices', array( $this, 'review_admin_notices') );
         add_action( 'admin_notices', array( $this, 'archive_admin_notices' ) );
+        add_action( 'admin_notices', array( $this, 'retired_template_assistant_admin_notices' ) );
         add_action( 'admin_menu', array( $this, 'admin_dashboard_pages' ) );
         add_action( 'admin_head', array( $this, 'admin_head' ) );
         add_action( 'admin_init', array( $this, 'admin_redirects' ) );
@@ -72,6 +73,33 @@ class PH_Admin {
                 );
             }
         }
+    }
+
+    public function retired_template_assistant_admin_notices() 
+    {
+        if ( is_multisite() ) 
+        {
+            $show = (bool)get_site_option( 'propertyhive_template_assistant_retired_notice', 0 );
+            if ( !$show ) return;
+            if ( !is_super_admin() ) return;
+        }
+        else
+        {
+            $show = (bool)get_option( 'propertyhive_template_assistant_retired_notice', 0 );
+            if ( !$show ) return;
+            if ( !current_user_can( 'activate_plugins' ) ) return;
+        }
+
+        echo '<div class="notice notice-info is-dismissible"><p>
+            <strong>The Template Assistant add-on has been retired.</strong><br>
+            Its functionality is now built into Property Hive under \'Property Hive &gt; Settings &gt; Frontend\'.<br>
+            The add-on has been deactivated to prevent conflicts. No settings were lost.
+        </p>
+        <p>
+            <a href="https://wp-property-hive.com/template-assistant-is-now-part-of-property-hive-core-plugin" target="_blank" class="button button-primary">Read more</a>
+            <a href="" class="button" id="ph_dismiss_notice_retired_template_assistant">Dismiss this notice</a>
+        </p>
+        </div>';
     }
 
     public function crm_only_mode_screen_id( $screen_ids )

@@ -33,6 +33,7 @@ class PH_Admin_Settings {
 			$settings[] = include( 'settings/class-ph-settings-general.php' );
             $settings[] = include( 'settings/class-ph-settings-offices.php' );
             $settings[] = include( 'settings/class-ph-settings-custom-fields.php' );
+            $settings[] = include( 'settings/class-ph-settings-template-assistant.php' ); // Maybe temporary after migrating TA code into core. Remove in future version
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
             $settings[] = include( 'settings/class-ph-settings-features.php' );
             $settings[] = include( 'settings/class-ph-settings-licenses.php' );
