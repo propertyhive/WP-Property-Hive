@@ -66,8 +66,11 @@ class PH_Meta_Box_Tenancy_Property {
             {
                 echo esc_html(__('No', 'propertyhive') . ' ' . ( ( $property->department == 'residential-lettings' ) ? __('landlord', 'propertyhive') : __('owner', 'propertyhive') ) . ' ' . __('specified', 'propertyhive'));
             }
-                
+
             echo '</p>';
+
+            do_action('propertyhive_property_search_meta_box_details', $property_id);
+            do_action('propertyhive_tenancy_property_search_meta_box_details', $post->ID, $property_id);
         }
         else
         {

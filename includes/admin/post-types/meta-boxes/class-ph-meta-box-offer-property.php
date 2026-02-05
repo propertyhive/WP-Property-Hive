@@ -68,6 +68,9 @@ class PH_Meta_Box_Offer_Property {
             }
                 
             echo '</p>';
+
+            do_action('propertyhive_property_search_meta_box_details', $property_id);
+            do_action('propertyhive_offer_property_search_meta_box_details', $post->ID, $property_id);
         }
         else
         {
