@@ -62,7 +62,7 @@ class PH_Meta_Box_Property_Coordinates {
         
         echo '<p class="form-field">
             <label>&nbsp;</label>
-            <a href="#" onclick="do_address_lookup( true ); return false;">' . esc_html(__( 'Obtain Co-ordinates', 'propertyhive' )) . '</a>
+            <a href="#" id="ph-obtain-coords">' . esc_html(__( 'Obtain Co-ordinates', 'propertyhive' )) . '</a>
         </p>';
 
         do_action('propertyhive_property_coordinates_fields');
@@ -98,18 +98,35 @@ class PH_Meta_Box_Property_Coordinates {
                 var markerSet = ' . ( ($markerSet) ? 'true' : 'false') . ';
                 var geocoder;
 
+                var phGeoTimer = null;
+                var phGeoXhr = null;
+                var phGeoInFlight = false;
+
                 jQuery(document).ready(function()
                 {
                     jQuery(\'#_address_postcode\').change(function()
                     {
-                        do_address_lookup();
+                        schedule_lookup(false);
                     });
                     jQuery(\'#_address_country\').change(function()
                     {
-                        do_address_lookup();
+                        schedule_lookup(false);
                     });
-
+                    jQuery(\'#ph-obtain-coords\').on(\'click\', function(e)
+                    {
+                        e.preventDefault();
+                        schedule_lookup(true);
+                    });
                 });
+
+                function schedule_lookup(force)
+                {
+                    clearTimeout(phGeoTimer);
+                    phGeoTimer = setTimeout(function()
+                    {
+                        do_address_lookup(!!force);
+                    }, 800);
+                }
 
                 function do_address_lookup( force )
                 {
@@ -241,6 +258,12 @@ class PH_Meta_Box_Property_Coordinates {
                         elseif ( get_option('propertyhive_geocoding_provider') == 'osm' )
                         {
                             echo '
+                            // Abort older request if they changed input quickly
+                            if (phGeoXhr && phGeoXhr.readyState !== 4) phGeoXhr.abort();
+
+                            if (phGeoInFlight && !force) return;
+                            phGeoInFlight = true;
+
                             var data = {
                                 \'action\': \'propertyhive_osm_geocoding_request\',
                                 \'address\': address,
@@ -248,7 +271,7 @@ class PH_Meta_Box_Property_Coordinates {
                                 \'security\': \'' . esc_js(wp_create_nonce( 'osm_geocoding_request' )) . '\'
                             };
 
-                            jQuery.post( ajaxurl, data, function(response) {
+                            phGeoXhr = jQuery.post( ajaxurl, data, function(response) {
                                 
                                 if ( response.error != \'\' )
                                 {
@@ -316,7 +339,7 @@ class PH_Meta_Box_Property_Coordinates {
                             }
                             echo '
                                 }
-                            }, \'json\');
+                            }, \'json\').always(function(){ phGeoInFlight = false; });
                             ';
                         }
                         else
