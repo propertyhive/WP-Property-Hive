@@ -3240,6 +3240,22 @@ class PH_AJAX {
         $lng = '';
         $error = '';
 
+        // Rate limit: 1 request/second
+        $rate_key = 'ph_osm_geo_last_ts';
+        $last_ts = (int)get_transient( $rate_key );
+        $now = time();
+
+        if ( $last_ts && ($now - $last_ts) < 1 ) 
+        {
+            // Too soon: tell client to retry shortly
+            $error = 'Too many geocoding requests. Please wait a second and try again.';
+            json_encode(array('error' => $error));
+            wp_die();
+        }
+
+        // Set timestamp immediately to prevent stampedes
+        set_transient( $rate_key, $now );
+
         $request_url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=" . strtolower(ph_clean($_POST['country'])) . "&addressdetails=1&q=" . urlencode(ph_clean($_POST['address']));
         
         $response = wp_remote_get(
