@@ -531,17 +531,37 @@ class PH_Emails {
 							// Remove from this array if on market changed or price changed
 							if ( is_array($already_sent_properties) )
 							{
+								if ( $dry_run === true ) { echo 'Already sent properties: ' . print_r($already_sent_properties, true) . "<br>\n"; }
+
 								foreach ( $already_sent_properties as $already_sent_property_id => $sends )
 								{
 									$highest_send = $sends[count($sends) - 1]['date'];
 
+									if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last sent: ' . $highest_send . "<br>\n"; }
+
 									if ( $highest_send != '' )
 									{
 										$on_market_change_date = get_post_meta( $already_sent_property_id, '_on_market_change_date', TRUE );
+
+										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last on market change: ' . $on_market_change_date . "<br>\n"; }
+
 										$price_change_date = get_post_meta( $already_sent_property_id, '_price_change_date', TRUE );
 
-										if ( $on_market_change_date > $highest_send || $price_change_date > $highest_send )
+										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' lastprice change: ' . $price_change_date . "<br>\n"; }
+
+										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last sent: ' . $highest_send . "<br>\n"; }
+
+										if ( $on_market_change_date > $highest_send )
 										{
+											if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' has changed on market since last sent' . "<br>\n"; }
+
+											// This property has changed since it was last sent. Remove from already sent list so it gets sent again
+											unset($already_sent_properties[$already_sent_property_id]);
+										}
+										elseif ( $price_change_date > $highest_send )
+										{
+											if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' has changed price since last sent' . "<br>\n"; }
+
 											// This property has changed since it was last sent. Remove from already sent list so it gets sent again
 											unset($already_sent_properties[$already_sent_property_id]);
 										}
