@@ -281,9 +281,18 @@ function get_property_map( $args = array() )
 		?>
 		var icon_options = { iconUrl: '<?php echo esc_url($marker_icon_url); ?>' }
 		<?php
+						$icon_width = '';
+						$icon_height = '';
+
+						$icon_anchor_width = '';
+						$icon_anchor_height = '';
+
 						$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
 						if ( $size !== FALSE && !empty($size) )
 						{
+							$icon_width = (int)$size[0];
+							$icon_height = (int)$size[1];
+							
 							if (isset($map_add_on_settings['custom_icon_anchor_position']) && $map_add_on_settings['custom_icon_anchor_position'] == 'center')
 							{
 								$icon_anchor_width = floor($size[0] / 2);
@@ -294,9 +303,23 @@ function get_property_map( $args = array() )
 								$icon_anchor_width = floor($size[0] / 2);
 								$icon_anchor_height = $size[1];
 							}
+						}
 
+						$icon_width = apply_filters( 'propertyhive_property_map_osm_icon_width', $icon_width );
+						$icon_height = apply_filters( 'propertyhive_property_map_osm_icon_height', $icon_height );
+
+						$icon_anchor_width = apply_filters( 'propertyhive_property_map_osm_icon_anchor_width', $icon_anchor_width );
+						$icon_anchor_height = apply_filters( 'propertyhive_property_map_osm_icon_anchor_height', $icon_anchor_height );
+
+						if ( !empty($icon_width) && !empty($icon_height) )
+						{
 		?>
-		icon_options.iconSize = [<?php echo (int)$size[0]; ?>, <?php echo (int)$size[1]; ?>];
+		icon_options.iconSize = [<?php echo (int)$icon_width; ?>, <?php echo (int)$icon_height; ?>];
+		<?php
+						}
+						if ( $icon_anchor_width != '' && $icon_anchor_height != '' )
+						{
+		?>
 		icon_options.iconAnchor = [<?php echo (int)$icon_anchor_width; ?>, <?php echo (int)$icon_anchor_height; ?>];
 		<?php
 						}
