@@ -531,25 +531,23 @@ class PH_Emails {
 							// Remove from this array if on market changed or price changed
 							if ( is_array($already_sent_properties) )
 							{
-								if ( $dry_run === true ) { echo 'Already sent properties: ' . print_r($already_sent_properties, true) . "<br>\n"; }
+								if ( $dry_run === true ) { echo 'Already sent properties before: ' . print_r($already_sent_properties, true) . "<br>\n"; }
 
 								foreach ( $already_sent_properties as $already_sent_property_id => $sends )
 								{
 									$highest_send = $sends[count($sends) - 1]['date'];
 
-									if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last sent: ' . $highest_send . "<br>\n"; }
-
 									if ( $highest_send != '' )
 									{
+										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last sent: ' . $highest_send . "<br>\n"; }
+
 										$on_market_change_date = get_post_meta( $already_sent_property_id, '_on_market_change_date', TRUE );
 
 										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last on market change: ' . $on_market_change_date . "<br>\n"; }
 
 										$price_change_date = get_post_meta( $already_sent_property_id, '_price_change_date', TRUE );
 
-										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' lastprice change: ' . $price_change_date . "<br>\n"; }
-
-										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last sent: ' . $highest_send . "<br>\n"; }
+										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last price change: ' . $price_change_date . "<br>\n"; }
 
 										if ( $on_market_change_date > $highest_send )
 										{
@@ -567,7 +565,11 @@ class PH_Emails {
 										}
 									}
 								}
+
+								if ( $dry_run === true ) { echo 'Already sent properties after: ' . print_r($already_sent_properties, true) . "<br>\n"; }
 							}
+
+							if ( $dry_run === true ) { echo 'Matching properties before removing already sent: ' . print_r($matching_properties, true) . "<br>\n"; }
 
 							// Check properties haven't already been sent and not marked as 'not interested'
 							$new_matching_properties = array();
@@ -578,6 +580,8 @@ class PH_Emails {
 									$new_matching_properties[] = $matching_property->id;
 								}
 							}
+
+							if ( $dry_run === true ) { echo 'Matching properties after removing already sent: ' . print_r($new_matching_properties, true) . "<br>\n"; }
 
 							$max_results = apply_filters( 'propertyhive_auto_match_maximum_results', FALSE);
 							if ( $max_results !== FALSE )
