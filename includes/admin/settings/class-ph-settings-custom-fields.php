@@ -44,26 +44,26 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             ''         => __( 'Custom Fields', 'propertyhive' )
         );
 
-        $residential_active  = false;
-        $residential_sales_active  = false;
-        $residential_lettings_active  = false;
-        $commercial_active  = false;
+        $residential_active = false;
+        $residential_sales_active = false;
+        $residential_lettings_active = false;
+        $commercial_active = false;
 
         if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' || get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
         {
-            $residential_active  = true;
+            $residential_active = true;
             if ( get_option( 'propertyhive_active_departments_sales' ) == 'yes' )
             {
-                $residential_sales_active  = true;
+                $residential_sales_active = true;
             }
             if ( get_option( 'propertyhive_active_departments_lettings' ) == 'yes' )
             {
-                $residential_lettings_active  = true;
+                $residential_lettings_active = true;
             }
         }
         if ( get_option( 'propertyhive_active_departments_commercial' ) == 'yes' )
         {
-            $commercial_active  = true;
+            $commercial_active = true;
         }
 
         $default_departments = ph_get_departments(true);
@@ -80,9 +80,9 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                         {
                             switch ( $custom_department['based_on'] )
                             {
-                                case "residential-sales": { $residential_active  = true; $residential_sales_active  = true; }
-                                case "residential-lettings": { $residential_active  = true; $residential_lettings_active  = true; }
-                                case "commercial": { $commercial_active  = true; }
+                                case "residential-sales": { $residential_active = true; $residential_sales_active = true; }
+                                case "residential-lettings": { $residential_active = true; $residential_lettings_active = true; }
+                                case "commercial": { $commercial_active = true; }
                             }
                         }
                     }
