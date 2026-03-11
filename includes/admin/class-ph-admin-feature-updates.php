@@ -197,11 +197,7 @@ class PH_Admin_Feature_Updates {
 
                 foreach ( $plugins as $file => $data ) 
                 {
-                    // Match folder name to our slug: e.g.
-                    // /wp-content/plugins/propertyhive-blm-export/propertyhive-blm-export.php
-                    $folder = dirname( $file );
-
-                    if ( stripos($folder, '/' . $slug_str . '.php') )
+                    if ( dirname($file) === $slug_str )
                     {
                         $installed_basename = $file;
                         $installed_version  = isset($data['Version']) ? (string)$data['Version'] : '';
@@ -215,18 +211,16 @@ class PH_Admin_Feature_Updates {
                 }
 
                 // Return a legacy-shaped "no update" response
-                $payload = [
+                $payload = (object)[
                     'slug'        => $slug_str,
-                    'new_version' => $installed_version ?: false, // mirrors "no update" semantics
-                    'package'     => '',
-                    'requires'    => '',
-                    'tested'      => '',
-                    // Add any other keys your legacy scripts expect, e.g. 'last_updated', 'sections', etc.
+                    'version'     => $installed_version,
+                    'homepage'    => '',
+                    'download_link'    => '',
                 ];
 
                 return [
                     'headers'  => [ 'Content-Type' => 'application/json' ],
-                    'body'     => wp_json_encode( $payload ),
+                    'body'     => serialize( $payload ),
                     'response' => [ 'code' => 200, 'message' => 'OK' ],
                     'cookies'  => [],
                     'filename' => null,
