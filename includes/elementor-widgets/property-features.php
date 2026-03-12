@@ -106,17 +106,47 @@ class Elementor_Property_Features_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-		/*$this->add_control(
-			'icon',
+		$this->add_control(
+			'bullet_shape',
 			[
-				'label' => __( 'List Icon', 'propertyhive' ),
-				'type' => \Elementor\Controls_Manager::ICONS,
-				'default' => [
-					'value' => 'fas fa-check',
-					'library' => 'solid',
+				'label' => __( 'Bullet Shape', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'disc',
+				'options' => [
+					'disc'   => __( 'Circle', 'propertyhive' ),
+					'square' => __( 'Square', 'propertyhive' ),
+				],
+				'selectors' => [
+					'{{WRAPPER}} .features ul' => 'list-style-type: {{VALUE}};',
 				],
 			]
-		);*/
+		);
+
+		$this->add_control(
+			'bullet_color',
+			[
+				'label' => __( 'Bullet Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .features ul li::marker' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'columns',
+			[
+				'label' => __( 'Columns', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::NUMBER,
+				'min' => 1,
+				'max' => 3,
+				'step' => 1,
+				'default' => 1,
+				'selectors' => [
+					'{{WRAPPER}} .features ul' => 'column-count: {{VALUE}};',
+				],
+			]
+		);
 
 		$this->end_controls_section();
 
