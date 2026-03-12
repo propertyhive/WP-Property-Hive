@@ -56,6 +56,47 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_responsive_control(
+			'button_layout',
+			[
+				'label' => __( 'Button Layout', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'options' => [
+					'inline' => __( 'Inline', 'propertyhive' ),
+					'equal'  => __( 'Equal Width', 'propertyhive' ),
+					'fixed'  => __( 'Fixed Width', 'propertyhive' ),
+				],
+				'default' => 'inline',
+				'toggle' => false,
+				'condition' => [
+					'display' => 'buttons',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'fixed_button_width',
+			[
+				'label' => __( 'Button Width', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%' ],
+				'range' => [
+					'px' => [
+						'min' => 40,
+						'max' => 600,
+					],
+					'%' => [
+						'min' => 5,
+						'max' => 100,
+					],
+				],
+				'condition' => [
+					'display' => 'buttons',
+					'button_layout' => 'fixed',
+				],
+			]
+		);
+
 		$this->start_controls_tabs( 'button_style_tabs' );
 
 		// Normal tab
@@ -128,8 +169,6 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_tab();
 
-	$this->end_controls_tabs();
-
 		$this->add_control(
 			'button_padding',
 			[
@@ -188,16 +227,68 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
-		if ( isset($settings['display']) && $settings['display'] == 'buttons' )
+		if ( isset( $settings['display'] ) && 'buttons' === $settings['display'] ) 
 		{
+			$breakpoints = \Elementor\Plugin::$instance->breakpoints->get_active_breakpoints();
+
+			$tablet_breakpoint = isset($breakpoints['tablet']) ? $breakpoints['tablet']->get_value() : 1024;
+			$mobile_breakpoint = isset($breakpoints['mobile']) ? $breakpoints['mobile']->get_value() : 767;
+
 			echo '<style type="text/css">';
-			echo '.property_actions ul { list-style-type:none; margin:0; padding:0; }';
-			echo '.property_actions ul li { display:inline-block; }';
-			echo '.property_actions ul li a { display:block; }';
+			echo '.property_actions ul { display:flex; flex-wrap:wrap; list-style:none; margin:0; padding:0; }';
+			echo '.property_actions ul li { float:none }';
+			echo '.property_actions ul li a { display:block; width:100%; box-sizing:border-box; text-align:center; }';
+
+			// Desktop
+			$this->output_layout_css( $settings, '' );
+
+			// Tablet
+			echo '@media (max-width: ' . $tablet_breakpoint . 'px) {';
+			$this->output_layout_css( $settings, '_tablet' );
+			echo '}';
+
+			// Mobile
+			echo '@media (max-width: ' . $mobile_breakpoint . 'px) {';
+			$this->output_layout_css( $settings, '_mobile' );
+			echo '}';
 			echo '</style>';
 		}
 
 		propertyhive_template_single_actions();
 
+	}
+
+	protected function output_layout_css( $settings, $suffix = '' ) {
+
+		$layout_key = 'button_layout' . $suffix;
+		$width_key  = 'fixed_button_width' . $suffix;
+
+		$layout = isset( $settings[ $layout_key ] ) ? $settings[ $layout_key ] : '';
+
+		if ( ! $layout && '' !== $suffix && isset( $settings['button_layout'] ) ) {
+			$layout = $settings['button_layout'];
+		}
+
+		switch ( $layout ) {
+			case 'equal':
+				echo '.property_actions ul li { flex:1 1 0; }';
+				break;
+
+			case 'fixed':
+				$size = isset( $settings[ $width_key ]['size'] ) ? $settings[ $width_key ]['size'] : '';
+				$unit = isset( $settings[ $width_key ]['unit'] ) ? $settings[ $width_key ]['unit'] : 'px';
+
+				if ( $size ) {
+					echo '.property_actions ul li { flex:0 0 ' . esc_attr( $size . $unit ) . '; max-width:' . esc_attr( $size . $unit ) . '; }';
+				} else {
+					echo '.property_actions ul li { flex:0 0 auto; }';
+				}
+				break;
+
+			case 'inline':
+			default:
+				echo '.property_actions ul li { flex:0 0 auto; }';
+				break;
+		}
 	}
 }
