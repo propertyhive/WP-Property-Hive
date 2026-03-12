@@ -56,39 +56,79 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->start_controls_tabs( 'button_style_tabs' );
+
+		// Normal tab
+		$this->start_controls_tab(
+			'button_style_normal',
+			[
+				'label' => __( 'Normal', 'propertyhive' ),
+				'condition' => [
+					'display' => 'buttons',
+				],
+			]
+		);
+
 		$this->add_control(
 			'button_background_color',
 			[
-				'label' => __( 'Button Background Colour', 'propertyhive' ),
-				'type' => \Elementor\Controls_Manager::COLOR,
-				'global' => [
-				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
-				],
+				'label' => __( 'Background Colour', 'propertyhive' ),
+				'type'  => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .property_actions ul li a' => 'background: {{VALUE}}',
+					'{{WRAPPER}} .property_actions ul li a' => 'background-color: {{VALUE}};',
 				],
-				'condition' => [
-		            'display' => 'buttons'
-		        ],
 			]
 		);
 
 		$this->add_control(
 			'button_text_color',
 			[
-				'label' => __( 'Button Text Colour', 'propertyhive' ),
-				'type' => \Elementor\Controls_Manager::COLOR,
-				'global' => [
-				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
-				],
+				'label' => __( 'Text Colour', 'propertyhive' ),
+				'type'  => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .property_actions ul li a' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .property_actions ul li a' => 'color: {{VALUE}};',
 				],
-				'condition' => [
-		            'display' => 'buttons'
-		        ],
 			]
 		);
+
+		$this->end_controls_tab();
+
+		// Hover tab
+		$this->start_controls_tab(
+			'button_style_hover',
+			[
+				'label' => __( 'Hover', 'propertyhive' ),
+				'condition' => [
+					'display' => 'buttons',
+				],
+			]
+		);
+
+		$this->add_control(
+			'button_background_hover_color',
+			[
+				'label' => __( 'Background Colour', 'propertyhive' ),
+				'type'  => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .property_actions ul li a:hover' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'button_text_hover_color',
+			[
+				'label' => __( 'Text Colour', 'propertyhive' ),
+				'type'  => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .property_actions ul li a:hover' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+	$this->end_controls_tabs();
 
 		$this->add_control(
 			'button_padding',
