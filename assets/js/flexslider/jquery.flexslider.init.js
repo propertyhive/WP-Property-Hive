@@ -27,6 +27,57 @@ jQuery(window).on('resize', function() {
     }
 });
 
+jQuery(function ($) {
+  $(document).on('click', '#slider .slides li a[data-fancybox]', function (e) {
+    var $li = $(this).closest('li');
+    var $slider = $(this).closest('.flexslider');
+    var group = $(this).attr('data-fancybox');
+
+    // Only handle actual image links
+    var href = $(this).attr('href') || '';
+    if (!href.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i)) {
+      return;
+    }
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    var $realItems = $slider.find('.slides li:not(.clone) a[data-fancybox="' + group + '"]');
+
+    var startIndex;
+
+    if ($li.hasClass('clone')) {
+      // Match clicked clone back to the real item by href
+      startIndex = $realItems.filter(function () {
+        return $(this).attr('href') === href;
+      }).first().parent().index();
+    } else {
+      startIndex = $realItems.index(this);
+    }
+
+    if (startIndex < 0) {
+      startIndex = 0;
+    }
+
+    $.fancybox.open(
+      $realItems.map(function () {
+        return {
+          src: $(this).attr('href'),
+          opts: {
+            caption: $(this).attr('title') || ''
+          }
+        };
+      }).get(),
+      {
+        loop: true
+      },
+      startIndex
+    );
+
+    return false;
+  });
+});
+
 function ph_init_slideshow() 
 {
     // Get all carousel elements on the page
