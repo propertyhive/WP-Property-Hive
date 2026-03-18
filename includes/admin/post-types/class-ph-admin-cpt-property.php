@@ -109,7 +109,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	    // Check if there are any properties
 	    $query = new WP_Query([
 	        'post_type'      => 'property',
-	        'post_status'    => 'any',
+	        'post_status'    => ['any', 'trash'],
 	        'posts_per_page' => 1
 	    ]);
 
