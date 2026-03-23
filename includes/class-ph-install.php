@@ -30,7 +30,7 @@ class PH_Install {
             'propertyhive_update_200_pre_pro_record_installed_plugins',
         ),
         '2.1.15' => array(
-            'propertyhive_update_2115_deactivate_template_assistant',
+            'propertyhive_deactivate_template_assistant', // different naming convention as needs to be run elsewhere too
         ),
 	);
 
@@ -145,7 +145,6 @@ class PH_Install {
 		// Do updates
 		$current_db_version = get_option( 'propertyhive_db_version' );
 
-		include( 'ph-update-functions.php' );
 		foreach ( self::get_db_update_callbacks() as $version => $update_callbacks ) {
 			if ( version_compare( $current_db_version, $version, '<' ) ) {
 				foreach ( $update_callbacks as $update_callback ) {
