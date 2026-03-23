@@ -46,6 +46,7 @@ class PH_Settings_General extends PH_Settings_Page {
             'international' => __( 'International', 'propertyhive' ),
             'gdpr'          => __( 'GDPR', 'propertyhive' ),
             'captcha'       => __( 'CAPTCHA', 'propertyhive' ),
+            'text-substitution' => __( 'Text Substitution', 'propertyhive' ),
             'misc'          => __( 'Miscellaneous', 'propertyhive' ),
         );
 
@@ -625,6 +626,61 @@ class PH_Settings_General extends PH_Settings_Page {
         ) ); // End general CAPTCHA settings
     }
 
+    /**
+     * Get text substitution settings array
+     *
+     * @return array
+     */
+    public function get_general_text_substitution_setting() {
+
+        $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+        $settings = array(
+
+            array( 'title' => __( 'Text Substitution', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'template_assistant_text_translation_settings' )
+
+        );
+
+        $existing_translations = array();
+        if ( isset($current_settings['text_translations']) && is_array($current_settings['text_translations']) && !empty($current_settings['text_translations']) )
+        {
+            foreach ( $current_settings['text_translations'] as $text_translation )
+            {
+                $existing_translations[] = '<tr>
+                    <td><input type="text" name="search[]" class="regular-text" value="' . esc_attr($text_translation['search']) . '"></td>
+                    <td><input type="text" name="replace[]" class="regular-text" value="' . esc_attr($text_translation['replace']) . '"></td>
+                </tr>';
+            }
+        }
+
+        $settings[] = array(
+            'type'      => 'html',
+            'html'      => '
+
+            <style type="text/css">.form-table .titledesc { display:none; }</style>
+
+            <table class="widefat striped" style="max-width:520px;" >
+                <thead>
+                    <tr>
+                        <th style="padding:8px 10px;" scope="col" width="50%">Text To Replace</th>
+                        <th style="padding:8px 10px;" scope="col" width="50%">Replace With</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ' . implode("", $existing_translations) . '
+                    <tr>
+                        <td><input type="text" name="search[]" class="regular-text" placeholder="e.g. Make Enquiry"></td>
+                        <td><input type="text" name="replace[]" class="regular-text" placeholder="e.g. Request Viewing"></td>
+                    </tr>
+                </tbody>
+            </table>'
+        );
+
+        $settings[] = array( 'type' => 'sectionend', 'id' => 'template_assistant_text_translation_settings');
+
+        return $settings;
+    }
+
 	/**
 	 * Get misc settings array
 	 *
@@ -812,6 +868,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 case "media": { $settings = $this->get_general_media_setting(); break; }
                 case "gdpr": { $settings = $this->get_general_gdpr_setting(); break; }
                 case "captcha": { $settings = $this->get_general_captcha_setting(); break; }
+                case "text-substitution": { $settings = $this->get_general_text_substitution_setting(); break; }
                 case "misc": { $settings = $this->get_general_misc_setting(); break; }
                 default: { die("Unknown setting section"); }
             }
@@ -911,6 +968,34 @@ class PH_Settings_General extends PH_Settings_Page {
                     $settings = $this->get_general_captcha_setting();
 
                     PH_Admin_Settings::save_fields( $settings );
+                    break;
+                }
+                case 'text-substitution':
+                {
+                    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+                    $text_translations = array();
+                    if ( isset($_POST['search']) && is_array($_POST['search']) && !empty($_POST['search']) && isset($_POST['replace']) && is_array($_POST['replace']) && !empty($_POST['replace']) )
+                    {
+                        foreach ( $_POST['search'] as $i => $search )
+                        {
+                            if ( trim($search) != '' && trim($_POST['replace'][$i]) != '' )
+                            {
+                                $text_translations[] = array(
+                                    'search' => sanitize_text_field(wp_unslash($search)),
+                                    'replace' => sanitize_text_field(wp_unslash($_POST['replace'][$i])),
+                                );
+                            }
+                        }
+                    }
+
+                    $propertyhive_template_assistant = array(
+                        'text_translations' => $text_translations,
+                    );
+
+                    $propertyhive_template_assistant = array_merge($current_settings, $propertyhive_template_assistant);
+
+                    update_option( 'propertyhive_template_assistant', $propertyhive_template_assistant );
                     break;
                 }
 				case 'misc':
