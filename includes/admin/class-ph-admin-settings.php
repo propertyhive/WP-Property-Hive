@@ -33,7 +33,12 @@ class PH_Admin_Settings {
 			$settings[] = include( 'settings/class-ph-settings-general.php' );
             $settings[] = include( 'settings/class-ph-settings-offices.php' );
             $settings[] = include( 'settings/class-ph-settings-custom-fields.php' );
-            $settings[] = include( 'settings/class-ph-settings-template-assistant.php' ); // Maybe temporary after migrating TA code into core. Remove in future version
+            $propertyhive_template_assistant_auto_deactivated = get_option('propertyhive_template_assistant_auto_deactivated', '');
+            if ( !empty($propertyhive_template_assistant_auto_deactivated) )
+            {
+            	// Only show if they had the TA active and we deactived it. Don't want it showing for new users
+	            $settings[] = include( 'settings/class-ph-settings-template-assistant.php' ); // Maybe temporary after migrating TA code into core. Remove in future version
+	        }
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
             $settings[] = include( 'settings/class-ph-settings-features.php' );
             $settings[] = include( 'settings/class-ph-settings-licenses.php' );
@@ -293,12 +298,15 @@ class PH_Admin_Settings {
 	            break;
                 
                 case 'html':
+                	$full_width = ( isset($value['full_width']) && is_bool($value['full_width']) ) ? $value['full_width'] : false;
                 ?>
                 <tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
+                		<?php if ( $full_width !== true ) { ?>
                         <th scope="row" class="titledesc">
                             <label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
                             <?php echo $tip; ?>
                         </th>
+                    	<?php } ?>
                         <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
                             <?php echo $value['html']; ?>
                         </td>
