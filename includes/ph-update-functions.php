@@ -86,31 +86,32 @@ function propertyhive_update_200_pre_pro_record_installed_plugins()
  *
  * @return void
  */
-function propertyhive_update_2115_deactivate_template_assistant()
+function propertyhive_deactivate_template_assistant()
 {
+    if ( !function_exists('is_plugin_active') ) 
+    {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
+
     $ta_plugin = 'propertyhive-template-assistant/propertyhive-template-assistant.php';
 
     if ( is_plugin_active( $ta_plugin ) || is_plugin_active_for_network( $ta_plugin ) ) 
     {
-        deactivate_plugins( $ta_plugin, true, true );
+        deactivate_plugins( 
+            $ta_plugin, 
+            true, 
+            is_plugin_active_for_network( $ta_plugin ) 
+        );
 
         update_option( 'propertyhive_template_assistant_auto_deactivated', current_time( 'mysql' ), false );
 
-        if ( is_multisite() ) 
+        /*if ( is_multisite() ) 
         {
             update_site_option( 'propertyhive_template_assistant_retired_notice', 1 );
         }
         else
         {
             update_option( 'propertyhive_template_assistant_retired_notice', 1, false );
-        }
-
-        /*add_action( 'admin_notices', function() {
-            echo '<div class="notice notice-info"><p>
-                <strong>The Template Assistant add on has been retired.</strong><br>
-                Its functionality is now built into Property Hive under \'Property Hive &gt; Settings &gt; Frontend\'.<br>
-                The add-on has been deactivated to prevent conflicts. No settings were lost.
-            </p></div>';
-        } );*/
+        }*/
     }
 }
