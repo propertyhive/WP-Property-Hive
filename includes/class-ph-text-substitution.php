@@ -16,7 +16,7 @@ class PH_Text_Substitution {
 		}
 	}
 
-	public function template_assistant_text_translation( $translated_text, $text, $domain )
+	public function do_text_translation( $translated_text, $text, $domain )
     {
     	if ( $domain != 'propertyhive' )
     	{
@@ -40,4 +40,4 @@ class PH_Text_Substitution {
     }
 }
 
-new PH_Form_Handler();
+new PH_Text_Substitution();

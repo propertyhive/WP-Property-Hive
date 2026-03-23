@@ -649,6 +649,7 @@ class PH_Settings_General extends PH_Settings_Page {
                 $existing_translations[] = '<tr>
                     <td><input type="text" name="search[]" class="regular-text" value="' . esc_attr($text_translation['search']) . '"></td>
                     <td><input type="text" name="replace[]" class="regular-text" value="' . esc_attr($text_translation['replace']) . '"></td>
+                    <td><a href="" class="delete-text-substitution" title="Delete Text Substitution"><span class="dashicons dashicons-trash"></span></a></td>
                 </tr>';
             }
         }
@@ -662,8 +663,9 @@ class PH_Settings_General extends PH_Settings_Page {
             <table class="widefat striped" style="max-width:520px;" >
                 <thead>
                     <tr>
-                        <th style="padding:8px 10px;" scope="col" width="50%">Text To Replace</th>
-                        <th style="padding:8px 10px;" scope="col" width="50%">Replace With</th>
+                        <th style="padding:8px 10px;" scope="col">Text To Replace</th>
+                        <th style="padding:8px 10px;" scope="col">Replace With</th>
+                        <th scope="col">&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -671,9 +673,26 @@ class PH_Settings_General extends PH_Settings_Page {
                     <tr>
                         <td><input type="text" name="search[]" class="regular-text" placeholder="e.g. Make Enquiry"></td>
                         <td><input type="text" name="replace[]" class="regular-text" placeholder="e.g. Request Viewing"></td>
+                        <td>&nbsp;</td>
                     </tr>
                 </tbody>
-            </table>'
+            </table>
+
+            <script>
+                jQuery(document).ready(function()
+                {
+                    jQuery(\'a.delete-text-substitution\').on(\'click\', function(e)
+                    {
+                        e.preventDefault();
+
+                        jQuery(this).closest(\'tr\').find(\'input\').val(\'\');
+
+                        setTimeout(function() {
+                            jQuery(\'.submit button[type="submit"]\').trigger(\'click\');
+                        }, 0);
+                    });
+                });
+            </script>'
         );
 
         $settings[] = array( 'type' => 'sectionend', 'id' => 'template_assistant_text_translation_settings');
