@@ -637,7 +637,7 @@ class PH_Settings_General extends PH_Settings_Page {
 
         $settings = array(
 
-            array( 'title' => __( 'Text Substitution', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'template_assistant_text_translation_settings' )
+            array( 'title' => __( 'Text Substitution', 'propertyhive' ), 'type' => 'title', 'desc' => 'Replace specific words or phrases used throughout Property Hive with your own preferred wording.', 'id' => 'template_assistant_text_translation_settings' )
 
         );
 
@@ -665,7 +665,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     <tr>
                         <th style="padding:8px 10px;" scope="col">Text To Replace</th>
                         <th style="padding:8px 10px;" scope="col">Replace With</th>
-                        <th scope="col">&nbsp;</th>
+                        <th style="padding:8px 10px;" scope="col">&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>

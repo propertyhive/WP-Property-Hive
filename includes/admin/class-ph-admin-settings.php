@@ -39,6 +39,7 @@ class PH_Admin_Settings {
             	// Only show if they had the TA active and we deactived it. Don't want it showing for new users
 	            $settings[] = include( 'settings/class-ph-settings-template-assistant.php' ); // Maybe temporary after migrating TA code into core. Remove in future version
 	        }
+	        $settings[] = include( 'settings/class-ph-settings-frontend.php' );
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
             $settings[] = include( 'settings/class-ph-settings-features.php' );
             $settings[] = include( 'settings/class-ph-settings-licenses.php' );

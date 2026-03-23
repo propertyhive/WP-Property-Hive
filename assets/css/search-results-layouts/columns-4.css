@@ -1,0 +1,14 @@
+/* SEARCH RESULTS CSS */
+.propertyhive ul.properties li { box-sizing:border-box; width:23.5%; margin-left:2%; border-bottom:0; clear:none !important; }
+.propertyhive ul.properties li:nth-child(4n+1) { clear:left !important; margin-left:0; }
+
+@media (max-width:990px) {
+	.propertyhive ul.properties li.first { clear:none !important; }
+	.propertyhive ul.properties li { width:49%; margin-left:2%; }
+	.propertyhive ul.properties li:nth-child(4n+1) { clear:none !important; margin-left:2%; }
+	.propertyhive ul.properties li:nth-child(2n+1) { clear:left !important; margin-left:0; }
+}
+
+@media (max-width:590px) {
+	.propertyhive ul.properties li { clear:both !important; float:none !important; width:100% !important; margin-left:0 !important; }
+}
