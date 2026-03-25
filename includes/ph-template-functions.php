@@ -1840,3 +1840,203 @@ if ( ! function_exists( 'propertyhive_my_account_delete' ) ) {
         ph_get_template( 'account/delete.php' );
     }
 }
+
+add_filter( 'loop_search_results_per_page', 'template_assistant_loop_search_results_per_page' );
+function template_assistant_loop_search_results_per_page( $cols )
+{
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( isset($current_settings['search_result_columns']) && in_array($current_settings['search_result_columns'], array(3,4)) )
+    {
+        return 12;
+    }
+
+    return $cols;
+}
+
+add_filter( 'loop_search_results_columns', 'template_assistant_search_result_columns' );
+function template_assistant_search_result_columns( $cols = 1 )
+{
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( isset($current_settings['search_result_columns']) && in_array($current_settings['search_result_columns'], array(1,2,3,4)) )
+    {
+        return $current_settings['search_result_columns'];
+    }
+
+    return 1;
+}
+
+add_filter( 'post_class', 'template_assistant_property_columns_post_class', 20, 3 );
+function template_assistant_property_columns_post_class( $classes, $class = '', $post_id = '' ) 
+{
+    if ( ! $post_id || get_post_type( $post_id ) !== 'property' )
+        return $classes;
+
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( isset($current_settings['search_result_columns']) && in_array($current_settings['search_result_columns'], array(2,3,4)) )
+    {
+        $property = get_property( $post_id );
+
+        if ( $property ) 
+        {
+            $classes[] = 'ph-cols-' . $current_settings['search_result_columns'];
+
+            if ( ($key = array_search('clear', $classes)) !== false ) 
+            {
+                unset($classes[$key]);
+            }
+        }
+    }
+
+    return $classes;
+}
+
+add_action( 'wp_head',  'load_template_assistant_styles' );
+function load_template_assistant_styles()
+{
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( 
+        is_post_type_archive('property') 
+        ||
+        ( isset($current_settings['search_result_css_all_pages']) && $current_settings['search_result_css_all_pages'] == 'yes' )
+    )
+    {
+        if ( isset($current_settings['search_result_css']) )
+        {
+            echo '<style type="text/css">
+            ' . $current_settings['search_result_css'] . '
+            </style>';
+        }
+    }
+}
+
+add_filter( 'propertyhive_default_search_results_orderby', 'template_assistant_change_default_order' );
+function template_assistant_change_default_order( $orderby )
+{
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( isset($current_settings['search_result_default_order']) && $current_settings['search_result_default_order'] != '' )
+    {
+        return $current_settings['search_result_default_order'];
+    }
+
+    return $orderby;
+}
+
+add_filter( 'property_search_results_thumbnail_size', 'template_assistant_search_result_image_size_changes' );
+function template_assistant_search_result_image_size_changes( $image_size )
+{
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( isset($current_settings['search_result_image_size']) && $current_settings['search_result_image_size'] != '' )
+    {
+        $image_size = $current_settings['search_result_image_size'];
+    }
+
+    return $image_size;
+}
+
+add_action( 'wp', 'template_assistant_search_result_field_changes' );
+function template_assistant_search_result_field_changes()
+{
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( isset($current_settings['search_result_fields']) && is_array($current_settings['search_result_fields']) && !empty($current_settings['search_result_fields']) )
+    {
+        remove_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_floor_area', 5 );
+        remove_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_price', 10 );
+        remove_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_summary', 20 );
+        remove_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_actions', 30 );
+
+        $priority = 5;
+        foreach ( $current_settings['search_result_fields'] as $search_result_field )
+        {
+            if ( substr($search_result_field, 0, 12) == 'custom_field' )
+            {
+                // custom field output here
+                $custom_field = substr($search_result_field, 12);
+
+                add_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_custom_field', $priority );
+
+                $priority += 5;
+                continue;
+            }
+
+            switch ( $search_result_field )
+            {
+                case "price":
+                case "floor_area":
+                case "summary":
+                case "actions": 
+                {
+                    add_action( 'propertyhive_after_search_results_loop_item_title', 'propertyhive_template_loop_' . $search_result_field, $priority );
+                    break;
+                }
+                case "availability":
+                {
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="availability">' . $property->availability . '</div>'; }, $priority );
+                    break;
+                }
+                case "property_type":
+                {
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="property-type">' . $property->property_type . '</div>'; }, $priority );
+                    break;
+                }
+                case "available_date":
+                {
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; if ( $property->department == 'residential-lettings' && $property->get_available_date() != '' ) { echo '<div class="available-date">' . $property->get_available_date() . '</div>'; } }, $priority );
+                    break;
+                }
+                case "rooms":
+                {
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { 
+                        global $property; 
+
+                        if ( ($property->bedrooms != '' && $property->bedrooms != '0') || ($property->bathrooms != '' && $property->bathrooms != '0') || ($property->reception_rooms != '' && $property->reception_rooms != '0') )
+                        {
+                            echo '<div class="rooms">';
+                            if ( $property->bedrooms != '' && $property->bedrooms != '0' ) { echo '<div class="room room-bedrooms"><span class="room-count">' . $property->bedrooms . '</span> <span class="room-label">Bedroom' . ( $property->bedrooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            if ( $property->bathrooms != '' && $property->bathrooms != '0' ) { echo '<div class="room room-bathrooms"><span class="room-count">' . $property->bathrooms . '</span> <span class="room-label">Bathroom' . ( $property->bathrooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            if ( $property->reception_rooms != '' && $property->reception_rooms != '0' ) { echo '<div class="room room-receptions"><span class="room-count">' . $property->reception_rooms . '</span> <span class="room-label">Reception' . ( $property->reception_rooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            echo '</div>'; 
+                        }
+                    }, $priority );
+                    break;
+                }
+                default:
+                {
+                    echo 'unknown search result field requested';
+                }
+            }
+
+            $priority += 5;
+        }
+    }
+}
+
+function propertyhive_template_loop_custom_field()
+{
+    global $property; 
+
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    foreach ( $current_settings['search_result_fields'] as $search_result_field )
+    {
+        if ( substr($search_result_field, 0, 12) == 'custom_field' )
+        {
+            // custom field output here
+            $custom_field = substr($search_result_field, 12);
+
+            $value = $property->{$custom_field};
+            $value = is_array($value) ? implode(", ", $value) : $value;
+
+            if ( $value != '' )
+            {
+                echo '<div class="custom-field custom-field-' . sanitize_title(trim($custom_field, "_")) . '">' . $value . '</div>';
+            }
+        }
+    }
+}

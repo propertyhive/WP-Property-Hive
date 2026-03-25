@@ -1423,14 +1423,14 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 	{
 		global $current_section;
 
+        $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
 		if ( $current_section != '' ) 
         {
         	switch ($current_section)
         	{
         		case "flags": 
                 {
-                	$current_settings = get_option( 'propertyhive_template_assistant', array() );
-                	
                     $propertyhive_template_assistant = array(
                         'flags_active' => ( ( isset($_POST['flags_active']) ) ? sanitize_text_field($_POST['flags_active']) : '' ),
                         'flags_active_single' => ( ( isset($_POST['flags_active_single']) ) ? sanitize_text_field($_POST['flags_active_single']) : '' ),
@@ -1447,8 +1447,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         		case "addsearchform": 
                 case "editsearchform": 
                 {
-                	$current_settings = get_option( 'propertyhive_template_assistant', array() );
-
                     $current_id = ( !isset( $_REQUEST['id'] ) ) ? '' : sanitize_title( $_REQUEST['id'] );
 
                     $existing_search_forms = ( (isset($current_settings['search_forms'])) ? $current_settings['search_forms'] : array() );
@@ -1624,7 +1622,43 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 		}
 		else
 		{
-			PH_Admin_Settings::save_fields( $this->get_settings() );
+			$search_results_fields = array();
+            if ( isset($_POST['search_result_fields']) && is_array($_POST['search_result_fields']) )
+            {
+                $search_results_fields = $_POST['search_result_fields'];
+
+                $new_search_results_fields = array();
+                foreach ( $search_results_fields as $search_results_field )
+                {
+                    if ( $search_results_field == 'custom_field' )
+                    {  
+                        if ( isset($_POST['search_result_fields_custom_field']) && $_POST['search_result_fields_custom_field'] != '' )
+                        {
+                            $new_search_results_fields[] = ph_clean($_POST['search_result_fields_custom_field']);
+                        }
+                    }
+                    else
+                    {
+                        $new_search_results_fields[] = $search_results_field;
+                    }
+                }
+
+                $search_results_fields = $new_search_results_fields;
+            }
+
+            $propertyhive_template_assistant = array(
+                'search_result_default_order' => ph_clean($_POST['search_result_default_order']),
+                'search_result_columns' => (int)$_POST['search_result_columns'],
+                'search_result_layout' => (int)$_POST['search_result_layout'],
+                'search_result_fields' => $search_results_fields,
+                'search_result_image_size' => ( isset($_POST['search_result_image_size']) ? ph_clean($_POST['search_result_image_size']) : 'medium' ),
+                'search_result_css' => wp_unslash($_POST['search_result_css']),
+                'search_result_css_all_pages' => isset($_POST['search_result_css_all_pages']) ? 'yes' : '',
+            );
+
+            $propertyhive_template_assistant = array_merge($current_settings, $propertyhive_template_assistant);
+
+            update_option( 'propertyhive_template_assistant', $propertyhive_template_assistant );
 		}
 	}
 }
