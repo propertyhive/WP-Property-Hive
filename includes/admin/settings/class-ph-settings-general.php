@@ -1115,6 +1115,41 @@ class PH_Settings_General extends PH_Settings_Page {
                     }
                 }
             }
+
+            // Update departments in any search forms
+            $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+            if ( isset($current_settings['search_forms']) && !empty($current_settings['search_forms']) )
+            {
+                foreach ( $current_settings['search_forms'] as $id => $form )
+                {
+                    if ( isset($form['active_fields']) && isset($form['active_fields']['department']) && isset($form['active_fields']['department']['options']) )
+                    {
+                        // We have a department field in this form. Check options match current department settings
+
+                        $departments = ph_get_departments();
+
+                        foreach ( $departments as $key => $value )
+                        {
+                            $department_active = get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) );
+
+                            if ( $department_active != 'yes' && isset($form['active_fields']['department']['options'][$key]) )
+                            {
+                                unset($form['active_fields']['department']['options'][$key]);
+                            }
+
+                            if ( $department_active == 'yes' && !isset($form['active_fields']['department']['options'][$key]) )
+                            {
+                                $form['active_fields']['department']['options'][$key] = $value;
+                            }
+                        }
+
+                        $current_settings['search_forms'][$id]['active_fields'] = $form['active_fields'];
+                    }
+                }
+            }
+
+            update_option( 'propertyhive_template_assistant', $current_settings );
 		}
 	}
 
