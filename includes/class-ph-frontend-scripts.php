@@ -119,10 +119,35 @@ class PH_Frontend_Scripts {
 
 		$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/';
 
-		if ( wp_script_is( 'propertyhive_search' ) ) {
-			wp_localize_script( 'propertyhive_search', 'propertyhive_search_params', apply_filters( 'propertyhive_search_params', array(
-				'custom_departments'	=> ph_get_custom_departments(),
-			) ) );
+		if ( wp_script_is( 'propertyhive_search' ) ) 
+		{
+			$params = array(
+				'custom_departments' => ph_get_custom_departments(),
+				'do_image_resize' => false,
+                'image_ratio' => 2 / 3,
+            );
+
+			$current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+	        if ( 
+	            is_post_type_archive('property') 
+	            ||
+	            ( isset($current_settings['search_result_css_all_pages']) && $current_settings['search_result_css_all_pages'] == 'yes' )
+	        )
+	        {
+	            if (
+	                isset($current_settings['search_result_layout']) &&
+	                isset($current_settings['search_result_layout']) == 2
+	            )
+	            {
+	            	$params['do_image_resize'] = true;
+	            }
+	        }
+
+            $params = apply_filters( 'propertyhive_search_params', $params );
+            $params = apply_filters( 'propertyhive_template_assistant_script_params', $params );
+
+			wp_localize_script( 'propertyhive_search', 'propertyhive_search_params', $params );
 		}
 
 		if ( wp_script_is( 'propertyhive_make_enquiry' ) ) 
