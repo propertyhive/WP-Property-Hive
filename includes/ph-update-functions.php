@@ -86,32 +86,105 @@ function propertyhive_update_200_pre_pro_record_installed_plugins()
  *
  * @return void
  */
-function propertyhive_deactivate_template_assistant()
+function propertyhive_deactivate_template_assistant() 
 {
-    if ( !function_exists('is_plugin_active') ) 
+    if ( ! function_exists( 'is_plugin_active' ) ) 
     {
         require_once ABSPATH . 'wp-admin/includes/plugin.php';
     }
 
     $ta_plugin = 'propertyhive-template-assistant/propertyhive-template-assistant.php';
 
-    if ( is_plugin_active( $ta_plugin ) || is_plugin_active_for_network( $ta_plugin ) ) 
+    // Single site.
+    if ( ! is_multisite() ) 
     {
-        deactivate_plugins( 
-            $ta_plugin, 
-            true, 
-            is_plugin_active_for_network( $ta_plugin ) 
+        if ( is_plugin_active( $ta_plugin ) ) 
+        {
+            deactivate_plugins( $ta_plugin, true, false );
+
+            update_option(
+                'propertyhive_template_assistant_auto_deactivated',
+                current_time( 'mysql' ),
+                false
+            );
+
+            return;
+        }
+
+        $existing_ta_settings        = get_option( 'propertyhive_template_assistant', null );
+        $existing_ta_settings_backup = get_option( 'propertyhive_template_assistant_backup', null );
+
+        if ( null !== $existing_ta_settings && null === $existing_ta_settings_backup ) {
+            update_option(
+                'propertyhive_template_assistant_backup',
+                array(
+                    'backed_up_at' => current_time( 'mysql' ),
+                    'settings'     => $existing_ta_settings,
+                ),
+                false
+            );
+
+            delete_option( 'propertyhive_template_assistant' );
+        }
+
+        return;
+    }
+
+    // Multisite: handle network-active first.
+    if ( is_plugin_active_for_network( $ta_plugin ) ) 
+    {
+        deactivate_plugins( $ta_plugin, true, true );
+
+        update_site_option(
+            'propertyhive_template_assistant_auto_deactivated',
+            current_time( 'mysql' )
         );
 
-        update_option( 'propertyhive_template_assistant_auto_deactivated', current_time( 'mysql' ), false );
+        return;
+    }
 
-        /*if ( is_multisite() ) 
+    // Multisite: handle each site individually.
+    $sites = get_sites(
+        array(
+            'fields' => 'ids',
+            'number' => 0,
+        )
+    );
+
+    foreach ( $sites as $blog_id ) 
+    {
+        switch_to_blog( $blog_id );
+
+        if ( is_plugin_active( $ta_plugin ) ) 
         {
-            update_site_option( 'propertyhive_template_assistant_retired_notice', 1 );
+            deactivate_plugins( $ta_plugin, true, false );
+
+            update_option(
+                'propertyhive_template_assistant_auto_deactivated',
+                current_time( 'mysql' ),
+                false
+            );
+
+            restore_current_blog();
+            continue;
         }
-        else
-        {
-            update_option( 'propertyhive_template_assistant_retired_notice', 1, false );
-        }*/
+
+        $existing_ta_settings        = get_option( 'propertyhive_template_assistant', null );
+        $existing_ta_settings_backup = get_option( 'propertyhive_template_assistant_backup', null );
+
+        if ( null !== $existing_ta_settings && null === $existing_ta_settings_backup ) {
+            update_option(
+                'propertyhive_template_assistant_backup',
+                array(
+                    'backed_up_at' => current_time( 'mysql' ),
+                    'settings'     => $existing_ta_settings,
+                ),
+                false
+            );
+
+            delete_option( 'propertyhive_template_assistant' );
+        }
+
+        restore_current_blog();
     }
 }

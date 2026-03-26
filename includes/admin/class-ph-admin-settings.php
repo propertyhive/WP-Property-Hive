@@ -138,7 +138,7 @@ class PH_Admin_Settings {
 	 * @return void
 	 */
 	public static function output() {
-	    global $current_section, $current_tab;
+	    global $current_section, $current_tab, $redirect_after_save;
 
 	    do_action( 'propertyhive_settings_start' );
 
@@ -895,37 +895,6 @@ class PH_Admin_Settings {
 
 	    return true;
 	}
-
-	/**
-	 * Checks which method we're using to serve downloads
-	 *
-	 * If using force or x-sendfile, this ensures the .htaccess is in place
-	 *
-	 * @access public
-	 * @return void
-	 */
-	/*public static function check_download_folder_protection() {
-		$upload_dir 		= wp_upload_dir();
-		$downloads_url 		= $upload_dir['basedir'] . '/propertyhive_uploads';
-		$download_method	= get_option('propertyhive_file_download_method');
-
-		if ( $download_method == 'redirect' ) {
-
-			// Redirect method - don't protect
-			if ( file_exists( $downloads_url . '/.htaccess' ) )
-				unlink( $downloads_url . '/.htaccess' );
-
-		} else {
-
-			// Force method - protect, add rules to the htaccess file
-			if ( ! file_exists( $downloads_url . '/.htaccess' ) ) {
-				if ( $file_handle = @fopen( $downloads_url . '/.htaccess', 'w' ) ) {
-					fwrite( $file_handle, 'deny from all' );
-					fclose( $file_handle );
-				}
-			}
-		}
-	}*/
 }
 
 endif;

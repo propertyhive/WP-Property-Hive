@@ -57,6 +57,13 @@ class PH_Admin_Menus {
 		} elseif ( '' === $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}", ! empty( $_POST['save'] ) ) ) { // WPCS: input var okay, CSRF ok.
 			PH_Admin_Settings::save();
 		}
+
+		$redirect_after_save = empty( $_POST['redirect'] ) ? '' : sanitize_url( wp_unslash( $_POST['redirect'] ) );
+		if ( !empty($redirect_after_save) )
+		{
+			wp_safe_redirect($redirect_after_save . '&ph_message=' . __( 'Your settings have been saved.', 'propertyhive' ) );
+			die();
+		}
 	}
 
 	public function remove_from_admin_bar( $wp_admin_bar )
