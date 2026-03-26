@@ -296,7 +296,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         return apply_filters( 'propertyhive_custom_fields_settings', array(
 
-            array( 'title' => __( 'Field Values', 'propertyhive' ), 'type' => 'title', 'desc' => __( 'Manage the selectable values used in dropdowns, filters and fields across properties, contacts and other records.', 'propertyhive' ), 'id' => 'custom_field_options' ),
+            array( 'title' => __( 'Field Values', 'propertyhive' ), 'type' => 'title', 'desc' => __( 'Manage the values used in dropdowns, filters and fields across properties, contacts and other records.', 'propertyhive' ), 'id' => 'custom_field_options' ),
             
             array(
                 'type'      => 'html',
@@ -314,7 +314,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      * Output the settings
      */
     public function output() {
-        global $current_section;
+        global $current_section, $redirect_after_save;
 
         if ( $current_section ) 
         {
@@ -336,6 +336,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 case "editadditionalfield":
                 {
                     $settings = $this->get_custom_fields_additional_field_settings();
+
+                    $redirect_after_save = admin_url('admin.php?page=ph-settings&tab=customfields&section=additional');
                 
                     PH_Admin_Settings::output_fields( $settings );
 
@@ -392,7 +394,12 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                 }
                             }
                         }
-                        
+
+                        if ( strpos($current_section, '-delete') === FALSE )
+                        {
+                            $redirect_after_save = admin_url('admin.php?page=ph-settings&tab=customfields&section=' . $current_section);
+                        }
+
                         PH_Admin_Settings::output_fields( $settings );
                     }
                     else
