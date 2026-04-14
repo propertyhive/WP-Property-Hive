@@ -102,45 +102,75 @@ function propertyhive_deactivate_template_assistant()
         {
             deactivate_plugins( $ta_plugin, true, false );
 
-            update_option(
-                'propertyhive_template_assistant_auto_deactivated',
-                current_time( 'mysql' ),
-                false
-            );
+            $auto_deactivated = get_option( 'propertyhive_template_assistant_auto_deactivated', null );
 
-            return;
+            if ( null === $auto_deactivated ) 
+            {
+                update_option(
+                    'propertyhive_template_assistant_auto_deactivated',
+                    current_time( 'mysql' ),
+                    false
+                );
+            }
+
+            $existing_ta_settings        = get_option( 'propertyhive_template_assistant', null );
+            $existing_ta_settings_backup = get_option( 'propertyhive_template_assistant_backup', null );
+
+            if ( null !== $existing_ta_settings && null === $existing_ta_settings_backup ) 
+            {
+                update_option(
+                    'propertyhive_template_assistant_backup',
+                    array(
+                        'backed_up_at' => current_time( 'mysql' ),
+                        'settings'     => $existing_ta_settings,
+                    ),
+                    false
+                );
+            }
         }
+        else
+        {
+            // TA plugin not active. Take backup of settings if exists and empty current settings
+            $existing_ta_settings        = get_option( 'propertyhive_template_assistant', null );
+            $existing_ta_settings_backup = get_option( 'propertyhive_template_assistant_backup', null );
 
-        $existing_ta_settings        = get_option( 'propertyhive_template_assistant', null );
-        $existing_ta_settings_backup = get_option( 'propertyhive_template_assistant_backup', null );
+            if ( null !== $existing_ta_settings && null === $existing_ta_settings_backup ) 
+            {
+                update_option(
+                    'propertyhive_template_assistant_backup',
+                    array(
+                        'backed_up_at' => current_time( 'mysql' ),
+                        'settings'     => $existing_ta_settings,
+                    ),
+                    false
+                );
 
-        if ( null !== $existing_ta_settings && null === $existing_ta_settings_backup ) {
-            update_option(
-                'propertyhive_template_assistant_backup',
-                array(
-                    'backed_up_at' => current_time( 'mysql' ),
-                    'settings'     => $existing_ta_settings,
-                ),
-                false
-            );
+                delete_option( 'propertyhive_template_assistant' );
+            }
 
-            delete_option( 'propertyhive_template_assistant' );
         }
 
         return;
     }
 
+    $was_network_active = false;
+
     // Multisite: handle network-active first.
     if ( is_plugin_active_for_network( $ta_plugin ) ) 
     {
+        $was_network_active = true;
+
         deactivate_plugins( $ta_plugin, true, true );
 
-        update_site_option(
-            'propertyhive_template_assistant_auto_deactivated',
-            current_time( 'mysql' )
-        );
+        $auto_deactivated = get_site_option( 'propertyhive_template_assistant_auto_deactivated', null );
 
-        return;
+        if ( null === $auto_deactivated ) 
+        {
+            update_site_option(
+                'propertyhive_template_assistant_auto_deactivated',
+                current_time( 'mysql' )
+            );
+        }
     }
 
     // Multisite: handle each site individually.
@@ -155,34 +185,54 @@ function propertyhive_deactivate_template_assistant()
     {
         switch_to_blog( $blog_id );
 
-        if ( is_plugin_active( $ta_plugin ) ) 
+        if ( $was_network_active || is_plugin_active( $ta_plugin ) ) 
         {
             deactivate_plugins( $ta_plugin, true, false );
 
-            update_option(
-                'propertyhive_template_assistant_auto_deactivated',
-                current_time( 'mysql' ),
-                false
-            );
+            $auto_deactivated = get_option( 'propertyhive_template_assistant_auto_deactivated', null );
 
-            restore_current_blog();
-            continue;
+            if ( null === $auto_deactivated ) 
+            {
+                update_option(
+                    'propertyhive_template_assistant_auto_deactivated',
+                    current_time( 'mysql' ),
+                    false
+                );
+            }
+
+            $existing_ta_settings        = get_option( 'propertyhive_template_assistant', null );
+            $existing_ta_settings_backup = get_option( 'propertyhive_template_assistant_backup', null );
+
+            if ( null !== $existing_ta_settings && null === $existing_ta_settings_backup ) {
+                update_option(
+                    'propertyhive_template_assistant_backup',
+                    array(
+                        'backed_up_at' => current_time( 'mysql' ),
+                        'settings'     => $existing_ta_settings,
+                    ),
+                    false
+                );
+            }
         }
+        else
+        {
+            // TA plugin not active. Take backup of settings if exists and empty current settings
+            $existing_ta_settings        = get_option( 'propertyhive_template_assistant', null );
+            $existing_ta_settings_backup = get_option( 'propertyhive_template_assistant_backup', null );
 
-        $existing_ta_settings        = get_option( 'propertyhive_template_assistant', null );
-        $existing_ta_settings_backup = get_option( 'propertyhive_template_assistant_backup', null );
+            if ( null !== $existing_ta_settings && null === $existing_ta_settings_backup ) 
+            {
+                update_option(
+                    'propertyhive_template_assistant_backup',
+                    array(
+                        'backed_up_at' => current_time( 'mysql' ),
+                        'settings'     => $existing_ta_settings,
+                    ),
+                    false
+                );
 
-        if ( null !== $existing_ta_settings && null === $existing_ta_settings_backup ) {
-            update_option(
-                'propertyhive_template_assistant_backup',
-                array(
-                    'backed_up_at' => current_time( 'mysql' ),
-                    'settings'     => $existing_ta_settings,
-                ),
-                false
-            );
-
-            delete_option( 'propertyhive_template_assistant' );
+                delete_option( 'propertyhive_template_assistant' );
+            }
         }
 
         restore_current_blog();
