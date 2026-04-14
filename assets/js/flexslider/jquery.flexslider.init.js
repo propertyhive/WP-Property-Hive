@@ -28,6 +28,7 @@ jQuery(window).on('resize', function() {
 });
 
 jQuery(function ($) {
+  $(document).off('click.fb-start', '[data-fancybox]');
   $(document).on('click', '#slider .slides li a[data-fancybox]', function (e) {
     var $li = $(this).closest('li');
     var $slider = $(this).closest('.flexslider');
