@@ -149,6 +149,37 @@ class PH_Settings_Features extends PH_Settings_Page {
 
             if ( $slug == 'propertyhive-template-assistant' )
             {
+                echo '<li style="visibility:hidden" class="';
+                if ( isset($feature['categories']) && is_array($feature['categories']) && !empty($feature['categories']) )
+                {
+                    echo esc_attr(implode(" ", $feature['categories']));
+                }
+
+                $pro = false;
+
+                echo '">
+                    <div class="inner"' . ( !$can_use ? ' style="border:1px solid #900"' : '' ) . '>
+                        <h3>' . ( ( isset($feature['dashicon']) && !empty($feature['dashicon']) ) ? '<span class="dashicons ' . esc_attr($feature['dashicon']) . '"></span> ' : '' ) . esc_html($feature['name']) . '</h3> 
+                        <span class="free"><span>FREE</span></span>
+                    ';
+
+                    $links = array();
+                    $links[] = 'This feature has moved. <a href="https://wp-property-hive.com/template-assistant-is-now-part-of-property-hive-core-plugin?src=plugin-feature-settings" target="_blank" style="text-decoration:none">' . esc_html(__( 'Read More', 'propertyhive' )) . '</a>';
+                    
+                    echo '<div style="float:right; padding-top:6px;">';
+                    echo implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links);
+                    echo '</div>';
+
+                    echo '<label class="switch">
+                      <input type="checkbox" name="" disabled value="">
+                      <span class="slider round" style="pointer-events:none; opacity:0.5"></span>
+                    </label>';
+
+                    echo '<div class="loading"><img src="' . esc_url(PH()->plugin_url() . '/assets/images/admin/loading.gif') . '" alt=""></div>';
+
+                    echo '</div>';
+                echo '</li>';
+
                 continue;
             }
 
