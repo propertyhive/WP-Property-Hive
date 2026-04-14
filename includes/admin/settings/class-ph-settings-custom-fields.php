@@ -963,7 +963,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_setting($current_section) {
         
-        $sections = $this->get_sections();
+        $sections = $this->custom_field_sections;
         
         return apply_filters( 'propertyhive_custom_fields_' . $current_section . '_settings', array(
 
