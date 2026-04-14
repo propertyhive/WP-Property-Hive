@@ -29,7 +29,7 @@ class PH_Install {
         '2.0.0' => array(
             'propertyhive_update_200_pre_pro_record_installed_plugins',
         ),
-        '2.1.15' => array(
+        '2.2.0' => array(
             'propertyhive_deactivate_template_assistant', // different naming convention as needs to be run elsewhere too
         ),
 	);
