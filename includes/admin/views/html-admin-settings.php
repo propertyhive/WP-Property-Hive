@@ -49,6 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 }
             ?>
         	<input type="hidden" name="subtab" id="last_tab" />
+            <input type="hidden" name="redirect" value="<?php echo esc_url( !empty($redirect_after_save) ? $redirect_after_save : '' ); ?>">
         	<?php wp_nonce_field( 'propertyhive-settings' ); ?>
         </p>
 	</form>

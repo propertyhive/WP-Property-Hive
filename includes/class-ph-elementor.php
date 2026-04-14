@@ -302,6 +302,19 @@ class PH_Elementor {
 			'Property Search Order',
 		);
 
+		$current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+        $custom_fields = ( (isset($current_settings['custom_fields'])) ? $current_settings['custom_fields'] : array() );
+
+        foreach ( $custom_fields as $custom_field )
+        {
+            if ( substr($custom_field['meta_box'], 0, 9) == 'property_' || substr($custom_field['meta_box'], 0, 7) == 'office_' )
+            {
+                $widgets[] = 'Property Additional Field';
+                break;
+            }
+        }
+
 		$widgets = apply_filters( 'propertyhive_elementor_widgets', $widgets );
 
 		foreach ( $widgets as $widget )

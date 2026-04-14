@@ -83,7 +83,7 @@ class PH_Settings_Features extends PH_Settings_Page {
         echo '</div>';
 
         // Check if AI Property Search is in list. If not, it can't have been launched yet and to show promo instead
-        $ai_property_search_found = false;
+        /*$ai_property_search_found = false;
         foreach ( $features as $feature )
         {
             $slug = explode("/", $feature['wordpress_plugin_file']);
@@ -94,7 +94,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                 $ai_property_search_found = true;
                 break;
             }
-        }
+        }*/
 
         // list of features
         echo '<div class="pro-features">';
@@ -102,7 +102,7 @@ class PH_Settings_Features extends PH_Settings_Page {
         $i = 0;
         foreach ( $features as $feature )
         {
-            if ( $i == 0 && $ai_property_search_found === false )
+            /*if ( $i == 0 && $ai_property_search_found === false )
             {
                 // Show ad
                 $feature_status = false;
@@ -142,10 +142,15 @@ class PH_Settings_Features extends PH_Settings_Page {
                 echo '</li>';
 
                 ++$i;
-            }
+            }*/
 
             $slug = explode("/", $feature['wordpress_plugin_file']);
             $slug = $slug[0];
+
+            if ( $slug == 'propertyhive-template-assistant' )
+            {
+                continue;
+            }
 
             $feature_status = false;
 

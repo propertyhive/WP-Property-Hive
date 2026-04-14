@@ -1,0 +1,4 @@
+/* CSS SPECIFIC TO CARD LAYOUT */
+.propertyhive ul.properties li .thumbnail { float:none; width:100%; }
+.propertyhive ul.properties li .thumbnail img { width:100%; }
+.propertyhive ul.properties li .details { float:none; width:100%; }

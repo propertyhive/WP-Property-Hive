@@ -13,6 +13,19 @@ jQuery( function ( $ ) {
 	// Tooltips
 	$( document.body ).trigger( 'init_tooltips' );
 
+	$( '#ph_dismiss_notice_retired_template_assistant' ).click(function(e)
+	{
+		e.preventDefault();
+		
+		var data = {
+			'action': 'propertyhive_dismiss_notice_retired_template_assistant'
+		};
+
+		$.post( ajaxurl, data, function(response) {
+			$( '#ph_notice_retired_template_assistant' ).fadeOut();
+		});
+	});
+
 	$( '#ph_dismiss_notice_leave_review' ).click(function(e)
 	{
 		e.preventDefault();
