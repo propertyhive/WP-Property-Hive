@@ -2,8 +2,8 @@
 Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
-Tested up to: 6.8.3
-Stable tag: 2.1.14
+Tested up to: 6.9
+Stable tag: 2.2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,28 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.2.0 - 2026-04-14 =
+* Added Template Assistant features to core, deprecating the Template Assistant plugin. Automatically deactivate the existing Template Assistant plugin if found to be active
+* Added 'Template Assistant' settings tab for users that previously had it active to highlight the changes made and where to find the new functionality
+* Added new 'Frontend' settings tab containing existing Template Assistant frontend related features
+* Added new 'Text Substitution' subsection to 'General' settings tab containing existing Template Assistant text substitution feature
+* Added 'Additional Fields' subsection to new 'Field Manager' tab
+* Added support for Instagram reels in Elementor Embedded Virtual Tours widget
+* Added Egypt to list of countries
+* Added MyDeposits Scotland deposit scheme plus a new filter to customise these further
+* Added rate limiting tactics to OSM geocoding requests on property edit screen
+* Added filters applied to override the OSM marker icon size and anchor
+* Updated 'Custom Fields' settings tab name to 'Field Manager'
+* Updated Elementor widgets 'Property Actions' and 'Property Features' to include more settings allowing further customisation
+* Updated properties splash screen to ensure it doesn't show if trashed properties exist
+* Updated result count template logic, casting numbers to integers
+* Updated activation of pro features so that they are validated and served from the Property Hive servers instead of just downloading the ZIP direct
+* Updated saving of offices and field values so it takes you back to the main screen instead of showing the form again
+* Corrected issue with bedrooms passed into [properties] shortcode not working
+* Corrected issue with price actual not being set when no country exists on a property
+* Corrected issue with fancybox images opened from slider being duplicated due to flexslider cloning the images
+* Declared compatibility for WordPress 6.9
 
 = 2.1.14 - 2025-12-01 =
 * Added support for Cloudflare Turnstile as a CAPTCHA service
