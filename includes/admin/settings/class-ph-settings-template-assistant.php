@@ -79,7 +79,7 @@ class PH_Settings_Template_Assistant extends PH_Settings_Page {
                 <p>
                     We\'re simplifying things by moving the Template Assistant features to new locations within the core plugin.
                     <br><br>
-                    <a href="https://wp-property-hive.com/template-assistant-is-now-part-of-property-hive-core-plugin" target="_blank" class="button button-primary">' . __('Read more', 'propertyhive' ) . '</a>
+                    <a href="https://wp-property-hive.com/template-assistant-is-now-part-of-property-hive-core-plugin?src=plugin-ta-temp-splash-screen" target="_blank" class="button button-primary">' . __('Read more', 'propertyhive' ) . '</a>
                 </p>
             </div>
 
