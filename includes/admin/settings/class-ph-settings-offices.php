@@ -310,7 +310,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
      * Output the settings
      */
     public function output() {
-        global $current_section;
+        global $current_section, $redirect_after_save;
         
         if ( $current_section == 'add' ) {
             
@@ -318,14 +318,10 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             $settings = $this->get_office_settings();
 
+            $redirect_after_save = admin_url('admin.php?page=ph-settings&tab=offices');
+
             PH_Admin_Settings::output_fields( $settings );
-            
-            /*foreach ( $shipping_methods as $method ) {
-                if ( strtolower( get_class( $method ) ) == strtolower( $current_section ) && $method->has_settings() ) {
-                    $method->admin_options();
-                    break;
-                }
-            }*/
+
         } elseif ( $current_section == 'edit' ) {            
             
             remove_action('propertyhive_admin_field_offices', array( $this, 'offices_setting' ));
@@ -333,6 +329,8 @@ class PH_Settings_Offices extends PH_Settings_Page {
             $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
             
             $settings = $this->get_office_settings();
+
+            $redirect_after_save = admin_url('admin.php?page=ph-settings&tab=offices');
 
             PH_Admin_Settings::output_fields( $settings );
        

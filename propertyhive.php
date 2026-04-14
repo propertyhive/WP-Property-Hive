@@ -131,9 +131,6 @@ if ( ! class_exists( 'PropertyHive' ) )
             // Include required files
             $this->includes();
     
-            // Init API
-            //$this->api = new PH_API();
-    
             // Hooks
             add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'action_links' ) );
             add_filter( 'propertyhive_departments', array( $this, 'setup_custom_departments' ) );
@@ -146,6 +143,11 @@ if ( ! class_exists( 'PropertyHive' ) )
             add_action( 'after_setup_theme', array( $this, 'setup_environment' ) );
             add_action( 'wp', array( $this, 'set_cache_constants' ) );
             add_action( 'wp_update_comment_count', array( $this, 'exclude_notes_from_comment_count' ) );
+
+            // Ensure Template Assistant add on is deactivated now the code is merged into core
+            add_action('plugins_loaded', function () {
+                propertyhive_deactivate_template_assistant();
+            }, 1);
     
             // Loaded action
             do_action( 'propertyhive_loaded' );
@@ -263,6 +265,7 @@ if ( ! class_exists( 'PropertyHive' ) )
          */
         private function includes() {
             include_once( 'includes/ph-core-functions.php' );
+            include_once( 'includes/ph-update-functions.php' );
             include_once( 'includes/class-ph-install.php' );
             include_once( 'includes/class-ph-comments.php' );
             include_once( 'includes/class-ph-emails.php' );
@@ -306,6 +309,9 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/class-ph-rank-math.php' );              // Rank Math
             include_once( 'includes/class-ph-aioseo.php' );                 // All In One SEO
             include_once( 'includes/class-ph-duplicate-post.php' );         // Duplicate Post
+
+            include_once( 'includes/class-ph-additional-fields.php' );      // Additional Fields
+            include_once( 'includes/class-ph-text-substitution.php' );      // Text Substitution
 
             include_once( 'includes/ph-pro-feature-functions.php' );        // Pro Features
             
