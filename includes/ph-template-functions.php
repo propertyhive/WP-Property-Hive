@@ -2040,3 +2040,58 @@ function propertyhive_template_loop_custom_field()
         }
     }
 }
+
+add_action( 'propertyhive_before_search_results_loop_item_title', 'propertyhive_add_flag' );
+function propertyhive_add_flag()
+{
+    global $property;
+
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( isset($current_settings['flags_active']) && $current_settings['flags_active'] == '1' )
+    {
+        $flag = propertyhive_get_flag();
+
+        if ( $flag != '' )
+        {
+            echo '<div class="flag flag-' . sanitize_title($flag) . '" style="position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . $current_settings['flag_position'] . '; color:' . $current_settings['flag_text_color'] . '; background:' . $current_settings['flag_bg_color'] . ';">' . $flag . '</div>';
+        }
+    }
+}
+
+add_action( 'propertyhive_before_single_property_images', 'propertyhive_add_flag_single', 5 );
+function propertyhive_add_flag_single()
+{
+    global $property;
+
+    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+    if ( isset($current_settings['flags_active_single']) && $current_settings['flags_active_single'] == '1' )
+    {
+        $flag = propertyhive_get_flag();
+
+        if ( $flag != '' )
+        {
+            echo '<div class="flag flag-' . sanitize_title($flag) . '" style="position:absolute; z-index:99; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . $current_settings['flag_position'] . '; color:' . $current_settings['flag_text_color'] . '; background:' . $current_settings['flag_bg_color'] . ';">' . $flag . '</div>';
+        }
+    }
+}
+
+function propertyhive_get_flag()
+{
+    global $property;
+
+    $flag = $property->availability;
+
+    if ( $property->marketing_flag != '' )
+    {
+        $flag = $property->marketing_flag;
+    }
+
+    $flag = apply_filters( 'propertyhive_template_assistant_flag', $flag );
+
+    return $flag;
+}
+
+
+
