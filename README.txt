@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property plugin, property import, propertyhive, property hive, properties, estate agent plugin, rightmove, zoopla, blm, rtdf, jupix, vebra, alto, expertagent, dezrez, expert agent, expertagent, reapit, reaxml, letmc, acquaint
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,6 +181,12 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.2.2 - 2026-04-20 =
+* Added new 'Property Location' Elementor widget
+* Added ability to use an icon as bullet point in Elementor 'Property Features' widget
+* Updated priority of per page and columns filters merged from Template Assistant merger to prevent issue when these filters were already being used elsewhere
+* Corrected issue with duplicate lightbox showing when clicking from image slideshow
 
 = 2.2.1 - 2026-04-16 =
 * Corrected issue with flags not appearing after Template Assistant merger
