@@ -28,31 +28,35 @@ jQuery(window).on('resize', function() {
 });
 
 jQuery(function ($) {
-  $(document).on('click', '#slider .slides li a[data-fancybox]', function (e) {
-    var $li = $(this).closest('li');
-    var $slider = $(this).closest('.flexslider');
-    var group = $(this).attr('data-fancybox');
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest('#slider .slides li a[data-fancybox]');
+    if (!link) return;
+
+    var $link = $(link);
+    var $li = $link.closest('li');
+    var $slider = $link.closest('.flexslider');
+    var group = $link.attr('data-fancybox');
+    var href = $link.attr('href') || '';
 
     // Only handle actual image links
-    var href = $(this).attr('href') || '';
     if (!href.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i)) {
       return;
     }
 
+    // Stop Fancybox's default delegated handler from seeing this click
     e.preventDefault();
+    e.stopPropagation();
     e.stopImmediatePropagation();
 
     var $realItems = $slider.find('.slides li:not(.clone) a[data-fancybox="' + group + '"]');
 
     var startIndex;
-
     if ($li.hasClass('clone')) {
-      // Match clicked clone back to the real item by href
       startIndex = $realItems.filter(function () {
         return $(this).attr('href') === href;
       }).first().parent().index();
     } else {
-      startIndex = $realItems.index(this);
+      startIndex = $realItems.index(link);
     }
 
     if (startIndex < 0) {
@@ -73,9 +77,7 @@ jQuery(function ($) {
       },
       startIndex
     );
-
-    return false;
-  });
+  }, true); // <- capture phase
 });
 
 function ph_init_slideshow() 
