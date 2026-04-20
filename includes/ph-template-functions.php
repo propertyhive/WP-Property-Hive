@@ -1841,7 +1841,7 @@ if ( ! function_exists( 'propertyhive_my_account_delete' ) ) {
     }
 }
 
-add_filter( 'loop_search_results_per_page', 'template_assistant_loop_search_results_per_page' );
+add_filter( 'loop_search_results_per_page', 'template_assistant_loop_search_results_per_page', 1 );
 function template_assistant_loop_search_results_per_page( $cols )
 {
     $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -1854,7 +1854,7 @@ function template_assistant_loop_search_results_per_page( $cols )
     return $cols;
 }
 
-add_filter( 'loop_search_results_columns', 'template_assistant_search_result_columns' );
+add_filter( 'loop_search_results_columns', 'template_assistant_search_result_columns', 1 );
 function template_assistant_search_result_columns( $cols = 1 )
 {
     $current_settings = get_option( 'propertyhive_template_assistant', array() );
