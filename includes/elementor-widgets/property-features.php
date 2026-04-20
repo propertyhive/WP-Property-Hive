@@ -107,17 +107,30 @@ class Elementor_Property_Features_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
-			'bullet_shape',
+			'bullet_type',
 			[
-				'label' => __( 'Bullet Shape', 'propertyhive' ),
+				'label' => __( 'Bullet Type', 'propertyhive' ),
 				'type' => \Elementor\Controls_Manager::SELECT,
 				'default' => 'disc',
 				'options' => [
 					'disc'   => __( 'Circle', 'propertyhive' ),
 					'square' => __( 'Square', 'propertyhive' ),
+					'icon'   => __( 'Icon', 'propertyhive' ),
 				],
 				'selectors' => [
 					'{{WRAPPER}} .features ul' => 'list-style-type: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'bullet_icon',
+			[
+				'label' => __( 'Icon', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::ICONS,
+				'fa4compatibility' => 'bullet_icon_old',
+				'condition' => [
+					'bullet_type' => 'icon',
 				],
 			]
 		);
@@ -129,6 +142,8 @@ class Elementor_Property_Features_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .features ul li::marker' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .features .ph-feature-icon' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .features .ph-feature-icon svg' => 'fill: {{VALUE}};',
 				],
 			]
 		);
@@ -171,7 +186,58 @@ class Elementor_Property_Features_Widget extends \Elementor\Widget_Base {
 <?php
 		}
 
+		$bullet_type = isset( $settings['bullet_type'] ) ? $settings['bullet_type'] : 'disc';
+
+		ob_start();
 		propertyhive_template_single_features();
+		$output = ob_get_clean();
+
+		if ( $bullet_type === 'icon' && ! empty( $settings['bullet_icon']['value'] ) ) {
+
+			$icon_html = '<span class="ph-feature-icon" aria-hidden="true">';
+			ob_start();
+			\Elementor\Icons_Manager::render_icon(
+				$settings['bullet_icon'],
+				[
+					'aria-hidden' => 'true',
+				]
+			);
+			$icon_html .= ob_get_clean();
+			$icon_html .= '</span>';
+
+			$output = preg_replace(
+				'/<li([^>]*)>/i',
+				'<li$1>' . $icon_html,
+				$output
+			);
+
+			?>
+			<style type="text/css">
+				.elementor-widget-property-features .features ul {
+					list-style: none !important;
+					padding-left: 0;
+				}
+				.elementor-widget-property-features .features ul li {
+					display: flex;
+					align-items: flex-start;
+					gap: 8px;
+				}
+				.elementor-widget-property-features .features .ph-feature-icon {
+					display: inline-flex;
+					flex: 0 0 auto;
+					line-height: 1;
+					margin-top: 0.15em;
+				}
+				.elementor-widget-property-features .features .ph-feature-icon i,
+				.elementor-widget-property-features .features .ph-feature-icon svg {
+					width: 1em;
+					height: 1em;
+				}
+			</style>
+			<?php
+		}
+
+		echo $output;
 	}
 
 }
