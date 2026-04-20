@@ -256,6 +256,26 @@ class PH_Elementor {
 			'Property Address County',
 			'Property Address Postcode',
 			'Property Address Full',
+		);
+
+		if ( taxonomy_exists('location') )
+        {
+            $args = array(
+                'taxonomy' => 'location',
+                'hide_empty' => false,
+                'parent' => 0,
+                'number' => 1,
+                'fields' => 'ids',
+            );
+            $terms = get_terms( $args );
+
+            if ( !empty( $terms ) && !is_wp_error( $terms ) )
+            {
+                $widgets[] = 'Property Location';
+            }
+        }
+
+        $widgets = array_merge( $widgets, array(
 			'Property Price',
 			'Property Price Qualifier',
 			'Property Features',
@@ -300,7 +320,7 @@ class PH_Elementor {
 			'Back To Search',
 			'Property Search Result Count',
 			'Property Search Order',
-		);
+		) );
 
 		$current_settings = get_option( 'propertyhive_template_assistant', array() );
 
