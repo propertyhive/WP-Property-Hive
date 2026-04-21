@@ -34,11 +34,11 @@ class Salient_Property_Search_Form_Widget {
 
 		$html_template = $widget_dir . '/' . str_replace("_", "-", str_replace(array( "salient_", "_widget" ), "", sanitize_title($class_name))) . '-html.php';
 
-		$description = '';
-		if ( class_exists('PH_Template_Assistant') )
-		{
-			$description = sprintf( __( 'Search forms can be managed from within \'<a href="%s" target="_blank">Property Hive > Settings > Template Assistant > Search Forms</a>\'', 'propertyhive' ), admin_url('/admin.php?page=ph-settings&tab=template-assistant&section=search-forms') );
-		}
+		$description = sprintf(
+			/* translators: %s: URL to Property Hive settings area */
+			__( 'Search forms can be managed from within \'<a href="%s" target="_blank">Property Hive > Settings > Frontend > Search Forms</a>\'', 'propertyhive' ), 
+			esc_url(admin_url('admin.php?page=ph-settings&tab=frontend&section=search-forms')) 
+		);
 
 		$departments = ph_get_departments();
 

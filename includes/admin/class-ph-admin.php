@@ -50,9 +50,23 @@ class PH_Admin {
 
                 $count = intval($_GET['bulk_archived_posts']);
 
+                $message = sprintf(
+                    /* translators: 1: number of items, 2: post type label */
+                    _n(
+                        '%1$s %2$s moved to archive.',
+                        '%1$s %2$s moved to archive.',
+                        $count,
+                        'propertyhive'
+                    ),
+                    number_format_i18n( $count ),
+                    $count === 1
+                        ? $post_type_object->labels->singular_name
+                        : $post_type_object->labels->name
+                );
+
                 printf(
-                    '<div id="message" class="notice is-dismissible updated"><p>' . _n('%s ' . $post_type_object->labels->singular_name . ' moved to Archive.', '%s ' . $post_type_object->labels->name . ' moved to Archive.', $count, 'propertyhive') . '</p></div>',
-                    $count
+                    '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
+                    $message
                 );
             }
         }
@@ -66,9 +80,23 @@ class PH_Admin {
 
                 $count = intval($_GET['bulk_unarchived_posts']);
 
+                $message = sprintf(
+                    /* translators: 1: number of items, 2: post type label */
+                    _n(
+                        '%1$s %2$s removed from archive.',
+                        '%1$s %2$s removed from archive.',
+                        $count,
+                        'propertyhive'
+                    ),
+                    number_format_i18n( $count ),
+                    $count === 1
+                        ? $post_type_object->labels->singular_name
+                        : $post_type_object->labels->name
+                );
+
                 printf(
-                    '<div id="message" class="notice is-dismissible updated"><p>' . _n('%s ' . $post_type_object->labels->singular_name . ' Removed from Archive.', '%s ' . $post_type_object->labels->name . ' removed from Archive.', $count, 'propertyhive') . '</p></div>',
-                    $count
+                    '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
+                    $message
                 );
             }
         }
@@ -731,7 +759,11 @@ class PH_Admin {
             {
                 echo "<div class=\"notice notice-info\" id=\"ph_notice_missing_google_maps_api_key\">
                         <p>
-                            " . sprintf( __( 'We noticed that you haven\'t entered a Google Maps API key yet. If wishing to display a map on your website it\'s recommended that you <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">create one</a> and <a href="%s">enter it</a>.', 'propertyhive' ), admin_url('admin.php?page=ph-settings&tab=general&section=map') ) . "
+                            " . sprintf( 
+                                    /* translators: %s: URL to plugin settings page where the Google Maps API key can be entered */
+                                    __( 'We noticed that you haven\'t entered a Google Maps API key. If wishing to display a map on your website it\'s recommended that you <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">create one</a> and <a href="%s">enter it</a>.', 'propertyhive' ), 
+                                    admin_url('admin.php?page=ph-settings&tab=general&section=map') 
+                                ) . "
                         </p>
                         <p>
                             <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=general&section=map')) . "\" class=\"button-primary\">" . esc_html(__( 'Enter Google Maps API Key', 'propertyhive' )) . "</a>

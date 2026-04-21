@@ -150,19 +150,22 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
 
                     if ( count($viewing_ids) > 0 )
                     {
-                        if ( count($viewing_ids) == 1 )
+                        if ( 1 === $viewing_count ) 
                         {
-                            $enquiry_text = __( 'is an existing viewing', 'propertyhive' );
+                            $message = __( '<p>There is an existing viewing for this applicant at this property.</p>', 'propertyhive' );
                         }
                         else
                         {
-                            $enquiry_text = sprintf( __( 'are %s existing viewings', 'propertyhive' ), count($viewing_ids) );
+                            $message = sprintf(
+                                /* translators: %s: number of existing viewings */
+                                __( '<p>There are %s existing viewings for this applicant at this property.</p>', 'propertyhive' ),
+                                number_format_i18n( $viewing_count )
+                            );
                         }
 
-                        $message = '<p>' . sprintf( __( 'There %s for this applicant at this property.', 'propertyhive' ), $enquiry_text ) . '</p>';
                         foreach( $viewing_ids as $viewing_id )
                         {
-                            $message .= '<p><a href="' . esc_url(get_edit_post_link( $viewing_id )) . '" class="button">' . esc_html(__( 'Edit Viewing', 'propertyhive' )) . '</a></p>';
+                            $message .= '<p><a href="' . esc_url(get_edit_post_link( $viewing_id )) . '" class="button">' . esc_html(__( 'Edit viewing', 'propertyhive' )) . '</a></p>';
                         }
                         echo "<div class=\"notice notice-info\">$message</div>";
                     }

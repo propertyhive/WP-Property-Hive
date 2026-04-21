@@ -335,19 +335,33 @@ if ($section != 'enquiry')
 								printf( __( '%s ago', 'propertyhive' ), human_time_diff( $note['timestamp'], current_time( 'timestamp', 1 ) ) );
 							}
 						?>
-					</abbr>
-					<?php if ( $note['author'] !== __( 'Property Hive', 'propertyhive' ) && $note['author'] != '' ) printf( ' ' . __( 'by %s', 'propertyhive' ), $note['author'] );?>
+					</abbr> 
+					<?php 
+						if ( !empty($note['author']) && $note['author'] !== 'Property Hive' )
+						{
+							printf( 
+								/* translators: %s: author name */
+								__( 'by %s', 'propertyhive' ), 
+								esc_html($note['author']) 
+							);
+						}
+					?>
 
 					<a href="#" data-section="<?php echo esc_attr($section); ?>" class="toggle_note_pinned"><?php echo esc_html(__( ( $note['pinned'] == '0' ) ? 'Pin To Top' : 'Unpin', 'propertyhive' )); ?></a>
 
-					<?php if ( $note['type'] == 'note' ) { ?><a href="#" data-section="<?php echo $section; ?>" class="delete_note"><?php echo esc_html(__( 'Delete', 'propertyhive' )); ?></a><?php } ?>
+					<?php if ( $note['type'] == 'note' ) { ?><a href="#" data-section="<?php echo esc_attr($section); ?>" class="delete_note"><?php echo esc_html(__( 'Delete', 'propertyhive' )); ?></a><?php } ?>
 					<?php
 						if ( $post->ID != $note['post_id'] )
 						{
-					?>
-					<br>
-					<?php echo esc_html(__( 'Note originally entered on', 'propertyhive' )); ?> <a href="<?php echo esc_url(get_edit_post_link($note['post_id'])); ?>" style="color:inherit;"><?php echo esc_html(__( ucfirst(get_post_type($note['post_id'])), 'propertyhive' )); ?></a>
-					<?php
+							echo '<br>';
+							$post_type_object = get_post_type_object( get_post_type( $note['post_id'] ) );
+							$post_type_label  = $post_type_object ? $post_type_object->labels->singular_name : get_post_type( $note['post_id'] );
+							
+							printf(
+								/* translators: %s: linked post type label, for example "Property" */
+								__( 'Note originally entered on %s', 'propertyhive' ),
+								'<a href="' . esc_url( get_edit_post_link( $note['post_id'] ) ) . '" style="color:inherit;">' . esc_html( $post_type_label ) . '</a>'
+							);
 						}
 					?>
 				</p>

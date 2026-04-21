@@ -644,13 +644,17 @@ class PH_Install {
         add_option( 'propertyhive_review_prompt_due_timestamp', strtotime('+30 days'), '', 'no' );
 
         add_option( 'propertyhive_enquiry_auto_responder_email_subject', __( 'Thank you for your enquiry', 'propertyhive' ), '', 'no' );
-        add_option( 'propertyhive_enquiry_auto_responder_email_body', sprintf( __( "Thank you for your recent property enquiry about [property_address_hyperlinked]. A member of our team will be in touch shortly.
+        add_option( 'propertyhive_enquiry_auto_responder_email_body', sprintf( 
+            /* translators: %s: blog name shown in the email sign-off */
+            __( "Thank you for your recent property enquiry about [property_address_hyperlinked]. A member of our team will be in touch shortly.
 
 Kind regards, 
 
 %s
 
-[similar_properties]", 'propertyhive' ), get_bloginfo('name') ), '', 'no' );
+[similar_properties]", 'propertyhive' ), 
+            get_bloginfo('name') 
+        ), '', 'no' );
 
         add_option( 'propertyhive_property_match_default_email_subject', __( 'We found [property_count] that might be of interest to you', 'propertyhive' ), '', 'no' );
         add_option( 'propertyhive_property_match_default_email_body', __( "Hi [contact_dear],

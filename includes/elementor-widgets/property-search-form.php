@@ -36,11 +36,11 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-		$description = '';
-		if ( class_exists('PH_Template_Assistant') )
-		{
-			$description = sprintf( __( 'Search forms can be managed from within \'<a href="%s" target="_blank">Property Hive > Settings > Template Assistant > Search Forms</a>\'', 'propertyhive' ), admin_url('/admin.php?page=ph-settings&tab=template-assistant&section=search-forms') );
-		}
+		$description = sprintf(
+			/* translators: %s: URL to Property Hive settings area */
+			__( 'Search forms can be managed from within \'<a href="%s" target="_blank">Property Hive > Settings > Frontend > Search Forms</a>\'', 'propertyhive' ), 
+			esc_url(admin_url('admin.php?page=ph-settings&tab=frontend&section=search-forms')) 
+		);
 
 		$this->add_control(
 			'form_id',

@@ -116,7 +116,11 @@ class PH_Emails {
 				$to = get_option( 'admin_email', '' );
 			}
 
-			$subject = sprintf( __( 'A new applicant, %s, has registered through your website', 'propertyhive' ), get_the_title($contact_post_id) );
+			$subject = sprintf( 
+				/* translators: %s: person name */
+				__( 'A new applicant, %s, has registered through your website', 'propertyhive' ), 
+				get_the_title($contact_post_id) 
+			);
 
 			$message = __( "A new applicant has registered through your website. Please find details of the applicant below:", 'propertyhive' ) . "\n\n";
             

@@ -206,21 +206,31 @@ if ( ! function_exists( 'propertyhive_page_title' ) ) {
      */
     function propertyhive_page_title( $echo = true ) {
 
-        if ( is_search() ) {
-            $page_title = sprintf( __( 'Search Results: &ldquo;%s&rdquo;', 'propertyhive' ), get_search_query() );
+        if ( is_search() ) 
+        {
+            $page_title = sprintf( 
+                /* translators: %s: search query */
+                __( 'Search Results: &ldquo;%s&rdquo;', 'propertyhive' ), 
+                get_search_query() 
+            );
 
             if ( get_query_var( 'paged' ) )
-                $page_title .= sprintf( __( '&nbsp;&ndash; Page %s', 'propertyhive' ), get_query_var( 'paged' ) );
+            {
+                $page_title .= sprintf( 
+                    /* translators: %s: page number */
+                    __( '&nbsp;&ndash; Page %s', 'propertyhive' ), 
+                    get_query_var( 'paged' ) 
+                );
+            }
 
-        } elseif ( is_tax() ) {
-
+        }elseif ( is_tax() )
+        {
             $page_title = single_term_title( "", false );
-
-        } else {
-
+        }
+        else
+        {
             $search_results_page_id = ph_get_page_id( 'search_results' );
             $page_title   = get_the_title( $search_results_page_id );
-
         }
 
         $page_title = apply_filters( 'propertyhive_page_title', $page_title );
