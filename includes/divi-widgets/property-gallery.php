@@ -256,13 +256,21 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                     if ( $image_number == 1 )
                     {
                         echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
-                        printf( __( 'See all %d images', 'propertyhive' ), count($images) + count($images_hidden) );
+                        printf( 
+                            /* translators: %d: number of images (1, 2, 3 etc) */
+                            __( 'See all %d images', 'propertyhive' ), 
+                            count($images) + count($images_hidden) 
+                        );
                         echo '</a></div></div>';
                     }
                     if ( $image_number == ($max_images - 1) )
                     {
                         echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
-                        printf( __( 'See all %d images', 'propertyhive' ), count($images) + count($images_hidden) );
+                        printf( 
+                            /* translators: %d: number of images (1, 2, 3 etc) */
+                            __( 'See all %d images', 'propertyhive' ), 
+                            count($images) + count($images_hidden) 
+                        );
                         echo '</a></div></div>';
                     }
                 }

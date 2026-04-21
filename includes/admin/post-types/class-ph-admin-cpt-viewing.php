@@ -82,9 +82,10 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 				( count($related_viewings['previous']) > 0 || count($related_viewings['next']) > 0 )
 			)
 			{
-				$message = sprintf( 
-				    __( 'This is the %s viewing for this applicant at this property.', 'propertyhive' ), 
-				    strtolower(ph_ordinal_suffix(count($related_viewings['previous']) + 1))
+				$message = sprintf(
+					/* translators: %s: viewing number (e.g. 1, 2, 3) */
+					__( 'This is viewing number %s for this applicant at this property.', 'propertyhive' ),
+					number_format_i18n( count( $related_viewings['previous'] ) + 1 )
 				) . '<br>';
 
 				if ( count($related_viewings['previous']) > 0 )

@@ -19,9 +19,19 @@ global $propertyhive;
 	if ( 1 == $total ) {
 		_e( 'Showing the single result', 'propertyhive' );
 	} elseif ( $total <= $per_page || -1 == $per_page ) {
-		printf( __( 'Showing %s properties', 'propertyhive' ), number_format($total) );
+		printf( 
+			/* translators: %s: total number of properties */
+			__( 'Showing %s properties', 'propertyhive' ), 
+			number_format_i18n($total) 
+		);
 	} else {
-		printf( _x( 'Showing %1$s–%2$s of %3$s properties', '%1$s = first, %2$s = last, %3$s = total', 'propertyhive' ), number_format($first), number_format($last), number_format($total) );
+		printf( 
+			/* translators: 1: first result number, 2: last result number, 3: total number of properties */
+			__( 'Showing %1$s–%2$s of %3$s properties', 'propertyhive' ), 
+			number_format_i18n($first), 
+			number_format_i18n($last), 
+			number_format_i18n($total) 
+		);
 	}
 	?>
 </p>

@@ -39,8 +39,17 @@ class PH_Admin_CPT {
 		if ( $post_type == $this->type ) {
 			$obj = get_post_type_object( $this->type );
 
-			$strings['insertIntoPost']     = sprintf( __( 'Insert into %s', 'propertyhive' ), $obj->labels->singular_name );
-			$strings['uploadedToThisPost'] = sprintf( __( 'Uploaded to this %s', 'propertyhive' ), $obj->labels->singular_name );
+			$strings['insertIntoPost'] = sprintf(
+				/* translators: %s: singular post type label */
+				__( 'Insert into %s', 'propertyhive' ),
+				$obj->labels->singular_name
+			);
+
+			$strings['uploadedToThisPost'] = sprintf(
+				/* translators: %s: singular post type label */
+				__( 'Uploaded to this %s', 'propertyhive' ),
+				$obj->labels->singular_name
+			);
 		}
 
 		return $strings;

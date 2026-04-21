@@ -63,11 +63,11 @@ class PH_Meta_Box_Property_Material_Information {
         echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Utilities', 'propertyhive' )) . '</h3>';
 
         $utilities = array( 
-            'electricity' => __( 'Electricity Type', 'propertyhive' ), 
-            'water' => __( 'Water Type', 'propertyhive' ),  
-            'heating' => __( 'Heating Type', 'propertyhive' ), 
-            'broadband' => __( 'Broadband Type', 'propertyhive' ), 
-            'sewerage' => __( 'Sewerage Type', 'propertyhive' ),  
+            'electricity' => __( 'electricity type', 'propertyhive' ), 
+            'water' => __( 'water type', 'propertyhive' ),  
+            'heating' => __( 'heating type', 'propertyhive' ), 
+            'broadband' => __( 'broadband type', 'propertyhive' ), 
+            'sewerage' => __( 'sewerage type', 'propertyhive' ),  
         );
         foreach ( $utilities as $utility_key => $utility_label )
         {
@@ -82,8 +82,16 @@ class PH_Meta_Box_Property_Material_Information {
                 $terms = $function_name();
             }
         ?>
-        <p class="form-field <?php echo esc_attr($utility_key); ?>_type_field"><label for="<?php echo esc_attr($utility_key); ?>_type"><?php echo esc_html($utility_label); ?></label>
-            <select id="<?php echo esc_attr($utility_key); ?>_type" name="<?php echo esc_attr($utility_key); ?>_type[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select ' . strtolower($utility_label) . '(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+        <p class="form-field <?php echo esc_attr($utility_key); ?>_type_field"><label for="<?php echo esc_attr($utility_key); ?>_type"><?php echo esc_html(ucfirst($utility_label)); ?></label>
+            <select id="<?php echo esc_attr($utility_key); ?>_type" name="<?php echo esc_attr($utility_key); ?>_type[]" multiple="multiple" data-placeholder="<?php 
+                echo esc_attr(
+                    sprintf(
+                        /* translators: %s: utility type (e.g. "gas type", "electricity type") */
+                        __( 'Select ' . $utility_label, 'propertyhive' ),
+                        $utility_label
+                    )
+                ); 
+            ?>" class="multiselect attribute_values">
                 <?php
                     $selected_values = array();
                     $term_list = get_post_meta($post->ID, '_' . $utility_key . '_type', true);
@@ -115,7 +123,11 @@ class PH_Meta_Box_Property_Material_Information {
                 'id' => '_' . $utility_key . '_type_other', 
                 'label' => '', 
                 'desc_tip' => false, 
-                'placeholder' => sprintf( __( 'Enter %s type', 'propertyhive' ), strtolower($utility_key) ), 
+                'placeholder' => sprintf(
+                    /* translators: %s: utility type (e.g. "gas type", "electricity type") */
+                    __( 'Enter other %s', 'propertyhive' ),
+                    $utility_label
+                ),
                 'type' => 'text'
             );
             propertyhive_wp_text_input( $args );
@@ -124,7 +136,7 @@ class PH_Meta_Box_Property_Material_Information {
         echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Accessibility', 'propertyhive' )) . '</h3>';
 
         $utilities = array( 
-            'accessibility' => __( 'Accessibility', 'propertyhive' ),
+            'accessibility' => __( 'accessibility features', 'propertyhive' ),
         );
         foreach ( $utilities as $utility_key => $utility_label )
         {
@@ -139,8 +151,16 @@ class PH_Meta_Box_Property_Material_Information {
                 $terms = $function_name();
             }
         ?>
-        <p class="form-field <?php echo esc_attr($utility_key); ?>_field"><label for="<?php echo esc_attr($utility_key); ?>"><?php echo esc_html($utility_label); ?></label>
-            <select id="<?php echo esc_attr($utility_key); ?>" name="<?php echo esc_attr($utility_key); ?>[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select ' . strtolower($utility_label) . '(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+        <p class="form-field <?php echo esc_attr($utility_key); ?>_field"><label for="<?php echo esc_attr($utility_key); ?>"><?php echo esc_html(ucfirst($utility_label)); ?></label>
+            <select id="<?php echo esc_attr($utility_key); ?>" name="<?php echo esc_attr($utility_key); ?>[]" multiple="multiple" data-placeholder="<?php 
+                echo esc_attr(
+                    sprintf(
+                        /* translators: %s: utility type (e.g. "gas type", "electricity type") */
+                        __( 'Select ' . $utility_label, 'propertyhive' ),
+                        $utility_label
+                    )
+                ); 
+            ?>" class="multiselect attribute_values">
                 <?php
                     $selected_values = array();
                     $term_list = get_post_meta($post->ID, '_' . $utility_key, true);
@@ -172,7 +192,11 @@ class PH_Meta_Box_Property_Material_Information {
                 'id' => '_' . $utility_key . '_other', 
                 'label' => '', 
                 'desc_tip' => false, 
-                'placeholder' => __( 'Enter ' . strtolower($utility_key), 'propertyhive' ), 
+                'placeholder' => sprintf(
+                    /* translators: %s: utility type (e.g. "gas type", "electricity type") */
+                    __( 'Enter other %s', 'propertyhive' ),
+                    $utility_label
+                ),
                 'type' => 'text'
             );
             propertyhive_wp_text_input( $args );
@@ -183,7 +207,7 @@ class PH_Meta_Box_Property_Material_Information {
         $terms = get_restrictions();
     ?>
         <p class="form-field restriction_field"><label for="restriction"><?php echo esc_html( __('Restrictions', 'propertyhive') ); ?></label>
-            <select id="restriction" name="restriction[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select restrictions(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+            <select id="restriction" name="restriction[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select restrictions', 'propertyhive' )); ?>" class="multiselect attribute_values">
                 <?php
                     $selected_values = array();
                     $term_list = get_post_meta($post->ID, '_restriction', true);
@@ -216,17 +240,17 @@ class PH_Meta_Box_Property_Material_Information {
             'id' => '_restriction_other', 
             'label' => '', 
             'desc_tip' => false, 
-            'placeholder' => __( 'Enter restrictions', 'propertyhive' ), 
+            'placeholder' => __( 'Enter other restrictions', 'propertyhive' ), 
             'type' => 'text'
         );
         propertyhive_wp_text_input( $args );
 
-        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Rights & Easements', 'propertyhive' )) . '</h3>';
+        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Rights and easements', 'propertyhive' )) . '</h3>';
 
         $terms = get_rights();
     ?>
-        <p class="form-field rights_field"><label for="right"><?php echo esc_html( __('Rights & Easements', 'propertyhive') ); ?></label>
-            <select id="right" name="right[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select rights(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+        <p class="form-field rights_field"><label for="right"><?php echo esc_html( __('Rights and easements', 'propertyhive') ); ?></label>
+            <select id="right" name="right[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select rights and easements', 'propertyhive' )); ?>" class="multiselect attribute_values">
                 <?php
                     $selected_values = array();
                     $term_list = get_post_meta($post->ID, '_right', true);
@@ -259,12 +283,12 @@ class PH_Meta_Box_Property_Material_Information {
             'id' => '_right_other', 
             'label' => '', 
             'desc_tip' => false, 
-            'placeholder' => __( 'Enter rights', 'propertyhive' ), 
+            'placeholder' => __( 'Enter other rights and easements', 'propertyhive' ),
             'type' => 'text'
         );
         propertyhive_wp_text_input( $args );
 
-        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Flood Risk', 'propertyhive' )) . '</h3>';
+        echo '<h3 style="padding-left:11px;">' . esc_html(__( 'Flood risk', 'propertyhive' )) . '</h3>';
 
         propertyhive_wp_select( array( 
             'id' => '_flooded_in_last_five_years', 
@@ -279,7 +303,7 @@ class PH_Meta_Box_Property_Material_Information {
         $terms = get_flooding_source_types();
     ?>
         <p class="form-field flood_source_type_field"><label for="flood_source_type"><?php echo esc_html( __('Flooding Source', 'propertyhive') ); ?></label>
-            <select id="flood_source_type" name="flood_source_type[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select flood source(s)', 'propertyhive' )); ?>" class="multiselect attribute_values">
+            <select id="flood_source_type" name="flood_source_type[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select flood source', 'propertyhive' )); ?>" class="multiselect attribute_values">
                 <?php
                     $selected_values = array();
                     $term_list = get_post_meta($post->ID, '_flood_source_type', true);
@@ -312,7 +336,7 @@ class PH_Meta_Box_Property_Material_Information {
             'id' => '_flood_source_type_other', 
             'label' => '', 
             'desc_tip' => false, 
-            'placeholder' => __( 'Enter flood source', 'propertyhive' ), 
+            'placeholder' => __( 'Enter other flood sources', 'propertyhive' ),
             'type' => 'text'
         );
         propertyhive_wp_text_input( $args );

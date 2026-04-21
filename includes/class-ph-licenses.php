@@ -423,7 +423,11 @@ class PH_Licenses {
 			{
 				$return = array(
 	        		'success' => false,
-	        		'error' => sprintf( __( 'Received response code %s when activating license key status', 'propertyhive' ), wp_remote_retrieve_response_code( $response ) )
+	        		'error' => sprintf( 
+	        			/* translators: %s: HTTP header response code */
+	        			__( 'Received response code %s when activating license key status', 'propertyhive' ), 
+	        			wp_remote_retrieve_response_code( $response ) 
+	        		)
 	        	);
 	        	return $return;
 			}
@@ -518,7 +522,11 @@ class PH_Licenses {
 			{
 				$return = array(
 	        		'success' => false,
-	        		'error' => sprintf( __( 'Received response code %s when deactivating license key status', 'propertyhive' ), wp_remote_retrieve_response_code( $response ) )
+	        		'error' => sprintf( 
+	        			/* translators: %s: HTTP header response code */
+	        			__( 'Received response code %s when deactivating license key status', 'propertyhive' ), 
+	        			wp_remote_retrieve_response_code( $response ) 
+	        		)
 	        	);
 	        	return $return;
 			}
@@ -636,7 +644,11 @@ class PH_Licenses {
 		{
         	$return = array(
         		'success' => false,
-        		'error' => sprintf( __( 'Received response code %s when requesting license key product list', 'propertyhive' ), wp_remote_retrieve_response_code( $response ) )
+        		'error' => sprintf( 
+        			/* translators: %s: HTTP header response code */
+        			__( 'Received response code %s when requesting license key product list', 'propertyhive' ), 
+        			wp_remote_retrieve_response_code( $response ) 
+        		)
         	);
         	
         	$last_known = get_option('ph_pro_last_known_license_product_id_and_package', array());
@@ -832,7 +844,11 @@ class PH_Licenses {
 
         	$return = array(
         		'success' => false,
-        		'error' => sprintf( __( 'Received response code %s when requesting license key status', 'propertyhive' ), wp_remote_retrieve_response_code( $response ) )
+        		'error' => sprintf( 
+        			/* translators: %s: HTTP header response code */
+        			__( 'Received response code %s when requesting license key status', 'propertyhive' ), 
+        			wp_remote_retrieve_response_code( $response ) 
+        		)
         	);
 
         	return $return;

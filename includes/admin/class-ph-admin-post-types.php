@@ -305,17 +305,22 @@ class PH_Admin_Post_Types {
 
 		$messages['property'] = array(
 			0 => '', // Unused. Messages start at index 1.
-			1 => sprintf( __( 'Property updated. <a href="%s">View Property</a>', 'propertyhive' ), esc_url( get_permalink($post_ID) ) ),
+            /* translators: %s: URL to view the property */
+			1 => sprintf( __( 'Property updated. <a href="%s">View property</a>', 'propertyhive' ), esc_url( get_permalink($post_ID) ) ),
 			2 => __( 'Custom field updated.', 'propertyhive' ),
 			3 => __( 'Custom field deleted.', 'propertyhive' ),
 			4 => __( 'Property updated.', 'propertyhive' ),
-			5 => isset($_GET['revision']) ? sprintf( __( 'Property restored to revision from %s', 'propertyhive' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-			6 => sprintf( __( 'Property published. <a href="%s">View Property</a>', 'propertyhive' ), esc_url( get_permalink($post_ID) ) ),
+			5 => __( 'Revision restored.', 'propertyhive' ),
+            /* translators: %s: URL to view the property */
+			6 => sprintf( __( 'Property published. <a href="%s">View property</a>', 'propertyhive' ), esc_url( get_permalink($post_ID) ) ),
 			7 => __( 'Property saved.', 'propertyhive' ),
-			8 => sprintf( __( 'Property submitted. <a target="_blank" href="%s">Preview Property</a>', 'propertyhive' ), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
-			9 => sprintf( __( 'Property scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview Property</a>', 'propertyhive' ),
+            /* translators: %s: URL to preview the property */
+			8 => sprintf( __( 'Property submitted. <a target="_blank" href="%s">Preview property</a>', 'propertyhive' ), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
+			/* translators: 1: formatted date, 2: URL to preview the property */
+            9 => sprintf( __( 'Property scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview property</a>', 'propertyhive' ),
 			  date_i18n( __( 'M j, Y @ G:i', 'propertyhive' ), strtotime( $post->post_date ) ), esc_url( get_permalink($post_ID) ) ),
-			10 => sprintf( __( 'Property draft updated. <a target="_blank" href="%s">Preview Property</a>', 'propertyhive' ), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
+			/* translators: %s: URL to preview the property */
+            10 => sprintf( __( 'Property draft updated. <a target="_blank" href="%s">Preview property</a>', 'propertyhive' ), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
 		);
 
 		$messages['contact'] = array(
@@ -324,10 +329,11 @@ class PH_Admin_Post_Types {
             2 => __( 'Custom field updated.', 'propertyhive' ),
             3 => __( 'Custom field deleted.', 'propertyhive' ),
             4 => __( 'Contact updated.', 'propertyhive' ),
-            5 => isset($_GET['revision']) ? sprintf( __( 'Contact restored to revision from %s', 'propertyhive' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+            5 => __( 'Revision restored.', 'propertyhive' ),
             6 => __( 'Contact published.', 'propertyhive' ),
             7 => __( 'Contact saved.', 'propertyhive' ),
             8 => __( 'Contact submitted.', 'propertyhive' ),
+            /* translators: 1: formatted date */
             9 => sprintf( __( 'Contact scheduled for: <strong>%1$s</strong>.', 'propertyhive' ), date_i18n( __( 'M j, Y @ G:i', 'propertyhive' ), strtotime( $post->post_date ) )),
             10 => __( 'Contact draft updated.', 'propertyhive' ),
         );
@@ -338,10 +344,11 @@ class PH_Admin_Post_Types {
             2 => __( 'Custom field updated.', 'propertyhive' ),
             3 => __( 'Custom field deleted.', 'propertyhive' ),
             4 => __( 'Office updated.', 'propertyhive' ),
-            5 => isset($_GET['revision']) ? sprintf( __( 'Office restored to revision from %s', 'propertyhive' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+            5 => __( 'Revision restored.', 'propertyhive' ),
             6 => sprintf( __( 'Office published.', 'propertyhive' ), esc_url( get_permalink($post_ID) ) ),
             7 => __( 'Office saved.', 'propertyhive' ),
             8 => sprintf( __( 'Office submitted.', 'propertyhive' ), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
+            /* translators: 1: formatted date */
             9 => sprintf( __( 'Office scheduled for: <strong>%1$s</strong>.', 'propertyhive' ),
               date_i18n( __( 'M j, Y @ G:i', 'propertyhive' ), strtotime( $post->post_date ) ), esc_url( get_permalink($post_ID) ) ),
             10 => sprintf( __( 'Office draft updated. ', 'propertyhive' ), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
@@ -353,10 +360,11 @@ class PH_Admin_Post_Types {
             2 => __( 'Custom field updated.', 'propertyhive' ),
             3 => __( 'Custom field deleted.', 'propertyhive' ),
             4 => __( 'Enquiry updated.', 'propertyhive' ),
-            5 => isset($_GET['revision']) ? sprintf( __( 'Enquiry restored to revision from %s', 'propertyhive' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+            5 => __( 'Revision restored.', 'propertyhive' ),
             6 => sprintf( __( 'Enquiry published.', 'propertyhive' ), esc_url( get_permalink($post_ID) ) ),
             7 => __( 'Enquiry saved.', 'propertyhive' ),
             8 => sprintf( __( 'Enquiry submitted.', 'propertyhive' ), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
+            /* translators: 1: formatted date */
             9 => sprintf( __( 'Enquiry scheduled for: <strong>%1$s</strong>.', 'propertyhive' ),
               date_i18n( __( 'M j, Y @ G:i', 'propertyhive' ), strtotime( $post->post_date ) ), esc_url( get_permalink($post_ID) ) ),
             10 => sprintf( __( 'Enquiry draft updated.', 'propertyhive' ), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),

@@ -41,6 +41,7 @@ class PH_Admin_Help {
 				'content' =>
 					'<h2>' . __( 'Property Hive Help &amp; Support', 'propertyhive' ) . '</h2>' .
 					'<p>' . sprintf(
+						/* translators: %s: URL to Property Hive documentation */
 						__( 'Should you need help understanding, using, or extending Property Hive, <a href="%s" target="_blank">please read our documentation</a>. You will find all kinds of resources including snippets, tutorials and much more.', 'propertyhive' ),
 						'https://docs.wp-property-hive.com'
 					) . '</p>' .
