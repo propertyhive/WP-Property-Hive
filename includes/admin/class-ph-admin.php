@@ -585,7 +585,7 @@ class PH_Admin {
 
         // Classes
         include_once( 'class-ph-admin-post-types.php' );
-        //include_once( 'class-ph-admin-taxonomies.php' );
+        include_once( dirname(PH_PLUGIN_FILE) . '/includes/class-ph-ai-service.php' );
 
         // Classes we only need if the ajax is not-ajax
         if ( ! is_ajax() ) {
