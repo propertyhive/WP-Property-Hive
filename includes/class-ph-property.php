@@ -591,11 +591,11 @@ class PH_Property {
             $explode_area = explode(".", $this->_floor_area_from);
             if ( count($explode_area) == 2 )
             {
-                $area .= number_format($explode_area[0], 0) . '.' . $explode_area[1];
+                $area .= number_format((float)$explode_area[0], 0) . '.' . $explode_area[1];
             }
             else
             {
-                $area .=  number_format($this->_floor_area_from, 0);
+                $area .= number_format((float)$this->_floor_area_from, 0);
             }
         }
         if ( $this->_floor_area_to != '' && $this->_floor_area_to != $this->_floor_area_from )
@@ -607,11 +607,11 @@ class PH_Property {
             $explode_area = explode(".", $this->_floor_area_to);
             if ( count($explode_area) == 2 )
             {
-                $area .= number_format($explode_area[0], 0) . '.' . $explode_area[1];
+                $area .= number_format((float)$explode_area[0], 0) . '.' . $explode_area[1];
             }
             else
             {
-                $area .=  number_format($this->_floor_area_to, 0);
+                $area .= number_format((float)$this->_floor_area_to, 0);
             }
         }
 
@@ -634,11 +634,11 @@ class PH_Property {
             $explode_area = explode(".", $this->_site_area_from);
             if ( count($explode_area) == 2 )
             {
-                $area .= number_format($explode_area[0], 0) . '.' . $explode_area[1];
+                $area .= number_format((float)$explode_area[0], 0) . '.' . $explode_area[1];
             }
             else
             {
-                $area .=  number_format($this->_site_area_from, 0);
+                $area .= number_format((float)$this->_site_area_from, 0);
             }
         }
         if ( $this->_site_area_to != '' && $this->_site_area_to != $this->_site_area_from )
@@ -650,11 +650,11 @@ class PH_Property {
             $explode_area = explode(".", $this->_site_area_to);
             if ( count($explode_area) == 2 )
             {
-                $area .= number_format($explode_area[0], 0) . '.' . $explode_area[1];
+                $area .= number_format((float)$explode_area[0], 0) . '.' . $explode_area[1];
             }
             else
             {
-                $area .=  number_format($this->_site_area_to, 0);
+                $area .= number_format((float)$this->_site_area_to, 0);
             }
         }
 
