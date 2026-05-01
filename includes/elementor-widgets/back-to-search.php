@@ -74,7 +74,7 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 				'global' => [
 					'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Typography::TYPOGRAPHY_PRIMARY,
 				],
-				'selector' => '{{WRAPPER}} .back-to-search',
+				'selector' => '{{WRAPPER}} .back-to-search a',
 			]
 		);
 
@@ -87,7 +87,7 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .back-to-search' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .back-to-search a' => 'color: {{VALUE}}',
 				],
 			]
 		);
