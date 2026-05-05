@@ -49,20 +49,6 @@ class Elementor_Property_Enquiry_Form_Link_Widget extends \Elementor\Widget_Base
 		);
 
 		$this->add_control(
-			'color',
-			[
-				'label' => __( 'Colour', 'propertyhive' ),
-				'type' => \Elementor\Controls_Manager::COLOR,
-				'global' => [
-				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
-				],
-				'selectors' => [
-					'{{WRAPPER}} a' => 'color: {{VALUE}}',
-				],
-			]
-		);
-
-		$this->add_control(
 			'text_align',
 			[
 				'label' => __( 'Alignment', 'propertyhive' ),
@@ -89,6 +75,30 @@ class Elementor_Property_Enquiry_Form_Link_Widget extends \Elementor\Widget_Base
 			]
 		);
 
+		$this->start_controls_tabs( 'button_style_tabs' );
+
+		// Normal tab
+		$this->start_controls_tab(
+			'button_style_normal',
+			[
+				'label' => __( 'Normal', 'propertyhive' ),
+			]
+		);
+
+		$this->add_control(
+			'color',
+			[
+				'label' => __( 'Colour', 'propertyhive' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'global' => [
+				    'default' => \Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
+				],
+				'selectors' => [
+					'{{WRAPPER}} a' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
 		$this->add_control(
 			'background_color',
 			[
@@ -102,6 +112,40 @@ class Elementor_Property_Enquiry_Form_Link_Widget extends \Elementor\Widget_Base
 				],
 			]
 		);
+
+		$this->end_controls_tab();
+
+		// Hover tab
+		$this->start_controls_tab(
+			'button_style_hover',
+			[
+				'label' => __( 'Hover', 'propertyhive' ),
+			]
+		);
+
+		$this->add_control(
+			'hover_color',
+			[
+				'label' => __( 'Colour', 'propertyhive' ),
+				'type'  => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} a:hover' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'background_hover_color',
+			[
+				'label' => __( 'Background Colour', 'propertyhive' ),
+				'type'  => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} a:hover' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
 
 		$this->add_control(
 			'padding',
