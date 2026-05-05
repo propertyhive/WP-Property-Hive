@@ -2159,7 +2159,7 @@ class PH_AJAX {
 
         if ( ! isset( $_POST['property_id'] ) || ( isset( $_POST['property_id'] ) && empty( $_POST['property_id'] ) ) )
         {
-            $errors[] = __( 'Property ID is a required field and must be supplied when making an enquiry', 'propertyhive' ) . ': ' . $key;
+            $errors[] = __( 'Property ID is a required field and must be supplied when making an enquiry', 'propertyhive' );
         }
         else
         {
