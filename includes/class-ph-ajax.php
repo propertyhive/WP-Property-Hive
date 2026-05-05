@@ -2280,6 +2280,17 @@ class PH_AJAX {
             $errors[] = __( 'Missing required field', 'propertyhive' ) . ': disclaimer';
         }
         
+        // Passed validation
+        $property_ids = array_filter( array_map( 'absint', explode( '|', sanitize_text_field( wp_unslash( $_POST['property_id'] ) ) ) ) );
+        foreach ( $property_ids as $property_id ) 
+        {
+            if ( get_post_type($property_id) !== 'property' ) 
+            {
+                $errors[] = __( 'Invalid property supplied', 'propertyhive' );
+                break;
+            }
+        }
+
         if ( !empty($errors) )
         {
             // Failed validation
@@ -2290,9 +2301,6 @@ class PH_AJAX {
         }
         else
         {
-            // Passed validation
-            $property_ids = explode("|", ph_clean($_POST['property_id']));
-            
             // Get recipient email address
             $to = '';
             
