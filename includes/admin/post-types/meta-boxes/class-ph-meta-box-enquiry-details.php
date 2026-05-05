@@ -252,6 +252,8 @@ function viewing_update_selected_properties()
             {
                 if ( ! in_array( $key, $ignore_keys ) && ( substr( $key, 0, 1 ) != '_' || $key == '_property_id' ) && strpos($key, 'captcha') === FALSE )
                 {
+                    $is_html = false;
+
                     if ( $key == '_property_id' || $key == 'property_id' )
                     {
                         $property_links = array();
@@ -266,6 +268,8 @@ function viewing_update_selected_properties()
                         $value = implode('<br>', $property_links);
 
                         $key = 'property';
+
+                        $is_html = true;
                     }
                     else
                     {
@@ -280,15 +284,34 @@ function viewing_update_selected_properties()
                     {
                         $value = '<a href="mailto:' . esc_attr($value) . '">' . esc_html($value) . '</a>';
                         $email = $value;
+                        $is_html = true;
                     }
 
                     echo '<p class="form-field enquiry_details_field">
 
-                            <label>' . ucwords( str_replace('_', ' ', trim($key, "_") ) ) . '</label>
+                            <label>' . esc_html( ucwords( str_replace('_', ' ', trim($key, "_") ) ) ) . '</label>';
 
-                            ' . nl2br( $value ) . '
+                    if ( $is_html )
+                    {
+                        echo wp_kses(
+                            nl2br( $value ),
+                            array(
+                                'br' => array(),
+                                'a'  => array(
+                                    'href' => array(),
+                                    'title' => array(),
+                                    'target' => array(),
+                                    'rel' => array(),
+                                ),
+                            )
+                        );
+                    }
+                    else
+                    {
+                        echo nl2br( esc_html( $value ) );
+                    }
 
-                          </p>';
+                    echo '</p>';
                 }
             }
 
