@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Property Hive plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Property Hive 2.2.2\n"
+"Project-Id-Version: Property Hive 2.2.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/propertyhive\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-21T17:58:30+01:00\n"
+"POT-Creation-Date: 2026-05-05T12:41:15+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: propertyhive\n"
@@ -408,11 +408,11 @@ msgstr ""
 #: includes/admin/views/html-viewing-actions.php:656
 #: includes/admin/views/html-viewing-actions.php:678
 #: includes/admin/views/html-viewing-actions.php:697
-#: includes/class-ph-ajax.php:3702
-#: includes/class-ph-ajax.php:3724
-#: includes/class-ph-ajax.php:3792
-#: includes/class-ph-ajax.php:3808
-#: includes/class-ph-ajax.php:3830
+#: includes/class-ph-ajax.php:3758
+#: includes/class-ph-ajax.php:3780
+#: includes/class-ph-ajax.php:3848
+#: includes/class-ph-ajax.php:3864
+#: includes/class-ph-ajax.php:3886
 msgid "Cancel"
 msgstr ""
 
@@ -568,7 +568,7 @@ msgstr ""
 #: includes/admin/class-ph-admin-menus.php:184
 #: includes/admin/class-ph-admin-reports.php:46
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:249
-#: includes/class-ph-ajax.php:2368
+#: includes/class-ph-ajax.php:2410
 #: includes/class-ph-post-types.php:541
 #: includes/ph-template-functions.php:1407
 msgid "Properties"
@@ -706,7 +706,7 @@ msgid "Potential Owner"
 msgstr ""
 
 #: includes/admin/class-ph-admin-merge-contacts.php:82
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:295
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:318
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:140
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:221
 msgid "Applicant"
@@ -1145,37 +1145,20 @@ msgid "Select a page&hellip;"
 msgstr ""
 
 #. translators: 1: number of items, 2: post type label
-#: includes/admin/class-ph-admin.php:56
+#: includes/admin/class-ph-admin.php:55
 msgid "%1$s %2$s moved to archive."
 msgid_plural "%1$s %2$s moved to archive."
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: number of items, 2: post type label
-#: includes/admin/class-ph-admin.php:86
+#: includes/admin/class-ph-admin.php:85
 msgid "%1$s %2$s removed from archive."
 msgid_plural "%1$s %2$s removed from archive."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-ph-admin.php:122
-msgid "The Template Assistant add-on has been retired."
-msgstr ""
-
-#: includes/admin/class-ph-admin.php:123
-msgid "Its functionality is now built into Property Hive under 'Property Hive &gt; Settings &gt; Frontend'."
-msgstr ""
-
-#: includes/admin/class-ph-admin.php:127
-#: includes/admin/settings/class-ph-settings-template-assistant.php:82
-msgid "Read more"
-msgstr ""
-
-#: includes/admin/class-ph-admin.php:128
-msgid "Dismiss this notice"
-msgstr ""
-
-#: includes/admin/class-ph-admin.php:196
+#: includes/admin/class-ph-admin.php:168
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1012
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1122
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1236
@@ -1194,15 +1177,15 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:200
-#: includes/admin/class-ph-admin.php:210
+#: includes/admin/class-ph-admin.php:172
+#: includes/admin/class-ph-admin.php:182
 #: includes/admin/settings/class-ph-settings-emails.php:578
 msgid "Date/Time"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:201
-#: includes/admin/class-ph-admin.php:211
-#: includes/admin/class-ph-admin.php:220
+#: includes/admin/class-ph-admin.php:173
+#: includes/admin/class-ph-admin.php:183
+#: includes/admin/class-ph-admin.php:192
 #: includes/admin/post-types/class-ph-admin-cpt-appraisal.php:102
 #: includes/admin/post-types/class-ph-admin-cpt-key-date.php:102
 #: includes/admin/post-types/class-ph-admin-cpt-offer.php:102
@@ -1216,7 +1199,7 @@ msgstr ""
 #: includes/admin/views/html-contact-sales-meta-box.php:35
 #: includes/admin/views/html-contact-tenancies-meta-box.php:88
 #: includes/admin/views/html-contact-viewings-meta-box.php:32
-#: includes/class-ph-ajax.php:2368
+#: includes/class-ph-ajax.php:2410
 #: includes/class-ph-elementor.php:360
 #: includes/class-ph-post-types.php:542
 #: templates/account/applicant-viewings.php:30
@@ -1226,9 +1209,9 @@ msgstr ""
 msgid "Property"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:203
-#: includes/admin/class-ph-admin.php:213
-#: includes/admin/class-ph-admin.php:222
+#: includes/admin/class-ph-admin.php:175
+#: includes/admin/class-ph-admin.php:185
+#: includes/admin/class-ph-admin.php:194
 #: includes/admin/post-types/class-ph-admin-cpt-offer.php:104
 #: includes/admin/post-types/class-ph-admin-cpt-sale.php:104
 #: includes/admin/post-types/class-ph-admin-cpt-viewing.php:164
@@ -1238,7 +1221,7 @@ msgstr ""
 msgid "Applicant(s)"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:204
+#: includes/admin/class-ph-admin.php:176
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-event.php:132
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:144
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:170
@@ -1248,9 +1231,9 @@ msgstr ""
 msgid "Attending Negotiator(s)"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:205
-#: includes/admin/class-ph-admin.php:214
-#: includes/admin/class-ph-admin.php:223
+#: includes/admin/class-ph-admin.php:177
+#: includes/admin/class-ph-admin.php:186
+#: includes/admin/class-ph-admin.php:195
 #: includes/admin/post-types/class-ph-admin-cpt-appraisal.php:105
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:245
 #: includes/admin/post-types/class-ph-admin-cpt-key-date.php:105
@@ -1275,29 +1258,29 @@ msgstr ""
 #: includes/admin/views/html-property-tenancies-meta-box.php:90
 #: includes/admin/views/html-property-viewings-meta-box.php:34
 #: includes/admin/views/html-viewing-details-meta-box.php:13
-#: includes/class-ph-ajax.php:3395
-#: includes/class-ph-ajax.php:6942
-#: includes/class-ph-ajax.php:7292
+#: includes/class-ph-ajax.php:3451
+#: includes/class-ph-ajax.php:6998
+#: includes/class-ph-ajax.php:7348
 #: templates/account/owner-properties.php:28
 msgid "Status"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:206
+#: includes/admin/class-ph-admin.php:178
 #: includes/admin/views/html-viewing-details-meta-box.php:124
 #: includes/admin/views/html-viewing-details-meta-box.php:134
 msgid "Feedback"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:215
+#: includes/admin/class-ph-admin.php:187
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:209
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:251
 #: includes/admin/views/html-contact-offers-meta-box.php:37
 #: includes/admin/views/html-property-offers-meta-box.php:36
-#: includes/class-ph-ajax.php:7004
+#: includes/class-ph-ajax.php:7060
 msgid "Offer Amount"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:219
+#: includes/admin/class-ph-admin.php:191
 #: includes/admin/views/html-contact-enquiries-meta-box.php:47
 #: includes/admin/views/html-contact-viewings-meta-box.php:31
 #: includes/admin/views/html-display-enquiries.php:8
@@ -1306,71 +1289,71 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:224
+#: includes/admin/class-ph-admin.php:196
 #: includes/admin/views/html-contact-sales-meta-box.php:37
 #: includes/admin/views/html-property-sales-meta-box.php:36
-#: includes/class-ph-ajax.php:7315
+#: includes/class-ph-ajax.php:7371
 msgid "Sale Amount"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:491
-#: includes/admin/class-ph-admin.php:492
-#: includes/admin/class-ph-admin.php:509
+#: includes/admin/class-ph-admin.php:463
+#: includes/admin/class-ph-admin.php:464
+#: includes/admin/class-ph-admin.php:481
 msgid "Welcome to Property Hive"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:696
+#: includes/admin/class-ph-admin.php:668
 msgid "<strong>Finding Property Hive useful?</strong> Please take a minute to <a href=\"https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post\" target=\"_blank\">leave us a ★★★★★ review</a>"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:714
+#: includes/admin/class-ph-admin.php:686
 msgid "<strong>It looks like you're also running Easy Property Listings.</strong> This will cause conflicts with Property Hive and should be deactivated."
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:739
+#: includes/admin/class-ph-admin.php:711
 msgid "<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:763
+#: includes/admin/class-ph-admin.php:735
 msgid "We noticed that you haven't assigned a page to be your 'Search Results' page yet. We recommend that you do this in order to display properties on your site."
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:766
+#: includes/admin/class-ph-admin.php:738
 msgid "Go To Property Hive Settings"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:767
-#: includes/admin/class-ph-admin.php:798
-#: includes/admin/class-ph-admin.php:836
+#: includes/admin/class-ph-admin.php:739
+#: includes/admin/class-ph-admin.php:770
+#: includes/admin/class-ph-admin.php:808
 msgid "Dismiss"
 msgstr ""
 
 #. translators: %s: URL to plugin settings page where the Google Maps API key can be entered
-#: includes/admin/class-ph-admin.php:792
+#: includes/admin/class-ph-admin.php:764
 msgid "We noticed that you haven't entered a Google Maps API key. If wishing to display a map on your website it's recommended that you <a href=\"https://developers.google.com/maps/documentation/javascript/get-api-key\" target=\"_blank\">create one</a> and <a href=\"%s\">enter it</a>."
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:797
+#: includes/admin/class-ph-admin.php:769
 msgid "Enter Google Maps API Key"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:821
+#: includes/admin/class-ph-admin.php:793
 msgid "Your Property Hive license key is inactive."
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:835
+#: includes/admin/class-ph-admin.php:807
 msgid "Go To License Key Settings"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:853
+#: includes/admin/class-ph-admin.php:825
 msgid "The Property Hive email queue does not appear to be running"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:856
+#: includes/admin/class-ph-admin.php:828
 msgid "Go To Email Queue"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:868
+#: includes/admin/class-ph-admin.php:840
 msgid "Contacts merged successfully"
 msgstr ""
 
@@ -1410,7 +1393,7 @@ msgid "Owner / Landlord"
 msgstr ""
 
 #: includes/admin/post-types/class-ph-admin-cpt-appraisal.php:104
-#: includes/class-ph-ajax.php:3445
+#: includes/class-ph-ajax.php:3501
 msgid "Valued Price"
 msgstr ""
 
@@ -1495,7 +1478,7 @@ msgstr ""
 #: includes/admin/views/html-viewing-actions.php:529
 #: includes/admin/views/html-viewing-actions.php:567
 #: includes/admin/views/html-viewing-actions.php:605
-#: includes/class-ph-ajax.php:3688
+#: includes/class-ph-ajax.php:3744
 msgid "Subject"
 msgstr ""
 
@@ -1552,7 +1535,7 @@ msgid "Date Due"
 msgstr ""
 
 #: includes/admin/post-types/class-ph-admin-cpt-offer.php:101
-#: includes/class-ph-ajax.php:6957
+#: includes/class-ph-ajax.php:7013
 msgid "Offer Date / Time"
 msgstr ""
 
@@ -1670,7 +1653,7 @@ msgstr ""
 #: includes/admin/post-types/class-ph-admin-cpt-sale.php:101
 #: includes/admin/views/html-contact-sales-meta-box.php:34
 #: includes/admin/views/html-property-sales-meta-box.php:34
-#: includes/class-ph-ajax.php:7307
+#: includes/class-ph-ajax.php:7363
 msgid "Sale Date"
 msgstr ""
 
@@ -2456,7 +2439,7 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:42
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:155
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:652
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:338
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:361
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:52
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:181
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:643
@@ -2528,18 +2511,18 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:273
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:271
 #: includes/admin/views/html-viewing-actions.php:392
-#: includes/class-ph-ajax.php:3668
-#: includes/class-ph-ajax.php:7038
-#: includes/class-ph-ajax.php:7349
+#: includes/class-ph-ajax.php:3724
+#: includes/class-ph-ajax.php:7094
+#: includes/class-ph-ajax.php:7405
 msgid "Back To Actions"
 msgstr ""
 
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:295
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-actions.php:99
 #: includes/admin/views/html-viewing-actions.php:378
-#: includes/class-ph-ajax.php:3654
-#: includes/class-ph-ajax.php:7123
-#: includes/class-ph-ajax.php:7406
+#: includes/class-ph-ajax.php:3710
+#: includes/class-ph-ajax.php:7179
+#: includes/class-ph-ajax.php:7462
 msgid "No actions to display"
 msgstr ""
 
@@ -2684,8 +2667,8 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:249
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-lettings-details.php:76
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:172
-#: includes/class-ph-ajax.php:3465
-#: includes/class-ph-ajax.php:3783
+#: includes/class-ph-ajax.php:3521
+#: includes/class-ph-ajax.php:3839
 msgid "Per Week"
 msgstr ""
 
@@ -2693,8 +2676,8 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:250
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-lettings-details.php:77
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:173
-#: includes/class-ph-ajax.php:3466
-#: includes/class-ph-ajax.php:3784
+#: includes/class-ph-ajax.php:3522
+#: includes/class-ph-ajax.php:3840
 msgid "Per Calendar Month"
 msgstr ""
 
@@ -2702,8 +2685,8 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:251
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-lettings-details.php:78
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:174
-#: includes/class-ph-ajax.php:3467
-#: includes/class-ph-ajax.php:3785
+#: includes/class-ph-ajax.php:3523
+#: includes/class-ph-ajax.php:3841
 msgid "Per Quarter"
 msgstr ""
 
@@ -2711,8 +2694,8 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:252
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-lettings-details.php:79
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:175
-#: includes/class-ph-ajax.php:3468
-#: includes/class-ph-ajax.php:3786
+#: includes/class-ph-ajax.php:3524
+#: includes/class-ph-ajax.php:3842
 msgid "Per Annum"
 msgstr ""
 
@@ -2801,33 +2784,33 @@ msgstr ""
 #: includes/admin/views/html-viewing-actions.php:537
 #: includes/admin/views/html-viewing-actions.php:575
 #: includes/admin/views/html-viewing-actions.php:613
-#: includes/class-ph-ajax.php:3696
+#: includes/class-ph-ajax.php:3752
 msgid "Body"
 msgstr ""
 
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:295
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:318
 #: includes/class-ph-post-types.php:581
 msgid "Contact"
 msgstr ""
 
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:342
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:365
 #: includes/class-ph-additional-fields.php:630
 msgid "View"
 msgstr ""
 
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:347
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:370
 msgid "Create"
 msgstr ""
 
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:359
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:382
 msgid "Creating"
 msgstr ""
 
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:372
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:395
 msgid "Create "
 msgstr ""
 
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:379
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-details.php:402
 msgid " Created. View Now"
 msgstr ""
 
@@ -3020,8 +3003,8 @@ msgstr ""
 
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:248
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-lettings-details.php:74
-#: includes/class-ph-ajax.php:3463
-#: includes/class-ph-ajax.php:3781
+#: includes/class-ph-ajax.php:3519
+#: includes/class-ph-ajax.php:3837
 msgid "Per Day"
 msgstr ""
 
@@ -3353,8 +3336,8 @@ msgid "Add Photos"
 msgstr ""
 
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-lettings-details.php:75
-#: includes/class-ph-ajax.php:3464
-#: includes/class-ph-ajax.php:3782
+#: includes/class-ph-ajax.php:3520
+#: includes/class-ph-ajax.php:3838
 msgid "Per Person Per Week"
 msgstr ""
 
@@ -4567,7 +4550,8 @@ msgstr ""
 #: includes/elementor-widgets/property-actions.php:116
 #: includes/elementor-widgets/property-actions.php:151
 #: includes/elementor-widgets/property-brochures-link.php:104
-#: includes/elementor-widgets/property-enquiry-form-link.php:95
+#: includes/elementor-widgets/property-enquiry-form-link.php:105
+#: includes/elementor-widgets/property-enquiry-form-link.php:140
 #: includes/elementor-widgets/property-epcs-link.php:95
 #: includes/elementor-widgets/property-floorplans-link.php:95
 #: includes/elementor-widgets/property-map-link.php:109
@@ -5209,6 +5193,10 @@ msgstr ""
 msgid "Template Assistant"
 msgstr ""
 
+#: includes/admin/settings/class-ph-settings-template-assistant.php:82
+msgid "Read more"
+msgstr ""
+
 #: includes/admin/settings/class-ph-settings-template-assistant.php:95
 msgid "Now found in 'Property Hive > Settings > Frontend > Search Results'."
 msgstr ""
@@ -5433,8 +5421,8 @@ msgstr ""
 #: includes/admin/views/html-viewing-actions.php:89
 #: includes/admin/views/html-viewing-actions.php:311
 #: includes/admin/views/html-viewing-actions.php:321
-#: includes/class-ph-ajax.php:3536
-#: includes/class-ph-ajax.php:3546
+#: includes/class-ph-ajax.php:3592
+#: includes/class-ph-ajax.php:3602
 msgid "Email "
 msgstr ""
 
@@ -5442,8 +5430,8 @@ msgstr ""
 #: includes/admin/views/html-viewing-actions.php:89
 #: includes/admin/views/html-viewing-actions.php:311
 #: includes/admin/views/html-viewing-actions.php:321
-#: includes/class-ph-ajax.php:3536
-#: includes/class-ph-ajax.php:3546
+#: includes/class-ph-ajax.php:3592
+#: includes/class-ph-ajax.php:3602
 msgid "Re-Email "
 msgstr ""
 
@@ -5510,8 +5498,8 @@ msgid "Re-Email Negotiator Cancellation Notification"
 msgstr ""
 
 #: includes/admin/views/html-viewing-actions.php:366
-#: includes/class-ph-ajax.php:3642
-#: includes/class-ph-ajax.php:7111
+#: includes/class-ph-ajax.php:3698
+#: includes/class-ph-ajax.php:7167
 msgid "Revert To Pending"
 msgstr ""
 
@@ -5530,15 +5518,15 @@ msgstr ""
 #: includes/admin/views/html-viewing-actions.php:552
 #: includes/admin/views/html-viewing-actions.php:590
 #: includes/admin/views/html-viewing-actions.php:628
-#: includes/class-ph-ajax.php:3703
+#: includes/class-ph-ajax.php:3759
 msgid "Send"
 msgstr ""
 
 #: includes/admin/views/html-viewing-actions.php:643
 #: includes/admin/views/html-viewing-details-meta-box.php:49
 #: includes/admin/views/html-viewing-details-meta-box.php:67
-#: includes/class-ph-ajax.php:3405
-#: includes/class-ph-ajax.php:3718
+#: includes/class-ph-ajax.php:3461
+#: includes/class-ph-ajax.php:3774
 #: templates/account/applicant-viewings.php:45
 #: templates/account/applicant-viewings.php:89
 #: templates/account/owner-viewings.php:45
@@ -5558,8 +5546,8 @@ msgid "If checked, the reason for cancellation entered will be visible to applic
 msgstr ""
 
 #: includes/admin/views/html-viewing-actions.php:657
-#: includes/class-ph-ajax.php:3725
-#: includes/class-ph-ajax.php:3793
+#: includes/class-ph-ajax.php:3781
+#: includes/class-ph-ajax.php:3849
 msgid "Save"
 msgstr ""
 
@@ -5620,8 +5608,8 @@ msgstr ""
 #: includes/bricks-builder-widgets/property-enquiry-form-link.php:63
 #: includes/divi-widgets/property-enquiry-form-link.php:36
 #: includes/divi-widgets/property-enquiry-form-link.php:41
-#: includes/elementor-widgets/property-enquiry-form-link.php:140
-#: includes/elementor-widgets/property-enquiry-form-link.php:145
+#: includes/elementor-widgets/property-enquiry-form-link.php:184
+#: includes/elementor-widgets/property-enquiry-form-link.php:189
 #: includes/elementor-widgets/property-tabbed-details.php:91
 #: templates/global/make-enquiry.php:17
 #: templates/global/make-enquiry.php:22
@@ -5631,7 +5619,7 @@ msgstr ""
 #: includes/avada-widgets/property-enquiry-form-link-shortcode.php:57
 #: includes/bricks-builder-widgets/property-enquiry-form-link.php:65
 #: includes/divi-widgets/property-enquiry-form-link.php:43
-#: includes/elementor-widgets/property-enquiry-form-link.php:147
+#: includes/elementor-widgets/property-enquiry-form-link.php:191
 #: templates/global/make-enquiry.php:24
 msgid "Please complete the form below and a member of staff will be in touch shortly."
 msgstr ""
@@ -6246,6 +6234,22 @@ msgstr ""
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
+#: includes/class-ph-ai-service.php:23
+msgid "No AI action was specified."
+msgstr ""
+
+#: includes/class-ph-ai-service.php:61
+msgid "The AI service returned an unexpected response."
+msgstr ""
+
+#: includes/class-ph-ai-service.php:74
+msgid "The AI service returned an invalid response."
+msgstr ""
+
+#: includes/class-ph-ai-service.php:84
+msgid "The AI service could not complete the request."
+msgstr ""
+
 #: includes/class-ph-ajax.php:391
 msgid "Error decoding response from reCAPTCHA check"
 msgstr ""
@@ -6335,137 +6339,141 @@ msgstr ""
 msgid "Failed hCaptcha validation"
 msgstr ""
 
-#: includes/class-ph-ajax.php:2358
+#: includes/class-ph-ajax.php:2323
+msgid "Invalid property supplied"
+msgstr ""
+
+#: includes/class-ph-ajax.php:2400
 msgid "New Property Enquiry"
 msgstr ""
 
-#: includes/class-ph-ajax.php:2362
-#: includes/class-ph-ajax.php:2464
+#: includes/class-ph-ajax.php:2404
+#: includes/class-ph-ajax.php:2520
 msgid "Multiple Property Enquiry"
 msgstr ""
 
-#: includes/class-ph-ajax.php:2364
+#: includes/class-ph-ajax.php:2406
 msgid "You have received a property enquiry via your website. Please find details of the enquiry below"
 msgstr ""
 
-#: includes/class-ph-ajax.php:2401
+#: includes/class-ph-ajax.php:2443
 msgid "To manage this enquiry please visit the following URL"
 msgstr ""
 
-#: includes/class-ph-ajax.php:2460
+#: includes/class-ph-ajax.php:2516
 msgid "Property Enquiry"
 msgstr ""
 
-#: includes/class-ph-ajax.php:2468
+#: includes/class-ph-ajax.php:2524
 msgid " from "
 msgstr ""
 
-#: includes/class-ph-ajax.php:2775
+#: includes/class-ph-ajax.php:2831
 msgid "Email address is invalid"
 msgstr ""
 
-#: includes/class-ph-ajax.php:2817
+#: includes/class-ph-ajax.php:2873
 msgid "A contact, "
 msgstr ""
 
-#: includes/class-ph-ajax.php:3366
+#: includes/class-ph-ajax.php:3422
 msgid "Views On Website"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3458
+#: includes/class-ph-ajax.php:3514
 msgid "Valued Rent"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3479
-#: includes/class-ph-ajax.php:3824
+#: includes/class-ph-ajax.php:3535
+#: includes/class-ph-ajax.php:3880
 msgid "Reason Lost"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3571
+#: includes/class-ph-ajax.php:3627
 msgid "Appraisal Carried Out"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3576
+#: includes/class-ph-ajax.php:3632
 msgid "Appraisal Cancelled"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3588
+#: includes/class-ph-ajax.php:3644
 msgid "Appraisal Won"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3594
+#: includes/class-ph-ajax.php:3650
 msgid "Appraisal Lost"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3605
+#: includes/class-ph-ajax.php:3661
 msgid "Instruct Property"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3616
+#: includes/class-ph-ajax.php:3672
 msgid "Revert To Carried Out"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3627
+#: includes/class-ph-ajax.php:3683
 msgid "View Instructed Property"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3765
+#: includes/class-ph-ajax.php:3821
 msgid "Valued Price ("
 msgstr ""
 
-#: includes/class-ph-ajax.php:3776
+#: includes/class-ph-ajax.php:3832
 msgid "Valued Rent ("
 msgstr ""
 
-#: includes/class-ph-ajax.php:3806
+#: includes/class-ph-ajax.php:3862
 msgid "Upon instruction a new property record will be created within the 'Properties' area."
 msgstr ""
 
-#: includes/class-ph-ajax.php:3809
+#: includes/class-ph-ajax.php:3865
 msgid "OK"
 msgstr ""
 
-#: includes/class-ph-ajax.php:3831
+#: includes/class-ph-ajax.php:3887
 msgid "Save Reason Lost"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7059
+#: includes/class-ph-ajax.php:7115
 msgid "Accept Offer"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7064
+#: includes/class-ph-ajax.php:7120
 msgid "Decline Offer"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7069
-#: includes/class-ph-ajax.php:7101
+#: includes/class-ph-ajax.php:7125
+#: includes/class-ph-ajax.php:7157
 msgid "Withdraw Offer"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7087
+#: includes/class-ph-ajax.php:7143
 #: includes/class-ph-post-types.php:795
 #: includes/class-ph-post-types.php:796
 msgid "View Sale"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7096
+#: includes/class-ph-ajax.php:7152
 msgid "Create Sale"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7370
+#: includes/class-ph-ajax.php:7426
 msgid "Sale Exchanged"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7380
+#: includes/class-ph-ajax.php:7436
 msgid "Sale Completed"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7394
+#: includes/class-ph-ajax.php:7450
 msgid "Sale Fallen Through"
 msgstr ""
 
-#: includes/class-ph-ajax.php:7718
-#: includes/class-ph-ajax.php:7778
+#: includes/class-ph-ajax.php:7774
+#: includes/class-ph-ajax.php:7834
 msgid "You do not have permission to manage key dates"
 msgstr ""
 
@@ -7510,7 +7518,8 @@ msgstr ""
 #: includes/elementor-widgets/property-brochures-link.php:63
 #: includes/elementor-widgets/property-council-tax-band.php:92
 #: includes/elementor-widgets/property-deposit.php:93
-#: includes/elementor-widgets/property-enquiry-form-link.php:54
+#: includes/elementor-widgets/property-enquiry-form-link.php:91
+#: includes/elementor-widgets/property-enquiry-form-link.php:129
 #: includes/elementor-widgets/property-epcs-link.php:54
 #: includes/elementor-widgets/property-floor-area.php:92
 #: includes/elementor-widgets/property-floorplans-link.php:54
@@ -7564,7 +7573,7 @@ msgstr ""
 #: includes/elementor-widgets/property-brochures-link.php:77
 #: includes/elementor-widgets/property-council-tax-band.php:120
 #: includes/elementor-widgets/property-deposit.php:107
-#: includes/elementor-widgets/property-enquiry-form-link.php:68
+#: includes/elementor-widgets/property-enquiry-form-link.php:54
 #: includes/elementor-widgets/property-epcs-link.php:68
 #: includes/elementor-widgets/property-floor-area.php:120
 #: includes/elementor-widgets/property-floorplans-link.php:68
@@ -7598,7 +7607,7 @@ msgstr ""
 #: includes/elementor-widgets/property-brochures-link.php:81
 #: includes/elementor-widgets/property-council-tax-band.php:124
 #: includes/elementor-widgets/property-deposit.php:111
-#: includes/elementor-widgets/property-enquiry-form-link.php:72
+#: includes/elementor-widgets/property-enquiry-form-link.php:58
 #: includes/elementor-widgets/property-epcs-link.php:72
 #: includes/elementor-widgets/property-floor-area.php:124
 #: includes/elementor-widgets/property-floorplans-link.php:72
@@ -7632,7 +7641,7 @@ msgstr ""
 #: includes/elementor-widgets/property-brochures-link.php:85
 #: includes/elementor-widgets/property-council-tax-band.php:128
 #: includes/elementor-widgets/property-deposit.php:115
-#: includes/elementor-widgets/property-enquiry-form-link.php:76
+#: includes/elementor-widgets/property-enquiry-form-link.php:62
 #: includes/elementor-widgets/property-epcs-link.php:76
 #: includes/elementor-widgets/property-floor-area.php:128
 #: includes/elementor-widgets/property-floorplans-link.php:76
@@ -7666,7 +7675,7 @@ msgstr ""
 #: includes/elementor-widgets/property-brochures-link.php:89
 #: includes/elementor-widgets/property-council-tax-band.php:132
 #: includes/elementor-widgets/property-deposit.php:119
-#: includes/elementor-widgets/property-enquiry-form-link.php:80
+#: includes/elementor-widgets/property-enquiry-form-link.php:66
 #: includes/elementor-widgets/property-epcs-link.php:80
 #: includes/elementor-widgets/property-floor-area.php:132
 #: includes/elementor-widgets/property-floorplans-link.php:80
@@ -7707,10 +7716,12 @@ msgid "Button Width"
 msgstr ""
 
 #: includes/elementor-widgets/property-actions.php:106
+#: includes/elementor-widgets/property-enquiry-form-link.php:84
 msgid "Normal"
 msgstr ""
 
 #: includes/elementor-widgets/property-actions.php:141
+#: includes/elementor-widgets/property-enquiry-form-link.php:122
 msgid "Hover"
 msgstr ""
 
@@ -7758,7 +7769,7 @@ msgid "Brochures"
 msgstr ""
 
 #: includes/elementor-widgets/property-brochures-link.php:118
-#: includes/elementor-widgets/property-enquiry-form-link.php:109
+#: includes/elementor-widgets/property-enquiry-form-link.php:153
 #: includes/elementor-widgets/property-epcs-link.php:109
 #: includes/elementor-widgets/property-floorplans-link.php:109
 #: includes/elementor-widgets/property-map-link.php:123
