@@ -2424,17 +2424,31 @@ class PH_AJAX {
             }
 
             $headers = array();
-            if ( isset($_POST['name']) && ! empty($_POST['name']) )
+            $name = isset( $_POST['name'] )
+                ? sanitize_text_field( wp_unslash( $_POST['name'] ) )
+                : '';
+
+            $name = str_replace( array( "\r", "\n" ), '', $name );
+
+            $from_email_address = sanitize_email( $from_email_address );
+
+            if ( $name !== '' ) 
             {
-                $headers[] = 'From: ' . html_entity_decode(ph_clean( $_POST['name'] )) . ' <' . sanitize_email( $from_email_address ) . '>';
+                $headers[] = sprintf( 'From: %s <%s>', $name, $from_email_address );
             }
             else
             {
-                $headers[] = 'From: <' . sanitize_email( $from_email_address ) . '>';
+                $headers[] = sprintf( 'From: <%s>', $from_email_address );
             }
-            if ( isset($_POST['email_address']) && sanitize_email( $_POST['email_address'] ) != '' )
+
+            if ( isset($_POST['email_address']) ) 
             {
-                $headers[] = 'Reply-To: ' . sanitize_email( $_POST['email_address'] );
+                $reply_to = sanitize_email(wp_unslash($_POST['email_address']));
+
+                if ( is_email($reply_to) ) 
+                {
+                    $headers[] = 'Reply-To: ' . $reply_to;
+                }
             }
 
             $to = apply_filters( 'propertyhive_property_enquiry_to', $to, $property_ids );
@@ -2473,7 +2487,7 @@ class PH_AJAX {
                     }
                     if ( isset($_POST['name']) && ! empty($_POST['name']) )
                     {
-                        $title .= __( ' from ', 'propertyhive' ) . ph_clean($_POST['name']);
+                        $title .= __( ' from ', 'propertyhive' ) . ph_clean(wp_unslash($_POST['name']));
                     }
                     
                     $enquiry_post = array(
@@ -2504,7 +2518,7 @@ class PH_AJAX {
                         }
                         else
                         {
-                            add_post_meta( $enquiry_post_id, $key, sanitize_textarea_field($value) );
+                            add_post_meta( $enquiry_post_id, $key, sanitize_textarea_field(wp_unslash($value)) );
                         }
                     }
                 }
