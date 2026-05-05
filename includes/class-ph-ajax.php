@@ -2279,7 +2279,41 @@ class PH_AJAX {
         {
             $errors[] = __( 'Missing required field', 'propertyhive' ) . ': disclaimer';
         }
-        
+
+        // Check only expected fields are received
+        /*$allowed_keys = array_keys($form_controls);
+        $allowed_keys[] = 'action';
+        $allowed_keys[] = 'utm_source';
+        $allowed_keys[] = 'utm_medium';
+        $allowed_keys[] = 'utm_term';
+        $allowed_keys[] = 'utm_content';
+        $allowed_keys[] = 'utm_campaign';
+        $allowed_keys[] = 'gclid';
+        $allowed_keys[] = 'fbclid';
+        $allowed_keys[] = 'property_id';
+        $allowed_keys[] = 'disclaimer';
+        $allowed_keys[] = 'g-recaptcha-response';
+        $allowed_keys[] = 'h-captcha-response';
+        $allowed_keys[] = 'cf-turnstile-response';
+
+        $allowed_keys = apply_filters(
+            'propertyhive_property_enquiry_allowed_keys',
+            $allowed_keys
+        );
+
+        foreach ( $_POST as $key => $value )
+        {
+            if ( !in_array($key, $allowed_keys) )
+            {
+                // Unexpected field
+                $errors[] = sprintf(
+                    esc_html__( 'Unexpected field %s received', 'propertyhive' ),
+                    esc_html( $key )
+                );
+                break;
+            }
+        }*/
+
         // Passed validation
         $property_ids = array_filter( array_map( 'absint', explode( '|', sanitize_text_field( wp_unslash( $_POST['property_id'] ) ) ) ) );
         foreach ( $property_ids as $property_id ) 
