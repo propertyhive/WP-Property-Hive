@@ -187,7 +187,7 @@ The free core plugin contains the foundations that you need to create a property
 * Added new AI Service class for upcoming AI functionality
 * Updated string output for easier translation including translator comments
 * Updated validation and sanitisation around property enquiries
-* Updated commercial floor and site area so it's case to float before being output
+* Updated commercial floor and site area so it's cast to float before being output
 * Corrected issue with missing Google API key warning if provider is Mapbox
 * Corrected Back To Search Elementor widget colour not taking effect
 
