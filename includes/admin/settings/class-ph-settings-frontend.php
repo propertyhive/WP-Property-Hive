@@ -98,6 +98,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 	public function get_sections() {
 		$sections = array(
 			'' => __( 'Search Results', 'propertyhive' ),
+            'full-details' => __( 'Full Details', 'propertyhive' ),
 			'search-forms' => __( 'Search Forms', 'propertyhive' ),
 			'flags' => __( 'Flags', 'propertyhive' ),
 		);
@@ -419,6 +420,29 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         );
 
         $settings[] = array( 'type' => 'sectionend', 'id' => 'template_assistant_search_forms_settings');
+
+        return $settings;
+    }
+
+    public function get_full_details_settings()
+    {
+        $current_settings = get_option( 'propertyhive_template_assistant', array() );
+
+        $settings = array(
+
+            array( 'title' => __( 'Full Details', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'template_assistant_full_details_settings' )
+
+        );
+
+        $settings[] = array(
+            'type' => 'html',
+            'html' => '<a href="#" style="margin-top:15px; vertical-align:middle; min-height:50px; line-height:50px; font-size:14px;" class="open-full-details-layout-assistant button button-primary">
+                <img alt="" style="vertical-align:middle; height:30px; margin-right:6px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFTklEQVR4AeyaW4hVVRzGnaJs0oqMwIqCMolAIqgIwsKu5EvTQ4RTauUUdn0pooeCFKyHApNu+FBGZWMhSQaZleVL9WAQPVZeUVBRvOJlVHT8fePesGe71tp77b3WnnOYM3zfrPt//f/fXmeftdc+54wZ5X8dAUb5AhjTWQGdFTDKFWjbj8Dg4GAvPAYH4CNVr2NbCkDA5xHwR/B8OBYupu5cUm+0pQBE+SC8FKa4jMwD0BvtKsAMQ6SPGeoKq9pOAJb6eKLqgXn00HZRvrKo3HYCENAbcBzMQ8G/nK8sKreNAFzdSbCfgF6DNsyjz1J4ta1Dvr6lBSCQCXAO/AnH/4e9sAiP02EzY1ZBjZ1A2YqWFQDnn8frXfBTqDu8j6/6SpzOOI3dha2nyRvhY9RoIGLl29hWICS1IBtvpRbyaSMCcAXGw2nwurwDjvIRR5tvk9VWdAEI+kK8/RuuhRsp305aBi/S6Risi8MYeBYaEV0AZtUGZTJpivlpxpV2dXWtoP1K2Ad1EzxFWhYn6bgaauw12NJ4imejCQFm56a9j1Vwea7OWMTxvXAJ1NZ3Ep2+gUX4kg7XM2Y61Ni9lK2IKgCBXsXMd8IsdFN6IltRJk8wW6C2wB87+i+iz2y4xdFnWFNUAZhpDjTBW4CMkUWZfDZ7gsK70AuxBXjK4s0UVsfNljZnNVd3PR2+h3msoG17vrKoHE0AAryLya+FNsyyNZSo/8TQR599Q7W7KpoATGtb/jQNYRYiVZ1fd/UDQ1bO/NtH8jP0RlUHnBMR2MV00A2LxAp9E5gea60D0gaW+nHy2iorHSA/lzrdA8j6IYoAuPAM1FEViRPPOVsdjQTcD8fCbrjc0dXZFEuAss/l97Napjg9jNwYXAAC0rZTO7iyrr9etmOMfkEFIPjbcHIh9MEMxs31GRCybzABCOJuHFsDu6EvdKw9z3dQiP61BSDwW+GHOPMb1N2fpBLexM6v8KFKoy2DiqorCYCT4+BM+AcT/AVfgCFwD0ZWYncTfBVOpBwVXgLgkK72Mjw6BLXzuoM0BrSDfAfDO5hTq6LMWSDd/VEoAA50wz64DvO62kUbHLoFhVZFP/NLjAWkpU98y3hhFYCJJsL3MaKDSe29dYenOGLQx0FfmVvx60c4NYQnVgEw/i18CepNDElLQQckvyCCRKnlmEuAm2pZjj/4Aqa4EdaCSwAt/1rGIw9exzOADlprTWMVAOP6vOnlwlJmOApbBfrq1bPGtBAOWQWQcURYDXVwoddLj1K3Eo4ENjDpK/AK/JkK34NBLopTACYcApMNwOXwYSp0Oqttq97VUYyGg1heAu9l3slwIdxJOShKCZCdESc2wfnwBur1HV37c4idLHS1n8T+JbAPaoudbQ+a9xYgOzvOrYUSQfw921Yhv40xM7Gnq/05+UZQS4DUQ5yWEDr//yKt80z/o/8t2PmKtFEEESD1mAB03v9PWvZIexi726N/sK5BBUi88n0yXEDwWgHJ8GaT4AIQzJ+E8B0sA111/Q6gTN9SfXw7BRcgceCDJC1KFiNYkO/zools7VEEICh9de2xTZqp14+eMsXms1EESMLQT1mTrDFZg1D/GlsarIwpgM4QXKF85mpsqi2aAFxdbWz04GKKRb/g+MHU0HRdNAGSQHRumGSHJdo4ZV9uDmtsshBbAP2kxfTSsuqOMbg2UQXgY7Afj/OP0HqbW/llJvaCIqoAiaf5m90yhJEISfPIJtEFINhVhPg1FDbyTydNJK2B6AIoTETohYJ+vrZDda3CRgRolWBNfnQEMKkymuo6K6Ddr3Zd/08DAAD//7iZ9n4AAAAGSURBVAMAyXZZkHYtq1kAAAAASUVORK5CYII=" />
+                Open AI Layout Assistant
+            </a>'
+        );
+
+        $settings[] = array( 'type' => 'sectionend', 'id' => 'template_assistant_full_details_settings');
 
         return $settings;
     }
@@ -1401,6 +1425,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         {
         	switch ($current_section)
             {
+                case "full-details": { $hide_save_button = true; $settings = $this->get_full_details_settings(); break; }
             	case "search-forms": { $hide_save_button = true; $settings = $this->get_search_forms_settings(); break; }
                 case "addsearchform": { $settings = $this->get_search_form_settings(); break; }
                 case "editsearchform": { $settings = $this->get_search_form_settings(); break; }

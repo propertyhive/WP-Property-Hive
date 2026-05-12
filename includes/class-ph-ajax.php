@@ -146,6 +146,7 @@ class PH_AJAX {
 
             // Settings
             'save_term_order' => false,
+            'submit_full_details_ai_layout_assistant_prompt' => false,
 
             // PRO features activate/deactivate
             'activate_pro_feature' => false,
@@ -163,6 +164,367 @@ class PH_AJAX {
 			}
 		}
 	}
+
+    public function submit_full_details_ai_layout_assistant_prompt()
+    {
+        // Verify the nonce
+        if ( !isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ai-layout-assistant') ) 
+        {
+            wp_send_json_error('Invalid nonce', 403);
+            die();
+        }
+
+        if ( !isset($_POST['prompt']) || empty($_POST['prompt']) ) 
+        {
+            wp_send_json_error('Prompt is required', 400);
+            die();
+        }
+
+        $wp_upload_dir = wp_upload_dir();
+        $uploads_dir_ok = true;
+        if( $wp_upload_dir['error'] !== FALSE )
+        {
+            wp_send_json_error('Unable to create uploads folder. Please check permissions', 400);
+            die();
+        }
+        else
+        {
+            $uploads_dir = $wp_upload_dir['basedir'] . '/ph_ai_templates/';
+
+            if ( ! @file_exists($uploads_dir) )
+            {
+                if ( ! @mkdir($uploads_dir) )
+                {
+                    wp_send_json_error("Unable to create directory " . $uploads_dir, 400);
+                    die();
+                }
+            }
+            else
+            {
+                if ( ! @is_writeable($uploads_dir) )
+                {
+                    wp_send_json_error("Directory " . $uploads_dir . " isn't writeable", 400);
+                    die();
+                }
+            }
+        }
+
+        $prompt = sanitize_textarea_field(wp_unslash($_POST['prompt']));
+
+        $revision_id = isset($_POST['revision_id']) ? (int)wp_unslash($_POST['revision_id']) : 0;
+
+        // Check for any existing prompts or response ID
+        $previous_response_id = '';
+        $existing_layout = array();
+        if ( !empty($revision_id) )
+        {
+            $previous_response_id = get_post_meta($revision_id, '_openai_response_id', true);
+            $existing_layout = get_post_meta($revision_id, '_template_files', true);
+        }
+
+        $context = array(
+            'template_type' => 'single_property_details',
+            'known_templates' => array(),
+            'available_fields' => array(
+                /*'address',
+                'price',
+                'bedrooms',
+                'bathrooms',
+                'receptions',
+                'property_type',
+                'department',
+                'summary_description',
+                'full_description',
+                'features',
+                'images',
+                'floorplans',
+                'epc',
+                'map',
+                'office',
+                'negotiator',
+                'enquiry_form',*/
+            ),
+        );
+
+        $template_files = array(
+            'single-property.php',
+            'content-single-property.php',
+            'single-property/actions.php',
+            'single-property/description.php',
+            'single-property/features.php',
+            'single-property/floor-area.php',
+            'single-property/material-informaton.php',
+            'single-property/meta.php',
+            'single-property/price.php',
+            'single-property/property-images.php',
+            'single-property/property-thumbnails.php',
+            'single-property/summary-description.php',
+            'single-property/title.php',
+            'global/make-enquiry.php',
+            'global/make-enquiry-form.php',
+        );
+
+        foreach ( $template_files as $template_file ) 
+        {
+            $path = ph_locate_template( $template_file );
+
+            if ( $path && file_exists($path) && is_readable($path) ) 
+            {
+                $contents = file_get_contents($path);
+
+                $context['known_templates'][] = array(
+                    'path' => $template_file,
+                    'contents' => mb_substr($contents, 0, 20000),
+                );
+            }
+        }
+
+        $args = array(
+            'site' => array(
+                'url' => home_url(),
+                'wp_version' => get_bloginfo('version'),
+                'php_version' => PHP_VERSION,
+                'theme' => array(
+                    'name' => wp_get_theme()->get('Name'),
+                    'version' => wp_get_theme()->get('Version'),
+                    'template' => wp_get_theme()->get_template(),
+                    'stylesheet' => wp_get_theme()->get_stylesheet(),
+                ),
+            ),
+
+            'property_hive' => array(
+                'version' => defined('PH_VERSION') ? PH_VERSION : '',
+                'currency_symbol' => get_option('propertyhive_currency_symbol', '£'),
+            ),
+
+            'request' => array(
+                'prompt' => $prompt,
+                'area' => 'single_property_details',
+                'previous_response_id' => $previous_response_id,
+            ),
+
+            /*'preview' => array(
+                'property_id' => $this->get_random_on_market_property_id_for_ai_preview(),
+            ),*/
+
+            'current_layout_state' => $existing_layout,
+
+            'template_context' => $context,
+
+            'allowed_output' => array(
+                'php_template_overrides' => true,
+                'css' => true,
+                'explanation' => true,
+                'warnings' => true,
+            ),
+        );
+
+        $ai_service = new PH_AI_Service();
+
+        $response = $ai_service->make_request('full_details_layout_assistant', $args);
+
+        if ( is_wp_error($response) )
+        {
+            $return = array(
+                'success' => false,
+                'error' => $response->get_error_message() . ' - ' . print_r($response, true)
+            );
+            echo wp_json_encode($return);
+            die();
+        }
+
+        if ( !isset($response['success']) || $response['success'] !== true )
+        {
+            $return = array(
+                'success' => false,
+                'error' => __( 'Failed to construct layout. Response: ', 'propertyhive' ) . print_r($response, true)
+            );
+            echo wp_json_encode($return);
+            die();
+        }
+
+        if ( !empty($response['openai_response_id']) )
+        {
+            update_option(
+                'propertyhive_full_details_ai_layout_assistant_last_response_id',
+                sanitize_text_field($response['openai_response_id']),
+                false
+            );
+        }
+
+        if ( !empty($response['layout']) && is_array($response['layout']) )
+        {
+            // Insert revision
+
+            $layout = $response['layout'];
+
+            $layout_key = 'full_details';
+
+            $css = isset($layout['css']) ? $layout['css'] : '';
+
+            $files = isset($layout['files']) && is_array($layout['files'])
+                ? $layout['files']
+                : array();
+
+            $summary = isset($layout['change_summary'])
+                ? sanitize_text_field($layout['change_summary'])
+                : 'AI generated layout';
+
+            $post_id = wp_insert_post(array(
+                'post_type'    => 'ph_ai_layout',
+                'post_status'  => 'private',
+                'post_title'   => sprintf(
+                    'Single Property Details AI Layout - %s',
+                    current_time('mysql')
+                ),
+                'post_content' => $css,
+                'post_author'  => get_current_user_id(),
+            ), true);
+
+            if ( is_wp_error($post_id) )
+            {
+                $return = array(
+                    'success' => false,
+                    'error' => 'Unable to create AI layout revision: ' . $post_id->get_error_message()
+                );
+                echo wp_json_encode($return);
+                die();
+            }
+
+            update_post_meta($post_id, '_layout_key', $layout_key);
+            update_post_meta($post_id, '_status', 'preview');
+            update_post_meta($post_id, '_prompt', $prompt);
+            update_post_meta($post_id, '_summary', $summary);
+            //update_post_meta($post_id, '_warnings', $warnings);
+            update_post_meta($post_id, '_template_files', wp_json_encode($files));
+            update_post_meta($post_id, '_full_layout_response', $layout);
+
+            if ( !empty($response['openai_response_id']) )
+            {
+                update_post_meta(
+                    $post_id,
+                    '_openai_response_id',
+                    sanitize_text_field($response['openai_response_id'])
+                );
+            }
+
+            /*
+             * Archive any previous preview revisions for this layout.
+             * This keeps only the latest one marked as 'preview'.
+             */
+            $previous_previews = get_posts(array(
+                'post_type'      => 'ph_ai_layout',
+                'post_status'    => 'private',
+                'posts_per_page' => -1,
+                'fields'         => 'ids',
+                'exclude'        => array($post_id),
+                'meta_query'     => array(
+                    array(
+                        'key'   => '_layout_key',
+                        'value' => $layout_key,
+                    ),
+                    array(
+                        'key'   => '_status',
+                        'value' => 'preview',
+                    ),
+                ),
+            ));
+
+            foreach ( $previous_previews as $previous_preview_id )
+            {
+                update_post_meta($previous_preview_id, '_status', 'superseded');
+            }
+
+            /*
+             * Write template files for this revision to uploads.
+             */
+            $files_to_write = array();
+            if ( !empty($files) )
+            {
+                foreach ( $files as $file )
+                {
+                    if ( isset($file['type']) && strtolower($file['type']) == 'php' )
+                    {
+                        $files_to_write[] = $file;
+                    }
+                }
+            }
+
+            if ( !empty($files_to_write) )
+            {
+                $base_dir = trailingslashit($wp_upload_dir['basedir'])
+                    . 'ph_ai_templates/'
+                    . sanitize_key($layout_key)
+                    . '/revision-'
+                    . absint($post_id)
+                    . '/';
+
+                if ( !wp_mkdir_p($base_dir) )
+                {
+                    return new WP_Error('mkdir_failed', 'Could not create AI template revision directory');
+                }
+
+                foreach ($files_to_write as $file)
+                {
+                    $relative_path = isset($file['path']) ? sanitize_text_field($file['path']) : '';
+                    $contents      = isset($file['contents']) ? $file['contents'] : '';
+
+                    $relative_path = ltrim($relative_path, '/\\');
+
+                    if ( empty($relative_path) )
+                    {
+                        continue;
+                    }
+
+                    if ( strpos($relative_path, '..') !== false )
+                    {
+                        return new WP_Error('invalid_path', 'Invalid template path: ' . $relative_path);
+                    }
+
+                    /*if ( ! in_array($relative_path, $allowed_paths, true) )
+                    {
+                        return new WP_Error('disallowed_path', 'Template path is not allowed: ' . $relative_path);
+                    }
+
+                    foreach ( $blocked_patterns as $pattern )
+                    {
+                        if ( preg_match($pattern, $contents) )
+                        {
+                            return new WP_Error(
+                                'blocked_code',
+                                'Blocked unsafe code in template: ' . $relative_path
+                            );
+                        }
+                    }*/
+
+                    $full_path = $base_dir . $relative_path;
+                    $full_dir  = dirname($full_path);
+
+                    if ( !wp_mkdir_p($full_dir) )
+                    {
+                        return new WP_Error('mkdir_failed', 'Could not create directory: ' . $full_dir);
+                    }
+
+                    $written = file_put_contents($full_path, $contents);
+
+                    if ( $written === false )
+                    {
+                        return new WP_Error('write_failed', 'Could not write template file: ' . $relative_path);
+                    }
+                }
+            }
+
+            $response['layout_revision_id'] = $post_id;
+            $response['preview_url_arg'] = 'ph_ai_layout_preview=' . absint($post_id);
+        }
+
+        $return = array(
+            'success' => true,
+            'response' => $response
+        );
+        echo wp_json_encode($return);
+        die();
+    }
 
     public function deactivate_survey()
     {

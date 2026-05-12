@@ -36,6 +36,47 @@ class PH_Template_Loader {
         	$priority = 99;
         }
         add_filter( 'template_include', array( $this, 'template_loader' ), $priority );
+
+        add_action( 'wp_head', array( $this, 'load_full_details_ai_layout_assistant_css' ) );
+	}
+
+	public function load_full_details_ai_layout_assistant_css()
+	{
+		$preview_id = isset($_GET['ph_ai_layout_preview'])
+	        ? absint($_GET['ph_ai_layout_preview'])
+	        : 0;
+
+	    if ( $preview_id && current_user_can('manage_options') ) 
+	    {
+	        $css = get_post_field('post_content', $preview_id);
+	    }
+	    else 
+	    {
+	        $approved = get_posts(array(
+	            'post_type'      => 'ph_ai_layout',
+	            'posts_per_page' => 1,
+	            'meta_query'     => array(
+	                array(
+	                    'key'   => '_layout_key',
+	                    'value' => 'full_details',
+	                ),
+	                array(
+	                    'key'   => '_status',
+	                    'value' => 'approved',
+	                ),
+	            ),
+	            'fields' => 'ids',
+	        ));
+
+	        $css = ! empty($approved[0]) ? get_post_field('post_content', $approved[0]) : '';
+	    }
+
+	    if ( $css ) 
+	    {
+	        echo '<style id="propertyhive-ai-layout-css">' . "\n";
+	        echo wp_strip_all_tags($css);
+	        echo "\n</style>";
+	    }
 	}
 
 	/**

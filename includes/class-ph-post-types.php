@@ -887,6 +887,29 @@ class PH_Post_types {
 				)
 			)
 		);
+
+        register_post_type( "ph_ai_layout",
+            apply_filters( 'propertyhive_register_post_type_ai_layout',
+                array(
+                    'labels' => array(
+                        'name' => 'AI Layouts',
+                        'singular_name' => 'AI Layout',
+                    ),
+                    'public'                => false,
+                    'show_ui'               => false,
+                    'capability_type'       => 'post',
+                    'publicly_queryable'    => false,
+                    'exclude_from_search'   => true,
+                    'hierarchical'          => false,
+                    'query_var'             => false,
+                    'rewrite'               => false,
+                    'supports'              => false,
+                    'show_in_nav_menus'     => false,
+                    'show_in_menu'          => false,
+                )
+            )
+        );
+
         do_action( 'propertyhive_after_register_post_types' );
 	}
 

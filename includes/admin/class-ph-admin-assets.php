@@ -107,6 +107,14 @@ class PH_Admin_Assets {
             );
         }
 
+        if ( strpos($screen->id, 'page_ph-settings') !== FALSE )
+        {
+            if ( isset($_GET['tab']) && $_GET['tab'] == 'frontend' && isset($_GET['section']) && $_GET['section'] == 'full-details' )
+            {
+                wp_enqueue_style( 'propertyhive_admin_settings_frontend_ai_layout_assistant_css', PH()->plugin_url() . '/assets/css/admin-settings-frontend-ai-layout-assistant.css', PH_VERSION );
+            }
+        }
+
         do_action( 'propertyhive_admin_css' );
     }
 
@@ -131,6 +139,8 @@ class PH_Admin_Assets {
         wp_register_script( 'propertyhive_admin_meta_boxes', PH()->plugin_url() . '/assets/js/admin/meta-boxes' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker', 'jquery-ui-sortable' ), PH_VERSION );
 
         wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery', 'wp-color-picker' ), PH_VERSION );
+
+        wp_register_script( 'propertyhive_admin_settings_frontend_ai_layout_assistant', PH()->plugin_url() . '/assets/js/admin/settings-frontend-ai-layout-assistant' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
 
         wp_register_script( 'propertyhive_admin_recently_viewed', PH()->plugin_url() . '/assets/js/admin/recently-viewed' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
 
@@ -409,6 +419,65 @@ class PH_Admin_Assets {
                 $params['valid_pro_license_key'] = PH()->license->is_valid_pro_license_key();
             }
             wp_localize_script( 'propertyhive_admin_settings', 'propertyhive_admin_settings', $params );
+
+            if ( isset($_GET['tab']) && $_GET['tab'] == 'frontend' && isset($_GET['section']) && $_GET['section'] == 'full-details' )
+            {
+                // Get example property to use in preview window
+                $preview_url = '';
+                $query = new WP_Query(array(
+                    'post_type'      => 'property',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => 1,
+                    'orderby'        => 'rand',
+                    'meta_query'     => array(
+                        array(
+                            'key'     => '_on_market',
+                            'value'   => 'yes',
+                            'compare' => '=',
+                        ),
+                    ),
+                    'fields' => 'ids',
+                ));
+
+                if ( ! empty($query->posts[0]) ) {
+                    $preview_url = get_permalink(absint($query->posts[0])). '?ph_preview_ai=1';
+                }
+                wp_reset_postdata();
+
+                // Get live revision
+                $revision_id = '';
+                $query = new WP_Query(array(
+                    'post_type'      => 'ph_ai_layout',
+                    'post_status'    => 'publish',
+                    'posts_per_page' => 1,
+                    'meta_query'     => array(
+                        array(
+                            'key'     => '_layout_key',
+                            'value'   => 'full_details',
+                        ),
+                        array(
+                            'key'     => '_status',
+                            'value'   => 'live',
+                        ),
+                    ),
+                    'fields' => 'ids',
+                ));
+
+                if ( ! empty($query->posts[0]) ) 
+                {
+                    $revision_id = absint($query->posts[0]);
+                    if ( !empty($preview_url) ) { $preview_url .= '&ph_ai_layout_preview=' . $revision_id; }
+                }
+
+                wp_enqueue_script( 'propertyhive_admin_settings_frontend_ai_layout_assistant' );
+
+                $params = array(
+                    'preview_url' => esc_url($preview_url),
+                    'revision_id' => $revision_id,
+                    'nonce' => wp_create_nonce('ai-layout-assistant'),
+                );
+                wp_localize_script( 'propertyhive_admin_settings_frontend_ai_layout_assistant', 'propertyhive_admin_settings_frontend_ai_layout_assistant', $params );
+            }
         }
         
         // Reports Pages
