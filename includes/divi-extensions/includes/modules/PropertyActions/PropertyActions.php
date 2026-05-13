@@ -1,116 +1,177 @@
 <?php
+/**
+ * Native Divi 5 Property Actions module.
+ *
+ * @package PropertyHive
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class PH_Divi_Property_Actions_Module extends ET_Builder_Module {
+use ET\Builder\Framework\DependencyManagement\Interfaces\DependencyInterface;
+use ET\Builder\FrontEnd\Module\Style;
+use ET\Builder\Packages\Module\Layout\Components\ModuleElements\ModuleElements;
+use ET\Builder\Packages\Module\Module;
+use ET\Builder\Packages\Module\Options\Css\CssStyle;
+use ET\Builder\Packages\Module\Options\Element\ElementClassnames;
+use ET\Builder\Packages\ModuleLibrary\ModuleRegistration;
 
-    public $slug       = 'et_pb_property_actions_widget';
-    public $vb_support = 'on';
+class PH_Divi_Property_Actions_Module implements DependencyInterface {
 
-    public function init() {
-        $this->name             = __( 'Property Actions', 'propertyhive' );
-        $this->main_css_element = '%%order_class%%';
-    }
-
-    public function get_fields() {
-        return array(
-            'display' => array(
-                'label'   => __( 'Display As', 'propertyhive' ),
-                'type'    => 'select',
-                'options' => array(
-                    'list'    => __( 'List', 'propertyhive' ),
-                    'buttons' => __( 'Buttons', 'propertyhive' ),
-                ),
-                'default' => 'list',
-            ),
-            'button_background_color' => array(
-                'label'           => esc_html__( 'Button Background Color', 'propertyhive' ),
-                'type'            => 'color',
-                'custom_color'    => true,
-                'show_if'         => array(
-                    'display' => 'buttons',
-                ),
-                'default'         => '#000',
-            ),
-
-            'button_text_color' => array(
-                'label'           => esc_html__( 'Button Text Color', 'propertyhive' ),
-                'type'            => 'color',
-                'custom_color'    => true,
-                'show_if'         => array(
-                    'display' => 'buttons',
-                ),
-                'default'         => '#ffffff',
-            ),
-
-            'button_padding' => array(
-                'label'           => esc_html__( 'Button Padding', 'propertyhive' ),
-                'type'            => 'text',
-                'show_if'         => array(
-                    'display' => 'buttons',
-                ),
-                'default'         => '10px 15px',
-                'description'     => esc_html__( 'CSS padding value, e.g. 10px 15px', 'propertyhive' ),
-            ),
-
-            'button_margin' => array(
-                'label'           => esc_html__( 'Button Margin', 'propertyhive' ),
-                'type'            => 'text',
-                'show_if'         => array(
-                    'display' => 'buttons',
-                ),
-                'default'         => '0 5px 0 0',
-                'description'     => esc_html__( 'CSS margin value, e.g. 0 5px 0 0', 'propertyhive' ),
-            ),
+    /**
+     * Register the module metadata and server render callback.
+     *
+     * @return void
+     */
+    public function load(): void {
+        ModuleRegistration::register_module(
+            __DIR__,
+            array(
+                'render_callback' => array( self::class, 'render_callback' ),
+            )
         );
     }
 
-    public function render( $attrs, $content = null, $render_slug = null ) {
+    /**
+     * Add standard Divi module classes.
+     *
+     * @param array $args Classname arguments.
+     * @return void
+     */
+    public static function module_classnames( array $args ): void {
+        $classnames_instance = $args['classnamesInstance'];
+        $attrs               = $args['attrs'];
 
-        $post_id  = get_the_ID();
-        $property = new PH_Property( $post_id );
+        $classnames_instance->add(
+            ElementClassnames::classnames(
+                array(
+                    'attrs' => array_merge(
+                        $attrs['module']['decoration'] ?? array(),
+                        array(
+                            'link' => $attrs['module']['advanced']['link'] ?? array(),
+                        )
+                    ),
+                )
+            )
+        );
+    }
 
-        if ( ! isset( $property->id ) ) {
+    /**
+     * Render standard Divi module styles.
+     *
+     * @param array $args Style arguments.
+     * @return void
+     */
+    public static function module_styles( array $args ): void {
+        $attrs    = $args['attrs'] ?? array();
+        $elements = $args['elements'];
+        $settings = $args['settings'] ?? array();
+
+        Style::add(
+            array(
+                'id'            => $args['id'],
+                'name'          => $args['name'],
+                'orderIndex'    => $args['orderIndex'],
+                'storeInstance' => $args['storeInstance'],
+                'styles'        => array(
+                    $elements->style(
+                        array(
+                            'attrName'   => 'module',
+                            'styleProps' => array(
+                                'disabledOn' => array(
+                                    'disabledModuleVisibility' => $settings['disabledModuleVisibility'] ?? null,
+                                ),
+                            ),
+                        )
+                    ),
+                    CssStyle::style(
+                        array(
+                            'selector' => $args['orderClass'],
+                            'attr'     => $attrs['css'] ?? array(),
+                        )
+                    ),
+                ),
+            )
+        );
+    }
+
+    /**
+     * Register standard Divi module script data.
+     *
+     * @param array $args Script data arguments.
+     * @return void
+     */
+    public static function module_script_data( array $args ): void {
+        $elements = $args['elements'];
+
+        $elements->script_data(
+            array(
+                'attrName' => 'module',
+            )
+        );
+    }
+
+    /**
+     * Render Property Hive's property actions inside a native Divi 5 module wrapper.
+     *
+     * @param array          $attrs                       Module attributes.
+     * @param string         $content                     Block content.
+     * @param WP_Block       $block                       WordPress block instance.
+     * @param ModuleElements $elements                    Divi module elements instance.
+     * @param array          $default_printed_style_attrs Default printed style attributes.
+     * @return string
+     */
+    public static function render_callback(
+        array $attrs,
+        string $content,
+        WP_Block $block,
+        ModuleElements $elements,
+        array $default_printed_style_attrs
+    ): string {
+        if ( ! function_exists( 'ph_divi_property_actions_render_actions_html' ) )
+        {
             return '';
         }
 
-        ob_start();
+        $actions_html = ph_divi_property_actions_render_actions_html( $attrs, get_the_ID(), $block );
 
-        $display                 = $this->props['display'];
-        $button_bg_color         = $this->props['button_background_color'];
-        $button_text_color       = $this->props['button_text_color'];
-        $button_padding          = $this->props['button_padding'];
-        $button_margin           = $this->props['button_margin'];
-
-        ob_start();
-
-        if ( 'buttons' === $display ) {
-            ?>
-            <style>
-                .property_actions ul { list-style-type:none; margin:0; padding:0;  }
-                .property_actions ul li {
-                    display: inline-block;
-                }
-                .property_actions ul li a {
-                    display: block;
-                    background: <?php echo esc_html( $button_bg_color ); ?>;
-                    color: <?php echo esc_html( $button_text_color ); ?>;
-                    padding: <?php echo esc_html( $button_padding ); ?>;
-                    margin: <?php echo esc_html( $button_margin ); ?>;
-                    text-decoration: none;
-                }
-            </style>
-            <?php
+        if ( '' === trim( $actions_html ) )
+        {
+            return '';
         }
 
-        propertyhive_template_single_actions();
+        $block_id       = $block->parsed_block['id'] ?? '';
+        $store_instance = $block->parsed_block['storeInstance'] ?? null;
+        $parent         = null;
 
-        return $this->_render_module_wrapper( ob_get_clean(), $render_slug );
+        if ( class_exists( '\ET\Builder\FrontEnd\BlockParser\BlockParserStore' ) && $block_id )
+        {
+            $parent = \ET\Builder\FrontEnd\BlockParser\BlockParserStore::get_parent( $block_id, $store_instance );
+        }
+
+        return Module::render(
+            array(
+                'orderIndex'               => $block->parsed_block['orderIndex'] ?? null,
+                'storeInstance'            => $store_instance,
+                'attrs'                    => $attrs,
+                'elements'                 => $elements,
+                'id'                       => $block_id,
+                'name'                     => $block->block_type->name,
+                'classnamesFunction'       => array( self::class, 'module_classnames' ),
+                'moduleCategory'           => $block->block_type->category,
+                'stylesComponent'          => array( self::class, 'module_styles' ),
+                'scriptDataComponent'      => array( self::class, 'module_script_data' ),
+                'parentAttrs'              => $parent->attrs ?? array(),
+                'parentId'                 => $parent->id ?? '',
+                'parentName'               => $parent->blockName ?? '',
+                'defaultPrintedStyleAttrs' => $default_printed_style_attrs,
+                'children'                 => $elements->style_components(
+                    array(
+                        'attrName' => 'module',
+                    )
+                ) . $actions_html,
+            )
+        );
     }
-}
-
-if ( class_exists( 'ET_Builder_Module' ) ) {
-    new PH_Divi_Property_Actions_Module();
 }

@@ -18,14 +18,25 @@ add_action( 'wp_enqueue_scripts', 'ph_divi_extension_enqueue' );
 add_action( 'admin_enqueue_scripts', 'ph_divi_extension_enqueue' );
 function ph_divi_extension_enqueue() 
 {
-    // Only load when Divi's builder is active (front-end or backend)
-    if ( function_exists( 'et_core_is_fb_enabled' ) && et_core_is_fb_enabled() ) 
+    if (
+        function_exists( 'et_builder_d5_enabled' )
+        && et_builder_d5_enabled()
+        && function_exists( 'et_core_is_fb_enabled' )
+        && et_core_is_fb_enabled()
+    )
     {
+        $bundle_path = PH_DIVI_EXTENSION_PATH . 'build/bundle.js';
+
+        if ( ! file_exists( $bundle_path ) )
+        {
+            return;
+        }
+
         wp_enqueue_script(
             'ph-divi-extension-bundle',
             PH_DIVI_EXTENSION_URL . 'build/bundle.js',
-            array( 'react', 'react-dom', 'wp-element' ), // <-- key change
-            '1.0.0',
+            array(),
+            filemtime( $bundle_path ),
             true
         );
     }
