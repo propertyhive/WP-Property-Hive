@@ -1,4 +1,5 @@
 .vscode
 .DS_Store
+dev-tools/
 includes/divi-extensions/node_modules/
-+includes/divi-extensions/build/*.map
+includes/divi-extensions/build/*.map
