@@ -576,6 +576,7 @@ class PH_Admin_Onboarding {
 							<?php $this->output_choice_card( 'departments', 'residential-lettings', __( 'Residential lettings', 'propertyhive' ), __( 'Handle lettings, tenancies and landlords.', 'propertyhive' ), in_array( 'residential-lettings', $departments, true ) ); ?>
 							<?php $this->output_choice_card( 'departments', 'commercial', __( 'Commercial', 'propertyhive' ), __( 'Work with commercial property records.', 'propertyhive' ), in_array( 'commercial', $departments, true ) ); ?>
 						</div>
+						<?php $this->output_settings_note( __( 'General', 'propertyhive' ) ); ?>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="country">
@@ -589,6 +590,7 @@ class PH_Admin_Onboarding {
 								<?php endforeach; ?>
 							</select>
 						</label>
+						<?php $this->output_settings_note( __( 'General > International', 'propertyhive' ) ); ?>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="office">
@@ -620,6 +622,7 @@ class PH_Admin_Onboarding {
 								<input type="text" name="office_postcode" value="<?php echo esc_attr( $office['postcode'] ); ?>" data-office-field="office_postcode">
 							</label>
 						</div>
+						<?php $this->output_settings_note( __( 'Offices', 'propertyhive' ) ); ?>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="usage">
@@ -635,6 +638,7 @@ class PH_Admin_Onboarding {
 							<a href="<?php echo esc_url( $this->get_import_url() ); ?>" target="_blank" rel="noopener noreferrer" data-usage-link="import_properties"><?php esc_html_e( 'Read about importing properties', 'propertyhive' ); ?></a>
 							<a href="<?php echo esc_url( $this->get_export_url() ); ?>" target="_blank" rel="noopener noreferrer" data-usage-link="portal_uploads"><?php esc_html_e( 'Read about portal exports', 'propertyhive' ); ?></a>
 						</div>
+						<?php $this->output_settings_note( __( 'General > Modules', 'propertyhive' ) ); ?>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="demo-data">
@@ -656,6 +660,7 @@ class PH_Admin_Onboarding {
 								<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=ph-settings&tab=features&profilter=free' ) ); ?>"><?php esc_html_e( 'Activate Demo Data Feature', 'propertyhive' ); ?></a>
 							<?php endif; ?>
 						</div>
+						<?php $this->output_settings_note( __( 'Demo Data', 'propertyhive' ) ); ?>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="complete">
@@ -745,6 +750,25 @@ class PH_Admin_Onboarding {
 				<small><?php echo esc_html( $summary ); ?></small>
 			</span>
 		</label>
+		<?php
+	}
+
+	/**
+	 * Output a settings location note.
+	 *
+	 * @param string $location Settings location.
+	 */
+	private function output_settings_note( $location ) {
+		?>
+		<p class="ph-onboarding__settings-note">
+			<?php
+			printf(
+				/* translators: %s: settings location, for example General > International. */
+				esc_html__( "These can later be edited under 'Property Hive > Settings > %s'.", 'propertyhive' ),
+				esc_html( $location )
+			);
+			?>
+		</p>
 		<?php
 	}
 
