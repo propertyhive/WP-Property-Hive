@@ -66,14 +66,14 @@ class PH_Admin_Onboarding {
 	}
 
 	/**
-	 * Remove the admin toolbar offset class from the full-screen onboarding page.
+	 * Prepare the HTML element classes for the full-screen onboarding page.
 	 */
 	public function remove_admin_toolbar_html_class() {
 		ob_start( array( $this, 'filter_admin_html_class' ) );
 	}
 
 	/**
-	 * Remove wp-toolbar from the admin HTML tag.
+	 * Remove wp-toolbar from the admin HTML tag and add an onboarding class.
 	 *
 	 * @param string $buffer Page output.
 	 * @return string
@@ -88,7 +88,7 @@ class PH_Admin_Onboarding {
 	}
 
 	/**
-	 * Strip the wp-toolbar class while preserving any other HTML attributes.
+	 * Strip wp-toolbar and add the onboarding class while preserving attributes.
 	 *
 	 * @param array $matches Regex matches.
 	 * @return string
@@ -103,9 +103,8 @@ class PH_Admin_Onboarding {
 			}
 		);
 
-		if ( empty( $classes ) ) {
-			return '<html' . $matches[3] . '>';
-		}
+		$classes[] = 'propertyhive-onboarding-html';
+		$classes   = array_unique( $classes );
 
 		return '<html class=' . $quote . esc_attr( implode( ' ', $classes ) ) . $quote . $matches[3] . '>';
 	}

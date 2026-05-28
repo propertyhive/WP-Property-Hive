@@ -45,6 +45,18 @@ body.propertyhive-onboarding-screen {
 	font-weight: 300;
 }
 
+@media (min-width: 721px) {
+	html.propertyhive-onboarding-html {
+		overflow-y: hidden;
+		scrollbar-gutter: stable;
+	}
+
+	html.propertyhive-onboarding-html body.propertyhive-onboarding-screen {
+		background: linear-gradient(to bottom, #151515 0 86px, #ffffff 86px);
+		overflow-y: hidden;
+	}
+}
+
 body.propertyhive-onboarding-screen #adminmenumain,
 body.propertyhive-onboarding-screen #wpadminbar,
 body.propertyhive-onboarding-screen #screen-meta,
