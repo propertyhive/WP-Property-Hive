@@ -346,6 +346,39 @@ class PH_Admin_Onboarding {
 	}
 
 	/**
+	 * Return a validation error response.
+	 *
+	 * @param string $message Error summary.
+	 * @param array  $errors  Field errors.
+	 */
+	private function send_validation_error( $message, $errors = array() ) {
+		wp_send_json_error(
+			array(
+				'message' => $message,
+				'errors'  => $errors,
+			),
+			400
+		);
+	}
+
+	/**
+	 * Get the first validation error message.
+	 *
+	 * @param array  $errors   Field errors.
+	 * @param string $fallback Fallback message.
+	 * @return string
+	 */
+	private function get_first_validation_error_message( $errors, $fallback ) {
+		foreach ( $errors as $message ) {
+			if ( is_string( $message ) && '' !== $message ) {
+				return $message;
+			}
+		}
+
+		return $fallback;
+	}
+
+	/**
 	 * Save intro step.
 	 *
 	 * @return array
@@ -376,9 +409,11 @@ class PH_Admin_Onboarding {
 		$departments = array_values( array_intersect( $allowed, $departments ) );
 
 		if ( empty( $departments ) ) {
-			wp_send_json_error(
-				array( 'message' => __( 'Please choose at least one property sector.', 'propertyhive' ) ),
-				400
+			$this->send_validation_error(
+				__( 'Please choose at least one property sector.', 'propertyhive' ),
+				array(
+					'departments' => __( 'Please choose at least one property sector.', 'propertyhive' ),
+				)
 			);
 		}
 
@@ -407,9 +442,11 @@ class PH_Admin_Onboarding {
 
 		$countries = $this->get_countries();
 		if ( ! isset( $countries[ $country ] ) ) {
-			wp_send_json_error(
-				array( 'message' => __( 'Please choose a valid country.', 'propertyhive' ) ),
-				400
+			$this->send_validation_error(
+				__( 'Please choose a valid country.', 'propertyhive' ),
+				array(
+					'country' => __( 'Please choose a valid country.', 'propertyhive' ),
+				)
 			);
 		}
 
@@ -436,6 +473,16 @@ class PH_Admin_Onboarding {
 	 */
 	private function save_office_step() {
 		$office = $this->sanitize_office_payload();
+		$errors = $this->validate_office_payload( $office );
+
+		if ( ! empty( $errors ) ) {
+			$this->send_validation_error(
+				$this->get_first_validation_error_message( $errors, __( 'Please check your office details.', 'propertyhive' ) ),
+				$errors
+			);
+		}
+
+		$office['email_address'] = sanitize_email( $office['email_address'] );
 
 		$office_id = $this->get_primary_office_id();
 		if ( ! $office_id ) {
@@ -500,7 +547,12 @@ class PH_Admin_Onboarding {
 		$usage = array_values( array_intersect( array( 'import_properties', 'crm', 'portal_uploads', 'not_sure' ), $usage ) );
 
 		if ( empty( $usage ) ) {
-			$usage = array( 'not_sure' );
+			$this->send_validation_error(
+				__( 'Please choose how you will use Property Hive.', 'propertyhive' ),
+				array(
+					'usage' => __( 'Please choose how you will use Property Hive.', 'propertyhive' ),
+				)
+			);
 		}
 
 		$crm_enabled = in_array( 'crm', $usage, true );
@@ -527,7 +579,26 @@ class PH_Admin_Onboarding {
 	 * @return array
 	 */
 	private function save_demo_data_step() {
+		$demo_choice = isset( $_POST['demo_data_choice'] ) ? sanitize_key( wp_unslash( $_POST['demo_data_choice'] ) ) : '';
 		$imported = isset( $_POST['demo_data_imported'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['demo_data_imported'] ) );
+
+		if ( ! in_array( $demo_choice, array( 'yes', 'no' ), true ) ) {
+			$this->send_validation_error(
+				__( 'Please choose whether to import demo data.', 'propertyhive' ),
+				array(
+					'demo_data_choice' => __( 'Please choose whether to import demo data.', 'propertyhive' ),
+				)
+			);
+		}
+
+		if ( 'yes' === $demo_choice && ! $imported ) {
+			$this->send_validation_error(
+				__( 'Demo data could not be imported. Please try again or choose No.', 'propertyhive' ),
+				array(
+					'demo_data_choice' => __( 'Demo data could not be imported. Please try again or choose No.', 'propertyhive' ),
+				)
+			);
+		}
 
 		self::track_event( $imported ? 'demo_data_completed' : 'demo_data_skipped' );
 
@@ -622,24 +693,26 @@ class PH_Admin_Onboarding {
 					<section class="ph-onboarding__panel" data-step="departments">
 						<h2><?php esc_html_e( 'Which property sectors do you deal in?', 'propertyhive' ); ?></h2>
 						<p><?php esc_html_e( 'Choose every department you want active in Property Hive.', 'propertyhive' ); ?></p>
-						<div class="ph-onboarding__cards" data-input-group="departments">
+						<div class="ph-onboarding__cards" data-input-group="departments" data-validation-field="departments">
 							<?php $this->output_choice_card( 'departments', 'residential-sales', __( 'Residential sales', 'propertyhive' ), __( 'Market and manage sales properties.', 'propertyhive' ), in_array( 'residential-sales', $departments, true ) ); ?>
 							<?php $this->output_choice_card( 'departments', 'residential-lettings', __( 'Residential lettings', 'propertyhive' ), __( 'Handle lettings, tenancies and landlords.', 'propertyhive' ), in_array( 'residential-lettings', $departments, true ) ); ?>
 							<?php $this->output_choice_card( 'departments', 'commercial', __( 'Commercial', 'propertyhive' ), __( 'Work with commercial property records.', 'propertyhive' ), in_array( 'commercial', $departments, true ) ); ?>
 						</div>
+						<?php $this->output_field_error( 'departments' ); ?>
 						<?php $this->output_settings_note( __( 'General', 'propertyhive' ) ); ?>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="country">
 						<h2><?php esc_html_e( 'Where does your agency operate?', 'propertyhive' ); ?></h2>
 						<p><?php esc_html_e( 'This sets your default country and currency defaults for Property Hive.', 'propertyhive' ); ?></p>
-						<label class="ph-onboarding__field">
+						<label class="ph-onboarding__field" data-validation-field="country">
 							<span><?php esc_html_e( 'Country', 'propertyhive' ); ?></span>
-							<select name="country" data-country-select>
+							<select name="country" data-country-select required aria-describedby="ph-onboarding-error-country">
 								<?php foreach ( $countries as $code => $country ) : ?>
 									<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $default_country, $code ); ?>><?php echo esc_html( $country['name'] ); ?></option>
 								<?php endforeach; ?>
 							</select>
+							<?php $this->output_field_error( 'country' ); ?>
 						</label>
 						<?php $this->output_settings_note( __( 'General > International', 'propertyhive' ) ); ?>
 					</section>
@@ -648,37 +721,45 @@ class PH_Admin_Onboarding {
 						<h2><?php esc_html_e( 'What are your office details?', 'propertyhive' ); ?></h2>
 						<p><?php esc_html_e( 'These details will be used for your primary office in Property Hive.', 'propertyhive' ); ?></p>
 						<div class="ph-onboarding__form-grid ph-onboarding__form-grid--office">
-							<label class="ph-onboarding__field">
+							<label class="ph-onboarding__field" data-validation-field="office_name">
 								<span><?php esc_html_e( 'Office name', 'propertyhive' ); ?></span>
-								<input type="text" name="office_name" value="<?php echo esc_attr( $office['name'] ); ?>" data-office-field="office_name">
+								<input type="text" name="office_name" value="<?php echo esc_attr( $office['name'] ); ?>" data-office-field="office_name" maxlength="120" aria-describedby="ph-onboarding-error-office_name">
+								<?php $this->output_field_error( 'office_name' ); ?>
 							</label>
-							<label class="ph-onboarding__field">
+							<label class="ph-onboarding__field" data-validation-field="office_address_1">
 								<span><?php esc_html_e( 'Address Line 1', 'propertyhive' ); ?></span>
-								<input type="text" name="office_address_1" value="<?php echo esc_attr( $office['address_1'] ); ?>" data-office-field="office_address_1">
+								<input type="text" name="office_address_1" value="<?php echo esc_attr( $office['address_1'] ); ?>" data-office-field="office_address_1" maxlength="120" aria-describedby="ph-onboarding-error-office_address_1">
+								<?php $this->output_field_error( 'office_address_1' ); ?>
 							</label>
-							<label class="ph-onboarding__field">
+							<label class="ph-onboarding__field" data-validation-field="office_address_2">
 								<span><?php esc_html_e( 'Address Line 2', 'propertyhive' ); ?></span>
-								<input type="text" name="office_address_2" value="<?php echo esc_attr( $office['address_2'] ); ?>" data-office-field="office_address_2">
+								<input type="text" name="office_address_2" value="<?php echo esc_attr( $office['address_2'] ); ?>" data-office-field="office_address_2" maxlength="120" aria-describedby="ph-onboarding-error-office_address_2">
+								<?php $this->output_field_error( 'office_address_2' ); ?>
 							</label>
-							<label class="ph-onboarding__field">
+							<label class="ph-onboarding__field" data-validation-field="office_address_3">
 								<span><?php esc_html_e( 'Address Line 3', 'propertyhive' ); ?></span>
-								<input type="text" name="office_address_3" value="<?php echo esc_attr( $office['address_3'] ); ?>" data-office-field="office_address_3">
+								<input type="text" name="office_address_3" value="<?php echo esc_attr( $office['address_3'] ); ?>" data-office-field="office_address_3" maxlength="120" aria-describedby="ph-onboarding-error-office_address_3">
+								<?php $this->output_field_error( 'office_address_3' ); ?>
 							</label>
-							<label class="ph-onboarding__field">
+							<label class="ph-onboarding__field" data-validation-field="office_address_4">
 								<span><?php esc_html_e( 'Address Line 4', 'propertyhive' ); ?></span>
-								<input type="text" name="office_address_4" value="<?php echo esc_attr( $office['address_4'] ); ?>" data-office-field="office_address_4">
+								<input type="text" name="office_address_4" value="<?php echo esc_attr( $office['address_4'] ); ?>" data-office-field="office_address_4" maxlength="120" aria-describedby="ph-onboarding-error-office_address_4">
+								<?php $this->output_field_error( 'office_address_4' ); ?>
 							</label>
-							<label class="ph-onboarding__field">
+							<label class="ph-onboarding__field" data-validation-field="office_postcode">
 								<span><?php esc_html_e( 'Postcode', 'propertyhive' ); ?></span>
-								<input type="text" name="office_postcode" value="<?php echo esc_attr( $office['postcode'] ); ?>" data-office-field="office_postcode">
+								<input type="text" name="office_postcode" value="<?php echo esc_attr( $office['postcode'] ); ?>" data-office-field="office_postcode" maxlength="20" aria-describedby="ph-onboarding-error-office_postcode">
+								<?php $this->output_field_error( 'office_postcode' ); ?>
 							</label>
-							<label class="ph-onboarding__field">
+							<label class="ph-onboarding__field" data-validation-field="office_telephone_number">
 								<span><?php esc_html_e( 'Phone number', 'propertyhive' ); ?></span>
-								<input type="tel" name="office_telephone_number" value="<?php echo esc_attr( $office['telephone_number'] ); ?>" data-office-field="office_telephone_number">
+								<input type="tel" name="office_telephone_number" value="<?php echo esc_attr( $office['telephone_number'] ); ?>" data-office-field="office_telephone_number" maxlength="30" inputmode="tel" aria-describedby="ph-onboarding-error-office_telephone_number">
+								<?php $this->output_field_error( 'office_telephone_number' ); ?>
 							</label>
-							<label class="ph-onboarding__field">
+							<label class="ph-onboarding__field" data-validation-field="office_email_address">
 								<span><?php esc_html_e( 'Email address', 'propertyhive' ); ?></span>
-								<input type="email" name="office_email_address" value="<?php echo esc_attr( $office['email_address'] ); ?>" data-office-field="office_email_address">
+								<input type="email" name="office_email_address" value="<?php echo esc_attr( $office['email_address'] ); ?>" data-office-field="office_email_address" maxlength="100" aria-describedby="ph-onboarding-error-office_email_address">
+								<?php $this->output_field_error( 'office_email_address' ); ?>
 							</label>
 						</div>
 						<?php $this->output_settings_note( __( 'Offices', 'propertyhive' ) ); ?>
@@ -687,12 +768,13 @@ class PH_Admin_Onboarding {
 					<section class="ph-onboarding__panel" data-step="usage">
 						<h2><?php esc_html_e( 'How will you use Property Hive?', 'propertyhive' ); ?></h2>
 						<p><?php esc_html_e( 'Pick every option that applies. This helps keep the admin area focused.', 'propertyhive' ); ?></p>
-						<div class="ph-onboarding__cards ph-onboarding__cards--usage" data-input-group="usage">
+						<div class="ph-onboarding__cards ph-onboarding__cards--usage" data-input-group="usage" data-validation-field="usage">
 							<?php $this->output_choice_card( 'usage', 'import_properties', __( 'Import properties', 'propertyhive' ), __( 'Bring listings in from another CRM or feed.', 'propertyhive' ), in_array( 'import_properties', $usage, true ) ); ?>
 							<?php $this->output_choice_card( 'usage', 'crm', __( 'Use it as a CRM', 'propertyhive' ), __( 'Manage contacts, appraisals, viewings, offers and tenancies.', 'propertyhive' ), in_array( 'crm', $usage, true ) ); ?>
 							<?php $this->output_choice_card( 'usage', 'portal_uploads', __( 'Upload to portals', 'propertyhive' ), __( 'Send property data to third-party portals.', 'propertyhive' ), in_array( 'portal_uploads', $usage, true ) ); ?>
 							<?php $this->output_choice_card( 'usage', 'not_sure', __( 'Not sure yet', 'propertyhive' ), __( 'Keep exploring before deciding.', 'propertyhive' ), in_array( 'not_sure', $usage, true ) ); ?>
 						</div>
+						<?php $this->output_field_error( 'usage' ); ?>
 						<div class="ph-onboarding__links" data-usage-links>
 							<a href="<?php echo esc_url( $this->get_import_url() ); ?>" target="_blank" rel="noopener noreferrer" data-usage-link="import_properties"><?php esc_html_e( 'Read about importing properties', 'propertyhive' ); ?></a>
 							<a href="<?php echo esc_url( $this->get_export_url() ); ?>" target="_blank" rel="noopener noreferrer" data-usage-link="portal_uploads"><?php esc_html_e( 'Read about portal exports', 'propertyhive' ); ?></a>
@@ -704,10 +786,11 @@ class PH_Admin_Onboarding {
 						<h2><?php esc_html_e( 'Would you like to import demo data?', 'propertyhive' ); ?></h2>
 						<p><?php esc_html_e( 'Demo data gives you sample properties and related records so you can see how Property Hive works before adding real listings.', 'propertyhive' ); ?></p>
 
-						<div class="ph-onboarding__cards ph-onboarding__cards--radio" data-input-group="demo-data-choice">
+						<div class="ph-onboarding__cards ph-onboarding__cards--radio" data-input-group="demo-data-choice" data-validation-field="demo_data_choice">
 							<?php $this->output_radio_card( 'demo_data_choice', 'no', __( 'No', 'propertyhive' ), __( 'I will add real properties and contacts myself.', 'propertyhive' ), 'no' === $demo_choice, false ); ?>
 							<?php $this->output_radio_card( 'demo_data_choice', 'yes', __( 'Yes', 'propertyhive' ), __( 'Add example records so I can explore the product first.', 'propertyhive' ), 'yes' === $demo_choice, ! $demo_active ); ?>
 						</div>
+						<?php $this->output_field_error( 'demo_data_choice' ); ?>
 
 						<div class="ph-onboarding__demo-box" data-demo-progress-box>
 							<?php if ( $demo_active ) : ?>
@@ -764,6 +847,17 @@ class PH_Admin_Onboarding {
 				</main>
 			</div>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Output a validation error container.
+	 *
+	 * @param string $field Field key.
+	 */
+	private function output_field_error( $field ) {
+		?>
+		<span id="ph-onboarding-error-<?php echo esc_attr( $field ); ?>" class="ph-onboarding__field-error" data-field-error="<?php echo esc_attr( $field ); ?>" aria-live="polite"></span>
 		<?php
 	}
 
@@ -860,6 +954,19 @@ class PH_Admin_Onboarding {
 					'importFailed'      => __( 'Demo data could not be imported. You can continue setup and try again later.', 'propertyhive' ),
 					'demoDataInactive'  => __( 'The Demo Data feature is not active on this site yet.', 'propertyhive' ),
 					'chooseDepartment'  => __( 'Please choose at least one property sector.', 'propertyhive' ),
+					'chooseCountry'     => __( 'Please choose a valid country.', 'propertyhive' ),
+					'chooseUsage'       => __( 'Please choose how you will use Property Hive.', 'propertyhive' ),
+					'chooseDemoData'    => __( 'Please choose whether to import demo data.', 'propertyhive' ),
+					'officeNameTooLong' => __( 'Office name must be 120 characters or fewer.', 'propertyhive' ),
+					'officeAddressTooLong' => __( 'Address Line 1 must be 120 characters or fewer.', 'propertyhive' ),
+					'officeAddress2TooLong' => __( 'Address Line 2 must be 120 characters or fewer.', 'propertyhive' ),
+					'officeAddress3TooLong' => __( 'Address Line 3 must be 120 characters or fewer.', 'propertyhive' ),
+					'officeAddress4TooLong' => __( 'Address Line 4 must be 120 characters or fewer.', 'propertyhive' ),
+					'officePostcodeTooLong' => __( 'Postcode must be 20 characters or fewer.', 'propertyhive' ),
+					'officePhoneTooLong' => __( 'Phone number must be 30 characters or fewer.', 'propertyhive' ),
+					'officePhoneInvalid' => __( 'Please enter a valid phone number.', 'propertyhive' ),
+					'officeEmailTooLong' => __( 'Email address must be 100 characters or fewer.', 'propertyhive' ),
+					'officeEmailInvalid' => __( 'Please enter a valid email address.', 'propertyhive' ),
 					'skipConfirm'       => __( 'Skip setup? You can still configure Property Hive from settings later.', 'propertyhive' ),
 				),
 			)
@@ -932,8 +1039,75 @@ class PH_Admin_Onboarding {
 			'address_4'        => isset( $_POST['office_address_4'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_4'] ) ) : '',
 			'postcode'         => isset( $_POST['office_postcode'] ) ? sanitize_text_field( wp_unslash( $_POST['office_postcode'] ) ) : '',
 			'telephone_number' => isset( $_POST['office_telephone_number'] ) ? sanitize_text_field( wp_unslash( $_POST['office_telephone_number'] ) ) : '',
-			'email_address'    => isset( $_POST['office_email_address'] ) ? sanitize_email( wp_unslash( $_POST['office_email_address'] ) ) : '',
+			'email_address'    => isset( $_POST['office_email_address'] ) ? sanitize_text_field( wp_unslash( $_POST['office_email_address'] ) ) : '',
 		);
+	}
+
+	/**
+	 * Validate office details.
+	 *
+	 * @param array $office Office payload.
+	 * @return array
+	 */
+	private function validate_office_payload( $office ) {
+		$errors = array();
+
+		$field_labels = array(
+			'name'             => __( 'Office name', 'propertyhive' ),
+			'address_1'        => __( 'Address Line 1', 'propertyhive' ),
+			'address_2'        => __( 'Address Line 2', 'propertyhive' ),
+			'address_3'        => __( 'Address Line 3', 'propertyhive' ),
+			'address_4'        => __( 'Address Line 4', 'propertyhive' ),
+			'postcode'         => __( 'Postcode', 'propertyhive' ),
+			'telephone_number' => __( 'Phone number', 'propertyhive' ),
+			'email_address'    => __( 'Email address', 'propertyhive' ),
+		);
+
+		$field_keys = array(
+			'name'             => 'office_name',
+			'address_1'        => 'office_address_1',
+			'address_2'        => 'office_address_2',
+			'address_3'        => 'office_address_3',
+			'address_4'        => 'office_address_4',
+			'postcode'         => 'office_postcode',
+			'telephone_number' => 'office_telephone_number',
+			'email_address'    => 'office_email_address',
+		);
+
+		$max_lengths = array(
+			'name'             => 120,
+			'address_1'        => 120,
+			'address_2'        => 120,
+			'address_3'        => 120,
+			'address_4'        => 120,
+			'postcode'         => 20,
+			'telephone_number' => 30,
+			'email_address'    => 100,
+		);
+
+		foreach ( $max_lengths as $field => $max_length ) {
+			if ( isset( $office[ $field ] ) && strlen( $office[ $field ] ) > $max_length ) {
+				$errors[ $field_keys[ $field ] ] = sprintf(
+					/* translators: 1: field label, 2: maximum character count. */
+					__( '%1$s must be %2$d characters or fewer.', 'propertyhive' ),
+					$field_labels[ $field ],
+					$max_length
+				);
+			}
+		}
+
+		if ( ! empty( $office['telephone_number'] ) ) {
+			$digits = preg_replace( '/\D+/', '', $office['telephone_number'] );
+			if ( strlen( $digits ) < 7 || ! preg_match( '/^[0-9+\-\s().]+$/', $office['telephone_number'] ) ) {
+				$errors['office_telephone_number'] = __( 'Please enter a valid phone number.', 'propertyhive' );
+			}
+		}
+
+		if ( ! empty( $office['email_address'] ) && ! is_email( $office['email_address'] ) ) {
+			$errors['office_email_address'] = __( 'Please enter a valid email address.', 'propertyhive' );
+		}
+
+		return $errors;
 	}
 
 	/**
