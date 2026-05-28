@@ -36,6 +36,7 @@ class PH_Admin_Onboarding {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'admin_dashboard_pages' ) );
 		add_action( 'admin_head', array( $this, 'hide_dashboard_page_menu_item' ) );
+		add_action( 'load-dashboard_page_ph-onboarding', array( $this, 'remove_admin_toolbar_html_class' ) );
 		add_filter( 'propertyhive_screen_ids', array( $this, 'add_screen_id' ) );
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
 
@@ -62,6 +63,51 @@ class PH_Admin_Onboarding {
 	 */
 	public function hide_dashboard_page_menu_item() {
 		remove_submenu_page( 'index.php', 'ph-onboarding' );
+	}
+
+	/**
+	 * Remove the admin toolbar offset class from the full-screen onboarding page.
+	 */
+	public function remove_admin_toolbar_html_class() {
+		ob_start( array( $this, 'filter_admin_html_class' ) );
+	}
+
+	/**
+	 * Remove wp-toolbar from the admin HTML tag.
+	 *
+	 * @param string $buffer Page output.
+	 * @return string
+	 */
+	public function filter_admin_html_class( $buffer ) {
+		return preg_replace_callback(
+			'/<html\s+class=(["\'])([^"\']*)\1([^>]*)>/i',
+			array( $this, 'remove_wp_toolbar_from_html_tag' ),
+			$buffer,
+			1
+		);
+	}
+
+	/**
+	 * Strip the wp-toolbar class while preserving any other HTML attributes.
+	 *
+	 * @param array $matches Regex matches.
+	 * @return string
+	 */
+	private function remove_wp_toolbar_from_html_tag( $matches ) {
+		$quote   = $matches[1];
+		$classes = preg_split( '/\s+/', trim( $matches[2] ) );
+		$classes = array_filter(
+			$classes,
+			function( $class ) {
+				return 'wp-toolbar' !== $class;
+			}
+		);
+
+		if ( empty( $classes ) ) {
+			return '<html' . $matches[3] . '>';
+		}
+
+		return '<html class=' . $quote . esc_attr( implode( ' ', $classes ) ) . $quote . $matches[3] . '>';
 	}
 
 	/**
