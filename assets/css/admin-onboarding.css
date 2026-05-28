@@ -247,11 +247,16 @@ body.propertyhive-onboarding-screen #wpbody-content > .notice {
 }
 
 .ph-onboarding__panel.is-active {
-	display: block;
+	display: flex;
+	flex-direction: column;
 }
 
 .ph-onboarding__panel[data-step="complete"] {
 	min-height: auto;
+}
+
+.ph-onboarding__panel[data-step="complete"].is-active {
+	display: block;
 }
 
 .ph-onboarding__panel--intro.is-active {
@@ -440,6 +445,18 @@ body.propertyhive-onboarding-screen #wpbody-content > .notice {
 	flex-wrap: wrap;
 	gap: 12px;
 	margin-top: 18px;
+}
+
+.ph-onboarding__panel > .ph-onboarding__settings-note {
+	color: var(--ph-slate);
+	font-size: 14px;
+	font-weight: 300;
+	line-height: 1.45;
+	margin: auto auto 0;
+	max-width: 640px;
+	opacity: 1;
+	padding-top: 24px;
+	text-align: center;
 }
 
 .ph-onboarding__links a,
