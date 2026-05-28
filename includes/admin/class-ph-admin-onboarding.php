@@ -429,6 +429,12 @@ class PH_Admin_Onboarding {
 		update_post_meta( $office_id, '_office_address_4', $office['address_4'] );
 		update_post_meta( $office_id, '_office_address_postcode', $office['postcode'] );
 
+		foreach ( $this->get_office_contact_departments() as $department ) {
+			$department_key = str_replace( 'residential-', '', $department );
+			update_post_meta( $office_id, '_office_telephone_number_' . $department_key, $office['telephone_number'] );
+			update_post_meta( $office_id, '_office_email_address_' . $department_key, $office['email_address'] );
+		}
+
 		return self::update_state(
 			array(
 				'status'    => 'in_progress',
@@ -594,7 +600,7 @@ class PH_Admin_Onboarding {
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="office">
-						<h2><?php esc_html_e( 'What is your office address?', 'propertyhive' ); ?></h2>
+						<h2><?php esc_html_e( 'What are your office details?', 'propertyhive' ); ?></h2>
 						<p><?php esc_html_e( 'These details will be used for your primary office in Property Hive.', 'propertyhive' ); ?></p>
 						<div class="ph-onboarding__form-grid ph-onboarding__form-grid--office">
 							<label class="ph-onboarding__field">
@@ -620,6 +626,14 @@ class PH_Admin_Onboarding {
 							<label class="ph-onboarding__field">
 								<span><?php esc_html_e( 'Postcode', 'propertyhive' ); ?></span>
 								<input type="text" name="office_postcode" value="<?php echo esc_attr( $office['postcode'] ); ?>" data-office-field="office_postcode">
+							</label>
+							<label class="ph-onboarding__field">
+								<span><?php esc_html_e( 'Phone number', 'propertyhive' ); ?></span>
+								<input type="tel" name="office_telephone_number" value="<?php echo esc_attr( $office['telephone_number'] ); ?>" data-office-field="office_telephone_number">
+							</label>
+							<label class="ph-onboarding__field">
+								<span><?php esc_html_e( 'Email address', 'propertyhive' ); ?></span>
+								<input type="email" name="office_email_address" value="<?php echo esc_attr( $office['email_address'] ); ?>" data-office-field="office_email_address">
 							</label>
 						</div>
 						<?php $this->output_settings_note( __( 'Offices', 'propertyhive' ) ); ?>
@@ -866,12 +880,14 @@ class PH_Admin_Onboarding {
 	 */
 	private function sanitize_office_payload() {
 		return array(
-			'name'      => isset( $_POST['office_name'] ) ? sanitize_text_field( wp_unslash( $_POST['office_name'] ) ) : '',
-			'address_1' => isset( $_POST['office_address_1'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_1'] ) ) : '',
-			'address_2' => isset( $_POST['office_address_2'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_2'] ) ) : '',
-			'address_3' => isset( $_POST['office_address_3'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_3'] ) ) : '',
-			'address_4' => isset( $_POST['office_address_4'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_4'] ) ) : '',
-			'postcode'  => isset( $_POST['office_postcode'] ) ? sanitize_text_field( wp_unslash( $_POST['office_postcode'] ) ) : '',
+			'name'             => isset( $_POST['office_name'] ) ? sanitize_text_field( wp_unslash( $_POST['office_name'] ) ) : '',
+			'address_1'        => isset( $_POST['office_address_1'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_1'] ) ) : '',
+			'address_2'        => isset( $_POST['office_address_2'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_2'] ) ) : '',
+			'address_3'        => isset( $_POST['office_address_3'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_3'] ) ) : '',
+			'address_4'        => isset( $_POST['office_address_4'] ) ? sanitize_text_field( wp_unslash( $_POST['office_address_4'] ) ) : '',
+			'postcode'         => isset( $_POST['office_postcode'] ) ? sanitize_text_field( wp_unslash( $_POST['office_postcode'] ) ) : '',
+			'telephone_number' => isset( $_POST['office_telephone_number'] ) ? sanitize_text_field( wp_unslash( $_POST['office_telephone_number'] ) ) : '',
+			'email_address'    => isset( $_POST['office_email_address'] ) ? sanitize_email( wp_unslash( $_POST['office_email_address'] ) ) : '',
 		);
 	}
 
@@ -883,23 +899,27 @@ class PH_Admin_Onboarding {
 	 */
 	private function get_office_defaults( $state ) {
 		$office = array(
-			'name'      => '',
-			'address_1' => '',
-			'address_2' => '',
-			'address_3' => '',
-			'address_4' => '',
-			'postcode'  => '',
+			'name'             => '',
+			'address_1'        => '',
+			'address_2'        => '',
+			'address_3'        => '',
+			'address_4'        => '',
+			'postcode'         => '',
+			'telephone_number' => '',
+			'email_address'    => '',
 		);
 
 		$office_id = $this->get_primary_office_id();
 		if ( $office_id ) {
 			$office = array(
-				'name'      => get_the_title( $office_id ),
-				'address_1' => get_post_meta( $office_id, '_office_address_1', true ),
-				'address_2' => get_post_meta( $office_id, '_office_address_2', true ),
-				'address_3' => get_post_meta( $office_id, '_office_address_3', true ),
-				'address_4' => get_post_meta( $office_id, '_office_address_4', true ),
-				'postcode'  => get_post_meta( $office_id, '_office_address_postcode', true ),
+				'name'             => get_the_title( $office_id ),
+				'address_1'        => get_post_meta( $office_id, '_office_address_1', true ),
+				'address_2'        => get_post_meta( $office_id, '_office_address_2', true ),
+				'address_3'        => get_post_meta( $office_id, '_office_address_3', true ),
+				'address_4'        => get_post_meta( $office_id, '_office_address_4', true ),
+				'postcode'         => get_post_meta( $office_id, '_office_address_postcode', true ),
+				'telephone_number' => $this->get_primary_office_contact_value( $office_id, 'telephone_number' ),
+				'email_address'    => $this->get_primary_office_contact_value( $office_id, 'email_address' ),
 			);
 		}
 
@@ -912,6 +932,47 @@ class PH_Admin_Onboarding {
 		}
 
 		return $office;
+	}
+
+	/**
+	 * Get the active departments that should receive shared office contact details.
+	 *
+	 * @return array
+	 */
+	private function get_office_contact_departments() {
+		$state       = self::get_state();
+		$allowed     = array( 'residential-sales', 'residential-lettings', 'commercial' );
+		$departments = ! empty( $state['departments'] ) && is_array( $state['departments'] ) ? array_values( array_intersect( $allowed, $state['departments'] ) ) : array();
+
+		if ( empty( $departments ) ) {
+			foreach ( $allowed as $department ) {
+				if ( 'yes' === get_option( 'propertyhive_active_departments_' . str_replace( 'residential-', '', $department ), 'no' ) ) {
+					$departments[] = $department;
+				}
+			}
+		}
+
+		return ! empty( $departments ) ? $departments : $allowed;
+	}
+
+	/**
+	 * Get the first saved office contact value across active departments.
+	 *
+	 * @param int    $office_id Office post id.
+	 * @param string $field     Contact field name.
+	 * @return string
+	 */
+	private function get_primary_office_contact_value( $office_id, $field ) {
+		$meta_prefix = 'email_address' === $field ? '_office_email_address_' : '_office_telephone_number_';
+
+		foreach ( $this->get_office_contact_departments() as $department ) {
+			$value = get_post_meta( $office_id, $meta_prefix . str_replace( 'residential-', '', $department ), true );
+			if ( '' !== $value ) {
+				return $value;
+			}
+		}
+
+		return '';
 	}
 
 	/**
