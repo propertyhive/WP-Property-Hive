@@ -451,6 +451,27 @@ body.propertyhive-onboarding-screen #wpbody-content > .notice {
 	outline: none;
 }
 
+.ph-onboarding__field.has-error input,
+.ph-onboarding__field.has-error select {
+	border-color: #d63638;
+	box-shadow: 0 0 0 1px #d63638;
+}
+
+.ph-onboarding__cards.has-error {
+	border-radius: 8px;
+	outline: 1px solid #d63638;
+	outline-offset: 4px;
+}
+
+.ph-onboarding__field-error {
+	color: #b32d2e;
+	display: none;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.35;
+	margin-top: 7px;
+}
+
 .ph-onboarding__links {
 	align-items: center;
 	display: flex;

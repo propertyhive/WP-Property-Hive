@@ -12,6 +12,30 @@ jQuery( function( $ ) {
 	var currentStep = $wizard.data( 'current-step' ) || 'intro';
 	var demoImported = $wizard.data( 'demo-imported' ) === 'yes';
 	var demoImporting = false;
+	var fieldControls = {
+		departments: 'input[name="departments[]"]',
+		country: '[data-country-select]',
+		office_name: '[data-office-field="office_name"]',
+		office_address_1: '[data-office-field="office_address_1"]',
+		office_address_2: '[data-office-field="office_address_2"]',
+		office_address_3: '[data-office-field="office_address_3"]',
+		office_address_4: '[data-office-field="office_address_4"]',
+		office_postcode: '[data-office-field="office_postcode"]',
+		office_telephone_number: '[data-office-field="office_telephone_number"]',
+		office_email_address: '[data-office-field="office_email_address"]',
+		usage: 'input[name="usage[]"]',
+		demo_data_choice: 'input[name="demo_data_choice"]'
+	};
+	var officeRules = [
+		{ field: 'office_name', maxLength: 120, maxMessage: 'officeNameTooLong' },
+		{ field: 'office_address_1', maxLength: 120, maxMessage: 'officeAddressTooLong' },
+		{ field: 'office_address_2', required: false, maxLength: 120, maxMessage: 'officeAddress2TooLong' },
+		{ field: 'office_address_3', required: false, maxLength: 120, maxMessage: 'officeAddress3TooLong' },
+		{ field: 'office_address_4', required: false, maxLength: 120, maxMessage: 'officeAddress4TooLong' },
+		{ field: 'office_postcode', maxLength: 20, maxMessage: 'officePostcodeTooLong' },
+		{ field: 'office_telephone_number', maxLength: 30, maxMessage: 'officePhoneTooLong' },
+		{ field: 'office_email_address', maxLength: 100, maxMessage: 'officeEmailTooLong' }
+	];
 
 	function getStepIndex( step ) {
 		var index = $.inArray( step, steps );
@@ -22,6 +46,87 @@ jQuery( function( $ ) {
 		return $( 'input[name="' + name + '[]"]:checked' ).map( function() {
 			return $( this ).val();
 		} ).get();
+	}
+
+	function text( key, fallback ) {
+		return config.i18n && config.i18n[ key ] ? config.i18n[ key ] : fallback;
+	}
+
+	function fieldSelector( field ) {
+		return '[data-validation-field="' + field + '"]';
+	}
+
+	function errorSelector( field ) {
+		return '[data-field-error="' + field + '"]';
+	}
+
+	function clearFieldError( field ) {
+		$( fieldSelector( field ) ).removeClass( 'has-error' );
+		$( errorSelector( field ) ).text( '' ).hide();
+
+		if ( fieldControls[ field ] ) {
+			$( fieldControls[ field ] ).removeAttr( 'aria-invalid' );
+		}
+	}
+
+	function setFieldError( field, message ) {
+		var $field = $( fieldSelector( field ) );
+		var $error = $( errorSelector( field ) );
+
+		if ( ! $field.length || ! $error.length ) {
+			return;
+		}
+
+		$field.addClass( 'has-error' );
+		$error.text( message ).css( 'display', 'block' );
+
+		if ( fieldControls[ field ] ) {
+			$( fieldControls[ field ] ).attr( 'aria-invalid', 'true' );
+		}
+	}
+
+	function clearValidation( step ) {
+		var $scope = step ? $( '.ph-onboarding__panel[data-step="' + step + '"]' ) : $wizard;
+
+		$scope.find( '[data-validation-field]' ).removeClass( 'has-error' );
+		$scope.find( '[data-field-error]' ).text( '' ).hide();
+		$scope.find( '[aria-invalid="true"]' ).removeAttr( 'aria-invalid' );
+	}
+
+	function applyFieldErrors( errors ) {
+		var firstMessage = '';
+		var firstField = '';
+
+		if ( ! errors ) {
+			return '';
+		}
+
+		$.each( errors, function( field, message ) {
+			if ( ! firstMessage ) {
+				firstMessage = message;
+				firstField = field;
+			}
+			setFieldError( field, message );
+		} );
+
+		if ( firstField && fieldControls[ firstField ] ) {
+			$( fieldControls[ firstField ] ).first().trigger( 'focus' );
+		}
+
+		return firstMessage;
+	}
+
+	function fieldValue( field ) {
+		return $.trim( $( fieldControls[ field ] ).val() || '' );
+	}
+
+	function isValidEmail( value ) {
+		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test( value );
+	}
+
+	function isValidPhone( value ) {
+		var digits = value.replace( /\D+/g, '' );
+		return digits.length >= 7 && /^[0-9+\-\s().]+$/.test( value );
 	}
 
 	function setMessage( message, type ) {
@@ -71,6 +176,7 @@ jQuery( function( $ ) {
 		$( '[data-back]' ).toggle( index > 0 );
 		$( '[data-next]' ).text( step === 'complete' ? config.i18n.finish : config.i18n.continue );
 		setMessage( '' );
+		clearValidation( step );
 		updateUsageLinks();
 		track( 'step_viewed', step );
 	}
@@ -117,6 +223,7 @@ jQuery( function( $ ) {
 		}
 
 		if ( step === 'demo-data' ) {
+			payload.demo_data_choice = $( 'input[name="demo_data_choice"]:checked' ).val() || '';
 			payload.demo_data_imported = demoImported ? 'yes' : 'no';
 		}
 
@@ -124,16 +231,64 @@ jQuery( function( $ ) {
 	}
 
 	function validateStep( step ) {
+		var errors = {};
+
+		clearValidation( step );
+
 		if ( step === 'departments' && ! selectedValues( 'departments' ).length ) {
-			setMessage( config.i18n.chooseDepartment, 'error' );
+			errors.departments = text( 'chooseDepartment', 'Please choose at least one property sector.' );
+		}
+
+		if ( step === 'country' && ! $( '[data-country-select]' ).val() ) {
+			errors.country = text( 'chooseCountry', 'Please choose a valid country.' );
+		}
+
+		if ( step === 'office' ) {
+			$.each( officeRules, function( index, rule ) {
+				var value = fieldValue( rule.field );
+
+				if ( rule.required && ! value ) {
+					errors[ rule.field ] = text( rule.requiredMessage, 'This field is required.' );
+					return;
+				}
+
+				if ( value && rule.maxLength && value.length > rule.maxLength ) {
+					errors[ rule.field ] = text( rule.maxMessage, 'This field is too long.' );
+					return;
+				}
+
+				if ( value && rule.field === 'office_telephone_number' && ! isValidPhone( value ) ) {
+					errors.office_telephone_number = text( 'officePhoneInvalid', 'Please enter a valid phone number.' );
+				}
+
+				if ( value && rule.field === 'office_email_address' && ! isValidEmail( value ) ) {
+					errors.office_email_address = text( 'officeEmailInvalid', 'Please enter a valid email address.' );
+				}
+			} );
+		}
+
+		if ( step === 'usage' && ! selectedValues( 'usage' ).length ) {
+			errors.usage = text( 'chooseUsage', 'Please choose how you will use Property Hive.' );
+		}
+
+		if ( step === 'demo-data' ) {
+			if ( ! $( 'input[name="demo_data_choice"]:checked' ).length ) {
+				errors.demo_data_choice = text( 'chooseDemoData', 'Please choose whether to import demo data.' );
+			} else if ( $( 'input[name="demo_data_choice"]:checked' ).val() === 'yes' && config.demo_data_active !== 'yes' ) {
+				errors.demo_data_choice = text( 'demoDataInactive', 'The Demo Data feature is not active on this site yet.' );
+			}
+		}
+
+		if ( ! $.isEmptyObject( errors ) ) {
+			setMessage( applyFieldErrors( errors ), 'error' );
 			return false;
 		}
 
 		return true;
 	}
 
-	function saveStep( step ) {
-		if ( ! validateStep( step ) ) {
+	function saveStep( step, skipClientValidation ) {
+		if ( ! skipClientValidation && ! validateStep( step ) ) {
 			return $.Deferred().reject().promise();
 		}
 
@@ -143,11 +298,19 @@ jQuery( function( $ ) {
 			.done( function( response ) {
 				if ( ! response || ! response.success ) {
 					var message = response && response.data && response.data.message ? response.data.message : 'Setup could not be saved.';
+					clearValidation( step );
+					if ( response && response.data && response.data.errors ) {
+						message = applyFieldErrors( response.data.errors ) || message;
+					}
 					setMessage( message, 'error' );
 				}
 			} )
 			.fail( function( xhr ) {
 				var message = xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message ? xhr.responseJSON.data.message : 'Setup could not be saved.';
+				clearValidation( step );
+				if ( xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.errors ) {
+					message = applyFieldErrors( xhr.responseJSON.data.errors ) || message;
+				}
 				setMessage( message, 'error' );
 			} )
 			.always( function() {
@@ -304,6 +467,12 @@ jQuery( function( $ ) {
 	$( document ).on( 'change', 'input[name="usage[]"]', updateUsageLinks );
 	$( document ).on( 'change', 'input[name="demo_data_choice"]', updateDemoChoice );
 
+	$( document ).on( 'input change', '[data-office-field], [data-country-select]', function() {
+		var field = $( this ).attr( 'data-office-field' ) || 'country';
+		clearFieldError( field );
+		setMessage( '' );
+	} );
+
 	$( '[data-next]' ).on( 'click', function() {
 		var index = getStepIndex( currentStep );
 
@@ -311,8 +480,12 @@ jQuery( function( $ ) {
 			return;
 		}
 
+		if ( ! validateStep( currentStep ) ) {
+			return;
+		}
+
 		maybeImportDemoData().done( function() {
-			saveStep( currentStep ).done( function( response ) {
+			saveStep( currentStep, true ).done( function( response ) {
 				if ( response && response.success === false ) {
 					return;
 				}
@@ -349,6 +522,23 @@ jQuery( function( $ ) {
 	} );
 
 	$( document ).on( 'change', '.ph-onboarding__choice input', function() {
+		var name = $( this ).attr( 'name' );
+
+		if ( name === 'departments[]' ) {
+			clearFieldError( 'departments' );
+			setMessage( '' );
+		}
+
+		if ( name === 'usage[]' ) {
+			clearFieldError( 'usage' );
+			setMessage( '' );
+		}
+
+		if ( name === 'demo_data_choice' ) {
+			clearFieldError( 'demo_data_choice' );
+			setMessage( '' );
+		}
+
 		if ( $( this ).attr( 'type' ) === 'radio' ) {
 			if ( $( this ).is( ':checked' ) ) {
 				$( 'input[name="' + $( this ).attr( 'name' ) + '"]' ).closest( '.ph-onboarding__choice' ).removeClass( 'is-selected' );
