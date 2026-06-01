@@ -1,0 +1,33 @@
+<?php
+namespace PropertyHive\Divi5Sim\Modules\PropertyNegotiatorName;
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+require_once ABSPATH . 'wp-content/themes/Divi/includes/builder-5/server/Framework/DependencyManagement/Interfaces/DependencyInterface.php';
+require_once __DIR__ . '/../PropertyContentModule.php';
+
+use ET\Builder\Framework\DependencyManagement\Interfaces\DependencyInterface;
+use PropertyHive\Divi5Sim\Modules\PropertyContentModule;
+
+class PropertyNegotiatorName extends PropertyContentModule implements DependencyInterface {
+    const MODULE_DIR = 'property-negotiator-name';
+    const MODULE_CLASS_NAME = 'propertyhive_divi5_property_negotiator_name';
+    const OUTPUT_CLASS = 'propertyhive-divi5-property-negotiator-name';
+    const TITLE = 'Negotiator Name';
+    const TEXT_ATTR = 'contentText';
+
+    public function load() { add_action( 'init', [ self::class, 'register_module' ] ); }
+
+    protected static function get_output( $property, $attrs ) {
+        if ( ! $property ) { return ''; }
+        $user = static::get_negotiator_user( $property );
+        $name = '';
+        if ( $user ) {
+            $name = $user->display_name ?: trim( $user->first_name . ' ' . $user->last_name );
+        }
+        if ( '' === $name ) { $name = $property->negotiator_name ?? ''; }
+        return esc_html( $name );
+    }
+}
+
+add_action( 'divi_module_library_modules_dependency_tree', function( $dependency_tree ) { $dependency_tree->add_dependency( new PropertyNegotiatorName() ); } );
