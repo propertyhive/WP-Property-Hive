@@ -8,11 +8,75 @@ class PH_Divi {
 
 	public function __construct()
 	{
-		add_action('et_builder_ready', array( $this, 'register_widgets' ) );
+		$dependency_interface = ABSPATH . 'wp-content/themes/Divi/includes/builder-5/server/Framework/DependencyManagement/Interfaces/DependencyInterface.php';
+
+	    if ( file_exists( $dependency_interface ) ) 
+	    {
+	        include_once( 'divi-5/includes/modules/Modules.php' );
+	    }
+        
+        add_action( 'divi_visual_builder_assets_before_enqueue_scripts', array( $this, 'propertyhive_enqueue_divi5_vb_assets' ) );
+
+        add_action( 'wp_enqueue_scripts', array( $this, 'propertyhive_enqueue_divi5_frontend_assets' ) );
+
+	    add_action( 'et_builder_ready', array( $this, 'register_widgets' ) );
+	}
+
+	public function propertyhive_enqueue_divi5_vb_assets() 
+	{
+	    if (
+	        ! function_exists( 'et_builder_d5_enabled' )
+	        || ! et_builder_d5_enabled()
+	        || ! function_exists( 'et_core_is_fb_enabled' )
+	        || ! et_core_is_fb_enabled()
+	    ) {
+	        return;
+	    }
+
+	    \ET\Builder\VisualBuilder\Assets\PackageBuildManager::register_package_build(
+	        [
+	            'name'    => 'propertyhive-divi5-builder-script',
+	            'version' => defined( 'PH_VERSION' ) ? PH_VERSION : '1.0.0',
+	            'script'  => [
+	                'src'                => PH()->plugin_url() . '/includes/divi-5/includes/scripts/bundle.js',
+	                'deps'               => [
+	                    'react',
+	                    'jquery',
+	                    'divi-module-library',
+	                    'wp-hooks',
+	                    'wp-data',
+	                    'divi-rest',
+	                ],
+	                'enqueue_top_window' => false,
+	                'enqueue_app_window' => true,
+	            ],
+	        ]
+	    );
+	}
+
+	public function propertyhive_enqueue_divi5_frontend_assets() 
+	{
+		if ( !function_exists( 'et_builder_d5_enabled' ) || !et_builder_d5_enabled() ) 
+        {
+        	return;
+        }
+
+	    wp_enqueue_style(
+	        'propertyhive-divi5-frontend',
+	        PH()->plugin_url() . '/includes/divi-5/includes/styles/bundle.css',
+	        [],
+	        defined( 'PH_VERSION' ) ? PH_VERSION : '1.0.0'
+	    );
 	}
 
 	public function register_widgets()
 	{
+		if (
+	        function_exists( 'et_builder_d5_enabled' )
+	    ) {
+	        return;
+	    }
+
 		if ( class_exists('ET_Builder_Module') ) 
 		{
 			$widgets = array(
