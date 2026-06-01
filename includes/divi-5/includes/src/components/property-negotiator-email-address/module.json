@@ -1,0 +1,188 @@
+{
+  "name": "propertyhive/property-negotiator-email-address",
+  "title": "Negotiator Email Address",
+  "titles": "Negotiator Email Address",
+  "category": "module",
+  "moduleClassName": "propertyhive_divi5_property_negotiator_email_address",
+  "moduleOrderClassName": "propertyhive_divi5_property_negotiator_email_address",
+  "attributes": {
+    "module": {
+      "type": "object",
+      "selector": "{{selector}}",
+      "default": {
+        "meta": {
+          "adminLabel": {
+            "desktop": {
+              "value": "Negotiator Email Address"
+            }
+          }
+        }
+      },
+      "settings": {
+        "meta": {
+          "adminLabel": {}
+        },
+        "decoration": {
+          "layout": {},
+          "background": {},
+          "sizing": {},
+          "spacing": {},
+          "border": {},
+          "disabledOn": {},
+          "position": {},
+          "zIndex": {}
+        }
+      }
+    },
+    "textAlign": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": "left"
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyNegotiatorEmailAddressStyle",
+            "priority": 10,
+            "render": true,
+            "attrName": "textAlign",
+            "label": "Text Align",
+            "component": {
+              "name": "divi/select",
+              "type": "field",
+              "props": {
+                "options": {
+                  "left": {
+                    "label": "Left"
+                  },
+                  "center": {
+                    "label": "Centre"
+                  },
+                  "right": {
+                    "label": "Right"
+                  }
+                }
+              }
+            },
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    },
+    "contentText": {
+      "type": "object",
+      "selector": "{{selector}} .propertyhive-divi5-property-negotiator-email-address",
+      "styleProps": {
+        "font": {
+          "important": {
+            "font": {
+              "desktop": {
+                "value": {
+                  "color": true,
+                  "font-size": true,
+                  "font-family": true,
+                  "font-weight": true,
+                  "line-height": true,
+                  "letter-spacing": true,
+                  "text-shadow": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "settings": {
+        "decoration": {
+          "font": {
+            "priority": 20,
+            "component": {
+              "props": {
+                "groupLabel": "Typography",
+                "fieldLabel": "Negotiator Email Address",
+                "fields": {
+                  "headingLevel": {
+                    "render": false
+                  },
+                  "textAlign": {
+                    "render": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "textColor": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": ""
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyNegotiatorEmailAddressStyle",
+            "priority": 50,
+            "render": true,
+            "attrName": "textColor",
+            "label": "Colour",
+            "component": {
+              "name": "divi/color-picker",
+              "type": "field"
+            },
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "content": "auto",
+    "design": "auto",
+    "advanced": "auto",
+    "groups": {
+      "propertyNegotiatorEmailAddress": {
+        "panel": "content",
+        "priority": 10,
+        "groupName": "propertyNegotiatorEmailAddress",
+        "component": {
+          "name": "divi/composite",
+          "props": {
+            "groupLabel": "Negotiator Email Address"
+          }
+        }
+      },
+      "propertyNegotiatorEmailAddressStyle": {
+        "panel": "design",
+        "priority": 10,
+        "groupName": "propertyNegotiatorEmailAddressStyle",
+        "component": {
+          "name": "divi/composite",
+          "props": {
+            "groupLabel": "Negotiator Email Address Style"
+          }
+        }
+      }
+    }
+  },
+  "wrapper": {
+    "status": true,
+    "tag": "div"
+  }
+}
