@@ -1,0 +1,186 @@
+{
+  "name": "propertyhive/property-address-line-2",
+  "title": "Property Address Line 2",
+  "titles": "Property Address Line 2",
+  "category": "module",
+  "moduleClassName": "propertyhive_divi5_property_address_line_2",
+  "moduleOrderClassName": "propertyhive_divi5_property_address_line_2",
+  "attributes": {
+    "module": {
+      "type": "object",
+      "selector": "{{selector}}",
+      "default": {
+        "meta": {
+          "adminLabel": {
+            "desktop": {
+              "value": "Property Address Line 2"
+            }
+          }
+        }
+      },
+      "settings": {
+        "meta": {
+          "adminLabel": {}
+        },
+        "decoration": {
+          "layout": {},
+          "background": {},
+          "sizing": {},
+          "spacing": {},
+          "border": {},
+          "disabledOn": {},
+          "position": {},
+          "zIndex": {}
+        }
+      }
+    },
+    "textAlign": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": "left"
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyAddressLine2Style",
+            "priority": 10,
+            "render": true,
+            "attrName": "textAlign",
+            "label": "Text Align",
+            "component": {
+              "name": "divi/select",
+              "type": "field",
+              "props": {
+                "options": {
+                  "left": {
+                    "label": "Left"
+                  },
+                  "center": {
+                    "label": "Centre"
+                  },
+                  "right": {
+                    "label": "Right"
+                  }
+                }
+              }
+            },
+            "description": "Controls the alignment of the output.",
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    },
+    "addressLine2Text": {
+      "type": "object",
+      "selector": "{{selector}} .propertyhive-divi5-property-address-line-2",
+      "styleProps": {
+        "font": {
+          "important": {
+            "font": {
+              "desktop": {
+                "value": {
+                  "color": true,
+                  "font-size": true,
+                  "font-family": true,
+                  "font-weight": true,
+                  "line-height": true,
+                  "letter-spacing": true,
+                  "text-shadow": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "settings": {
+        "decoration": {
+          "font": {
+            "priority": 20,
+            "component": {
+              "props": {
+                "groupLabel": "Typography",
+                "fieldLabel": "Address Line 2",
+                "fields": {
+                  "headingLevel": {
+                    "render": false
+                  },
+                  "textAlign": {
+                    "render": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "textColor": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": ""
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyAddressLine2Style",
+            "priority": 50,
+            "render": true,
+            "attrName": "textColor",
+            "label": "Colour",
+            "component": {
+              "name": "divi/color-picker",
+              "type": "field"
+            },
+            "description": "Text colour.",
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "content": "auto",
+    "design": "auto",
+    "advanced": "auto",
+    "groups": {
+      "propertyAddressLine2": {
+        "panel": "content",
+        "priority": 10,
+        "groupName": "propertyAddressLine2",
+        "component": {
+          "name": "divi/composite",
+          "props": {
+            "groupLabel": "Property Address Line 2"
+          }
+        }
+      },
+      "propertyAddressLine2Style": {
+        "panel": "design",
+        "priority": 10,
+        "groupName": "propertyAddressLine2Style",
+        "component": {
+          "name": "divi/composite",
+          "props": {
+            "groupLabel": "Address Line 2 Style"
+          }
+        }
+      }
+    }
+  }
+}
