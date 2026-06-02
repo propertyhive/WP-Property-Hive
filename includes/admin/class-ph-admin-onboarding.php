@@ -23,6 +23,8 @@ class PH_Admin_Onboarding {
 
 	const NONCE_ACTION = 'propertyhive-onboarding';
 
+	const RESTART_NONCE_ACTION = 'propertyhive-restart-onboarding';
+
 	/**
 	 * Wizard step ids.
 	 *
@@ -36,9 +38,11 @@ class PH_Admin_Onboarding {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'admin_dashboard_pages' ) );
 		add_action( 'admin_head', array( $this, 'hide_dashboard_page_menu_item' ) );
+		add_action( 'admin_init', array( $this, 'maybe_restart_onboarding' ) );
 		add_action( 'load-dashboard_page_ph-onboarding', array( $this, 'remove_admin_toolbar_html_class' ) );
 		add_filter( 'propertyhive_screen_ids', array( $this, 'add_screen_id' ) );
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
+		add_action( 'propertyhive_settings_start', array( $this, 'output_restart_onboarding_notice' ) );
 
 		add_action( 'wp_ajax_propertyhive_onboarding_save_step', array( $this, 'ajax_save_step' ) );
 		add_action( 'wp_ajax_propertyhive_onboarding_skip', array( $this, 'ajax_skip' ) );
@@ -329,6 +333,94 @@ class PH_Admin_Onboarding {
 		}
 
 		wp_send_json_success();
+	}
+
+	/**
+	 * Check whether the onboarding restart tool should be available.
+	 *
+	 * @return bool
+	 */
+	public static function can_restart_onboarding() {
+		return in_array( self::get_environment_type(), array( 'local', 'development', 'staging' ), true );
+	}
+
+	/**
+	 * Get the current WordPress environment type.
+	 *
+	 * @return string
+	 */
+	private static function get_environment_type() {
+		if ( function_exists( 'wp_get_environment_type' ) ) {
+			return wp_get_environment_type();
+		}
+
+		return 'production';
+	}
+
+	/**
+	 * Restart the onboarding wizard from a gated admin URL.
+	 */
+	public function maybe_restart_onboarding() {
+		if ( empty( $_GET['propertyhive_restart_onboarding'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to restart setup.', 'propertyhive' ) );
+		}
+
+		check_admin_referer( self::RESTART_NONCE_ACTION );
+
+		if ( ! self::can_restart_onboarding() ) {
+			wp_die( esc_html__( 'The setup wizard can only be restarted on local, development or staging sites.', 'propertyhive' ) );
+		}
+
+		delete_option( self::OPTION_NAME );
+		self::track_event( 'restarted', array( 'environment_type' => self::get_environment_type() ) );
+
+		wp_safe_redirect( admin_url( 'index.php?page=ph-onboarding' ) );
+		exit;
+	}
+
+	/**
+	 * Output a development-only setup restart prompt on the settings page.
+	 */
+	public function output_restart_onboarding_notice() {
+		if ( ! current_user_can( 'manage_options' ) || ! self::can_restart_onboarding() ) {
+			return;
+		}
+
+		?>
+		<div class="notice notice-info inline">
+			<p>
+				<strong><?php esc_html_e( 'Development setup tools', 'propertyhive' ); ?></strong>
+			</p>
+			<p>
+				<?php
+				printf(
+					/* translators: %s: WordPress environment type. */
+					esc_html__( 'This site is marked as %s, so administrators can restart the Property Hive setup wizard for testing.', 'propertyhive' ),
+					'<code>' . esc_html( self::get_environment_type() ) . '</code>'
+				);
+				?>
+			</p>
+			<p>
+				<a class="button" href="<?php echo esc_url( $this->get_restart_onboarding_url() ); ?>"><?php esc_html_e( 'Restart setup wizard', 'propertyhive' ); ?></a>
+			</p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Get the onboarding restart URL.
+	 *
+	 * @return string
+	 */
+	private function get_restart_onboarding_url() {
+		return wp_nonce_url(
+			add_query_arg( 'propertyhive_restart_onboarding', '1', admin_url( 'admin.php?page=ph-settings' ) ),
+			self::RESTART_NONCE_ACTION
+		);
 	}
 
 	/**
