@@ -25,7 +25,9 @@ class PropertyNegotiatorPhoto extends PropertyContentModule implements Dependenc
             $avatar = get_avatar( $user->ID, 300 );
             if ( $avatar ) { return $avatar; }
         }
-        return $property->negotiator_photo ?? '';
+        $value = $property->negotiator_photo;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

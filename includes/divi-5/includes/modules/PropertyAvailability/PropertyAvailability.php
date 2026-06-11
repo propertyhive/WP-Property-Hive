@@ -24,7 +24,9 @@ class PropertyAvailability extends PropertyMetaModule implements DependencyInter
     }
 
     protected static function get_property_value( $property ) {
-        return $property->availability ?? '';
+        $value = $property->availability;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

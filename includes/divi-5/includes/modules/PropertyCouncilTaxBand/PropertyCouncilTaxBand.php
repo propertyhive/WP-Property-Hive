@@ -24,7 +24,9 @@ class PropertyCouncilTaxBand extends PropertyMetaModule implements DependencyInt
     }
 
     protected static function get_property_value( $property ) {
-        return $property->council_tax_band ?? '';
+        $value = $property->council_tax_band;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

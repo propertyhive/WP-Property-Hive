@@ -24,7 +24,9 @@ class PropertyAddressPostcode extends PropertyMetaModule implements DependencyIn
     }
 
     protected static function get_property_value( $property ) {
-        return $property->address_postcode ?? '';
+        $value = $property->address_postcode;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

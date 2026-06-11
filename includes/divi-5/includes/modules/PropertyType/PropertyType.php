@@ -24,7 +24,9 @@ class PropertyType extends PropertyMetaModule implements DependencyInterface {
     }
 
     protected static function get_property_value( $property ) {
-        return $property->property_type ?? '';
+        $value = $property->property_type;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 
