@@ -7,7 +7,7 @@
  * Author: PropertyHive
  * Author URI: https://wp-property-hive.com
  * Requires at least: 5.6
- * Tested up to: 6.9
+ * Tested up to: 7.0
  * 
  * Text Domain: propertyhive
  * Domain Path: /i18n/languages/
