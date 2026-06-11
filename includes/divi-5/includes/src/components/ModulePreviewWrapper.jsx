@@ -247,53 +247,62 @@ export const getFontDecorationStyle = (attr = {}, device = 'desktop') => {
 };
 
 
-export const processDiviIconAttr = (attr, device = 'desktop', fallback = '') => {
-  const processFontIcon = window?.divi?.iconLibrary?.processFontIcon;
+export const getRawIconAttrValue = (attr, device = 'desktop', fallback = '') => {
   const responsiveValue = getResponsiveAttrValue(attr, device, fallback);
 
-  const candidates = [];
-  if (responsiveValue !== undefined && responsiveValue !== null && responsiveValue !== '') {
-    candidates.push(responsiveValue);
-  }
-  if (attr?.[device]?.value !== undefined) {
-    candidates.push(attr?.[device]?.value);
-  }
-  if (attr?.desktop?.value !== undefined) {
-    candidates.push(attr?.desktop?.value);
-  }
-  candidates.push(attr);
+  const candidates = [
+    responsiveValue,
+    attr?.[device]?.value?.icon,
+    attr?.[device]?.value?.value,
+    attr?.[device]?.value?.unicode,
+    attr?.[device]?.value,
+    attr?.desktop?.value?.icon,
+    attr?.desktop?.value?.value,
+    attr?.desktop?.value?.unicode,
+    attr?.desktop?.value,
+    attr?.value?.icon,
+    attr?.value?.value,
+    attr?.value?.unicode,
+    attr?.value,
+    attr?.icon,
+    attr?.unicode,
+    attr?.selectedIcon,
+  ];
 
   for (const candidate of candidates) {
-    if (candidate === undefined || candidate === null || candidate === '') {
-      continue;
-    }
-
-    if (typeof processFontIcon === 'function') {
-      const processed = processFontIcon(candidate);
-      if (processed) {
-        return processed;
-      }
-    }
-
-    if (typeof candidate === 'string') {
+    if (typeof candidate === 'string' && candidate !== '') {
       return candidate;
-    }
-
-    if (typeof candidate === 'object') {
-      const maybeIcon = candidate.icon || candidate.value || candidate.unicode || candidate.selectedIcon;
-      if (typeof maybeIcon === 'string') {
-        if (typeof processFontIcon === 'function') {
-          const processed = processFontIcon(maybeIcon);
-          if (processed) {
-            return processed;
-          }
-        }
-        return maybeIcon;
-      }
     }
   }
 
   return fallback;
+};
+
+export const processDiviIconAttr = (attr, device = 'desktop', fallback = '') => {
+  const rawIcon = getRawIconAttrValue(attr, device, fallback);
+
+  if (!rawIcon) {
+    return fallback;
+  }
+
+  const processFontIcon = window?.divi?.iconLibrary?.processFontIcon;
+
+  if (typeof processFontIcon === 'function') {
+    return processFontIcon(rawIcon) || fallback;
+  }
+
+  return rawIcon;
+};
+
+export const getDiviIconFontFamily = (attr, device = 'desktop') => {
+  const rawIcon = getRawIconAttrValue(attr, device, '');
+  const getFontFamily = window?.divi?.iconLibrary?.getIconFontFamily;
+
+  if (rawIcon && typeof getFontFamily === 'function') {
+    return getFontFamily(rawIcon) || undefined;
+  }
+
+  return undefined;
 };
 
 export const getModuleStyle = (

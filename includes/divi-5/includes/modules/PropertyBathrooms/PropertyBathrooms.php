@@ -24,7 +24,9 @@ class PropertyBathrooms extends PropertyMetaModule implements DependencyInterfac
     }
 
     protected static function get_property_value( $property ) {
-        return $property->bathrooms ?? '';
+        $value = $property->bathrooms;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

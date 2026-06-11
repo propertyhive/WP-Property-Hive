@@ -24,7 +24,9 @@ class PropertyAddressCounty extends PropertyMetaModule implements DependencyInte
     }
 
     protected static function get_property_value( $property ) {
-        return $property->address_four ?? '';
+        $value = $property->address_four;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 
