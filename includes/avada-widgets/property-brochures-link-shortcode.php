@@ -10,7 +10,7 @@ add_shortcode( 'avada_property_brochures_link', function( $atts ) {
         'text_transform'  => '',
         'line_height'  => '',
         'text_color'       => '',
-        'label'       => 'View Brochure',
+        'label'       => __( 'View Brochure', 'propertyhive' ),
     ), $atts );
 
     if ( get_post_type( get_the_ID() ) != 'property' )

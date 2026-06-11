@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Property Hive plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Property Hive 2.2.3\n"
+"Project-Id-Version: Property Hive 2.2.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/propertyhive\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-05T12:41:15+01:00\n"
+"POT-Creation-Date: 2026-06-11T11:31:24+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: propertyhive\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: includes/admin/class-ph-admin-menus.php:126
 #: includes/admin/class-ph-admin-menus.php:182
 #: includes/class-ph-ajax.php:1928
-#: includes/class-ph-elementor.php:238
+#: includes/class-ph-elementor.php:241
 #: includes/salient-widgets/property-actions.php:41
 #: includes/salient-widgets/property-address-county.php:41
 #: includes/salient-widgets/property-address-line-2.php:41
@@ -1200,7 +1200,7 @@ msgstr ""
 #: includes/admin/views/html-contact-tenancies-meta-box.php:88
 #: includes/admin/views/html-contact-viewings-meta-box.php:32
 #: includes/class-ph-ajax.php:2410
-#: includes/class-ph-elementor.php:360
+#: includes/class-ph-elementor.php:363
 #: includes/class-ph-post-types.php:542
 #: templates/account/applicant-viewings.php:30
 #: templates/account/applicant-viewings.php:74
@@ -2872,6 +2872,7 @@ msgstr ""
 #: includes/avada-widgets/property-map.php:30
 #: includes/bricks-builder-widgets/property-embedded-virtual-tours.php:38
 #: includes/bricks-builder-widgets/property-images.php:50
+#: includes/class-ph-elementor.php:410
 #: includes/divi-widgets/property-negotiator-email-address.php:25
 #: includes/divi-widgets/property-negotiator-telephone-number.php:25
 #: includes/elementor-widgets/property-embedded-virtual-tours.php:89
@@ -3241,6 +3242,7 @@ msgstr ""
 #: includes/avada-widgets/property-map.php:29
 #: includes/bricks-builder-widgets/property-embedded-virtual-tours.php:39
 #: includes/bricks-builder-widgets/property-images.php:51
+#: includes/class-ph-elementor.php:409
 #: includes/divi-widgets/property-negotiator-email-address.php:24
 #: includes/divi-widgets/property-negotiator-telephone-number.php:24
 #: includes/elementor-widgets/property-embedded-virtual-tours.php:88
@@ -4481,7 +4483,7 @@ msgstr ""
 #: includes/ph-form-functions.php:252
 #: includes/ph-form-functions.php:1122
 #: includes/ph-form-functions.php:1228
-#: includes/ph-form-functions.php:1471
+#: includes/ph-form-functions.php:1489
 msgid "No preference"
 msgstr ""
 
@@ -6475,6 +6477,14 @@ msgstr ""
 #: includes/class-ph-ajax.php:7774
 #: includes/class-ph-ajax.php:7834
 msgid "You do not have permission to manage key dates"
+msgstr ""
+
+#: includes/class-ph-elementor.php:407
+msgid "Show Availability Flag"
+msgstr ""
+
+#: includes/class-ph-elementor.php:421
+msgid "The flag shown will take its colour and position settings from the <a href=\""
 msgstr ""
 
 #. translators: %s: person name
