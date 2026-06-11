@@ -1,56 +1,14 @@
 import { registerPropertyHiveModule } from '../../shared/register-propertyhive-module';
 import ModulePreviewWrapper, {
   getResponsiveAttrValue,
+  getRawIconAttrValue,
+  processDiviIconAttr,
+  getDiviIconFontFamily,
   getFontDecorationStyle,
   getTextStyle,
   getCssSizeValue,
   usePreviewDevice,
 } from '../ModulePreviewWrapper';
-
-const getIconAttributeValue = (attr, device = 'desktop', fallback = null) => {
-  const value = getResponsiveAttrValue(attr, device, fallback);
-
-  if (!value) {
-    return fallback;
-  }
-
-  return value;
-};
-
-const processDiviIcon = (iconAttributeValue) => {
-  if (!iconAttributeValue) {
-    return '';
-  }
-
-  const processFontIcon =
-    window?.divi?.iconLibrary?.processFontIcon;
-
-  if (typeof processFontIcon === 'function') {
-    return processFontIcon(iconAttributeValue) || '';
-  }
-
-  if (typeof iconAttributeValue === 'string') {
-    return iconAttributeValue;
-  }
-
-  return (
-    iconAttributeValue?.decodedUnicode ||
-    iconAttributeValue?.unicode ||
-    iconAttributeValue?.icon ||
-    ''
-  );
-};
-
-const getIconFontFamily = (iconAttributeValue) => {
-  const getFontFamily =
-    window?.divi?.iconLibrary?.getIconFontFamily;
-
-  if (typeof getFontFamily === 'function') {
-    return getFontFamily(iconAttributeValue) || undefined;
-  }
-
-  return undefined;
-};
 
 const createPropertyMetaPreview = ({
   moduleClassName,
@@ -65,9 +23,9 @@ const createPropertyMetaPreview = ({
 
     const device = usePreviewDevice();
 
-    const iconAttributeValue = hasIcon ? getIconAttributeValue(attrs?.icon, device, null) : null;
-    const icon = hasIcon ? processDiviIcon(iconAttributeValue) : '';
-    const iconFontFamily = hasIcon ? getIconFontFamily(iconAttributeValue) : undefined;
+    const rawIcon = hasIcon ? getRawIconAttrValue(attrs?.icon, device, '') : '';
+    const icon = hasIcon ? processDiviIconAttr(attrs?.icon, device, '') : '';
+    const iconFontFamily = hasIcon ? getDiviIconFontFamily(attrs?.icon, device) : undefined;
     const before = getResponsiveAttrValue(attrs?.before, device, '');
     const after = getResponsiveAttrValue(
       attrs?.after?.innerContent || attrs?.after,

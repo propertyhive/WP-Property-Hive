@@ -24,7 +24,9 @@ class PropertyAddressNameNumber extends PropertyMetaModule implements Dependency
     }
 
     protected static function get_property_value( $property ) {
-        return $property->address_name_number ?? '';
+        $value = $property->address_name_number;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

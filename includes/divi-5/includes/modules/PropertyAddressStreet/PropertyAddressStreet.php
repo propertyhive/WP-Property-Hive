@@ -24,7 +24,9 @@ class PropertyAddressStreet extends PropertyMetaModule implements DependencyInte
     }
 
     protected static function get_property_value( $property ) {
-        return $property->address_street ?? '';
+        $value = $property->address_street;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

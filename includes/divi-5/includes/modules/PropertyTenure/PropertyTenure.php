@@ -24,7 +24,9 @@ class PropertyTenure extends PropertyMetaModule implements DependencyInterface {
     }
 
     protected static function get_property_value( $property ) {
-        return $property->tenure ?? '';
+        $value = $property->tenure;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 
