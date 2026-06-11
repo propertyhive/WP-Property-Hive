@@ -182,7 +182,7 @@ The free core plugin contains the foundations that you need to create a property
 
 == Changelog ==
 
-= 2.2.4 - 2026-05-05 =
+= 2.2.4 - 2026-06-11 =
 * Added flag setting back in to Elementor Image widget lost during Template Assistant merger
 * Corrected label text in Avada brochures shortcode and add default value
 * Corrected security vulnerability in search form slider control
