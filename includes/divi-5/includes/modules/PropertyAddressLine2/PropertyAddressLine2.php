@@ -24,7 +24,9 @@ class PropertyAddressLine2 extends PropertyMetaModule implements DependencyInter
     }
 
     protected static function get_property_value( $property ) {
-        return $property->address_two ?? '';
+        $value = $property->address_two;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

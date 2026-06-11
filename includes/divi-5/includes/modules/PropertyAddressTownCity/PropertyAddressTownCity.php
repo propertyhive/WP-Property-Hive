@@ -24,7 +24,9 @@ class PropertyAddressTownCity extends PropertyMetaModule implements DependencyIn
     }
 
     protected static function get_property_value( $property ) {
-        return $property->address_three ?? '';
+        $value = $property->address_three;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

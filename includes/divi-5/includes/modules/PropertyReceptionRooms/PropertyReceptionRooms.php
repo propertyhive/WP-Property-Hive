@@ -24,7 +24,9 @@ class PropertyReceptionRooms extends PropertyMetaModule implements DependencyInt
     }
 
     protected static function get_property_value( $property ) {
-        return $property->reception_rooms ?? '';
+        $value = $property->reception_rooms;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 

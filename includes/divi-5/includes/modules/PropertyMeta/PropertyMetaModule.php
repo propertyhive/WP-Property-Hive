@@ -160,13 +160,63 @@ abstract class PropertyMetaModule {
     }
 
     protected static function get_icon_value( $attrs, $default = '' ) {
-        $value = $attrs['icon']['desktop']['value'] ?? $default;
+        $value = $attrs['icon']['desktop']['value'] ?? $attrs['icon']['value'] ?? $attrs['icon'] ?? $default;
 
         if ( is_array( $value ) ) {
-            return $value['icon'] ?? $value['value'] ?? $value['unicode'] ?? $default;
+            return self::get_icon_raw_value( $value, $default );
         }
 
-        return $value;
+        return is_string( $value ) ? $value : $default;
+    }
+
+    protected static function get_icon_raw_value( $icon_attr, $default = '' ) {
+        if ( is_string( $icon_attr ) ) {
+            return $icon_attr;
+        }
+
+        if ( ! is_array( $icon_attr ) ) {
+            return $default;
+        }
+
+        $candidates = array(
+            $icon_attr['desktop']['value']['icon'] ?? null,
+            $icon_attr['desktop']['value']['value'] ?? null,
+            $icon_attr['desktop']['value']['unicode'] ?? null,
+            $icon_attr['desktop']['value'] ?? null,
+            $icon_attr['value']['icon'] ?? null,
+            $icon_attr['value']['value'] ?? null,
+            $icon_attr['value']['unicode'] ?? null,
+            $icon_attr['value'] ?? null,
+            $icon_attr['icon'] ?? null,
+            $icon_attr['unicode'] ?? null,
+            $icon_attr['selectedIcon'] ?? null,
+        );
+
+        foreach ( $candidates as $candidate ) {
+            if ( is_string( $candidate ) && '' !== $candidate ) {
+                return $candidate;
+            }
+        }
+
+        return $default;
+    }
+
+    protected static function get_icon_font_family( $icon ) {
+        if ( ! is_string( $icon ) || '' === $icon || ! function_exists( 'et_pb_get_icon_font_family' ) ) {
+            return '';
+        }
+
+        return et_pb_get_icon_font_family( $icon );
+    }
+
+    protected static function process_icon( $icon ) {
+        if ( ! is_string( $icon ) || '' === $icon ) {
+            return '';
+        }
+
+        $processed_icon = function_exists( 'et_pb_process_font_icon' ) ? et_pb_process_font_icon( $icon ) : $icon;
+
+        return html_entity_decode( $processed_icon, ENT_QUOTES, 'UTF-8' );
     }
 
     protected static function css_rule( $property, $value ) {
@@ -212,10 +262,15 @@ abstract class PropertyMetaModule {
         return $style;
     }
 
-    protected static function get_icon_style( $attrs ) {
-        $style  = 'vertical-align:middle;margin-right:7px;';
+    protected static function get_icon_style( $attrs, $icon = '' ) {
+        $style  = 'vertical-align:middle;margin-right:7px;line-height:1;font-size:1em;';
         $style .= static::css_rule( 'color', static::get_attr_value( $attrs, 'iconColor', '' ) );
-        $style .= static::css_rule( 'font-size', static::get_css_size_value( $attrs, 'iconSize', '24px' ) );
+        $style .= static::css_rule( 'font-size', static::get_css_size_value( $attrs, 'iconSize', '1em' ) );
+
+        $font_family = static::get_icon_font_family( $icon );
+        if ( '' !== $font_family ) {
+            $style .= 'font-family:' . esc_attr( $font_family ) . ';';
+        }
 
         return $style;
     }
@@ -242,8 +297,10 @@ abstract class PropertyMetaModule {
         $children .= '<div class="' . esc_attr( static::OUTPUT_CLASS ) . '" style="' . esc_attr( static::get_text_style( $attrs ) ) . '">';
 
         if ( '' !== $icon ) {
-            $processed_icon = function_exists( 'et_pb_process_font_icon' ) ? et_pb_process_font_icon( $icon ) : $icon;
-            $children .= '<span class="et-pb-icon ' . esc_attr( static::OUTPUT_CLASS . '__icon' ) . '" style="' . esc_attr( static::get_icon_style( $attrs ) ) . '">' . esc_html( $processed_icon ) . '</span>';
+            $processed_icon = static::process_icon( $icon );
+            if ( '' !== $processed_icon ) {
+                $children .= '<span class="et-pb-icon ' . esc_attr( static::OUTPUT_CLASS . '__icon' ) . '" style="' . esc_attr( static::get_icon_style( $attrs, $icon ) ) . '">' . $processed_icon . '</span>';
+            }
         }
 
         if ( '' !== $before ) {

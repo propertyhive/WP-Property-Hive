@@ -65,7 +65,7 @@ class PropertyFeatures extends PropertyContentModule implements DependencyInterf
             $ul_style .= 'list-style:none;padding-left:0;';
             $icon_style = 'display:inline-block;margin-right:8px;line-height:1;font-size:1em;';
             if ( '' !== $bullet_color ) { $icon_style .= 'color:' . esc_attr( $bullet_color ) . ';'; }
-            $icon_html = '<span class="et-pb-icon ph-feature-icon" aria-hidden="true" style="' . esc_attr( $icon_style ) . '">' . esc_html( $processed_icon ) . '</span>';
+            $icon_html = '<span class="et-pb-icon ph-feature-icon" aria-hidden="true" style="' . esc_attr( $icon_style ) . '">' . html_entity_decode( $processed_icon, ENT_QUOTES, 'UTF-8' ) . '</span>';
             $output = preg_replace( '/<li([^>]*)>/i', '<li$1 style="break-inside:avoid;margin-bottom:6px;">' . $icon_html, $output );
         } else {
             $ul_style .= 'list-style-type:' . ( 'square' === $bullet_type ? 'square' : 'disc' ) . ';';

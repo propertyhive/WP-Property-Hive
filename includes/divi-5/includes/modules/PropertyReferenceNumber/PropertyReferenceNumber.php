@@ -24,7 +24,9 @@ class PropertyReferenceNumber extends PropertyMetaModule implements DependencyIn
     }
 
     protected static function get_property_value( $property ) {
-        return $property->reference_number ?? '';
+        $value = $property->reference_number;
+
+        return ( '' === $value || null === $value ) ? '' : $value;
     }
 }
 
