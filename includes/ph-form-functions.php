@@ -1317,33 +1317,51 @@ function ph_form_field( $key, $field )
                 }
             }
 
+            $js_key    = wp_json_encode( sanitize_html_class( $key ) );
+            $js_prefix = wp_json_encode( html_entity_decode( $prefix, ENT_QUOTES, 'UTF-8' ) );
+            $js_suffix = wp_json_encode( html_entity_decode( $suffix, ENT_QUOTES, 'UTF-8' ) );
+
             if ( $field['min'] != '' && $field['max'] != '' )
             {
-                $value = 'values: [ ' . ( isset($_GET['minimum_' . $field_name]) && $_GET['minimum_' . $field_name] != '' ? ph_clean($_GET['minimum_' . $field_name]) : $field['min'] ) . ', ' . ( isset($_GET['maximum_' . $field_name]) && $_GET['maximum_' . $field_name] != '' ? ph_clean($_GET['maximum_' . $field_name]) : $field['max'] ) . ' ],';
+                $value = 'values: [ ' . ( isset($_GET['minimum_' . $field_name]) && $_GET['minimum_' . $field_name] != '' ? (float)wp_unslash($_GET['minimum_' . $field_name]) : (float)$field['min'] ) . ', ' . ( isset($_GET['maximum_' . $field_name]) && $_GET['maximum_' . $field_name] != '' ? (float)wp_unslash($_GET['maximum_' . $field_name]) : (float)$field['max'] ) . ' ],';
             }
 
             $output .= '<script>
                 jQuery(document).ready(function()
                 {
-                    jQuery( ".search-form-slider-' . $key . '" ).each(function(index) 
+                    var key = ' . $js_key . ';
+                    var prefix = ' . $js_prefix . ';
+                    var suffix = ' . $js_suffix . ';
+
+                    jQuery(".search-form-slider-" + key).each(function(index) 
                     {
-                        jQuery(this).slider({
+                        var $slider = jQuery(this);
+
+                        $slider.slider({
                             range: ' . ( ( $field['min'] != '' && $field['max'] != '' ) ? 'true' : 'false' ) . ',
-                            step: ' . $field['step'] . ',
-                            ' . ( $field['min'] != '' ? 'min: ' . $field['min'] . ',' : '' ) . '
-                            ' . ( $field['max'] != '' ? 'max: ' . $field['max'] . ',' : '' ) . '
+                            step: ' . (float) $field['step'] . ',
+                            ' . ( $field['min'] != '' ? 'min: ' . (float) $field['min'] . ',' : '' ) . '
+                            ' . ( $field['max'] != '' ? 'max: ' . (float) $field['max'] . ',' : '' ) . '
                             ' . $value . '
                             slide: function( event, ui ) {
-                                //jQuery( "#search-form-slider-value-' . $key . '" ).html( "' . $prefix . '" + ui.values[ 0 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + ui.values[ 1 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
-                                //jQuery( "#min_slider_value-' . $key . '" ).val( ui.values[0] );
-                                //jQuery( "#max_slider_value-' . $key . '" ).val( ui.values[1] );
+                                var min = ui.values[0].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                                var max = ui.values[1].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 
-                                jQuery(this).closest("form").find(".search-form-slider-value-' . $key . '").html( "' . $prefix . '" + ui.values[ 0 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + ui.values[ 1 ].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
-                                jQuery(this).closest("form").find(".min_slider_value-' . $key . '").val( ui.values[0] );
-                                jQuery(this).closest("form").find(".max_slider_value-' . $key . '").val( ui.values[1] );
+                                $slider.closest("form").find(".search-form-slider-value-" + key).text(
+                                    prefix + min + suffix + " - " + prefix + max + suffix
+                                );
+
+                                $slider.closest("form").find(".min_slider_value-" + key).val(ui.values[0]);
+                                $slider.closest("form").find(".max_slider_value-" + key).val(ui.values[1]);
                             }
                         });
-                        jQuery(this).closest("form").find(".search-form-slider-value-' . $key . '").html( "' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 0 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" + " - ' . $prefix . '" + jQuery( "#search-form-slider-' . $key . '" ).slider( "values", 1 ).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + "' . $suffix . '" );
+
+                        var initialMin = $slider.slider("values", 0).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                        var initialMax = $slider.slider("values", 1).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+
+                        $slider.closest("form").find(".search-form-slider-value-" + key).text(
+                            prefix + initialMin + suffix + " - " + prefix + initialMax + suffix
+                        );
                     });
                 });
             </script>';
