@@ -2521,7 +2521,7 @@ class PH_AJAX {
                     }
                     if ( isset($_POST['name']) && ! empty($_POST['name']) )
                     {
-                        $title .= __( ' from ', 'propertyhive' ) . ph_clean(wp_unslash($_POST['name']));
+                        $title .= ' ' . __( 'from', 'propertyhive' ) . ' ' . ph_clean(wp_unslash($_POST['name']));
                     }
                     
                     $enquiry_post = array(
