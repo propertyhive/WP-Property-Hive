@@ -16,8 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @return array
  */
 function ph_get_screen_ids() {
-	$ph_screen_id = sanitize_title( __( 'PropertyHive', 'propertyhive' ) );
-
     return apply_filters( 'propertyhive_screen_ids', array(
         'edit-property',
         'property',
