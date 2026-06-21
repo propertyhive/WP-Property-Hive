@@ -91,6 +91,18 @@ class PH_Template_Set {
 	}
 
 	/**
+	 * Version preview assets by modified time so local design changes are not cached.
+	 *
+	 * @param string $relative_path Asset path relative to the plugin root.
+	 * @return string
+	 */
+	private static function asset_version( $relative_path ) {
+		$path = PH()->plugin_path() . '/' . ltrim( $relative_path, '/' );
+
+		return file_exists( $path ) ? (string) filemtime( $path ) : PH_VERSION;
+	}
+
+	/**
 	 * Credible demo agency / negotiator identity used in preview mode.
 	 *
 	 * @return array
@@ -118,7 +130,7 @@ class PH_Template_Set {
 		$styles['propertyhive-template-set'] = array(
 			'src'     => str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/template-set.css',
 			'deps'    => array( 'propertyhive-general' ),
-			'version' => PH_VERSION,
+			'version' => self::asset_version( 'assets/css/template-set.css' ),
 			'media'   => 'all',
 		);
 
@@ -137,7 +149,7 @@ class PH_Template_Set {
 			'propertyhive-template-set',
 			str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/frontend/template-set.js',
 			array(),
-			PH_VERSION,
+			self::asset_version( 'assets/js/frontend/template-set.js' ),
 			true
 		);
 	}

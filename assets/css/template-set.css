@@ -28,6 +28,10 @@
 	display: none;
 }
 
+.ph-template-preview-mode {
+	padding-bottom: 82px;
+}
+
 .ph-template-preview-mode .ph-template-search .propertyhive-result-count,
 .ph-template-preview-mode .ph-template-search .propertyhive-ordering,
 .ph-template-preview-mode .ph-template-search .propertyhive-pagination {
@@ -1837,11 +1841,12 @@
 }
 
 .ph-template-gallery {
+	--ph-gallery-hover: #17212b;
+	--ph-gallery-hover-contrast: #ffffff;
 	align-self: start;
 	display: grid;
 	gap: 14px;
 	grid-template-areas:
-		"switcher switcher"
 		"hero rail";
 	grid-template-columns: minmax(0, 1.7fr) minmax(340px, 0.62fr);
 	margin: 0 0 36px;
@@ -1859,13 +1864,19 @@
 .ph-template-gallery-direction-switcher {
 	align-items: center;
 	background: #ffffff;
-	border: 1px solid var(--ph-template-line);
+	border: 0;
+	border-top: 1px solid var(--ph-template-line);
+	bottom: 0;
+	box-shadow: 0 -10px 24px rgba(22, 28, 36, 0.08);
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
-	grid-area: switcher;
 	justify-content: flex-start;
-	padding: 10px;
+	left: 0;
+	padding: 14px max(18px, calc((100vw - 1440px) / 2 + 18px));
+	position: fixed;
+	right: 0;
+	z-index: 100020;
 }
 
 .ph-template-gallery-direction-switcher span {
@@ -1928,26 +1939,52 @@
 
 .ph-template-gallery-photo-trigger {
 	appearance: none;
-	background: #d9dde0;
+	background: #d9dde0 !important;
 	border: 0 !important;
+	box-shadow: none !important;
+	color: inherit !important;
 	cursor: zoom-in;
 	display: block;
 	height: 100%;
 	margin: 0;
 	overflow: hidden;
-	padding: 0;
+	padding: 0 !important;
 	position: relative;
 	text-align: left;
+	transition: none !important;
 	width: 100%;
+}
+
+.ph-template-gallery-photo-trigger:hover,
+.ph-template-gallery-photo-trigger:focus,
+.ph-template-gallery-photo-trigger:focus-visible {
+	background: #d9dde0 !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+	color: inherit !important;
+	outline: none !important;
+}
+
+.ph-template-gallery-photo-trigger::after {
+	border: 6px solid transparent;
+	bottom: 0;
+	content: "";
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+}
+
+.ph-template-gallery-photo-trigger:hover::after,
+.ph-template-gallery-photo-trigger:focus::after,
+.ph-template-gallery-photo-trigger:focus-visible::after {
+	border-color: var(--ph-gallery-hover);
 }
 
 .ph-template-gallery-photo-trigger[hidden] {
 	display: none;
-}
-
-.ph-template-gallery-photo-trigger:focus-visible {
-	outline: 3px solid var(--ph-template-accent);
-	outline-offset: -3px;
 }
 
 .ph-template-gallery-expand-label {
@@ -1977,8 +2014,8 @@
 
 .ph-template-gallery-photo-trigger:hover .ph-template-gallery-expand-label,
 .ph-template-gallery-photo-trigger:focus-visible .ph-template-gallery-expand-label {
-	background: #ffffff;
-	color: #17212b;
+	background: var(--ph-gallery-hover);
+	color: var(--ph-gallery-hover-contrast);
 }
 
 .ph-template-gallery-rail {
@@ -1992,16 +2029,24 @@
 .ph-template-gallery-thumb {
 	appearance: none;
 	aspect-ratio: 16 / 10;
-	background: #d9dde0;
+	background: #d9dde0 !important;
 	border: 0 !important;
+	color: inherit !important;
 	cursor: pointer;
 	margin: 0;
 	overflow: hidden;
-	padding: 0;
+	padding: 0 !important;
 	position: relative;
 	text-align: left;
-	transition: opacity 160ms ease, outline-color 160ms ease;
+	transition: none !important;
 	width: 100%;
+}
+
+.ph-template-gallery-thumb:hover,
+.ph-template-gallery-thumb:focus,
+.ph-template-gallery-thumb:focus-visible {
+	background: #d9dde0 !important;
+	color: inherit !important;
 }
 
 .ph-template-gallery-thumb:not(.is-active) {
@@ -2012,7 +2057,7 @@
 .ph-template-gallery-thumb:focus-visible,
 .ph-template-gallery-thumb.is-active {
 	opacity: 1;
-	outline: 3px solid var(--ph-template-accent);
+	outline: 3px solid var(--ph-gallery-hover);
 	outline-offset: -3px;
 }
 
@@ -2128,7 +2173,6 @@
 
 .ph-gallery-variant-cinema {
 	grid-template-areas:
-		"switcher"
 		"hero"
 		"rail";
 	grid-template-columns: 1fr;
@@ -2148,7 +2192,6 @@
 
 .ph-gallery-variant-mosaic {
 	grid-template-areas:
-		"switcher switcher switcher"
 		"hero hero rail";
 	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(420px, 0.84fr);
 }
@@ -2176,7 +2219,6 @@
 .ph-gallery-variant-editorial {
 	gap: 18px;
 	grid-template-areas:
-		"switcher switcher"
 		"rail hero";
 	grid-template-columns: minmax(260px, 0.36fr) minmax(0, 1fr);
 }
@@ -2197,7 +2239,6 @@
 
 .ph-gallery-variant-strip {
 	grid-template-areas:
-		"switcher"
 		"hero"
 		"rail";
 	grid-template-columns: 1fr;
@@ -2828,7 +2869,6 @@
 	.ph-gallery-variant-strip,
 	.ph-template-gallery-premium-editorial-detail .ph-template-gallery-rail {
 		grid-template-areas:
-			"switcher"
 			"hero"
 			"rail";
 		grid-template-columns: 1fr;
