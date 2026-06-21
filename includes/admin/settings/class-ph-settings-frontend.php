@@ -100,6 +100,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 			'' => __( 'Search Results', 'propertyhive' ),
 			'search-forms' => __( 'Search Forms', 'propertyhive' ),
 			'flags' => __( 'Flags', 'propertyhive' ),
+			'template-set' => __( 'Template Set', 'propertyhive' ),
 		);
 
 		return apply_filters( 'propertyhive_get_sections_' . $this->id, $sections );
@@ -1391,6 +1392,159 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         return $settings;
     }
 
+    /**
+     * Get template set settings.
+     *
+     * @return array Array of settings
+     */
+    public function get_template_set_settings() {
+
+        $current_settings = get_option( 'propertyhive_template_assistant', array() );
+        $settings         = array();
+        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'The template set includes 10 fixed examples. Use the front-end Template example menu to preview any example in context.', 'propertyhive' ) . '</p><ul>';
+
+        foreach ( PH_Template_Set::get_template_catalog() as $slug => $template ) {
+            $catalog_html .= '<li><strong>' . esc_html( $template['label'] ) . '</strong> <span>' . esc_html( $template['group'] ) . '</span> <a href="' . esc_url( PH_Template_Set::get_template_preview_url( $slug ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Preview', 'propertyhive' ) . '</a></li>';
+        }
+
+        $catalog_html .= '</ul></div>';
+
+        $settings[] = array(
+            'title' => __( 'Template Set', 'propertyhive' ),
+            'type'  => 'title',
+            'desc'  => __( 'Choose the fixed front-end templates used for property detail pages, search results, and featured property modules.', 'propertyhive' ),
+            'id'    => 'template_set_settings',
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Enable Template Set', 'propertyhive' ),
+            'id'      => 'template_set_enabled',
+            'type'    => 'checkbox',
+            'default' => ( isset( $current_settings['template_set_enabled'] ) && 'yes' === $current_settings['template_set_enabled'] ) ? 'yes' : '',
+            'desc'    => __( 'Use the selected template set on Property Hive front-end pages.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Property Detail Template', 'propertyhive' ),
+            'id'      => 'template_set_detail_template',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_detail_template'] ) ? $current_settings['template_set_detail_template'] : 'standard-sales-detail',
+            'options' => PH_Template_Set::get_detail_templates(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Search Results Template', 'propertyhive' ),
+            'id'      => 'template_set_search_template',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_search_template'] ) ? $current_settings['template_set_search_template'] : 'portal-style-search-results',
+            'options' => PH_Template_Set::get_search_templates(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Homepage Module Template', 'propertyhive' ),
+            'id'      => 'template_set_module_template',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_module_template'] ) ? $current_settings['template_set_module_template'] : 'featured-properties-homepage-module',
+            'options' => PH_Template_Set::get_module_templates(),
+            'desc'    => sprintf(
+                /* translators: %s: shortcode */
+                __( 'Use %s to add the module to a page.', 'propertyhive' ),
+                '<code>[propertyhive_featured_template]</code>'
+            ),
+        );
+
+        $settings[] = array(
+            'title' => __( 'Template Catalogue', 'propertyhive' ),
+            'type'  => 'html',
+            'html'  => $catalog_html,
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Brand Colour', 'propertyhive' ),
+            'id'      => 'template_set_brand_colour',
+            'type'    => 'color',
+            'default' => isset( $current_settings['template_set_brand_colour'] ) ? $current_settings['template_set_brand_colour'] : '#155e63',
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Accent Colour', 'propertyhive' ),
+            'id'      => 'template_set_accent_colour',
+            'type'    => 'color',
+            'default' => isset( $current_settings['template_set_accent_colour'] ) ? $current_settings['template_set_accent_colour'] : '#b7791f',
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Button Style', 'propertyhive' ),
+            'id'      => 'template_set_button_style',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_button_style'] ) ? $current_settings['template_set_button_style'] : 'filled',
+            'options' => array(
+                'filled'  => __( 'Filled', 'propertyhive' ),
+                'outline' => __( 'Outline', 'propertyhive' ),
+                'soft'    => __( 'Soft', 'propertyhive' ),
+            ),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Card Density', 'propertyhive' ),
+            'id'      => 'template_set_card_density',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_card_density'] ) ? $current_settings['template_set_card_density'] : 'standard',
+            'options' => array(
+                'spacious' => __( 'Spacious', 'propertyhive' ),
+                'standard' => __( 'Standard', 'propertyhive' ),
+                'compact'  => __( 'Compact', 'propertyhive' ),
+            ),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Image Style', 'propertyhive' ),
+            'id'      => 'template_set_image_style',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_image_style'] ) ? $current_settings['template_set_image_style'] : 'soft',
+            'options' => array(
+                'square'  => __( 'Square', 'propertyhive' ),
+                'soft'    => __( 'Soft corners', 'propertyhive' ),
+                'rounded' => __( 'Rounded media', 'propertyhive' ),
+            ),
+        );
+
+        $settings[] = array(
+            'title'         => __( 'Display Options', 'propertyhive' ),
+            'id'            => 'template_set_show_branch',
+            'type'          => 'checkbox',
+            'checkboxgroup' => 'start',
+            'default'       => ( ! isset( $current_settings['template_set_show_branch'] ) || 'yes' === $current_settings['template_set_show_branch'] ) ? 'yes' : '',
+            'desc'          => __( 'Show branch contact details on property cards.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_badges',
+            'type'          => 'checkbox',
+            'checkboxgroup' => '',
+            'default'       => ( ! isset( $current_settings['template_set_show_badges'] ) || 'yes' === $current_settings['template_set_show_badges'] ) ? 'yes' : '',
+            'desc'          => __( 'Show badges on property cards.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_mobile_cta',
+            'type'          => 'checkbox',
+            'checkboxgroup' => 'end',
+            'default'       => ( ! isset( $current_settings['template_set_show_mobile_cta'] ) || 'yes' === $current_settings['template_set_show_mobile_cta'] ) ? 'yes' : '',
+            'desc'          => __( 'Show the mobile enquiry bar on property detail pages.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'title' => __( 'Shortcode', 'propertyhive' ),
+            'type'  => 'html',
+            'html'  => '<p><code>[propertyhive_featured_template title="Featured properties" per_page="3" columns="3"]</code></p>',
+        );
+
+        $settings[] = array( 'type' => 'sectionend', 'id' => 'template_set_settings');
+
+        return $settings;
+    }
+
 	/**
 	 * Output the settings.
 	 */
@@ -1405,6 +1559,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 case "addsearchform": { $settings = $this->get_search_form_settings(); break; }
                 case "editsearchform": { $settings = $this->get_search_form_settings(); break; }
             	case "flags": { $settings = $this->get_flags_settings();  break; }
+                case "template-set": { $settings = $this->get_template_set_settings(); break; }
                 default: { die("Unknown setting section"); }
             }
         }
@@ -1443,6 +1598,72 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
                     update_option( 'propertyhive_template_assistant', $propertyhive_template_assistant );
                     break; 
+                }
+                case "template-set":
+                {
+                    $detail_templates = PH_Template_Set::get_detail_templates();
+                    $search_templates = PH_Template_Set::get_search_templates();
+                    $module_templates = PH_Template_Set::get_module_templates();
+
+                    $detail_template = isset( $_POST['template_set_detail_template'] ) ? sanitize_title( $_POST['template_set_detail_template'] ) : 'standard-sales-detail';
+                    if ( ! isset( $detail_templates[ $detail_template ] ) ) {
+                        $detail_template = 'standard-sales-detail';
+                    }
+
+                    $search_template = isset( $_POST['template_set_search_template'] ) ? sanitize_title( $_POST['template_set_search_template'] ) : 'portal-style-search-results';
+                    if ( ! isset( $search_templates[ $search_template ] ) ) {
+                        $search_template = 'portal-style-search-results';
+                    }
+
+                    $module_template = isset( $_POST['template_set_module_template'] ) ? sanitize_title( $_POST['template_set_module_template'] ) : 'featured-properties-homepage-module';
+                    if ( ! isset( $module_templates[ $module_template ] ) ) {
+                        $module_template = 'featured-properties-homepage-module';
+                    }
+
+                    $brand_colour = isset( $_POST['template_set_brand_colour'] ) ? sanitize_hex_color( wp_unslash( $_POST['template_set_brand_colour'] ) ) : '';
+                    if ( empty( $brand_colour ) ) {
+                        $brand_colour = '#155e63';
+                    }
+
+                    $accent_colour = isset( $_POST['template_set_accent_colour'] ) ? sanitize_hex_color( wp_unslash( $_POST['template_set_accent_colour'] ) ) : '';
+                    if ( empty( $accent_colour ) ) {
+                        $accent_colour = '#b7791f';
+                    }
+
+                    $button_style = isset( $_POST['template_set_button_style'] ) ? sanitize_title( $_POST['template_set_button_style'] ) : 'filled';
+                    if ( ! in_array( $button_style, array( 'filled', 'outline', 'soft' ), true ) ) {
+                        $button_style = 'filled';
+                    }
+
+                    $card_density = isset( $_POST['template_set_card_density'] ) ? sanitize_title( $_POST['template_set_card_density'] ) : 'standard';
+                    if ( ! in_array( $card_density, array( 'spacious', 'standard', 'compact' ), true ) ) {
+                        $card_density = 'standard';
+                    }
+
+                    $image_style = isset( $_POST['template_set_image_style'] ) ? sanitize_title( $_POST['template_set_image_style'] ) : 'soft';
+                    if ( ! in_array( $image_style, array( 'square', 'soft', 'rounded' ), true ) ) {
+                        $image_style = 'soft';
+                    }
+
+                    $propertyhive_template_assistant = array(
+                        'template_set_enabled'         => isset( $_POST['template_set_enabled'] ) ? 'yes' : '',
+                        'template_set_detail_template' => $detail_template,
+                        'template_set_search_template' => $search_template,
+                        'template_set_module_template' => $module_template,
+                        'template_set_brand_colour'    => $brand_colour,
+                        'template_set_accent_colour'   => $accent_colour,
+                        'template_set_button_style'    => $button_style,
+                        'template_set_card_density'    => $card_density,
+                        'template_set_image_style'     => $image_style,
+                        'template_set_show_branch'     => isset( $_POST['template_set_show_branch'] ) ? 'yes' : '',
+                        'template_set_show_badges'     => isset( $_POST['template_set_show_badges'] ) ? 'yes' : '',
+                        'template_set_show_mobile_cta' => isset( $_POST['template_set_show_mobile_cta'] ) ? 'yes' : '',
+                    );
+
+                    $propertyhive_template_assistant = array_merge($current_settings, $propertyhive_template_assistant);
+
+                    update_option( 'propertyhive_template_assistant', $propertyhive_template_assistant );
+                    break;
                 }
         		case "addsearchform": 
                 case "editsearchform": 
