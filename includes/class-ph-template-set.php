@@ -41,7 +41,6 @@ class PH_Template_Set {
 		add_action( 'wp', array( __CLASS__, 'prepare_module_preview' ) );
 		add_action( 'wp', array( __CLASS__, 'prepare_detail_preview' ) );
 		add_action( 'admin_bar_menu', array( __CLASS__, 'add_admin_bar_menu' ), 80 );
-		add_action( 'wp_footer', array( __CLASS__, 'render_context_switcher' ), 30 );
 
 		add_action( 'propertyhive_before_main_content', array( __CLASS__, 'open_search_wrapper' ), 11 );
 		add_action( 'propertyhive_after_main_content', array( __CLASS__, 'close_search_wrapper' ), 9 );
@@ -828,9 +827,6 @@ class PH_Template_Set {
 
 		echo '<div class="ph-template-masthead"><div class="ph-template-masthead-inner">';
 			echo '<span class="ph-template-masthead-brand">' . esc_html( $brand ) . '</span>';
-			echo '<nav class="ph-template-masthead-nav" aria-hidden="true">';
-				echo '<span>Buy</span><span>Let</span><span>New Homes</span><span>About</span>';
-			echo '</nav>';
 			if ( $phone ) {
 				echo '<a class="ph-template-masthead-phone" href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>';
 			}
@@ -908,6 +904,7 @@ class PH_Template_Set {
 				foreach ( $gallery_variants as $variant => $label ) {
 					echo '<button type="button" data-ph-gallery-variant="' . esc_attr( $variant ) . '" aria-pressed="' . ( 'showcase' === $variant ? 'true' : 'false' ) . '" class="' . ( 'showcase' === $variant ? 'is-active' : '' ) . '">' . esc_html( $label ) . '</button>';
 				}
+				self::render_context_switcher();
 			echo '</div>';
 
 			echo '<figure class="ph-template-gallery-hero">';

@@ -457,6 +457,72 @@ body.propertyhive-onboarding-screen #wpbody-content > .notice {
 	box-shadow: 0 0 0 1px #d63638;
 }
 
+.ph-onboarding__address-lookup {
+	margin-top: 26px;
+	max-width: 640px;
+	position: relative;
+}
+
+.ph-onboarding__address-lookup .ph-onboarding__field {
+	margin-top: 0;
+	max-width: none;
+}
+
+.ph-onboarding__address-results {
+	background: var(--ph-white);
+	border: 1px solid var(--ph-slate);
+	border-radius: 6px;
+	box-shadow: 0 14px 34px rgba(21, 21, 21, 0.14);
+	margin-top: 8px;
+	max-height: 238px;
+	overflow-y: auto;
+	position: absolute;
+	width: 100%;
+	z-index: 20;
+}
+
+.ph-onboarding__address-result {
+	background: transparent;
+	border: 0;
+	border-bottom: 1px solid var(--ph-smoke);
+	color: var(--ph-carbon);
+	cursor: pointer;
+	display: block;
+	font-family: var(--ph-font-body);
+	font-size: 14px;
+	line-height: 1.4;
+	padding: 11px 12px;
+	text-align: left;
+	width: 100%;
+}
+
+.ph-onboarding__address-result:last-child {
+	border-bottom: 0;
+}
+
+.ph-onboarding__address-result:focus,
+.ph-onboarding__address-result:hover {
+	background: var(--ph-sunlight);
+	outline: none;
+}
+
+.ph-onboarding__address-status {
+	color: var(--ph-carbon);
+	display: none;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.35;
+	margin-top: 7px;
+}
+
+.ph-onboarding__address-status.is-error {
+	color: #b32d2e;
+}
+
+.ph-onboarding__address-status.is-success {
+	color: #276749;
+}
+
 .ph-onboarding__cards.has-error {
 	border-radius: 8px;
 	outline: 1px solid #d63638;

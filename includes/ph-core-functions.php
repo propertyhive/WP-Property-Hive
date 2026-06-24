@@ -20,6 +20,28 @@ include( 'ph-page-functions.php' );
 include( 'ph-property-functions.php' );
 
 /**
+ * Get the current WordPress environment type.
+ *
+ * @return string
+ */
+function ph_get_environment_type() {
+    if ( function_exists( 'wp_get_environment_type' ) ) {
+        return wp_get_environment_type();
+    }
+
+    return 'production';
+}
+
+/**
+ * Check whether development-only features should be available.
+ *
+ * @return bool
+ */
+function ph_is_development_environment() {
+    return in_array( ph_get_environment_type(), array( 'local', 'development', 'staging' ), true );
+}
+
+/**
  * Get template part (for templates like the single-property).
  *
  * @access public

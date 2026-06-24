@@ -756,6 +756,7 @@ class PH_Admin_Onboarding {
 		$usage           = ! empty( $state['usage'] ) && is_array( $state['usage'] ) ? $state['usage'] : array( 'crm' );
 		$usage_tracking  = 'yes' === get_option( 'propertyhive_data_sharing', 'yes' );
 		$demo_choice     = ! empty( $state['demo_data_imported'] ) ? 'yes' : 'no';
+		$address_lookup_enabled = function_exists( 'ph_is_development_environment' ) && ph_is_development_environment() && '' !== trim( (string) get_option( 'propertyhive_getaddress_api_key', '' ) );
 
 		$current_step = $this->get_current_step( $state );
 
@@ -812,6 +813,16 @@ class PH_Admin_Onboarding {
 					<section class="ph-onboarding__panel" data-step="office">
 						<h2><?php esc_html_e( 'What are your office details?', 'propertyhive' ); ?></h2>
 						<p><?php esc_html_e( 'These details will be used for your primary office in Property Hive.', 'propertyhive' ); ?></p>
+						<?php if ( $address_lookup_enabled ) : ?>
+							<div class="ph-onboarding__address-lookup" data-address-lookup>
+								<label class="ph-onboarding__field ph-onboarding__field--wide">
+									<span><?php esc_html_e( 'Find address', 'propertyhive' ); ?></span>
+									<input type="search" data-address-lookup-input autocomplete="off" placeholder="<?php esc_attr_e( 'Start typing an address or postcode', 'propertyhive' ); ?>">
+								</label>
+								<div class="ph-onboarding__address-results" data-address-lookup-results hidden></div>
+								<div class="ph-onboarding__address-status" data-address-lookup-status role="status" aria-live="polite"></div>
+							</div>
+						<?php endif; ?>
 						<div class="ph-onboarding__form-grid ph-onboarding__form-grid--office">
 							<label class="ph-onboarding__field" data-validation-field="office_name">
 								<span><?php esc_html_e( 'Office name', 'propertyhive' ); ?></span>
@@ -1032,6 +1043,8 @@ class PH_Admin_Onboarding {
 				'settings_url'           => admin_url( 'admin.php?page=ph-settings' ),
 				'features_url'           => admin_url( 'admin.php?page=ph-settings&tab=features&profilter=free' ),
 				'demo_data_active'       => $demo_active ? 'yes' : 'no',
+				'address_lookup_enabled' => ( function_exists( 'ph_is_development_environment' ) && ph_is_development_environment() && '' !== trim( (string) get_option( 'propertyhive_getaddress_api_key', '' ) ) ) ? 'yes' : 'no',
+				'address_lookup_nonce'   => wp_create_nonce( 'propertyhive_getaddress_lookup' ),
 				'import_url'             => $this->get_import_url(),
 				'export_url'             => $this->get_export_url(),
 				'demo_base_sections'     => array( 'applicant', 'property' ),
@@ -1059,6 +1072,10 @@ class PH_Admin_Onboarding {
 					'officePhoneInvalid' => __( 'Please enter a valid phone number.', 'propertyhive' ),
 					'officeEmailTooLong' => __( 'Email address must be 100 characters or fewer.', 'propertyhive' ),
 					'officeEmailInvalid' => __( 'Please enter a valid email address.', 'propertyhive' ),
+					'addressLookupSearching' => __( 'Searching addresses...', 'propertyhive' ),
+					'addressLookupNoResults' => __( 'No matching addresses found.', 'propertyhive' ),
+					'addressLookupFailed' => __( 'Address lookup could not be completed. Please enter the address manually.', 'propertyhive' ),
+					'addressLookupSelected' => __( 'Address selected.', 'propertyhive' ),
 					'skipConfirm'       => __( 'Skip setup? You can still configure Property Hive from settings later.', 'propertyhive' ),
 				),
 			)

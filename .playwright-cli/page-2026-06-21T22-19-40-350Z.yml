@@ -1,0 +1,175 @@
+- generic [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#content"
+  - generic [ref=e4]:
+    - generic [ref=e5]: Ashford & Rowe Prime
+    - navigation [ref=e6]:
+      - generic [ref=e7]: Buy
+      - generic [ref=e8]: Let
+      - generic [ref=e9]: New Homes
+      - generic [ref=e10]: About
+    - link "020 7946 0958" [ref=e11] [cursor=pointer]:
+      - /url: tel:02079460958
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - generic "Gallery layout options" [ref=e16]:
+          - generic [ref=e17]: Gallery direction
+          - button "Showcase" [pressed] [ref=e18] [cursor=pointer]
+          - button "Cinema" [ref=e19] [cursor=pointer]
+          - button "Mosaic" [ref=e20] [cursor=pointer]
+          - button "Editorial" [ref=e21] [cursor=pointer]
+          - button "Filmstrip" [ref=e22] [cursor=pointer]
+        - generic "Gallery hover colour options" [ref=e23]:
+          - generic [ref=e24]: Hover colour
+          - button "Gold" [active] [pressed] [ref=e25] [cursor=pointer]: Gold
+          - button "Slate" [ref=e27] [cursor=pointer]: Slate
+          - button "Green" [ref=e29] [cursor=pointer]: Green
+          - button "Burgundy" [ref=e31] [cursor=pointer]: Burgundy
+          - button "Blue" [ref=e33] [cursor=pointer]: Blue
+          - button "Black" [ref=e35] [cursor=pointer]: Black
+        - figure [ref=e37]:
+          - 'button "Open larger photo: Reception room" [ref=e38] [cursor=pointer]':
+            - img "Reception room" [ref=e39]
+            - generic [ref=e40]: View larger
+          - generic [ref=e41]: 14 photos
+          - tablist "Gallery views" [ref=e43]:
+            - button "Photos" [ref=e44] [cursor=pointer]
+            - button "Floorplan" [ref=e45] [cursor=pointer]
+            - button "Map" [ref=e46] [cursor=pointer]
+        - generic [ref=e47]:
+          - button "Show Reception room" [ref=e48] [cursor=pointer]:
+            - img "Reception room" [ref=e49]
+          - button "Show Kitchen / dining" [ref=e50] [cursor=pointer]:
+            - img "Kitchen / dining" [ref=e51]
+          - button "Show Principal bedroom" [ref=e52] [cursor=pointer]:
+            - img "Principal bedroom" [ref=e53]
+          - button "Show Garden terrace" [ref=e54] [cursor=pointer]:
+            - img "Garden terrace" [ref=e55]
+          - button "Show Exterior" [ref=e56] [cursor=pointer]:
+            - img "Exterior" [ref=e57]
+      - generic [ref=e58]:
+        - paragraph [ref=e59]: For sale
+        - heading "Cavendish House, Marylebone W1" [level=1] [ref=e60]
+        - paragraph [ref=e61]: Guide price £1,250,000
+        - list [ref=e63]:
+          - listitem [ref=e64]: 3 bedrooms
+          - listitem [ref=e65]: 2 bathrooms
+          - listitem [ref=e66]: 2 reception rooms
+          - listitem [ref=e67]: Freehold
+        - list [ref=e68]:
+          - listitem [ref=e69]:
+            - generic [ref=e70]: Gallery
+            - text: Photos available
+          - listitem [ref=e71]:
+            - generic [ref=e72]: Facts
+            - text: 3 beds / 3 baths / 2 receptions
+          - listitem [ref=e73]:
+            - generic [ref=e74]: Viewing
+            - text: Request viewing
+      - complementary "Property contact" [ref=e75]:
+        - generic [ref=e76]:
+          - img "James Ashford" [ref=e78]
+          - generic [ref=e79]:
+            - generic [ref=e80]: James Ashford
+            - generic [ref=e81]: Associate Director, Marylebone
+        - paragraph [ref=e82]: Marketed by
+        - heading "Ashford & Rowe Prime" [level=2] [ref=e83]
+        - paragraph [ref=e84]: 18 Cavendish Parade, Marylebone, London W1U 4QT
+        - paragraph [ref=e85]: Call or request a viewing with the agent.
+        - generic [ref=e86]:
+          - link "Call agent" [ref=e87] [cursor=pointer]:
+            - /url: tel:02079460958
+          - link "Request viewing" [ref=e88] [cursor=pointer]:
+            - /url: javascript:;
+          - link "Email agent" [ref=e89] [cursor=pointer]:
+            - /url: mailto:james.ashford@ashfordrowe.co.uk
+      - generic [ref=e90]:
+        - heading "Key features" [level=4] [ref=e91]
+        - list [ref=e92]:
+          - listitem [ref=e93]: Three double bedrooms
+          - listitem [ref=e94]: Double reception room
+          - listitem [ref=e95]: Full-width kitchen and dining room
+          - listitem [ref=e96]: Landscaped west-facing terrace
+          - listitem [ref=e97]: Share of freehold
+          - listitem [ref=e98]: No onward chain
+      - generic [ref=e99]:
+        - heading "Overview" [level=4] [ref=e100]
+        - generic [ref=e101]: A restored period home on a quiet Marylebone street, arranged for modern family living with generous entertaining space, calm bedrooms and a landscaped west-facing terrace.
+      - generic [ref=e102]:
+        - heading "Full details" [level=4] [ref=e103]
+        - generic [ref=e104]:
+          - paragraph [ref=e105]: Cavendish House sits behind cast-iron railings on a tree-lined address moments from the village shops, restaurants and transport links of Marylebone. The house has been finished with a measured hand, retaining original proportion while introducing modern lighting, fitted storage and warm natural materials throughout.
+          - paragraph [ref=e106]: The raised ground floor opens into a double reception with tall sash windows and a working fireplace. To the rear, a full-width kitchen and dining room connects directly to the terrace, creating a natural space for day-to-day family life and informal entertaining.
+          - paragraph [ref=e107]: The principal suite occupies the quieter upper floor and includes a dressing area and marble-lined shower room. Two further bedrooms, a family bathroom, guest cloakroom and practical utility storage complete the accommodation.
+      - region "Property information" [ref=e108]:
+        - article [ref=e109]:
+          - heading "Floorplan" [level=4] [ref=e110]
+          - generic [ref=e111]:
+            - generic [ref=e112]: Reception
+            - generic [ref=e113]: Kitchen
+            - generic [ref=e114]: Bed 1
+            - generic [ref=e115]: Bed 2
+            - generic [ref=e116]: Bath
+          - paragraph [ref=e117]: 1,480 sq ft / 137.5 sq m
+        - article [ref=e118]:
+          - heading "Energy performance" [level=4] [ref=e119]
+          - generic [ref=e120]:
+            - generic [ref=e121]: A
+            - generic [ref=e122]: B
+            - generic [ref=e123]:
+              - text: C
+              - generic [ref=e124]: "72"
+            - generic [ref=e125]: D
+            - generic [ref=e126]: E
+            - generic [ref=e127]: F
+            - generic [ref=e128]: G
+          - paragraph [ref=e129]: Current 72 / Potential 86
+        - article [ref=e130]:
+          - heading "Location" [level=4] [ref=e131]
+          - generic [ref=e134]: Marylebone
+          - list [ref=e135]:
+            - listitem [ref=e136]:
+              - generic [ref=e137]: Baker Street Underground
+              - strong [ref=e138]: 0.3 miles
+            - listitem [ref=e139]:
+              - generic [ref=e140]: Marylebone station
+              - strong [ref=e141]: 0.6 miles
+            - listitem [ref=e142]:
+              - generic [ref=e143]: Regent's Park
+              - strong [ref=e144]: 0.5 miles
+            - listitem [ref=e145]:
+              - generic [ref=e146]: Marylebone High Street
+              - strong [ref=e147]: 0.4 miles
+        - article [ref=e148]:
+          - heading "Documents and viewing" [level=4] [ref=e149]
+          - generic [ref=e150]:
+            - generic [ref=e151]: Brochure
+            - generic [ref=e153]: Floorplan
+            - generic [ref=e155]: EPC
+          - paragraph [ref=e157]: Brochure pack available from Ashford & Rowe Prime.
+      - region "Similar properties" [ref=e158]:
+        - generic [ref=e159]:
+          - paragraph [ref=e160]: Also available
+          - heading "Similar homes nearby" [level=2] [ref=e161]
+        - generic [ref=e162]:
+          - article [ref=e163]:
+            - img "Period townhouse, Cavendish Road" [ref=e164]
+            - generic [ref=e165]:
+              - heading "Period townhouse, Cavendish Road" [level=3] [ref=e166]
+              - paragraph [ref=e167]: £1,250,000
+              - generic [ref=e168]: 4 bed / terrace
+          - article [ref=e169]:
+            - img "Garden maisonette, Devonshire Street" [ref=e170]
+            - generic [ref=e171]:
+              - heading "Garden maisonette, Devonshire Street" [level=3] [ref=e172]
+              - paragraph [ref=e173]: £925,000
+              - generic [ref=e174]: 2 bed / garden
+          - article [ref=e175]:
+            - img "Upper floor apartment, Weymouth Street" [ref=e176]
+            - generic [ref=e177]:
+              - heading "Upper floor apartment, Weymouth Street" [level=3] [ref=e178]
+              - paragraph [ref=e179]: £1,100,000
+              - generic [ref=e180]: 3 bed / lift
+  - contentinfo [ref=e181]:
+    - paragraph [ref=e184]: All rights reserved

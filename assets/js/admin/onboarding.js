@@ -12,6 +12,9 @@ jQuery( function( $ ) {
 	var currentStep = $wizard.data( 'current-step' ) || 'intro';
 	var demoImported = $wizard.data( 'demo-imported' ) === 'yes';
 	var demoImporting = false;
+	var addressLookupTimer = null;
+	var addressLookupXhr = null;
+	var addressGetXhr = null;
 	var fieldControls = {
 		departments: 'input[name="departments[]"]',
 		country: '[data-country-select]',
@@ -139,6 +142,141 @@ jQuery( function( $ ) {
 		}
 
 		$message.addClass( type === 'error' ? 'is-error' : 'is-success' ).text( message ).show();
+	}
+
+	function setAddressStatus( message, type ) {
+		var $status = $( '[data-address-lookup-status]' );
+		$status.removeClass( 'is-error is-success' );
+
+		if ( ! message ) {
+			$status.text( '' ).hide();
+			return;
+		}
+
+		$status.addClass( type === 'error' ? 'is-error' : 'is-success' ).text( message ).show();
+	}
+
+	function clearAddressResults() {
+		$( '[data-address-lookup-results]' ).empty().prop( 'hidden', true );
+	}
+
+	function renderAddressSuggestions( suggestions ) {
+		var $results = $( '[data-address-lookup-results]' );
+		$results.empty();
+
+		if ( ! suggestions || ! suggestions.length ) {
+			clearAddressResults();
+			setAddressStatus( text( 'addressLookupNoResults', 'No matching addresses found.' ), 'error' );
+			return;
+		}
+
+		$.each( suggestions, function( index, suggestion ) {
+			if ( ! suggestion.id || ! suggestion.address ) {
+				return;
+			}
+
+			$( '<button />', {
+				type: 'button',
+				class: 'ph-onboarding__address-result',
+				text: suggestion.address
+			} ).attr( 'data-address-id', suggestion.id ).appendTo( $results );
+		} );
+
+		$results.prop( 'hidden', false );
+		setAddressStatus( '' );
+	}
+
+	function setOfficeField( field, value ) {
+		$( '[data-office-field="' + field + '"]' ).val( value || '' ).trigger( 'input' ).trigger( 'change' );
+	}
+
+	function fillOfficeAddress( address ) {
+		address = address || {};
+
+		setOfficeField( 'office_address_1', address.line_1 );
+		setOfficeField( 'office_address_2', address.line_2 );
+		setOfficeField( 'office_address_3', address.town_or_city );
+		setOfficeField( 'office_address_4', address.county );
+		setOfficeField( 'office_postcode', address.postcode );
+
+		clearAddressResults();
+		$( '[data-address-lookup-input]' ).val( '' );
+		setAddressStatus( text( 'addressLookupSelected', 'Address selected.' ), 'success' );
+	}
+
+	function fetchAddress( id ) {
+		if ( ! id || config.address_lookup_enabled !== 'yes' ) {
+			return;
+		}
+
+		if ( addressGetXhr ) {
+			addressGetXhr.abort();
+		}
+
+		setAddressStatus( text( 'addressLookupSearching', 'Searching addresses...' ) );
+
+		addressGetXhr = $.post( config.ajax_url, {
+			action: 'propertyhive_getaddress_get',
+			security: config.address_lookup_nonce,
+			id: id
+		} ).done( function( response ) {
+			if ( response && response.success && response.data && response.data.address ) {
+				fillOfficeAddress( response.data.address );
+				return;
+			}
+
+			setAddressStatus( text( 'addressLookupFailed', 'Address lookup could not be completed. Please enter the address manually.' ), 'error' );
+		} ).fail( function( xhr ) {
+			if ( xhr.statusText === 'abort' ) {
+				return;
+			}
+
+			setAddressStatus( text( 'addressLookupFailed', 'Address lookup could not be completed. Please enter the address manually.' ), 'error' );
+		} );
+	}
+
+	function searchAddresses( term ) {
+		if ( config.address_lookup_enabled !== 'yes' ) {
+			return;
+		}
+
+		term = $.trim( term || '' );
+
+		if ( term.length < 3 ) {
+			if ( addressLookupXhr ) {
+				addressLookupXhr.abort();
+			}
+			clearAddressResults();
+			setAddressStatus( '' );
+			return;
+		}
+
+		if ( addressLookupXhr ) {
+			addressLookupXhr.abort();
+		}
+
+		setAddressStatus( text( 'addressLookupSearching', 'Searching addresses...' ) );
+
+		addressLookupXhr = $.post( config.ajax_url, {
+			action: 'propertyhive_getaddress_autocomplete',
+			security: config.address_lookup_nonce,
+			term: term
+		} ).done( function( response ) {
+			if ( response && response.success && response.data ) {
+				renderAddressSuggestions( response.data.suggestions || [] );
+				return;
+			}
+
+			clearAddressResults();
+			setAddressStatus( text( 'addressLookupFailed', 'Address lookup could not be completed. Please enter the address manually.' ), 'error' );
+		} ).fail( function( xhr ) {
+			if ( xhr.statusText === 'abort' ) {
+				return;
+			}
+
+			clearAddressResults();
+			setAddressStatus( text( 'addressLookupFailed', 'Address lookup could not be completed. Please enter the address manually.' ), 'error' );
+		} );
 	}
 
 	function track( eventName, step ) {
@@ -466,6 +604,17 @@ jQuery( function( $ ) {
 
 	$( document ).on( 'change', 'input[name="usage[]"]', updateUsageLinks );
 	$( document ).on( 'change', 'input[name="demo_data_choice"]', updateDemoChoice );
+	$( document ).on( 'input', '[data-address-lookup-input]', function() {
+		var value = $( this ).val();
+
+		window.clearTimeout( addressLookupTimer );
+		addressLookupTimer = window.setTimeout( function() {
+			searchAddresses( value );
+		}, 300 );
+	} );
+	$( document ).on( 'click', '[data-address-id]', function() {
+		fetchAddress( $( this ).attr( 'data-address-id' ) );
+	} );
 
 	$( document ).on( 'input change', '[data-office-field], [data-country-select]', function() {
 		var field = $( this ).attr( 'data-office-field' ) || 'country';
