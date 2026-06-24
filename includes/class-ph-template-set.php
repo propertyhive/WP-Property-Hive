@@ -887,7 +887,8 @@ class PH_Template_Set {
 		$rail         = array_slice( $images, 0, 5 );
 		$count        = count( $images );
 		$location     = self::get_property_location_label( $property );
-		$has_floorplan = $property ? self::has_floorplan( $property ) : true;
+		$has_floor_map = true;
+		$has_virtual_tour = true;
 
 		$gallery_variants = array(
 			'showcase'  => __( 'Showcase', 'propertyhive' ),
@@ -916,14 +917,26 @@ class PH_Template_Set {
 					echo '<img src="' . esc_url( self::demo_asset( $hero[0] ) ) . '" alt="' . esc_attr( $hero[1] ) . '" loading="lazy" data-ph-gallery-hero-image>';
 					echo '<span class="ph-template-gallery-expand-label" aria-hidden="true">' . esc_html__( 'View larger', 'propertyhive' ) . '</span>';
 				echo '</button>';
-				if ( $has_floorplan ) {
-					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-floorplan" hidden data-ph-gallery-panel="floorplan" aria-label="' . esc_attr__( 'Floorplan preview', 'propertyhive' ) . '">';
+				if ( $has_floor_map ) {
+					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-floorplan" hidden data-ph-gallery-panel="floorplan" aria-label="' . esc_attr__( 'Floor map preview', 'propertyhive' ) . '">';
 						echo '<div class="ph-template-floorplan" aria-hidden="true">';
 							echo '<span class="ph-template-floorplan-room ph-template-room-reception">' . esc_html__( 'Reception', 'propertyhive' ) . '</span>';
 							echo '<span class="ph-template-floorplan-room ph-template-room-kitchen">' . esc_html__( 'Kitchen', 'propertyhive' ) . '</span>';
 							echo '<span class="ph-template-floorplan-room ph-template-room-bed-one">' . esc_html__( 'Bed 1', 'propertyhive' ) . '</span>';
 							echo '<span class="ph-template-floorplan-room ph-template-room-bed-two">' . esc_html__( 'Bed 2', 'propertyhive' ) . '</span>';
 							echo '<span class="ph-template-floorplan-room ph-template-room-bath">' . esc_html__( 'Bath', 'propertyhive' ) . '</span>';
+						echo '</div>';
+					echo '</div>';
+				}
+				if ( $has_virtual_tour ) {
+					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-virtual-tour" hidden data-ph-gallery-panel="virtual-tour" aria-label="' . esc_attr__( 'Virtual tour preview', 'propertyhive' ) . '">';
+						echo '<div class="ph-template-virtual-tour-preview" aria-hidden="true">';
+							echo '<span class="ph-template-virtual-tour-scene ph-template-virtual-tour-scene-living">' . esc_html__( 'Living room', 'propertyhive' ) . '</span>';
+							echo '<span class="ph-template-virtual-tour-scene ph-template-virtual-tour-scene-kitchen">' . esc_html__( 'Kitchen', 'propertyhive' ) . '</span>';
+							echo '<span class="ph-template-virtual-tour-scene ph-template-virtual-tour-scene-bedroom">' . esc_html__( 'Bedroom', 'propertyhive' ) . '</span>';
+							echo '<span class="ph-template-virtual-tour-hotspot ph-template-virtual-tour-hotspot-one"></span>';
+							echo '<span class="ph-template-virtual-tour-hotspot ph-template-virtual-tour-hotspot-two"></span>';
+							echo '<span class="ph-template-virtual-tour-label">' . esc_html__( '360 virtual tour', 'propertyhive' ) . '</span>';
 						echo '</div>';
 					echo '</div>';
 				}
@@ -940,8 +953,11 @@ class PH_Template_Set {
 
 						echo '<div class="ph-template-gallery-tabs" role="tablist" aria-label="' . esc_attr__( 'Gallery views', 'propertyhive' ) . '">';
 							echo '<button type="button" class="is-active" data-ph-gallery-tab="photos" aria-selected="true">' . esc_html__( 'Photos', 'propertyhive' ) . '</button>';
-							if ( $has_floorplan ) {
-								echo '<button type="button" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floorplan', 'propertyhive' ) . '</button>';
+							if ( $has_floor_map ) {
+								echo '<button type="button" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floor map', 'propertyhive' ) . '</button>';
+							}
+							if ( $has_virtual_tour ) {
+								echo '<button type="button" data-ph-gallery-tab="virtual-tour" aria-selected="false">' . esc_html__( 'Virtual tour', 'propertyhive' ) . '</button>';
 							}
 							if ( $location ) {
 								echo '<button type="button" data-ph-gallery-tab="map" aria-selected="false">' . esc_html__( 'Map', 'propertyhive' ) . '</button>';

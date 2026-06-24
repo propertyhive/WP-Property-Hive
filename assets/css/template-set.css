@@ -1938,6 +1938,7 @@
 	text-align: left;
 	transition: none !important;
 	width: 100%;
+	z-index: 1;
 }
 
 .ph-template-gallery-photo-trigger:hover,
@@ -2082,7 +2083,7 @@
 	left: 16px;
 	max-width: calc(100% - 32px);
 	padding: 4px;
-	z-index: 2;
+	z-index: 5;
 }
 
 .ph-template-gallery.is-showing-panel .ph-template-gallery-count {
@@ -2268,6 +2269,90 @@
 	box-shadow: 0 10px 24px rgba(22, 28, 36, 0.12);
 	max-width: 520px;
 	width: min(82%, 520px);
+}
+
+.ph-template-gallery-panel-virtual-tour {
+	background:
+		radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.22), transparent 32%),
+		linear-gradient(135deg, #202a33, #50616c);
+}
+
+.ph-template-virtual-tour-preview {
+	aspect-ratio: 16 / 9;
+	background:
+		linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+		linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+		radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.18), transparent 34%),
+		#26313b;
+	background-size: 44px 44px, 44px 44px, auto, auto;
+	box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
+	max-width: 620px;
+	position: relative;
+	width: min(88%, 620px);
+}
+
+.ph-template-virtual-tour-preview::before {
+	border: 2px solid rgba(255, 255, 255, 0.75);
+	border-radius: 999px;
+	content: "";
+	height: 42%;
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 70%;
+}
+
+.ph-template-virtual-tour-scene,
+.ph-template-virtual-tour-label {
+	background: rgba(255, 255, 255, 0.9);
+	color: var(--ph-template-ink);
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1;
+	padding: 9px 10px;
+	position: absolute;
+}
+
+.ph-template-virtual-tour-scene-living {
+	left: 10%;
+	top: 14%;
+}
+
+.ph-template-virtual-tour-scene-kitchen {
+	right: 12%;
+	top: 30%;
+}
+
+.ph-template-virtual-tour-scene-bedroom {
+	bottom: 17%;
+	left: 28%;
+}
+
+.ph-template-virtual-tour-hotspot {
+	background: var(--ph-template-accent);
+	border: 4px solid #ffffff;
+	border-radius: 50%;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.26);
+	height: 22px;
+	position: absolute;
+	width: 22px;
+}
+
+.ph-template-virtual-tour-hotspot-one {
+	left: 48%;
+	top: 45%;
+}
+
+.ph-template-virtual-tour-hotspot-two {
+	right: 24%;
+	top: 55%;
+}
+
+.ph-template-virtual-tour-label {
+	bottom: 14px;
+	right: 14px;
+	text-transform: uppercase;
 }
 
 .ph-template-gallery-panel-map {
