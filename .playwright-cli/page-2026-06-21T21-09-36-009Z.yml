@@ -1,0 +1,159 @@
+- generic [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#content"
+  - generic [ref=e4]:
+    - generic [ref=e5]: Ashford & Rowe Prime
+    - navigation [ref=e6]:
+      - generic [ref=e7]: Buy
+      - generic [ref=e8]: Let
+      - generic [ref=e9]: New Homes
+      - generic [ref=e10]: About
+    - link "020 7946 0958" [ref=e11] [cursor=pointer]:
+      - /url: tel:02079460958
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - figure [ref=e16]:
+          - img "Kitchen / dining" [ref=e163]
+          - generic [ref=e18]: 14 photos
+          - tablist "Gallery views" [ref=e20]:
+            - button "Photos" [active] [ref=e21] [cursor=pointer]
+            - button "Floorplan" [ref=e22] [cursor=pointer]
+            - button "Map" [ref=e23] [cursor=pointer]
+            - button "Virtual tour" [ref=e24] [cursor=pointer]
+        - generic [ref=e25]:
+          - button "Show Reception room" [ref=e26] [cursor=pointer]:
+            - img "Reception room" [ref=e27]
+          - button "Show Kitchen / dining" [ref=e28] [cursor=pointer]:
+            - img "Kitchen / dining" [ref=e29]
+          - button "Show Principal bedroom" [ref=e30] [cursor=pointer]:
+            - img "Principal bedroom" [ref=e31]
+          - button "Show Garden terrace" [ref=e32] [cursor=pointer]:
+            - img "Garden terrace" [ref=e33]
+          - button "Show Exterior" [ref=e34] [cursor=pointer]:
+            - img "Exterior" [ref=e35]
+      - generic [ref=e36]:
+        - paragraph [ref=e37]: For sale
+        - heading "Cavendish House, Marylebone W1" [level=1] [ref=e38]
+        - paragraph [ref=e39]: Guide price £1,250,000
+        - list [ref=e41]:
+          - listitem [ref=e42]: 3 bedrooms
+          - listitem [ref=e43]: 2 bathrooms
+          - listitem [ref=e44]: 2 reception rooms
+          - listitem [ref=e45]: Freehold
+        - list [ref=e46]:
+          - listitem [ref=e47]:
+            - generic [ref=e48]: Gallery
+            - text: Photos available
+          - listitem [ref=e49]:
+            - generic [ref=e50]: Facts
+            - text: 3 beds / 3 baths / 2 receptions
+          - listitem [ref=e51]:
+            - generic [ref=e52]: Viewing
+            - text: Request viewing
+      - complementary "Property contact" [ref=e53]:
+        - generic [ref=e54]:
+          - img "James Ashford" [ref=e56]
+          - generic [ref=e57]:
+            - generic [ref=e58]: James Ashford
+            - generic [ref=e59]: Associate Director, Marylebone
+        - paragraph [ref=e60]: Marketed by
+        - heading "Ashford & Rowe Prime" [level=2] [ref=e61]
+        - paragraph [ref=e62]: 18 Cavendish Parade, Marylebone, London W1U 4QT
+        - paragraph [ref=e63]: Call or request a viewing with the agent.
+        - generic [ref=e64]:
+          - link "Call agent" [ref=e65] [cursor=pointer]:
+            - /url: tel:02079460958
+          - link "Request viewing" [ref=e66] [cursor=pointer]:
+            - /url: javascript:;
+          - link "Email agent" [ref=e67] [cursor=pointer]:
+            - /url: mailto:james.ashford@ashfordrowe.co.uk
+      - generic [ref=e68]:
+        - heading "Key features" [level=4] [ref=e69]
+        - list [ref=e70]:
+          - listitem [ref=e71]: Three double bedrooms
+          - listitem [ref=e72]: Double reception room
+          - listitem [ref=e73]: Full-width kitchen and dining room
+          - listitem [ref=e74]: Landscaped west-facing terrace
+          - listitem [ref=e75]: Share of freehold
+          - listitem [ref=e76]: No onward chain
+      - generic [ref=e77]:
+        - heading "Overview" [level=4] [ref=e78]
+        - generic [ref=e79]: A restored period home on a quiet Marylebone street, arranged for modern family living with generous entertaining space, calm bedrooms and a landscaped west-facing terrace.
+      - generic [ref=e80]:
+        - heading "Full details" [level=4] [ref=e81]
+        - generic [ref=e82]:
+          - paragraph [ref=e83]: Cavendish House sits behind cast-iron railings on a tree-lined address moments from the village shops, restaurants and transport links of Marylebone. The house has been finished with a measured hand, retaining original proportion while introducing modern lighting, fitted storage and warm natural materials throughout.
+          - paragraph [ref=e84]: The raised ground floor opens into a double reception with tall sash windows and a working fireplace. To the rear, a full-width kitchen and dining room connects directly to the terrace, creating a natural space for day-to-day family life and informal entertaining.
+          - paragraph [ref=e85]: The principal suite occupies the quieter upper floor and includes a dressing area and marble-lined shower room. Two further bedrooms, a family bathroom, guest cloakroom and practical utility storage complete the accommodation.
+      - region "Property information" [ref=e86]:
+        - article [ref=e87]:
+          - heading "Floorplan" [level=4] [ref=e88]
+          - generic [ref=e89]:
+            - generic [ref=e90]: Reception
+            - generic [ref=e91]: Kitchen
+            - generic [ref=e92]: Bed 1
+            - generic [ref=e93]: Bed 2
+            - generic [ref=e94]: Bath
+          - paragraph [ref=e95]: 1,480 sq ft / 137.5 sq m
+        - article [ref=e96]:
+          - heading "Energy performance" [level=4] [ref=e97]
+          - generic [ref=e98]:
+            - generic [ref=e99]: A
+            - generic [ref=e100]: B
+            - generic [ref=e101]:
+              - text: C
+              - generic [ref=e102]: "72"
+            - generic [ref=e103]: D
+            - generic [ref=e104]: E
+            - generic [ref=e105]: F
+            - generic [ref=e106]: G
+          - paragraph [ref=e107]: Current 72 / Potential 86
+        - article [ref=e108]:
+          - heading "Location" [level=4] [ref=e109]
+          - generic [ref=e112]: Marylebone
+          - list [ref=e113]:
+            - listitem [ref=e114]:
+              - generic [ref=e115]: Baker Street Underground
+              - strong [ref=e116]: 0.3 miles
+            - listitem [ref=e117]:
+              - generic [ref=e118]: Marylebone station
+              - strong [ref=e119]: 0.6 miles
+            - listitem [ref=e120]:
+              - generic [ref=e121]: Regent's Park
+              - strong [ref=e122]: 0.5 miles
+            - listitem [ref=e123]:
+              - generic [ref=e124]: Marylebone High Street
+              - strong [ref=e125]: 0.4 miles
+        - article [ref=e126]:
+          - heading "Documents and viewing" [level=4] [ref=e127]
+          - generic [ref=e128]:
+            - generic [ref=e129]: Brochure
+            - generic [ref=e131]: Floorplan
+            - generic [ref=e133]: EPC
+          - paragraph [ref=e135]: Brochure pack available from Ashford & Rowe Prime.
+      - region "Similar properties" [ref=e136]:
+        - generic [ref=e137]:
+          - paragraph [ref=e138]: Also available
+          - heading "Similar homes nearby" [level=2] [ref=e139]
+        - generic [ref=e140]:
+          - article [ref=e141]:
+            - img "Period townhouse, Cavendish Road" [ref=e142]
+            - generic [ref=e143]:
+              - heading "Period townhouse, Cavendish Road" [level=3] [ref=e144]
+              - paragraph [ref=e145]: £1,250,000
+              - generic [ref=e146]: 4 bed / terrace
+          - article [ref=e147]:
+            - img "Garden maisonette, Devonshire Street" [ref=e148]
+            - generic [ref=e149]:
+              - heading "Garden maisonette, Devonshire Street" [level=3] [ref=e150]
+              - paragraph [ref=e151]: £925,000
+              - generic [ref=e152]: 2 bed / garden
+          - article [ref=e153]:
+            - img "Upper floor apartment, Weymouth Street" [ref=e154]
+            - generic [ref=e155]:
+              - heading "Upper floor apartment, Weymouth Street" [level=3] [ref=e156]
+              - paragraph [ref=e157]: £1,100,000
+              - generic [ref=e158]: 3 bed / lift
+  - contentinfo [ref=e159]:
+    - paragraph [ref=e162]: All rights reserved

@@ -44,19 +44,18 @@
 
 .ph-template-context-switcher {
 	align-items: center;
-	background: #ffffff;
-	border: 1px solid var(--ph-template-line-strong);
+	background: transparent;
+	border: 0;
 	border-radius: var(--ph-template-radius);
-	box-shadow: 0 1px 3px rgba(26, 31, 36, 0.08);
+	box-shadow: none;
 	display: flex;
 	gap: 10px;
-	max-width: calc(100vw - 32px);
-	padding: 10px 12px;
-	position: fixed;
-	right: 16px;
-	top: 48px;
-	width: 390px;
-	z-index: 100000;
+	margin-left: auto;
+	max-width: 100%;
+	padding: 0;
+	position: static;
+	width: auto;
+	z-index: auto;
 }
 
 .ph-template-context-switcher label {
@@ -681,6 +680,7 @@
 	gap: 28px;
 	margin: 0 auto;
 	max-width: 1180px;
+	padding-inline: 24px;
 	width: 100%;
 }
 
@@ -1394,15 +1394,15 @@
 	.ph-detail-template-standard-sales-detail .ph-template-detail > .ph-template-modules {
 		align-self: start;
 		grid-column: 1;
-		grid-row: 2;
+		grid-row: 3;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		margin-top: 742px;
+		margin-top: 0;
 		max-width: 760px;
 	}
 
 	.ph-detail-template-standard-sales-detail.ph-template-detail > .ph-template-similar-properties,
 	.ph-detail-template-standard-sales-detail .ph-template-detail > .ph-template-similar-properties {
-		grid-row: 3;
+		grid-row: 4;
 	}
 
 	.ph-detail-template-conversion-first-sales-detail.ph-template-detail,
@@ -1574,9 +1574,6 @@
 
 @media (max-width: 759px) {
 	.ph-template-context-switcher {
-		left: 10px;
-		right: 10px;
-		top: 56px;
 		width: auto;
 	}
 
@@ -1818,18 +1815,6 @@
 	font-size: 18px;
 	font-weight: 700;
 	line-height: 1.2;
-}
-
-.ph-template-masthead-nav {
-	align-items: center;
-	color: var(--ph-template-muted);
-	display: flex;
-	flex: 1 1 auto;
-	font-size: 13px;
-	font-weight: 600;
-	gap: 22px;
-	justify-content: center;
-	line-height: 1;
 }
 
 .ph-template-masthead-phone {
@@ -2896,17 +2881,15 @@
 }
 
 @media (max-width: 720px) {
+	.ph-template-detail {
+		padding-inline: 16px;
+	}
+
 	.ph-template-masthead-inner {
 		align-items: flex-start;
 		flex-direction: column;
 		gap: 10px;
 		padding: 14px 16px;
-	}
-
-	.ph-template-masthead-nav {
-		justify-content: flex-start;
-		overflow-x: auto;
-		width: 100%;
 	}
 
 	.ph-template-gallery-hero,
@@ -2935,7 +2918,8 @@
 	}
 
 	.ph-template-gallery-direction-switcher span,
-	.ph-template-gallery-direction-switcher button {
+	.ph-template-gallery-direction-switcher button,
+	.ph-template-context-switcher {
 		flex: 0 0 auto;
 	}
 

@@ -46,6 +46,8 @@ class PH_AJAX {
             // Property actions
             'check_duplicate_reference_number' => false,
             'osm_geocoding_request'  => false,
+            'getaddress_autocomplete' => false,
+            'getaddress_get' => false,
             'get_property_marketing_statistics_meta_box' => false,
             'get_property_tenancies_grid' => false,
 
@@ -347,6 +349,183 @@ class PH_AJAX {
 	private function json_headers() {
 		header( 'Content-Type: application/json; charset=utf-8' );
 	}
+
+    /**
+     * Get the local getAddress API key when address lookup is available.
+     *
+     * @return string
+     */
+    private function get_getaddress_api_key()
+    {
+        if ( ! function_exists( 'ph_is_development_environment' ) || ! ph_is_development_environment() )
+        {
+            return '';
+        }
+
+        return trim( (string) get_option( 'propertyhive_getaddress_api_key', '' ) );
+    }
+
+    /**
+     * Validate local address lookup requests.
+     */
+    private function check_getaddress_permissions()
+    {
+        check_ajax_referer( 'propertyhive_getaddress_lookup', 'security' );
+
+        if ( ! current_user_can( 'manage_options' ) )
+        {
+            wp_send_json_error(
+                array( 'message' => __( 'You do not have permission to use address lookup.', 'propertyhive' ) ),
+                403
+            );
+        }
+
+        if ( $this->get_getaddress_api_key() === '' )
+        {
+            wp_send_json_error(
+                array( 'message' => __( 'Address lookup is not configured for this environment.', 'propertyhive' ) ),
+                403
+            );
+        }
+    }
+
+    /**
+     * Request data from getAddress.
+     *
+     * @param string $endpoint getAddress endpoint.
+     * @return array
+     */
+    private function get_getaddress_response( $endpoint )
+    {
+        $request_url = add_query_arg(
+            'api-key',
+            $this->get_getaddress_api_key(),
+            'https://api.getAddress.io/' . ltrim( $endpoint, '/' )
+        );
+
+        $response = wp_remote_get(
+            $request_url,
+            array(
+                'timeout' => 10,
+                'headers' => array(
+                    'User-Agent' => 'Property-Hive/' . PH_VERSION . ' (+https://wp-property-hive.com)',
+                ),
+            )
+        );
+
+        if ( is_wp_error( $response ) )
+        {
+            wp_send_json_error(
+                array( 'message' => $response->get_error_message() ),
+                500
+            );
+        }
+
+        $response_code = wp_remote_retrieve_response_code( $response );
+        $body          = wp_remote_retrieve_body( $response );
+
+        if ( $response_code < 200 || $response_code >= 300 )
+        {
+            wp_send_json_error(
+                array( 'message' => __( 'Address lookup could not be completed. Please try again.', 'propertyhive' ) ),
+                $response_code
+            );
+        }
+
+        $json = json_decode( $body, true );
+        if ( ! is_array( $json ) )
+        {
+            wp_send_json_error(
+                array( 'message' => __( 'Address lookup returned an invalid response.', 'propertyhive' ) ),
+                500
+            );
+        }
+
+        return $json;
+    }
+
+    /**
+     * Get getAddress autocomplete suggestions.
+     */
+    public function getaddress_autocomplete()
+    {
+        $this->check_getaddress_permissions();
+
+        $term = isset( $_POST['term'] ) ? sanitize_text_field( wp_unslash( $_POST['term'] ) ) : '';
+        $term = trim( $term );
+
+        if ( strlen( $term ) < 3 )
+        {
+            wp_send_json_success( array( 'suggestions' => array() ) );
+        }
+
+        $json        = $this->get_getaddress_response( 'autocomplete/' . rawurlencode( $term ) );
+        $items       = isset( $json['suggestions'] ) && is_array( $json['suggestions'] ) ? $json['suggestions'] : array();
+        $suggestions = array();
+
+        foreach ( $items as $item )
+        {
+            if ( ! is_array( $item ) )
+            {
+                continue;
+            }
+
+            $id      = isset( $item['id'] ) ? sanitize_text_field( $item['id'] ) : '';
+            $address = isset( $item['address'] ) ? sanitize_text_field( $item['address'] ) : '';
+
+            if ( $id === '' || $address === '' )
+            {
+                continue;
+            }
+
+            $suggestions[] = array(
+                'id'      => $id,
+                'address' => $address,
+            );
+
+            if ( count( $suggestions ) >= 10 )
+            {
+                break;
+            }
+        }
+
+        wp_send_json_success( array( 'suggestions' => $suggestions ) );
+    }
+
+    /**
+     * Get a full getAddress address by suggestion id.
+     */
+    public function getaddress_get()
+    {
+        $this->check_getaddress_permissions();
+
+        $id = isset( $_POST['id'] ) ? sanitize_text_field( wp_unslash( $_POST['id'] ) ) : '';
+        $id = trim( $id );
+
+        if ( $id === '' )
+        {
+            wp_send_json_error(
+                array( 'message' => __( 'Please choose an address.', 'propertyhive' ) ),
+                400
+            );
+        }
+
+        $json = $this->get_getaddress_response( 'get/' . rawurlencode( $id ) );
+
+        wp_send_json_success(
+            array(
+                'address' => array(
+                    'line_1'       => isset( $json['line_1'] ) ? sanitize_text_field( $json['line_1'] ) : '',
+                    'line_2'       => isset( $json['line_2'] ) ? sanitize_text_field( $json['line_2'] ) : '',
+                    'line_3'       => isset( $json['line_3'] ) ? sanitize_text_field( $json['line_3'] ) : '',
+                    'line_4'       => isset( $json['line_4'] ) ? sanitize_text_field( $json['line_4'] ) : '',
+                    'town_or_city' => isset( $json['town_or_city'] ) ? sanitize_text_field( $json['town_or_city'] ) : '',
+                    'county'       => isset( $json['county'] ) ? sanitize_text_field( $json['county'] ) : '',
+                    'postcode'     => isset( $json['postcode'] ) ? sanitize_text_field( $json['postcode'] ) : '',
+                ),
+            )
+        );
+    }
 
     /**
      * Return a list string, comma delimited with an ampersand(&) before the final item
