@@ -351,9 +351,10 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             }
 
             // Code second layout, for one main photo
-        }
+        
         ?>
         </div>
         <?php
+        }
     }
 }
