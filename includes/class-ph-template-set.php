@@ -762,6 +762,7 @@ class PH_Template_Set {
 
 		remove_action( 'propertyhive_before_single_property_summary', 'propertyhive_show_property_images', 10 );
 		add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_demo_gallery' ), 10 );
+		add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_detail_facts_strip' ), 11 );
 
 		remove_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_price', 10 );
 		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_demo_price' ), 10 );
@@ -987,6 +988,46 @@ class PH_Template_Set {
 				}
 
 		echo '</div>';
+	}
+
+	/**
+	 * Render Rightmove-style detail facts below the gallery.
+	 */
+	public static function render_detail_facts_strip() {
+		if ( ! self::is_demo_preview() || ! is_property() || 'standard-sales-detail' !== self::get_detail_template() ) {
+			return;
+		}
+
+		$property = self::get_current_property();
+
+		if ( ! $property ) {
+			return;
+		}
+
+		$facts = self::get_detail_facts_strip_items( $property );
+
+		if ( empty( $facts ) ) {
+			return;
+		}
+
+		echo '<section class="ph-template-detail-facts-strip" aria-label="' . esc_attr__( 'Property facts', 'propertyhive' ) . '">';
+			echo '<ul>';
+			foreach ( $facts as $fact ) {
+				echo '<li class="ph-template-detail-fact ph-template-detail-fact-' . esc_attr( sanitize_html_class( $fact['icon'] ) ) . '">';
+					echo '<span class="ph-template-detail-fact-label">' . esc_html( $fact['label'] ) . '</span>';
+					echo '<span class="ph-template-detail-fact-content">';
+						echo '<span class="ph-template-detail-fact-icon ph-template-detail-fact-icon-' . esc_attr( sanitize_html_class( $fact['icon'] ) ) . '" aria-hidden="true"></span>';
+						echo '<span class="ph-template-detail-fact-values">';
+							echo '<strong>' . esc_html( $fact['value'] ) . '</strong>';
+							if ( ! empty( $fact['secondary'] ) ) {
+								echo '<span>' . esc_html( $fact['secondary'] ) . '</span>';
+							}
+						echo '</span>';
+					echo '</span>';
+				echo '</li>';
+			}
+			echo '</ul>';
+		echo '</section>';
 	}
 
 	/**
@@ -1389,7 +1430,8 @@ class PH_Template_Set {
 			return;
 		}
 
-		$facts          = self::get_detail_meta_items( $property );
+		$template       = self::get_detail_template();
+		$facts          = ( 'standard-sales-detail' === $template ) ? array() : self::get_detail_meta_items( $property );
 		$location_label = self::get_property_location_label( $property );
 		$address        = $property->get_formatted_full_address();
 		$documents      = self::get_property_document_labels( $property );
@@ -1464,15 +1506,7 @@ class PH_Template_Set {
 			return;
 		}
 
-		$properties = get_posts(
-			array(
-				'post_type'      => 'property',
-				'post_status'    => 'publish',
-				'posts_per_page' => 3,
-				'post__not_in'   => array( get_queried_object_id() ),
-				'fields'         => 'ids',
-			)
-		);
+		$properties = self::get_nearby_similar_property_ids( $current_property );
 
 		if ( empty( $properties ) ) {
 			return;
@@ -1511,6 +1545,200 @@ class PH_Template_Set {
 			}
 			echo '</div>';
 		echo '</section>';
+	}
+
+	/**
+	 * Get nearby/similar properties for the template-set detail preview.
+	 *
+	 * @param PH_Property $property Current property object.
+	 * @return array Property IDs.
+	 */
+	private static function get_nearby_similar_property_ids( $property ) {
+		$property_id = absint( isset( $property->id ) ? $property->id : get_queried_object_id() );
+
+		if ( ! $property_id ) {
+			return array();
+		}
+
+		$limit = absint( apply_filters( 'propertyhive_template_set_similar_properties_limit', 3, $property ) );
+
+		if ( ! $limit ) {
+			return array();
+		}
+
+		$selected = array();
+		$tiers    = array(
+			'location'      => self::get_location_term_ids( $property_id ),
+			'address_three' => sanitize_text_field( get_post_meta( $property_id, '_address_three', true ) ),
+			'address_four'  => sanitize_text_field( get_post_meta( $property_id, '_address_four', true ) ),
+			'postcode'      => self::get_outward_postcode( get_post_meta( $property_id, '_address_postcode', true ) ),
+			'fallback'      => true,
+		);
+
+		foreach ( $tiers as $tier => $tier_value ) {
+			if ( empty( $tier_value ) ) {
+				continue;
+			}
+
+			$remaining = $limit - count( $selected );
+
+			if ( $remaining <= 0 ) {
+				break;
+			}
+
+			$matches = self::query_nearby_similar_properties( $property, $tier, $tier_value, $remaining, $selected );
+
+			foreach ( $matches as $match_id ) {
+				$match_id = absint( $match_id );
+
+				if ( $match_id && $match_id !== $property_id && ! in_array( $match_id, $selected, true ) ) {
+					$selected[] = $match_id;
+				}
+			}
+		}
+
+		$selected = array_slice( $selected, 0, $limit );
+		$selected = apply_filters( 'propertyhive_template_set_similar_properties_ids', $selected, $property, $limit );
+		$selected = array_values( array_unique( array_filter( array_map( 'absint', (array) $selected ) ) ) );
+		$selected = array_values( array_diff( $selected, array( $property_id ) ) );
+
+		return array_slice( $selected, 0, $limit );
+	}
+
+	/**
+	 * Query one matching tier for nearby/similar properties.
+	 *
+	 * @param PH_Property       $property Current property object.
+	 * @param string            $tier Matching tier name.
+	 * @param string|array|bool $tier_value Value for the matching tier.
+	 * @param int               $limit Number of properties to fetch.
+	 * @param array             $selected Already selected property IDs.
+	 * @return array Property IDs.
+	 */
+	private static function query_nearby_similar_properties( $property, $tier, $tier_value, $limit, $selected ) {
+		$property_id = absint( isset( $property->id ) ? $property->id : get_queried_object_id() );
+		$department  = get_post_meta( $property_id, '_department', true );
+		$meta_query  = array(
+			array(
+				'key'   => '_on_market',
+				'value' => 'yes',
+			),
+		);
+
+		if ( '' !== $department ) {
+			$meta_query[] = array(
+				'key'   => '_department',
+				'value' => $department,
+			);
+		}
+
+		$args = array(
+			'post_type'           => 'property',
+			'post_status'         => self::get_similar_property_post_statuses(),
+			'posts_per_page'      => $limit,
+			'post__not_in'        => array_values( array_unique( array_merge( array( $property_id ), array_map( 'absint', $selected ) ) ) ),
+			'fields'              => 'ids',
+			'ignore_sticky_posts' => 1,
+			'has_password'        => false,
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+			'meta_query'          => $meta_query,
+		);
+
+		if ( 'location' === $tier ) {
+			$args['tax_query'] = array(
+				array(
+					'taxonomy' => 'location',
+					'terms'    => array_map( 'absint', (array) $tier_value ),
+					'operator' => 'IN',
+				),
+			);
+		} elseif ( 'address_three' === $tier ) {
+			$args['meta_query'][] = array(
+				'key'   => '_address_three',
+				'value' => $tier_value,
+			);
+		} elseif ( 'address_four' === $tier ) {
+			$args['meta_query'][] = array(
+				'key'   => '_address_four',
+				'value' => $tier_value,
+			);
+		} elseif ( 'postcode' === $tier ) {
+			$args['meta_query'][] = array(
+				'key'     => '_address_postcode',
+				'value'   => $tier_value,
+				'compare' => 'LIKE',
+			);
+		}
+
+		$args = apply_filters( 'propertyhive_template_set_similar_properties_query_args', $args, $property, $tier, $selected );
+
+		if ( ! is_array( $args ) || empty( $args ) ) {
+			return array();
+		}
+
+		$posts = get_posts( $args );
+		$ids   = array();
+
+		foreach ( (array) $posts as $post ) {
+			$ids[] = is_object( $post ) && isset( $post->ID ) ? $post->ID : $post;
+		}
+
+		return array_values( array_filter( array_map( 'absint', $ids ) ) );
+	}
+
+	/**
+	 * Get post statuses visible to the current visitor.
+	 *
+	 * @return string|array
+	 */
+	private static function get_similar_property_post_statuses() {
+		return ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array( 'publish', 'private' ) : 'publish';
+	}
+
+	/**
+	 * Get assigned location term IDs for a property.
+	 *
+	 * @param int $property_id Property ID.
+	 * @return array
+	 */
+	private static function get_location_term_ids( $property_id ) {
+		if ( ! taxonomy_exists( 'location' ) ) {
+			return array();
+		}
+
+		$terms = wp_get_post_terms( $property_id, 'location', array( 'fields' => 'ids' ) );
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+
+		return array_values( array_filter( array_map( 'absint', $terms ) ) );
+	}
+
+	/**
+	 * Get a useful outward postcode prefix for nearby matching.
+	 *
+	 * @param string $postcode Full postcode.
+	 * @return string
+	 */
+	private static function get_outward_postcode( $postcode ) {
+		$postcode = strtoupper( trim( (string) $postcode ) );
+
+		if ( '' === $postcode ) {
+			return '';
+		}
+
+		if ( false !== strpos( $postcode, ' ' ) ) {
+			$parts = preg_split( '/\s+/', $postcode );
+			return sanitize_text_field( $parts[0] );
+		}
+
+		if ( strlen( $postcode ) > 3 ) {
+			return sanitize_text_field( substr( $postcode, 0, -3 ) );
+		}
+
+		return sanitize_text_field( $postcode );
 	}
 
 	/**
@@ -2626,6 +2854,118 @@ class PH_Template_Set {
 		}
 
 		return array_values( array_unique( array_filter( $items ) ) );
+	}
+
+	/**
+	 * Build labelled facts for the below-gallery detail facts strip.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return array
+	 */
+	private static function get_detail_facts_strip_items( $property ) {
+		$fallback = self::get_demo_detail_facts_strip_items();
+		$size     = self::split_detail_fact_size( $property->get_formatted_floor_area() );
+		$items    = array(
+			'type'      => array(
+				'label'     => __( 'Property type', 'propertyhive' ),
+				'value'     => $property->property_type ? $property->property_type : $fallback['type']['value'],
+				'secondary' => '',
+				'icon'      => 'type',
+			),
+			'bedrooms'  => array(
+				'label'     => __( 'Bedrooms', 'propertyhive' ),
+				'value'     => $property->bedrooms > 0 ? (string) (int) $property->bedrooms : $fallback['bedrooms']['value'],
+				'secondary' => '',
+				'icon'      => 'bedrooms',
+			),
+			'bathrooms' => array(
+				'label'     => __( 'Bathrooms', 'propertyhive' ),
+				'value'     => $property->bathrooms > 0 ? (string) (int) $property->bathrooms : $fallback['bathrooms']['value'],
+				'secondary' => '',
+				'icon'      => 'bathrooms',
+			),
+			'size'      => array(
+				'label'     => __( 'Size', 'propertyhive' ),
+				'value'     => $size['value'] ? $size['value'] : $fallback['size']['value'],
+				'secondary' => $size['value'] ? $size['secondary'] : $fallback['size']['secondary'],
+				'icon'      => 'size',
+			),
+			'tenure'    => array(
+				'label'     => __( 'Tenure', 'propertyhive' ),
+				'value'     => $property->tenure ? $property->tenure : $fallback['tenure']['value'],
+				'secondary' => '',
+				'icon'      => 'tenure',
+			),
+		);
+
+		return array_values(
+			array_filter(
+				$items,
+				function( $item ) {
+					return '' !== trim( (string) $item['value'] );
+				}
+			)
+		);
+	}
+
+	/**
+	 * Fallback facts for sparse local preview records.
+	 *
+	 * @return array
+	 */
+	private static function get_demo_detail_facts_strip_items() {
+		$listing = self::get_demo_listing( self::get_detail_template() );
+		$size    = self::split_detail_fact_size( isset( $listing['floor_area'] ) ? $listing['floor_area'] : '' );
+
+		return array(
+			'type'      => array(
+				'value' => __( 'House', 'propertyhive' ),
+			),
+			'bedrooms'  => array(
+				'value' => '3',
+			),
+			'bathrooms' => array(
+				'value' => '2',
+			),
+			'size'      => array(
+				'value'     => $size['value'],
+				'secondary' => $size['secondary'],
+			),
+			'tenure'    => array(
+				'value' => __( 'Freehold', 'propertyhive' ),
+			),
+		);
+	}
+
+	/**
+	 * Split a floor-area value into primary and secondary display values.
+	 *
+	 * @param string $size Floor area label.
+	 * @return array
+	 */
+	private static function split_detail_fact_size( $size ) {
+		$size = trim( wp_strip_all_tags( (string) $size ) );
+
+		if ( '' === $size ) {
+			return array(
+				'value'     => '',
+				'secondary' => '',
+			);
+		}
+
+		if ( false !== strpos( $size, '/' ) ) {
+			$parts = array_map( 'trim', explode( '/', $size, 2 ) );
+
+			return array(
+				'value'     => $parts[0],
+				'secondary' => isset( $parts[1] ) ? $parts[1] : '',
+			);
+		}
+
+		return array(
+			'value'     => $size,
+			'secondary' => '',
+		);
 	}
 
 	/**
