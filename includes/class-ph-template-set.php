@@ -179,7 +179,6 @@ class PH_Template_Set {
 				self::OPTION_ENABLED             => '',
 				'template_set_detail_template'  => 'standard-sales-detail',
 				'template_set_search_template'  => 'portal-style-search-results',
-				'template_set_module_template'  => 'featured-properties-homepage-module',
 				'template_set_brand_colour'     => '#155e63',
 				'template_set_accent_colour'    => '#b7791f',
 				'template_set_button_style'     => 'filled',
@@ -215,10 +214,6 @@ class PH_Template_Set {
 	public static function get_detail_templates() {
 		return array(
 			'standard-sales-detail'           => __( 'Standard Sales Detail', 'propertyhive' ),
-			'conversion-first-sales-detail'   => __( 'Conversion-First Sales Detail', 'propertyhive' ),
-			'premium-editorial-detail'        => __( 'Premium Editorial Detail', 'propertyhive' ),
-			'lettings-detail'                 => __( 'Lettings Detail', 'propertyhive' ),
-			'new-homes-development-detail'    => __( 'New Homes / Development Detail', 'propertyhive' ),
 		);
 	}
 
@@ -230,9 +225,6 @@ class PH_Template_Set {
 	public static function get_search_templates() {
 		return array(
 			'portal-style-search-results'      => __( 'Portal-Style Search Results', 'propertyhive' ),
-			'brand-led-agency-search-results'  => __( 'Brand-Led Agency Search Results', 'propertyhive' ),
-			'map-led-search-results'           => __( 'Map-Led Search Results', 'propertyhive' ),
-			'compact-list-search-results'      => __( 'Compact List Search Results', 'propertyhive' ),
 		);
 	}
 
@@ -242,9 +234,7 @@ class PH_Template_Set {
 	 * @return array
 	 */
 	public static function get_module_templates() {
-		return array(
-			'featured-properties-homepage-module' => __( 'Featured Properties / Homepage Module', 'propertyhive' ),
-		);
+		return array();
 	}
 
 	/**
@@ -322,15 +312,10 @@ class PH_Template_Set {
 	 * @return string
 	 */
 	public static function get_module_template() {
-		$settings  = self::get_settings();
 		$templates = self::get_module_templates();
 		$template  = self::get_query_template( self::MODULE_QUERY_ARG, $templates );
 
-		if ( empty( $template ) ) {
-			$template = sanitize_title( $settings['template_set_module_template'] );
-		}
-
-		return isset( $templates[ $template ] ) ? $template : 'featured-properties-homepage-module';
+		return isset( $templates[ $template ] ) ? $template : '';
 	}
 
 	/**
@@ -355,10 +340,6 @@ class PH_Template_Set {
 		$archive_url = get_post_type_archive_link( 'property' );
 		if ( ! $archive_url ) {
 			$archive_url = home_url( '/' );
-		}
-
-		if ( 'module' === $catalog[ $template ]['type'] ) {
-			return add_query_arg( self::MODULE_QUERY_ARG, $template, $archive_url );
 		}
 
 		return add_query_arg( self::SEARCH_QUERY_ARG, $template, $archive_url );
@@ -772,8 +753,8 @@ class PH_Template_Set {
 	}
 
 	/**
-	 * Swap dummy database content for a curated demo presentation while the
-	 * detail page is being previewed by a capable user.
+	 * Render the detail preview with the current property record, while keeping
+	 * the gallery sandbox available for layout exploration.
 	 */
 	public static function prepare_detail_preview() {
 		if ( ! self::is_demo_preview() || ! is_property() ) {
@@ -801,26 +782,17 @@ class PH_Template_Set {
 		remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_description', 40 );
 		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_demo_description' ), 40 );
 
-		add_filter( 'the_title', array( __CLASS__, 'filter_demo_title' ), 20, 2 );
 	}
 
 	/**
-	 * Replace the previewed property's headline with a curated demo address so
-	 * placeholder import titles never surface in a screenshot. Scoped to the
-	 * single queried property only; every other title on the page is untouched.
+	 * Deprecated no-op retained for compatibility with older preview hooks.
 	 *
 	 * @param string $title Original title.
 	 * @param int    $id    Post ID.
 	 * @return string
 	 */
 	public static function filter_demo_title( $title, $id = 0 ) {
-		if ( ! self::is_demo_preview() || (int) $id !== (int) get_queried_object_id() ) {
-			return $title;
-		}
-
-		$listing = self::get_demo_listing( self::get_detail_template() );
-
-		return $listing['title'];
+		return $title;
 	}
 
 	/**
@@ -836,14 +808,32 @@ class PH_Template_Set {
 			return;
 		}
 
-		$agency = self::get_demo_agency();
+		$brand = '';
+		$phone = '';
+
+		if ( is_property() ) {
+			$property = self::get_current_property();
+
+			if ( $property ) {
+				$brand = self::get_display_office_name( $property );
+				$phone = $property->get_negotiator_telephone_number();
+			}
+		}
+
+		if ( ! $brand ) {
+			$agency = self::get_demo_agency();
+			$brand  = $agency['office'];
+			$phone  = $agency['phone'];
+		}
 
 		echo '<div class="ph-template-masthead"><div class="ph-template-masthead-inner">';
-			echo '<span class="ph-template-masthead-brand">' . esc_html( $agency['office'] ) . '</span>';
+			echo '<span class="ph-template-masthead-brand">' . esc_html( $brand ) . '</span>';
 			echo '<nav class="ph-template-masthead-nav" aria-hidden="true">';
 				echo '<span>Buy</span><span>Let</span><span>New Homes</span><span>About</span>';
 			echo '</nav>';
-			echo '<a class="ph-template-masthead-phone" href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $agency['phone'] ) ) . '">' . esc_html( $agency['phone'] ) . '</a>';
+			if ( $phone ) {
+				echo '<a class="ph-template-masthead-phone" href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>';
+			}
 		echo '</div></div>';
 	}
 
@@ -887,7 +877,7 @@ class PH_Template_Set {
 	 * Render a hero/gallery presentation using bundled demo photography.
 	 */
 	public static function render_demo_gallery() {
-		global $property;
+		$property = self::get_current_property();
 
 		$template = self::get_detail_template();
 		$images   = self::get_demo_gallery_images( $template );
@@ -899,7 +889,9 @@ class PH_Template_Set {
 		$is_editorial = ( 'premium-editorial-detail' === $template );
 		$hero         = reset( $images );
 		$rail         = array_slice( $images, 0, 5 );
-		$count        = 9 + count( $images );
+		$count        = count( $images );
+		$location     = self::get_property_location_label( $property );
+		$has_floorplan = $property ? self::has_floorplan( $property ) : true;
 
 		$gallery_variants = array(
 			'showcase'  => __( 'Showcase', 'propertyhive' ),
@@ -927,28 +919,36 @@ class PH_Template_Set {
 					echo '<img src="' . esc_url( self::demo_asset( $hero[0] ) ) . '" alt="' . esc_attr( $hero[1] ) . '" loading="lazy" data-ph-gallery-hero-image>';
 					echo '<span class="ph-template-gallery-expand-label" aria-hidden="true">' . esc_html__( 'View larger', 'propertyhive' ) . '</span>';
 				echo '</button>';
-				echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-floorplan" hidden data-ph-gallery-panel="floorplan" aria-label="' . esc_attr__( 'Floorplan preview', 'propertyhive' ) . '">';
-					echo '<div class="ph-template-floorplan" aria-hidden="true">';
-						echo '<span class="ph-template-floorplan-room ph-template-room-reception">' . esc_html__( 'Reception', 'propertyhive' ) . '</span>';
-						echo '<span class="ph-template-floorplan-room ph-template-room-kitchen">' . esc_html__( 'Kitchen', 'propertyhive' ) . '</span>';
-						echo '<span class="ph-template-floorplan-room ph-template-room-bed-one">' . esc_html__( 'Bed 1', 'propertyhive' ) . '</span>';
-						echo '<span class="ph-template-floorplan-room ph-template-room-bed-two">' . esc_html__( 'Bed 2', 'propertyhive' ) . '</span>';
-						echo '<span class="ph-template-floorplan-room ph-template-room-bath">' . esc_html__( 'Bath', 'propertyhive' ) . '</span>';
+				if ( $has_floorplan ) {
+					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-floorplan" hidden data-ph-gallery-panel="floorplan" aria-label="' . esc_attr__( 'Floorplan preview', 'propertyhive' ) . '">';
+						echo '<div class="ph-template-floorplan" aria-hidden="true">';
+							echo '<span class="ph-template-floorplan-room ph-template-room-reception">' . esc_html__( 'Reception', 'propertyhive' ) . '</span>';
+							echo '<span class="ph-template-floorplan-room ph-template-room-kitchen">' . esc_html__( 'Kitchen', 'propertyhive' ) . '</span>';
+							echo '<span class="ph-template-floorplan-room ph-template-room-bed-one">' . esc_html__( 'Bed 1', 'propertyhive' ) . '</span>';
+							echo '<span class="ph-template-floorplan-room ph-template-room-bed-two">' . esc_html__( 'Bed 2', 'propertyhive' ) . '</span>';
+							echo '<span class="ph-template-floorplan-room ph-template-room-bath">' . esc_html__( 'Bath', 'propertyhive' ) . '</span>';
+						echo '</div>';
 					echo '</div>';
-				echo '</div>';
-				echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-map" hidden data-ph-gallery-panel="map" aria-label="' . esc_attr__( 'Map preview', 'propertyhive' ) . '"><span class="ph-template-map-pin"></span><span class="ph-template-map-label">' . esc_html( self::get_demo_listing( $template )['area'] ) . '</span></div>';
+				}
+				if ( $location ) {
+					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-map" hidden data-ph-gallery-panel="map" aria-label="' . esc_attr__( 'Map preview', 'propertyhive' ) . '"><span class="ph-template-map-pin"></span><span class="ph-template-map-label">' . esc_html( $location ) . '</span></div>';
+				}
 
 				if ( ! $is_editorial ) {
-					echo '<span class="ph-template-gallery-count"><span class="ph-template-gallery-count-icon" aria-hidden="true"></span>' . sprintf(
+					echo '<span class="ph-template-gallery-count"><span class="ph-template-gallery-count-icon" aria-hidden="true"></span>' . esc_html( sprintf(
 						/* translators: %d: number of property photos */
-						esc_html__( '%d photos', 'propertyhive' ),
+						_n( '%d photo', '%d photos', $count, 'propertyhive' ),
 						(int) $count
-						) . '</span>';
+						) ) . '</span>';
 
 						echo '<div class="ph-template-gallery-tabs" role="tablist" aria-label="' . esc_attr__( 'Gallery views', 'propertyhive' ) . '">';
 							echo '<button type="button" class="is-active" data-ph-gallery-tab="photos" aria-selected="true">' . esc_html__( 'Photos', 'propertyhive' ) . '</button>';
-							echo '<button type="button" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floorplan', 'propertyhive' ) . '</button>';
-							echo '<button type="button" data-ph-gallery-tab="map" aria-selected="false">' . esc_html__( 'Map', 'propertyhive' ) . '</button>';
+							if ( $has_floorplan ) {
+								echo '<button type="button" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floorplan', 'propertyhive' ) . '</button>';
+							}
+							if ( $location ) {
+								echo '<button type="button" data-ph-gallery-tab="map" aria-selected="false">' . esc_html__( 'Map', 'propertyhive' ) . '</button>';
+							}
 						echo '</div>';
 					} else {
 						echo '<figcaption data-ph-gallery-caption>' . esc_html( $hero[1] ) . '</figcaption>';
@@ -1121,57 +1121,85 @@ class PH_Template_Set {
 	}
 
 	/**
-	 * Render curated preview price.
+	 * Render preview price from the current property record.
 	 */
 	public static function render_demo_price() {
 		if ( ! self::is_demo_preview() || ! is_property() ) {
 			return;
 		}
 
-		$listing = self::get_demo_listing( self::get_detail_template() );
+		$property = self::get_current_property();
 
-		echo '<p class="price ph-template-demo-price">' . esc_html( $listing['price'] ) . '</p>';
+		if ( ! $property ) {
+			return;
+		}
+
+		$price = $property->get_formatted_price();
+
+		if ( '' === $price ) {
+			return;
+		}
+
+		$price_qualifier = method_exists( $property, 'get_price_qualifier' ) ? $property->get_price_qualifier() : $property->price_qualifier;
+
+		echo '<div class="price ph-template-demo-price">' . wp_kses_post( $price );
+			if ( $price_qualifier ) {
+				echo ' <span class="price-qualifier">' . esc_html( $price_qualifier ) . '</span>';
+			}
+		echo '</div>';
 	}
 
 	/**
-	 * Render curated preview meta.
+	 * Render preview meta from the current property record.
 	 */
 	public static function render_demo_meta() {
 		if ( ! self::is_demo_preview() || ! is_property() ) {
 			return;
 		}
 
-		$listing = self::get_demo_listing( self::get_detail_template() );
+		$property = self::get_current_property();
 
-		if ( empty( $listing['meta'] ) ) {
+		if ( ! $property ) {
+			return;
+		}
+
+		$meta = self::get_detail_meta_items( $property );
+
+		if ( empty( $meta ) ) {
 			return;
 		}
 
 		echo '<div class="property_meta ph-template-demo-meta"><ul>';
-		foreach ( $listing['meta'] as $item ) {
+		foreach ( $meta as $item ) {
 			echo '<li>' . esc_html( $item ) . '</li>';
 		}
 		echo '</ul></div>';
 	}
 
 	/**
-	 * Render curated features in preview mode.
+	 * Render current property features in preview mode.
 	 */
 	public static function render_demo_features() {
 		if ( ! self::is_demo_preview() || ! is_property() ) {
 			return;
 		}
 
-		$listing = self::get_demo_listing( self::get_detail_template() );
+		$property = self::get_current_property();
 
-		if ( empty( $listing['features'] ) ) {
+		if ( ! $property ) {
+			return;
+		}
+
+		$features = $property->get_features();
+
+		if ( empty( $features ) ) {
 			return;
 		}
 
 		echo '<div class="features ph-template-demo-features">';
 			echo '<h4>' . esc_html__( 'Key features', 'propertyhive' ) . '</h4>';
 			echo '<ul>';
-			foreach ( $listing['features'] as $feature ) {
+			foreach ( $features as $feature ) {
 				echo '<li>' . esc_html( $feature ) . '</li>';
 			}
 			echo '</ul>';
@@ -1179,46 +1207,48 @@ class PH_Template_Set {
 	}
 
 	/**
-	 * Render curated summary in preview mode.
+	 * Render current property summary in preview mode.
 	 */
 	public static function render_demo_summary() {
 		if ( ! self::is_demo_preview() || ! is_property() ) {
 			return;
 		}
 
-		$listing = self::get_demo_listing( self::get_detail_template() );
+		$summary = get_post_field( 'post_excerpt', get_queried_object_id() );
 
-		if ( empty( $listing['summary'] ) ) {
+		if ( '' === trim( wp_strip_all_tags( $summary ) ) ) {
 			return;
 		}
 
 		echo '<div class="summary ph-template-demo-summary">';
 			echo '<h4>' . esc_html__( 'Overview', 'propertyhive' ) . '</h4>';
-			echo '<div class="summary-contents">' . esc_html( $listing['summary'] ) . '</div>';
+			echo '<div class="summary-contents">' . wp_kses_post( wpautop( $summary ) ) . '</div>';
 		echo '</div>';
 	}
 
 	/**
-	 * Render curated description in preview mode.
+	 * Render current property description in preview mode.
 	 */
 	public static function render_demo_description() {
 		if ( ! self::is_demo_preview() || ! is_property() ) {
 			return;
 		}
 
-		$listing = self::get_demo_listing( self::get_detail_template() );
+		$property = self::get_current_property();
 
-		if ( empty( $listing['description'] ) ) {
+		if ( ! $property ) {
+			return;
+		}
+
+		$description = $property->get_formatted_description( false );
+
+		if ( '' === trim( wp_strip_all_tags( $description ) ) ) {
 			return;
 		}
 
 		echo '<div class="description ph-template-demo-description">';
 			echo '<h4>' . esc_html__( 'Full details', 'propertyhive' ) . '</h4>';
-			echo '<div class="description-contents">';
-			foreach ( $listing['description'] as $paragraph ) {
-				echo '<p>' . esc_html( $paragraph ) . '</p>';
-			}
-			echo '</div>';
+			echo '<div class="description-contents">' . wp_kses_post( $description ) . '</div>';
 		echo '</div>';
 	}
 
@@ -1340,67 +1370,70 @@ class PH_Template_Set {
 			return;
 		}
 
-		$listing = self::get_demo_listing( self::get_detail_template() );
-		$agency  = self::get_demo_agency();
+		$property = self::get_current_property();
+
+		if ( ! $property ) {
+			return;
+		}
+
+		$facts          = self::get_detail_meta_items( $property );
+		$location_label = self::get_property_location_label( $property );
+		$address        = $property->get_formatted_full_address();
+		$documents      = self::get_property_document_labels( $property );
+		$office         = self::get_display_office_name( $property );
+
+		if ( empty( $facts ) && ! $location_label && ! $address && empty( $documents ) && ! self::has_floorplan( $property ) ) {
+			return;
+		}
 
 		echo '<section class="ph-template-modules" aria-label="' . esc_attr__( 'Property information', 'propertyhive' ) . '">';
-			echo '<article class="ph-template-module-card ph-template-module-floorplan">';
-				echo '<h4>' . esc_html__( 'Floorplan', 'propertyhive' ) . '</h4>';
-				echo '<div class="ph-template-floorplan" aria-hidden="true">';
-					echo '<span class="ph-template-floorplan-room ph-template-room-reception">' . esc_html__( 'Reception', 'propertyhive' ) . '</span>';
-					echo '<span class="ph-template-floorplan-room ph-template-room-kitchen">' . esc_html__( 'Kitchen', 'propertyhive' ) . '</span>';
-					echo '<span class="ph-template-floorplan-room ph-template-room-bed-one">' . esc_html__( 'Bed 1', 'propertyhive' ) . '</span>';
-					echo '<span class="ph-template-floorplan-room ph-template-room-bed-two">' . esc_html__( 'Bed 2', 'propertyhive' ) . '</span>';
-					echo '<span class="ph-template-floorplan-room ph-template-room-bath">' . esc_html__( 'Bath', 'propertyhive' ) . '</span>';
-				echo '</div>';
-				echo '<p class="ph-template-module-foot">' . esc_html( $listing['floor_area'] ) . '</p>';
-			echo '</article>';
-
-			echo '<article class="ph-template-module-card ph-template-module-epc">';
-				echo '<h4>' . esc_html__( 'Energy performance', 'propertyhive' ) . '</h4>';
-				echo '<div class="ph-template-epc">';
-					$bands = array( 'A', 'B', 'C', 'D', 'E', 'F', 'G' );
-					foreach ( $bands as $index => $band ) {
-						$score_min = array( 92, 81, 69, 55, 39, 21, 1 );
-						$score_max = array( 100, 91, 80, 68, 54, 38, 20 );
-						$marker    = '';
-						if ( $listing['epc_now'] >= $score_min[ $index ] && $listing['epc_now'] <= $score_max[ $index ] ) {
-							$marker = '<span class="ph-template-epc-now">' . (int) $listing['epc_now'] . '</span>';
-						}
-						echo '<span class="ph-template-epc-band ph-template-epc-band-' . esc_attr( strtolower( $band ) ) . '">' . esc_html( $band ) . $marker . '</span>';
+			if ( ! empty( $facts ) ) {
+				echo '<article class="ph-template-module-card ph-template-module-facts">';
+					echo '<h4>' . esc_html__( 'At a glance', 'propertyhive' ) . '</h4>';
+					echo '<ul class="ph-template-area-list">';
+					foreach ( $facts as $fact ) {
+						echo '<li><span>' . esc_html( $fact ) . '</span></li>';
 					}
-				echo '</div>';
-				echo '<p class="ph-template-module-foot">' . sprintf(
-					/* translators: 1: current EPC score, 2: potential EPC score */
-					esc_html__( 'Current %1$d / Potential %2$d', 'propertyhive' ),
-					(int) $listing['epc_now'],
-					(int) $listing['epc_next']
-				) . '</p>';
-			echo '</article>';
+					echo '</ul>';
+				echo '</article>';
+			}
 
-			echo '<article class="ph-template-module-card ph-template-module-map">';
-				echo '<h4>' . esc_html__( 'Location', 'propertyhive' ) . '</h4>';
-				echo '<div class="ph-template-module-map-surface" aria-hidden="true"><span class="ph-template-map-pin"></span><span class="ph-template-map-label">' . esc_html( $listing['area'] ) . '</span></div>';
-				echo '<ul class="ph-template-area-list">';
-				foreach ( $listing['connections'] as $row ) {
-					echo '<li><span>' . esc_html( $row[0] ) . '</span><strong>' . esc_html( $row[1] ) . '</strong></li>';
-				}
-				echo '</ul>';
-			echo '</article>';
+			if ( self::has_floorplan( $property ) ) {
+				echo '<article class="ph-template-module-card ph-template-module-floorplan">';
+					echo '<h4>' . esc_html__( 'Floorplan', 'propertyhive' ) . '</h4>';
+					echo '<p class="ph-template-module-foot">' . esc_html__( 'Floorplan available for this property.', 'propertyhive' ) . '</p>';
+				echo '</article>';
+			}
 
-			echo '<article class="ph-template-module-card ph-template-module-documents">';
-				echo '<h4>' . esc_html__( 'Documents and viewing', 'propertyhive' ) . '</h4>';
-				echo '<div class="ph-template-doc-row">';
-					echo '<span class="ph-template-doc-pill"><span class="ph-template-doc-icon" aria-hidden="true"></span>' . esc_html__( 'Brochure', 'propertyhive' ) . '</span>';
-					echo '<span class="ph-template-doc-pill"><span class="ph-template-doc-icon" aria-hidden="true"></span>' . esc_html__( 'Floorplan', 'propertyhive' ) . '</span>';
-					echo '<span class="ph-template-doc-pill"><span class="ph-template-doc-icon" aria-hidden="true"></span>' . esc_html__( 'EPC', 'propertyhive' ) . '</span>';
-				echo '</div>';
-				echo '<p class="ph-template-module-foot">' . sprintf(
-					/* translators: %s: agency name */
-					esc_html__( 'Brochure pack available from %s.', 'propertyhive' ),
-					esc_html( $agency['office'] )
-				) . '</p>';
-			echo '</article>';
+			if ( $location_label || $address ) {
+				echo '<article class="ph-template-module-card ph-template-module-map">';
+					echo '<h4>' . esc_html__( 'Location', 'propertyhive' ) . '</h4>';
+					if ( $location_label ) {
+						echo '<div class="ph-template-module-map-surface" aria-hidden="true"><span class="ph-template-map-pin"></span><span class="ph-template-map-label">' . esc_html( $location_label ) . '</span></div>';
+					}
+					if ( $address ) {
+						echo '<p class="ph-template-module-foot">' . esc_html( $address ) . '</p>';
+					}
+				echo '</article>';
+			}
+
+			if ( ! empty( $documents ) ) {
+				echo '<article class="ph-template-module-card ph-template-module-documents">';
+					echo '<h4>' . esc_html__( 'Documents and viewing', 'propertyhive' ) . '</h4>';
+					echo '<div class="ph-template-doc-row">';
+					foreach ( $documents as $document ) {
+						echo '<span class="ph-template-doc-pill"><span class="ph-template-doc-icon" aria-hidden="true"></span>' . esc_html( $document ) . '</span>';
+					}
+					echo '</div>';
+					if ( $office ) {
+						echo '<p class="ph-template-module-foot">' . sprintf(
+							/* translators: %s: office name */
+							esc_html__( 'Available from %s.', 'propertyhive' ),
+							esc_html( $office )
+						) . '</p>';
+					}
+				echo '</article>';
+			}
 		echo '</section>';
 	}
 
@@ -1412,28 +1445,24 @@ class PH_Template_Set {
 			return;
 		}
 
-		$template = self::get_detail_template();
-		$is_let   = ( 'lettings-detail' === $template );
-		$is_new   = ( 'new-homes-development-detail' === $template );
+		$current_property = self::get_current_property();
 
-		if ( $is_let ) {
-			$cards = array(
-				array( 'atlas-apartment-living.png', __( 'Two bedroom apartment, Wharf Lane', 'propertyhive' ), self::demo_price( '2,450' ) . __( ' pcm', 'propertyhive' ), __( '2 bed / 2 bath', 'propertyhive' ) ),
-				array( 'cavendish-living-room.png', __( 'One bedroom flat, Quay Street', 'propertyhive' ), self::demo_price( '1,795' ) . __( ' pcm', 'propertyhive' ), __( '1 bed / balcony', 'propertyhive' ) ),
-				array( 'cavendish-kitchen-dining.png', __( 'Two bedroom duplex, Mill Court', 'propertyhive' ), self::demo_price( '2,950' ) . __( ' pcm', 'propertyhive' ), __( '2 bed / concierge', 'propertyhive' ) ),
-			);
-		} elseif ( $is_new ) {
-			$cards = array(
-				array( 'elm-yard-development.png', __( 'Elm Yard Plot 4', 'propertyhive' ), __( 'From ', 'propertyhive' ) . self::demo_price( '485,000' ), __( '2 bed apartment', 'propertyhive' ) ),
-				array( 'cavendish-kitchen-dining.png', __( 'Elm Yard Plot 11', 'propertyhive' ), __( 'From ', 'propertyhive' ) . self::demo_price( '625,000' ), __( '3 bed townhouse', 'propertyhive' ) ),
-				array( 'cavendish-garden-terrace.png', __( 'Elm Yard Garden Home', 'propertyhive' ), __( 'From ', 'propertyhive' ) . self::demo_price( '710,000' ), __( '3 bed / courtyard', 'propertyhive' ) ),
-			);
-		} else {
-			$cards = array(
-				array( 'cavendish-exterior.png', __( 'Period townhouse, Cavendish Road', 'propertyhive' ), self::demo_price( '1,250,000' ), __( '4 bed / terrace', 'propertyhive' ) ),
-				array( 'cavendish-living-room.png', __( 'Garden maisonette, Devonshire Street', 'propertyhive' ), self::demo_price( '925,000' ), __( '2 bed / garden', 'propertyhive' ) ),
-				array( 'cavendish-kitchen-dining.png', __( 'Upper floor apartment, Weymouth Street', 'propertyhive' ), self::demo_price( '1,100,000' ), __( '3 bed / lift', 'propertyhive' ) ),
-			);
+		if ( ! $current_property ) {
+			return;
+		}
+
+		$properties = get_posts(
+			array(
+				'post_type'      => 'property',
+				'post_status'    => 'publish',
+				'posts_per_page' => 3,
+				'post__not_in'   => array( get_queried_object_id() ),
+				'fields'         => 'ids',
+			)
+		);
+
+		if ( empty( $properties ) ) {
+			return;
 		}
 
 		echo '<section class="ph-template-similar-properties" aria-label="' . esc_attr__( 'Similar properties', 'propertyhive' ) . '">';
@@ -1442,13 +1471,28 @@ class PH_Template_Set {
 				echo '<h2>' . esc_html__( 'Similar homes nearby', 'propertyhive' ) . '</h2>';
 			echo '</div>';
 			echo '<div class="ph-template-similar-grid">';
-			foreach ( $cards as $card ) {
+			foreach ( $properties as $property_id ) {
+				$related = new PH_Property( $property_id );
+				$image   = $related->get_main_photo_src( 'medium_large' );
+				$price   = $related->get_formatted_price();
+				$facts   = self::get_fact_summary( $related );
+				$title   = get_the_title( $property_id );
+				$url     = get_permalink( $property_id );
+
 				echo '<article class="ph-template-similar-card">';
-					echo '<img src="' . esc_url( self::demo_asset( $card[0] ) ) . '" alt="' . esc_attr( $card[1] ) . '" loading="lazy">';
+					if ( $image ) {
+						echo '<a href="' . esc_url( $url ) . '"><img src="' . esc_url( $image ) . '" alt="' . esc_attr( $title ) . '" loading="lazy"></a>';
+					} elseif ( ph_placeholder_img_src() ) {
+						echo '<a href="' . esc_url( $url ) . '"><img src="' . esc_url( ph_placeholder_img_src() ) . '" alt="' . esc_attr( $title ) . '" loading="lazy"></a>';
+					}
 					echo '<div>';
-						echo '<h3>' . esc_html( $card[1] ) . '</h3>';
-						echo '<p>' . esc_html( $card[2] ) . '</p>';
-						echo '<span>' . esc_html( $card[3] ) . '</span>';
+						echo '<h3><a href="' . esc_url( $url ) . '">' . esc_html( $title ) . '</a></h3>';
+						if ( $price ) {
+							echo '<p>' . wp_kses_post( $price ) . '</p>';
+						}
+						if ( $facts ) {
+							echo '<span>' . esc_html( $facts ) . '</span>';
+						}
 					echo '</div>';
 				echo '</article>';
 			}
@@ -1589,10 +1633,12 @@ class PH_Template_Set {
 				echo '</ul>';
 			}
 
-			if ( 'yes' === $settings['template_set_show_branch'] && ( $property->get_office_name() || $phone ) ) {
+			$office = self::get_display_office_name( $property );
+
+			if ( 'yes' === $settings['template_set_show_branch'] && ( $office || $phone ) ) {
 				echo '<div class="ph-template-card-branch">';
-					if ( $property->get_office_name() ) {
-						echo '<span>' . esc_html( $property->get_office_name() ) . '</span>';
+					if ( $office ) {
+						echo '<span>' . esc_html( $office ) . '</span>';
 					}
 					if ( $phone ) {
 						echo '<a href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>';
@@ -1610,7 +1656,9 @@ class PH_Template_Set {
 			return;
 		}
 
-		global $post, $property;
+		global $post;
+
+		$property = self::get_current_property();
 
 		if ( ! $property ) {
 			return;
@@ -1620,30 +1668,29 @@ class PH_Template_Set {
 		$button   = self::get_primary_cta_label( $property, $template );
 		$hint     = self::get_contact_hint( $template );
 		$is_demo  = self::is_demo_preview();
-
-		if ( $is_demo ) {
-			$agency  = self::get_demo_agency();
-			$phone   = $agency['phone'];
-			$email   = $agency['email'];
-			$office  = $agency['office'];
-			$address = $agency['address'];
-		} else {
-			$phone   = $property->get_negotiator_telephone_number();
-			$email   = $property->get_negotiator_email_address();
-			$office  = $property->get_office_name();
-			$address = $property->get_office_address();
-		}
+		$phone    = $property->get_negotiator_telephone_number();
+		$email    = $property->get_negotiator_email_address();
+		$office   = self::get_display_office_name( $property );
+		$address  = $property->get_office_address();
+		$agent    = $property->get_negotiator_name();
+		$portrait = $property->get_negotiator_photo();
 
 		$office_alt = $office ? $office : __( 'Agent', 'propertyhive' );
 
 		echo '<aside class="ph-template-detail-contact-card' . ( $is_demo ? ' is-demo' : '' ) . '" aria-label="' . esc_attr__( 'Property contact', 'propertyhive' ) . '">';
 
-			if ( $is_demo ) {
+			if ( $agent || $portrait ) {
 				echo '<div class="ph-template-contact-agent">';
-					echo '<span class="ph-template-contact-portrait"><img src="' . esc_url( self::demo_asset( $agency['portrait'] ) ) . '" alt="' . esc_attr( $agency['agent'] ) . '" loading="lazy"></span>';
+					if ( $portrait ) {
+						echo '<span class="ph-template-contact-portrait">' . wp_kses_post( $portrait ) . '</span>';
+					}
 					echo '<span class="ph-template-contact-agent-meta">';
-						echo '<span class="ph-template-contact-agent-name">' . esc_html( $agency['agent'] ) . '</span>';
-						echo '<span class="ph-template-contact-agent-role">' . esc_html( $agency['role'] . ', ' . $agency['branch'] ) . '</span>';
+						if ( $agent ) {
+							echo '<span class="ph-template-contact-agent-name">' . esc_html( $agent ) . '</span>';
+						}
+						if ( $office ) {
+							echo '<span class="ph-template-contact-agent-role">' . esc_html( $office ) . '</span>';
+						}
 					echo '</span>';
 				echo '</div>';
 			}
@@ -1960,10 +2007,6 @@ class PH_Template_Set {
 			return true;
 		}
 
-		if ( '' !== self::get_query_template( self::MODULE_QUERY_ARG, self::get_module_templates() ) ) {
-			return true;
-		}
-
 		if ( empty( $_GET[ self::CATALOG_QUERY_ARG ] ) ) {
 			return false;
 		}
@@ -1980,7 +2023,7 @@ class PH_Template_Set {
 	 * @return array
 	 */
 	private static function get_preview_query_args() {
-		return array( self::DETAIL_QUERY_ARG, self::SEARCH_QUERY_ARG, self::MODULE_QUERY_ARG, self::CATALOG_QUERY_ARG, 'ph_view' );
+		return array( self::DETAIL_QUERY_ARG, self::SEARCH_QUERY_ARG, self::CATALOG_QUERY_ARG, 'ph_view' );
 	}
 
 	/**
@@ -1989,10 +2032,6 @@ class PH_Template_Set {
 	 * @return string
 	 */
 	private static function get_current_catalog_template() {
-		if ( self::is_module_preview() ) {
-			return self::get_module_template();
-		}
-
 		if ( is_property() ) {
 			return self::get_detail_template();
 		}
@@ -2480,6 +2519,127 @@ class PH_Template_Set {
 	}
 
 	/**
+	 * Get the current property object even before Property Hive sets the global.
+	 *
+	 * @return PH_Property|false
+	 */
+	private static function get_current_property() {
+		global $property;
+
+		if ( is_a( $property, 'PH_Property' ) ) {
+			return $property;
+		}
+
+		$property_id = get_queried_object_id();
+
+		if ( ! $property_id || 'property' !== get_post_type( $property_id ) ) {
+			return false;
+		}
+
+		return new PH_Property( $property_id );
+	}
+
+	/**
+	 * Get an office name suitable for front-end display.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return string
+	 */
+	private static function get_display_office_name( $property ) {
+		$office = $property->get_office_name();
+
+		if ( $office && false === stripos( $office, 'codex' ) ) {
+			return $office;
+		}
+
+		return __( 'Property Hive', 'propertyhive' );
+	}
+
+	/**
+	 * Build readable facts for the detail preview from the property record.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return array
+	 */
+	private static function get_detail_meta_items( $property ) {
+		$items = array();
+
+		if ( $property->bedrooms > 0 ) {
+			$items[] = sprintf(
+				/* translators: %d: number of bedrooms */
+				_n( '%d bedroom', '%d bedrooms', (int) $property->bedrooms, 'propertyhive' ),
+				(int) $property->bedrooms
+			);
+		}
+
+		if ( $property->bathrooms > 0 ) {
+			$items[] = sprintf(
+				/* translators: %d: number of bathrooms */
+				_n( '%d bathroom', '%d bathrooms', (int) $property->bathrooms, 'propertyhive' ),
+				(int) $property->bathrooms
+			);
+		}
+
+		if ( $property->reception_rooms > 0 ) {
+			$items[] = sprintf(
+				/* translators: %d: number of reception rooms */
+				_n( '%d reception room', '%d reception rooms', (int) $property->reception_rooms, 'propertyhive' ),
+				(int) $property->reception_rooms
+			);
+		}
+
+		if ( $property->property_type ) {
+			$items[] = $property->property_type;
+		}
+
+		if ( $property->tenure ) {
+			$items[] = $property->tenure;
+		}
+
+		if ( $property->availability ) {
+			$items[] = $property->availability;
+		}
+
+		if ( $property->furnished ) {
+			$items[] = $property->furnished;
+		}
+
+		if ( $property->available_date ) {
+			$items[] = $property->get_available_date();
+		}
+
+		if ( $property->floor_area ) {
+			$items[] = $property->get_formatted_floor_area();
+		}
+
+		return array_values( array_unique( array_filter( $items ) ) );
+	}
+
+	/**
+	 * Get a compact location label from the real address data.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return string
+	 */
+	private static function get_property_location_label( $property ) {
+		$candidates = array(
+			$property->_address_three,
+			$property->_address_four,
+			$property->_address_two,
+			$property->_address_postcode,
+			$property->get_formatted_summary_address(),
+		);
+
+		foreach ( $candidates as $candidate ) {
+			if ( '' !== trim( (string) $candidate ) ) {
+				return trim( (string) $candidate );
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Does the property have at least one floorplan?
 	 *
 	 * @param PH_Property $property Property object.
@@ -2534,23 +2694,7 @@ class PH_Template_Set {
 	 * @return string
 	 */
 	private static function get_document_summary( $property ) {
-		$documents = array();
-
-		if ( self::has_floorplan( $property ) ) {
-			$documents[] = __( 'Floorplan', 'propertyhive' );
-		}
-
-		if ( self::has_epc( $property ) ) {
-			$documents[] = __( 'EPC', 'propertyhive' );
-		}
-
-		if ( self::has_brochure( $property ) ) {
-			$documents[] = __( 'Brochure', 'propertyhive' );
-		}
-
-		if ( ! empty( $property->get_virtual_tours() ) ) {
-			$documents[] = __( 'Virtual tour', 'propertyhive' );
-		}
+		$documents = self::get_property_document_labels( $property );
 
 		if ( empty( $documents ) ) {
 			return __( 'Ask agent', 'propertyhive' );
@@ -2566,18 +2710,13 @@ class PH_Template_Set {
 	 * @return string
 	 */
 	private static function get_fact_summary( $property ) {
-		$facts = self::get_fact_items( $property, 3 );
+		$facts = array_slice( self::get_detail_meta_items( $property ), 0, 3 );
 
 		if ( empty( $facts ) ) {
 			return __( 'Details available', 'propertyhive' );
 		}
 
-		$parts = array();
-		foreach ( $facts as $fact ) {
-			$parts[] = trim( $fact['value'] . ' ' . strtolower( $fact['label'] ) );
-		}
-
-		return implode( ' / ', $parts );
+		return implode( ' / ', $facts );
 	}
 
 	/**
@@ -2725,23 +2864,7 @@ class PH_Template_Set {
 	 * @param PH_Property $property Property object.
 	 */
 	private static function render_detail_media_links( $property ) {
-		$links = array();
-
-		if ( ! empty( $property->get_floorplan_attachment_ids() ) || ( is_array( $property->_floorplan_urls ) && ! empty( $property->_floorplan_urls ) ) ) {
-			$links[] = __( 'Floorplan', 'propertyhive' );
-		}
-
-		if ( ! empty( $property->get_epc_attachment_ids() ) || ( is_array( $property->_epc_urls ) && ! empty( $property->_epc_urls ) ) ) {
-			$links[] = __( 'EPC', 'propertyhive' );
-		}
-
-		if ( ! empty( $property->get_brochure_attachment_ids() ) || ( is_array( $property->_brochure_urls ) && ! empty( $property->_brochure_urls ) ) ) {
-			$links[] = __( 'Brochure', 'propertyhive' );
-		}
-
-		if ( ! empty( $property->get_virtual_tours() ) ) {
-			$links[] = __( 'Virtual tour', 'propertyhive' );
-		}
+		$links = self::get_property_document_labels( $property );
 
 		if ( empty( $links ) ) {
 			return;
@@ -2752,6 +2875,30 @@ class PH_Template_Set {
 			echo '<li>' . esc_html( $link ) . '</li>';
 		}
 		echo '</ul>';
+	}
+
+	/**
+	 * Get supporting document labels that are available for the property.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return array
+	 */
+	private static function get_property_document_labels( $property ) {
+		$documents = array();
+
+		if ( self::has_floorplan( $property ) ) {
+			$documents[] = __( 'Floorplan', 'propertyhive' );
+		}
+
+		if ( self::has_epc( $property ) ) {
+			$documents[] = __( 'EPC', 'propertyhive' );
+		}
+
+		if ( self::has_brochure( $property ) ) {
+			$documents[] = __( 'Brochure', 'propertyhive' );
+		}
+
+		return $documents;
 	}
 }
 

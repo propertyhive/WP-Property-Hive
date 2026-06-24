@@ -1401,7 +1401,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
         $settings         = array();
-        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'The template set includes 10 fixed examples. Use the front-end Template example menu to preview any example in context.', 'propertyhive' ) . '</p><ul>';
+        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'The template set includes the standard sales detail and portal-style search results examples. Use the front-end Template example menu to preview either example in context.', 'propertyhive' ) . '</p><ul>';
 
         foreach ( PH_Template_Set::get_template_catalog() as $slug => $template ) {
             $catalog_html .= '<li><strong>' . esc_html( $template['label'] ) . '</strong> <span>' . esc_html( $template['group'] ) . '</span> <a href="' . esc_url( PH_Template_Set::get_template_preview_url( $slug ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Preview', 'propertyhive' ) . '</a></li>';
@@ -1412,7 +1412,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         $settings[] = array(
             'title' => __( 'Template Set', 'propertyhive' ),
             'type'  => 'title',
-            'desc'  => __( 'Choose the fixed front-end templates used for property detail pages, search results, and featured property modules.', 'propertyhive' ),
+            'desc'  => __( 'Choose the fixed front-end templates used for property detail pages and search results.', 'propertyhive' ),
             'id'    => 'template_set_settings',
         );
 
@@ -1438,19 +1438,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             'type'    => 'select',
             'default' => isset( $current_settings['template_set_search_template'] ) ? $current_settings['template_set_search_template'] : 'portal-style-search-results',
             'options' => PH_Template_Set::get_search_templates(),
-        );
-
-        $settings[] = array(
-            'title'   => __( 'Homepage Module Template', 'propertyhive' ),
-            'id'      => 'template_set_module_template',
-            'type'    => 'select',
-            'default' => isset( $current_settings['template_set_module_template'] ) ? $current_settings['template_set_module_template'] : 'featured-properties-homepage-module',
-            'options' => PH_Template_Set::get_module_templates(),
-            'desc'    => sprintf(
-                /* translators: %s: shortcode */
-                __( 'Use %s to add the module to a page.', 'propertyhive' ),
-                '<code>[propertyhive_featured_template]</code>'
-            ),
         );
 
         $settings[] = array(
@@ -1603,8 +1590,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 {
                     $detail_templates = PH_Template_Set::get_detail_templates();
                     $search_templates = PH_Template_Set::get_search_templates();
-                    $module_templates = PH_Template_Set::get_module_templates();
-
                     $detail_template = isset( $_POST['template_set_detail_template'] ) ? sanitize_title( $_POST['template_set_detail_template'] ) : 'standard-sales-detail';
                     if ( ! isset( $detail_templates[ $detail_template ] ) ) {
                         $detail_template = 'standard-sales-detail';
@@ -1613,11 +1598,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                     $search_template = isset( $_POST['template_set_search_template'] ) ? sanitize_title( $_POST['template_set_search_template'] ) : 'portal-style-search-results';
                     if ( ! isset( $search_templates[ $search_template ] ) ) {
                         $search_template = 'portal-style-search-results';
-                    }
-
-                    $module_template = isset( $_POST['template_set_module_template'] ) ? sanitize_title( $_POST['template_set_module_template'] ) : 'featured-properties-homepage-module';
-                    if ( ! isset( $module_templates[ $module_template ] ) ) {
-                        $module_template = 'featured-properties-homepage-module';
                     }
 
                     $brand_colour = isset( $_POST['template_set_brand_colour'] ) ? sanitize_hex_color( wp_unslash( $_POST['template_set_brand_colour'] ) ) : '';
@@ -1649,7 +1629,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                         'template_set_enabled'         => isset( $_POST['template_set_enabled'] ) ? 'yes' : '',
                         'template_set_detail_template' => $detail_template,
                         'template_set_search_template' => $search_template,
-                        'template_set_module_template' => $module_template,
                         'template_set_brand_colour'    => $brand_colour,
                         'template_set_accent_colour'   => $accent_colour,
                         'template_set_button_style'    => $button_style,
