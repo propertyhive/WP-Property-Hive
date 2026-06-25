@@ -18,6 +18,7 @@ class PH_Template_Set {
 	const MODULE_QUERY_ARG = 'ph_module_template';
 	const CATALOG_QUERY_ARG = 'ph_template_preview';
 	const EDIT_QUERY_ARG = 'ph_template_edit';
+	const EDIT_CLOSED_QUERY_ARG = 'ph_template_editor_closed';
 	const EDITOR_MODE_LEGACY = 'legacy';
 	const EDITOR_MODE_VISUAL = 'visual_editor';
 	const EDITOR_NONCE_ACTION = 'propertyhive_template_set_editor';
@@ -60,6 +61,7 @@ class PH_Template_Set {
 		add_filter( 'propertyhive_show_page_title', array( __CLASS__, 'maybe_hide_title_for_module_preview' ), 20 );
 
 		add_action( 'propertyhive_before_search_results_loop_item_title', array( __CLASS__, 'render_card_badges' ), 5 );
+		add_action( 'propertyhive_before_search_results_loop_item_title', array( __CLASS__, 'render_card_gallery_data' ), 15 );
 		add_action( 'propertyhive_after_search_results_loop_item', array( __CLASS__, 'render_card_footer' ), 5 );
 
 		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_detail_template_kicker' ), 3 );
@@ -188,18 +190,22 @@ class PH_Template_Set {
 			$settings,
 			array(
 				self::OPTION_ENABLED             => '',
-				'template_set_editor_mode'      => $default_editor_mode,
-				'template_set_detail_template'  => 'standard-sales-detail',
-				'template_set_search_template'  => 'portal-style-search-results',
-				'template_set_gallery_layout'   => 'showcase',
-				'template_set_brand_colour'     => '#155e63',
-				'template_set_accent_colour'    => '#b7791f',
-				'template_set_button_style'     => 'filled',
-				'template_set_card_density'     => 'standard',
-				'template_set_image_style'      => 'soft',
-				'template_set_show_branch'      => 'yes',
-				'template_set_show_badges'      => 'yes',
-				'template_set_show_mobile_cta'  => 'yes',
+				'template_set_editor_mode'            => $default_editor_mode,
+				'template_set_detail_template'        => 'standard-sales-detail',
+				'template_set_search_template'        => 'portal-style-search-results',
+				'template_set_gallery_layout'         => 'showcase',
+				'template_set_brand_colour'           => '#155e63',
+				'template_set_accent_colour'          => '#b7791f',
+				'template_set_button_style'           => 'filled',
+				'template_set_card_density'           => 'standard',
+				'template_set_image_style'            => 'soft',
+				'template_set_show_branch'            => 'yes',
+				'template_set_show_badges'            => 'yes',
+				'template_set_show_mobile_cta'        => 'yes',
+				'template_set_show_recommended'       => 'yes',
+				'template_set_recommended_count'      => 3,
+				'template_set_recommended_layout'     => 'grid',
+				'template_set_recommended_image_size' => 'standard',
 			)
 		);
 	}
@@ -322,20 +328,39 @@ class PH_Template_Set {
 			$image_style = 'soft';
 		}
 
+		$recommended_count = isset( $raw_settings['template_set_recommended_count'] ) ? absint( $raw_settings['template_set_recommended_count'] ) : absint( $current['template_set_recommended_count'] );
+		if ( ! isset( self::get_recommended_property_counts()[ $recommended_count ] ) ) {
+			$recommended_count = 3;
+		}
+
+		$recommended_layout = isset( $raw_settings['template_set_recommended_layout'] ) ? sanitize_title( $raw_settings['template_set_recommended_layout'] ) : sanitize_title( $current['template_set_recommended_layout'] );
+		if ( ! isset( self::get_recommended_property_layouts()[ $recommended_layout ] ) ) {
+			$recommended_layout = 'grid';
+		}
+
+		$recommended_image_size = isset( $raw_settings['template_set_recommended_image_size'] ) ? sanitize_title( $raw_settings['template_set_recommended_image_size'] ) : sanitize_title( $current['template_set_recommended_image_size'] );
+		if ( ! isset( self::get_recommended_property_image_sizes()[ $recommended_image_size ] ) ) {
+			$recommended_image_size = 'standard';
+		}
+
 		$template_set_settings = array(
-			self::OPTION_ENABLED             => $activate || ! empty( $raw_settings[ self::OPTION_ENABLED ] ) ? 'yes' : '',
-			'template_set_editor_mode'      => $editor_mode,
-			'template_set_detail_template'  => $detail_template,
-			'template_set_search_template'  => $search_template,
-			'template_set_gallery_layout'   => $gallery_layout,
-			'template_set_brand_colour'     => $brand_colour,
-			'template_set_accent_colour'    => $accent_colour,
-			'template_set_button_style'     => $button_style,
-			'template_set_card_density'     => $card_density,
-			'template_set_image_style'      => $image_style,
-			'template_set_show_branch'      => self::normalise_checkbox_value( $raw_settings, 'template_set_show_branch' ),
-			'template_set_show_badges'      => self::normalise_checkbox_value( $raw_settings, 'template_set_show_badges' ),
-			'template_set_show_mobile_cta'  => self::normalise_checkbox_value( $raw_settings, 'template_set_show_mobile_cta' ),
+			self::OPTION_ENABLED                       => $activate || ! empty( $raw_settings[ self::OPTION_ENABLED ] ) ? 'yes' : '',
+			'template_set_editor_mode'                => $editor_mode,
+			'template_set_detail_template'            => $detail_template,
+			'template_set_search_template'            => $search_template,
+			'template_set_gallery_layout'             => $gallery_layout,
+			'template_set_brand_colour'               => $brand_colour,
+			'template_set_accent_colour'              => $accent_colour,
+			'template_set_button_style'               => $button_style,
+			'template_set_card_density'               => $card_density,
+			'template_set_image_style'                => $image_style,
+			'template_set_show_branch'                => self::normalise_checkbox_value( $raw_settings, 'template_set_show_branch' ),
+			'template_set_show_badges'                => self::normalise_checkbox_value( $raw_settings, 'template_set_show_badges' ),
+			'template_set_show_mobile_cta'            => self::normalise_checkbox_value( $raw_settings, 'template_set_show_mobile_cta' ),
+			'template_set_show_recommended'           => self::normalise_checkbox_value( $raw_settings, 'template_set_show_recommended' ),
+			'template_set_recommended_count'          => $recommended_count,
+			'template_set_recommended_layout'         => $recommended_layout,
+			'template_set_recommended_image_size' => $recommended_image_size,
 		);
 
 		return array_merge( $current_settings, $template_set_settings );
@@ -419,6 +444,46 @@ class PH_Template_Set {
 			'square'  => __( 'Square', 'propertyhive' ),
 			'soft'    => __( 'Soft corners', 'propertyhive' ),
 			'rounded' => __( 'Rounded media', 'propertyhive' ),
+		);
+	}
+
+	/**
+	 * Recommended-property count choices.
+	 *
+	 * @return array
+	 */
+	public static function get_recommended_property_counts() {
+		return array(
+			2 => __( '2 homes', 'propertyhive' ),
+			3 => __( '3 homes', 'propertyhive' ),
+			4 => __( '4 homes', 'propertyhive' ),
+			6 => __( '6 homes', 'propertyhive' ),
+		);
+	}
+
+	/**
+	 * Recommended-property layout choices.
+	 *
+	 * @return array
+	 */
+	public static function get_recommended_property_layouts() {
+		return array(
+			'grid'    => __( 'Grid cards', 'propertyhive' ),
+			'feature' => __( 'Featured lead', 'propertyhive' ),
+			'list'    => __( 'List rows', 'propertyhive' ),
+		);
+	}
+
+	/**
+	 * Recommended-property image size choices.
+	 *
+	 * @return array
+	 */
+	public static function get_recommended_property_image_sizes() {
+		return array(
+			'compact'  => __( 'Compact images', 'propertyhive' ),
+			'standard' => __( 'Standard images', 'propertyhive' ),
+			'large'    => __( 'Large images', 'propertyhive' ),
 		);
 	}
 
@@ -602,6 +667,8 @@ class PH_Template_Set {
 
 		if ( self::is_template_editor_active() ) {
 			$args[ self::EDIT_QUERY_ARG ] = '1';
+		} elseif ( self::is_template_editor_closed_request() ) {
+			$args[ self::EDIT_CLOSED_QUERY_ARG ] = '1';
 		}
 
 		return add_query_arg( $args, $url );
@@ -649,7 +716,8 @@ class PH_Template_Set {
 		$settings_url    = admin_url( 'admin.php?page=ph-settings&tab=frontend&section=template-set' );
 		$root_id         = 'ph-template-set';
 		$inactive_suffix = self::is_enabled() ? '' : ' ' . __( '(inactive)', 'propertyhive' );
-		$editor_url      = add_query_arg( self::EDIT_QUERY_ARG, '1', self::get_current_url() );
+		$editor_url      = add_query_arg( self::EDIT_QUERY_ARG, '1', remove_query_arg( self::EDIT_CLOSED_QUERY_ARG, self::get_current_url() ) );
+		$exit_editor_url = add_query_arg( self::EDIT_CLOSED_QUERY_ARG, '1', remove_query_arg( self::EDIT_QUERY_ARG, self::get_current_url() ) );
 
 		$wp_admin_bar->add_node(
 			array(
@@ -678,7 +746,7 @@ class PH_Template_Set {
 					'id'     => 'ph-template-set-exit-editor',
 					'parent' => $root_id,
 					'title'  => __( 'Exit template editor', 'propertyhive' ),
-					'href'   => remove_query_arg( self::EDIT_QUERY_ARG, self::get_current_url() ),
+					'href'   => $exit_editor_url,
 				)
 			);
 		}
@@ -713,7 +781,7 @@ class PH_Template_Set {
 				'id'     => 'ph-template-set-use-saved-default',
 				'parent' => $root_id,
 				'title'  => __( 'Use saved default', 'propertyhive' ),
-				'href'   => remove_query_arg( self::get_preview_query_args(), self::get_current_url() ),
+				'href'   => remove_query_arg( self::get_preview_clear_query_args(), self::get_current_url() ),
 			)
 		);
 
@@ -744,6 +812,13 @@ class PH_Template_Set {
 		$classes[] = 'ph-template-images-' . sanitize_html_class( $settings['template_set_image_style'] );
 		$classes[] = 'ph-template-buttons-' . sanitize_html_class( $settings['template_set_button_style'] );
 		$classes[] = 'ph-template-editor-mode-' . sanitize_html_class( $settings['template_set_editor_mode'] );
+		$classes[] = 'yes' === $settings['template_set_show_branch'] ? 'ph-template-show-branch' : 'ph-template-hide-branch';
+		$classes[] = 'yes' === $settings['template_set_show_badges'] ? 'ph-template-show-badges' : 'ph-template-hide-badges';
+		$classes[] = 'yes' === $settings['template_set_show_mobile_cta'] ? 'ph-template-show-mobile-cta' : 'ph-template-hide-mobile-cta';
+		$classes[] = 'yes' === $settings['template_set_show_recommended'] ? 'ph-template-show-recommended' : 'ph-template-hide-recommended';
+		$classes[] = 'ph-template-recommended-count-' . absint( $settings['template_set_recommended_count'] );
+		$classes[] = 'ph-template-recommended-layout-' . sanitize_html_class( $settings['template_set_recommended_layout'] );
+		$classes[] = 'ph-template-recommended-images-' . sanitize_html_class( $settings['template_set_recommended_image_size'] );
 
 		if ( self::is_template_editor_active() ) {
 			$classes[] = 'ph-template-editor-active';
@@ -1162,6 +1237,54 @@ class PH_Template_Set {
 		}
 
 		return $images;
+	}
+
+	/**
+	 * Render search-card gallery data for inline image navigation.
+	 */
+	public static function render_card_gallery_data() {
+		if ( ! self::should_render_card_extras() ) {
+			return;
+		}
+
+		global $property;
+
+		if ( ! $property ) {
+			return;
+		}
+
+		self::render_card_gallery_data_script( self::get_property_gallery_images( $property ) );
+	}
+
+	/**
+	 * Render card gallery data as JSON for the front-end script.
+	 *
+	 * @param array $images Image data.
+	 */
+	private static function render_card_gallery_data_script( $images ) {
+		if ( empty( $images ) || count( $images ) < 2 ) {
+			return;
+		}
+
+		$payload = array();
+
+		foreach ( array_slice( $images, 0, 12 ) as $image ) {
+			if ( empty( $image['src'] ) ) {
+				continue;
+			}
+
+			$payload[] = array(
+				'src'     => esc_url_raw( $image['src'] ),
+				'alt'     => isset( $image['alt'] ) ? wp_strip_all_tags( $image['alt'] ) : '',
+				'caption' => isset( $image['caption'] ) ? wp_strip_all_tags( $image['caption'] ) : '',
+			);
+		}
+
+		if ( count( $payload ) < 2 ) {
+			return;
+		}
+
+		echo '<script type="application/json" data-ph-card-gallery-data>' . wp_json_encode( $payload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . '</script>';
 	}
 
 	/**
@@ -1678,7 +1801,9 @@ class PH_Template_Set {
 		$agency = self::get_demo_agency();
 
 		echo '<li class="property ph-template-card ph-template-demo-card">';
-			echo '<div class="thumbnail"><a href="javascript:;" aria-label="' . esc_attr( $card['title'] ) . '"><img src="' . esc_url( self::demo_asset( $card['image'] ) ) . '" alt="' . esc_attr( $card['title'] ) . '" loading="lazy"></a><span class="ph-template-badges"><span class="ph-template-badge">' . esc_html( $card['badge'] ) . '</span></span></div>';
+			echo '<div class="thumbnail"><a href="javascript:;" aria-label="' . esc_attr( $card['title'] ) . '"><img src="' . esc_url( self::demo_asset( $card['image'] ) ) . '" alt="' . esc_attr( $card['title'] ) . '" loading="lazy">';
+				self::render_card_gallery_data_script( self::get_demo_card_gallery_images( $card ) );
+			echo '</a><span class="ph-template-badges"><span class="ph-template-badge">' . esc_html( $card['badge'] ) . '</span></span></div>';
 			echo '<div class="details">';
 				echo '<p class="status">' . esc_html( $card['badge'] ) . '</p>';
 				echo '<h3><a href="javascript:;">' . esc_html( $card['title'] ) . '</a></h3>';
@@ -1694,6 +1819,52 @@ class PH_Template_Set {
 				echo '<div class="ph-template-card-branch"><span>' . esc_html( $agency['office'] ) . '</span><a href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $agency['phone'] ) ) . '">' . esc_html( $agency['phone'] ) . '</a></div>';
 			echo '</div>';
 		echo '</li>';
+	}
+
+	/**
+	 * Build image data for a demo search card.
+	 *
+	 * @param array $card Card data.
+	 * @return array
+	 */
+	private static function get_demo_card_gallery_images( $card ) {
+		$files = array_values(
+			array_unique(
+				array_filter(
+					array_merge(
+						array( isset( $card['image'] ) ? $card['image'] : '' ),
+						array(
+							'cavendish-living-room.png',
+							'cavendish-kitchen-dining.png',
+							'cavendish-principal-bedroom.png',
+							'cavendish-garden-terrace.png',
+							'cavendish-exterior.png',
+							'atlas-apartment-living.png',
+							'elm-yard-development.png',
+						)
+					)
+				)
+			)
+		);
+
+		$images = array();
+
+		foreach ( array_slice( $files, 0, 5 ) as $index => $file ) {
+			$label = sprintf(
+				/* translators: 1: property title, 2: photo number */
+				__( '%1$s photo %2$d', 'propertyhive' ),
+				isset( $card['title'] ) ? $card['title'] : __( 'Property', 'propertyhive' ),
+				(int) $index + 1
+			);
+
+			$images[] = array(
+				'src'     => self::demo_asset( $file ),
+				'alt'     => $label,
+				'caption' => $label,
+			);
+		}
+
+		return $images;
 	}
 
 	/**
@@ -1805,33 +1976,44 @@ class PH_Template_Set {
 			return;
 		}
 
+		$settings = self::get_settings();
+		if ( 'yes' !== $settings['template_set_show_recommended'] && ! self::is_template_editor_active() ) {
+			return;
+		}
+
 		$current_property = self::get_current_property();
 
 		if ( ! $current_property ) {
 			return;
 		}
 
-		$properties = self::get_nearby_similar_property_ids( $current_property );
+		$display_count = self::get_recommended_property_count();
+		$query_count   = self::is_template_editor_active() ? self::get_recommended_property_max_count() : $display_count;
+		$image_size    = self::get_recommended_property_wp_image_size();
+		$layout        = self::get_recommended_property_layout();
+		$image_style   = self::get_recommended_property_image_size();
+		$properties    = self::get_nearby_similar_property_ids( $current_property, $query_count );
 
 		if ( empty( $properties ) ) {
 			return;
 		}
 
-		echo '<section class="ph-template-similar-properties" aria-label="' . esc_attr__( 'Similar properties', 'propertyhive' ) . '">';
+		echo '<section class="ph-template-similar-properties ph-template-similar-layout-' . esc_attr( sanitize_html_class( $layout ) ) . ' ph-template-similar-images-' . esc_attr( sanitize_html_class( $image_style ) ) . '" aria-label="' . esc_attr__( 'Similar properties', 'propertyhive' ) . '" data-ph-recommended-properties>';
 			echo '<div class="ph-template-section-heading">';
 				echo '<p>' . esc_html__( 'Also available', 'propertyhive' ) . '</p>';
 				echo '<h2>' . esc_html__( 'Similar homes nearby', 'propertyhive' ) . '</h2>';
 			echo '</div>';
-			echo '<div class="ph-template-similar-grid">';
-			foreach ( $properties as $property_id ) {
+			echo '<div class="ph-template-similar-grid" data-ph-recommended-grid>';
+			foreach ( $properties as $index => $property_id ) {
 				$related = new PH_Property( $property_id );
-				$image   = $related->get_main_photo_src( 'medium_large' );
+				$image   = $related->get_main_photo_src( $image_size );
 				$price   = $related->get_formatted_price();
 				$facts   = self::get_fact_summary( $related );
 				$title   = get_the_title( $property_id );
 				$url     = get_permalink( $property_id );
+				$hidden  = $index >= $display_count ? ' hidden' : '';
 
-				echo '<article class="ph-template-similar-card">';
+				echo '<article class="ph-template-similar-card" data-ph-recommended-card data-ph-recommended-index="' . esc_attr( (string) $index ) . '"' . $hidden . '>';
 					if ( $image ) {
 						echo '<a href="' . esc_url( $url ) . '"><img src="' . esc_url( $image ) . '" alt="' . esc_attr( $title ) . '" loading="lazy"></a>';
 					} elseif ( ph_placeholder_img_src() ) {
@@ -1858,14 +2040,15 @@ class PH_Template_Set {
 	 * @param PH_Property $property Current property object.
 	 * @return array Property IDs.
 	 */
-	private static function get_nearby_similar_property_ids( $property ) {
+	private static function get_nearby_similar_property_ids( $property, $limit = null ) {
 		$property_id = absint( isset( $property->id ) ? $property->id : get_queried_object_id() );
 
 		if ( ! $property_id ) {
 			return array();
 		}
 
-		$limit = absint( apply_filters( 'propertyhive_template_set_similar_properties_limit', 3, $property ) );
+		$limit = null === $limit ? self::get_recommended_property_count() : absint( $limit );
+		$limit = absint( apply_filters( 'propertyhive_template_set_similar_properties_limit', $limit, $property ) );
 
 		if ( ! $limit ) {
 			return array();
@@ -1908,6 +2091,70 @@ class PH_Template_Set {
 		$selected = array_values( array_diff( $selected, array( $property_id ) ) );
 
 		return array_slice( $selected, 0, $limit );
+	}
+
+	/**
+	 * Get the selected recommended-property count.
+	 *
+	 * @return int
+	 */
+	private static function get_recommended_property_count() {
+		$settings = self::get_settings();
+		$count    = absint( $settings['template_set_recommended_count'] );
+
+		return isset( self::get_recommended_property_counts()[ $count ] ) ? $count : 3;
+	}
+
+	/**
+	 * Get the largest recommended-property count available in the editor.
+	 *
+	 * @return int
+	 */
+	private static function get_recommended_property_max_count() {
+		return max( array_map( 'absint', array_keys( self::get_recommended_property_counts() ) ) );
+	}
+
+	/**
+	 * Get the selected recommended-property layout.
+	 *
+	 * @return string
+	 */
+	private static function get_recommended_property_layout() {
+		$settings = self::get_settings();
+		$layout   = sanitize_title( $settings['template_set_recommended_layout'] );
+
+		return isset( self::get_recommended_property_layouts()[ $layout ] ) ? $layout : 'grid';
+	}
+
+	/**
+	 * Get the selected recommended-property image treatment.
+	 *
+	 * @return string
+	 */
+	private static function get_recommended_property_image_size() {
+		$settings   = self::get_settings();
+		$image_size = sanitize_title( $settings['template_set_recommended_image_size'] );
+
+		return isset( self::get_recommended_property_image_sizes()[ $image_size ] ) ? $image_size : 'standard';
+	}
+
+	/**
+	 * Map the recommended-property image treatment to a WordPress image size.
+	 *
+	 * @return string
+	 */
+	private static function get_recommended_property_wp_image_size() {
+		$image_size = self::get_recommended_property_image_size();
+
+		if ( 'compact' === $image_size ) {
+			return 'medium';
+		}
+
+		if ( 'large' === $image_size ) {
+			return 'large';
+		}
+
+		return 'medium_large';
 	}
 
 	/**
@@ -2102,7 +2349,7 @@ class PH_Template_Set {
 		}
 
 		$settings = self::get_settings();
-		if ( 'yes' !== $settings['template_set_show_badges'] ) {
+		if ( 'yes' !== $settings['template_set_show_badges'] && ! self::is_template_editor_active() ) {
 			return;
 		}
 
@@ -2163,10 +2410,11 @@ class PH_Template_Set {
 		}
 
 		$settings = self::get_settings();
-		$facts    = self::get_fact_items( $property, self::get_search_fact_limit() );
-		$phone    = $property->get_negotiator_telephone_number();
+		$facts       = self::get_fact_items( $property, self::get_search_fact_limit() );
+		$phone       = $property->get_negotiator_telephone_number();
+		$show_branch = 'yes' === $settings['template_set_show_branch'] || self::is_template_editor_active();
 
-		if ( empty( $facts ) && 'yes' !== $settings['template_set_show_branch'] ) {
+		if ( empty( $facts ) && ! $show_branch ) {
 			return;
 		}
 
@@ -2181,7 +2429,7 @@ class PH_Template_Set {
 
 			$office = self::get_display_office_name( $property );
 
-			if ( 'yes' === $settings['template_set_show_branch'] && ( $office || $phone ) ) {
+			if ( $show_branch && ( $office || $phone ) ) {
 				echo '<div class="ph-template-card-branch">';
 					if ( $office ) {
 						echo '<span>' . esc_html( $office ) . '</span>';
@@ -2368,7 +2616,7 @@ class PH_Template_Set {
 		}
 
 		$settings = self::get_settings();
-		if ( 'yes' !== $settings['template_set_show_mobile_cta'] ) {
+		if ( 'yes' !== $settings['template_set_show_mobile_cta'] && ! self::is_template_editor_active() ) {
 			return;
 		}
 
@@ -2486,7 +2734,7 @@ class PH_Template_Set {
 
 		$settings     = self::get_settings();
 		$context      = self::get_template_editor_context();
-		$exit_url     = remove_query_arg( self::EDIT_QUERY_ARG, self::get_current_url() );
+		$exit_url     = add_query_arg( self::EDIT_CLOSED_QUERY_ARG, '1', remove_query_arg( self::EDIT_QUERY_ARG, self::get_current_url() ) );
 		$settings_url = admin_url( 'admin.php?page=ph-settings&tab=frontend&section=template-set' );
 
 		echo '<aside class="ph-template-editor ph-template-editor-' . esc_attr( sanitize_html_class( $context ) ) . '" data-ph-template-editor data-ph-template-editor-context="' . esc_attr( $context ) . '" aria-label="' . esc_attr__( 'Template editor', 'propertyhive' ) . '">';
@@ -2506,10 +2754,10 @@ class PH_Template_Set {
 				self::render_template_editor_section_start( __( 'Template', 'propertyhive' ) );
 				if ( 'search' === $context ) {
 					self::render_template_editor_hidden( 'template_set_detail_template', self::get_detail_template() );
-					self::render_template_editor_select( 'template_set_search_template', __( 'Search results', 'propertyhive' ), self::get_search_templates(), self::get_search_template() );
+					self::render_template_editor_select( 'template_set_search_template', __( 'Search results', 'propertyhive' ), self::get_search_templates(), self::get_search_template(), self::get_template_editor_preview_urls( self::get_search_templates() ) );
 				} else {
 					self::render_template_editor_hidden( 'template_set_search_template', self::get_search_template() );
-					self::render_template_editor_select( 'template_set_detail_template', __( 'Detail template', 'propertyhive' ), self::get_detail_templates(), self::get_detail_template() );
+					self::render_template_editor_select( 'template_set_detail_template', __( 'Detail template', 'propertyhive' ), self::get_detail_templates(), self::get_detail_template(), self::get_template_editor_preview_urls( self::get_detail_templates() ) );
 				}
 				self::render_template_editor_section_end();
 
@@ -2522,6 +2770,10 @@ class PH_Template_Set {
 					self::render_template_editor_hidden( 'template_set_gallery_layout', $settings['template_set_gallery_layout'] );
 					self::render_template_editor_hidden( 'template_set_button_style', $settings['template_set_button_style'] );
 					self::render_template_editor_hidden( 'template_set_show_mobile_cta', $settings['template_set_show_mobile_cta'] );
+					self::render_template_editor_hidden( 'template_set_show_recommended', $settings['template_set_show_recommended'] );
+					self::render_template_editor_hidden( 'template_set_recommended_count', $settings['template_set_recommended_count'] );
+					self::render_template_editor_hidden( 'template_set_recommended_layout', $settings['template_set_recommended_layout'] );
+					self::render_template_editor_hidden( 'template_set_recommended_image_size', $settings['template_set_recommended_image_size'] );
 
 					self::render_template_editor_section_start( __( 'Results cards', 'propertyhive' ) );
 					self::render_template_editor_select( 'template_set_card_density', __( 'Cards', 'propertyhive' ), self::get_card_densities(), $settings['template_set_card_density'] );
@@ -2549,6 +2801,13 @@ class PH_Template_Set {
 					self::render_template_editor_section_start( __( 'Property page', 'propertyhive' ) );
 					self::render_template_editor_select( 'template_set_button_style', __( 'Buttons', 'propertyhive' ), self::get_button_styles(), $settings['template_set_button_style'] );
 					self::render_template_editor_checkbox( 'template_set_show_mobile_cta', __( 'Mobile enquiry bar', 'propertyhive' ), $settings['template_set_show_mobile_cta'] );
+					self::render_template_editor_section_end();
+
+					self::render_template_editor_section_start( __( 'Recommended homes', 'propertyhive' ) );
+					self::render_template_editor_checkbox( 'template_set_show_recommended', __( 'Show recommended homes', 'propertyhive' ), $settings['template_set_show_recommended'] );
+					self::render_template_editor_select( 'template_set_recommended_count', __( 'Number shown', 'propertyhive' ), self::get_recommended_property_counts(), $settings['template_set_recommended_count'] );
+					self::render_template_editor_select( 'template_set_recommended_layout', __( 'Layout', 'propertyhive' ), self::get_recommended_property_layouts(), $settings['template_set_recommended_layout'] );
+					self::render_template_editor_select( 'template_set_recommended_image_size', __( 'Images', 'propertyhive' ), self::get_recommended_property_image_sizes(), $settings['template_set_recommended_image_size'] );
 					self::render_template_editor_section_end();
 				}
 
@@ -2607,15 +2866,32 @@ class PH_Template_Set {
 	 * @param array  $options Options.
 	 * @param string $selected Selected value.
 	 */
-	private static function render_template_editor_select( $name, $label, $options, $selected ) {
+	private static function render_template_editor_select( $name, $label, $options, $selected, $option_urls = array() ) {
 		echo '<label class="ph-template-editor-field">';
 			echo '<span>' . esc_html( $label ) . '</span>';
 			echo '<select name="' . esc_attr( $name ) . '" data-ph-template-editor-control>';
 				foreach ( $options as $value => $option_label ) {
-					echo '<option value="' . esc_attr( $value ) . '"' . selected( $value, $selected, false ) . '>' . esc_html( $option_label ) . '</option>';
+					$option_url = isset( $option_urls[ $value ] ) ? $option_urls[ $value ] : '';
+					echo '<option value="' . esc_attr( $value ) . '"' . selected( $value, $selected, false ) . ( $option_url ? ' data-ph-template-preview-url="' . esc_url( $option_url ) . '"' : '' ) . '>' . esc_html( $option_label ) . '</option>';
 				}
 			echo '</select>';
 		echo '</label>';
+	}
+
+	/**
+	 * Build editor preview URLs for a template select.
+	 *
+	 * @param array $templates Template choices.
+	 * @return array
+	 */
+	private static function get_template_editor_preview_urls( $templates ) {
+		$urls = array();
+
+		foreach ( $templates as $template => $label ) {
+			$urls[ $template ] = add_query_arg( self::EDIT_QUERY_ARG, '1', self::get_template_preview_url( $template ) );
+		}
+
+		return $urls;
 	}
 
 	/**
@@ -2698,6 +2974,7 @@ class PH_Template_Set {
 			'labels'       => array(
 				'ready'   => __( 'Ready', 'propertyhive' ),
 				'changed' => __( 'Unsaved changes', 'propertyhive' ),
+				'loading' => __( 'Loading...', 'propertyhive' ),
 				'saving'  => __( 'Saving...', 'propertyhive' ),
 				'saved'   => __( 'Saved', 'propertyhive' ),
 				'error'   => __( 'Could not save', 'propertyhive' ),
@@ -2715,17 +2992,21 @@ class PH_Template_Set {
 		$settings = wp_parse_args( is_array( $settings ) ? $settings : array(), self::get_settings() );
 
 		return array(
-			'template_set_detail_template'  => sanitize_title( $settings['template_set_detail_template'] ),
-			'template_set_search_template'  => sanitize_title( $settings['template_set_search_template'] ),
-			'template_set_gallery_layout'   => sanitize_title( $settings['template_set_gallery_layout'] ),
-			'template_set_brand_colour'     => sanitize_hex_color( $settings['template_set_brand_colour'] ),
-			'template_set_accent_colour'    => sanitize_hex_color( $settings['template_set_accent_colour'] ),
-			'template_set_button_style'     => sanitize_title( $settings['template_set_button_style'] ),
-			'template_set_card_density'     => sanitize_title( $settings['template_set_card_density'] ),
-			'template_set_image_style'      => sanitize_title( $settings['template_set_image_style'] ),
-			'template_set_show_branch'      => 'yes' === $settings['template_set_show_branch'] ? 'yes' : '',
-			'template_set_show_badges'      => 'yes' === $settings['template_set_show_badges'] ? 'yes' : '',
-			'template_set_show_mobile_cta'  => 'yes' === $settings['template_set_show_mobile_cta'] ? 'yes' : '',
+			'template_set_detail_template'        => sanitize_title( $settings['template_set_detail_template'] ),
+			'template_set_search_template'        => sanitize_title( $settings['template_set_search_template'] ),
+			'template_set_gallery_layout'         => sanitize_title( $settings['template_set_gallery_layout'] ),
+			'template_set_brand_colour'           => sanitize_hex_color( $settings['template_set_brand_colour'] ),
+			'template_set_accent_colour'          => sanitize_hex_color( $settings['template_set_accent_colour'] ),
+			'template_set_button_style'           => sanitize_title( $settings['template_set_button_style'] ),
+			'template_set_card_density'           => sanitize_title( $settings['template_set_card_density'] ),
+			'template_set_image_style'            => sanitize_title( $settings['template_set_image_style'] ),
+			'template_set_show_branch'            => 'yes' === $settings['template_set_show_branch'] ? 'yes' : '',
+			'template_set_show_badges'            => 'yes' === $settings['template_set_show_badges'] ? 'yes' : '',
+			'template_set_show_mobile_cta'        => 'yes' === $settings['template_set_show_mobile_cta'] ? 'yes' : '',
+			'template_set_show_recommended'       => 'yes' === $settings['template_set_show_recommended'] ? 'yes' : '',
+			'template_set_recommended_count'      => absint( $settings['template_set_recommended_count'] ),
+			'template_set_recommended_layout'     => sanitize_title( $settings['template_set_recommended_layout'] ),
+			'template_set_recommended_image_size' => sanitize_title( $settings['template_set_recommended_image_size'] ),
 		);
 	}
 
@@ -2789,13 +3070,11 @@ class PH_Template_Set {
 			return false;
 		}
 
-		if ( self::is_template_editor_request() ) {
-			return true;
+		if ( self::is_template_editor_closed_request() ) {
+			return false;
 		}
 
-		$settings = self::get_settings();
-
-		return self::EDITOR_MODE_VISUAL === $settings['template_set_editor_mode'] && self::is_previewing_template();
+		return self::is_template_editor_request();
 	}
 
 	/**
@@ -2805,6 +3084,15 @@ class PH_Template_Set {
 	 */
 	private static function is_template_editor_request() {
 		return ! empty( $_GET[ self::EDIT_QUERY_ARG ] );
+	}
+
+	/**
+	 * Is this request explicitly asking to hide the front-end editor?
+	 *
+	 * @return bool
+	 */
+	private static function is_template_editor_closed_request() {
+		return ! empty( $_GET[ self::EDIT_CLOSED_QUERY_ARG ] );
 	}
 
 	/**
@@ -2855,6 +3143,15 @@ class PH_Template_Set {
 	 */
 	private static function get_preview_query_args() {
 		return array( self::DETAIL_QUERY_ARG, self::SEARCH_QUERY_ARG, self::MODULE_QUERY_ARG, self::CATALOG_QUERY_ARG, self::EDIT_QUERY_ARG, 'ph_view' );
+	}
+
+	/**
+	 * Query args to clear when leaving the preview/editor flow.
+	 *
+	 * @return array
+	 */
+	private static function get_preview_clear_query_args() {
+		return array_merge( self::get_preview_query_args(), array( self::EDIT_CLOSED_QUERY_ARG ) );
 	}
 
 	/**
@@ -2952,7 +3249,7 @@ class PH_Template_Set {
 	 * @return string
 	 */
 	private static function get_template_switch_url( $query_arg, $template ) {
-		$url = remove_query_arg( self::get_preview_query_args(), self::get_current_url() );
+		$url = remove_query_arg( self::get_preview_clear_query_args(), self::get_current_url() );
 
 		return add_query_arg( $query_arg, sanitize_title( $template ), $url );
 	}

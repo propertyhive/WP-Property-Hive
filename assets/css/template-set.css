@@ -281,6 +281,12 @@ body.admin-bar .ph-template-editor {
 	color: #b42318;
 }
 
+.ph-template-hide-badges .ph-template-badges,
+.ph-template-hide-branch .ph-template-card-branch,
+.ph-template-hide-mobile-cta .ph-template-mobile-cta {
+	display: none !important;
+}
+
 .ph-template-button,
 .ph-template-set .property_actions a,
 .ph-template-set .button {
@@ -575,6 +581,56 @@ body.admin-bar .ph-template-editor {
 	height: 100%;
 	object-fit: cover;
 	width: 100%;
+}
+
+.ph-template-card-gallery-controls {
+	align-items: center;
+	display: flex;
+	inset: 0;
+	justify-content: space-between;
+	pointer-events: none;
+	position: absolute;
+	z-index: 3;
+}
+
+.ph-template-card-gallery-button {
+	align-items: center;
+	background: rgba(26, 31, 36, 0.82);
+	border: 1px solid rgba(255, 255, 255, 0.42);
+	color: #ffffff;
+	cursor: pointer;
+	display: inline-flex;
+	font-size: 18px;
+	font-weight: 800;
+	height: 34px;
+	justify-content: center;
+	line-height: 1;
+	margin: 0 8px;
+	padding: 0;
+	pointer-events: auto;
+	width: 34px;
+}
+
+.ph-template-card-gallery-button:hover,
+.ph-template-card-gallery-button:focus-visible {
+	background: #1a1f24;
+	border-color: #ffffff;
+	color: #ffffff;
+	outline: none;
+}
+
+.ph-template-card-gallery-count {
+	align-self: flex-end;
+	background: rgba(26, 31, 36, 0.82);
+	color: #ffffff;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1;
+	margin: 0 0 8px;
+	padding: 6px 8px;
+	pointer-events: none;
+	position: absolute;
+	right: 8px;
 }
 
 .ph-template-set ul.properties li.ph-template-card .details {
@@ -3341,6 +3397,22 @@ body.admin-bar .ph-template-editor {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.ph-template-hide-recommended .ph-template-similar-properties {
+	display: none;
+}
+
+.ph-template-recommended-count-2 .ph-template-similar-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ph-template-recommended-count-4 .ph-template-similar-grid {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ph-template-recommended-count-6 .ph-template-similar-grid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .ph-template-similar-card {
 	background: #ffffff;
 	border: 1px solid var(--ph-template-line);
@@ -3349,12 +3421,49 @@ body.admin-bar .ph-template-editor {
 	min-width: 0;
 }
 
+.ph-template-similar-card[hidden] {
+	display: none;
+}
+
+.ph-template-recommended-layout-feature .ph-template-similar-grid {
+	grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.ph-template-recommended-layout-feature .ph-template-similar-card:first-child {
+	grid-column: span 2;
+	grid-row: span 2;
+}
+
+.ph-template-recommended-layout-list .ph-template-similar-grid {
+	grid-template-columns: 1fr;
+}
+
+.ph-template-recommended-layout-list .ph-template-similar-card {
+	align-items: stretch;
+	grid-template-columns: minmax(180px, 30%) 1fr;
+	grid-template-rows: auto;
+}
+
 .ph-template-similar-card img {
 	aspect-ratio: 16 / 10;
 	display: block;
 	height: auto;
 	object-fit: cover;
 	width: 100%;
+}
+
+.ph-template-recommended-images-compact .ph-template-similar-card img {
+	aspect-ratio: 16 / 9;
+}
+
+.ph-template-recommended-images-large .ph-template-similar-card img,
+.ph-template-recommended-layout-feature .ph-template-similar-card:first-child img {
+	aspect-ratio: 4 / 3;
+}
+
+.ph-template-recommended-layout-list .ph-template-similar-card img {
+	height: 100%;
+	min-height: 160px;
 }
 
 .ph-template-similar-card div {
@@ -3438,6 +3547,22 @@ body.admin-bar .ph-template-editor {
 	.ph-template-modules,
 	.ph-template-similar-grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ph-template-recommended-layout-feature .ph-template-similar-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ph-template-recommended-layout-feature .ph-template-similar-card:first-child {
+		grid-column: 1 / -1;
+	}
+
+	.ph-template-recommended-layout-list .ph-template-similar-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.ph-template-recommended-layout-list .ph-template-similar-card {
+		grid-template-columns: minmax(170px, 34%) 1fr;
 	}
 
 	.ph-template-detail-facts-strip ul {
@@ -3607,6 +3732,20 @@ body.admin-bar .ph-template-editor {
 	.ph-template-modules,
 	.ph-template-similar-grid {
 		grid-template-columns: 1fr;
+	}
+
+	.ph-template-recommended-layout-feature .ph-template-similar-card:first-child {
+		grid-column: auto;
+		grid-row: auto;
+	}
+
+	.ph-template-recommended-layout-list .ph-template-similar-card {
+		grid-template-columns: 1fr;
+	}
+
+	.ph-template-recommended-layout-list .ph-template-similar-card img {
+		height: auto;
+		min-height: 0;
 	}
 
 	.ph-gallery-variant-strip .ph-template-gallery-rail {

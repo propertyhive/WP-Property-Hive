@@ -1534,9 +1534,41 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         $settings[] = array(
             'id'            => 'template_set_show_mobile_cta',
             'type'          => 'checkbox',
-            'checkboxgroup' => 'end',
+            'checkboxgroup' => '',
             'default'       => ( ! isset( $current_settings['template_set_show_mobile_cta'] ) || 'yes' === $current_settings['template_set_show_mobile_cta'] ) ? 'yes' : '',
             'desc'          => __( 'Show the mobile enquiry bar on property detail pages.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_recommended',
+            'type'          => 'checkbox',
+            'checkboxgroup' => 'end',
+            'default'       => ( ! isset( $current_settings['template_set_show_recommended'] ) || 'yes' === $current_settings['template_set_show_recommended'] ) ? 'yes' : '',
+            'desc'          => __( 'Show recommended homes on property detail pages.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Recommended Homes Count', 'propertyhive' ),
+            'id'      => 'template_set_recommended_count',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_recommended_count'] ) ? $current_settings['template_set_recommended_count'] : 3,
+            'options' => PH_Template_Set::get_recommended_property_counts(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Recommended Homes Layout', 'propertyhive' ),
+            'id'      => 'template_set_recommended_layout',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_recommended_layout'] ) ? $current_settings['template_set_recommended_layout'] : 'grid',
+            'options' => PH_Template_Set::get_recommended_property_layouts(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Recommended Homes Images', 'propertyhive' ),
+            'id'      => 'template_set_recommended_image_size',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_recommended_image_size'] ) ? $current_settings['template_set_recommended_image_size'] : 'standard',
+            'options' => PH_Template_Set::get_recommended_property_image_sizes(),
         );
 
         $settings[] = array(
