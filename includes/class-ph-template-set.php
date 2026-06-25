@@ -883,12 +883,12 @@ class PH_Template_Set {
 			return;
 		}
 
-		$is_editorial = ( 'premium-editorial-detail' === $template );
-		$hero         = reset( $images );
-		$rail         = array_slice( $images, 0, 5 );
-		$count        = count( $images );
-		$location     = self::get_property_location_label( $property );
-		$has_floor_map = true;
+		$is_editorial     = ( 'premium-editorial-detail' === $template );
+		$hero             = reset( $images );
+		$rail             = array_slice( $images, 0, 5 );
+		$count            = count( $images );
+		$location         = self::get_property_location_label( $property );
+		$has_floor_map    = true;
 		$has_virtual_tour = true;
 
 		$gallery_variants = array(
@@ -902,10 +902,12 @@ class PH_Template_Set {
 		echo '<div class="images ph-template-gallery ph-template-gallery-' . esc_attr( sanitize_html_class( $template ) ) . ' ph-gallery-variant-showcase" data-ph-template-gallery data-ph-gallery-current-variant="showcase">';
 
 			echo '<div class="ph-template-gallery-direction-switcher" data-ph-gallery-variant-switcher aria-label="' . esc_attr__( 'Gallery layout options', 'propertyhive' ) . '">';
-				echo '<span>' . esc_html__( 'Gallery direction', 'propertyhive' ) . '</span>';
-				foreach ( $gallery_variants as $variant => $label ) {
-					echo '<button type="button" data-ph-gallery-variant="' . esc_attr( $variant ) . '" aria-pressed="' . ( 'showcase' === $variant ? 'true' : 'false' ) . '" class="' . ( 'showcase' === $variant ? 'is-active' : '' ) . '">' . esc_html( $label ) . '</button>';
-				}
+				echo '<div class="ph-template-control-group">';
+					echo '<span>' . esc_html__( 'Gallery direction', 'propertyhive' ) . '</span>';
+					foreach ( $gallery_variants as $variant => $label ) {
+						echo '<button type="button" data-ph-gallery-variant="' . esc_attr( $variant ) . '" aria-pressed="' . ( 'showcase' === $variant ? 'true' : 'false' ) . '" class="' . ( 'showcase' === $variant ? 'is-active' : '' ) . '">' . esc_html( $label ) . '</button>';
+					}
+				echo '</div>';
 				self::render_context_switcher();
 			echo '</div>';
 
@@ -1010,7 +1012,7 @@ class PH_Template_Set {
 			return;
 		}
 
-		echo '<section class="ph-template-detail-facts-strip" aria-label="' . esc_attr__( 'Property facts', 'propertyhive' ) . '">';
+		echo '<section class="ph-template-detail-facts-strip ph-template-detail-facts-count-' . esc_attr( count( $facts ) ) . '" aria-label="' . esc_attr__( 'Property facts', 'propertyhive' ) . '">';
 			echo '<ul>';
 			foreach ( $facts as $fact ) {
 				echo '<li class="ph-template-detail-fact ph-template-detail-fact-' . esc_attr( sanitize_html_class( $fact['icon'] ) ) . '">';
@@ -1195,12 +1197,34 @@ class PH_Template_Set {
 		}
 
 		$price_qualifier = method_exists( $property, 'get_price_qualifier' ) ? $property->get_price_qualifier() : $property->price_qualifier;
+		$price_qualifier = self::format_price_qualifier_label( $price_qualifier );
 
-		echo '<div class="price ph-template-demo-price">' . wp_kses_post( $price );
+		echo '<div class="price ph-template-demo-price">';
 			if ( $price_qualifier ) {
-				echo ' <span class="price-qualifier">' . esc_html( $price_qualifier ) . '</span>';
+				echo "\n" . '<span class="price-qualifier ph-template-price-qualifier">' . esc_html( $price_qualifier ) . '</span>';
 			}
-		echo '</div>';
+			echo "\n" . '<span class="ph-template-price-value">' . wp_kses_post( $price ) . '</span>';
+		echo "\n" . '</div>';
+	}
+
+	/**
+	 * Format a backend price qualifier for front-end display.
+	 *
+	 * @param string $price_qualifier Price qualifier.
+	 * @return string
+	 */
+	private static function format_price_qualifier_label( $price_qualifier ) {
+		$price_qualifier = trim( wp_strip_all_tags( (string) $price_qualifier ) );
+
+		if ( '' === $price_qualifier ) {
+			return '';
+		}
+
+		if ( false === strpos( $price_qualifier, ' ' ) && strtoupper( $price_qualifier ) === $price_qualifier ) {
+			return $price_qualifier;
+		}
+
+		return ucfirst( strtolower( $price_qualifier ) );
 	}
 
 	/**
@@ -1208,6 +1232,10 @@ class PH_Template_Set {
 	 */
 	public static function render_demo_meta() {
 		if ( ! self::is_demo_preview() || ! is_property() ) {
+			return;
+		}
+
+		if ( 'standard-sales-detail' === self::get_detail_template() ) {
 			return;
 		}
 
@@ -2622,6 +2650,10 @@ class PH_Template_Set {
 			);
 		}
 
+		if ( 'standard-sales-detail' === $template ) {
+			return array();
+		}
+
 		return array(
 			array(
 				'label' => __( 'Gallery', 'propertyhive' ),
@@ -2863,36 +2895,41 @@ class PH_Template_Set {
 	 * @return array
 	 */
 	private static function get_detail_facts_strip_items( $property ) {
-		$fallback = self::get_demo_detail_facts_strip_items();
-		$size     = self::split_detail_fact_size( $property->get_formatted_floor_area() );
-		$items    = array(
+		$size  = self::split_detail_fact_size( $property->get_formatted_floor_area() );
+		$items = array(
 			'type'      => array(
 				'label'     => __( 'Property type', 'propertyhive' ),
-				'value'     => $property->property_type ? $property->property_type : $fallback['type']['value'],
+				'value'     => $property->property_type ? $property->property_type : '',
 				'secondary' => '',
 				'icon'      => 'type',
 			),
 			'bedrooms'  => array(
 				'label'     => __( 'Bedrooms', 'propertyhive' ),
-				'value'     => $property->bedrooms > 0 ? (string) (int) $property->bedrooms : $fallback['bedrooms']['value'],
+				'value'     => $property->bedrooms > 0 ? (string) (int) $property->bedrooms : '',
 				'secondary' => '',
 				'icon'      => 'bedrooms',
 			),
 			'bathrooms' => array(
 				'label'     => __( 'Bathrooms', 'propertyhive' ),
-				'value'     => $property->bathrooms > 0 ? (string) (int) $property->bathrooms : $fallback['bathrooms']['value'],
+				'value'     => $property->bathrooms > 0 ? (string) (int) $property->bathrooms : '',
 				'secondary' => '',
 				'icon'      => 'bathrooms',
 			),
+			'receptions' => array(
+				'label'     => __( 'Receptions', 'propertyhive' ),
+				'value'     => $property->reception_rooms > 0 ? (string) (int) $property->reception_rooms : '',
+				'secondary' => '',
+				'icon'      => 'receptions',
+			),
 			'size'      => array(
 				'label'     => __( 'Size', 'propertyhive' ),
-				'value'     => $size['value'] ? $size['value'] : $fallback['size']['value'],
-				'secondary' => $size['value'] ? $size['secondary'] : $fallback['size']['secondary'],
+				'value'     => $size['value'],
+				'secondary' => $size['secondary'],
 				'icon'      => 'size',
 			),
 			'tenure'    => array(
 				'label'     => __( 'Tenure', 'propertyhive' ),
-				'value'     => $property->tenure ? $property->tenure : $fallback['tenure']['value'],
+				'value'     => $property->tenure ? $property->tenure : '',
 				'secondary' => '',
 				'icon'      => 'tenure',
 			),
@@ -2905,35 +2942,6 @@ class PH_Template_Set {
 					return '' !== trim( (string) $item['value'] );
 				}
 			)
-		);
-	}
-
-	/**
-	 * Fallback facts for sparse local preview records.
-	 *
-	 * @return array
-	 */
-	private static function get_demo_detail_facts_strip_items() {
-		$listing = self::get_demo_listing( self::get_detail_template() );
-		$size    = self::split_detail_fact_size( isset( $listing['floor_area'] ) ? $listing['floor_area'] : '' );
-
-		return array(
-			'type'      => array(
-				'value' => __( 'House', 'propertyhive' ),
-			),
-			'bedrooms'  => array(
-				'value' => '3',
-			),
-			'bathrooms' => array(
-				'value' => '2',
-			),
-			'size'      => array(
-				'value'     => $size['value'],
-				'secondary' => $size['secondary'],
-			),
-			'tenure'    => array(
-				'value' => __( 'Freehold', 'propertyhive' ),
-			),
 		);
 	}
 
