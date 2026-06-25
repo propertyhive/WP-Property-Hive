@@ -1451,6 +1451,30 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         );
 
         $settings[] = array(
+            'title'   => __( 'Search Listing Layout', 'propertyhive' ),
+            'id'      => 'template_set_search_layout',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_search_layout'] ) && '' !== $current_settings['template_set_search_layout'] ? $current_settings['template_set_search_layout'] : 'list',
+            'options' => PH_Template_Set::get_search_layouts(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Search Card Size', 'propertyhive' ),
+            'id'      => 'template_set_search_card_size',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_search_card_size'] ) ? $current_settings['template_set_search_card_size'] : 'standard',
+            'options' => PH_Template_Set::get_search_card_sizes(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Search Results Shown', 'propertyhive' ),
+            'id'      => 'template_set_search_result_count',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_search_result_count'] ) ? $current_settings['template_set_search_result_count'] : 12,
+            'options' => PH_Template_Set::get_search_result_counts(),
+        );
+
+        $settings[] = array(
             'title'   => __( 'Gallery Layout', 'propertyhive' ),
             'id'      => 'template_set_gallery_layout',
             'type'    => 'select',
@@ -1491,18 +1515,6 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         );
 
         $settings[] = array(
-            'title'   => __( 'Card Density', 'propertyhive' ),
-            'id'      => 'template_set_card_density',
-            'type'    => 'select',
-            'default' => isset( $current_settings['template_set_card_density'] ) ? $current_settings['template_set_card_density'] : 'standard',
-            'options' => array(
-                'spacious' => __( 'Spacious', 'propertyhive' ),
-                'standard' => __( 'Standard', 'propertyhive' ),
-                'compact'  => __( 'Compact', 'propertyhive' ),
-            ),
-        );
-
-        $settings[] = array(
             'title'   => __( 'Image Style', 'propertyhive' ),
             'id'      => 'template_set_image_style',
             'type'    => 'select',
@@ -1510,7 +1522,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             'options' => array(
                 'square'  => __( 'Square', 'propertyhive' ),
                 'soft'    => __( 'Soft corners', 'propertyhive' ),
-                'rounded' => __( 'Rounded media', 'propertyhive' ),
+                'rounded' => __( 'Rounded corners', 'propertyhive' ),
             ),
         );
 
