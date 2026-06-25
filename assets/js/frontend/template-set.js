@@ -626,18 +626,19 @@
 	}
 
 	var editorSidebarLayout = {
-		active: { search: 'cards', detail: 'media' },
+		active: { search: 'layout', detail: 'media' },
 		groups: {
 			search: [
 				{ id: 'template', label: 'Template', controls: ['template_set_search_template'] },
-				{ id: 'cards', label: 'Cards', controls: ['template_set_search_layout', 'template_set_search_card_size', 'template_set_search_grid_columns'] },
-				{ id: 'content', label: 'Content', controls: ['template_set_image_style', 'template_set_show_branch', 'template_set_show_badges'] }
+				{ id: 'layout', label: 'Layout', controls: ['template_set_search_layout', 'template_set_search_grid_columns'] },
+				{ id: 'card-appearance', label: 'Card appearance', controls: ['template_set_search_card_size', 'template_set_image_style'] },
+				{ id: 'details', label: 'Details shown', controls: ['template_set_show_branch', 'template_set_show_badges'] }
 			],
 			detail: [
 				{ id: 'template', label: 'Template', controls: ['template_set_detail_template'] },
 				{ id: 'media', label: 'Media', controls: ['template_set_gallery_layout', 'template_set_show_floorplans', 'template_set_show_virtual_tours'] },
-				{ id: 'enquiry', label: 'Enquiry', controls: ['template_set_button_style', 'template_set_contact_card_style', 'template_set_show_mobile_cta'] },
-				{ id: 'recommended', label: 'Recommended', controls: ['template_set_show_recommended', 'template_set_recommended_count', 'template_set_recommended_layout', 'template_set_recommended_image_size'] }
+				{ id: 'enquiry', label: 'Enquiries', controls: ['template_set_button_style', 'template_set_contact_card_style', 'template_set_show_mobile_cta'] },
+				{ id: 'recommended', label: 'Related properties', controls: ['template_set_show_recommended', 'template_set_recommended_count', 'template_set_recommended_layout', 'template_set_recommended_image_size'] }
 			]
 		}
 	};
@@ -648,7 +649,7 @@
 		}
 
 		if (control.name === 'template_set_gallery_layout') {
-			return control.closest('.ph-template-editor-segmented');
+			return control.closest('.ph-template-editor-field') || control.closest('.ph-template-editor-segmented');
 		}
 
 		return control.closest('.ph-template-editor-field, .ph-template-editor-toggle');
