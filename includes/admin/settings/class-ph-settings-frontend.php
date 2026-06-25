@@ -1467,11 +1467,11 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         );
 
         $settings[] = array(
-            'title'   => __( 'Search Results Shown', 'propertyhive' ),
-            'id'      => 'template_set_search_result_count',
+            'title'   => __( 'Grid Properties Per Row', 'propertyhive' ),
+            'id'      => 'template_set_search_grid_columns',
             'type'    => 'select',
-            'default' => isset( $current_settings['template_set_search_result_count'] ) ? $current_settings['template_set_search_result_count'] : 12,
-            'options' => PH_Template_Set::get_search_result_counts(),
+            'default' => isset( $current_settings['template_set_search_grid_columns'] ) ? $current_settings['template_set_search_grid_columns'] : 3,
+            'options' => PH_Template_Set::get_search_grid_column_options(),
         );
 
         $settings[] = array(

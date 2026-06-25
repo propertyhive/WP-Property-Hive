@@ -39,8 +39,9 @@ class PH_Template_Set {
 		add_filter( 'post_class', array( __CLASS__, 'post_classes' ), 25, 3 );
 		add_filter( 'loop_search_results_columns', array( __CLASS__, 'search_result_columns' ), 20 );
 		add_filter( 'post_type_link', array( __CLASS__, 'preserve_template_preview_on_property_links' ), 20, 2 );
+		add_filter( 'propertyhive_search_form_fields', array( __CLASS__, 'prepare_search_form_fields' ), 20 );
+		add_filter( 'propertyhive_taxonomy_hide_empty_args', array( __CLASS__, 'filter_search_taxonomy_empty_check_args' ), 20, 3 );
 
-		add_action( 'pre_get_posts', array( __CLASS__, 'set_search_results_per_page' ), 20 );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ), 20 );
 		add_action( 'wp_head', array( __CLASS__, 'print_style_variables' ), 20 );
 		add_action( 'init', array( __CLASS__, 'register_shortcodes' ) );
@@ -53,6 +54,7 @@ class PH_Template_Set {
 
 		add_action( 'propertyhive_before_main_content', array( __CLASS__, 'open_search_wrapper' ), 11 );
 		add_action( 'propertyhive_after_main_content', array( __CLASS__, 'close_search_wrapper' ), 9 );
+		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'prepare_search_result_cards' ), 1 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_module_preview' ), 12 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_search_template_intro' ), 18 );
 		add_action( 'propertyhive_before_search_results_loop', array( __CLASS__, 'render_search_tools' ), 25 );
@@ -196,7 +198,7 @@ class PH_Template_Set {
 				'template_set_search_template'        => 'portal-style-search-results',
 				'template_set_search_layout'          => '',
 				'template_set_search_card_size'       => 'standard',
-				'template_set_search_result_count'    => 12,
+				'template_set_search_grid_columns'    => 3,
 				'template_set_gallery_layout'         => 'showcase',
 				'template_set_brand_colour'           => '#155e63',
 				'template_set_accent_colour'          => '#b7791f',
@@ -342,9 +344,9 @@ class PH_Template_Set {
 			$search_card_size = 'standard';
 		}
 
-		$search_result_count = isset( $raw_settings['template_set_search_result_count'] ) ? absint( $raw_settings['template_set_search_result_count'] ) : absint( $current['template_set_search_result_count'] );
-		if ( ! isset( self::get_search_result_counts()[ $search_result_count ] ) ) {
-			$search_result_count = 12;
+		$search_grid_columns = isset( $raw_settings['template_set_search_grid_columns'] ) ? absint( $raw_settings['template_set_search_grid_columns'] ) : absint( $current['template_set_search_grid_columns'] );
+		if ( ! isset( self::get_search_grid_column_options()[ $search_grid_columns ] ) ) {
+			$search_grid_columns = 3;
 		}
 
 		$image_style = isset( $raw_settings['template_set_image_style'] ) ? sanitize_title( $raw_settings['template_set_image_style'] ) : sanitize_title( $current['template_set_image_style'] );
@@ -383,7 +385,7 @@ class PH_Template_Set {
 			'template_set_accent_colour'              => $accent_colour,
 			'template_set_button_style'               => $button_style,
 			'template_set_search_card_size'           => $search_card_size,
-			'template_set_search_result_count'        => $search_result_count,
+			'template_set_search_grid_columns'        => $search_grid_columns,
 			'template_set_image_style'                => $image_style,
 			'template_set_contact_card_style'         => $contact_card_style,
 			'template_set_show_branch'                => self::normalise_checkbox_value( $raw_settings, 'template_set_show_branch' ),
@@ -482,16 +484,15 @@ class PH_Template_Set {
 	}
 
 	/**
-	 * Search result count choices.
+	 * Grid column choices for search results.
 	 *
 	 * @return array
 	 */
-	public static function get_search_result_counts() {
+	public static function get_search_grid_column_options() {
 		return array(
-			6  => __( '6 results', 'propertyhive' ),
-			9  => __( '9 results', 'propertyhive' ),
-			12 => __( '12 results', 'propertyhive' ),
-			24 => __( '24 results', 'propertyhive' ),
+			2 => __( '2 per row', 'propertyhive' ),
+			3 => __( '3 per row', 'propertyhive' ),
+			4 => __( '4 per row', 'propertyhive' ),
 		);
 	}
 
@@ -913,7 +914,7 @@ class PH_Template_Set {
 			$classes[] = 'ph-search-template-' . sanitize_html_class( self::get_search_template() );
 			$classes[] = 'ph-search-view-' . sanitize_html_class( self::get_search_view() );
 			$classes[] = 'ph-search-card-size-' . sanitize_html_class( $settings['template_set_search_card_size'] );
-			$classes[] = 'ph-search-result-count-' . absint( $settings['template_set_search_result_count'] );
+			$classes[] = 'ph-search-grid-columns-' . absint( $settings['template_set_search_grid_columns'] );
 		}
 
 		if ( self::is_module_preview() ) {
@@ -984,21 +985,158 @@ class PH_Template_Set {
 	}
 
 	/**
-	 * Apply the visual editor's search result count to the archive query.
-	 *
-	 * @param WP_Query $query Query object.
+	 * Align the base search-result card hooks to the template-set card pattern.
 	 */
-	public static function set_search_results_per_page( $query ) {
-		if ( ! self::is_enabled() || is_admin() || self::is_module_preview() || ! $query->is_main_query() || ! $query->is_post_type_archive( 'property' ) ) {
+	public static function prepare_search_result_cards() {
+		if ( ! self::is_enabled() || ! is_post_type_archive( 'property' ) ) {
 			return;
 		}
 
-		$settings = self::get_settings();
-		$count    = absint( $settings['template_set_search_result_count'] );
+		$hook = 'propertyhive_after_search_results_loop_item_title';
 
-		if ( isset( self::get_search_result_counts()[ $count ] ) ) {
-			$query->set( 'posts_per_page', $count );
+		self::remove_named_action_callbacks( $hook, 'propertyhive_template_loop_price' );
+		self::remove_named_action_callbacks( $hook, 'propertyhive_template_loop_actions' );
+		remove_action( $hook, array( __CLASS__, 'render_linked_card_price' ), 10 );
+		add_action( $hook, array( __CLASS__, 'render_linked_card_price' ), 10 );
+	}
+
+	/**
+	 * Render a linked result price so the image, address and price all lead to the property.
+	 */
+	public static function render_linked_card_price() {
+		global $property;
+
+		if ( ! $property ) {
+			return;
 		}
+
+		$fees = '';
+		if ( 'yes' === get_option( 'propertyhive_lettings_fees_display_search_results', '' ) ) {
+			if ( 'residential-lettings' === $property->department && '' !== get_option( 'propertyhive_lettings_fees', '' ) ) {
+				$fees = nl2br( get_option( 'propertyhive_lettings_fees', '' ) );
+			}
+
+			if ( 'commercial' === $property->department && 'yes' === $property->to_rent && '' !== get_option( 'propertyhive_lettings_fees_commercial', '' ) ) {
+				$fees = nl2br( get_option( 'propertyhive_lettings_fees_commercial', '' ) );
+			}
+		}
+
+		$price_qualifier = '';
+		if (
+			(
+				'residential-sales' === $property->department ||
+				'residential-sales' === ph_get_custom_department_based_on( $property->department ) ||
+				'commercial' === $property->department ||
+				'commercial' === ph_get_custom_department_based_on( $property->department )
+			) &&
+			'' !== $property->price_qualifier
+		) {
+			$price_qualifier = $property->price_qualifier;
+		}
+
+		echo '<div class="price">';
+			echo '<a href="' . esc_url( get_permalink() ) . '">';
+				echo wp_kses_post( $property->get_formatted_price() );
+				if ( '' !== $price_qualifier ) {
+					echo ' <span class="price-qualifier">' . esc_html( $price_qualifier ) . '</span>';
+				}
+			echo '</a>';
+
+			if ( '' !== $fees ) {
+				echo ' <span class="lettings-fees"><a data-fancybox data-src="#propertyhive_lettings_fees_popup" href="javascript:;">' . esc_html__( 'Tenancy Info', 'propertyhive' ) . '</a></span>';
+				echo '<div id="propertyhive_lettings_fees_popup" style="display:none; max-width:500px;"><h3>' . esc_html__( 'Tenancy Info', 'propertyhive' ) . '</h3>' . wp_kses_post( $fees ) . '</div>';
+			}
+		echo '</div>';
+	}
+
+	/**
+	 * Remove a named callback wherever the saved search-result field order placed it.
+	 *
+	 * @param string $hook_name     Hook name.
+	 * @param string $callback_name Callback function name.
+	 */
+	private static function remove_named_action_callbacks( $hook_name, $callback_name ) {
+		global $wp_filter;
+
+		if ( empty( $wp_filter[ $hook_name ] ) || ! is_a( $wp_filter[ $hook_name ], 'WP_Hook' ) ) {
+			return;
+		}
+
+		$priorities = array();
+
+		foreach ( $wp_filter[ $hook_name ]->callbacks as $priority => $callbacks ) {
+			foreach ( $callbacks as $callback ) {
+				if ( isset( $callback['function'] ) && $callback_name === $callback['function'] ) {
+					$priorities[] = (int) $priority;
+				}
+			}
+		}
+
+		foreach ( array_unique( $priorities ) as $priority ) {
+			remove_action( $hook_name, $callback_name, $priority );
+		}
+	}
+
+	/**
+	 * Keep search type controls aligned to real searchable stock.
+	 *
+	 * @param array $fields Search form fields.
+	 * @return array
+	 */
+	public static function prepare_search_form_fields( $fields ) {
+		if ( ! self::is_enabled() || ! is_post_type_archive( 'property' ) ) {
+			return $fields;
+		}
+
+		foreach ( array( 'property_type', 'commercial_property_type' ) as $field_id ) {
+			if ( empty( $fields[ $field_id ] ) || ! is_array( $fields[ $field_id ] ) ) {
+				continue;
+			}
+
+			$fields[ $field_id ]['hide_empty']   = true;
+			$fields[ $field_id ]['blank_option'] = __( 'All property types', 'propertyhive' );
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Match hidden empty-term checks to the currently selected department.
+	 *
+	 * @param array $query_args Empty-check query args.
+	 * @param array $field      Form field config.
+	 * @param int   $term_id    Term ID being checked.
+	 * @return array
+	 */
+	public static function filter_search_taxonomy_empty_check_args( $query_args, $field, $term_id ) {
+		if ( ! self::is_enabled() || ! is_post_type_archive( 'property' ) || empty( $field['type'] ) ) {
+			return $query_args;
+		}
+
+		if ( ! in_array( $field['type'], array( 'property_type', 'commercial_property_type' ), true ) ) {
+			return $query_args;
+		}
+
+		$department = self::get_search_department_for_taxonomy( $field['type'] );
+
+		if ( '' === $department ) {
+			return $query_args;
+		}
+
+		if ( empty( $query_args['meta_query'] ) || ! is_array( $query_args['meta_query'] ) ) {
+			$query_args['meta_query'] = array();
+		}
+
+		$query_args['post_status']      = 'publish';
+		$query_args['posts_per_page']  = 1;
+		$query_args['no_found_rows']   = true;
+		$query_args['meta_query'][]    = array(
+			'key'     => '_department',
+			'value'   => $department,
+			'compare' => '=',
+		);
+
+		return $query_args;
 	}
 
 	/**
@@ -1039,7 +1177,7 @@ class PH_Template_Set {
 			'ph-search-template-' . sanitize_html_class( self::get_search_template() ),
 			'ph-search-view-' . sanitize_html_class( self::get_search_view() ),
 			'ph-search-card-size-' . sanitize_html_class( $settings['template_set_search_card_size'] ),
-			'ph-search-result-count-' . absint( $settings['template_set_search_result_count'] ),
+			'ph-search-grid-columns-' . absint( $settings['template_set_search_grid_columns'] ),
 		);
 
 		if ( self::is_module_preview() ) {
@@ -1958,7 +2096,9 @@ class PH_Template_Set {
 			return;
 		}
 
-		self::render_demo_property_cards( self::get_demo_property_cards(), 'ph-template-demo-search-results' );
+		// Search template previews use the real archive loop so filters, counts,
+		// pagination, and property-type options stay aligned to backend data.
+		return;
 	}
 
 	/**
@@ -2397,7 +2537,7 @@ class PH_Template_Set {
 	 * @return bool
 	 */
 	public static function maybe_hide_results_for_module_preview( $show_results ) {
-		return ( self::is_module_preview() || self::is_search_preview() ) ? false : $show_results;
+		return self::is_module_preview() ? false : $show_results;
 	}
 
 	/**
@@ -2850,7 +2990,7 @@ class PH_Template_Set {
 					self::render_template_editor_section_start( __( 'Search result cards', 'propertyhive' ) );
 					self::render_template_editor_select( 'template_set_search_layout', __( 'Listing layout', 'propertyhive' ), self::get_search_layouts(), self::get_search_view() );
 					self::render_template_editor_select( 'template_set_search_card_size', __( 'Card size', 'propertyhive' ), self::get_search_card_sizes(), $settings['template_set_search_card_size'] );
-					self::render_template_editor_select( 'template_set_search_result_count', __( 'Number shown', 'propertyhive' ), self::get_search_result_counts(), $settings['template_set_search_result_count'] );
+					self::render_template_editor_select( 'template_set_search_grid_columns', __( 'Properties per row', 'propertyhive' ), self::get_search_grid_column_options(), $settings['template_set_search_grid_columns'] );
 					self::render_template_editor_select( 'template_set_image_style', __( 'Image style', 'propertyhive' ), self::get_image_styles(), $settings['template_set_image_style'] );
 					self::render_template_editor_checkbox( 'template_set_show_branch', __( 'Show branch details', 'propertyhive' ), $settings['template_set_show_branch'] );
 					self::render_template_editor_checkbox( 'template_set_show_badges', __( 'Show property badges', 'propertyhive' ), $settings['template_set_show_badges'] );
@@ -2858,7 +2998,7 @@ class PH_Template_Set {
 				} else {
 					self::render_template_editor_hidden( 'template_set_search_layout', $settings['template_set_search_layout'] );
 					self::render_template_editor_hidden( 'template_set_search_card_size', $settings['template_set_search_card_size'] );
-					self::render_template_editor_hidden( 'template_set_search_result_count', $settings['template_set_search_result_count'] );
+					self::render_template_editor_hidden( 'template_set_search_grid_columns', $settings['template_set_search_grid_columns'] );
 					self::render_template_editor_hidden( 'template_set_image_style', $settings['template_set_image_style'] );
 					self::render_template_editor_hidden( 'template_set_show_branch', $settings['template_set_show_branch'] );
 					self::render_template_editor_hidden( 'template_set_show_badges', $settings['template_set_show_badges'] );
@@ -2946,7 +3086,7 @@ class PH_Template_Set {
 	 * @param string $selected Selected value.
 	 */
 	private static function render_template_editor_select( $name, $label, $options, $selected, $option_urls = array() ) {
-		echo '<label class="ph-template-editor-field">';
+		echo '<label class="ph-template-editor-field ph-template-editor-field-' . esc_attr( sanitize_html_class( $name ) ) . '">';
 			echo '<span>' . esc_html( $label ) . '</span>';
 			echo '<select name="' . esc_attr( $name ) . '" data-ph-template-editor-control>';
 				foreach ( $options as $value => $option_label ) {
@@ -3063,7 +3203,7 @@ class PH_Template_Set {
 			'template_set_accent_colour'          => sanitize_hex_color( $settings['template_set_accent_colour'] ),
 			'template_set_button_style'           => sanitize_title( $settings['template_set_button_style'] ),
 			'template_set_search_card_size'       => sanitize_title( $settings['template_set_search_card_size'] ),
-			'template_set_search_result_count'    => absint( $settings['template_set_search_result_count'] ),
+			'template_set_search_grid_columns'    => absint( $settings['template_set_search_grid_columns'] ),
 			'template_set_image_style'            => sanitize_title( $settings['template_set_image_style'] ),
 			'template_set_contact_card_style'     => sanitize_title( $settings['template_set_contact_card_style'] ),
 			'template_set_show_branch'            => 'yes' === $settings['template_set_show_branch'] ? 'yes' : '',
@@ -3396,6 +3536,56 @@ class PH_Template_Set {
 	 */
 	private static function get_current_url() {
 		return home_url( add_query_arg( null, null ) );
+	}
+
+	/**
+	 * Get the active search department from the request/settings.
+	 *
+	 * @return string
+	 */
+	private static function get_current_search_department() {
+		if ( ! empty( $_REQUEST['department'] ) ) {
+			return sanitize_text_field( wp_unslash( $_REQUEST['department'] ) );
+		}
+
+		$department = get_option( 'propertyhive_primary_department', 'residential-sales' );
+
+		if ( '' !== $department ) {
+			return sanitize_text_field( $department );
+		}
+
+		foreach ( ph_get_departments() as $key => $label ) {
+			if ( 'yes' === get_option( 'propertyhive_active_departments_' . str_replace( 'residential-', '', $key ) ) ) {
+				return sanitize_text_field( $key );
+			}
+		}
+
+		return 'residential-sales';
+	}
+
+	/**
+	 * Get the department constraint that should validate a taxonomy dropdown.
+	 *
+	 * @param string $taxonomy Taxonomy name.
+	 * @return string
+	 */
+	private static function get_search_department_for_taxonomy( $taxonomy ) {
+		$department = self::get_current_search_department();
+		$base       = ph_get_custom_department_based_on( $department );
+
+		if ( false === $base ) {
+			$base = $department;
+		}
+
+		if ( 'commercial_property_type' === $taxonomy ) {
+			return 'commercial' === $base ? $department : '';
+		}
+
+		if ( 'property_type' === $taxonomy ) {
+			return in_array( $base, array( 'residential-sales', 'residential-lettings' ), true ) ? $department : '';
+		}
+
+		return '';
 	}
 
 	/**
