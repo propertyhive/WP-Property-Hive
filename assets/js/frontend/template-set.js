@@ -374,6 +374,86 @@
 		});
 	}
 
+	function parseCardGalleryImages(dataNode) {
+		var images;
+
+		try {
+			images = JSON.parse(dataNode.textContent || '[]');
+		} catch (error) {
+			return [];
+		}
+
+		if (!Array.isArray(images)) {
+			return [];
+		}
+
+		return images.filter(function (image) {
+			return image && image.src;
+		});
+	}
+
+	function setCardGalleryImage(card, images, index) {
+		var safeIndex = normaliseIndex(index, images.length);
+		var imageData = images[safeIndex];
+		var image = card.querySelector('.thumbnail img');
+		var count = card.querySelector('[data-ph-card-gallery-count]');
+
+		if (!image || !imageData) {
+			return;
+		}
+
+		card.phTemplateCardGalleryIndex = safeIndex;
+		image.src = imageData.src;
+		image.alt = imageData.alt || image.alt || '';
+
+		if (count) {
+			count.textContent = (safeIndex + 1) + ' / ' + images.length;
+		}
+	}
+
+	function moveCardGallery(card, images, step) {
+		setCardGalleryImage(card, images, (card.phTemplateCardGalleryIndex || 0) + step);
+	}
+
+	function initCardGallery(dataNode) {
+		var card = dataNode.closest('.ph-template-card');
+		var thumbnail = dataNode.closest('.thumbnail');
+		var images = parseCardGalleryImages(dataNode);
+		var controls;
+
+		if (!card || !thumbnail || images.length < 2 || card.phTemplateCardGalleryReady) {
+			return;
+		}
+
+		card.phTemplateCardGalleryReady = true;
+		card.phTemplateCardGalleryIndex = 0;
+		thumbnail.classList.add('has-ph-card-gallery');
+
+		controls = document.createElement('div');
+		controls.className = 'ph-template-card-gallery-controls';
+		controls.innerHTML = [
+			'<button type="button" class="ph-template-card-gallery-button ph-template-card-gallery-prev" data-ph-card-gallery-prev aria-label="Previous listing photo"><span aria-hidden="true">&lt;</span></button>',
+			'<span class="ph-template-card-gallery-count" data-ph-card-gallery-count>1 / ' + images.length + '</span>',
+			'<button type="button" class="ph-template-card-gallery-button ph-template-card-gallery-next" data-ph-card-gallery-next aria-label="Next listing photo"><span aria-hidden="true">&gt;</span></button>'
+		].join('');
+
+		controls.addEventListener('click', function (event) {
+			var previous = event.target.closest('[data-ph-card-gallery-prev]');
+			var next = event.target.closest('[data-ph-card-gallery-next]');
+
+			if (!previous && !next) {
+				return;
+			}
+
+			event.preventDefault();
+			event.stopPropagation();
+			moveCardGallery(card, images, previous ? -1 : 1);
+		});
+
+		thumbnail.appendChild(controls);
+		setCardGalleryImage(card, images, 0);
+	}
+
 	document.addEventListener('keydown', function (event) {
 		if (!activeLightbox) {
 			return;
@@ -395,6 +475,7 @@
 
 	document.addEventListener('DOMContentLoaded', function () {
 		document.querySelectorAll('[data-ph-template-gallery]').forEach(initGallery);
+		document.querySelectorAll('[data-ph-card-gallery-data]').forEach(initCardGallery);
 		initTemplateEditor();
 	});
 
@@ -425,12 +506,54 @@
 		document.body.classList.add(prefix + value);
 	}
 
+	function setBodyToggle(showClass, hideClass, enabled) {
+		document.body.classList.toggle(showClass, enabled);
+		document.body.classList.toggle(hideClass, !enabled);
+	}
+
 	function setTemplateColour(property, value) {
 		var targets = [document.documentElement].concat(Array.prototype.slice.call(document.querySelectorAll('.ph-template-set, .ph-template-set-active')));
 
 		targets.forEach(function (target) {
 			target.style.setProperty(property, value);
 		});
+	}
+
+	function applyRecommendedCount(value) {
+		var limit = parseInt(value, 10) || 3;
+
+		document.querySelectorAll('[data-ph-recommended-properties]').forEach(function (section) {
+			Array.prototype.slice.call(section.querySelectorAll('[data-ph-recommended-card]')).forEach(function (card, index) {
+				card.hidden = index >= limit;
+			});
+		});
+	}
+
+	function getSelectedOption(control) {
+		if (!control || typeof control.selectedIndex !== 'number' || control.selectedIndex < 0) {
+			return null;
+		}
+
+		return control.options[control.selectedIndex] || null;
+	}
+
+	function maybeNavigateTemplatePreview(control) {
+		var selectedOption;
+		var previewUrl;
+
+		if (control.name !== 'template_set_detail_template' && control.name !== 'template_set_search_template') {
+			return false;
+		}
+
+		selectedOption = getSelectedOption(control);
+		previewUrl = selectedOption ? selectedOption.getAttribute('data-ph-template-preview-url') : '';
+
+		if (!previewUrl || previewUrl === window.location.href) {
+			return false;
+		}
+
+		window.location.href = previewUrl;
+		return true;
 	}
 
 	function updateSegmentedControl(input) {
@@ -477,6 +600,35 @@
 
 		if (name === 'template_set_image_style') {
 			setBodyOption('ph-template-images-', value);
+		}
+
+		if (name === 'template_set_show_branch') {
+			setBodyToggle('ph-template-show-branch', 'ph-template-hide-branch', value === 'yes');
+		}
+
+		if (name === 'template_set_show_badges') {
+			setBodyToggle('ph-template-show-badges', 'ph-template-hide-badges', value === 'yes');
+		}
+
+		if (name === 'template_set_show_mobile_cta') {
+			setBodyToggle('ph-template-show-mobile-cta', 'ph-template-hide-mobile-cta', value === 'yes');
+		}
+
+		if (name === 'template_set_show_recommended') {
+			setBodyToggle('ph-template-show-recommended', 'ph-template-hide-recommended', value === 'yes');
+		}
+
+		if (name === 'template_set_recommended_count') {
+			setBodyOption('ph-template-recommended-count-', value);
+			applyRecommendedCount(value);
+		}
+
+		if (name === 'template_set_recommended_layout') {
+			setBodyOption('ph-template-recommended-layout-', value);
+		}
+
+		if (name === 'template_set_recommended_image_size') {
+			setBodyOption('ph-template-recommended-images-', value);
 		}
 	}
 
@@ -527,6 +679,11 @@
 
 		form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
 			control.addEventListener('change', function () {
+				if (maybeNavigateTemplatePreview(control)) {
+					setEditorStatus(editor, labels.loading || 'Loading...', 'saving');
+					return;
+				}
+
 				applyEditorControl(control);
 				editor.classList.add('is-dirty');
 				setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
