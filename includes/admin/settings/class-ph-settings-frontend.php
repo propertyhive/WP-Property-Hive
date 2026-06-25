@@ -1515,6 +1515,14 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         );
 
         $settings[] = array(
+            'title'   => __( 'Contact Card Style', 'propertyhive' ),
+            'id'      => 'template_set_contact_card_style',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_contact_card_style'] ) ? $current_settings['template_set_contact_card_style'] : 'classic',
+            'options' => PH_Template_Set::get_contact_card_styles(),
+        );
+
+        $settings[] = array(
             'title'         => __( 'Display Options', 'propertyhive' ),
             'id'            => 'template_set_show_branch',
             'type'          => 'checkbox',

@@ -72,8 +72,8 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 					'type'        => 'text',
 				),
 				'photo_attachment_id'    => array(
-					'label'       => __( 'Photo', 'propertyhive' ),
-					'description' => '',
+					'label'       => __( 'Estate agent image', 'propertyhive' ),
+					'description' => __( 'Shown on property contact cards when this user is assigned as the negotiator.', 'propertyhive' ),
 					'type'        => 'image',
 				),
 			);
