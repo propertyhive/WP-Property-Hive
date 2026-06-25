@@ -3,6 +3,7 @@
 
 	var activeLightbox = null;
 	var lastFocusedElement = null;
+	var config = window.phTemplateSet || {};
 	var galleryVariants = ['showcase', 'cinema', 'mosaic', 'editorial', 'strip'];
 	var galleryVariantStorageKey = 'phTemplateGalleryVariant';
 
@@ -146,6 +147,12 @@
 		if (persist) {
 			storeGalleryVariant(selectedVariant);
 		}
+	}
+
+	function setAllGalleryVariants(variant, persist) {
+		document.querySelectorAll('[data-ph-template-gallery]').forEach(function (gallery) {
+			setGalleryVariant(gallery, variant, persist);
+		});
 	}
 
 	function normaliseIndex(index, length) {
@@ -338,7 +345,7 @@
 		var tabs = gallery.querySelectorAll('[data-ph-gallery-tab]');
 		var photoTrigger = gallery.querySelector('[data-ph-gallery-open]');
 		var variantButtons = gallery.querySelectorAll('[data-ph-gallery-variant]');
-		var storedVariant = getStoredGalleryVariant();
+		var storedVariant = (!config.editorActive && variantButtons.length) ? getStoredGalleryVariant() : '';
 
 		setGalleryVariant(gallery, storedVariant || gallery.getAttribute('data-ph-gallery-current-variant') || 'showcase', false);
 
@@ -388,5 +395,188 @@
 
 	document.addEventListener('DOMContentLoaded', function () {
 		document.querySelectorAll('[data-ph-template-gallery]').forEach(initGallery);
+		initTemplateEditor();
 	});
+
+	window.phTemplateSetGallery = {
+		setVariant: setAllGalleryVariants
+	};
+
+	function setEditorStatus(editor, message, state) {
+		var status = editor.querySelector('[data-ph-template-editor-status]');
+
+		if (status) {
+			status.textContent = message;
+		}
+
+		editor.setAttribute('data-ph-template-editor-state', state || 'ready');
+	}
+
+	function removePrefixedClass(element, prefix) {
+		Array.prototype.slice.call(element.classList).forEach(function (className) {
+			if (className.indexOf(prefix) === 0) {
+				element.classList.remove(className);
+			}
+		});
+	}
+
+	function setBodyOption(prefix, value) {
+		removePrefixedClass(document.body, prefix);
+		document.body.classList.add(prefix + value);
+	}
+
+	function setTemplateColour(property, value) {
+		var targets = [document.documentElement].concat(Array.prototype.slice.call(document.querySelectorAll('.ph-template-set, .ph-template-set-active')));
+
+		targets.forEach(function (target) {
+			target.style.setProperty(property, value);
+		});
+	}
+
+	function updateSegmentedControl(input) {
+		var group = input.closest('.ph-template-editor-segmented');
+
+		if (!group) {
+			return;
+		}
+
+		group.querySelectorAll('label').forEach(function (label) {
+			var labelInput = label.querySelector('input');
+			label.classList.toggle('is-active', !!labelInput && labelInput.checked);
+		});
+	}
+
+	function applyEditorControl(control) {
+		var name = control.name;
+		var value = control.type === 'checkbox' ? (control.checked ? 'yes' : '') : control.value;
+
+		if (control.type === 'radio' && !control.checked) {
+			return;
+		}
+
+		if (name === 'template_set_gallery_layout') {
+			setAllGalleryVariants(value, false);
+			updateSegmentedControl(control);
+		}
+
+		if (name === 'template_set_brand_colour') {
+			setTemplateColour('--ph-template-brand', value);
+		}
+
+		if (name === 'template_set_accent_colour') {
+			setTemplateColour('--ph-template-accent', value);
+		}
+
+		if (name === 'template_set_button_style') {
+			setBodyOption('ph-template-buttons-', value);
+		}
+
+		if (name === 'template_set_card_density') {
+			setBodyOption('ph-template-density-', value);
+		}
+
+		if (name === 'template_set_image_style') {
+			setBodyOption('ph-template-images-', value);
+		}
+	}
+
+	function buildEditorFormData(form) {
+		var data = new window.FormData();
+
+		data.append('action', 'propertyhive_template_set_save');
+		data.append('security', config.security || '');
+
+		Array.prototype.slice.call(form.elements).forEach(function (field) {
+			if (!field.name || field.disabled) {
+				return;
+			}
+
+			if (field.type === 'checkbox') {
+				data.append(field.name, field.checked ? field.value : '');
+				return;
+			}
+
+			if (field.type === 'radio') {
+				if (field.checked) {
+					data.append(field.name, field.value);
+				}
+				return;
+			}
+
+			data.append(field.name, field.value);
+		});
+
+		return data;
+	}
+
+	function initTemplateEditor() {
+		var editor = document.querySelector('[data-ph-template-editor]');
+		var form;
+		var labels;
+
+		if (!editor || !config.editorActive) {
+			return;
+		}
+
+		form = editor.querySelector('[data-ph-template-editor-form]');
+		labels = config.labels || {};
+
+		if (!form) {
+			return;
+		}
+
+		form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
+			control.addEventListener('change', function () {
+				applyEditorControl(control);
+				editor.classList.add('is-dirty');
+				setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+			});
+
+			if (control.type === 'color') {
+				control.addEventListener('input', function () {
+					applyEditorControl(control);
+					editor.classList.add('is-dirty');
+					setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+				});
+			}
+		});
+
+		form.addEventListener('submit', function (event) {
+			var saveButton = form.querySelector('[data-ph-template-editor-save]');
+
+			event.preventDefault();
+
+			if (!window.fetch || !window.FormData) {
+				setEditorStatus(editor, labels.error || 'Could not save', 'error');
+				return;
+			}
+
+			setEditorStatus(editor, labels.saving || 'Saving...', 'saving');
+			if (saveButton) {
+				saveButton.disabled = true;
+			}
+
+			window.fetch(config.ajaxUrl || '', {
+				method: 'POST',
+				credentials: 'same-origin',
+				body: buildEditorFormData(form)
+			}).then(function (response) {
+				return response.json();
+			}).then(function (payload) {
+				if (!payload || !payload.success) {
+					throw new Error('Save failed');
+				}
+
+				config.settings = payload.data && payload.data.settings ? payload.data.settings : config.settings;
+				editor.classList.remove('is-dirty');
+				setEditorStatus(editor, labels.saved || 'Saved', 'saved');
+			}).catch(function () {
+				setEditorStatus(editor, labels.error || 'Could not save', 'error');
+			}).finally(function () {
+				if (saveButton) {
+					saveButton.disabled = false;
+				}
+			});
+		});
+	}
 }());

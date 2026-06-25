@@ -1400,8 +1400,9 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     public function get_template_set_settings() {
 
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
+        $template_set_settings = PH_Template_Set::get_settings();
         $settings         = array();
-        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'The template set includes the standard sales detail and portal-style search results examples. Use the front-end Template example menu to preview either example in context.', 'propertyhive' ) . '</p><ul>';
+        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'The template set includes the standard sales detail and portal-style search results examples. Use the preview links or the front-end visual editor to review either example in context.', 'propertyhive' ) . '</p><ul>';
 
         foreach ( PH_Template_Set::get_template_catalog() as $slug => $template ) {
             $catalog_html .= '<li><strong>' . esc_html( $template['label'] ) . '</strong> <span>' . esc_html( $template['group'] ) . '</span> <a href="' . esc_url( PH_Template_Set::get_template_preview_url( $slug ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Preview', 'propertyhive' ) . '</a></li>';
@@ -1425,6 +1426,15 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         );
 
         $settings[] = array(
+            'title'   => __( 'Editing Experience', 'propertyhive' ),
+            'id'      => 'template_set_editor_mode',
+            'type'    => 'select',
+            'default' => $template_set_settings['template_set_editor_mode'],
+            'desc'    => __( 'Fresh installs use the visual editor by default. Existing sites with legacy front-end settings stay on legacy controls until changed here.', 'propertyhive' ),
+            'options' => PH_Template_Set::get_editor_modes(),
+        );
+
+        $settings[] = array(
             'title'   => __( 'Property Detail Template', 'propertyhive' ),
             'id'      => 'template_set_detail_template',
             'type'    => 'select',
@@ -1438,6 +1448,14 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             'type'    => 'select',
             'default' => isset( $current_settings['template_set_search_template'] ) ? $current_settings['template_set_search_template'] : 'portal-style-search-results',
             'options' => PH_Template_Set::get_search_templates(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Gallery Layout', 'propertyhive' ),
+            'id'      => 'template_set_gallery_layout',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_gallery_layout'] ) ? $current_settings['template_set_gallery_layout'] : 'showcase',
+            'options' => PH_Template_Set::get_gallery_layouts(),
         );
 
         $settings[] = array(
@@ -1588,58 +1606,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 }
                 case "template-set":
                 {
-                    $detail_templates = PH_Template_Set::get_detail_templates();
-                    $search_templates = PH_Template_Set::get_search_templates();
-                    $detail_template = isset( $_POST['template_set_detail_template'] ) ? sanitize_title( $_POST['template_set_detail_template'] ) : 'standard-sales-detail';
-                    if ( ! isset( $detail_templates[ $detail_template ] ) ) {
-                        $detail_template = 'standard-sales-detail';
-                    }
-
-                    $search_template = isset( $_POST['template_set_search_template'] ) ? sanitize_title( $_POST['template_set_search_template'] ) : 'portal-style-search-results';
-                    if ( ! isset( $search_templates[ $search_template ] ) ) {
-                        $search_template = 'portal-style-search-results';
-                    }
-
-                    $brand_colour = isset( $_POST['template_set_brand_colour'] ) ? sanitize_hex_color( wp_unslash( $_POST['template_set_brand_colour'] ) ) : '';
-                    if ( empty( $brand_colour ) ) {
-                        $brand_colour = '#155e63';
-                    }
-
-                    $accent_colour = isset( $_POST['template_set_accent_colour'] ) ? sanitize_hex_color( wp_unslash( $_POST['template_set_accent_colour'] ) ) : '';
-                    if ( empty( $accent_colour ) ) {
-                        $accent_colour = '#b7791f';
-                    }
-
-                    $button_style = isset( $_POST['template_set_button_style'] ) ? sanitize_title( $_POST['template_set_button_style'] ) : 'filled';
-                    if ( ! in_array( $button_style, array( 'filled', 'outline', 'soft' ), true ) ) {
-                        $button_style = 'filled';
-                    }
-
-                    $card_density = isset( $_POST['template_set_card_density'] ) ? sanitize_title( $_POST['template_set_card_density'] ) : 'standard';
-                    if ( ! in_array( $card_density, array( 'spacious', 'standard', 'compact' ), true ) ) {
-                        $card_density = 'standard';
-                    }
-
-                    $image_style = isset( $_POST['template_set_image_style'] ) ? sanitize_title( $_POST['template_set_image_style'] ) : 'soft';
-                    if ( ! in_array( $image_style, array( 'square', 'soft', 'rounded' ), true ) ) {
-                        $image_style = 'soft';
-                    }
-
-                    $propertyhive_template_assistant = array(
-                        'template_set_enabled'         => isset( $_POST['template_set_enabled'] ) ? 'yes' : '',
-                        'template_set_detail_template' => $detail_template,
-                        'template_set_search_template' => $search_template,
-                        'template_set_brand_colour'    => $brand_colour,
-                        'template_set_accent_colour'   => $accent_colour,
-                        'template_set_button_style'    => $button_style,
-                        'template_set_card_density'    => $card_density,
-                        'template_set_image_style'     => $image_style,
-                        'template_set_show_branch'     => isset( $_POST['template_set_show_branch'] ) ? 'yes' : '',
-                        'template_set_show_badges'     => isset( $_POST['template_set_show_badges'] ) ? 'yes' : '',
-                        'template_set_show_mobile_cta' => isset( $_POST['template_set_show_mobile_cta'] ) ? 'yes' : '',
-                    );
-
-                    $propertyhive_template_assistant = array_merge($current_settings, $propertyhive_template_assistant);
+                    $propertyhive_template_assistant = PH_Template_Set::sanitize_template_set_settings( $_POST, $current_settings, false );
 
                     update_option( 'propertyhive_template_assistant', $propertyhive_template_assistant );
                     break;
