@@ -280,6 +280,7 @@ body.admin-bar .ph-template-editor {
 	background: var(--ph-template-brand);
 	border: 1px solid var(--ph-template-brand);
 	border-radius: var(--ph-template-radius);
+	box-shadow: none;
 	color: #fff;
 	display: inline-flex;
 	font-size: 15px;
@@ -290,7 +291,7 @@ body.admin-bar .ph-template-editor {
 	padding: 11px 18px;
 	text-align: center;
 	text-decoration: none;
-	transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+	transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease, transform 160ms ease;
 	white-space: normal;
 }
 
@@ -325,20 +326,39 @@ body.admin-bar .ph-template-editor {
 }
 
 .ph-template-buttons-outline .ph-template-button-primary,
+.ph-template-buttons-outline .ph-template-mobile-cta .ph-template-button-primary,
+.ph-template-buttons-outline .ph-template-module-action .ph-template-button,
 .ph-template-buttons-outline .ph-template-set .property_actions a {
 	background: #fff;
+	border-color: var(--ph-template-brand);
+	box-shadow: inset 0 0 0 1px var(--ph-template-brand);
 	color: var(--ph-template-brand);
 }
 
-.ph-template-buttons-outline .ph-template-button-primary:hover {
+.ph-template-buttons-outline .ph-template-button-primary:hover,
+.ph-template-buttons-outline .ph-template-mobile-cta .ph-template-button-primary:hover,
+.ph-template-buttons-outline .ph-template-module-action .ph-template-button:hover {
 	background: var(--ph-template-brand);
+	box-shadow: inset 0 0 0 1px var(--ph-template-brand);
 	color: #fff;
 }
 
 .ph-template-buttons-soft .ph-template-button-primary,
+.ph-template-buttons-soft .ph-template-mobile-cta .ph-template-button-primary,
+.ph-template-buttons-soft .ph-template-module-action .ph-template-button,
 .ph-template-buttons-soft .ph-template-set .property_actions a {
 	background: var(--ph-template-soft);
-	border-color: var(--ph-template-line-strong);
+	border-color: transparent;
+	box-shadow: inset 0 0 0 1px rgba(31, 42, 55, 0.12);
+	color: var(--ph-template-brand);
+}
+
+.ph-template-buttons-soft .ph-template-button-primary:hover,
+.ph-template-buttons-soft .ph-template-mobile-cta .ph-template-button-primary:hover,
+.ph-template-buttons-soft .ph-template-module-action .ph-template-button:hover {
+	background: #e8edf2;
+	border-color: transparent;
+	box-shadow: inset 0 0 0 1px rgba(31, 42, 55, 0.2);
 	color: var(--ph-template-brand);
 }
 
