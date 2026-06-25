@@ -147,8 +147,7 @@ body.admin-bar .ph-template-editor {
 	line-height: 1.2;
 }
 
-.ph-template-editor-field select,
-.ph-template-editor-field input[type="color"] {
+.ph-template-editor-field select {
 	background: #ffffff;
 	border: 1px solid var(--ph-template-line-strong);
 	color: var(--ph-template-text);
@@ -156,19 +155,6 @@ body.admin-bar .ph-template-editor {
 	min-height: 38px;
 	padding: 7px 9px;
 	width: 100%;
-}
-
-.ph-template-editor-colour {
-	align-items: center;
-	display: grid;
-	gap: 12px;
-	grid-template-columns: 1fr 52px;
-}
-
-.ph-template-editor-colour input[type="color"] {
-	cursor: pointer;
-	height: 38px;
-	padding: 3px;
 }
 
 .ph-template-editor-segmented {
@@ -2782,6 +2768,16 @@ body.admin-bar .ph-template-editor {
 }
 
 .ph-template-gallery-panel[hidden] {
+	display: none;
+}
+
+.ph-template-hide-floorplans .ph-template-gallery-panel-floorplan,
+.ph-template-hide-floorplans [data-ph-gallery-tab="floorplan"],
+.ph-template-hide-floorplans .ph-template-module-floorplan,
+.ph-template-hide-floorplans .ph-template-doc-pill-floorplan,
+.ph-template-hide-virtual-tours .ph-template-gallery-panel-virtual-tour,
+.ph-template-hide-virtual-tours [data-ph-gallery-tab="virtual-tour"],
+.ph-template-hide-virtual-tours .ph-template-doc-pill-virtual-tour {
 	display: none;
 }
 
