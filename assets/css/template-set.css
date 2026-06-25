@@ -599,30 +599,51 @@ body.admin-bar .ph-template-editor {
 	z-index: 3;
 }
 
-.ph-template-card-gallery-button {
+.ph-template-set ul.properties li.ph-template-card .ph-template-card-gallery-button {
+	appearance: none;
 	align-items: center;
-	background: rgba(26, 31, 36, 0.82);
-	border: 1px solid rgba(255, 255, 255, 0.42);
+	background: rgba(26, 31, 36, 0.74);
+	background-color: rgba(26, 31, 36, 0.74);
+	border: 1px solid rgba(255, 255, 255, 0.36);
+	border-radius: 999px;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 	color: #ffffff;
 	cursor: pointer;
 	display: inline-flex;
-	font-size: 18px;
-	font-weight: 800;
-	height: 34px;
+	font-family: inherit;
+	font-size: 0;
+	font-weight: 700;
+	height: 32px;
 	justify-content: center;
 	line-height: 1;
-	margin: 0 8px;
+	margin: 0 10px;
 	padding: 0;
 	pointer-events: auto;
-	width: 34px;
+	transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+	width: 32px;
 }
 
-.ph-template-card-gallery-button:hover,
-.ph-template-card-gallery-button:focus-visible {
-	background: #1a1f24;
-	border-color: #ffffff;
+.ph-template-set ul.properties li.ph-template-card .ph-template-card-gallery-button span {
+	display: block;
+	font-size: 18px;
+	line-height: 1;
+	transform: translateY(-1px);
+}
+
+.ph-template-set ul.properties li.ph-template-card .ph-template-card-gallery-button:hover,
+.ph-template-set ul.properties li.ph-template-card .ph-template-card-gallery-button:focus-visible {
+	background: rgba(26, 31, 36, 0.92);
+	background-color: rgba(26, 31, 36, 0.92);
+	border-color: rgba(255, 255, 255, 0.64);
+	box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
 	color: #ffffff;
 	outline: none;
+	transform: translateY(-1px);
+}
+
+.ph-template-set ul.properties li.ph-template-card .ph-template-card-gallery-button:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.86);
+	outline-offset: 2px;
 }
 
 .ph-template-card-gallery-count {
