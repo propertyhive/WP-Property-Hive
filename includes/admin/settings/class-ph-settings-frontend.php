@@ -1540,6 +1540,22 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         );
 
         $settings[] = array(
+            'id'            => 'template_set_show_floorplans',
+            'type'          => 'checkbox',
+            'checkboxgroup' => '',
+            'default'       => ( ! isset( $current_settings['template_set_show_floorplans'] ) || 'yes' === $current_settings['template_set_show_floorplans'] ) ? 'yes' : '',
+            'desc'          => __( 'Show floorplans on property detail pages when available.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_virtual_tours',
+            'type'          => 'checkbox',
+            'checkboxgroup' => '',
+            'default'       => ( isset( $current_settings['template_set_show_virtual_tours'] ) && 'yes' === $current_settings['template_set_show_virtual_tours'] ) ? 'yes' : '',
+            'desc'          => __( 'Show virtual tours on property detail pages when available.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
             'id'            => 'template_set_show_recommended',
             'type'          => 'checkbox',
             'checkboxgroup' => 'end',

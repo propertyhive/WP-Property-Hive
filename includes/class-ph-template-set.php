@@ -202,6 +202,8 @@ class PH_Template_Set {
 				'template_set_show_branch'            => 'yes',
 				'template_set_show_badges'            => 'yes',
 				'template_set_show_mobile_cta'        => 'yes',
+				'template_set_show_floorplans'        => 'yes',
+				'template_set_show_virtual_tours'     => '',
 				'template_set_show_recommended'       => 'yes',
 				'template_set_recommended_count'      => 3,
 				'template_set_recommended_layout'     => 'grid',
@@ -357,10 +359,12 @@ class PH_Template_Set {
 			'template_set_show_branch'                => self::normalise_checkbox_value( $raw_settings, 'template_set_show_branch' ),
 			'template_set_show_badges'                => self::normalise_checkbox_value( $raw_settings, 'template_set_show_badges' ),
 			'template_set_show_mobile_cta'            => self::normalise_checkbox_value( $raw_settings, 'template_set_show_mobile_cta' ),
+			'template_set_show_floorplans'            => self::normalise_checkbox_value( $raw_settings, 'template_set_show_floorplans' ),
+			'template_set_show_virtual_tours'         => self::normalise_checkbox_value( $raw_settings, 'template_set_show_virtual_tours' ),
 			'template_set_show_recommended'           => self::normalise_checkbox_value( $raw_settings, 'template_set_show_recommended' ),
 			'template_set_recommended_count'          => $recommended_count,
 			'template_set_recommended_layout'         => $recommended_layout,
-			'template_set_recommended_image_size' => $recommended_image_size,
+			'template_set_recommended_image_size'     => $recommended_image_size,
 		);
 
 		return array_merge( $current_settings, $template_set_settings );
@@ -815,6 +819,8 @@ class PH_Template_Set {
 		$classes[] = 'yes' === $settings['template_set_show_branch'] ? 'ph-template-show-branch' : 'ph-template-hide-branch';
 		$classes[] = 'yes' === $settings['template_set_show_badges'] ? 'ph-template-show-badges' : 'ph-template-hide-badges';
 		$classes[] = 'yes' === $settings['template_set_show_mobile_cta'] ? 'ph-template-show-mobile-cta' : 'ph-template-hide-mobile-cta';
+		$classes[] = 'yes' === $settings['template_set_show_floorplans'] ? 'ph-template-show-floorplans' : 'ph-template-hide-floorplans';
+		$classes[] = 'yes' === $settings['template_set_show_virtual_tours'] ? 'ph-template-show-virtual-tours' : 'ph-template-hide-virtual-tours';
 		$classes[] = 'yes' === $settings['template_set_show_recommended'] ? 'ph-template-show-recommended' : 'ph-template-hide-recommended';
 		$classes[] = 'ph-template-recommended-count-' . absint( $settings['template_set_recommended_count'] );
 		$classes[] = 'ph-template-recommended-layout-' . sanitize_html_class( $settings['template_set_recommended_layout'] );
@@ -1305,8 +1311,8 @@ class PH_Template_Set {
 		$rail             = array_slice( $images, 0, 5 );
 		$count            = count( $images );
 		$location         = self::get_property_location_label( $property );
-		$has_floor_map    = $property ? self::has_floorplan( $property ) : false;
-		$has_virtual_tour = false;
+		$has_floor_map    = self::should_render_floorplans( $property );
+		$has_virtual_tour = self::should_render_virtual_tours( $property );
 		$gallery_layout   = self::get_gallery_layout();
 
 		echo '<div class="images ph-template-gallery ph-template-gallery-' . esc_attr( sanitize_html_class( $template ) ) . ' ph-gallery-variant-' . esc_attr( sanitize_html_class( $gallery_layout ) ) . '" data-ph-template-gallery data-ph-gallery-current-variant="' . esc_attr( $gallery_layout ) . '">';
@@ -1912,8 +1918,9 @@ class PH_Template_Set {
 		$address        = $property->get_formatted_full_address();
 		$documents      = self::get_property_document_labels( $property );
 		$office         = self::get_display_office_name( $property );
+		$has_floorplan  = self::should_render_floorplans( $property );
 
-		if ( empty( $facts ) && ! $location_label && ! $address && empty( $documents ) && ! self::has_floorplan( $property ) ) {
+		if ( empty( $facts ) && ! $location_label && ! $address && empty( $documents ) && ! $has_floorplan ) {
 			return;
 		}
 
@@ -1929,7 +1936,7 @@ class PH_Template_Set {
 				echo '</article>';
 			}
 
-			if ( self::has_floorplan( $property ) ) {
+			if ( $has_floorplan ) {
 				echo '<article class="ph-template-module-card ph-template-module-floorplan">';
 					echo '<h4>' . esc_html__( 'Floorplan', 'propertyhive' ) . '</h4>';
 					echo '<p class="ph-template-module-foot">' . esc_html__( 'Floorplan available for this property.', 'propertyhive' ) . '</p>';
@@ -1953,7 +1960,7 @@ class PH_Template_Set {
 					echo '<h4>' . esc_html__( 'Documents and viewing', 'propertyhive' ) . '</h4>';
 					echo '<div class="ph-template-doc-row">';
 					foreach ( $documents as $document ) {
-						echo '<span class="ph-template-doc-pill"><span class="ph-template-doc-icon" aria-hidden="true"></span>' . esc_html( $document ) . '</span>';
+						echo '<span class="ph-template-doc-pill ph-template-doc-pill-' . esc_attr( sanitize_html_class( $document['type'] ) ) . '"><span class="ph-template-doc-icon" aria-hidden="true"></span>' . esc_html( $document['label'] ) . '</span>';
 					}
 					echo '</div>';
 					if ( $office ) {
@@ -2761,15 +2768,12 @@ class PH_Template_Set {
 				}
 				self::render_template_editor_section_end();
 
-				self::render_template_editor_section_start( __( 'Brand', 'propertyhive' ) );
-					self::render_template_editor_colour( 'template_set_brand_colour', __( 'Brand colour', 'propertyhive' ), $settings['template_set_brand_colour'] );
-					self::render_template_editor_colour( 'template_set_accent_colour', __( 'Accent colour', 'propertyhive' ), $settings['template_set_accent_colour'] );
-				self::render_template_editor_section_end();
-
 				if ( 'search' === $context ) {
 					self::render_template_editor_hidden( 'template_set_gallery_layout', $settings['template_set_gallery_layout'] );
 					self::render_template_editor_hidden( 'template_set_button_style', $settings['template_set_button_style'] );
 					self::render_template_editor_hidden( 'template_set_show_mobile_cta', $settings['template_set_show_mobile_cta'] );
+					self::render_template_editor_hidden( 'template_set_show_floorplans', $settings['template_set_show_floorplans'] );
+					self::render_template_editor_hidden( 'template_set_show_virtual_tours', $settings['template_set_show_virtual_tours'] );
 					self::render_template_editor_hidden( 'template_set_show_recommended', $settings['template_set_show_recommended'] );
 					self::render_template_editor_hidden( 'template_set_recommended_count', $settings['template_set_recommended_count'] );
 					self::render_template_editor_hidden( 'template_set_recommended_layout', $settings['template_set_recommended_layout'] );
@@ -2801,6 +2805,8 @@ class PH_Template_Set {
 					self::render_template_editor_section_start( __( 'Property page', 'propertyhive' ) );
 					self::render_template_editor_select( 'template_set_button_style', __( 'Buttons', 'propertyhive' ), self::get_button_styles(), $settings['template_set_button_style'] );
 					self::render_template_editor_checkbox( 'template_set_show_mobile_cta', __( 'Mobile enquiry bar', 'propertyhive' ), $settings['template_set_show_mobile_cta'] );
+					self::render_template_editor_checkbox( 'template_set_show_floorplans', __( 'Show floorplans', 'propertyhive' ), $settings['template_set_show_floorplans'] );
+					self::render_template_editor_checkbox( 'template_set_show_virtual_tours', __( 'Show virtual tours', 'propertyhive' ), $settings['template_set_show_virtual_tours'] );
 					self::render_template_editor_section_end();
 
 					self::render_template_editor_section_start( __( 'Recommended homes', 'propertyhive' ) );
@@ -2905,22 +2911,6 @@ class PH_Template_Set {
 	}
 
 	/**
-	 * Render an editor colour control.
-	 *
-	 * @param string $name Control name.
-	 * @param string $label Control label.
-	 * @param string $value Current value.
-	 */
-	private static function render_template_editor_colour( $name, $label, $value ) {
-		$value = sanitize_hex_color( $value );
-
-		echo '<label class="ph-template-editor-field ph-template-editor-colour">';
-			echo '<span>' . esc_html( $label ) . '</span>';
-			echo '<input type="color" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ? $value : '#155e63' ) . '" data-ph-template-editor-control>';
-		echo '</label>';
-	}
-
-	/**
 	 * Render an editor checkbox control.
 	 *
 	 * @param string $name Control name.
@@ -3003,6 +2993,8 @@ class PH_Template_Set {
 			'template_set_show_branch'            => 'yes' === $settings['template_set_show_branch'] ? 'yes' : '',
 			'template_set_show_badges'            => 'yes' === $settings['template_set_show_badges'] ? 'yes' : '',
 			'template_set_show_mobile_cta'        => 'yes' === $settings['template_set_show_mobile_cta'] ? 'yes' : '',
+			'template_set_show_floorplans'        => 'yes' === $settings['template_set_show_floorplans'] ? 'yes' : '',
+			'template_set_show_virtual_tours'     => 'yes' === $settings['template_set_show_virtual_tours'] ? 'yes' : '',
 			'template_set_show_recommended'       => 'yes' === $settings['template_set_show_recommended'] ? 'yes' : '',
 			'template_set_recommended_count'      => absint( $settings['template_set_recommended_count'] ),
 			'template_set_recommended_layout'     => sanitize_title( $settings['template_set_recommended_layout'] ),
@@ -3897,6 +3889,48 @@ class PH_Template_Set {
 	}
 
 	/**
+	 * Should floorplans render for this property template request?
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return bool
+	 */
+	private static function should_render_floorplans( $property ) {
+		if ( ! $property || ! self::has_floorplan( $property ) ) {
+			return false;
+		}
+
+		$settings = self::get_settings();
+
+		return 'yes' === $settings['template_set_show_floorplans'] || self::is_template_editor_active();
+	}
+
+	/**
+	 * Does the property have at least one virtual tour?
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return bool
+	 */
+	private static function has_virtual_tour( $property ) {
+		return $property && ! empty( $property->get_virtual_tours() );
+	}
+
+	/**
+	 * Should virtual tours render for this property template request?
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return bool
+	 */
+	private static function should_render_virtual_tours( $property ) {
+		if ( ! $property || ! self::has_virtual_tour( $property ) ) {
+			return false;
+		}
+
+		$settings = self::get_settings();
+
+		return 'yes' === $settings['template_set_show_virtual_tours'] || self::is_template_editor_active();
+	}
+
+	/**
 	 * Does the property have at least one EPC?
 	 *
 	 * @param PH_Property $property Property object.
@@ -3941,7 +3975,7 @@ class PH_Template_Set {
 			return __( 'Ask agent', 'propertyhive' );
 		}
 
-		return implode( ', ', array_slice( $documents, 0, 3 ) );
+		return implode( ', ', array_slice( wp_list_pluck( $documents, 'label' ), 0, 3 ) );
 	}
 
 	/**
@@ -4113,7 +4147,7 @@ class PH_Template_Set {
 
 		echo '<ul class="ph-template-media-links">';
 		foreach ( array_slice( $links, 0, 4 ) as $link ) {
-			echo '<li>' . esc_html( $link ) . '</li>';
+			echo '<li>' . esc_html( $link['label'] ) . '</li>';
 		}
 		echo '</ul>';
 	}
@@ -4127,16 +4161,32 @@ class PH_Template_Set {
 	private static function get_property_document_labels( $property ) {
 		$documents = array();
 
-		if ( self::has_floorplan( $property ) ) {
-			$documents[] = __( 'Floorplan', 'propertyhive' );
+		if ( self::should_render_floorplans( $property ) ) {
+			$documents[] = array(
+				'label' => __( 'Floorplan', 'propertyhive' ),
+				'type'  => 'floorplan',
+			);
+		}
+
+		if ( self::should_render_virtual_tours( $property ) ) {
+			$documents[] = array(
+				'label' => __( 'Virtual tour', 'propertyhive' ),
+				'type'  => 'virtual-tour',
+			);
 		}
 
 		if ( self::has_epc( $property ) ) {
-			$documents[] = __( 'EPC', 'propertyhive' );
+			$documents[] = array(
+				'label' => __( 'EPC', 'propertyhive' ),
+				'type'  => 'epc',
+			);
 		}
 
 		if ( self::has_brochure( $property ) ) {
-			$documents[] = __( 'Brochure', 'propertyhive' );
+			$documents[] = array(
+				'label' => __( 'Brochure', 'propertyhive' ),
+				'type'  => 'brochure',
+			);
 		}
 
 		return $documents;
