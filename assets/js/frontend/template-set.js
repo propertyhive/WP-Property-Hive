@@ -521,6 +521,20 @@
 		});
 	}
 
+	function applySearchResultCount(value) {
+		var limit = parseInt(value, 10) || 12;
+
+		document.querySelectorAll('.ph-template-search > ul.properties').forEach(function (list) {
+			Array.prototype.slice.call(list.children).forEach(function (card, index) {
+				if (!card.classList || !card.classList.contains('ph-template-card')) {
+					return;
+				}
+
+				card.hidden = index >= limit;
+			});
+		});
+	}
+
 	function resetGalleryPanel(panelName) {
 		document.querySelectorAll('[data-ph-template-gallery]').forEach(function (gallery) {
 			var panel = gallery.querySelector('[data-ph-gallery-panel="' + panelName + '"]');
@@ -588,8 +602,17 @@
 			setBodyOption('ph-template-buttons-', value);
 		}
 
-		if (name === 'template_set_card_density') {
-			setBodyOption('ph-template-density-', value);
+		if (name === 'template_set_search_layout') {
+			setBodyOption('ph-search-view-', value);
+		}
+
+		if (name === 'template_set_search_card_size') {
+			setBodyOption('ph-search-card-size-', value);
+		}
+
+		if (name === 'template_set_search_result_count') {
+			setBodyOption('ph-search-result-count-', value);
+			applySearchResultCount(value);
 		}
 
 		if (name === 'template_set_image_style') {

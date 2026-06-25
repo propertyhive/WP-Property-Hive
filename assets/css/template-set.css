@@ -408,70 +408,16 @@ body.admin-bar .ph-template-editor {
 	display: none;
 }
 
-.ph-template-search-tools {
-	align-items: center;
-	border-bottom: 1px solid var(--ph-template-line);
-	display: flex;
-	flex-wrap: wrap;
-	gap: 12px 16px;
-	justify-content: space-between;
-	margin: 0 0 20px;
-	padding: 0 0 14px;
-}
-
-.ph-template-view-toggle {
-	align-items: center;
-	border: 1px solid var(--ph-template-line-strong);
-	border-radius: var(--ph-template-radius);
-	display: inline-flex;
-	overflow: hidden;
-}
-
-.ph-template-search-actions {
-	align-items: center;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 18px;
-}
-
-.ph-template-view-button {
-	border-right: 1px solid var(--ph-template-line-strong);
-	color: var(--ph-template-text);
-	display: inline-flex;
-	font-size: 13px;
-	font-weight: 600;
-	line-height: 1;
-	padding: 9px 14px;
-	text-decoration: none;
-}
-
-.ph-template-view-button:last-child {
-	border-right: 0;
-}
-
-.ph-template-view-button.is-active {
-	background: var(--ph-template-brand);
-	color: #fff;
-}
-
-.ph-template-view-button:hover:not(.is-active) {
-	background: var(--ph-template-soft);
-}
-
-.ph-template-soft-action {
-	color: var(--ph-template-brand);
-	font-size: 13px;
-	font-weight: 600;
-	line-height: 1;
-	text-decoration: none;
-}
-
-.ph-template-soft-action:hover {
-	text-decoration: underline;
-}
-
 .ph-template-map-panel {
+	display: none;
 	margin: 0 0 20px;
+}
+
+.ph-template-search.ph-search-view-map > .ph-template-map-panel,
+.ph-search-view-map .ph-template-search > .ph-template-map-panel,
+.ph-template-search.ph-search-template-map-led-search-results > .ph-template-map-panel,
+.ph-search-template-map-led-search-results .ph-template-search > .ph-template-map-panel {
+	display: block;
 }
 
 .ph-template-map-surface {
@@ -587,6 +533,65 @@ body.admin-bar .ph-template-editor {
 	height: 100%;
 	object-fit: cover;
 	width: 100%;
+}
+
+.ph-template-search.ph-search-card-size-compact ul.properties li.ph-template-card,
+.ph-search-card-size-compact .ph-template-search ul.properties li.ph-template-card {
+	gap: 0 16px;
+	grid-template-columns: minmax(150px, 26%) minmax(0, 1fr);
+	padding: 14px 0;
+}
+
+.ph-template-search.ph-search-card-size-compact ul.properties li.ph-template-card .details,
+.ph-search-card-size-compact .ph-template-search ul.properties li.ph-template-card .details {
+	gap: 5px;
+}
+
+.ph-template-search.ph-search-card-size-compact ul.properties li.ph-template-card .details h3,
+.ph-search-card-size-compact .ph-template-search ul.properties li.ph-template-card .details h3 {
+	font-size: 16px;
+}
+
+.ph-template-search.ph-search-card-size-compact ul.properties li.ph-template-card .price,
+.ph-search-card-size-compact .ph-template-search ul.properties li.ph-template-card .price {
+	font-size: 18px;
+}
+
+.ph-template-search.ph-search-card-size-compact ul.properties li.ph-template-card .summary,
+.ph-search-card-size-compact .ph-template-search ul.properties li.ph-template-card .summary,
+.ph-template-search.ph-search-card-size-compact ul.properties li.ph-template-card .property_summary,
+.ph-search-card-size-compact .ph-template-search ul.properties li.ph-template-card .property_summary {
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.ph-template-search.ph-search-card-size-large ul.properties li.ph-template-card,
+.ph-search-card-size-large .ph-template-search ul.properties li.ph-template-card {
+	gap: 0 28px;
+	grid-template-columns: minmax(280px, 42%) minmax(0, 1fr);
+	padding: 28px 0;
+}
+
+.ph-template-search.ph-search-card-size-large ul.properties li.ph-template-card .details,
+.ph-search-card-size-large .ph-template-search ul.properties li.ph-template-card .details {
+	gap: 9px;
+}
+
+.ph-template-search.ph-search-card-size-large ul.properties li.ph-template-card .details h3,
+.ph-search-card-size-large .ph-template-search ul.properties li.ph-template-card .details h3 {
+	font-size: 21px;
+}
+
+.ph-template-search.ph-search-card-size-large ul.properties li.ph-template-card .price,
+.ph-search-card-size-large .ph-template-search ul.properties li.ph-template-card .price {
+	font-size: 24px;
+}
+
+.ph-template-search.ph-search-card-size-large ul.properties li.ph-template-card .summary,
+.ph-search-card-size-large .ph-template-search ul.properties li.ph-template-card .summary,
+.ph-template-search.ph-search-card-size-large ul.properties li.ph-template-card .property_summary,
+.ph-search-card-size-large .ph-template-search ul.properties li.ph-template-card .property_summary {
+	font-size: 15px;
 }
 
 .ph-template-card-gallery-controls {
@@ -923,17 +928,6 @@ body.admin-bar .ph-template-editor {
 .ph-template-images-rounded .ph-template-card .thumbnail a,
 .ph-template-card.ph-template-images-rounded .thumbnail a {
 	border-radius: 8px;
-}
-
-/* Density presets */
-.ph-template-density-spacious.ph-template-set ul.properties li.ph-template-card,
-.ph-template-density-spacious .ph-template-set ul.properties li.ph-template-card {
-	padding: 28px 0;
-}
-
-.ph-template-density-compact.ph-template-set ul.properties li.ph-template-card,
-.ph-template-density-compact .ph-template-set ul.properties li.ph-template-card {
-	padding: 14px 0;
 }
 
 /* ----- Detail pages ----- */
@@ -1807,6 +1801,11 @@ body.admin-bar .ph-template-editor {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
+	.ph-template-search.ph-search-card-size-large.ph-search-view-grid ul.properties,
+	.ph-search-card-size-large.ph-search-view-grid .ph-template-search ul.properties {
+		grid-template-columns: 1fr;
+	}
+
 	.ph-template-featured-module ul.properties {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
@@ -2152,6 +2151,16 @@ body.admin-bar .ph-template-editor {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 
+	.ph-template-search.ph-search-card-size-compact.ph-search-view-grid ul.properties,
+	.ph-search-card-size-compact.ph-search-view-grid .ph-template-search ul.properties {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.ph-template-search.ph-search-card-size-large.ph-search-view-grid ul.properties,
+	.ph-search-card-size-large.ph-search-view-grid .ph-template-search ul.properties {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.ph-search-template-brand-led-agency-search-results ul.properties {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
@@ -2178,11 +2187,6 @@ body.admin-bar .ph-template-editor {
 }
 
 @media (max-width: 759px) {
-	.ph-template-search-tools {
-		align-items: flex-start;
-		flex-direction: column;
-	}
-
 	.ph-template-set ul.properties li.ph-template-card,
 	.ph-search-template-compact-list-search-results ul.properties li.ph-template-card,
 	.ph-search-template-map-led-search-results ul.properties li.ph-template-card {
