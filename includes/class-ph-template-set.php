@@ -2988,12 +2988,12 @@ class PH_Template_Set {
 					self::render_template_editor_hidden( 'template_set_recommended_image_size', $settings['template_set_recommended_image_size'] );
 
 					self::render_template_editor_section_start( __( 'Search result cards', 'propertyhive' ) );
-					self::render_template_editor_select( 'template_set_search_layout', __( 'Listing layout', 'propertyhive' ), self::get_search_layouts(), self::get_search_view() );
+					self::render_template_editor_select( 'template_set_search_layout', __( 'Results layout', 'propertyhive' ), self::get_search_layouts(), self::get_search_view() );
 					self::render_template_editor_select( 'template_set_search_card_size', __( 'Card size', 'propertyhive' ), self::get_search_card_sizes(), $settings['template_set_search_card_size'] );
-					self::render_template_editor_select( 'template_set_search_grid_columns', __( 'Properties per row', 'propertyhive' ), self::get_search_grid_column_options(), $settings['template_set_search_grid_columns'] );
-					self::render_template_editor_select( 'template_set_image_style', __( 'Image style', 'propertyhive' ), self::get_image_styles(), $settings['template_set_image_style'] );
-					self::render_template_editor_checkbox( 'template_set_show_branch', __( 'Show branch details', 'propertyhive' ), $settings['template_set_show_branch'] );
-					self::render_template_editor_checkbox( 'template_set_show_badges', __( 'Show property badges', 'propertyhive' ), $settings['template_set_show_badges'] );
+					self::render_template_editor_select( 'template_set_search_grid_columns', __( 'Cards per row', 'propertyhive' ), self::get_search_grid_column_options(), $settings['template_set_search_grid_columns'] );
+					self::render_template_editor_select( 'template_set_image_style', __( 'Photo shape', 'propertyhive' ), self::get_image_styles(), $settings['template_set_image_style'] );
+					self::render_template_editor_checkbox( 'template_set_show_branch', __( 'Show branch contact details', 'propertyhive' ), $settings['template_set_show_branch'] );
+					self::render_template_editor_checkbox( 'template_set_show_badges', __( 'Show property labels', 'propertyhive' ), $settings['template_set_show_badges'] );
 					self::render_template_editor_section_end();
 				} else {
 					self::render_template_editor_hidden( 'template_set_search_layout', $settings['template_set_search_layout'] );
@@ -3004,28 +3004,31 @@ class PH_Template_Set {
 					self::render_template_editor_hidden( 'template_set_show_badges', $settings['template_set_show_badges'] );
 
 					self::render_template_editor_section_start( __( 'Gallery', 'propertyhive' ) );
-						echo '<div class="ph-template-editor-segmented" role="radiogroup" aria-label="' . esc_attr__( 'Gallery layout', 'propertyhive' ) . '">';
-							foreach ( self::get_gallery_layouts() as $layout => $label ) {
-								echo '<label class="' . ( $layout === $settings['template_set_gallery_layout'] ? 'is-active' : '' ) . '">';
-									echo '<input type="radio" name="template_set_gallery_layout" value="' . esc_attr( $layout ) . '"' . checked( $layout, $settings['template_set_gallery_layout'], false ) . ' data-ph-template-editor-control>';
-									echo '<span>' . esc_html( $label ) . '</span>';
-								echo '</label>';
-							}
+						echo '<div class="ph-template-editor-field ph-template-editor-field-template_set_gallery_layout">';
+							echo '<span>' . esc_html__( 'Gallery layout', 'propertyhive' ) . '</span>';
+							echo '<div class="ph-template-editor-segmented" role="radiogroup" aria-label="' . esc_attr__( 'Gallery layout', 'propertyhive' ) . '">';
+								foreach ( self::get_gallery_layouts() as $layout => $label ) {
+									echo '<label class="' . ( $layout === $settings['template_set_gallery_layout'] ? 'is-active' : '' ) . '">';
+										echo '<input type="radio" name="template_set_gallery_layout" value="' . esc_attr( $layout ) . '"' . checked( $layout, $settings['template_set_gallery_layout'], false ) . ' data-ph-template-editor-control>';
+										echo '<span>' . esc_html( $label ) . '</span>';
+									echo '</label>';
+								}
+							echo '</div>';
 						echo '</div>';
 					self::render_template_editor_section_end();
 
 					self::render_template_editor_section_start( __( 'Property page', 'propertyhive' ) );
-					self::render_template_editor_select( 'template_set_button_style', __( 'Buttons', 'propertyhive' ), self::get_button_styles(), $settings['template_set_button_style'] );
-					self::render_template_editor_select( 'template_set_contact_card_style', __( 'Contact card', 'propertyhive' ), self::get_contact_card_styles(), $settings['template_set_contact_card_style'] );
-					self::render_template_editor_checkbox( 'template_set_show_mobile_cta', __( 'Mobile enquiry bar', 'propertyhive' ), $settings['template_set_show_mobile_cta'] );
+					self::render_template_editor_select( 'template_set_button_style', __( 'Button style', 'propertyhive' ), self::get_button_styles(), $settings['template_set_button_style'] );
+					self::render_template_editor_select( 'template_set_contact_card_style', __( 'Contact card style', 'propertyhive' ), self::get_contact_card_styles(), $settings['template_set_contact_card_style'] );
+					self::render_template_editor_checkbox( 'template_set_show_mobile_cta', __( 'Show mobile enquiry bar', 'propertyhive' ), $settings['template_set_show_mobile_cta'] );
 					self::render_template_editor_checkbox( 'template_set_show_floorplans', __( 'Show floorplans', 'propertyhive' ), $settings['template_set_show_floorplans'] );
 					self::render_template_editor_checkbox( 'template_set_show_virtual_tours', __( 'Show virtual tours', 'propertyhive' ), $settings['template_set_show_virtual_tours'] );
 					self::render_template_editor_section_end();
 
-					self::render_template_editor_section_start( __( 'Recommended homes', 'propertyhive' ) );
-					self::render_template_editor_checkbox( 'template_set_show_recommended', __( 'Show recommended homes', 'propertyhive' ), $settings['template_set_show_recommended'] );
-					self::render_template_editor_select( 'template_set_recommended_count', __( 'Number shown', 'propertyhive' ), self::get_recommended_property_counts(), $settings['template_set_recommended_count'] );
-					self::render_template_editor_select( 'template_set_recommended_layout', __( 'Layout', 'propertyhive' ), self::get_recommended_property_layouts(), $settings['template_set_recommended_layout'] );
+					self::render_template_editor_section_start( __( 'Related properties', 'propertyhive' ) );
+					self::render_template_editor_checkbox( 'template_set_show_recommended', __( 'Show related properties', 'propertyhive' ), $settings['template_set_show_recommended'] );
+					self::render_template_editor_select( 'template_set_recommended_count', __( 'Number of properties', 'propertyhive' ), self::get_recommended_property_counts(), $settings['template_set_recommended_count'] );
+					self::render_template_editor_select( 'template_set_recommended_layout', __( 'Card layout', 'propertyhive' ), self::get_recommended_property_layouts(), $settings['template_set_recommended_layout'] );
 					self::render_template_editor_select( 'template_set_recommended_image_size', __( 'Image size', 'propertyhive' ), self::get_recommended_property_image_sizes(), $settings['template_set_recommended_image_size'] );
 					self::render_template_editor_section_end();
 				}
