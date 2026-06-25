@@ -186,7 +186,7 @@ class PH_Template_Set {
 
 		$default_editor_mode = self::get_default_editor_mode( $settings );
 
-		return wp_parse_args(
+		$settings = wp_parse_args(
 			$settings,
 			array(
 				self::OPTION_ENABLED             => '',
@@ -199,6 +199,7 @@ class PH_Template_Set {
 				'template_set_button_style'           => 'filled',
 				'template_set_card_density'           => 'standard',
 				'template_set_image_style'            => 'soft',
+				'template_set_contact_card_style'     => 'classic',
 				'template_set_show_branch'            => 'yes',
 				'template_set_show_badges'            => 'yes',
 				'template_set_show_mobile_cta'        => 'yes',
@@ -210,6 +211,12 @@ class PH_Template_Set {
 				'template_set_recommended_image_size' => 'standard',
 			)
 		);
+
+		if ( ! isset( self::get_contact_card_styles()[ $settings['template_set_contact_card_style'] ] ) ) {
+			$settings['template_set_contact_card_style'] = 'classic';
+		}
+
+		return $settings;
 	}
 
 	/**
@@ -330,6 +337,11 @@ class PH_Template_Set {
 			$image_style = 'soft';
 		}
 
+		$contact_card_style = isset( $raw_settings['template_set_contact_card_style'] ) ? sanitize_title( $raw_settings['template_set_contact_card_style'] ) : sanitize_title( $current['template_set_contact_card_style'] );
+		if ( ! isset( self::get_contact_card_styles()[ $contact_card_style ] ) ) {
+			$contact_card_style = 'classic';
+		}
+
 		$recommended_count = isset( $raw_settings['template_set_recommended_count'] ) ? absint( $raw_settings['template_set_recommended_count'] ) : absint( $current['template_set_recommended_count'] );
 		if ( ! isset( self::get_recommended_property_counts()[ $recommended_count ] ) ) {
 			$recommended_count = 3;
@@ -356,6 +368,7 @@ class PH_Template_Set {
 			'template_set_button_style'               => $button_style,
 			'template_set_card_density'               => $card_density,
 			'template_set_image_style'                => $image_style,
+			'template_set_contact_card_style'         => $contact_card_style,
 			'template_set_show_branch'                => self::normalise_checkbox_value( $raw_settings, 'template_set_show_branch' ),
 			'template_set_show_badges'                => self::normalise_checkbox_value( $raw_settings, 'template_set_show_badges' ),
 			'template_set_show_mobile_cta'            => self::normalise_checkbox_value( $raw_settings, 'template_set_show_mobile_cta' ),
@@ -448,6 +461,20 @@ class PH_Template_Set {
 			'square'  => __( 'Square', 'propertyhive' ),
 			'soft'    => __( 'Soft corners', 'propertyhive' ),
 			'rounded' => __( 'Rounded media', 'propertyhive' ),
+		);
+	}
+
+	/**
+	 * Contact-card style choices.
+	 *
+	 * @return array
+	 */
+	public static function get_contact_card_styles() {
+		return array(
+			'classic'   => __( 'Classic portal', 'propertyhive' ),
+			'signature' => __( 'Agency signature', 'propertyhive' ),
+			'concierge' => __( 'Private client', 'propertyhive' ),
+			'editorial' => __( 'Editorial rail', 'propertyhive' ),
 		);
 	}
 
@@ -815,6 +842,7 @@ class PH_Template_Set {
 		$classes[] = 'ph-template-density-' . sanitize_html_class( $settings['template_set_card_density'] );
 		$classes[] = 'ph-template-images-' . sanitize_html_class( $settings['template_set_image_style'] );
 		$classes[] = 'ph-template-buttons-' . sanitize_html_class( $settings['template_set_button_style'] );
+		$classes[] = 'ph-template-contact-card-' . sanitize_html_class( $settings['template_set_contact_card_style'] );
 		$classes[] = 'ph-template-editor-mode-' . sanitize_html_class( $settings['template_set_editor_mode'] );
 		$classes[] = 'yes' === $settings['template_set_show_branch'] ? 'ph-template-show-branch' : 'ph-template-hide-branch';
 		$classes[] = 'yes' === $settings['template_set_show_badges'] ? 'ph-template-show-badges' : 'ph-template-hide-badges';
@@ -2471,26 +2499,29 @@ class PH_Template_Set {
 		$is_demo  = self::is_demo_preview();
 		$phone    = $property->get_negotiator_telephone_number();
 		$email    = $property->get_negotiator_email_address();
-		$office   = self::get_display_office_name( $property );
+		$office   = $property->get_office_name();
 		$address  = $property->get_office_address();
 		$agent    = $property->get_negotiator_name();
 		$portrait = $property->get_negotiator_photo();
 
 		$office_alt = $office ? $office : __( 'Agent', 'propertyhive' );
+		$agent_role = self::get_contact_agent_role( $agent, $office_alt, $office );
 
 		echo '<aside class="ph-template-detail-contact-card' . ( $is_demo ? ' is-demo' : '' ) . '" aria-label="' . esc_attr__( 'Property contact', 'propertyhive' ) . '">';
 
 			if ( $agent || $portrait ) {
 				echo '<div class="ph-template-contact-agent">';
 					if ( $portrait ) {
-						echo '<span class="ph-template-contact-portrait">' . wp_kses_post( $portrait ) . '</span>';
+						echo '<span class="ph-template-contact-portrait ph-template-contact-portrait-image">' . wp_kses_post( $portrait ) . '</span>';
+					} elseif ( $agent ) {
+						echo '<span class="ph-template-contact-portrait ph-template-contact-portrait-initials" aria-hidden="true">' . esc_html( self::get_contact_agent_initials( $agent ) ) . '</span>';
 					}
 					echo '<span class="ph-template-contact-agent-meta">';
 						if ( $agent ) {
 							echo '<span class="ph-template-contact-agent-name">' . esc_html( $agent ) . '</span>';
 						}
-						if ( $office ) {
-							echo '<span class="ph-template-contact-agent-role">' . esc_html( $office ) . '</span>';
+						if ( $agent_role ) {
+							echo '<span class="ph-template-contact-agent-role">' . esc_html( $agent_role ) . '</span>';
 						}
 					echo '</span>';
 				echo '</div>';
@@ -2771,6 +2802,7 @@ class PH_Template_Set {
 				if ( 'search' === $context ) {
 					self::render_template_editor_hidden( 'template_set_gallery_layout', $settings['template_set_gallery_layout'] );
 					self::render_template_editor_hidden( 'template_set_button_style', $settings['template_set_button_style'] );
+					self::render_template_editor_hidden( 'template_set_contact_card_style', $settings['template_set_contact_card_style'] );
 					self::render_template_editor_hidden( 'template_set_show_mobile_cta', $settings['template_set_show_mobile_cta'] );
 					self::render_template_editor_hidden( 'template_set_show_floorplans', $settings['template_set_show_floorplans'] );
 					self::render_template_editor_hidden( 'template_set_show_virtual_tours', $settings['template_set_show_virtual_tours'] );
@@ -2804,6 +2836,7 @@ class PH_Template_Set {
 
 					self::render_template_editor_section_start( __( 'Property page', 'propertyhive' ) );
 					self::render_template_editor_select( 'template_set_button_style', __( 'Buttons', 'propertyhive' ), self::get_button_styles(), $settings['template_set_button_style'] );
+					self::render_template_editor_select( 'template_set_contact_card_style', __( 'Contact card', 'propertyhive' ), self::get_contact_card_styles(), $settings['template_set_contact_card_style'] );
 					self::render_template_editor_checkbox( 'template_set_show_mobile_cta', __( 'Mobile enquiry bar', 'propertyhive' ), $settings['template_set_show_mobile_cta'] );
 					self::render_template_editor_checkbox( 'template_set_show_floorplans', __( 'Show floorplans', 'propertyhive' ), $settings['template_set_show_floorplans'] );
 					self::render_template_editor_checkbox( 'template_set_show_virtual_tours', __( 'Show virtual tours', 'propertyhive' ), $settings['template_set_show_virtual_tours'] );
@@ -2990,6 +3023,7 @@ class PH_Template_Set {
 			'template_set_button_style'           => sanitize_title( $settings['template_set_button_style'] ),
 			'template_set_card_density'           => sanitize_title( $settings['template_set_card_density'] ),
 			'template_set_image_style'            => sanitize_title( $settings['template_set_image_style'] ),
+			'template_set_contact_card_style'     => sanitize_title( $settings['template_set_contact_card_style'] ),
 			'template_set_show_branch'            => 'yes' === $settings['template_set_show_branch'] ? 'yes' : '',
 			'template_set_show_badges'            => 'yes' === $settings['template_set_show_badges'] ? 'yes' : '',
 			'template_set_show_mobile_cta'        => 'yes' === $settings['template_set_show_mobile_cta'] ? 'yes' : '',
@@ -3646,6 +3680,88 @@ class PH_Template_Set {
 		);
 
 		return isset( $hints[ $template ] ) ? $hints[ $template ] : __( 'Call or request a viewing with the agent.', 'propertyhive' );
+	}
+
+	/**
+	 * Build initials for the contact-card photo fallback.
+	 *
+	 * @param string $name Negotiator display name.
+	 * @return string
+	 */
+	private static function get_contact_agent_initials( $name ) {
+		$name = trim( wp_strip_all_tags( (string) $name ) );
+
+		if ( '' === $name ) {
+			return '';
+		}
+
+		$parts    = preg_split( '/\s+/', $name );
+		$first    = isset( $parts[0] ) ? $parts[0] : '';
+		$last     = count( $parts ) > 1 ? $parts[ count( $parts ) - 1 ] : '';
+		$initials = self::get_string_initial( $first );
+
+		if ( '' !== $last ) {
+			$initials .= self::get_string_initial( $last );
+		} else {
+			$initials .= self::get_string_initial( self::get_string_slice( $first, 1 ) );
+		}
+
+		return strtoupper( substr( $initials, 0, 2 ) );
+	}
+
+	/**
+	 * Get a non-repeating subline for the negotiator row.
+	 *
+	 * @param string $agent Agent display name.
+	 * @param string $office_heading Marketed-by heading.
+	 * @param string $office Office name.
+	 * @return string
+	 */
+	private static function get_contact_agent_role( $agent, $office_heading, $office ) {
+		$office         = trim( wp_strip_all_tags( (string) $office ) );
+		$office_heading = trim( wp_strip_all_tags( (string) $office_heading ) );
+
+		if ( '' === $office || '' === $agent ) {
+			return '';
+		}
+
+		if ( 0 === strcasecmp( $office, $office_heading ) ) {
+			return '';
+		}
+
+		return $office;
+	}
+
+	/**
+	 * Get the first character from a string.
+	 *
+	 * @param string $value Value.
+	 * @return string
+	 */
+	private static function get_string_initial( $value ) {
+		$value = trim( (string) $value );
+
+		if ( '' === $value ) {
+			return '';
+		}
+
+		return self::get_string_slice( $value, 0, 1 );
+	}
+
+	/**
+	 * Slice strings with mbstring support when available.
+	 *
+	 * @param string   $value Value.
+	 * @param int      $start Start offset.
+	 * @param int|null $length Length.
+	 * @return string
+	 */
+	private static function get_string_slice( $value, $start, $length = null ) {
+		if ( function_exists( 'mb_substr' ) ) {
+			return null === $length ? mb_substr( $value, $start ) : mb_substr( $value, $start, $length );
+		}
+
+		return null === $length ? substr( $value, $start ) : substr( $value, $start, $length );
 	}
 
 	/**

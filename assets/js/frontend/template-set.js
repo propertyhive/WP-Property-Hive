@@ -596,6 +596,10 @@
 			setBodyOption('ph-template-images-', value);
 		}
 
+		if (name === 'template_set_contact_card_style') {
+			setBodyOption('ph-template-contact-card-', value);
+		}
+
 		if (name === 'template_set_show_branch') {
 			setBodyToggle('ph-template-show-branch', 'ph-template-hide-branch', value === 'yes');
 		}

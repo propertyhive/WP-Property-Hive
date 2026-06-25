@@ -1274,9 +1274,14 @@ body.admin-bar .ph-template-editor {
 	background: var(--ph-template-panel);
 	border: 1px solid var(--ph-template-line-strong);
 	border-radius: var(--ph-template-radius);
+	margin-top: var(--ph-template-contact-card-margin-top, 24px);
 	padding: 20px;
 	position: relative;
 	z-index: 20;
+}
+
+.ph-template-detail > .ph-template-detail-contact-card {
+	margin-top: var(--ph-template-contact-card-margin-top, 24px);
 }
 
 .ph-template-contact-kicker {
@@ -1965,7 +1970,7 @@ body.admin-bar .ph-template-editor {
 		align-self: start;
 		grid-column: 2;
 		grid-row: 2 / span 4;
-		margin-top: 154px;
+		margin-top: 178px;
 	}
 
 	.ph-detail-template-standard-sales-detail.ph-template-detail > .ph-template-modules,
@@ -3092,6 +3097,17 @@ body.admin-bar .ph-template-editor {
 	width: 100%;
 }
 
+.ph-template-contact-portrait-initials {
+	align-items: center;
+	background: #17212f;
+	color: #fff;
+	display: flex;
+	font-size: 17px;
+	font-weight: 700;
+	justify-content: center;
+	letter-spacing: 0.04em;
+}
+
 .ph-template-contact-agent-meta {
 	display: grid;
 	gap: 2px;
@@ -3109,6 +3125,233 @@ body.admin-bar .ph-template-editor {
 	color: var(--ph-template-muted);
 	font-size: 13px;
 	line-height: 1.35;
+}
+
+.ph-template-contact-card-classic .ph-template-detail-contact-card {
+	border-top: 3px solid var(--ph-template-ink);
+	box-shadow: none;
+}
+
+.ph-template-contact-card-signature .ph-template-detail-contact-card,
+.ph-template-contact-card-concierge .ph-template-detail-contact-card {
+	overflow: hidden;
+}
+
+.ph-template-contact-card-signature .ph-template-detail-contact-card {
+	border-color: var(--ph-template-line);
+	border-radius: 6px;
+	border-top: 0;
+	box-shadow: 0 16px 34px rgba(20, 28, 38, 0.08);
+	padding: 26px 22px 22px;
+}
+
+.ph-template-contact-card-signature .ph-template-detail-contact-card:before {
+	background: linear-gradient(90deg, var(--ph-template-brand) 0 68%, var(--ph-template-accent) 68% 100%);
+	content: "";
+	height: 4px;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+.ph-template-contact-card-signature .ph-template-contact-agent {
+	background: var(--ph-template-tint);
+	border: 1px solid var(--ph-template-line);
+	border-radius: 6px;
+	margin: 0 0 18px;
+	padding: 14px;
+}
+
+.ph-template-contact-card-signature .ph-template-contact-portrait {
+	border: 2px solid #fff;
+	box-shadow: 0 8px 20px rgba(20, 28, 38, 0.12);
+	flex-basis: 62px;
+	height: 62px;
+	width: 62px;
+}
+
+.ph-template-contact-card-signature .ph-template-contact-portrait-initials {
+	background: var(--ph-template-brand);
+}
+
+.ph-template-contact-card-signature .ph-template-contact-kicker {
+	color: var(--ph-template-accent);
+}
+
+.ph-template-contact-card-concierge .ph-template-detail-contact-card {
+	background: var(--ph-template-ink);
+	border-color: var(--ph-template-ink);
+	border-radius: 6px;
+	box-shadow: 0 18px 36px rgba(20, 28, 38, 0.14);
+	color: #fff;
+	padding: 22px;
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-agent {
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	border-radius: 6px;
+	margin-bottom: 18px;
+	padding: 14px;
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-portrait {
+	background: rgba(255, 255, 255, 0.12);
+	border: 2px solid rgba(255, 255, 255, 0.28);
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-portrait-initials {
+	background: rgba(255, 255, 255, 0.16);
+	color: #fff;
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-agent-name,
+.ph-template-contact-card-concierge .ph-template-detail-contact-card h2 {
+	color: #fff;
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-agent-role,
+.ph-template-contact-card-concierge .ph-template-contact-kicker,
+.ph-template-contact-card-concierge .ph-template-contact-address,
+.ph-template-contact-card-concierge .ph-template-contact-hint {
+	color: rgba(255, 255, 255, 0.76);
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-actions .ph-template-button-primary {
+	background: #fff;
+	border-color: #fff;
+	color: var(--ph-template-ink);
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-actions .ph-template-button-primary:hover {
+	background: var(--ph-template-accent);
+	border-color: var(--ph-template-accent);
+	color: #fff;
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-actions .ph-template-button-secondary {
+	background: transparent;
+	border-color: rgba(255, 255, 255, 0.35);
+	color: #fff;
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-actions .ph-template-button-secondary:hover {
+	background: rgba(255, 255, 255, 0.1);
+	border-color: rgba(255, 255, 255, 0.55);
+	color: #fff;
+}
+
+.ph-template-contact-card-concierge .ph-template-contact-link,
+.ph-template-contact-card-concierge .ph-template-media-links li {
+	color: #fff;
+}
+
+.ph-template-contact-card-concierge .ph-template-media-links {
+	border-top-color: rgba(255, 255, 255, 0.18);
+}
+
+.ph-template-contact-card-editorial .ph-template-detail-contact-card {
+	background: transparent;
+	border: 0;
+	border-left: 1px solid var(--ph-template-line-strong);
+	border-radius: 0;
+	box-shadow: none;
+	padding: 6px 0 6px 22px;
+}
+
+.ph-template-contact-card-editorial .ph-template-contact-address,
+.ph-template-contact-card-editorial .ph-template-contact-hint {
+	max-width: 30rem;
+}
+
+.ph-template-contact-card-editorial .ph-template-contact-agent {
+	border-bottom-color: var(--ph-template-line-strong);
+	margin-bottom: 20px;
+	padding-bottom: 20px;
+}
+
+.ph-template-contact-card-editorial .ph-template-contact-portrait {
+	border-radius: 6px;
+}
+
+.ph-template-contact-card-editorial .ph-template-contact-portrait-initials {
+	background: var(--ph-template-soft);
+	color: var(--ph-template-ink);
+}
+
+.ph-template-contact-card-editorial .ph-template-contact-kicker {
+	color: var(--ph-template-accent);
+	letter-spacing: 0.12em;
+}
+
+.ph-template-contact-card-editorial .ph-template-detail-contact-card h2 {
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 23px;
+	font-weight: 400;
+}
+
+.ph-template-contact-card-editorial .ph-template-contact-actions .ph-template-button-primary {
+	background: transparent;
+	border-color: var(--ph-template-brand);
+	color: var(--ph-template-brand);
+}
+
+.ph-template-contact-card-editorial .ph-template-contact-actions .ph-template-button-primary:hover {
+	background: var(--ph-template-brand);
+	color: #fff;
+}
+
+.ph-template-contact-card-classic .ph-template-detail-contact-card.is-demo {
+	border-top: 3px solid var(--ph-template-ink);
+	padding-top: 20px;
+}
+
+.ph-template-contact-card-signature .ph-template-detail-contact-card.is-demo {
+	border-top: 0;
+	padding-top: 26px;
+}
+
+.ph-template-contact-card-concierge .ph-template-detail-contact-card.is-demo {
+	border-top: 0;
+	padding-top: 22px;
+}
+
+.ph-template-contact-card-editorial .ph-template-detail-contact-card.is-demo {
+	border-top: 0;
+	padding-top: 6px;
+}
+
+.ph-template-contact-card-classic .ph-detail-template-standard-sales-detail.ph-template-detail > .ph-template-detail-contact-card.is-demo,
+.ph-template-contact-card-classic .ph-detail-template-standard-sales-detail .ph-template-detail > .ph-template-detail-contact-card.is-demo {
+	border-top: 3px solid var(--ph-template-ink);
+	padding-top: 20px;
+}
+
+.ph-template-contact-card-signature .ph-detail-template-standard-sales-detail.ph-template-detail > .ph-template-detail-contact-card.is-demo,
+.ph-template-contact-card-signature .ph-detail-template-standard-sales-detail .ph-template-detail > .ph-template-detail-contact-card.is-demo {
+	border-top: 0;
+	padding-top: 26px;
+}
+
+.ph-template-contact-card-concierge .ph-detail-template-standard-sales-detail.ph-template-detail > .ph-template-detail-contact-card.is-demo,
+.ph-template-contact-card-concierge .ph-detail-template-standard-sales-detail .ph-template-detail > .ph-template-detail-contact-card.is-demo {
+	border-top: 0;
+	padding-top: 22px;
+}
+
+.ph-template-contact-card-editorial .ph-detail-template-standard-sales-detail.ph-template-detail > .ph-template-detail-contact-card.is-demo,
+.ph-template-contact-card-editorial .ph-detail-template-standard-sales-detail .ph-template-detail > .ph-template-detail-contact-card.is-demo {
+	border-top: 0;
+	padding-top: 6px;
+}
+
+@media (max-width: 700px) {
+	.ph-template-contact-card-editorial .ph-template-detail-contact-card {
+		border-left: 0;
+		border-top: 1px solid var(--ph-template-line-strong);
+		padding: 18px 0 0;
+	}
 }
 
 .ph-template-modules,
@@ -3409,8 +3652,50 @@ body.admin-bar .ph-template-editor {
 
 .ph-template-similar-grid {
 	display: grid;
-	gap: 16px;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--ph-template-recommended-card-gap, 16px);
+	grid-template-columns: var(--ph-template-recommended-grid-columns, repeat(3, minmax(0, 1fr)));
+	max-width: var(--ph-template-recommended-grid-max-width, none);
+}
+
+.ph-template-recommended-images-compact .ph-template-similar-properties {
+	--ph-template-recommended-card-gap: 12px;
+	--ph-template-recommended-card-padding: 12px;
+	--ph-template-recommended-count-2-columns: repeat(2, minmax(0, 1fr));
+	--ph-template-recommended-count-4-columns: repeat(4, minmax(0, 1fr));
+	--ph-template-recommended-count-6-columns: repeat(4, minmax(0, 1fr));
+	--ph-template-recommended-feature-columns: repeat(4, minmax(0, 1fr));
+	--ph-template-recommended-grid-max-width: 920px;
+	--ph-template-recommended-grid-columns: repeat(4, minmax(0, 1fr));
+	--ph-template-recommended-image-ratio: 16 / 10;
+	--ph-template-recommended-list-image-min: 132px;
+	--ph-template-recommended-list-image-width: 24%;
+}
+
+.ph-template-recommended-images-standard .ph-template-similar-properties,
+.ph-template-recommended-images-balanced .ph-template-similar-properties {
+	--ph-template-recommended-card-gap: 16px;
+	--ph-template-recommended-card-padding: 14px;
+	--ph-template-recommended-count-2-columns: repeat(2, minmax(0, 1fr));
+	--ph-template-recommended-count-4-columns: repeat(3, minmax(0, 1fr));
+	--ph-template-recommended-count-6-columns: repeat(3, minmax(0, 1fr));
+	--ph-template-recommended-feature-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
+	--ph-template-recommended-grid-columns: repeat(3, minmax(0, 1fr));
+	--ph-template-recommended-image-ratio: 16 / 10;
+	--ph-template-recommended-list-image-min: 180px;
+	--ph-template-recommended-list-image-width: 30%;
+}
+
+.ph-template-recommended-images-large .ph-template-similar-properties {
+	--ph-template-recommended-card-gap: 18px;
+	--ph-template-recommended-card-padding: 16px;
+	--ph-template-recommended-count-2-columns: repeat(2, minmax(0, 1fr));
+	--ph-template-recommended-count-4-columns: repeat(2, minmax(0, 1fr));
+	--ph-template-recommended-count-6-columns: repeat(2, minmax(0, 1fr));
+	--ph-template-recommended-feature-columns: repeat(2, minmax(0, 1fr));
+	--ph-template-recommended-grid-columns: repeat(2, minmax(0, 1fr));
+	--ph-template-recommended-image-ratio: 16 / 10;
+	--ph-template-recommended-list-image-min: 250px;
+	--ph-template-recommended-list-image-width: 42%;
 }
 
 .ph-template-hide-recommended .ph-template-similar-properties {
@@ -3418,15 +3703,15 @@ body.admin-bar .ph-template-editor {
 }
 
 .ph-template-recommended-count-2 .ph-template-similar-grid {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: var(--ph-template-recommended-count-2-columns, repeat(2, minmax(0, 1fr)));
 }
 
 .ph-template-recommended-count-4 .ph-template-similar-grid {
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-columns: var(--ph-template-recommended-count-4-columns, repeat(4, minmax(0, 1fr)));
 }
 
 .ph-template-recommended-count-6 .ph-template-similar-grid {
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: var(--ph-template-recommended-count-6-columns, repeat(3, minmax(0, 1fr)));
 }
 
 .ph-template-similar-card {
@@ -3442,7 +3727,7 @@ body.admin-bar .ph-template-editor {
 }
 
 .ph-template-recommended-layout-feature .ph-template-similar-grid {
-	grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
+	grid-template-columns: var(--ph-template-recommended-feature-columns, minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr));
 }
 
 .ph-template-recommended-layout-feature .ph-template-similar-card:first-child {
@@ -3456,36 +3741,30 @@ body.admin-bar .ph-template-editor {
 
 .ph-template-recommended-layout-list .ph-template-similar-card {
 	align-items: stretch;
-	grid-template-columns: minmax(180px, 30%) 1fr;
+	grid-template-columns: minmax(var(--ph-template-recommended-list-image-min, 180px), var(--ph-template-recommended-list-image-width, 30%)) 1fr;
 	grid-template-rows: auto;
 }
 
 .ph-template-similar-card img {
-	aspect-ratio: 16 / 10;
+	aspect-ratio: var(--ph-template-recommended-image-ratio, 16 / 10);
 	display: block;
 	height: auto;
 	object-fit: cover;
 	width: 100%;
 }
 
-.ph-template-recommended-images-compact .ph-template-similar-card img {
-	aspect-ratio: 16 / 9;
-}
-
-.ph-template-recommended-images-large .ph-template-similar-card img,
 .ph-template-recommended-layout-feature .ph-template-similar-card:first-child img {
-	aspect-ratio: 4 / 3;
+	aspect-ratio: var(--ph-template-recommended-image-ratio, 16 / 10);
 }
 
 .ph-template-recommended-layout-list .ph-template-similar-card img {
-	height: 100%;
-	min-height: 160px;
+	height: auto;
 }
 
 .ph-template-similar-card div {
 	display: grid;
 	gap: 6px;
-	padding: 14px;
+	padding: var(--ph-template-recommended-card-padding, 14px);
 }
 
 .ph-template-similar-card h3 {
@@ -3578,7 +3857,7 @@ body.admin-bar .ph-template-editor {
 	}
 
 	.ph-template-recommended-layout-list .ph-template-similar-card {
-		grid-template-columns: minmax(170px, 34%) 1fr;
+		grid-template-columns: minmax(170px, min(var(--ph-template-recommended-list-image-width, 34%), 34%)) 1fr;
 	}
 
 	.ph-template-detail-facts-strip ul {
@@ -3748,6 +4027,23 @@ body.admin-bar .ph-template-editor {
 	.ph-template-modules,
 	.ph-template-similar-grid {
 		grid-template-columns: 1fr;
+	}
+
+	.ph-template-recommended-images-compact:not(.ph-template-recommended-layout-list) .ph-template-similar-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		max-width: none;
+	}
+
+	.ph-template-recommended-images-standard .ph-template-similar-grid,
+	.ph-template-recommended-images-balanced .ph-template-similar-grid {
+		grid-template-columns: 1fr;
+		max-width: 310px;
+	}
+
+	.ph-template-recommended-images-large .ph-template-similar-grid,
+	.ph-template-recommended-layout-list .ph-template-similar-grid {
+		grid-template-columns: 1fr;
+		max-width: none;
 	}
 
 	.ph-template-recommended-layout-feature .ph-template-similar-card:first-child {
