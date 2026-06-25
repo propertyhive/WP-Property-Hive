@@ -3066,7 +3066,7 @@ class PH_Template_Set {
 	 * @param string $title Section title.
 	 */
 	private static function render_template_editor_section_start( $title ) {
-		echo '<section class="ph-template-editor-section">';
+		echo '<section class="ph-template-editor-section ph-template-editor-source-section">';
 			echo '<h3>' . esc_html( $title ) . '</h3>';
 	}
 
