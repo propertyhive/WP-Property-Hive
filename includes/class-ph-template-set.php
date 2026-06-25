@@ -2485,36 +2485,32 @@ class PH_Template_Set {
 		}
 
 		$settings     = self::get_settings();
+		$context      = self::get_template_editor_context();
 		$exit_url     = remove_query_arg( self::EDIT_QUERY_ARG, self::get_current_url() );
 		$settings_url = admin_url( 'admin.php?page=ph-settings&tab=frontend&section=template-set' );
 
-		echo '<aside class="ph-template-editor" data-ph-template-editor aria-label="' . esc_attr__( 'Template editor', 'propertyhive' ) . '">';
+		echo '<aside class="ph-template-editor ph-template-editor-' . esc_attr( sanitize_html_class( $context ) ) . '" data-ph-template-editor data-ph-template-editor-context="' . esc_attr( $context ) . '" aria-label="' . esc_attr__( 'Template editor', 'propertyhive' ) . '">';
 			echo '<form class="ph-template-editor-form" data-ph-template-editor-form>';
 				echo '<header class="ph-template-editor-header">';
 					echo '<div>';
 						echo '<span>' . esc_html__( 'Property Hive', 'propertyhive' ) . '</span>';
-						echo '<h2>' . esc_html__( 'Template editor', 'propertyhive' ) . '</h2>';
+						echo '<h2>' . esc_html( self::get_template_editor_title( $context ) ) . '</h2>';
 					echo '</div>';
 					echo '<a href="' . esc_url( $exit_url ) . '" aria-label="' . esc_attr__( 'Exit template editor', 'propertyhive' ) . '">&times;</a>';
 				echo '</header>';
 
 				echo '<input type="hidden" name="template_set_enabled" value="yes">';
 				echo '<input type="hidden" name="template_set_editor_mode" value="' . esc_attr( self::EDITOR_MODE_VISUAL ) . '">';
+				echo '<input type="hidden" name="template_set_editor_context" value="' . esc_attr( $context ) . '">';
 
-				self::render_template_editor_section_start( __( 'Templates', 'propertyhive' ) );
-					self::render_template_editor_select( 'template_set_detail_template', __( 'Detail template', 'propertyhive' ), self::get_detail_templates(), self::get_detail_template() );
+				self::render_template_editor_section_start( __( 'Template', 'propertyhive' ) );
+				if ( 'search' === $context ) {
+					self::render_template_editor_hidden( 'template_set_detail_template', self::get_detail_template() );
 					self::render_template_editor_select( 'template_set_search_template', __( 'Search results', 'propertyhive' ), self::get_search_templates(), self::get_search_template() );
-				self::render_template_editor_section_end();
-
-				self::render_template_editor_section_start( __( 'Gallery', 'propertyhive' ) );
-					echo '<div class="ph-template-editor-segmented" role="radiogroup" aria-label="' . esc_attr__( 'Gallery layout', 'propertyhive' ) . '">';
-						foreach ( self::get_gallery_layouts() as $layout => $label ) {
-							echo '<label class="' . ( $layout === $settings['template_set_gallery_layout'] ? 'is-active' : '' ) . '">';
-								echo '<input type="radio" name="template_set_gallery_layout" value="' . esc_attr( $layout ) . '"' . checked( $layout, $settings['template_set_gallery_layout'], false ) . ' data-ph-template-editor-control>';
-								echo '<span>' . esc_html( $label ) . '</span>';
-							echo '</label>';
-						}
-					echo '</div>';
+				} else {
+					self::render_template_editor_hidden( 'template_set_search_template', self::get_search_template() );
+					self::render_template_editor_select( 'template_set_detail_template', __( 'Detail template', 'propertyhive' ), self::get_detail_templates(), self::get_detail_template() );
+				}
 				self::render_template_editor_section_end();
 
 				self::render_template_editor_section_start( __( 'Brand', 'propertyhive' ) );
@@ -2522,17 +2518,39 @@ class PH_Template_Set {
 					self::render_template_editor_colour( 'template_set_accent_colour', __( 'Accent colour', 'propertyhive' ), $settings['template_set_accent_colour'] );
 				self::render_template_editor_section_end();
 
-				self::render_template_editor_section_start( __( 'Style', 'propertyhive' ) );
-					self::render_template_editor_select( 'template_set_button_style', __( 'Buttons', 'propertyhive' ), self::get_button_styles(), $settings['template_set_button_style'] );
+				if ( 'search' === $context ) {
+					self::render_template_editor_hidden( 'template_set_gallery_layout', $settings['template_set_gallery_layout'] );
+					self::render_template_editor_hidden( 'template_set_button_style', $settings['template_set_button_style'] );
+					self::render_template_editor_hidden( 'template_set_show_mobile_cta', $settings['template_set_show_mobile_cta'] );
+
+					self::render_template_editor_section_start( __( 'Results cards', 'propertyhive' ) );
 					self::render_template_editor_select( 'template_set_card_density', __( 'Cards', 'propertyhive' ), self::get_card_densities(), $settings['template_set_card_density'] );
 					self::render_template_editor_select( 'template_set_image_style', __( 'Images', 'propertyhive' ), self::get_image_styles(), $settings['template_set_image_style'] );
-				self::render_template_editor_section_end();
-
-				self::render_template_editor_section_start( __( 'Display', 'propertyhive' ) );
 					self::render_template_editor_checkbox( 'template_set_show_branch', __( 'Branch details', 'propertyhive' ), $settings['template_set_show_branch'] );
 					self::render_template_editor_checkbox( 'template_set_show_badges', __( 'Property badges', 'propertyhive' ), $settings['template_set_show_badges'] );
+					self::render_template_editor_section_end();
+				} else {
+					self::render_template_editor_hidden( 'template_set_card_density', $settings['template_set_card_density'] );
+					self::render_template_editor_hidden( 'template_set_image_style', $settings['template_set_image_style'] );
+					self::render_template_editor_hidden( 'template_set_show_branch', $settings['template_set_show_branch'] );
+					self::render_template_editor_hidden( 'template_set_show_badges', $settings['template_set_show_badges'] );
+
+					self::render_template_editor_section_start( __( 'Gallery', 'propertyhive' ) );
+						echo '<div class="ph-template-editor-segmented" role="radiogroup" aria-label="' . esc_attr__( 'Gallery layout', 'propertyhive' ) . '">';
+							foreach ( self::get_gallery_layouts() as $layout => $label ) {
+								echo '<label class="' . ( $layout === $settings['template_set_gallery_layout'] ? 'is-active' : '' ) . '">';
+									echo '<input type="radio" name="template_set_gallery_layout" value="' . esc_attr( $layout ) . '"' . checked( $layout, $settings['template_set_gallery_layout'], false ) . ' data-ph-template-editor-control>';
+									echo '<span>' . esc_html( $label ) . '</span>';
+								echo '</label>';
+							}
+						echo '</div>';
+					self::render_template_editor_section_end();
+
+					self::render_template_editor_section_start( __( 'Property page', 'propertyhive' ) );
+					self::render_template_editor_select( 'template_set_button_style', __( 'Buttons', 'propertyhive' ), self::get_button_styles(), $settings['template_set_button_style'] );
 					self::render_template_editor_checkbox( 'template_set_show_mobile_cta', __( 'Mobile enquiry bar', 'propertyhive' ), $settings['template_set_show_mobile_cta'] );
-				self::render_template_editor_section_end();
+					self::render_template_editor_section_end();
+				}
 
 				echo '<footer class="ph-template-editor-footer">';
 					echo '<span data-ph-template-editor-status>' . esc_html__( 'Ready', 'propertyhive' ) . '</span>';
@@ -2543,6 +2561,25 @@ class PH_Template_Set {
 				echo '</footer>';
 			echo '</form>';
 		echo '</aside>';
+	}
+
+	/**
+	 * Get the current visual editor page context.
+	 *
+	 * @return string
+	 */
+	private static function get_template_editor_context() {
+		return is_post_type_archive( 'property' ) ? 'search' : 'detail';
+	}
+
+	/**
+	 * Get the editor title for the current page context.
+	 *
+	 * @param string $context Editor context.
+	 * @return string
+	 */
+	private static function get_template_editor_title( $context ) {
+		return 'search' === $context ? __( 'Search template editor', 'propertyhive' ) : __( 'Property template editor', 'propertyhive' );
 	}
 
 	/**
@@ -2579,6 +2616,16 @@ class PH_Template_Set {
 				}
 			echo '</select>';
 		echo '</label>';
+	}
+
+	/**
+	 * Preserve a setting when it is not shown in the current editor context.
+	 *
+	 * @param string $name  Control name.
+	 * @param string $value Current value.
+	 */
+	private static function render_template_editor_hidden( $name, $value ) {
+		echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '">';
 	}
 
 	/**
