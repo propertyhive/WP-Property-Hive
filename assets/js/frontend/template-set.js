@@ -551,6 +551,15 @@
 		document.body.classList.add(prefix + value);
 	}
 
+	function setSearchOption(prefix, value) {
+		setBodyOption(prefix, value);
+
+		document.querySelectorAll('.ph-template-search').forEach(function (search) {
+			removePrefixedClass(search, prefix);
+			search.classList.add(prefix + value);
+		});
+	}
+
 	function setBodyToggle(showClass, hideClass, enabled) {
 		document.body.classList.toggle(showClass, enabled);
 		document.body.classList.toggle(hideClass, !enabled);
@@ -634,15 +643,15 @@
 		}
 
 		if (name === 'template_set_search_layout') {
-			setBodyOption('ph-search-view-', value);
+			setSearchOption('ph-search-view-', value);
 		}
 
 		if (name === 'template_set_search_card_size') {
-			setBodyOption('ph-search-card-size-', value);
+			setSearchOption('ph-search-card-size-', value);
 		}
 
 		if (name === 'template_set_search_grid_columns') {
-			setBodyOption('ph-search-grid-columns-', value);
+			setSearchOption('ph-search-grid-columns-', value);
 		}
 
 		if (name === 'template_set_image_style') {
