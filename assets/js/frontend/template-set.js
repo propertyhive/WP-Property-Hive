@@ -454,6 +454,50 @@
 		setCardGalleryImage(card, images, 0);
 	}
 
+	function getCardUrl(card) {
+		var link = card.querySelector('.details h3 a, .thumbnail a, a.button');
+
+		return link ? link.href : '';
+	}
+
+	function shouldIgnoreCardClick(event) {
+		if (event.button && event.button !== 0) {
+			return true;
+		}
+
+		return !!event.target.closest('a, button, input, select, textarea, label, [role="button"], [data-ph-card-gallery-prev], [data-ph-card-gallery-next]');
+	}
+
+	function initSearchCardLinks() {
+		document.addEventListener('click', function (event) {
+			var card;
+			var url;
+
+			if (shouldIgnoreCardClick(event)) {
+				return;
+			}
+
+			card = event.target.closest('.ph-template-search ul.properties > li.ph-template-card');
+
+			if (!card) {
+				return;
+			}
+
+			url = getCardUrl(card);
+
+			if (!url) {
+				return;
+			}
+
+			if (event.metaKey || event.ctrlKey) {
+				window.open(url, '_blank');
+				return;
+			}
+
+			window.location.href = url;
+		});
+	}
+
 	document.addEventListener('keydown', function (event) {
 		if (!activeLightbox) {
 			return;
@@ -476,6 +520,7 @@
 	document.addEventListener('DOMContentLoaded', function () {
 		document.querySelectorAll('[data-ph-template-gallery]').forEach(initGallery);
 		document.querySelectorAll('[data-ph-card-gallery-data]').forEach(initCardGallery);
+		initSearchCardLinks();
 		initTemplateEditor();
 	});
 
@@ -516,20 +561,6 @@
 
 		document.querySelectorAll('[data-ph-recommended-properties]').forEach(function (section) {
 			Array.prototype.slice.call(section.querySelectorAll('[data-ph-recommended-card]')).forEach(function (card, index) {
-				card.hidden = index >= limit;
-			});
-		});
-	}
-
-	function applySearchResultCount(value) {
-		var limit = parseInt(value, 10) || 12;
-
-		document.querySelectorAll('.ph-template-search > ul.properties').forEach(function (list) {
-			Array.prototype.slice.call(list.children).forEach(function (card, index) {
-				if (!card.classList || !card.classList.contains('ph-template-card')) {
-					return;
-				}
-
 				card.hidden = index >= limit;
 			});
 		});
@@ -610,9 +641,8 @@
 			setBodyOption('ph-search-card-size-', value);
 		}
 
-		if (name === 'template_set_search_result_count') {
-			setBodyOption('ph-search-result-count-', value);
-			applySearchResultCount(value);
+		if (name === 'template_set_search_grid_columns') {
+			setBodyOption('ph-search-grid-columns-', value);
 		}
 
 		if (name === 'template_set_image_style') {
