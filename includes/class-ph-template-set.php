@@ -1087,49 +1087,91 @@ class PH_Template_Set {
 	}
 
 	/**
-	 * Demo gallery image set for a detail template.
+	 * Build gallery image data from the current property's attached photos.
 	 *
-	 * @param string $template Template slug.
+	 * @param PH_Property $property Property object.
 	 * @return array
 	 */
-	private static function get_demo_gallery_images( $template ) {
-		$cavendish = array(
-			array( 'cavendish-living-room.png', __( 'Reception room', 'propertyhive' ) ),
-			array( 'cavendish-kitchen-dining.png', __( 'Kitchen / dining', 'propertyhive' ) ),
-			array( 'cavendish-principal-bedroom.png', __( 'Principal bedroom', 'propertyhive' ) ),
-			array( 'cavendish-garden-terrace.png', __( 'Garden terrace', 'propertyhive' ) ),
-			array( 'cavendish-exterior.png', __( 'Exterior', 'propertyhive' ) ),
-		);
+	private static function get_property_gallery_images( $property ) {
+		$images = array();
 
-		if ( 'lettings-detail' === $template ) {
-			return array(
-				array( 'atlas-apartment-living.png', __( 'Open-plan living', 'propertyhive' ) ),
-				array( 'cavendish-kitchen-dining.png', __( 'Kitchen / dining', 'propertyhive' ) ),
-				array( 'cavendish-principal-bedroom.png', __( 'Bedroom', 'propertyhive' ) ),
-				array( 'cavendish-living-room.png', __( 'Reception', 'propertyhive' ) ),
+		if ( ! $property ) {
+			return $images;
+		}
+
+		if ( get_option( 'propertyhive_images_stored_as', '' ) === 'urls' ) {
+			$photos = $property->_photo_urls;
+
+			if ( ! is_array( $photos ) ) {
+				return $images;
+			}
+
+			foreach ( $photos as $index => $photo ) {
+				if ( empty( $photo['url'] ) ) {
+					continue;
+				}
+
+				$label = ! empty( $photo['title'] ) ? $photo['title'] : sprintf(
+					/* translators: %d: photo number */
+					__( 'Photo %d', 'propertyhive' ),
+					(int) $index + 1
+				);
+
+				$images[] = array(
+					'src'     => $photo['url'],
+					'thumb'   => $photo['url'],
+					'alt'     => $label,
+					'caption' => $label,
+				);
+			}
+
+			return $images;
+		}
+
+		foreach ( $property->get_gallery_attachment_ids() as $index => $attachment_id ) {
+			$src   = wp_get_attachment_image_src( $attachment_id, apply_filters( 'propertyhive_single_property_image_size', 'large' ) );
+			$thumb = wp_get_attachment_image_src( $attachment_id, apply_filters( 'single_property_small_thumbnail_size', 'medium' ) );
+
+			if ( empty( $src[0] ) ) {
+				continue;
+			}
+
+			$alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+			if ( '' === trim( (string) $alt ) ) {
+				$alt = get_the_title( $attachment_id );
+			}
+			if ( '' === trim( (string) $alt ) ) {
+				$alt = sprintf(
+					/* translators: %d: photo number */
+					__( 'Photo %d', 'propertyhive' ),
+					(int) $index + 1
+				);
+			}
+
+			$caption = wp_get_attachment_caption( $attachment_id );
+			if ( '' === trim( (string) $caption ) ) {
+				$caption = $alt;
+			}
+
+			$images[] = array(
+				'src'     => $src[0],
+				'thumb'   => ! empty( $thumb[0] ) ? $thumb[0] : $src[0],
+				'alt'     => $alt,
+				'caption' => $caption,
 			);
 		}
 
-		if ( 'new-homes-development-detail' === $template ) {
-			return array(
-				array( 'elm-yard-development.png', __( 'Elm Yard development', 'propertyhive' ) ),
-				array( 'cavendish-living-room.png', __( 'Show home reception', 'propertyhive' ) ),
-				array( 'cavendish-kitchen-dining.png', __( 'Show home kitchen', 'propertyhive' ) ),
-				array( 'cavendish-garden-terrace.png', __( 'Landscaped terrace', 'propertyhive' ) ),
-			);
-		}
-
-		return $cavendish;
+		return $images;
 	}
 
 	/**
-	 * Render a hero/gallery presentation using bundled demo photography.
+	 * Render a hero/gallery presentation using the property's attached photos.
 	 */
 	public static function render_demo_gallery() {
 		$property = self::get_current_property();
 
 		$template = self::get_detail_template();
-		$images   = self::get_demo_gallery_images( $template );
+		$images   = self::get_property_gallery_images( $property );
 
 		if ( empty( $images ) ) {
 			return;
@@ -1140,8 +1182,8 @@ class PH_Template_Set {
 		$rail             = array_slice( $images, 0, 5 );
 		$count            = count( $images );
 		$location         = self::get_property_location_label( $property );
-		$has_floor_map    = true;
-		$has_virtual_tour = true;
+		$has_floor_map    = $property ? self::has_floorplan( $property ) : false;
+		$has_virtual_tour = false;
 		$gallery_layout   = self::get_gallery_layout();
 
 		echo '<div class="images ph-template-gallery ph-template-gallery-' . esc_attr( sanitize_html_class( $template ) ) . ' ph-gallery-variant-' . esc_attr( sanitize_html_class( $gallery_layout ) ) . '" data-ph-template-gallery data-ph-gallery-current-variant="' . esc_attr( $gallery_layout ) . '">';
@@ -1150,9 +1192,9 @@ class PH_Template_Set {
 				echo '<button type="button" class="ph-template-gallery-photo-trigger" data-ph-gallery-open aria-label="' . esc_attr( sprintf(
 					/* translators: %s: image label */
 					__( 'Open larger photo: %s', 'propertyhive' ),
-					$hero[1]
+					$hero['caption']
 				) ) . '">';
-					echo '<img src="' . esc_url( self::demo_asset( $hero[0] ) ) . '" alt="' . esc_attr( $hero[1] ) . '" loading="lazy" data-ph-gallery-hero-image>';
+					echo '<img src="' . esc_url( $hero['src'] ) . '" alt="' . esc_attr( $hero['alt'] ) . '" loading="lazy" data-ph-gallery-hero-image>';
 					echo '<span class="ph-template-gallery-expand-label" aria-hidden="true">' . esc_html__( 'View larger', 'propertyhive' ) . '</span>';
 				echo '</button>';
 				if ( $has_floor_map ) {
@@ -1187,7 +1229,7 @@ class PH_Template_Set {
 						/* translators: %d: number of property photos */
 						_n( '%d photo', '%d photos', $count, 'propertyhive' ),
 						(int) $count
-						) ) . '</span>';
+					) ) . '</span>';
 
 						echo '<div class="ph-template-gallery-tabs" role="tablist" aria-label="' . esc_attr__( 'Gallery views', 'propertyhive' ) . '">';
 							echo '<button type="button" class="is-active" data-ph-gallery-tab="photos" aria-selected="true">' . esc_html__( 'Photos', 'propertyhive' ) . '</button>';
@@ -1202,7 +1244,7 @@ class PH_Template_Set {
 							}
 						echo '</div>';
 					} else {
-						echo '<figcaption data-ph-gallery-caption>' . esc_html( $hero[1] ) . '</figcaption>';
+						echo '<figcaption data-ph-gallery-caption>' . esc_html( $hero['caption'] ) . '</figcaption>';
 					}
 				echo '</figure>';
 
@@ -1210,14 +1252,14 @@ class PH_Template_Set {
 					echo '<div class="ph-template-gallery-rail">';
 					foreach ( $rail as $index => $image ) {
 						$is_active = ( 0 === $index );
-						echo '<button type="button" class="ph-template-gallery-thumb' . ( $is_active ? ' is-active' : '' ) . '" data-ph-gallery-thumb data-src="' . esc_url( self::demo_asset( $image[0] ) ) . '" data-alt="' . esc_attr( $image[1] ) . '" data-caption="' . esc_attr( $image[1] ) . '" aria-label="' . esc_attr( sprintf(
+						echo '<button type="button" class="ph-template-gallery-thumb' . ( $is_active ? ' is-active' : '' ) . '" data-ph-gallery-thumb data-src="' . esc_url( $image['src'] ) . '" data-alt="' . esc_attr( $image['alt'] ) . '" data-caption="' . esc_attr( $image['caption'] ) . '" aria-label="' . esc_attr( sprintf(
 							/* translators: %s: image label */
 							__( 'Show %s', 'propertyhive' ),
-							$image[1]
+							$image['caption']
 						) ) . '"' . ( $is_active ? ' aria-current="true"' : '' ) . '>';
-							echo '<img src="' . esc_url( self::demo_asset( $image[0] ) ) . '" alt="' . esc_attr( $image[1] ) . '" loading="lazy">';
+							echo '<img src="' . esc_url( $image['thumb'] ) . '" alt="' . esc_attr( $image['alt'] ) . '" loading="lazy">';
 							if ( $is_editorial ) {
-								echo '<span>' . esc_html( $image[1] ) . '</span>';
+								echo '<span>' . esc_html( $image['caption'] ) . '</span>';
 							}
 						echo '</button>';
 					}
