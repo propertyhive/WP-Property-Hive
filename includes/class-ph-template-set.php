@@ -2813,8 +2813,9 @@ class PH_Template_Set {
 		echo '<aside class="ph-template-editor ph-template-editor-' . esc_attr( sanitize_html_class( $context ) ) . '" data-ph-template-editor data-ph-template-editor-context="' . esc_attr( $context ) . '" aria-label="' . esc_attr__( 'Template editor', 'propertyhive' ) . '">';
 			echo '<form class="ph-template-editor-form" data-ph-template-editor-form>';
 				echo '<header class="ph-template-editor-header">';
-					echo '<div>';
-						echo '<span>' . esc_html__( 'Property Hive', 'propertyhive' ) . '</span>';
+					echo '<div class="ph-template-editor-brand">';
+						echo '<img src="' . esc_url( PH()->plugin_url() . '/assets/images/admin/propertyhive-logo-onboarding.png' ) . '" alt="' . esc_attr__( 'Property Hive', 'propertyhive' ) . '">';
+						echo '<span>' . esc_html__( 'Template editor', 'propertyhive' ) . '</span>';
 						echo '<h2>' . esc_html( self::get_template_editor_title( $context ) ) . '</h2>';
 					echo '</div>';
 					echo '<a href="' . esc_url( $exit_url ) . '" aria-label="' . esc_attr__( 'Exit template editor', 'propertyhive' ) . '">&times;</a>';
@@ -2916,7 +2917,7 @@ class PH_Template_Set {
 	 * @return string
 	 */
 	private static function get_template_editor_title( $context ) {
-		return 'search' === $context ? __( 'Search template editor', 'propertyhive' ) : __( 'Property template editor', 'propertyhive' );
+		return 'search' === $context ? __( 'Search results', 'propertyhive' ) : __( 'Property pages', 'propertyhive' );
 	}
 
 	/**
