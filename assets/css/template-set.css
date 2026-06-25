@@ -636,6 +636,7 @@ body.ph-template-editor-active .ph-template-editor .ph-template-editor-secondary
 	border-radius: 0;
 	box-shadow: none;
 	clear: none !important;
+	cursor: pointer;
 	display: grid;
 	float: none !important;
 	gap: 0 24px;
@@ -860,6 +861,15 @@ body.ph-template-editor-active .ph-template-editor .ph-template-editor-secondary
 	order: 2;
 }
 
+.ph-template-set ul.properties li.ph-template-card .price a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.ph-template-set ul.properties li.ph-template-card .price a:hover {
+	text-decoration: underline;
+}
+
 .ph-template-set ul.properties li.ph-template-card .summary,
 .ph-template-set ul.properties li.ph-template-card .property_summary {
 	color: var(--ph-template-muted);
@@ -934,10 +944,14 @@ body.ph-template-editor-active .ph-template-editor .ph-template-editor-secondary
 
 .ph-template-facts li {
 	align-items: baseline;
+	clear: none !important;
 	display: inline-flex;
+	float: none !important;
 	gap: 4px;
+	height: auto !important;
 	margin: 0;
-	padding: 0;
+	padding: 0 !important;
+	width: auto !important;
 }
 
 .ph-template-facts li + li:before {
@@ -2362,6 +2376,78 @@ body.ph-template-editor-active .ph-template-editor .ph-template-editor-secondary
 
 	.ph-search-template-brand-led-agency-search-results ul.properties li.ph-template-card:first-child .ph-template-card-footer {
 		grid-column: 2;
+	}
+}
+
+.ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-columns: 3;
+	--ph-search-grid-card-min: 300px;
+	--ph-search-grid-image-ratio: 4 / 3;
+}
+
+.ph-template-search.ph-search-grid-columns-2.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-columns: 2;
+}
+
+.ph-template-search.ph-search-grid-columns-3.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-columns: 3;
+}
+
+.ph-template-search.ph-search-grid-columns-4.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-columns: 4;
+}
+
+.ph-search-grid-columns-2 .ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-columns: 2;
+}
+
+.ph-search-grid-columns-3 .ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-columns: 3;
+}
+
+.ph-search-grid-columns-4 .ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-columns: 4;
+}
+
+.ph-template-search.ph-search-card-size-compact.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results),
+.ph-search-card-size-compact .ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-card-min: 240px;
+	--ph-search-grid-image-ratio: 16 / 10;
+}
+
+.ph-template-search.ph-search-card-size-large.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results),
+.ph-search-card-size-large .ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) {
+	--ph-search-grid-card-min: 390px;
+	--ph-search-grid-image-ratio: 16 / 9;
+}
+
+.ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties > li.ph-template-card,
+.ph-template-search.ph-search-card-size-compact.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties > li.ph-template-card,
+.ph-template-search.ph-search-card-size-large.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties > li.ph-template-card {
+	align-self: start;
+	grid-template-columns: minmax(0, 1fr);
+	height: auto;
+}
+
+.ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties > li.ph-template-card .thumbnail a {
+	aspect-ratio: var(--ph-search-grid-image-ratio);
+	height: auto;
+}
+
+.ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties > li.ph-template-card .details,
+.ph-template-search.ph-search-card-size-compact.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties > li.ph-template-card .details,
+.ph-template-search.ph-search-card-size-large.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties > li.ph-template-card .details {
+	padding-bottom: 0;
+}
+
+body:not(.ph-search-view-grid) .ph-template-editor-field-template_set_search_grid_columns {
+	display: none;
+}
+
+@media (min-width: 760px) {
+	.ph-template-search.ph-search-view-grid:not(.ph-search-template-brand-led-agency-search-results) ul.properties {
+		align-items: start;
+		grid-template-columns: repeat(var(--ph-search-grid-columns), minmax(0, 1fr));
 	}
 }
 
