@@ -2512,7 +2512,7 @@ class PH_Template_Set {
 					echo '<a class="ph-template-button ph-template-button-primary" href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ) . '">' . esc_html__( 'Call agent', 'propertyhive' ) . '</a>';
 				}
 
-				echo '<a class="ph-template-button ph-template-button-secondary" data-fancybox data-src="#makeEnquiry' . (int) $post->ID . '" href="javascript:;">' . esc_html( $button ) . '</a>';
+				echo '<a class="ph-template-button ' . esc_attr( $phone ? 'ph-template-button-secondary' : 'ph-template-button-primary' ) . '" data-fancybox data-src="#makeEnquiry' . (int) $post->ID . '" href="javascript:;">' . esc_html( $button ) . '</a>';
 
 				if ( $email ) {
 					echo '<a class="ph-template-contact-link" href="' . esc_url( 'mailto:' . $email ) . '">' . esc_html__( 'Email agent', 'propertyhive' ) . '</a>';
