@@ -213,6 +213,11 @@ body.admin-bar .ph-template-editor {
 	padding: 20px 22px;
 }
 
+.ph-template-editor-section[hidden],
+.ph-template-editor-source-section[hidden] {
+	display: none !important;
+}
+
 .ph-template-editor-section:first-of-type {
 	border-top: 1px solid var(--ph-editor-smoke);
 }
