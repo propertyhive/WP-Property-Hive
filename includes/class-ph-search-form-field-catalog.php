@@ -26,7 +26,10 @@ class PH_Search_Form_Field_Catalog {
 			'before'     => '<div class="control control-address_keyword">',
 		);
 
-		if ( class_exists( 'PH_Radial_Search' ) ) {
+		if (
+			class_exists( 'PH_Radial_Search' ) &&
+			apply_filters( 'propertyhive_add_on_can_be_used', true, 'propertyhive-radial-search' ) !== false
+		) {
 			$all_fields['radius'] = array(
 				'type'       => 'select',
 				'label'      => __( 'Radius', 'propertyhive' ),

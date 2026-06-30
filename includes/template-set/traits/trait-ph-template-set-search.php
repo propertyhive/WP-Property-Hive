@@ -53,6 +53,22 @@ trait PH_Template_Set_Search {
 			$classes[] = 'ph-search-view-' . sanitize_html_class( self::get_search_view() );
 			$classes[] = 'ph-search-card-size-' . sanitize_html_class( $settings['template_set_search_card_size'] );
 			$classes[] = 'ph-search-grid-columns-' . absint( $settings['template_set_search_grid_columns'] );
+
+			if ( self::is_map_search_managing_search_view() ) {
+				$classes[] = 'ph-template-map-search-active';
+			}
+
+			if ( self::is_real_map_search_view() ) {
+				$classes[] = 'ph-template-map-search-real-map';
+			}
+
+			if ( class_exists( 'PH_Radial_Search' ) && self::is_add_on_usable( 'propertyhive-radial-search' ) ) {
+				$classes[] = 'ph-template-radial-search-active';
+			}
+
+			if ( class_exists( 'PH_Location_Autocomplete' ) && self::is_add_on_usable( 'propertyhive-location-autocomplete' ) ) {
+				$classes[] = 'ph-template-location-autocomplete-active';
+			}
 		}
 
 		if ( self::is_module_preview() ) {
@@ -294,6 +310,14 @@ trait PH_Template_Set_Search {
 			'ph-search-grid-columns-' . absint( $settings['template_set_search_grid_columns'] ),
 		);
 
+		if ( self::is_map_search_managing_search_view() ) {
+			$classes[] = 'ph-template-map-search-active';
+		}
+
+		if ( self::is_real_map_search_view() ) {
+			$classes[] = 'ph-template-map-search-real-map';
+		}
+
 		if ( self::is_module_preview() ) {
 			$classes[] = 'ph-template-module-preview-shell';
 			$classes[] = 'ph-module-template-' . sanitize_html_class( self::get_module_template() );
@@ -363,6 +387,10 @@ trait PH_Template_Set_Search {
 		}
 
 		if ( self::is_module_preview() ) {
+			return;
+		}
+
+		if ( self::is_map_search_managing_search_view() && ! self::is_template_editor_active() ) {
 			return;
 		}
 
@@ -509,8 +537,9 @@ trait PH_Template_Set_Search {
 		$facts       = self::get_fact_items( $property, self::get_search_fact_limit() );
 		$phone       = $property->get_negotiator_telephone_number();
 		$show_branch = 'yes' === $settings['template_set_show_branch'] || self::is_template_editor_active();
+		$shortlist_button = self::get_shortlist_button_markup();
 
-		if ( empty( $facts ) && ! $show_branch ) {
+		if ( empty( $facts ) && ! $show_branch && '' === $shortlist_button ) {
 			return;
 		}
 
@@ -521,14 +550,99 @@ trait PH_Template_Set_Search {
 			self::get_search_template(),
 			'card-footer',
 			array(
-				'property'    => $property,
-				'facts'       => $facts,
-				'phone'       => $phone,
-				'office'      => $office,
-				'show_branch' => $show_branch,
-				'template'    => self::get_search_template(),
+				'property'         => $property,
+				'facts'            => $facts,
+				'phone'            => $phone,
+				'office'           => $office,
+				'show_branch'      => $show_branch,
+				'shortlist_button' => $shortlist_button,
+				'template'         => self::get_search_template(),
 			)
 		);
+	}
+
+	/**
+	 * Check whether a premium add-on can be used on this install.
+	 *
+	 * @param string $slug Add-on slug.
+	 * @return bool
+	 */
+	public static function is_add_on_usable( $slug ) {
+		$slug = sanitize_key( $slug );
+
+		if ( '' === $slug ) {
+			return false;
+		}
+
+		return apply_filters( 'propertyhive_add_on_can_be_used', true, $slug ) !== false;
+	}
+
+	/**
+	 * Is Map Search active and configured to control the search map UI.
+	 *
+	 * @return bool
+	 */
+	private static function is_map_search_managing_search_view() {
+		if ( ! class_exists( 'PH_Map_Search' ) || ! self::is_add_on_usable( 'propertyhive-map-search' ) ) {
+			return false;
+		}
+
+		return in_array( self::get_map_search_format(), array( 'view', 'split' ), true );
+	}
+
+	/**
+	 * Is a real Map Search map expected on the current results page.
+	 *
+	 * @return bool
+	 */
+	private static function is_real_map_search_view() {
+		if ( ! self::is_map_search_managing_search_view() ) {
+			return false;
+		}
+
+		$format = self::get_map_search_format();
+
+		if ( 'split' === $format ) {
+			return true;
+		}
+
+		$view = isset( $_GET['view'] ) ? sanitize_title( wp_unslash( $_GET['view'] ) ) : '';
+
+		return 'map' === $view;
+	}
+
+	/**
+	 * Get the Map Search display format.
+	 *
+	 * @return string
+	 */
+	private static function get_map_search_format() {
+		$settings = get_option( 'propertyhive_map_search', array() );
+
+		if ( ! is_array( $settings ) || empty( $settings['format'] ) ) {
+			return '';
+		}
+
+		return sanitize_key( $settings['format'] );
+	}
+
+	/**
+	 * Get a Shortlist add-on button for search result cards.
+	 *
+	 * @return string
+	 */
+	private static function get_shortlist_button_markup( $class = 'ph-template-shortlist-button' ) {
+		if ( ! class_exists( 'PH_Shortlist' ) || ! self::is_add_on_usable( 'propertyhive-shortlist' ) || ! shortcode_exists( 'shortlist_button' ) ) {
+			return '';
+		}
+
+		$class = trim( (string) $class );
+
+		if ( '' === $class ) {
+			$class = 'ph-template-shortlist-button';
+		}
+
+		return do_shortcode( '[shortlist_button class="' . esc_attr( $class ) . '"]' );
 	}
 
 	/**

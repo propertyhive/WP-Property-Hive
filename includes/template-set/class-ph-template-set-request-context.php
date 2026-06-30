@@ -628,6 +628,18 @@ class PH_Template_Set_Request_Context {
 		$template = self::get_search_template();
 		$settings = PH_Template_Set_Settings::get_settings();
 
+		$map_search_view = isset( $_GET['view'] ) ? sanitize_title( wp_unslash( $_GET['view'] ) ) : '';
+
+		if (
+			'map' === $map_search_view &&
+			class_exists( 'PH_Map_Search' ) &&
+			class_exists( 'PH_Template_Set' ) &&
+			method_exists( 'PH_Template_Set', 'is_add_on_usable' ) &&
+			PH_Template_Set::is_add_on_usable( 'propertyhive-map-search' )
+		) {
+			return 'map';
+		}
+
 		if ( 'compact-list-search-results' === $template ) {
 			return 'list';
 		}

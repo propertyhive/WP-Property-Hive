@@ -458,7 +458,7 @@
 	}
 
 	function getCardUrl(card) {
-		var link = card.querySelector('.details h3 a, .thumbnail a, a.button');
+		var link = card.querySelector('.details h3 a, .thumbnail a, a.button:not([data-add-to-shortlist])');
 
 		return link ? link.href : '';
 	}
@@ -468,7 +468,7 @@
 			return true;
 		}
 
-		return !!event.target.closest('a, button, input, select, textarea, label, [role="button"], [data-ph-card-gallery-prev], [data-ph-card-gallery-next]');
+		return !!event.target.closest('a, button, input, select, textarea, label, [role="button"], [data-add-to-shortlist], [data-ph-card-gallery-prev], [data-ph-card-gallery-next]');
 	}
 
 	function initSearchCardLinks() {
