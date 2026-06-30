@@ -98,6 +98,7 @@ body.ph-template-editor-active {
 	--ph-editor-smoke: #eceeec;
 	--ph-editor-mist: #f6f6f6;
 	--ph-editor-white: #ffffff;
+	--ph-editor-action: #cc3366;
 	--ph-editor-font: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
 	background: var(--ph-editor-mist);
@@ -306,6 +307,10 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 		opacity 180ms ease;
 }
 
+.ph-template-editor-groups.is-ready .ph-template-editor-group-body.is-resizing-content {
+	transition: none;
+}
+
 .ph-template-editor-group-content {
 	display: grid;
 	gap: 12px;
@@ -471,6 +476,7 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 	padding: 8px;
 }
 
+.ph-search-form-builder-item:hover,
 .ph-search-form-builder-item.is-active {
 	background: var(--ph-editor-sunlight);
 	border-color: var(--ph-editor-wax);
@@ -539,24 +545,79 @@ body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder
 	width: 100%;
 }
 
-.ph-search-form-builder-item-title {
+.ph-search-form-builder-icon-remove {
+	flex-basis: 17px;
+	height: 17px;
+	width: 17px;
+}
+
+.ph-search-form-builder-icon-remove svg {
+	fill: none;
+	stroke: currentColor;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 2;
+}
+
+.ph-search-form-builder-icon-remove path {
+	fill: none;
+}
+
+.ph-search-form-builder-item-title,
+body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder-item-title {
 	appearance: none;
 	background: transparent;
-	border: 0;
-	color: var(--ph-editor-carbon);
+	border: 1px solid var(--ph-editor-action);
+	border-radius: 0;
+	box-shadow: none;
+	color: var(--ph-editor-action);
 	cursor: pointer;
+	display: grid;
+	gap: 3px;
 	font-family: var(--ph-editor-font);
 	font-size: 13px;
 	font-weight: 700;
 	line-height: 1.2;
 	min-width: 0;
 	overflow-wrap: anywhere;
-	padding: 0;
-	text-align: left;
+	padding: 8px 10px;
+	text-align: center;
+	transition: none;
+	width: 100%;
 }
 
-.ph-search-form-builder-drag-handle:focus,
-.ph-search-form-builder-item-title:focus {
+.ph-search-form-builder-item-title:hover,
+.ph-search-form-builder-item-title:active,
+.ph-search-form-builder-item-title:focus:not(:focus-visible),
+.ph-search-form-builder-item.is-active .ph-search-form-builder-item-title,
+body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder-item-title:hover,
+body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder-item-title:active,
+body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder-item-title:focus:not(:focus-visible),
+body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item.is-active button.ph-search-form-builder-item-title {
+	background: transparent;
+	border-color: var(--ph-editor-action);
+	box-shadow: none;
+	color: var(--ph-editor-action);
+	outline: none;
+	transform: none;
+}
+
+.ph-search-form-builder-item-label,
+.ph-search-form-builder-item-visibility {
+	display: block;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.ph-search-form-builder-item-visibility {
+	color: var(--ph-editor-action);
+	font-size: 11px;
+	font-weight: 600;
+	opacity: 0.55;
+}
+
+.ph-search-form-builder-drag-handle:focus-visible,
+.ph-search-form-builder-item-title:focus-visible {
 	outline: 2px solid var(--ph-editor-carbon);
 	outline-offset: 2px;
 }
@@ -565,6 +626,8 @@ body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder
 	display: grid;
 	gap: 6px;
 	grid-template-columns: 34px;
+	justify-items: center;
+	overflow: visible;
 }
 
 .ph-search-form-builder-item-actions button,
@@ -588,10 +651,14 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 	align-items: center;
 	box-sizing: border-box;
 	display: inline-flex;
+	flex: 0 0 34px;
 	height: 34px;
 	justify-content: center;
+	line-height: 0;
+	margin: 0;
 	min-height: 34px;
 	min-width: 34px;
+	overflow: visible;
 	padding: 0;
 	width: 34px;
 }
@@ -727,11 +794,44 @@ body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item-
 	margin: 0;
 }
 
+.ph-search-form-builder-setting.ph-search-form-builder-visibility-setting {
+	border: 1px solid var(--ph-editor-smoke);
+	border-radius: 6px;
+	padding: 10px;
+}
+
 .ph-search-form-builder-setting span {
 	color: var(--ph-editor-carbon);
 	font-size: 12px;
 	font-weight: 700;
 	line-height: 1.2;
+}
+
+.ph-search-form-builder-setting legend {
+	color: var(--ph-editor-carbon);
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.2;
+	padding: 0;
+}
+
+.ph-search-form-builder-visibility-options {
+	display: grid;
+	gap: 8px;
+	grid-template-columns: 1fr 1fr;
+}
+
+.ph-search-form-builder-visibility-options label {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	margin: 0;
+	min-width: 0;
+}
+
+.ph-search-form-builder-visibility-options span {
+	font-weight: 600;
+	overflow-wrap: anywhere;
 }
 
 .ph-search-form-builder-setting input[type="text"],
