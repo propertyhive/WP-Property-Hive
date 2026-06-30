@@ -101,7 +101,7 @@ class PH_Search_Form_Manager {
 		$form_id  = $this->normalize_form_id( $form_id );
 		$form     = isset( $settings['search_forms'][ $form_id ] ) && is_array( $settings['search_forms'][ $form_id ] ) ? $settings['search_forms'][ $form_id ] : array();
 
-		$new_fields = isset( $form['active_fields'] ) && is_array( $form['active_fields'] ) && ! empty( $form['active_fields'] ) ? $form['active_fields'] : $fields;
+		$new_fields = isset( $form['active_fields'] ) && is_array( $form['active_fields'] ) ? $form['active_fields'] : $fields;
 
 		foreach ( $fields as $field_id => $field ) {
 			$field_type = isset( $field['type'] ) ? $field['type'] : '';
@@ -140,6 +140,8 @@ class PH_Search_Form_Manager {
 		$custom_fields = isset( $settings['custom_fields'] ) && is_array( $settings['custom_fields'] ) ? $settings['custom_fields'] : array();
 
 		foreach ( $fields as $field_id => $field ) {
+			$field = $this->apply_display_contexts_to_field( $field );
+
 			foreach ( $custom_fields as $custom_field ) {
 				if (
 					isset( $custom_field['field_name'], $custom_field['field_type'], $custom_field['dropdown_options'] ) &&
@@ -151,13 +153,15 @@ class PH_Search_Form_Manager {
 					foreach ( $custom_field['dropdown_options'] as $dropdown_option ) {
 						$options[ $dropdown_option ] = $dropdown_option;
 					}
-					$fields[ $field_id ]['options'] = $options;
+					$field['options'] = $options;
 
 					if ( 'multiselect' === $custom_field['field_type'] ) {
-						$fields[ $field_id ]['type'] = 'select';
+						$field['type'] = 'select';
 					}
 				}
 			}
+
+			$fields[ $field_id ] = $field;
 		}
 
 		return $fields;
@@ -213,11 +217,13 @@ class PH_Search_Form_Manager {
 		$sets    = $this->get_field_sets( $form_id );
 
 		return array(
-			'formId'     => $form_id,
-			'baseHash'   => $this->get_form_hash( $form_id ),
-			'active'     => $this->prepare_editor_fields( $sets['active'] ),
-			'inactive'   => $this->prepare_editor_fields( $sets['inactive'] ),
-			'categories' => $this->get_editor_categories(),
+			'formId'            => $form_id,
+			'baseHash'          => $this->get_form_hash( $form_id ),
+			'active'            => $this->prepare_editor_fields( $sets['active'] ),
+			'inactive'          => $this->prepare_editor_fields( $sets['inactive'] ),
+			'categories'        => $this->get_editor_categories(),
+			'visibilityContexts' => $this->get_display_context_options(),
+			'visibilityChoices'  => $this->get_selectable_display_context_choices( $sets['active'] ),
 		);
 	}
 
@@ -249,13 +255,15 @@ class PH_Search_Form_Manager {
 	 * @return array
 	 */
 	private function prepare_editor_field( $field_id, $field ) {
-		$type = isset( $field['type'] ) ? sanitize_title( $field['type'] ) : '';
+		$type             = isset( $field['type'] ) ? sanitize_title( $field['type'] ) : '';
+		$display_contexts = $this->get_field_display_contexts( $field );
 
 		return array(
-			'id'       => $field_id,
-			'title'    => $this->get_field_title( $field_id, $field ),
-			'type'     => $type,
-			'category' => $this->catalog->get_field_category( $field_id, $field ),
+			'id'         => $field_id,
+			'title'      => $this->get_field_title( $field_id, $field ),
+			'type'       => $type,
+			'category'   => $this->catalog->get_field_category( $field_id, $field ),
+			'visibility' => $this->get_field_visibility( $field ),
 			'settings' => array(
 				'type'                => $type,
 				'show_label'          => ! empty( $field['show_label'] ),
@@ -269,6 +277,7 @@ class PH_Search_Form_Manager {
 				'parent_terms_only'   => ! empty( $field['parent_terms_only'] ),
 				'hide_empty'          => ! empty( $field['hide_empty'] ),
 				'dynamic_population'  => ! empty( $field['dynamic_population'] ),
+				'display_contexts'    => $display_contexts,
 			),
 			'supports' => array(
 				'placeholder'        => in_array( $type, array( 'text', 'email', 'date', 'number', 'password' ), true ),
@@ -294,6 +303,423 @@ class PH_Search_Form_Manager {
 		}
 
 		return ucwords( str_replace( '_', ' ', trim( $field_id, '_' ) ) );
+	}
+
+	/**
+	 * Get editor visibility hints from the front-end control classes.
+	 *
+	 * @param array $field Field data.
+	 * @return array
+	 */
+	private function get_field_visibility( $field ) {
+		$contexts       = $this->get_field_display_contexts( $field );
+		$all_contexts   = $this->get_all_display_contexts();
+		$is_all_contexts = empty( array_diff( $all_contexts, $contexts ) ) && empty( array_diff( $contexts, $all_contexts ) );
+		$visibility     = array(
+			'scope'    => $is_all_contexts ? 'all' : 'custom',
+			'label'    => $this->get_display_contexts_label( $contexts ),
+			'contexts' => array_values( $contexts ),
+		);
+
+		if ( $is_all_contexts ) {
+			return $visibility;
+		}
+
+		if ( in_array( 'residential_sales', $contexts, true ) ) {
+			$visibility['preview_department'] = 'residential-sales';
+			return $visibility;
+		}
+
+		if ( in_array( 'residential_lettings', $contexts, true ) ) {
+			$visibility['preview_department'] = 'residential-lettings';
+			return $visibility;
+		}
+
+		if ( in_array( 'commercial_sales', $contexts, true ) ) {
+			$visibility['preview_department']      = 'commercial';
+			$visibility['commercial_availability'] = 'for_sale';
+			return $visibility;
+		}
+
+		if ( in_array( 'commercial_lettings', $contexts, true ) ) {
+			$visibility['preview_department']      = 'commercial';
+			$visibility['commercial_availability'] = 'to_rent';
+		}
+
+		return $visibility;
+	}
+
+	/**
+	 * Get the selectable display contexts for field visibility controls.
+	 *
+	 * @return array
+	 */
+	private function get_display_context_options() {
+		return array(
+			'residential_sales'    => __( 'Residential sales', 'propertyhive' ),
+			'residential_lettings' => __( 'Residential lettings', 'propertyhive' ),
+			'commercial_sales'     => __( 'Commercial sale', 'propertyhive' ),
+			'commercial_lettings'  => __( 'Commercial rent', 'propertyhive' ),
+		);
+	}
+
+	/**
+	 * Get the display context choices that can be reached in the current form.
+	 *
+	 * @param array $fields Active form fields.
+	 * @return array
+	 */
+	private function get_selectable_display_context_choices( $fields ) {
+		$choices          = array();
+		$base_departments = $this->get_reachable_base_departments_from_fields( $fields );
+		$labels           = $this->get_display_context_options();
+
+		if ( in_array( 'residential-sales', $base_departments, true ) ) {
+			$choices[] = array(
+				'id'       => 'residential_sales',
+				'label'    => $labels['residential_sales'],
+				'contexts' => array( 'residential_sales' ),
+			);
+		}
+
+		if ( in_array( 'residential-lettings', $base_departments, true ) ) {
+			$choices[] = array(
+				'id'       => 'residential_lettings',
+				'label'    => $labels['residential_lettings'],
+				'contexts' => array( 'residential_lettings' ),
+			);
+		}
+
+		if ( in_array( 'commercial', $base_departments, true ) ) {
+			$commercial_availability_values = $this->get_commercial_availability_values_from_fields( $fields );
+
+			if ( in_array( 'for_sale', $commercial_availability_values, true ) && in_array( 'to_rent', $commercial_availability_values, true ) ) {
+				$choices[] = array(
+					'id'       => 'commercial_sales',
+					'label'    => $labels['commercial_sales'],
+					'contexts' => array( 'commercial_sales' ),
+				);
+				$choices[] = array(
+					'id'       => 'commercial_lettings',
+					'label'    => $labels['commercial_lettings'],
+					'contexts' => array( 'commercial_lettings' ),
+				);
+			} elseif ( in_array( 'for_sale', $commercial_availability_values, true ) ) {
+				$choices[] = array(
+					'id'       => 'commercial_sales',
+					'label'    => $labels['commercial_sales'],
+					'contexts' => array( 'commercial_sales' ),
+				);
+			} elseif ( in_array( 'to_rent', $commercial_availability_values, true ) ) {
+				$choices[] = array(
+					'id'       => 'commercial_lettings',
+					'label'    => $labels['commercial_lettings'],
+					'contexts' => array( 'commercial_lettings' ),
+				);
+			} else {
+				$choices[] = array(
+					'id'       => 'commercial',
+					'label'    => __( 'Commercial', 'propertyhive' ),
+					'contexts' => array( 'commercial_sales', 'commercial_lettings' ),
+				);
+			}
+		}
+
+		if ( ! empty( $choices ) ) {
+			return $choices;
+		}
+
+		foreach ( $labels as $context => $label ) {
+			$choices[] = array(
+				'id'       => $context,
+				'label'    => $label,
+				'contexts' => array( $context ),
+			);
+		}
+
+		return $choices;
+	}
+
+	/**
+	 * Get the base departments that can be selected by the current form.
+	 *
+	 * @param array $fields Active form fields.
+	 * @return array
+	 */
+	private function get_reachable_base_departments_from_fields( $fields ) {
+		$departments = array();
+		$field       = isset( $fields['department'] ) && is_array( $fields['department'] ) ? $fields['department'] : array();
+
+		if ( ! empty( $field ) && isset( $field['type'] ) && 'hidden' === $field['type'] ) {
+			if ( ! empty( $field['value'] ) ) {
+				$departments[] = $field['value'];
+			}
+		} elseif ( ! empty( $field['options'] ) && is_array( $field['options'] ) ) {
+			$departments = array_keys( $field['options'] );
+		} elseif ( ! empty( $field['value'] ) ) {
+			$departments[] = $field['value'];
+		}
+
+		if ( empty( $departments ) ) {
+			$default_fields = ph_get_search_form_fields();
+			$default_field  = isset( $default_fields['department'] ) && is_array( $default_fields['department'] ) ? $default_fields['department'] : array();
+
+			if ( ! empty( $default_field['value'] ) ) {
+				$departments[] = $default_field['value'];
+			} elseif ( ! empty( $default_field['options'] ) && is_array( $default_field['options'] ) ) {
+				$departments = array_keys( $default_field['options'] );
+			}
+		}
+
+		$base_departments = array();
+
+		foreach ( $departments as $department ) {
+			$base_department = ph_get_custom_department_based_on( $department );
+			$base_department = $base_department ? $base_department : $department;
+
+			if ( in_array( $base_department, array( 'residential-sales', 'residential-lettings', 'commercial' ), true ) && ! in_array( $base_department, $base_departments, true ) ) {
+				$base_departments[] = $base_department;
+			}
+		}
+
+		return $base_departments;
+	}
+
+	/**
+	 * Get reachable values for the commercial sale/rent selector.
+	 *
+	 * @param array $fields Active form fields.
+	 * @return array
+	 */
+	private function get_commercial_availability_values_from_fields( $fields ) {
+		$field = isset( $fields['commercial_for_sale_to_rent'] ) && is_array( $fields['commercial_for_sale_to_rent'] ) ? $fields['commercial_for_sale_to_rent'] : array();
+
+		if ( empty( $field ) ) {
+			return array();
+		}
+
+		if ( isset( $field['type'] ) && 'hidden' === $field['type'] ) {
+			return ! empty( $field['value'] ) && in_array( $field['value'], array( 'for_sale', 'to_rent' ), true ) ? array( $field['value'] ) : array();
+		}
+
+		if ( empty( $field['options'] ) || ! is_array( $field['options'] ) ) {
+			return array();
+		}
+
+		$values = array();
+
+		foreach ( array_keys( $field['options'] ) as $value ) {
+			if ( in_array( $value, array( 'for_sale', 'to_rent' ), true ) ) {
+				$values[] = $value;
+			}
+		}
+
+		return $values;
+	}
+
+	/**
+	 * Get display context keys.
+	 *
+	 * @return array
+	 */
+	private function get_all_display_contexts() {
+		return array_keys( $this->get_display_context_options() );
+	}
+
+	/**
+	 * Get a field's display contexts from saved settings or legacy classes.
+	 *
+	 * @param array $field Field data.
+	 * @return array
+	 */
+	private function get_field_display_contexts( $field ) {
+		if ( isset( $field['display_contexts'] ) && is_array( $field['display_contexts'] ) ) {
+			return $this->sanitize_display_contexts( $field['display_contexts'] );
+		}
+
+		$before = isset( $field['before'] ) ? (string) $field['before'] : '';
+
+		if ( false !== strpos( $before, 'commercial-sales-only' ) ) {
+			return array( 'commercial_sales' );
+		}
+
+		if ( false !== strpos( $before, 'commercial-lettings-only' ) ) {
+			return array( 'commercial_lettings' );
+		}
+
+		if ( false !== strpos( $before, 'commercial-only' ) ) {
+			return array( 'commercial_sales', 'commercial_lettings' );
+		}
+
+		if ( false !== strpos( $before, 'lettings-only' ) ) {
+			return array( 'residential_lettings' );
+		}
+
+		if ( false !== strpos( $before, 'sales-only' ) ) {
+			return array( 'residential_sales' );
+		}
+
+		if ( false !== strpos( $before, 'residential-only' ) ) {
+			return array( 'residential_sales', 'residential_lettings' );
+		}
+
+		return $this->get_all_display_contexts();
+	}
+
+	/**
+	 * Sanitize display contexts while ensuring a field remains visible somewhere.
+	 *
+	 * @param array $contexts Context keys.
+	 * @return array
+	 */
+	private function sanitize_display_contexts( $contexts ) {
+		$allowed = $this->get_all_display_contexts();
+		$clean   = array();
+
+		foreach ( is_array( $contexts ) ? $contexts : array() as $context ) {
+			$context = sanitize_key( $context );
+
+			if ( in_array( $context, $allowed, true ) && ! in_array( $context, $clean, true ) ) {
+				$clean[] = $context;
+			}
+		}
+
+		return ! empty( $clean ) ? $clean : $allowed;
+	}
+
+	/**
+	 * Get compact label text for a set of display contexts.
+	 *
+	 * @param array $contexts Context keys.
+	 * @return string
+	 */
+	private function get_display_contexts_label( $contexts ) {
+		$contexts     = $this->sanitize_display_contexts( $contexts );
+		$all_contexts = $this->get_all_display_contexts();
+
+		if ( empty( array_diff( $all_contexts, $contexts ) ) && empty( array_diff( $contexts, $all_contexts ) ) ) {
+			return '';
+		}
+
+		if ( empty( array_diff( array( 'residential_sales', 'residential_lettings' ), $contexts ) ) && empty( array_diff( $contexts, array( 'residential_sales', 'residential_lettings' ) ) ) ) {
+			return __( 'Residential', 'propertyhive' );
+		}
+
+		if ( empty( array_diff( array( 'commercial_sales', 'commercial_lettings' ), $contexts ) ) && empty( array_diff( $contexts, array( 'commercial_sales', 'commercial_lettings' ) ) ) ) {
+			return __( 'Commercial', 'propertyhive' );
+		}
+
+		$options = $this->get_display_context_options();
+		$labels  = array();
+
+		foreach ( $contexts as $context ) {
+			if ( isset( $options[ $context ] ) ) {
+				$labels[] = $options[ $context ];
+			}
+		}
+
+		return implode( ', ', $labels );
+	}
+
+	/**
+	 * Apply stored display contexts to the field wrapper classes.
+	 *
+	 * @param array $field Field data.
+	 * @return array
+	 */
+	private function apply_display_contexts_to_field( $field ) {
+		$field['display_contexts'] = $this->get_field_display_contexts( $field );
+
+		if ( empty( $field['before'] ) ) {
+			return $field;
+		}
+
+		$field['before'] = $this->replace_visibility_classes(
+			(string) $field['before'],
+			$this->get_visibility_classes_for_contexts( $field['display_contexts'] )
+		);
+
+		return $field;
+	}
+
+	/**
+	 * Translate display contexts to existing front-end visibility classes.
+	 *
+	 * @param array $contexts Context keys.
+	 * @return array
+	 */
+	private function get_visibility_classes_for_contexts( $contexts ) {
+		$contexts     = $this->sanitize_display_contexts( $contexts );
+		$all_contexts = $this->get_all_display_contexts();
+
+		if ( empty( array_diff( $all_contexts, $contexts ) ) && empty( array_diff( $contexts, $all_contexts ) ) ) {
+			return array();
+		}
+
+		$classes = array();
+
+		if ( in_array( 'residential_sales', $contexts, true ) && in_array( 'residential_lettings', $contexts, true ) ) {
+			$classes[] = 'residential-only';
+		} else {
+			if ( in_array( 'residential_sales', $contexts, true ) ) {
+				$classes[] = 'sales-only';
+			}
+
+			if ( in_array( 'residential_lettings', $contexts, true ) ) {
+				$classes[] = 'lettings-only';
+			}
+		}
+
+		if ( in_array( 'commercial_sales', $contexts, true ) && in_array( 'commercial_lettings', $contexts, true ) ) {
+			$classes[] = 'commercial-only';
+		} else {
+			if ( in_array( 'commercial_sales', $contexts, true ) ) {
+				$classes[] = 'commercial-sales-only';
+			}
+
+			if ( in_array( 'commercial_lettings', $contexts, true ) ) {
+				$classes[] = 'commercial-lettings-only';
+			}
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * Replace legacy visibility classes in a field wrapper.
+	 *
+	 * @param string $before Wrapper HTML.
+	 * @param array  $visibility_classes New visibility classes.
+	 * @return string
+	 */
+	private function replace_visibility_classes( $before, $visibility_classes ) {
+		$known_classes = array(
+			'sales-only',
+			'lettings-only',
+			'residential-only',
+			'commercial-only',
+			'commercial-sales-only',
+			'commercial-lettings-only',
+		);
+
+		return preg_replace_callback(
+			'/class=(["\'])(.*?)\1/i',
+			function( $matches ) use ( $known_classes, $visibility_classes ) {
+				$classes = preg_split( '/\s+/', trim( $matches[2] ) );
+				$classes = is_array( $classes ) ? $classes : array();
+				$classes = array_values( array_diff( $classes, $known_classes ) );
+
+				foreach ( $visibility_classes as $visibility_class ) {
+					if ( ! in_array( $visibility_class, $classes, true ) ) {
+						$classes[] = $visibility_class;
+					}
+				}
+
+				return 'class=' . $matches[1] . esc_attr( implode( ' ', $classes ) ) . $matches[1];
+			},
+			$before,
+			1
+		);
 	}
 
 	/**
@@ -535,7 +961,11 @@ class PH_Search_Form_Manager {
 			}
 		}
 
-		return $field;
+		$field['display_contexts'] = $this->sanitize_display_contexts(
+			isset( $raw['display_contexts'] ) && is_array( $raw['display_contexts'] ) ? $raw['display_contexts'] : $this->get_field_display_contexts( $field )
+		);
+
+		return $this->apply_display_contexts_to_field( $field );
 	}
 
 	/**

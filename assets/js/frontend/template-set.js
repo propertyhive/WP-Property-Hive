@@ -750,6 +750,18 @@
 		body.style.setProperty('--ph-template-editor-group-height', body.scrollHeight + 'px');
 	}
 
+	function updateEditorGroupBodyHeightWithoutTransition(body) {
+		if (!body) {
+			return;
+		}
+
+		body.classList.add('is-resizing-content');
+		updateEditorGroupBodyHeight(body);
+		window.requestAnimationFrame(function () {
+			body.classList.remove('is-resizing-content');
+		});
+	}
+
 	function setEditorGroupBodyOpen(body, isActive) {
 		if (!body) {
 			return;
@@ -775,6 +787,12 @@
 		var activeBody = organizer ? organizer.querySelector('.ph-template-editor-group.is-active [data-ph-template-editor-group-body]') : null;
 
 		updateEditorGroupBodyHeight(activeBody);
+	}
+
+	function refreshActiveEditorGroupBodyWithoutTransition(organizer) {
+		var activeBody = organizer ? organizer.querySelector('.ph-template-editor-group.is-active [data-ph-template-editor-group-body]') : null;
+
+		updateEditorGroupBodyHeightWithoutTransition(activeBody);
 	}
 
 	function refreshActiveEditorGroupBodyOnNextFrame(organizer) {
@@ -1099,6 +1117,8 @@
 		var openingTimer = null;
 		var closingFieldId = '';
 		var closingTimer = null;
+		var builderResizeObserver = null;
+		var builderResizeFrame = null;
 
 		if (!root || !searchFormConfig.enabled || !window.fetch || !window.FormData) {
 			return null;
@@ -1108,6 +1128,13 @@
 			active: (searchFormConfig.active || []).map(cloneSearchFormField),
 			inactive: (searchFormConfig.inactive || []).map(cloneSearchFormField),
 			categories: searchFormConfig.categories || {},
+			visibilityContexts: searchFormConfig.visibilityContexts || {
+				residential_sales: 'Residential sales',
+				residential_lettings: 'Residential lettings',
+				commercial_sales: 'Commercial sale',
+				commercial_lettings: 'Commercial rent'
+			},
+			visibilityChoices: searchFormConfig.visibilityChoices || [],
 			selectedId: '',
 			dirty: false,
 			previewing: false,
@@ -1122,6 +1149,281 @@
 			}
 
 			root.setAttribute('data-ph-search-form-builder-state', stateName || 'ready');
+		}
+
+		function refreshBuilderGroupBody() {
+			refreshActiveEditorGroupBodyWithoutTransition(form.querySelector('[data-ph-template-editor-groups]'));
+		}
+
+		function scheduleBuilderGroupBodyRefresh() {
+			if (builderResizeFrame && window.cancelAnimationFrame) {
+				window.cancelAnimationFrame(builderResizeFrame);
+			}
+
+			if (window.requestAnimationFrame) {
+				builderResizeFrame = window.requestAnimationFrame(function () {
+					builderResizeFrame = null;
+					refreshBuilderGroupBody();
+				});
+			} else {
+				refreshBuilderGroupBody();
+			}
+		}
+
+		function getSearchFormPreview() {
+			return document.querySelector(searchFormConfig.previewSelector || '.property-search-form');
+		}
+
+		function setSearchFormPreviewValue(previewForm, name, value) {
+			var controls = previewForm ? Array.prototype.slice.call(previewForm.querySelectorAll('[name="' + name + '"]')) : [];
+			var matched = false;
+			var changed = false;
+
+			if (!controls.length || !value) {
+				return false;
+			}
+
+			controls.forEach(function (control) {
+				if (control.type === 'radio' || control.type === 'checkbox') {
+					if (control.value === value) {
+						matched = true;
+					}
+					return;
+				}
+
+				if (control.tagName && control.tagName.toLowerCase() === 'select') {
+					Array.prototype.slice.call(control.options).forEach(function (option) {
+						if (option.value === value) {
+							matched = true;
+						}
+					});
+					return;
+				}
+
+				matched = true;
+			});
+
+			if (!matched) {
+				return false;
+			}
+
+			controls.forEach(function (control) {
+				if (control.type === 'radio') {
+					if (control.checked !== (control.value === value)) {
+						changed = true;
+					}
+					control.checked = control.value === value;
+					return;
+				}
+
+				if (control.type === 'checkbox') {
+					if (control.value === value && !control.checked) {
+						changed = true;
+						control.checked = true;
+					}
+					return;
+				}
+
+				if (control.value !== value) {
+					changed = true;
+				}
+				control.value = value;
+			});
+
+			return changed;
+		}
+
+		function syncSearchFormPreviewSelection() {
+			var field = getSearchFormFieldById(state, state.selectedId);
+			var visibility = field && field.visibility ? field.visibility : {};
+			var previewForm = getSearchFormPreview();
+			var changed = false;
+
+			if (!previewForm || !visibility.preview_department) {
+				return;
+			}
+
+			changed = setSearchFormPreviewValue(previewForm, 'department', visibility.preview_department) || changed;
+
+			if (visibility.commercial_availability) {
+				changed = setSearchFormPreviewValue(previewForm, 'commercial_for_sale_to_rent', visibility.commercial_availability) || changed;
+			}
+
+			if (changed && typeof window.toggleDepartmentFields === 'function') {
+				window.toggleDepartmentFields();
+			}
+		}
+
+		function getVisibilityContextKeys() {
+			return Object.keys(state.visibilityContexts || {});
+		}
+
+		function cleanDisplayContexts(contexts) {
+			var allowed = getVisibilityContextKeys();
+			var clean = [];
+
+			if (!Array.isArray(contexts)) {
+				contexts = [];
+			}
+
+			contexts.forEach(function (context) {
+				if (allowed.indexOf(context) !== -1 && clean.indexOf(context) === -1) {
+					clean.push(context);
+				}
+			});
+
+			return clean;
+		}
+
+		function normalizeDisplayContexts(contexts) {
+			var allowed = getVisibilityContextKeys();
+			var clean = cleanDisplayContexts(contexts);
+
+			return clean.length ? clean : allowed.slice();
+		}
+
+		function getDefaultVisibilityChoices() {
+			return getVisibilityContextKeys().map(function (context) {
+				return {
+					id: context,
+					label: state.visibilityContexts[context],
+					contexts: [context]
+				};
+			});
+		}
+
+		function normalizeVisibilityChoices(choices) {
+			var normalized = [];
+
+			if (!Array.isArray(choices)) {
+				return getDefaultVisibilityChoices();
+			}
+
+			choices.forEach(function (choice) {
+				var contexts = cleanDisplayContexts(choice && choice.contexts ? choice.contexts : [choice && choice.id]);
+
+				if (!choice || !choice.id || !contexts.length) {
+					return;
+				}
+
+				normalized.push({
+					id: choice.id,
+					label: choice.label || contexts.map(function (context) {
+						return state.visibilityContexts[context];
+					}).join(', '),
+					contexts: contexts
+				});
+			});
+
+			return normalized.length ? normalized : getDefaultVisibilityChoices();
+		}
+
+		function getVisibilityChoices() {
+			state.visibilityChoices = normalizeVisibilityChoices(state.visibilityChoices);
+
+			return state.visibilityChoices;
+		}
+
+		function getSelectableVisibilityContextKeys() {
+			var selectable = [];
+
+			getVisibilityChoices().forEach(function (choice) {
+				choice.contexts.forEach(function (context) {
+					if (selectable.indexOf(context) === -1) {
+						selectable.push(context);
+					}
+				});
+			});
+
+			return selectable;
+		}
+
+		function hasSameContexts(first, second) {
+			first = normalizeDisplayContexts(first);
+			second = normalizeDisplayContexts(second);
+
+			return first.length === second.length && first.every(function (context) {
+				return second.indexOf(context) !== -1;
+			});
+		}
+
+		function getDisplayContextLabel(contexts) {
+			var allContexts = getVisibilityContextKeys();
+			var labels = [];
+
+			contexts = normalizeDisplayContexts(contexts);
+
+			if (hasSameContexts(contexts, allContexts)) {
+				return '';
+			}
+
+			if (hasSameContexts(contexts, ['residential_sales', 'residential_lettings'])) {
+				return 'Residential';
+			}
+
+			if (hasSameContexts(contexts, ['commercial_sales', 'commercial_lettings'])) {
+				return 'Commercial';
+			}
+
+			contexts.forEach(function (context) {
+				if (state.visibilityContexts[context]) {
+					labels.push(state.visibilityContexts[context]);
+				}
+			});
+
+			return labels.join(', ');
+		}
+
+		function getVisibilityForContexts(contexts) {
+			var allContexts = getVisibilityContextKeys();
+			var visibility = {
+				scope: 'all',
+				label: '',
+				contexts: normalizeDisplayContexts(contexts)
+			};
+
+			if (hasSameContexts(visibility.contexts, allContexts)) {
+				return visibility;
+			}
+
+			visibility.scope = 'custom';
+			visibility.label = getDisplayContextLabel(visibility.contexts);
+
+			if (visibility.contexts.indexOf('residential_sales') !== -1) {
+				visibility.preview_department = 'residential-sales';
+				return visibility;
+			}
+
+			if (visibility.contexts.indexOf('residential_lettings') !== -1) {
+				visibility.preview_department = 'residential-lettings';
+				return visibility;
+			}
+
+			if (visibility.contexts.indexOf('commercial_sales') !== -1) {
+				visibility.preview_department = 'commercial';
+				visibility.commercial_availability = 'for_sale';
+				return visibility;
+			}
+
+			if (visibility.contexts.indexOf('commercial_lettings') !== -1) {
+				visibility.preview_department = 'commercial';
+				visibility.commercial_availability = 'to_rent';
+			}
+
+			return visibility;
+		}
+
+		function syncFieldVisibilityState(field) {
+			var contexts;
+
+			if (!field) {
+				return;
+			}
+
+			field.settings = field.settings || {};
+			contexts = normalizeDisplayContexts(field.settings.display_contexts || (field.visibility && field.visibility.contexts));
+			field.settings.display_contexts = contexts;
+			field.visibility = getVisibilityForContexts(contexts);
 		}
 
 		function markDirty() {
@@ -1145,7 +1447,14 @@
 
 			openingTimer = window.setTimeout(function () {
 				if (openingFieldId === fieldId) {
+					var item = getActiveFieldItem(fieldId);
+					var panel = item ? item.querySelector('.ph-search-form-builder-settings.is-opening') : null;
+
+					if (panel) {
+						panel.classList.remove('is-opening');
+					}
 					openingFieldId = '';
+					scheduleBuilderGroupBodyRefresh();
 				}
 				openingTimer = null;
 			}, 210);
@@ -1331,7 +1640,12 @@
 			}
 
 			field.settings = field.settings || {};
-			field.settings[key] = value;
+			if (key === 'display_contexts') {
+				field.settings[key] = normalizeDisplayContexts(value);
+				field.visibility = getVisibilityForContexts(field.settings[key]);
+			} else {
+				field.settings[key] = value;
+			}
 
 			if (key === 'label' && value) {
 				field.title = value;
@@ -1363,6 +1677,7 @@
 				}
 
 				replaceSearchFormPreview(data.html || '', searchFormConfig);
+				syncSearchFormPreviewSelection();
 				state.previewing = false;
 				setBuilderStatus(state.dirty ? (labels.changed || 'Unsaved changes') : (labels.ready || 'Ready'), state.dirty ? 'changed' : 'ready');
 			}).catch(function (error) {
@@ -1380,6 +1695,13 @@
 				return Promise.resolve();
 			}
 
+			if (previewTimer) {
+				window.clearTimeout(previewTimer);
+				previewTimer = null;
+			}
+
+			previewSequence++;
+			state.previewing = false;
 			setBuilderStatus(labels.saving || 'Saving...', 'saving');
 
 			return searchFormRequest(
@@ -1392,6 +1714,10 @@
 					searchFormConfig.active = data.editor.active || searchFormConfig.active;
 					searchFormConfig.inactive = data.editor.inactive || searchFormConfig.inactive;
 					searchFormConfig.baseHash = data.editor.baseHash || searchFormConfig.baseHash;
+					searchFormConfig.visibilityContexts = data.editor.visibilityContexts || searchFormConfig.visibilityContexts;
+					searchFormConfig.visibilityChoices = data.editor.visibilityChoices || searchFormConfig.visibilityChoices;
+					state.visibilityContexts = data.editor.visibilityContexts || state.visibilityContexts;
+					state.visibilityChoices = normalizeVisibilityChoices(data.editor.visibilityChoices || state.visibilityChoices);
 					state.active = (data.editor.active || state.active).map(cloneSearchFormField);
 					state.inactive = (data.editor.inactive || state.inactive).map(cloneSearchFormField);
 					state.baseHash = data.editor.baseHash || state.baseHash;
@@ -1399,6 +1725,7 @@
 
 				if (data.html) {
 					replaceSearchFormPreview(data.html, searchFormConfig);
+					syncSearchFormPreviewSelection();
 				}
 
 				state.dirty = false;
@@ -1424,10 +1751,10 @@
 			var icon = document.createElement('span');
 			var icons = {
 				move: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2l3.5 3.5h-2.4v5.4h5.4V8.5L22 12l-3.5 3.5v-2.4h-5.4v5.4h2.4L12 22l-3.5-3.5h2.4v-5.4H5.5v2.4L2 12l3.5-3.5v2.4h5.4V5.5H8.5L12 2z"></path></svg>',
-				remove: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3h6l1 2h4v2H4V5h4l1-2zm-2 6h10l-.7 11H7.7L7 9zm3 2v7h2v-7h-2zm4 0v7h2v-7h-2z"></path></svg>'
+				remove: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" data-ph-search-form-icon="remove"><path d="M3 6h18"></path><path d="M8 6V4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2"></path><path d="M19 6l-1 14c-.1 1.1-1 2-2.1 2H8.1c-1.1 0-2-.9-2.1-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>'
 			};
 
-			icon.className = 'ph-search-form-builder-icon';
+			icon.className = 'ph-search-form-builder-icon ph-search-form-builder-icon-' + name;
 			icon.innerHTML = icons[name] || '';
 
 			return icon;
@@ -1466,8 +1793,10 @@
 				var item = document.createElement('div');
 				var handle = document.createElement('button');
 				var title = document.createElement('button');
+				var titleLabel = document.createElement('span');
 				var actions = document.createElement('div');
 				var titleText = field.title || field.id;
+				var visibility = field.visibility || {};
 
 				item.className = 'ph-search-form-builder-item';
 				item.classList.toggle('is-active', field.id === state.selectedId);
@@ -1485,8 +1814,16 @@
 
 				title.type = 'button';
 				title.className = 'ph-search-form-builder-item-title';
-				title.textContent = titleText;
 				title.setAttribute('aria-expanded', field.id === state.selectedId ? 'true' : 'false');
+				titleLabel.className = 'ph-search-form-builder-item-label';
+				titleLabel.textContent = titleText;
+				title.appendChild(titleLabel);
+				if (visibility.label) {
+					var visibilityLabel = document.createElement('span');
+					visibilityLabel.className = 'ph-search-form-builder-item-visibility';
+					visibilityLabel.textContent = 'Shown for ' + visibility.label;
+					title.appendChild(visibilityLabel);
+				}
 				title.addEventListener('click', function () {
 					selectField(field.id);
 				});
@@ -1594,6 +1931,73 @@
 			return input;
 		}
 
+		function renderDisplayContextSettings(container, field) {
+			var row = document.createElement('fieldset');
+			var legend = document.createElement('legend');
+			var choices = document.createElement('div');
+			var contexts = normalizeDisplayContexts(field.settings.display_contexts || (field.visibility && field.visibility.contexts));
+			var selectableContexts = getSelectableVisibilityContextKeys();
+
+			row.className = 'ph-search-form-builder-setting ph-search-form-builder-visibility-setting';
+			legend.textContent = 'Show for';
+			choices.className = 'ph-search-form-builder-visibility-options';
+			row.appendChild(legend);
+
+			getVisibilityChoices().forEach(function (choice) {
+				var label = document.createElement('label');
+				var input = document.createElement('input');
+				var text = document.createElement('span');
+
+				input.type = 'checkbox';
+				input.value = choice.id;
+				input.checked = choice.contexts.every(function (context) {
+					return contexts.indexOf(context) !== -1;
+				});
+				text.textContent = choice.label;
+
+				input.addEventListener('change', function () {
+					var selectedContexts = contexts.filter(function (context) {
+						return selectableContexts.indexOf(context) === -1;
+					});
+					var selectedVisibleContexts = [];
+
+					Array.prototype.slice.call(row.querySelectorAll('input[type="checkbox"]:checked')).forEach(function (checkbox) {
+						var matchedChoice = getVisibilityChoices().filter(function (visibilityChoice) {
+							return visibilityChoice.id === checkbox.value;
+						})[0];
+
+						if (!matchedChoice) {
+							return;
+						}
+
+						matchedChoice.contexts.forEach(function (context) {
+							if (selectedVisibleContexts.indexOf(context) === -1) {
+								selectedVisibleContexts.push(context);
+							}
+
+							if (selectedContexts.indexOf(context) === -1) {
+								selectedContexts.push(context);
+							}
+						});
+					});
+
+					if (!selectedVisibleContexts.length) {
+						input.checked = true;
+						return;
+					}
+
+					updateSelectedSetting('display_contexts', selectedContexts);
+				});
+
+				label.appendChild(input);
+				label.appendChild(text);
+				choices.appendChild(label);
+			});
+
+			row.appendChild(choices);
+			container.appendChild(row);
+		}
+
 		function renderFieldSettings(container, selectedField, isClosing, isOpening) {
 			var field = selectedField || getSearchFormFieldById(state, state.selectedId);
 			var panel = document.createElement('div');
@@ -1632,6 +2036,8 @@
 			if (field.supports && field.supports.blank_option) {
 				appendSettingField(panel, field, 'blank_option', 'Blank option', 'text');
 			}
+
+			renderDisplayContextSettings(panel, field);
 
 			if (field.supports && field.supports.department_type) {
 				var row = document.createElement('label');
@@ -1674,7 +2080,9 @@
 				appendSettingField(advanced, field, 'dynamic_population', 'Cascading dropdowns', 'checkbox');
 			}
 
-			panel.appendChild(advanced);
+			if (advanced.querySelector('.ph-search-form-builder-setting')) {
+				panel.appendChild(advanced);
+			}
 			container.appendChild(panel);
 		}
 
@@ -1709,7 +2117,9 @@
 			renderAvailableFields(body);
 
 			setBuilderStatus(state.previewing ? (labels.loading || 'Loading...') : (state.dirty ? (labels.changed || 'Unsaved changes') : (labels.ready || 'Ready')), state.previewing ? 'saving' : (state.dirty ? 'changed' : 'ready'));
-			refreshActiveEditorGroupBody(form.querySelector('[data-ph-template-editor-groups]'));
+			refreshBuilderGroupBody();
+			scheduleBuilderGroupBodyRefresh();
+			syncSearchFormPreviewSelection();
 
 			if (pendingHandleFocusId) {
 				var focusId = pendingHandleFocusId;
@@ -1854,6 +2264,15 @@
 			draggedFieldId = '';
 		});
 
+		if (window.ResizeObserver) {
+			builderResizeObserver = new window.ResizeObserver(function () {
+				scheduleBuilderGroupBodyRefresh();
+			});
+			builderResizeObserver.observe(root);
+		}
+
+		state.active.forEach(syncFieldVisibilityState);
+		state.inactive.forEach(syncFieldVisibilityState);
 		state.selectedId = state.active.length ? state.active[0].id : '';
 		render();
 
@@ -1959,7 +2378,7 @@
 				return response.json();
 			}).then(function (payload) {
 				if (!payload || !payload.success) {
-					throw new Error('Save failed');
+					throw new Error(payload && payload.data && payload.data.message ? payload.data.message : (labels.error || 'Could not save'));
 				}
 
 				config.settings = payload.data && payload.data.settings ? payload.data.settings : config.settings;
@@ -1970,8 +2389,8 @@
 			}).then(function () {
 				editor.classList.remove('is-dirty');
 				setEditorStatus(editor, labels.saved || 'Saved', 'saved');
-			}).catch(function () {
-				setEditorStatus(editor, labels.error || 'Could not save', 'error');
+			}).catch(function (error) {
+				setEditorStatus(editor, error && error.message ? error.message : (labels.error || 'Could not save'), 'error');
 			}).finally(function () {
 				if (saveButton) {
 					saveButton.disabled = false;
