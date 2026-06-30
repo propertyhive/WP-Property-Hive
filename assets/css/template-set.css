@@ -408,6 +408,277 @@ body.ph-template-editor-active .ph-template-editor button.ph-template-editor-gro
 	width: 18px;
 }
 
+.ph-template-editor-field-builder {
+	display: grid;
+	gap: 12px;
+}
+
+.ph-search-form-builder-header {
+	align-items: center;
+	display: flex;
+	gap: 10px;
+	justify-content: space-between;
+}
+
+.ph-search-form-builder-header strong {
+	color: var(--ph-editor-carbon);
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.ph-search-form-builder-header a {
+	color: var(--ph-editor-carbon);
+	font-size: 12px;
+	font-weight: 700;
+	text-decoration: underline;
+}
+
+.ph-search-form-builder-status {
+	color: var(--ph-editor-carbon);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.3;
+	min-height: 16px;
+}
+
+.ph-template-editor-field-builder[data-ph-search-form-builder-state="error"] .ph-search-form-builder-status {
+	color: #b42318;
+}
+
+.ph-template-editor-field-builder[data-ph-search-form-builder-state="saved"] .ph-search-form-builder-status {
+	color: var(--ph-template-brand);
+}
+
+.ph-search-form-builder-body {
+	display: grid;
+	gap: 12px;
+}
+
+.ph-search-form-builder-list {
+	display: grid;
+	gap: 8px;
+}
+
+.ph-search-form-builder-item {
+	align-items: center;
+	background: var(--ph-editor-mist);
+	border: 1px solid var(--ph-editor-smoke);
+	border-radius: 6px;
+	display: grid;
+	gap: 8px;
+	grid-template-columns: 30px minmax(0, 1fr) auto;
+	padding: 8px;
+}
+
+.ph-search-form-builder-item.is-active {
+	background: var(--ph-editor-sunlight);
+	border-color: var(--ph-editor-wax);
+}
+
+.ph-search-form-builder-item.is-dragging {
+	opacity: 0.45;
+}
+
+.ph-search-form-builder-item.is-drop-before {
+	box-shadow: inset 0 3px 0 var(--ph-editor-carbon);
+}
+
+.ph-search-form-builder-item.is-drop-after {
+	box-shadow: inset 0 -3px 0 var(--ph-editor-carbon);
+}
+
+.ph-search-form-builder-drag-handle {
+	align-items: center;
+	appearance: none;
+	background: var(--ph-editor-white);
+	border: 1px solid var(--ph-editor-slate);
+	border-radius: 6px;
+	color: var(--ph-editor-carbon);
+	cursor: grab;
+	display: inline-flex;
+	font-family: var(--ph-editor-font);
+	font-size: 13px;
+	font-weight: 700;
+	height: 34px;
+	justify-content: center;
+	line-height: 1;
+	padding: 0;
+	touch-action: none;
+	width: 30px;
+}
+
+.ph-search-form-builder-drag-handle:active {
+	cursor: grabbing;
+}
+
+.ph-search-form-builder-drag-handle:disabled {
+	cursor: default;
+	opacity: 0.45;
+}
+
+.ph-search-form-builder-item-title {
+	appearance: none;
+	background: transparent;
+	border: 0;
+	color: var(--ph-editor-carbon);
+	cursor: pointer;
+	font-family: var(--ph-editor-font);
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.2;
+	min-width: 0;
+	overflow-wrap: anywhere;
+	padding: 0;
+	text-align: left;
+}
+
+.ph-search-form-builder-drag-handle:focus,
+.ph-search-form-builder-item-title:focus {
+	outline: 2px solid var(--ph-editor-carbon);
+	outline-offset: 2px;
+}
+
+.ph-search-form-builder-item-actions {
+	display: grid;
+	gap: 6px;
+	grid-template-columns: minmax(72px, auto);
+}
+
+.ph-search-form-builder-item-actions button,
+.ph-search-form-builder-add button {
+	appearance: none;
+	background: var(--ph-editor-white);
+	border: 1px solid var(--ph-editor-slate);
+	border-radius: 6px;
+	color: var(--ph-editor-carbon);
+	cursor: pointer;
+	font-family: var(--ph-editor-font);
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.15;
+	min-height: 34px;
+	padding: 8px;
+}
+
+.ph-search-form-builder-item-actions button:disabled {
+	cursor: not-allowed;
+	opacity: 0.45;
+}
+
+.ph-search-form-builder-item-actions button:focus,
+.ph-search-form-builder-item-actions button:hover,
+.ph-search-form-builder-add button:focus,
+.ph-search-form-builder-add button:hover {
+	background: var(--ph-editor-sunlight);
+	border-color: var(--ph-editor-wax);
+	outline: none;
+}
+
+.ph-search-form-builder-add {
+	border: 1px solid var(--ph-editor-smoke);
+	border-radius: 6px;
+	padding: 10px;
+}
+
+.ph-search-form-builder-add summary,
+.ph-search-form-builder-advanced summary {
+	color: var(--ph-editor-carbon);
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.ph-search-form-builder-add-groups {
+	display: grid;
+	gap: 12px;
+	padding-top: 12px;
+}
+
+.ph-search-form-builder-add-groups h4,
+.ph-search-form-builder-settings h4 {
+	color: var(--ph-editor-carbon);
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.2;
+	margin: 0;
+}
+
+.ph-search-form-builder-add-groups > div {
+	display: grid;
+	gap: 6px;
+}
+
+.ph-search-form-builder-settings {
+	background: var(--ph-editor-white);
+	border: 1px solid var(--ph-editor-smoke);
+	border-radius: 6px;
+	display: grid;
+	gap: 10px;
+	grid-column: 1 / -1;
+	padding: 12px;
+}
+
+.ph-search-form-builder-setting {
+	display: grid;
+	gap: 6px;
+	margin: 0;
+}
+
+.ph-search-form-builder-setting span {
+	color: var(--ph-editor-carbon);
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.ph-search-form-builder-setting input[type="text"],
+.ph-search-form-builder-setting input[type="number"],
+.ph-search-form-builder-setting select {
+	background: var(--ph-editor-white);
+	border: 1px solid var(--ph-editor-slate);
+	border-radius: 6px;
+	color: var(--ph-editor-carbon);
+	font-family: var(--ph-editor-font);
+	font-size: 14px;
+	font-weight: 400;
+	min-height: 38px;
+	padding: 8px 10px;
+	width: 100%;
+}
+
+.ph-search-form-builder-setting input[type="checkbox"] {
+	accent-color: var(--ph-editor-carbon);
+	height: 18px;
+	width: 18px;
+}
+
+.ph-search-form-builder-setting input:focus,
+.ph-search-form-builder-setting select:focus {
+	border-color: var(--ph-editor-carbon);
+	box-shadow: 0 0 0 1px var(--ph-editor-carbon);
+	outline: none;
+}
+
+.ph-search-form-builder-advanced {
+	display: grid;
+	gap: 10px;
+}
+
+.ph-search-form-builder-advanced[open] {
+	border-top: 1px solid var(--ph-editor-smoke);
+	padding-top: 10px;
+}
+
+.ph-search-form-builder-empty {
+	color: var(--ph-editor-carbon);
+	font-size: 13px;
+	line-height: 1.4;
+	margin: 0;
+	opacity: 0.75;
+}
+
 .ph-template-editor-footer {
 	align-items: center;
 	background: var(--ph-editor-white);

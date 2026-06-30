@@ -42,25 +42,23 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     {
         if ( isset($_GET['action']) && $_GET['action'] == 'resetsearchform' && isset($_GET['id']) && $_GET['id'] != '' )
         {
-            $current_settings = get_option( 'propertyhive_template_assistant', array() );
-
             $current_id = ( !isset( $_GET['id'] ) ) ? '' : sanitize_title( $_GET['id'] );
 
-            $existing_search_forms = ( (isset($current_settings['search_forms'])) ? $current_settings['search_forms'] : array() );
-
-            if ( !isset($existing_search_forms[$current_id]) )
-            {
-                die("Trying to reset a non-existant search form. Please go back and try again");
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_die( esc_html__( 'You do not have permission to reset search forms.', 'propertyhive' ) );
             }
 
-            if ( isset($existing_search_forms[$current_id]) )
-            {
-                $existing_search_forms[$current_id] = array();
+            check_admin_referer( 'propertyhive_reset_search_form_' . $current_id );
+
+            $manager = new PH_Search_Form_Manager();
+            $result  = $manager->reset_form( $current_id );
+
+            if ( is_wp_error( $result ) ) {
+                wp_die( esc_html( $result->get_error_message() ) );
             }
 
-            $current_settings['search_forms'] = $existing_search_forms;
-
-            update_option( 'propertyhive_template_assistant', $current_settings );
+            wp_safe_redirect( admin_url( 'admin.php?page=ph-settings&tab=frontend&section=search-forms' ) );
+            exit;
         }
     }
 
@@ -68,25 +66,23 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     {
         if ( isset($_GET['action']) && $_GET['action'] == 'deletesearchform' && isset($_GET['id']) && $_GET['id'] != '' && $_GET['id'] != 'default' )
         {
-            $current_settings = get_option( 'propertyhive_template_assistant', array() );
-
             $current_id = ( !isset( $_GET['id'] ) ) ? '' : sanitize_title( $_GET['id'] );
 
-            $existing_search_forms = ( (isset($current_settings['search_forms'])) ? $current_settings['search_forms'] : array() );
-
-            if ( !isset($existing_search_forms[$current_id]) )
-            {
-                die("Trying to delete a non-existant search form. Please go back and try again");
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_die( esc_html__( 'You do not have permission to delete search forms.', 'propertyhive' ) );
             }
 
-            if ( isset($existing_search_forms[$current_id]) )
-            {
-                unset($existing_search_forms[$current_id]);
+            check_admin_referer( 'propertyhive_delete_search_form_' . $current_id );
+
+            $manager = new PH_Search_Form_Manager();
+            $result  = $manager->delete_form( $current_id );
+
+            if ( is_wp_error( $result ) ) {
+                wp_die( esc_html( $result->get_error_message() ) );
             }
 
-            $current_settings['search_forms'] = $existing_search_forms;
-
-            update_option( 'propertyhive_template_assistant', $current_settings );
+            wp_safe_redirect( admin_url( 'admin.php?page=ph-settings&tab=frontend&section=search-forms' ) );
+            exit;
         }
     }
 
@@ -540,13 +536,16 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                             {
                                 foreach ($search_forms as $id => $search_form)
                                 {
+                                    $reset_url = wp_nonce_url( admin_url( 'admin.php?page=ph-settings&tab=frontend&section=search-forms&action=resetsearchform&id=' . $id ), 'propertyhive_reset_search_form_' . $id );
+                                    $delete_url = wp_nonce_url( admin_url( 'admin.php?page=ph-settings&tab=frontend&section=search-forms&action=deletesearchform&id=' . $id ), 'propertyhive_delete_search_form_' . $id );
+
                                     echo '<tr>';
                                         echo '<td class="id">' . $id . '</td>';
                                         echo '<td class="shortcode"><pre style="background:#EEE; padding:5px; display:inline">[property_search_form id="' . $id . '"]</pre></td>';
                                         echo '<td class="settings">
                                             <a class="button" href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=frontend&section=editsearchform&id=' . $id )) . '">' . esc_html(__( 'Edit Fields', 'propertyhive' )) . '</a>
-                                            <a class="button" href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=frontend&section=search-forms&action=resetsearchform&id=' . $id )) . '">' . esc_html(__( 'Reset To Default Fields', 'propertyhive' )) . '</a>
-                                            ' .  ( ( $id != 'default' ) ? '<a class="button" href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=frontend&section=search-forms&action=deletesearchform&id=' . $id )) . '" onclick="var confirmBox = confirm(\'Are you sure you wish to delete this search form?\'); return confirmBox;">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>' : '' ) . '
+                                            <a class="button" href="' . esc_url( $reset_url ) . '">' . esc_html(__( 'Reset To Default Fields', 'propertyhive' )) . '</a>
+                                            ' .  ( ( $id != 'default' ) ? '<a class="button" href="' . esc_url( $delete_url ) . '" onclick="var confirmBox = confirm(\'Are you sure you wish to delete this search form?\'); return confirmBox;">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>' : '' ) . '
                                         </td>';
                                     echo '</tr>';
                                 }

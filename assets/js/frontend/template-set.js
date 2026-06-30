@@ -630,6 +630,7 @@
 		groups: {
 			search: [
 				{ id: 'template', label: 'Template', controls: ['template_set_search_template'] },
+				{ id: 'search-form', label: 'Search form', controls: ['ph_search_form_builder'] },
 				{ id: 'layout', label: 'Layout', controls: ['template_set_search_layout', 'template_set_search_grid_columns'] },
 				{ id: 'card-appearance', label: 'Card appearance', controls: ['template_set_search_card_size', 'template_set_image_style'] },
 				{ id: 'details', label: 'Details shown', controls: ['template_set_show_branch', 'template_set_show_badges'] }
@@ -657,6 +658,14 @@
 
 	function getEditorControlItems(form) {
 		var items = {};
+
+		form.querySelectorAll('[data-ph-template-editor-panel-control]').forEach(function (item) {
+			var name = item.getAttribute('data-ph-template-editor-panel-control');
+
+			if (name && !items[name]) {
+				items[name] = item;
+			}
+		});
 
 		form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
 			var item;
@@ -967,6 +976,782 @@
 		}
 	}
 
+	function cloneSearchFormField(field) {
+		return JSON.parse(JSON.stringify(field || {}));
+	}
+
+	function getSearchFormFieldById(state, fieldId) {
+		var pools = [state.active, state.inactive];
+		var found = null;
+
+		pools.forEach(function (pool) {
+			pool.some(function (field) {
+				if (field.id === fieldId) {
+					found = field;
+					return true;
+				}
+				return false;
+			});
+		});
+
+		return found;
+	}
+
+	function buildSearchFormPayload(state) {
+		function prepareList(list) {
+			return list.map(function (field) {
+				return {
+					id: field.id,
+					settings: field.settings || {}
+				};
+			});
+		}
+
+		return {
+			active_fields: prepareList(state.active),
+			inactive_fields: prepareList(state.inactive)
+		};
+	}
+
+	function searchFormRequest(action, searchFormConfig, payload, extra) {
+		var data = new window.FormData();
+
+		data.append('action', action);
+		data.append('security', searchFormConfig.security || '');
+		data.append('payload', JSON.stringify(payload || {}));
+
+		Object.keys(extra || {}).forEach(function (key) {
+			data.append(key, extra[key]);
+		});
+
+		return window.fetch(config.ajaxUrl || '', {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: data
+		}).then(function (response) {
+			return response.json();
+		}).then(function (responsePayload) {
+			if (!responsePayload || !responsePayload.success) {
+				throw new Error(responsePayload && responsePayload.data && responsePayload.data.message ? responsePayload.data.message : 'Request failed');
+			}
+
+			return responsePayload.data || {};
+		});
+	}
+
+	function replaceSearchFormPreview(html, searchFormConfig) {
+		var selector = searchFormConfig.previewSelector || '.property-search-form';
+		var currentForm = document.querySelector(selector);
+		var container = document.createElement('div');
+		var nextForm;
+
+		if (!currentForm || !html) {
+			return;
+		}
+
+		container.innerHTML = html;
+		nextForm = container.querySelector(selector) || container.querySelector('form.property-search-form');
+
+		if (!nextForm) {
+			return;
+		}
+
+		currentForm.parentNode.replaceChild(nextForm, currentForm);
+
+		nextForm.querySelectorAll('script').forEach(function (script) {
+			var executable = document.createElement('script');
+			executable.text = script.text || script.textContent || '';
+			document.body.appendChild(executable);
+			document.body.removeChild(executable);
+		});
+
+		if (typeof window.toggleDepartmentFields === 'function') {
+			window.toggleDepartmentFields();
+		}
+
+		if (window.jQuery && window.jQuery.fn && window.jQuery.fn.multiselect) {
+			window.jQuery(nextForm).find('select.ph-form-multiselect').each(function () {
+				var select = window.jQuery(this);
+
+				if (select.data('ph-template-editor-multiselect')) {
+					return;
+				}
+
+				select.multiselect({
+					texts: {
+						placeholder: select.data('blank-option')
+					}
+				});
+				select.data('ph-template-editor-multiselect', true);
+			});
+		}
+	}
+
+	function initSearchFormBuilder(editor, form, labels) {
+		var searchFormConfig = config.searchFormEditor || {};
+		var root = form.querySelector('[data-ph-search-form-builder]');
+		var state;
+		var previewTimer = null;
+		var previewSequence = 0;
+		var draggedFieldId = '';
+		var pendingHandleFocusId = '';
+
+		if (!root || !searchFormConfig.enabled || !window.fetch || !window.FormData) {
+			return null;
+		}
+
+		state = {
+			active: (searchFormConfig.active || []).map(cloneSearchFormField),
+			inactive: (searchFormConfig.inactive || []).map(cloneSearchFormField),
+			categories: searchFormConfig.categories || {},
+			selectedId: '',
+			dirty: false,
+			previewing: false,
+			baseHash: searchFormConfig.baseHash || ''
+		};
+
+		function setBuilderStatus(message, stateName) {
+			var status = root.querySelector('[data-ph-search-form-builder-status]');
+
+			if (status) {
+				status.textContent = message || '';
+			}
+
+			root.setAttribute('data-ph-search-form-builder-state', stateName || 'ready');
+		}
+
+		function markDirty() {
+			state.dirty = true;
+			editor.classList.add('is-dirty');
+			setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+			queuePreview();
+		}
+
+		function selectField(fieldId) {
+			state.selectedId = state.selectedId === fieldId ? '' : fieldId;
+			render();
+		}
+
+		function getActiveFieldItem(fieldId) {
+			var items = root.querySelectorAll('[data-ph-search-form-field]');
+			var i;
+
+			for (i = 0; i < items.length; i++) {
+				if (items[i].getAttribute('data-ph-search-form-field') === fieldId) {
+					return items[i];
+				}
+			}
+
+			return null;
+		}
+
+		function focusFieldHandle(fieldId) {
+			var item = getActiveFieldItem(fieldId);
+			var handle = item ? item.querySelector('[data-ph-search-form-drag-handle]') : null;
+
+			if (handle) {
+				handle.focus();
+			}
+		}
+
+		function moveField(fieldId, direction, shouldFocusHandle) {
+			var index = state.active.findIndex(function (field) { return field.id === fieldId; });
+			var target = index + direction;
+			var field;
+
+			if (index < 0 || target < 0 || target >= state.active.length) {
+				return;
+			}
+
+			field = state.active.splice(index, 1)[0];
+			state.active.splice(target, 0, field);
+			state.selectedId = fieldId;
+			if (shouldFocusHandle) {
+				pendingHandleFocusId = fieldId;
+			}
+			markDirty();
+			render();
+		}
+
+		function reorderField(fieldId, targetFieldId, placement) {
+			var originalOrder = state.active.map(function (field) { return field.id; }).join('|');
+			var sourceIndex = state.active.findIndex(function (field) { return field.id === fieldId; });
+			var targetIndex = state.active.findIndex(function (field) { return field.id === targetFieldId; });
+			var field;
+			var nextOrder;
+
+			if (sourceIndex < 0 || targetIndex < 0 || fieldId === targetFieldId) {
+				return;
+			}
+
+			field = state.active.splice(sourceIndex, 1)[0];
+			if (sourceIndex < targetIndex) {
+				targetIndex--;
+			}
+			if (placement === 'after') {
+				targetIndex++;
+			}
+			targetIndex = Math.max(0, Math.min(targetIndex, state.active.length));
+			state.active.splice(targetIndex, 0, field);
+
+			nextOrder = state.active.map(function (activeField) { return activeField.id; }).join('|');
+			if (nextOrder === originalOrder) {
+				return;
+			}
+
+			state.selectedId = fieldId;
+			markDirty();
+			render();
+		}
+
+		function getDropPlacement(event, item) {
+			var rect = item.getBoundingClientRect();
+
+			return event.clientY > rect.top + (rect.height / 2) ? 'after' : 'before';
+		}
+
+		function clearDropTargets(includeDragging) {
+			root.querySelectorAll('.is-drop-before, .is-drop-after, .is-dragging').forEach(function (item) {
+				item.classList.remove('is-drop-before', 'is-drop-after');
+				if (includeDragging) {
+					item.classList.remove('is-dragging');
+				}
+			});
+		}
+
+		function removeField(fieldId) {
+			var index = state.active.findIndex(function (field) { return field.id === fieldId; });
+			var field;
+
+			if (index < 0) {
+				return;
+			}
+
+			field = state.active.splice(index, 1)[0];
+			state.inactive.push(field);
+			if (state.selectedId === fieldId) {
+				state.selectedId = state.active.length ? state.active[Math.max(0, index - 1)].id : '';
+			}
+			markDirty();
+			render();
+		}
+
+		function addField(fieldId) {
+			var index = state.inactive.findIndex(function (field) { return field.id === fieldId; });
+			var field;
+
+			if (index < 0) {
+				return;
+			}
+
+			field = state.inactive.splice(index, 1)[0];
+			state.active.push(field);
+			state.selectedId = field.id;
+			markDirty();
+			render();
+		}
+
+		function updateSelectedSetting(key, value) {
+			var field = getSearchFormFieldById(state, state.selectedId);
+
+			if (!field) {
+				return;
+			}
+
+			field.settings = field.settings || {};
+			field.settings[key] = value;
+
+			if (key === 'label' && value) {
+				field.title = value;
+			}
+
+			markDirty();
+			render();
+		}
+
+		function queuePreview() {
+			if (previewTimer) {
+				window.clearTimeout(previewTimer);
+			}
+
+			previewTimer = window.setTimeout(function () {
+				refreshPreview();
+			}, 450);
+		}
+
+		function refreshPreview() {
+			var sequence = ++previewSequence;
+
+			state.previewing = true;
+			setBuilderStatus(labels.loading || 'Loading...', 'saving');
+
+			searchFormRequest(searchFormConfig.previewAction, searchFormConfig, buildSearchFormPayload(state)).then(function (data) {
+				if (sequence !== previewSequence) {
+					return;
+				}
+
+				replaceSearchFormPreview(data.html || '', searchFormConfig);
+				state.previewing = false;
+				setBuilderStatus(state.dirty ? (labels.changed || 'Unsaved changes') : (labels.ready || 'Ready'), state.dirty ? 'changed' : 'ready');
+			}).catch(function (error) {
+				if (sequence !== previewSequence) {
+					return;
+				}
+
+				state.previewing = false;
+				setBuilderStatus(error.message || (labels.error || 'Could not save'), 'error');
+			});
+		}
+
+		function save() {
+			if (!state.dirty) {
+				return Promise.resolve();
+			}
+
+			setBuilderStatus(labels.saving || 'Saving...', 'saving');
+
+			return searchFormRequest(
+				searchFormConfig.saveAction,
+				searchFormConfig,
+				buildSearchFormPayload(state),
+				{ base_hash: state.baseHash || '' }
+			).then(function (data) {
+				if (data.editor) {
+					searchFormConfig.active = data.editor.active || searchFormConfig.active;
+					searchFormConfig.inactive = data.editor.inactive || searchFormConfig.inactive;
+					searchFormConfig.baseHash = data.editor.baseHash || searchFormConfig.baseHash;
+					state.active = (data.editor.active || state.active).map(cloneSearchFormField);
+					state.inactive = (data.editor.inactive || state.inactive).map(cloneSearchFormField);
+					state.baseHash = data.editor.baseHash || state.baseHash;
+				}
+
+				if (data.html) {
+					replaceSearchFormPreview(data.html, searchFormConfig);
+				}
+
+				state.dirty = false;
+				setBuilderStatus(labels.saved || 'Saved', 'saved');
+				render();
+			});
+		}
+
+		function createButton(label, action, disabled) {
+			var button = document.createElement('button');
+
+			button.type = 'button';
+			button.textContent = label;
+			button.setAttribute('data-ph-search-form-action', action);
+			if (disabled) {
+				button.disabled = true;
+			}
+
+			return button;
+		}
+
+		function renderActiveFields(container) {
+			var list = document.createElement('div');
+
+			list.className = 'ph-search-form-builder-list';
+			list.setAttribute('data-ph-search-form-active-list', '');
+
+			if (!state.active.length) {
+				var empty = document.createElement('p');
+				empty.className = 'ph-search-form-builder-empty';
+				empty.textContent = 'No active fields';
+				list.appendChild(empty);
+			}
+
+			state.active.forEach(function (field, index) {
+				var item = document.createElement('div');
+				var handle = document.createElement('button');
+				var title = document.createElement('button');
+				var actions = document.createElement('div');
+				var titleText = field.title || field.id;
+
+				item.className = 'ph-search-form-builder-item';
+				item.classList.toggle('is-active', field.id === state.selectedId);
+				item.setAttribute('data-ph-search-form-field', field.id);
+				item.setAttribute('data-ph-search-form-index', String(index));
+
+				handle.type = 'button';
+				handle.className = 'ph-search-form-builder-drag-handle';
+				handle.draggable = state.active.length > 1;
+				handle.disabled = state.active.length < 2;
+				handle.setAttribute('data-ph-search-form-drag-handle', '');
+				handle.setAttribute('aria-label', 'Drag to reorder ' + titleText + '. Use arrow keys to move it.');
+				handle.innerHTML = '<span aria-hidden="true">::</span>';
+
+				title.type = 'button';
+				title.className = 'ph-search-form-builder-item-title';
+				title.textContent = titleText;
+				title.setAttribute('aria-expanded', field.id === state.selectedId ? 'true' : 'false');
+				title.addEventListener('click', function () {
+					selectField(field.id);
+				});
+
+				actions.className = 'ph-search-form-builder-item-actions';
+				actions.appendChild(createButton('Remove', 'remove', false));
+
+				item.appendChild(handle);
+				item.appendChild(title);
+				item.appendChild(actions);
+				if (field.id === state.selectedId) {
+					renderFieldSettings(item, field);
+				}
+				list.appendChild(item);
+			});
+
+			container.appendChild(list);
+		}
+
+		function renderAvailableFields(container) {
+			var groups = {};
+			var wrapper = document.createElement('details');
+			var summary = document.createElement('summary');
+			var groupWrap = document.createElement('div');
+
+			wrapper.className = 'ph-search-form-builder-add';
+			summary.textContent = 'Add field';
+			groupWrap.className = 'ph-search-form-builder-add-groups';
+
+			state.inactive.forEach(function (field) {
+				var category = field.category || 'core';
+				if (!groups[category]) {
+					groups[category] = [];
+				}
+				groups[category].push(field);
+			});
+
+			Object.keys(state.categories).forEach(function (category) {
+				var fields = groups[category] || [];
+				var group;
+				var heading;
+
+				if (!fields.length) {
+					return;
+				}
+
+				group = document.createElement('div');
+				heading = document.createElement('h4');
+				heading.textContent = state.categories[category];
+				group.appendChild(heading);
+
+				fields.forEach(function (field) {
+					var button = createButton(field.title || field.id, 'add', false);
+					button.setAttribute('data-ph-search-form-add-field', field.id);
+					group.appendChild(button);
+				});
+
+				groupWrap.appendChild(group);
+			});
+
+			if (!state.inactive.length) {
+				var empty = document.createElement('p');
+				empty.className = 'ph-search-form-builder-empty';
+				empty.textContent = 'All available fields are active';
+				groupWrap.appendChild(empty);
+			}
+
+			wrapper.appendChild(summary);
+			wrapper.appendChild(groupWrap);
+			container.appendChild(wrapper);
+		}
+
+		function appendSettingField(container, field, key, label, type) {
+			var row = document.createElement('label');
+			var span = document.createElement('span');
+			var input = document.createElement(type === 'select' ? 'select' : 'input');
+
+			row.className = 'ph-search-form-builder-setting';
+			span.textContent = label;
+			row.appendChild(span);
+
+			if (type === 'checkbox') {
+				input.type = 'checkbox';
+				input.checked = !!field.settings[key];
+			} else if (type === 'number') {
+				input.type = 'number';
+				input.value = field.settings[key] || '';
+			} else {
+				input.type = 'text';
+				input.value = field.settings[key] || '';
+			}
+
+			input.addEventListener('change', function () {
+				updateSelectedSetting(key, type === 'checkbox' ? input.checked : input.value);
+			});
+
+			row.appendChild(input);
+			container.appendChild(row);
+
+			return input;
+		}
+
+		function renderFieldSettings(container, selectedField) {
+			var field = selectedField || getSearchFormFieldById(state, state.selectedId);
+			var panel = document.createElement('div');
+			var heading = document.createElement('h4');
+			var advanced;
+			var departmentType;
+			var labelToggle;
+
+			panel.className = 'ph-search-form-builder-settings';
+
+			if (!field) {
+				var prompt = document.createElement('p');
+				prompt.className = 'ph-search-form-builder-empty';
+				prompt.textContent = 'Select a field to edit its settings';
+				panel.appendChild(prompt);
+				container.appendChild(panel);
+				return;
+			}
+
+			heading.textContent = field.title || field.id;
+			panel.appendChild(heading);
+
+			labelToggle = appendSettingField(panel, field, 'show_label', 'Show label', 'checkbox');
+			appendSettingField(panel, field, 'label', 'Label', 'text');
+
+			if (field.supports && field.supports.placeholder) {
+				appendSettingField(panel, field, 'placeholder', 'Placeholder', 'text');
+			}
+
+			if (field.supports && field.supports.blank_option) {
+				appendSettingField(panel, field, 'blank_option', 'Blank option', 'text');
+			}
+
+			if (field.supports && field.supports.department_type) {
+				var row = document.createElement('label');
+				var span = document.createElement('span');
+				departmentType = document.createElement('select');
+				row.className = 'ph-search-form-builder-setting';
+				span.textContent = 'Department style';
+				row.appendChild(span);
+				['radio', 'select'].forEach(function (value) {
+					var option = document.createElement('option');
+					option.value = value;
+					option.textContent = value === 'radio' ? 'Radio buttons' : 'Dropdown';
+					option.selected = (field.settings.type || field.type) === value;
+					departmentType.appendChild(option);
+				});
+				departmentType.addEventListener('change', function () {
+					updateSelectedSetting('type', departmentType.value);
+				});
+				row.appendChild(departmentType);
+				panel.appendChild(row);
+			}
+
+			advanced = document.createElement('details');
+			advanced.className = 'ph-search-form-builder-advanced';
+			advanced.innerHTML = '<summary>Advanced field settings</summary>';
+
+			if (field.supports && field.supports.slider) {
+				appendSettingField(advanced, field, 'min', 'Minimum', 'number');
+				appendSettingField(advanced, field, 'max', 'Maximum', 'number');
+				appendSettingField(advanced, field, 'step', 'Step', 'number');
+			}
+
+			if (field.supports && field.supports.multiselect) {
+				appendSettingField(advanced, field, 'multiselect', 'Multi-select', 'checkbox');
+			}
+
+			if (field.supports && field.supports.taxonomy_settings) {
+				appendSettingField(advanced, field, 'parent_terms_only', 'Top-level terms only', 'checkbox');
+				appendSettingField(advanced, field, 'hide_empty', 'Hide empty terms', 'checkbox');
+				appendSettingField(advanced, field, 'dynamic_population', 'Cascading dropdowns', 'checkbox');
+			}
+
+			panel.appendChild(advanced);
+			container.appendChild(panel);
+		}
+
+		function render() {
+			var header = document.createElement('div');
+			var title = document.createElement('strong');
+			var link = document.createElement('a');
+			var status = document.createElement('div');
+			var body = document.createElement('div');
+
+			root.innerHTML = '';
+
+			header.className = 'ph-search-form-builder-header';
+			title.textContent = 'Default search form';
+			link.href = searchFormConfig.advancedUrl || '#';
+			link.textContent = 'Advanced';
+			link.target = '_blank';
+			link.rel = 'noopener';
+			header.appendChild(title);
+			header.appendChild(link);
+
+			status.className = 'ph-search-form-builder-status';
+			status.setAttribute('data-ph-search-form-builder-status', '');
+
+			body.className = 'ph-search-form-builder-body';
+
+			root.appendChild(header);
+			root.appendChild(status);
+			root.appendChild(body);
+
+			renderActiveFields(body);
+			renderAvailableFields(body);
+
+			setBuilderStatus(state.previewing ? (labels.loading || 'Loading...') : (state.dirty ? (labels.changed || 'Unsaved changes') : (labels.ready || 'Ready')), state.previewing ? 'saving' : (state.dirty ? 'changed' : 'ready'));
+			refreshActiveEditorGroupBody(form.querySelector('[data-ph-template-editor-groups]'));
+
+			if (pendingHandleFocusId) {
+				var focusId = pendingHandleFocusId;
+				pendingHandleFocusId = '';
+				if (window.requestAnimationFrame) {
+					window.requestAnimationFrame(function () {
+						focusFieldHandle(focusId);
+					});
+				} else {
+					window.setTimeout(function () {
+						focusFieldHandle(focusId);
+					}, 0);
+				}
+			}
+		}
+
+		root.addEventListener('click', function (event) {
+			var actionButton = event.target.closest('[data-ph-search-form-action]');
+			var item;
+			var fieldId;
+
+			if (!actionButton) {
+				return;
+			}
+
+			item = actionButton.closest('[data-ph-search-form-field]');
+			fieldId = item ? item.getAttribute('data-ph-search-form-field') : actionButton.getAttribute('data-ph-search-form-add-field');
+
+			if (!fieldId) {
+				return;
+			}
+
+			if (actionButton.getAttribute('data-ph-search-form-action') === 'remove') {
+				removeField(fieldId);
+			}
+
+			if (actionButton.getAttribute('data-ph-search-form-action') === 'add') {
+				addField(fieldId);
+			}
+		});
+
+		root.addEventListener('keydown', function (event) {
+			var handle = event.target.closest('[data-ph-search-form-drag-handle]');
+			var item;
+			var fieldId;
+
+			if (!handle) {
+				return;
+			}
+
+			item = handle.closest('[data-ph-search-form-field]');
+			fieldId = item ? item.getAttribute('data-ph-search-form-field') : '';
+
+			if (!fieldId) {
+				return;
+			}
+
+			if (event.key === 'ArrowUp') {
+				event.preventDefault();
+				moveField(fieldId, -1, true);
+			}
+
+			if (event.key === 'ArrowDown') {
+				event.preventDefault();
+				moveField(fieldId, 1, true);
+			}
+		});
+
+		root.addEventListener('dragstart', function (event) {
+			var handle = event.target.closest('[data-ph-search-form-drag-handle]');
+			var item = handle ? handle.closest('[data-ph-search-form-field]') : null;
+
+			if (!item || handle.disabled) {
+				event.preventDefault();
+				return;
+			}
+
+			draggedFieldId = item.getAttribute('data-ph-search-form-field') || '';
+			if (!draggedFieldId) {
+				event.preventDefault();
+				return;
+			}
+
+			if (event.dataTransfer) {
+				event.dataTransfer.effectAllowed = 'move';
+				event.dataTransfer.setData('text/plain', draggedFieldId);
+			}
+
+			window.setTimeout(function () {
+				item.classList.add('is-dragging');
+			}, 0);
+		});
+
+		root.addEventListener('dragover', function (event) {
+			var list = event.target.closest('[data-ph-search-form-active-list]');
+			var item = event.target.closest('[data-ph-search-form-field]');
+			var placement;
+
+			if (!draggedFieldId || !list || !item || item.getAttribute('data-ph-search-form-field') === draggedFieldId) {
+				return;
+			}
+
+			event.preventDefault();
+			if (event.dataTransfer) {
+				event.dataTransfer.dropEffect = 'move';
+			}
+
+			placement = getDropPlacement(event, item);
+			clearDropTargets(false);
+			item.classList.add(placement === 'after' ? 'is-drop-after' : 'is-drop-before');
+		});
+
+		root.addEventListener('dragleave', function (event) {
+			var item = event.target.closest('[data-ph-search-form-field]');
+
+			if (item && !item.contains(event.relatedTarget)) {
+				item.classList.remove('is-drop-before', 'is-drop-after');
+			}
+		});
+
+		root.addEventListener('drop', function (event) {
+			var item = event.target.closest('[data-ph-search-form-field]');
+			var targetFieldId = item ? item.getAttribute('data-ph-search-form-field') : '';
+			var placement;
+
+			if (!draggedFieldId || !targetFieldId || targetFieldId === draggedFieldId) {
+				event.preventDefault();
+				clearDropTargets(true);
+				draggedFieldId = '';
+				return;
+			}
+
+			event.preventDefault();
+			placement = getDropPlacement(event, item);
+			reorderField(draggedFieldId, targetFieldId, placement);
+			clearDropTargets(true);
+			draggedFieldId = '';
+		});
+
+		root.addEventListener('dragend', function () {
+			clearDropTargets(true);
+			draggedFieldId = '';
+		});
+
+		state.selectedId = state.active.length ? state.active[0].id : '';
+		render();
+
+		return {
+			isDirty: function () {
+				return state.dirty;
+			},
+			save: save
+		};
+	}
+
 	function buildEditorFormData(form) {
 		var data = new window.FormData();
 
@@ -1000,6 +1785,7 @@
 		var editor = document.querySelector('[data-ph-template-editor]');
 		var form;
 		var labels;
+		var searchFormBuilder;
 
 		if (!editor || !config.editorActive) {
 			return;
@@ -1011,6 +1797,8 @@
 		if (!form) {
 			return;
 		}
+
+		searchFormBuilder = initSearchFormBuilder(editor, form, labels);
 
 		initEditorSidebarGroups(editor, form);
 
@@ -1062,6 +1850,11 @@
 				}
 
 				config.settings = payload.data && payload.data.settings ? payload.data.settings : config.settings;
+
+				if (searchFormBuilder && searchFormBuilder.isDirty()) {
+					return searchFormBuilder.save();
+				}
+			}).then(function () {
 				editor.classList.remove('is-dirty');
 				setEditorStatus(editor, labels.saved || 'Saved', 'saved');
 			}).catch(function () {
