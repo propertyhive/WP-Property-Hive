@@ -124,7 +124,7 @@
 		try {
 			window.localStorage.setItem(galleryVariantStorageKey, variant);
 		} catch (error) {
-			// Storage can be unavailable in privacy modes; the switcher still works for the current page.
+			// Storage can be unavailable in privacy modes; the current page still updates.
 		}
 	}
 
@@ -1095,6 +1095,10 @@
 		var previewSequence = 0;
 		var draggedFieldId = '';
 		var pendingHandleFocusId = '';
+		var openingFieldId = '';
+		var openingTimer = null;
+		var closingFieldId = '';
+		var closingTimer = null;
 
 		if (!root || !searchFormConfig.enabled || !window.fetch || !window.FormData) {
 			return null;
@@ -1127,8 +1131,69 @@
 			queuePreview();
 		}
 
+		function queueOpeningField(fieldId) {
+			if (openingTimer) {
+				window.clearTimeout(openingTimer);
+			}
+
+			openingFieldId = fieldId || '';
+
+			if (!openingFieldId) {
+				openingTimer = null;
+				return;
+			}
+
+			openingTimer = window.setTimeout(function () {
+				if (openingFieldId === fieldId) {
+					openingFieldId = '';
+				}
+				openingTimer = null;
+			}, 210);
+		}
+
+		function queueClosingField(fieldId) {
+			if (closingTimer) {
+				window.clearTimeout(closingTimer);
+			}
+
+			closingFieldId = fieldId || '';
+
+			if (!closingFieldId) {
+				closingTimer = null;
+				return;
+			}
+
+			closingTimer = window.setTimeout(function () {
+				if (closingFieldId === fieldId) {
+					closingFieldId = '';
+					render();
+				}
+				closingTimer = null;
+			}, 210);
+		}
+
 		function selectField(fieldId) {
-			state.selectedId = state.selectedId === fieldId ? '' : fieldId;
+			var previousFieldId = state.selectedId;
+
+			if (previousFieldId === fieldId) {
+				state.selectedId = '';
+				queueOpeningField('');
+				queueClosingField(fieldId);
+				render();
+				return;
+			}
+
+			state.selectedId = fieldId;
+
+			if (closingFieldId === fieldId) {
+				queueClosingField('');
+			}
+
+			if (previousFieldId) {
+				queueClosingField(previousFieldId);
+			}
+
+			queueOpeningField(fieldId);
 			render();
 		}
 
@@ -1232,6 +1297,12 @@
 			if (state.selectedId === fieldId) {
 				state.selectedId = state.active.length ? state.active[Math.max(0, index - 1)].id : '';
 			}
+			if (openingFieldId === fieldId) {
+				queueOpeningField('');
+			}
+			if (closingFieldId === fieldId) {
+				queueClosingField('');
+			}
 			markDirty();
 			render();
 		}
@@ -1247,6 +1318,7 @@
 			field = state.inactive.splice(index, 1)[0];
 			state.active.push(field);
 			state.selectedId = field.id;
+			queueOpeningField(field.id);
 			markDirty();
 			render();
 		}
@@ -1348,6 +1420,35 @@
 			return button;
 		}
 
+		function createIcon(name) {
+			var icon = document.createElement('span');
+			var icons = {
+				move: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2l3.5 3.5h-2.4v5.4h5.4V8.5L22 12l-3.5 3.5v-2.4h-5.4v5.4h2.4L12 22l-3.5-3.5h2.4v-5.4H5.5v2.4L2 12l3.5-3.5v2.4h5.4V5.5H8.5L12 2z"></path></svg>',
+				remove: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3h6l1 2h4v2H4V5h4l1-2zm-2 6h10l-.7 11H7.7L7 9zm3 2v7h2v-7h-2zm4 0v7h2v-7h-2z"></path></svg>'
+			};
+
+			icon.className = 'ph-search-form-builder-icon';
+			icon.innerHTML = icons[name] || '';
+
+			return icon;
+		}
+
+		function createIconButton(label, action, iconName, disabled) {
+			var button = document.createElement('button');
+
+			button.type = 'button';
+			button.className = 'ph-search-form-builder-icon-button';
+			button.setAttribute('aria-label', label);
+			button.setAttribute('title', label);
+			button.setAttribute('data-ph-search-form-action', action);
+			button.appendChild(createIcon(iconName));
+			if (disabled) {
+				button.disabled = true;
+			}
+
+			return button;
+		}
+
 		function renderActiveFields(container) {
 			var list = document.createElement('div');
 
@@ -1379,7 +1480,8 @@
 				handle.disabled = state.active.length < 2;
 				handle.setAttribute('data-ph-search-form-drag-handle', '');
 				handle.setAttribute('aria-label', 'Drag to reorder ' + titleText + '. Use arrow keys to move it.');
-				handle.innerHTML = '<span aria-hidden="true">::</span>';
+				handle.setAttribute('title', 'Drag to reorder ' + titleText);
+				handle.appendChild(createIcon('move'));
 
 				title.type = 'button';
 				title.className = 'ph-search-form-builder-item-title';
@@ -1390,13 +1492,18 @@
 				});
 
 				actions.className = 'ph-search-form-builder-item-actions';
-				actions.appendChild(createButton('Remove', 'remove', false));
+				actions.appendChild(createIconButton('Remove ' + titleText, 'remove', 'remove', false));
 
 				item.appendChild(handle);
 				item.appendChild(title);
 				item.appendChild(actions);
-				if (field.id === state.selectedId) {
-					renderFieldSettings(item, field);
+				if (field.id === state.selectedId || field.id === closingFieldId) {
+					renderFieldSettings(
+						item,
+						field,
+						field.id === closingFieldId && field.id !== state.selectedId,
+						field.id === openingFieldId && field.id === state.selectedId
+					);
 				}
 				list.appendChild(item);
 			});
@@ -1487,7 +1594,7 @@
 			return input;
 		}
 
-		function renderFieldSettings(container, selectedField) {
+		function renderFieldSettings(container, selectedField, isClosing, isOpening) {
 			var field = selectedField || getSearchFormFieldById(state, state.selectedId);
 			var panel = document.createElement('div');
 			var heading = document.createElement('h4');
@@ -1496,6 +1603,12 @@
 			var labelToggle;
 
 			panel.className = 'ph-search-form-builder-settings';
+			if (isClosing) {
+				panel.classList.add('is-closing');
+			}
+			if (isOpening) {
+				panel.classList.add('is-opening');
+			}
 
 			if (!field) {
 				var prompt = document.createElement('p');
