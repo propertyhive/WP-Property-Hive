@@ -34,6 +34,8 @@ class PH_Template_Set {
 	 * Hook in methods.
 	 */
 	public static function init() {
+		PH_Template_Set_Search_Form_Editor::init();
+
 		add_filter( 'propertyhive_enqueue_styles', array( __CLASS__, 'enqueue_styles' ) );
 		add_filter( 'body_class', array( __CLASS__, 'body_classes' ) );
 		add_filter( 'post_class', array( __CLASS__, 'post_classes' ), 25, 3 );
@@ -2976,6 +2978,8 @@ class PH_Template_Set {
 				self::render_template_editor_section_end();
 
 				if ( 'search' === $context ) {
+					PH_Template_Set_Search_Form_Editor::render_sidebar_section();
+
 					self::render_template_editor_hidden( 'template_set_gallery_layout', $settings['template_set_gallery_layout'] );
 					self::render_template_editor_hidden( 'template_set_button_style', $settings['template_set_button_style'] );
 					self::render_template_editor_hidden( 'template_set_contact_card_style', $settings['template_set_contact_card_style'] );
@@ -3177,6 +3181,7 @@ class PH_Template_Set {
 			'editorActive' => self::is_template_editor_active(),
 			'editorMode'   => $settings['template_set_editor_mode'],
 			'settings'     => self::get_public_settings( $settings ),
+			'searchFormEditor' => PH_Template_Set_Search_Form_Editor::get_script_data( self::get_template_editor_context() ),
 			'labels'       => array(
 				'ready'   => __( 'Ready', 'propertyhive' ),
 				'changed' => __( 'Unsaved changes', 'propertyhive' ),
