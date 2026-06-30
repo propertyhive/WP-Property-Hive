@@ -4,7 +4,7 @@
  *
  * Override this template by copying it to yourtheme/propertyhive/template-set/detail/standard-sales-detail/contact-panel.php
  *
- * Available variables: $property, $post_id, $template, $button, $hint, $is_demo, $phone, $email, $office, $office_alt, $address, $agent, $agent_role, $agent_initials, $portrait, $media_links.
+ * Available variables: $property, $post_id, $template, $button, $hint, $is_demo, $phone, $email, $office, $office_alt, $address, $agent, $agent_role, $agent_initials, $portrait, $media_links, $shortlist_button.
  *
  * @author  PropertyHive
  * @package PropertyHive/Templates/TemplateSet
@@ -47,6 +47,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<a class="ph-template-button ph-template-button-primary" href="<?php echo esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ); ?>"><?php esc_html_e( 'Call agent', 'propertyhive' ); ?></a>
 		<?php endif; ?>
 		<a class="ph-template-button <?php echo esc_attr( $phone ? 'ph-template-button-secondary' : 'ph-template-button-primary' ); ?>" data-fancybox data-src="#makeEnquiry<?php echo absint( $post_id ); ?>" href="javascript:;"><?php echo esc_html( $button ); ?></a>
+		<?php if ( ! empty( $shortlist_button ) ) : ?>
+			<?php
+			echo wp_kses(
+				$shortlist_button,
+				array(
+					'a' => array(
+						'href'                  => true,
+						'class'                 => true,
+						'rel'                   => true,
+						'data-add-to-shortlist' => true,
+					),
+				)
+			);
+			?>
+		<?php endif; ?>
 		<?php if ( $email ) : ?>
 			<a class="ph-template-contact-link" href="<?php echo esc_url( 'mailto:' . $email ); ?>"><?php esc_html_e( 'Email agent', 'propertyhive' ); ?></a>
 		<?php endif; ?>

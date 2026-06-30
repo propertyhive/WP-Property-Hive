@@ -86,6 +86,14 @@
 
 		currentForm.parentNode.replaceChild(nextForm, currentForm);
 
+		if (typeof window.CustomEvent === 'function') {
+			document.dispatchEvent(new window.CustomEvent('propertyhive_template_set_search_form_replaced', {
+				detail: {
+					form: nextForm
+				}
+			}));
+		}
+
 		nextForm.querySelectorAll('script').forEach(function (script) {
 			var executable = document.createElement('script');
 			executable.text = script.text || script.textContent || '';
