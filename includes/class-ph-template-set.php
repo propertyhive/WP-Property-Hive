@@ -62,6 +62,7 @@ class PH_Template_Set {
 		add_action( 'init', array( __CLASS__, 'register_shortcodes' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_catalog_preview_request' ), 1 );
 		add_action( 'wp', array( __CLASS__, 'prepare_module_preview' ) );
+		add_action( 'wp', array( __CLASS__, 'prepare_detail_layout' ) );
 		add_action( 'wp', array( __CLASS__, 'prepare_detail_preview' ) );
 		add_action( 'admin_bar_menu', array( __CLASS__, 'add_admin_bar_menu' ), 80 );
 		add_action( 'wp_footer', array( __CLASS__, 'render_template_editor' ), 20 );

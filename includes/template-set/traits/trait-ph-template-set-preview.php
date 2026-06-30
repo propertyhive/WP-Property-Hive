@@ -51,6 +51,33 @@ trait PH_Template_Set_Preview {
 	}
 
 	/**
+	 * Swap the default property gallery for the template-set gallery and facts
+	 * strip on the live frontend as well as in preview.
+	 *
+	 * This is what makes a selected template render consistently across themes:
+	 * the theme-agnostic template gallery (and the facts strip) replace the
+	 * default PropertyHive flexslider whenever the template set is active for the
+	 * property detail page. The richer demo-content swaps (price, features,
+	 * summary, etc.) remain preview-only in prepare_detail_preview().
+	 */
+	public static function prepare_detail_layout() {
+		if ( ! self::is_enabled() || ! is_property() ) {
+			return;
+		}
+
+		remove_action( 'propertyhive_before_single_property_summary', 'propertyhive_show_property_images', 10 );
+		add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_detail_gallery' ), 10 );
+		add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_detail_facts_strip' ), 11 );
+
+		// Standard sales detail surfaces type/beds/baths/etc. in the facts strip
+		// below the gallery, so the default sidebar meta list is redundant. Drop
+		// it on the live frontend to match the editor preview.
+		if ( 'standard-sales-detail' === self::get_detail_template() ) {
+			remove_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_meta', 20 );
+		}
+	}
+
+	/**
 	 * Render the detail preview with the current property record, while keeping
 	 * the gallery sandbox available for layout exploration.
 	 */
@@ -58,10 +85,6 @@ trait PH_Template_Set_Preview {
 		if ( ! self::is_demo_preview() || ! is_property() ) {
 			return;
 		}
-
-		remove_action( 'propertyhive_before_single_property_summary', 'propertyhive_show_property_images', 10 );
-		add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_demo_gallery' ), 10 );
-		add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_detail_facts_strip' ), 11 );
 
 		remove_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_price', 10 );
 		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_demo_price' ), 10 );
@@ -261,8 +284,13 @@ trait PH_Template_Set_Preview {
 
 	/**
 	 * Render a hero/gallery presentation using the property's attached photos.
+	 *
+	 * Used on both the live frontend and in preview so the selected template's
+	 * gallery renders identically across themes. The floor-map and virtual-tour
+	 * panels are stylised previews, so they are limited to preview mode; the map
+	 * panel (real location) and the photo rail render live too.
 	 */
-	public static function render_demo_gallery() {
+	public static function render_detail_gallery() {
 		$property = self::get_current_property();
 
 		$template = self::get_detail_template();
@@ -272,13 +300,14 @@ trait PH_Template_Set_Preview {
 			return;
 		}
 
+		$is_preview       = self::is_demo_preview();
 		$is_editorial     = ( 'premium-editorial-detail' === $template );
 		$hero             = reset( $images );
 		$rail             = array_slice( $images, 0, 5 );
 		$count            = count( $images );
 		$location         = self::get_property_location_label( $property );
-		$has_floor_map    = self::should_render_floorplans( $property );
-		$has_virtual_tour = self::should_render_virtual_tours( $property );
+		$has_floor_map    = $is_preview && self::should_render_floorplans( $property );
+		$has_virtual_tour = $is_preview && self::should_render_virtual_tours( $property );
 		$gallery_layout   = self::get_gallery_layout();
 
 		echo '<div class="images ph-template-gallery ph-template-gallery-' . esc_attr( sanitize_html_class( $template ) ) . ' ph-gallery-variant-' . esc_attr( sanitize_html_class( $gallery_layout ) ) . '" data-ph-template-gallery data-ph-gallery-current-variant="' . esc_attr( $gallery_layout ) . '">';
@@ -368,7 +397,7 @@ trait PH_Template_Set_Preview {
 	 * Render Rightmove-style detail facts below the gallery.
 	 */
 	public static function render_detail_facts_strip() {
-		if ( ! self::is_demo_preview() || ! is_property() || 'standard-sales-detail' !== self::get_detail_template() ) {
+		if ( ! self::is_enabled() || ! is_property() || 'standard-sales-detail' !== self::get_detail_template() ) {
 			return;
 		}
 

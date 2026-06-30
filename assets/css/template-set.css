@@ -3539,7 +3539,7 @@ body.ph-template-map-search-real-map.ph-search-view-map .propertyhive-ordering {
 }
 
 @media (min-width: 980px) {
-	.ph-template-preview-mode:not(.ph-detail-template-new-homes-development-detail) .ph-template-detail > .ph-template-gallery {
+	.ph-template-set-active:not(.ph-detail-template-new-homes-development-detail) .ph-template-detail > .ph-template-gallery {
 		grid-column: 1 / -1;
 		grid-row: 1;
 	}
