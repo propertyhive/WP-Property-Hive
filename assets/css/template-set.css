@@ -597,7 +597,7 @@ body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder
 body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder-item-title:hover,
 body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder-item-title:active,
 body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder-item-title:focus:not(:focus-visible) {
-	background: var(--ph-editor-mist);
+	background: var(--ph-editor-white);
 	border-color: var(--ph-editor-slate);
 	box-shadow: none;
 	color: var(--ph-editor-carbon);
@@ -607,7 +607,7 @@ body.ph-template-editor-active .ph-template-editor button.ph-search-form-builder
 
 .ph-search-form-builder-item.is-active .ph-search-form-builder-item-title,
 body.ph-template-editor-active .ph-template-editor .ph-search-form-builder-item.is-active button.ph-search-form-builder-item-title {
-	background: var(--ph-editor-sunlight);
+	background: var(--ph-editor-white);
 	border-color: var(--ph-editor-wax);
 	box-shadow: none;
 	color: var(--ph-editor-carbon);
