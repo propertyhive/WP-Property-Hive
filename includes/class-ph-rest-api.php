@@ -951,6 +951,25 @@ class PH_Rest_Api {
 		            				}
 		            				break;
 		            			}
+		            			case "description":
+		            			{
+		            				$property = new PH_Property($object->ID);
+
+		            				if ( isset($property->_department) && $property->_department == 'commercial' )
+		            				{
+		            					update_post_meta( $object->ID, '_descriptions', '1' );
+										update_post_meta( $object->ID, '_description_name_0', '' );
+					            		update_post_meta( $object->ID, '_description_0', $value );
+		            				}
+		            				else
+		            				{
+		            					update_post_meta( $object->ID, '_rooms', '1' );
+										update_post_meta( $object->ID, '_room_name_0', '' );
+							            update_post_meta( $object->ID, '_room_dimensions_0', '' );
+							            update_post_meta( $object->ID, '_room_description_0', $value );
+		            				}
+		            				break;
+		            			}
 		            			case "images":
 		            			case "floorplans":
 		            			case "brochures":
