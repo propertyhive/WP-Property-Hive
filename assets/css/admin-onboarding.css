@@ -71,6 +71,12 @@ body.propertyhive-onboarding-screen #wpbody-content {
 	padding: 0;
 }
 
+@media screen and (max-width: 600px) {
+	body.propertyhive-onboarding-screen #wpbody {
+		padding-top: 0;
+	}
+}
+
 body.propertyhive-onboarding-screen #wpbody-content > .notice {
 	display: none;
 }
@@ -254,7 +260,6 @@ body.propertyhive-onboarding-screen #wpbody-content > .notice {
 
 .ph-onboarding__panel {
 	display: none;
-	min-height: 410px;
 	width: 100%;
 }
 
@@ -716,15 +721,16 @@ body.propertyhive-onboarding-screen #wpbody-content > .notice {
 @media (max-width: 720px) {
 	.ph-onboarding__chrome {
 		gap: 16px;
-		padding: 16px 18px;
+		min-height: 56px;
+		padding: 10px 16px;
 	}
 
 	.ph-onboarding__brand img {
-		width: 210px;
+		width: 180px;
 	}
 
 	.ph-onboarding__shell {
-		min-height: calc(100vh - 70px);
+		min-height: calc(100vh - 56px);
 	}
 
 	.ph-onboarding__cards,
