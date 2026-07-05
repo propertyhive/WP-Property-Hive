@@ -166,6 +166,7 @@ class PH_Admin_Onboarding {
 				'license_activated'  => false,
 				'demo_data_imported' => false,
 				'import_feature_enabled' => false,
+				'completed_via'      => '',
 				'events'             => array(),
 			)
 		);
@@ -1008,6 +1009,11 @@ class PH_Admin_Onboarding {
 	private function save_complete_step() {
 		$import_feature        = $this->get_import_feature_for_onboarding();
 		$import_feature_active = $this->is_import_feature_active( ! empty( $import_feature['plugin_file'] ) ? $import_feature['plugin_file'] : '' );
+		$completed_via        = isset( $_POST['completed_via'] ) ? sanitize_key( wp_unslash( $_POST['completed_via'] ) ) : '';
+
+		if ( ! in_array( $completed_via, array( 'import', 'properties', 'site', 'settings' ), true ) ) {
+			$completed_via = '';
+		}
 
 		$state = self::update_state(
 			array(
@@ -1015,10 +1021,11 @@ class PH_Admin_Onboarding {
 				'last_step'              => 'complete',
 				'completed_at'           => time(),
 				'import_feature_enabled' => $import_feature_active,
+				'completed_via'          => $completed_via,
 			)
 		);
 
-		self::track_event( 'completed' );
+		self::track_event( 'completed', array( 'completed_via' => $completed_via ) );
 
 		return $state;
 	}
@@ -1161,6 +1168,14 @@ class PH_Admin_Onboarding {
 		$import_feature_active = ! empty( $import_feature['active'] ) || $this->is_import_feature_active();
 		$demo_choice     = ! empty( $state['demo_data_imported'] ) ? 'yes' : 'no';
 		$address_lookup_enabled = function_exists( 'ph_is_development_environment' ) && ph_is_development_environment() && '' !== trim( (string) get_option( 'propertyhive_getaddress_api_key', '' ) );
+		$search_results_page_id = function_exists( 'ph_get_page_id' ) ? absint( ph_get_page_id( 'search_results' ) ) : 0;
+		$site_preview_url       = home_url( '/' );
+		if ( $search_results_page_id && get_post( $search_results_page_id ) ) {
+			$search_results_permalink = get_permalink( $search_results_page_id );
+			if ( $search_results_permalink ) {
+				$site_preview_url = $search_results_permalink;
+			}
+		}
 
 		$current_step = $this->get_current_step( $state );
 
@@ -1399,7 +1414,7 @@ class PH_Admin_Onboarding {
 
 					<section class="ph-onboarding__panel" data-step="complete">
 						<h2><?php esc_html_e( "You're all set", 'propertyhive' ); ?></h2>
-						<p><?php esc_html_e( 'Property Hive has been configured with your first setup choices.', 'propertyhive' ); ?></p>
+						<p><?php esc_html_e( 'Property Hive is configured. Where would you like to start?', 'propertyhive' ); ?></p>
 
 						<?php if ( ! empty( $video_url ) ) : ?>
 							<div class="ph-onboarding__video">
@@ -1411,13 +1426,23 @@ class PH_Admin_Onboarding {
 							</div>
 						<?php endif; ?>
 
-						<div class="ph-onboarding__quick-links">
-							<a href="<?php echo esc_url( $import_feature_active ? admin_url( 'admin.php?page=propertyhive_import_properties' ) : admin_url( 'admin.php?page=ph-settings&tab=features&profilter=import' ) ); ?>" data-import-setup-link <?php echo $import_feature_active ? '' : 'hidden'; ?>><?php esc_html_e( 'Setup Property Import', 'propertyhive' ); ?></a>
-							<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=property' ) ); ?>"><?php esc_html_e( 'Add a property', 'propertyhive' ); ?></a>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ph-settings' ) ); ?>"><?php esc_html_e( 'Open settings', 'propertyhive' ); ?></a>
-							<a href="<?php echo esc_url( $this->get_import_url() ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Import guidance', 'propertyhive' ); ?></a>
-							<a href="<?php echo esc_url( $this->get_export_url() ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Export guidance', 'propertyhive' ); ?></a>
-							<a href="https://docs.wp-property-hive.com" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Documentation', 'propertyhive' ); ?></a>
+						<div class="ph-onboarding__exits">
+							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=propertyhive_import_properties' ) ); ?>" data-onboarding-exit data-exit="import" <?php echo $import_feature_active ? '' : 'hidden'; ?>>
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Create a property import', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Bring listings in from your current CRM or feed', 'propertyhive' ); ?></span>
+							</a>
+							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'edit.php?post_type=property' ) ); ?>" data-onboarding-exit data-exit="properties">
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Go to properties', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Open the property list in the dashboard', 'propertyhive' ); ?></span>
+							</a>
+							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( $site_preview_url ); ?>" data-onboarding-exit data-exit="site" <?php echo ! empty( $state['demo_data_imported'] ) ? '' : 'hidden'; ?>>
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'See properties on your site', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'View the demo listings on your live site', 'propertyhive' ); ?></span>
+							</a>
+							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=ph-settings' ) ); ?>" data-onboarding-exit data-exit="settings">
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Open settings', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Fine-tune everything you set up today', 'propertyhive' ); ?></span>
+							</a>
 						</div>
 					</section>
 
@@ -1556,10 +1581,8 @@ class PH_Admin_Onboarding {
 				'export_url'             => $this->get_export_url(),
 				'demo_base_sections'     => array( 'applicant', 'property' ),
 				'demo_crm_sub_sections'  => apply_filters( 'propertyhive_onboarding_demo_crm_sub_sections', array( 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'enquiry' ) ),
-				'complete_redirect_url'  => admin_url( 'admin.php?page=ph-settings' ),
 				'i18n'                   => array(
 					'continue'          => __( 'Continue', 'propertyhive' ),
-					'finish'            => __( 'Finish setup', 'propertyhive' ),
 					'saving'            => __( 'Saving...', 'propertyhive' ),
 					'importing'         => __( 'Importing demo data...', 'propertyhive' ),
 					'importComplete'    => __( 'Demo data imported.', 'propertyhive' ),

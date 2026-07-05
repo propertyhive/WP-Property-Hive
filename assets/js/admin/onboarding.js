@@ -306,8 +306,9 @@ jQuery( function( $ ) {
 		$( '.ph-onboarding__panel[data-step="' + step + '"]' ).addClass( 'is-active' );
 
 		$( '[data-progress-bar]' ).css( 'width', percent + '%' );
-		$( '[data-back]' ).toggle( index > 0 );
-		$( '[data-next]' ).text( step === 'complete' ? config.i18n.finish : config.i18n.continue );
+		$( '[data-back]' ).toggle( index > 0 && step !== 'complete' );
+		$( '[data-next]' ).toggle( step !== 'complete' ).text( config.i18n.continue );
+		$( '[data-ph-onboarding-skip]' ).toggle( step !== 'complete' );
 		setMessage( '' );
 		clearValidation( step );
 		track( 'step_viewed', step );
@@ -318,7 +319,7 @@ jQuery( function( $ ) {
 		if ( saving ) {
 			$( '[data-next]' ).text( config.i18n.saving );
 		} else {
-			$( '[data-next]' ).text( currentStep === 'complete' ? config.i18n.finish : config.i18n.continue );
+			$( '[data-next]' ).text( config.i18n.continue );
 		}
 	}
 
@@ -570,6 +571,7 @@ jQuery( function( $ ) {
 			.done( function() {
 				demoImported = true;
 				demoImporting = false;
+				revealSiteExit();
 				updateDemoProgress( total, total, config.i18n.importComplete );
 			} )
 			.fail( function() {
@@ -662,10 +664,14 @@ jQuery( function( $ ) {
 		$( '[data-license-old-note]' ).hide();
 	}
 
-	function revealImportSetupLink() {
-		$( '[data-import-setup-link]' )
+	function revealImportExit() {
+		$( '[data-exit="import"]' )
 			.attr( 'href', config.import_setup_url || 'admin.php?page=propertyhive_import_properties' )
 			.removeAttr( 'hidden' );
+	}
+
+	function revealSiteExit() {
+		$( '[data-exit="site"]' ).removeAttr( 'hidden' );
 	}
 
 	function appendImportEnabledLine() {
@@ -683,7 +689,7 @@ jQuery( function( $ ) {
 
 	function importFeatureSucceeded() {
 		appendImportEnabledLine();
-		revealImportSetupLink();
+		revealImportExit();
 	}
 
 	function maybeEnableImportFeature() {
@@ -797,8 +803,28 @@ jQuery( function( $ ) {
 	$( document ).on( 'change', 'input[name="has_license_key"]', updateLicenseChoice );
 	$( document ).on( 'change', 'input[name="license_key_type"]', updateLicenseType );
 	$( document ).on( 'click', '[data-license-activate]', activateLicense );
-	$( document ).on( 'click', '[data-import-setup-link]', function() {
-		track( 'setup_import_clicked', 'complete' );
+	$( document ).on( 'click', '[data-onboarding-exit]', function( event ) {
+		event.preventDefault();
+
+		var $exit = $( this );
+		var destination = $exit.attr( 'href' );
+		var completedVia = $exit.attr( 'data-exit' ) || '';
+
+		if ( $exit.attr( 'aria-disabled' ) === 'true' || ! destination ) {
+			return;
+		}
+
+		$( '[data-onboarding-exit]' ).attr( 'aria-disabled', 'true' ).addClass( 'is-disabled' );
+		$exit.addClass( 'is-busy' );
+
+		$.post( config.ajax_url, {
+			action: 'propertyhive_onboarding_save_step',
+			security: config.nonce,
+			step: 'complete',
+			completed_via: completedVia
+		} ).always( function() {
+			window.location.href = destination;
+		} );
 	} );
 	$( document ).on( 'input', '[data-address-lookup-input]', function() {
 		var value = $( this ).val();
@@ -836,11 +862,6 @@ jQuery( function( $ ) {
 		maybeImportDemoData().done( function() {
 			saveStep( currentStep, true ).done( function( response ) {
 				if ( response && response.success === false ) {
-					return;
-				}
-
-				if ( currentStep === 'complete' ) {
-					window.location.href = config.complete_redirect_url || config.settings_url;
 					return;
 				}
 
