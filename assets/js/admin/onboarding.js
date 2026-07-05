@@ -664,7 +664,8 @@ jQuery( function( $ ) {
 		$.post( config.ajax_url, {
 			action: 'propertyhive_onboarding_skip',
 			security: config.nonce,
-			step: currentStep
+			step: currentStep,
+			usage_tracking: $( '[data-usage-tracking]' ).is( ':checked' ) ? 'yes' : 'no'
 		} ).done( function( response ) {
 			window.location.href = response && response.data && response.data.redirect_url ? response.data.redirect_url : config.settings_url;
 		} );
