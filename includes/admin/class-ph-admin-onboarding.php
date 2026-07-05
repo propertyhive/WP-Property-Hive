@@ -300,14 +300,23 @@ class PH_Admin_Onboarding {
 	public function ajax_skip() {
 		$this->check_ajax_permissions();
 
-		$step  = isset( $_POST['step'] ) ? sanitize_key( wp_unslash( $_POST['step'] ) ) : '';
-		$state = self::update_state(
-			array(
-				'status'     => 'skipped',
-				'last_step'  => $step,
-				'skipped_at' => time(),
-			)
+		$step = isset( $_POST['step'] ) ? sanitize_key( wp_unslash( $_POST['step'] ) ) : '';
+
+		$updates = array(
+			'status'     => 'skipped',
+			'last_step'  => $step,
+			'skipped_at' => time(),
 		);
+
+		if ( isset( $_POST['usage_tracking'] ) ) {
+			$usage_tracking = 'yes' === sanitize_text_field( wp_unslash( $_POST['usage_tracking'] ) );
+
+			update_option( 'propertyhive_data_sharing', $usage_tracking ? 'yes' : 'no' );
+
+			$updates['usage_tracking'] = $usage_tracking;
+		}
+
+		$state = self::update_state( $updates );
 
 		self::track_event( 'skipped', array( 'step' => $step ) );
 
