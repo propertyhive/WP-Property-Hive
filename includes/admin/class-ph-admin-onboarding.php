@@ -30,7 +30,7 @@ class PH_Admin_Onboarding {
 	 *
 	 * @var array
 	 */
-	private $steps = array( 'intro', 'departments', 'country', 'office', 'usage', 'demo-data', 'complete' );
+	private $steps = array( 'intro', 'departments', 'country', 'office', 'usage', 'license', 'demo-data', 'complete' );
 
 	/**
 	 * Constructor.
@@ -47,6 +47,7 @@ class PH_Admin_Onboarding {
 		add_action( 'wp_ajax_propertyhive_onboarding_save_step', array( $this, 'ajax_save_step' ) );
 		add_action( 'wp_ajax_propertyhive_onboarding_skip', array( $this, 'ajax_skip' ) );
 		add_action( 'wp_ajax_propertyhive_onboarding_track', array( $this, 'ajax_track' ) );
+		add_action( 'wp_ajax_propertyhive_onboarding_activate_license', array( $this, 'ajax_activate_license' ) );
 	}
 
 	/**
@@ -160,7 +161,11 @@ class PH_Admin_Onboarding {
 				'office_id'          => 0,
 				'usage'              => array(),
 				'usage_tracking'     => true,
+				'has_license_key'    => 'no',
+				'license_key_type'   => 'pro',
+				'license_activated'  => false,
 				'demo_data_imported' => false,
+				'import_feature_enabled' => false,
 				'events'             => array(),
 			)
 		);
@@ -281,6 +286,9 @@ class PH_Admin_Onboarding {
 			case 'usage':
 				$state = $this->save_usage_step();
 				break;
+			case 'license':
+				$state = $this->save_license_step();
+				break;
 			case 'demo-data':
 				$state = $this->save_demo_data_step();
 				break;
@@ -342,6 +350,155 @@ class PH_Admin_Onboarding {
 		}
 
 		wp_send_json_success();
+	}
+
+	/**
+	 * Activate a license key from the onboarding wizard.
+	 */
+	public function ajax_activate_license() {
+		$this->check_ajax_permissions();
+
+		$license_key_type = isset( $_POST['license_key_type'] ) ? sanitize_key( wp_unslash( $_POST['license_key_type'] ) ) : '';
+		if ( ! in_array( $license_key_type, array( 'pro', 'old' ), true ) ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Please choose a valid license type.', 'propertyhive' ) ),
+				400
+			);
+		}
+
+		$license_key = isset( $_POST['license_key'] ) ? sanitize_text_field( ph_clean( wp_unslash( $_POST['license_key'] ) ) ) : '';
+		if ( '' === $license_key ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Please enter your license key.', 'propertyhive' ) ),
+				400
+			);
+		}
+
+		$snapshot = $this->snapshot_license_state();
+
+		update_option( 'missing_invalid_expired_license_key_notice_dismissed', '' );
+
+		if ( 'pro' === $license_key_type ) {
+			$result = $this->activate_pro_license_for_onboarding( $license_key );
+		} else {
+			$result = $this->activate_old_license_for_onboarding( $license_key );
+		}
+
+		if ( empty( $result['activated'] ) ) {
+			$this->restore_license_state( $snapshot );
+		}
+
+		self::update_state(
+			array(
+				'has_license_key'       => 'yes',
+				'license_key_type'      => $license_key_type,
+				'license_activated'     => ! empty( $result['activated'] ),
+				'license_activated_at'  => ! empty( $result['activated'] ) ? time() : 0,
+			)
+		);
+
+		self::track_event(
+			! empty( $result['activated'] ) ? 'license_activated' : 'license_activation_failed',
+			array( 'license_type' => $license_key_type )
+		);
+
+		wp_send_json_success(
+			array(
+				'activated'    => ! empty( $result['activated'] ),
+				'license_type' => $license_key_type,
+				'summary'      => isset( $result['summary'] ) ? $result['summary'] : '',
+				'message'      => isset( $result['message'] ) ? $result['message'] : '',
+				'renew_url'    => isset( $result['renew_url'] ) ? $result['renew_url'] : '',
+			)
+		);
+	}
+
+	/**
+	 * Activate a Pro license key and confirm it with a fresh status check.
+	 *
+	 * @param string $license_key License key.
+	 * @return array
+	 */
+	private function activate_pro_license_for_onboarding( $license_key ) {
+		$this->clear_pro_license_cache_surfaces();
+
+		update_option( 'propertyhive_license_type', 'pro' );
+		update_option( 'propertyhive_pro_license_key', $license_key );
+
+		$activation = PH()->license->activate_pro_license_key();
+		if ( ! isset( $activation['success'] ) || true !== $activation['success'] ) {
+			return array(
+				'activated' => false,
+				'message'   => ! empty( $activation['error'] ) ? $activation['error'] : __( "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost.", 'propertyhive' ),
+			);
+		}
+
+		if ( ! PH()->license->is_valid_pro_license_key( true ) ) {
+			$license = PH()->license->get_current_pro_license();
+
+			return array(
+				'activated' => false,
+				'message'   => ! empty( $license['error'] ) ? $license['error'] : __( "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost.", 'propertyhive' ),
+			);
+		}
+
+		return array(
+			'activated' => true,
+			'summary'   => '',
+		);
+	}
+
+	/**
+	 * Activate an old-style license key.
+	 *
+	 * @param string $license_key License key.
+	 * @return array
+	 */
+	private function activate_old_license_for_onboarding( $license_key ) {
+		update_option( 'propertyhive_license_type', 'old' );
+		update_option( 'propertyhive_license_key', $license_key );
+
+		PH()->license->ph_check_licenses( true );
+
+		$license = PH()->license->get_current_license();
+		$error   = get_option( 'propertyhive_license_key_error', '' );
+
+		if ( '' !== $error ) {
+			return array(
+				'activated' => false,
+				'message'   => sprintf(
+					/* translators: %s: license service error detail. */
+					__( "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost. %s", 'propertyhive' ),
+					$error
+				),
+			);
+		}
+
+		if ( empty( $license ) || ! is_array( $license ) || ! isset( $license['active'] ) || '1' !== (string) $license['active'] ) {
+			return array(
+				'activated' => false,
+				'message'   => isset( $license['active'] ) && '1' !== (string) $license['active'] ? __( 'Your Property Hive license key is inactive. You can keep going and add it later - nothing is lost.', 'propertyhive' ) : __( "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost.", 'propertyhive' ),
+			);
+		}
+
+		if ( empty( $license['expires_at'] ) || ( strtotime( $license['expires_at'] ) + DAY_IN_SECONDS ) <= time() ) {
+			$expires_at = ! empty( $license['expires_at'] ) ? date_i18n( 'jS F Y', strtotime( $license['expires_at'] ) ) : '';
+
+			return array(
+				'activated' => false,
+				'message'   => '' !== $expires_at ? sprintf(
+					/* translators: %s: license expiry date. */
+					__( 'License expired on %s.', 'propertyhive' ),
+					$expires_at
+				) : __( "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost.", 'propertyhive' ),
+				'renew_url' => 'https://wp-property-hive.com/license-key/',
+			);
+		}
+
+		return array(
+			'activated' => true,
+			'summary'   => date_i18n( 'jS F Y', strtotime( $license['expires_at'] ) ),
+		);
 	}
 
 	/**
@@ -477,6 +634,110 @@ class PH_Admin_Onboarding {
 		}
 
 		return $fallback;
+	}
+
+	/**
+	 * Snapshot license options and transients so failed attempts can roll back.
+	 *
+	 * @return array
+	 */
+	private function snapshot_license_state() {
+		$option_names = array(
+			'propertyhive_license_type',
+			'propertyhive_pro_license_key',
+			'propertyhive_license_key',
+			'propertyhive_license_key_details',
+			'propertyhive_license_key_error',
+			'propertyhive_pro_license_key_status',
+			'propertyhive_pro_license_key_last_checked',
+			'ph_pro_last_known_license_product_id_and_package',
+			'propertyhive_pro_instance_id',
+		);
+
+		$transient_names = array(
+			'ph_pro_license_status',
+			'ph_pro_license_product_id_and_package',
+		);
+
+		$snapshot = array(
+			'options'    => array(),
+			'transients' => array(),
+		);
+
+		foreach ( $option_names as $option_name ) {
+			$snapshot['options'][ $option_name ] = $this->snapshot_option( $option_name );
+		}
+
+		foreach ( $transient_names as $transient_name ) {
+			$snapshot['transients'][ $transient_name ] = array(
+				'value'   => $this->snapshot_option( '_transient_' . $transient_name ),
+				'timeout' => $this->snapshot_option( '_transient_timeout_' . $transient_name ),
+			);
+		}
+
+		return $snapshot;
+	}
+
+	/**
+	 * Snapshot one option while retaining whether it existed.
+	 *
+	 * @param string $option_name Option name.
+	 * @return array
+	 */
+	private function snapshot_option( $option_name ) {
+		$missing = '__propertyhive_onboarding_missing_option__';
+		$value   = get_option( $option_name, $missing );
+
+		return array(
+			'exists' => $missing !== $value,
+			'value'  => $value,
+		);
+	}
+
+	/**
+	 * Restore a previously snapshotted option.
+	 *
+	 * @param string $option_name Option name.
+	 * @param array  $snapshot    Snapshot.
+	 */
+	private function restore_option_snapshot( $option_name, $snapshot ) {
+		if ( empty( $snapshot['exists'] ) ) {
+			delete_option( $option_name );
+			return;
+		}
+
+		update_option( $option_name, $snapshot['value'] );
+	}
+
+	/**
+	 * Restore license options and transients after a failed activation.
+	 *
+	 * @param array $snapshot Snapshot.
+	 */
+	private function restore_license_state( $snapshot ) {
+		if ( ! empty( $snapshot['options'] ) && is_array( $snapshot['options'] ) ) {
+			foreach ( $snapshot['options'] as $option_name => $option_snapshot ) {
+				$this->restore_option_snapshot( $option_name, $option_snapshot );
+			}
+		}
+
+		if ( ! empty( $snapshot['transients'] ) && is_array( $snapshot['transients'] ) ) {
+			foreach ( $snapshot['transients'] as $transient_name => $transient_snapshot ) {
+				$this->restore_option_snapshot( '_transient_' . $transient_name, $transient_snapshot['value'] );
+				$this->restore_option_snapshot( '_transient_timeout_' . $transient_name, $transient_snapshot['timeout'] );
+			}
+		}
+	}
+
+	/**
+	 * Clear all Pro license cache surfaces before validating a submitted key.
+	 */
+	private function clear_pro_license_cache_surfaces() {
+		delete_transient( 'ph_pro_license_status' );
+		delete_transient( 'ph_pro_license_product_id_and_package' );
+		delete_option( 'propertyhive_pro_license_key_status' );
+		delete_option( 'propertyhive_pro_license_key_last_checked' );
+		delete_option( 'ph_pro_last_known_license_product_id_and_package' );
 	}
 
 	/**
@@ -675,6 +936,33 @@ class PH_Admin_Onboarding {
 	}
 
 	/**
+	 * Save license step choices.
+	 *
+	 * @return array
+	 */
+	private function save_license_step() {
+		$has_license_key  = isset( $_POST['has_license_key'] ) ? sanitize_key( wp_unslash( $_POST['has_license_key'] ) ) : 'no';
+		$license_key_type = isset( $_POST['license_key_type'] ) ? sanitize_key( wp_unslash( $_POST['license_key_type'] ) ) : 'pro';
+
+		if ( ! in_array( $has_license_key, array( 'yes', 'no' ), true ) ) {
+			$has_license_key = 'no';
+		}
+
+		if ( ! in_array( $license_key_type, array( 'pro', 'old' ), true ) ) {
+			$license_key_type = 'pro';
+		}
+
+		return self::update_state(
+			array(
+				'status'           => 'in_progress',
+				'last_step'        => 'license',
+				'has_license_key'  => $has_license_key,
+				'license_key_type' => $license_key_type,
+			)
+		);
+	}
+
+	/**
 	 * Save demo-data result.
 	 *
 	 * @return array
@@ -718,11 +1006,15 @@ class PH_Admin_Onboarding {
 	 * @return array
 	 */
 	private function save_complete_step() {
+		$import_feature        = $this->get_import_feature_for_onboarding();
+		$import_feature_active = $this->is_import_feature_active( ! empty( $import_feature['plugin_file'] ) ? $import_feature['plugin_file'] : '' );
+
 		$state = self::update_state(
 			array(
-				'status'       => 'completed',
-				'last_step'    => 'complete',
-				'completed_at' => time(),
+				'status'                 => 'completed',
+				'last_step'              => 'complete',
+				'completed_at'           => time(),
+				'import_feature_enabled' => $import_feature_active,
 			)
 		);
 
@@ -748,6 +1040,104 @@ class PH_Admin_Onboarding {
 	}
 
 	/**
+	 * Get license state for rendering without remote checks.
+	 *
+	 * @return array
+	 */
+	private function get_license_render_state() {
+		$pro_status = get_transient( 'ph_pro_license_status' );
+		if ( false === $pro_status ) {
+			$pro_status = get_option( 'propertyhive_pro_license_key_status', '' );
+		}
+
+		if ( is_array( $pro_status ) && isset( $pro_status['success'] ) && true === $pro_status['success'] ) {
+			return array(
+				'type'    => 'pro',
+				'active'  => true,
+				'message' => __( 'Property Hive Pro is active on this site.', 'propertyhive' ),
+			);
+		}
+
+		$license = PH()->license->get_current_license();
+		if (
+			is_array( $license ) &&
+			isset( $license['active'] ) &&
+			'1' === (string) $license['active'] &&
+			! empty( $license['expires_at'] ) &&
+			( strtotime( $license['expires_at'] ) + DAY_IN_SECONDS ) > time()
+		) {
+			return array(
+				'type'    => 'old',
+				'active'  => true,
+				'message' => __( 'Your license is active - add-on updates are enabled.', 'propertyhive' ),
+			);
+		}
+
+		return array(
+			'type'    => '',
+			'active'  => false,
+			'message' => '',
+		);
+	}
+
+	/**
+	 * Resolve the Property Import feature from the cached add-ons feed.
+	 *
+	 * @return array
+	 */
+	private function get_import_feature_for_onboarding() {
+		$features = get_transient( 'propertyhive_features' );
+		if ( false === $features || ! is_array( $features ) ) {
+			return array();
+		}
+
+		foreach ( $features as $feature ) {
+			if ( empty( $feature['wordpress_plugin_file'] ) || ! is_string( $feature['wordpress_plugin_file'] ) ) {
+				continue;
+			}
+
+			$plugin_file  = $feature['wordpress_plugin_file'];
+			$plugin_parts = explode( '/', $plugin_file );
+			$slug         = $plugin_parts[0];
+			$haystack     = strtolower( $plugin_file . ' ' . $slug );
+
+			if (
+				false === strpos( $haystack, 'property-import' ) &&
+				false === strpos( $haystack, 'property_import' ) &&
+				false === strpos( $haystack, 'wp-property-hive-property-import' )
+			) {
+				continue;
+			}
+
+			return array(
+				'slug'        => $slug,
+				'plugin_file' => $plugin_file,
+				'active'      => $this->is_import_feature_active( $plugin_file ),
+			);
+		}
+
+		return array();
+	}
+
+	/**
+	 * Determine whether the Property Import feature is active.
+	 *
+	 * @param string $plugin_file Optional plugin file.
+	 * @return bool
+	 */
+	private function is_import_feature_active( $plugin_file = '' ) {
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		if ( '' !== $plugin_file && is_plugin_active( $plugin_file ) ) {
+			return true;
+		}
+
+		return class_exists( 'PH_Property_Import' );
+	}
+
+	/**
 	 * Output onboarding page.
 	 */
 	public function output() {
@@ -764,13 +1154,18 @@ class PH_Admin_Onboarding {
 		$departments     = ! empty( $state['departments'] ) && is_array( $state['departments'] ) ? $state['departments'] : array( 'residential-sales', 'residential-lettings' );
 		$usage           = ! empty( $state['usage'] ) && is_array( $state['usage'] ) ? $state['usage'] : array( 'crm' );
 		$usage_tracking  = 'yes' === get_option( 'propertyhive_data_sharing', 'yes' );
+		$has_license_key     = ! empty( $state['has_license_key'] ) && 'yes' === $state['has_license_key'] ? 'yes' : 'no';
+		$license_key_type    = ! empty( $state['license_key_type'] ) && in_array( $state['license_key_type'], array( 'pro', 'old' ), true ) ? $state['license_key_type'] : 'pro';
+		$license_render_state = $this->get_license_render_state();
+		$import_feature      = $this->get_import_feature_for_onboarding();
+		$import_feature_active = ! empty( $import_feature['active'] ) || $this->is_import_feature_active();
 		$demo_choice     = ! empty( $state['demo_data_imported'] ) ? 'yes' : 'no';
 		$address_lookup_enabled = function_exists( 'ph_is_development_environment' ) && ph_is_development_environment() && '' !== trim( (string) get_option( 'propertyhive_getaddress_api_key', '' ) );
 
 		$current_step = $this->get_current_step( $state );
 
 		self::track_event( 'step_viewed', array( 'step' => $current_step ) );
-		$this->localize_script( $demo_active );
+		$this->localize_script( $demo_active, $import_feature, $import_feature_active );
 		?>
 		<div class="ph-onboarding" data-current-step="<?php echo esc_attr( $current_step ); ?>" data-demo-imported="<?php echo ! empty( $state['demo_data_imported'] ) ? 'yes' : 'no'; ?>">
 			<div class="ph-onboarding__chrome">
@@ -881,17 +1276,102 @@ class PH_Admin_Onboarding {
 						<h2><?php esc_html_e( 'How will you use Property Hive?', 'propertyhive' ); ?></h2>
 						<p><?php esc_html_e( 'Pick every option that applies. This helps keep the admin area focused.', 'propertyhive' ); ?></p>
 						<div class="ph-onboarding__cards ph-onboarding__cards--usage" data-input-group="usage" data-validation-field="usage">
-							<?php $this->output_choice_card( 'usage', 'import_properties', __( 'Import properties', 'propertyhive' ), __( 'Bring listings in from another CRM or feed.', 'propertyhive' ), in_array( 'import_properties', $usage, true ) ); ?>
+							<?php $this->output_choice_card( 'usage', 'import_properties', __( 'Import properties', 'propertyhive' ), __( 'Bring listings in from another CRM or feed.', 'propertyhive' ), in_array( 'import_properties', $usage, true ), true ); ?>
 							<?php $this->output_choice_card( 'usage', 'crm', __( 'Use it as a CRM', 'propertyhive' ), __( 'Manage contacts, appraisals, viewings, offers and tenancies.', 'propertyhive' ), in_array( 'crm', $usage, true ) ); ?>
-							<?php $this->output_choice_card( 'usage', 'portal_uploads', __( 'Upload to portals', 'propertyhive' ), __( 'Send property data to third-party portals.', 'propertyhive' ), in_array( 'portal_uploads', $usage, true ) ); ?>
+							<?php $this->output_choice_card( 'usage', 'portal_uploads', __( 'Upload to portals', 'propertyhive' ), __( 'Send property data to third-party portals.', 'propertyhive' ), in_array( 'portal_uploads', $usage, true ), true ); ?>
 							<?php $this->output_choice_card( 'usage', 'not_sure', __( 'Not sure yet', 'propertyhive' ), __( 'Keep exploring before deciding.', 'propertyhive' ), in_array( 'not_sure', $usage, true ) ); ?>
 						</div>
 						<?php $this->output_field_error( 'usage' ); ?>
-						<div class="ph-onboarding__links" data-usage-links>
-							<a href="<?php echo esc_url( $this->get_import_url() ); ?>" target="_blank" rel="noopener noreferrer" data-usage-link="import_properties"><?php esc_html_e( 'Read about importing properties', 'propertyhive' ); ?></a>
-							<a href="<?php echo esc_url( $this->get_export_url() ); ?>" target="_blank" rel="noopener noreferrer" data-usage-link="portal_uploads"><?php esc_html_e( 'Read about portal exports', 'propertyhive' ); ?></a>
+						<div class="ph-onboarding__pro-note">
+							<p>
+								<strong><?php esc_html_e( 'Importing properties and uploading to portals require a Pro subscription.', 'propertyhive' ); ?></strong>
+								<?php esc_html_e( 'Try every Pro feature free for 7 days.', 'propertyhive' ); ?>
+							</p>
+							<span class="ph-onboarding__pro-note-actions">
+								<a class="button button-primary" href="<?php echo esc_url( $this->get_pricing_url( 'trial-cta' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
+								<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_pricing_url( 'view-pricing' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View pricing', 'propertyhive' ); ?></a>
+							</span>
 						</div>
 						<?php $this->output_settings_note( __( 'General > Modules', 'propertyhive' ) ); ?>
+					</section>
+
+					<section class="ph-onboarding__panel" data-step="license">
+						<h2><?php esc_html_e( 'Do you have a Pro license key?', 'propertyhive' ); ?></h2>
+						<p><?php esc_html_e( 'Pro unlocks importing, portal uploads and premium add-ons. You can always add a key later.', 'propertyhive' ); ?></p>
+
+						<?php if ( ! empty( $license_render_state['active'] ) ) : ?>
+							<input type="hidden" name="has_license_key" value="yes">
+							<input type="hidden" name="license_key_type" value="<?php echo esc_attr( $license_render_state['type'] ); ?>">
+							<div class="ph-onboarding__license-state is-ok">
+								<strong>&#10003; <?php echo esc_html( $license_render_state['message'] ); ?></strong>
+							</div>
+							<?php if ( 'old' === $license_render_state['type'] ) : ?>
+								<div class="ph-onboarding__pro-note">
+									<p>
+										<strong><?php esc_html_e( 'Try Property Hive Pro free for 7 days.', 'propertyhive' ); ?></strong>
+										<?php esc_html_e( 'Pro features need a Pro subscription.', 'propertyhive' ); ?>
+									</p>
+									<span class="ph-onboarding__pro-note-actions">
+										<a class="button button-primary" href="<?php echo esc_url( $this->get_pricing_url( 'license-step-trial' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
+										<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_pricing_url( 'license-step-pricing' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View pricing', 'propertyhive' ); ?></a>
+									</span>
+								</div>
+							<?php endif; ?>
+						<?php else : ?>
+							<div class="ph-onboarding__cards ph-onboarding__cards--radio" data-input-group="license-choice">
+								<?php $this->output_radio_card( 'has_license_key', 'yes', __( 'Yes, I have a key', 'propertyhive' ), __( 'Activate it now so Pro features are ready to use.', 'propertyhive' ), 'yes' === $has_license_key, false ); ?>
+								<?php $this->output_radio_card( 'has_license_key', 'no', __( 'Not yet', 'propertyhive' ), __( 'Keep going - you can start a free trial or add a key later.', 'propertyhive' ), 'no' === $has_license_key, false ); ?>
+							</div>
+
+							<div class="ph-onboarding__license-panel <?php echo 'yes' === $has_license_key ? 'is-open' : ''; ?>" data-license-panel="yes">
+								<div class="ph-onboarding__license-type" data-input-group="license-key-type">
+									<label class="ph-onboarding__choice ph-onboarding__choice--compact">
+										<input type="radio" name="license_key_type" value="pro" <?php checked( 'pro', $license_key_type ); ?>>
+										<span class="ph-onboarding__choice-check" aria-hidden="true"></span>
+										<span class="ph-onboarding__choice-copy">
+											<strong><?php esc_html_e( 'Pro subscription key', 'propertyhive' ); ?></strong>
+										</span>
+									</label>
+									<label class="ph-onboarding__choice ph-onboarding__choice--compact">
+										<input type="radio" name="license_key_type" value="old" <?php checked( 'old', $license_key_type ); ?>>
+										<span class="ph-onboarding__choice-check" aria-hidden="true"></span>
+										<span class="ph-onboarding__choice-copy">
+											<strong><?php esc_html_e( 'Old-style key (purchased before October 2023)', 'propertyhive' ); ?></strong>
+										</span>
+									</label>
+								</div>
+
+								<div class="ph-onboarding__license-entry" data-license-entry>
+									<div class="ph-onboarding__field ph-onboarding__field--wide" data-validation-field="license_key">
+										<label for="ph-onboarding-license-key"><span><?php esc_html_e( 'License key', 'propertyhive' ); ?></span></label>
+										<div class="ph-onboarding__license-entry-row">
+											<input id="ph-onboarding-license-key" type="text" name="license_key" autocomplete="off" aria-describedby="ph-onboarding-error-license_key">
+											<button type="button" class="button button-primary" data-license-activate><?php esc_html_e( 'Activate', 'propertyhive' ); ?></button>
+										</div>
+										<?php $this->output_field_error( 'license_key' ); ?>
+										<small><?php esc_html_e( 'Your key is in your purchase email and your wp-property-hive.com account.', 'propertyhive' ); ?></small>
+									</div>
+								</div>
+
+								<p class="ph-onboarding__license-old-note" data-license-old-note><?php esc_html_e( "Old-style keys enable updates for add-ons you've already purchased. Pro features need a Pro subscription.", 'propertyhive' ); ?></p>
+								<div class="ph-onboarding__license-state" data-license-state role="status" aria-live="polite"></div>
+							</div>
+
+							<div class="ph-onboarding__license-panel <?php echo 'no' === $has_license_key ? 'is-open' : ''; ?>" data-license-panel="no">
+								<div class="ph-onboarding__pro-note">
+									<p>
+										<strong><?php esc_html_e( 'Try Property Hive Pro free for 7 days.', 'propertyhive' ); ?></strong>
+										<?php esc_html_e( 'Every Pro feature.', 'propertyhive' ); ?>
+									</p>
+									<span class="ph-onboarding__pro-note-actions">
+										<a class="button button-primary" href="<?php echo esc_url( $this->get_pricing_url( 'license-step-trial' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
+										<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_pricing_url( 'license-step-pricing' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View pricing', 'propertyhive' ); ?></a>
+									</span>
+								</div>
+							</div>
+						<?php endif; ?>
+
+						<?php $this->output_settings_note( __( 'Licenses', 'propertyhive' ) ); ?>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="demo-data">
@@ -932,6 +1412,7 @@ class PH_Admin_Onboarding {
 						<?php endif; ?>
 
 						<div class="ph-onboarding__quick-links">
+							<a href="<?php echo esc_url( $import_feature_active ? admin_url( 'admin.php?page=propertyhive_import_properties' ) : admin_url( 'admin.php?page=ph-settings&tab=features&profilter=import' ) ); ?>" data-import-setup-link <?php echo $import_feature_active ? '' : 'hidden'; ?>><?php esc_html_e( 'Setup Property Import', 'propertyhive' ); ?></a>
 							<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=property' ) ); ?>"><?php esc_html_e( 'Add a property', 'propertyhive' ); ?></a>
 							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ph-settings' ) ); ?>"><?php esc_html_e( 'Open settings', 'propertyhive' ); ?></a>
 							<a href="<?php echo esc_url( $this->get_import_url() ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Import guidance', 'propertyhive' ); ?></a>
@@ -981,14 +1462,20 @@ class PH_Admin_Onboarding {
 	 * @param string $title   Card title.
 	 * @param string $summary Card summary.
 	 * @param bool   $checked Default checked state.
+	 * @param bool   $pro     Whether the option requires a Pro subscription.
 	 */
-	private function output_choice_card( $name, $value, $title, $summary, $checked ) {
+	private function output_choice_card( $name, $value, $title, $summary, $checked, $pro = false ) {
 		?>
 		<label class="ph-onboarding__choice">
 			<input type="checkbox" name="<?php echo esc_attr( $name ); ?>[]" value="<?php echo esc_attr( $value ); ?>" <?php checked( $checked ); ?>>
 			<span class="ph-onboarding__choice-check" aria-hidden="true"></span>
 			<span class="ph-onboarding__choice-copy">
-				<strong><?php echo esc_html( $title ); ?></strong>
+				<strong>
+					<?php echo esc_html( $title ); ?>
+					<?php if ( $pro ) : ?>
+						<span class="ph-onboarding__choice-pro"><?php esc_html_e( 'Pro', 'propertyhive' ); ?></span>
+					<?php endif; ?>
+				</strong>
 				<small><?php echo esc_html( $summary ); ?></small>
 			</span>
 		</label>
@@ -1040,18 +1527,29 @@ class PH_Admin_Onboarding {
 	/**
 	 * Localize onboarding script data.
 	 *
-	 * @param bool $demo_active Whether demo data add-on is active.
+	 * @param bool  $demo_active           Whether demo data add-on is active.
+	 * @param array $import_feature        Cached Property Import feature data.
+	 * @param bool  $import_feature_active Whether Property Import is active.
 	 */
-	private function localize_script( $demo_active ) {
+	private function localize_script( $demo_active, $import_feature = array(), $import_feature_active = false ) {
 		wp_localize_script(
 			'propertyhive_admin_onboarding',
 			'propertyhive_onboarding',
 			array(
 				'ajax_url'               => admin_url( 'admin-ajax.php' ),
 				'nonce'                  => wp_create_nonce( self::NONCE_ACTION ),
+				'steps'                  => $this->steps,
 				'settings_url'           => admin_url( 'admin.php?page=ph-settings' ),
 				'features_url'           => admin_url( 'admin.php?page=ph-settings&tab=features&profilter=free' ),
+				'import_features_url'    => admin_url( 'admin.php?page=ph-settings&tab=features&profilter=import' ),
+				'import_setup_url'       => admin_url( 'admin.php?page=propertyhive_import_properties' ),
+				'license_trial_url'      => $this->get_pricing_url( 'license-step-trial' ),
 				'demo_data_active'       => $demo_active ? 'yes' : 'no',
+				'updates_nonce'          => wp_create_nonce( 'updates' ),
+				'can_install_plugins'    => current_user_can( 'install_plugins' ) ? 'yes' : 'no',
+				'import_feature_slug'    => ! empty( $import_feature['slug'] ) ? $import_feature['slug'] : '',
+				'import_feature_plugin'  => ! empty( $import_feature['plugin_file'] ) ? $import_feature['plugin_file'] : '',
+				'import_feature_active'  => $import_feature_active ? 'yes' : 'no',
 				'address_lookup_enabled' => ( function_exists( 'ph_is_development_environment' ) && ph_is_development_environment() && '' !== trim( (string) get_option( 'propertyhive_getaddress_api_key', '' ) ) ) ? 'yes' : 'no',
 				'address_lookup_nonce'   => wp_create_nonce( 'propertyhive_getaddress_lookup' ),
 				'import_url'             => $this->get_import_url(),
@@ -1067,6 +1565,14 @@ class PH_Admin_Onboarding {
 					'importComplete'    => __( 'Demo data imported.', 'propertyhive' ),
 					'importFailed'      => __( 'Demo data could not be imported. You can continue setup and try again later.', 'propertyhive' ),
 					'demoDataInactive'  => __( 'The Demo Data feature is not active on this site yet.', 'propertyhive' ),
+					'licenseKeyRequired' => __( 'Please enter your license key.', 'propertyhive' ),
+					'licenseChecking'   => __( 'Checking your key... Contacting wp-property-hive.com - a couple of seconds.', 'propertyhive' ),
+					'licenseProSuccess' => __( 'Pro activated. The features in your plan are ready to use.', 'propertyhive' ),
+					'licenseOldSuccess' => __( 'License valid - updates are enabled for your purchased add-ons.', 'propertyhive' ),
+					'licenseError'      => __( "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost.", 'propertyhive' ),
+					'licenseOldTrial'   => __( 'Want the Pro features too? Start a free 7-day trial.', 'propertyhive' ),
+					'importFeatureEnabled' => __( 'Property Import feature enabled', 'propertyhive' ),
+					'renewLicense'      => __( 'Renew License', 'propertyhive' ),
 					'chooseDepartment'  => __( 'Please choose at least one property sector.', 'propertyhive' ),
 					'chooseCountry'     => __( 'Please choose a valid country.', 'propertyhive' ),
 					'chooseUsage'       => __( 'Please choose how you will use Property Hive.', 'propertyhive' ),
@@ -1379,6 +1885,29 @@ class PH_Admin_Onboarding {
 	 */
 	private function get_export_url() {
 		return apply_filters( 'propertyhive_onboarding_export_url', 'https://docs.wp-property-hive.com/article/404-managing-portal-feeds' );
+	}
+
+	/**
+	 * Get pricing page URL.
+	 *
+	 * @param string $utm_content UTM content value identifying which link was clicked.
+	 * @return string
+	 */
+	private function get_pricing_url( $utm_content = '' ) {
+		$args = array(
+			'src'          => 'plugin-onboarding',
+			'utm_source'   => 'propertyhive-plugin',
+			'utm_medium'   => 'onboarding',
+			'utm_campaign' => 'setup-wizard',
+		);
+
+		if ( '' !== $utm_content ) {
+			$args['utm_content'] = $utm_content;
+		}
+
+		$url = add_query_arg( $args, 'https://wp-property-hive.com/pricing/' );
+
+		return apply_filters( 'propertyhive_onboarding_pricing_url', $url, $utm_content );
 	}
 }
 

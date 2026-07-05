@@ -7,11 +7,13 @@ jQuery( function( $ ) {
 	'use strict';
 
 	var config = window.propertyhive_onboarding || {};
-	var steps = [ 'intro', 'departments', 'country', 'office', 'usage', 'demo-data', 'complete' ];
+	var fallbackSteps = [ 'intro', 'departments', 'country', 'office', 'usage', 'license', 'demo-data', 'complete' ];
+	var steps = $.isArray( config.steps ) && config.steps.length ? config.steps : fallbackSteps;
 	var $wizard = $( '.ph-onboarding' );
 	var currentStep = $wizard.data( 'current-step' ) || 'intro';
 	var demoImported = $wizard.data( 'demo-imported' ) === 'yes';
 	var demoImporting = false;
+	var licenseActivating = false;
 	var addressLookupTimer = null;
 	var addressLookupXhr = null;
 	var addressGetXhr = null;
@@ -27,6 +29,7 @@ jQuery( function( $ ) {
 		office_telephone_number: '[data-office-field="office_telephone_number"]',
 		office_email_address: '[data-office-field="office_email_address"]',
 		usage: 'input[name="usage[]"]',
+		license_key: 'input[name="license_key"]',
 		demo_data_choice: 'input[name="demo_data_choice"]'
 	};
 	var officeRules = [
@@ -292,14 +295,6 @@ jQuery( function( $ ) {
 		} );
 	}
 
-	function updateUsageLinks() {
-		var usage = selectedValues( 'usage' );
-		$( '[data-usage-link]' ).each( function() {
-			var $link = $( this );
-			$link.toggle( $.inArray( $link.data( 'usage-link' ), usage ) >= 0 );
-		} );
-	}
-
 	function showStep( step ) {
 		currentStep = step;
 		var index = getStepIndex( step );
@@ -315,7 +310,6 @@ jQuery( function( $ ) {
 		$( '[data-next]' ).text( step === 'complete' ? config.i18n.finish : config.i18n.continue );
 		setMessage( '' );
 		clearValidation( step );
-		updateUsageLinks();
 		track( 'step_viewed', step );
 	}
 
@@ -358,6 +352,11 @@ jQuery( function( $ ) {
 
 		if ( step === 'usage' ) {
 			payload.usage = selectedValues( 'usage' );
+		}
+
+		if ( step === 'license' ) {
+			payload.has_license_key = $( 'input[name="has_license_key"]:checked' ).val() || $( 'input[name="has_license_key"][type="hidden"]' ).val() || 'no';
+			payload.license_key_type = $( 'input[name="license_key_type"]:checked' ).val() || $( 'input[name="license_key_type"][type="hidden"]' ).val() || 'pro';
 		}
 
 		if ( step === 'demo-data' ) {
@@ -589,6 +588,198 @@ jQuery( function( $ ) {
 		$( '[data-demo-progress-box]' ).toggle( wantsDemo );
 	}
 
+	function updateLicenseChoice() {
+		var choice = $( 'input[name="has_license_key"]:checked' ).val() || 'no';
+		$( '[data-license-panel]' ).removeClass( 'is-open' );
+		$( '[data-license-panel="' + choice + '"]' ).addClass( 'is-open' );
+	}
+
+	function updateLicenseType() {
+		var type = $( 'input[name="license_key_type"]:checked' ).val() || 'pro';
+		$( '[data-license-old-note]' ).toggle( type === 'old' );
+	}
+
+	function setLicenseState( type, content ) {
+		var $state = $( '[data-license-state]' );
+
+		$state.removeClass( 'is-busy is-ok is-error' );
+		if ( ! content ) {
+			$state.empty().hide();
+			return;
+		}
+
+		$state.addClass( type ? 'is-' + type : '' ).empty().append( content ).show();
+	}
+
+	function renderLicenseBusy() {
+		setLicenseState( 'busy', $( '<span />' ).text( text( 'licenseChecking', 'Checking your key... Contacting wp-property-hive.com - a couple of seconds.' ) ) );
+	}
+
+	function renderLicenseSuccess( licenseType, summary ) {
+		var $content = $( '<div />' );
+		var message = licenseType === 'old' ? text( 'licenseOldSuccess', 'License valid - updates are enabled for your purchased add-ons.' ) : text( 'licenseProSuccess', 'Pro activated. The features in your plan are ready to use.' );
+
+		if ( licenseType === 'old' && summary ) {
+			message += ' Expires ' + summary + '.';
+		}
+
+		$( '<strong />' ).text( '\u2713 ' + message ).appendTo( $content );
+
+		if ( licenseType === 'old' ) {
+			$( '<a />', {
+				href: config.license_trial_url || config.import_features_url || '#',
+				target: '_blank',
+				rel: 'noopener noreferrer',
+				text: text( 'licenseOldTrial', 'Want the Pro features too? Start a free 7-day trial.' )
+			} ).appendTo( $( '<p />', { class: 'ph-onboarding__license-trial-link' } ).appendTo( $content ) );
+		}
+
+		setLicenseState( 'ok', $content.contents() );
+	}
+
+	function renderLicenseError( message, renewUrl ) {
+		var $content = $( '<div />' );
+
+		$( '<strong />' ).text( message || text( 'licenseError', "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost." ) ).appendTo( $content );
+
+		if ( renewUrl ) {
+			$content.append( ' ' );
+			$( '<a />', {
+				href: renewUrl,
+				target: '_blank',
+				rel: 'noopener noreferrer',
+				text: text( 'renewLicense', 'Renew License' )
+			} ).appendTo( $content );
+		}
+
+		setLicenseState( 'error', $content.contents() );
+	}
+
+	function lockLicenseSuccess() {
+		$( 'input[name="has_license_key"][value="yes"]' ).prop( 'checked', true ).trigger( 'change' );
+		$( 'input[name="has_license_key"], input[name="license_key_type"]' ).prop( 'disabled', true ).closest( '.ph-onboarding__choice' ).addClass( 'is-disabled' );
+		$( '[data-license-entry]' ).hide();
+		$( '[data-license-old-note]' ).hide();
+	}
+
+	function revealImportSetupLink() {
+		$( '[data-import-setup-link]' )
+			.attr( 'href', config.import_setup_url || 'admin.php?page=propertyhive_import_properties' )
+			.removeAttr( 'hidden' );
+	}
+
+	function appendImportEnabledLine() {
+		var $state = $( '[data-license-state]' );
+
+		if ( $state.find( '[data-license-import-enabled]' ).length ) {
+			return;
+		}
+
+		$( '<p />', {
+			'data-license-import-enabled': 'yes',
+			text: text( 'importFeatureEnabled', 'Property Import feature enabled' ) + ' \u2713'
+		} ).appendTo( $state );
+	}
+
+	function importFeatureSucceeded() {
+		appendImportEnabledLine();
+		revealImportSetupLink();
+	}
+
+	function maybeEnableImportFeature() {
+		if ( $.inArray( 'import_properties', selectedValues( 'usage' ) ) < 0 ) {
+			return;
+		}
+
+		if ( config.import_feature_active === 'yes' ) {
+			importFeatureSucceeded();
+			return;
+		}
+
+		if ( config.can_install_plugins !== 'yes' || ! config.import_feature_slug || ! config.updates_nonce ) {
+			return;
+		}
+
+		$.ajax( {
+			url: config.ajax_url,
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				action: 'propertyhive_activate_pro_feature',
+				slug: config.import_feature_slug,
+				_ajax_nonce: config.updates_nonce
+			}
+		} ).done( function( response ) {
+			if ( response && response.success === true ) {
+				if ( response.data && response.data.activateUrl ) {
+					$.get( response.data.activateUrl ).done( importFeatureSucceeded );
+					return;
+				}
+
+				importFeatureSucceeded();
+				return;
+			}
+
+			if ( response && response.data && response.data.errorMessage === 'Plugin already active' ) {
+				importFeatureSucceeded();
+			}
+		} ).fail( function() {
+			if ( window.console && window.console.log ) {
+				window.console.log( 'Property Import auto-enable failed.' );
+			}
+		} );
+	}
+
+	function activateLicense() {
+		if ( licenseActivating ) {
+			return;
+		}
+
+		var licenseKey = $.trim( $( 'input[name="license_key"]' ).val() || '' );
+		var licenseType = $( 'input[name="license_key_type"]:checked' ).val() || 'pro';
+
+		clearFieldError( 'license_key' );
+		setMessage( '' );
+
+		if ( ! licenseKey ) {
+			setFieldError( 'license_key', text( 'licenseKeyRequired', 'Please enter your license key.' ) );
+			return;
+		}
+
+		licenseActivating = true;
+		$( '[data-license-activate]' ).prop( 'disabled', true ).addClass( 'is-busy' );
+		renderLicenseBusy();
+
+		$.post( config.ajax_url, {
+			action: 'propertyhive_onboarding_activate_license',
+			security: config.nonce,
+			license_key_type: licenseType,
+			license_key: licenseKey
+		} ).done( function( response ) {
+			var data = response && response.data ? response.data : {};
+
+			if ( response && response.success && data.activated ) {
+				renderLicenseSuccess( data.license_type, data.summary );
+				lockLicenseSuccess();
+
+				if ( data.license_type === 'pro' ) {
+					maybeEnableImportFeature();
+				}
+
+				return;
+			}
+
+			renderLicenseError( data.message, data.renew_url );
+			$( '[data-license-activate]' ).prop( 'disabled', false ).removeClass( 'is-busy' );
+		} ).fail( function( xhr ) {
+			var data = xhr.responseJSON && xhr.responseJSON.data ? xhr.responseJSON.data : {};
+			renderLicenseError( data.message, data.renew_url );
+			$( '[data-license-activate]' ).prop( 'disabled', false ).removeClass( 'is-busy' );
+		} ).always( function() {
+			licenseActivating = false;
+		} );
+	}
+
 	function maybeImportDemoData() {
 		if ( currentStep !== 'demo-data' || $( 'input[name="demo_data_choice"]:checked' ).val() !== 'yes' || demoImported ) {
 			return $.Deferred().resolve().promise();
@@ -602,8 +793,13 @@ jQuery( function( $ ) {
 		return importDemoData();
 	}
 
-	$( document ).on( 'change', 'input[name="usage[]"]', updateUsageLinks );
 	$( document ).on( 'change', 'input[name="demo_data_choice"]', updateDemoChoice );
+	$( document ).on( 'change', 'input[name="has_license_key"]', updateLicenseChoice );
+	$( document ).on( 'change', 'input[name="license_key_type"]', updateLicenseType );
+	$( document ).on( 'click', '[data-license-activate]', activateLicense );
+	$( document ).on( 'click', '[data-import-setup-link]', function() {
+		track( 'setup_import_clicked', 'complete' );
+	} );
 	$( document ).on( 'input', '[data-address-lookup-input]', function() {
 		var value = $( this ).val();
 
@@ -620,6 +816,10 @@ jQuery( function( $ ) {
 		var field = $( this ).attr( 'data-office-field' ) || 'country';
 		clearFieldError( field );
 		setMessage( '' );
+	} );
+
+	$( document ).on( 'input change', 'input[name="license_key"]', function() {
+		clearFieldError( 'license_key' );
 	} );
 
 	$( '[data-next]' ).on( 'click', function() {
@@ -689,6 +889,10 @@ jQuery( function( $ ) {
 			setMessage( '' );
 		}
 
+		if ( name === 'has_license_key' ) {
+			setMessage( '' );
+		}
+
 		if ( $( this ).attr( 'type' ) === 'radio' ) {
 			if ( $( this ).is( ':checked' ) ) {
 				$( 'input[name="' + $( this ).attr( 'name' ) + '"]' ).closest( '.ph-onboarding__choice' ).removeClass( 'is-selected' );
@@ -705,4 +909,6 @@ jQuery( function( $ ) {
 	$( '.ph-onboarding__choice input' ).trigger( 'change' );
 	showStep( currentStep );
 	refreshDemoState();
+	updateLicenseChoice();
+	updateLicenseType();
 } );
