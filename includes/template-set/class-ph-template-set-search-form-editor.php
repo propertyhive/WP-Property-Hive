@@ -26,9 +26,13 @@ class PH_Template_Set_Search_Form_Editor {
 	 * @return bool
 	 */
 	public static function can_manage() {
-		$capability = apply_filters( 'propertyhive_template_set_search_form_editor_capability', 'manage_options' );
+		$capability = apply_filters( 'propertyhive_template_set_search_form_editor_capability', '' );
 
-		return current_user_can( $capability );
+		if ( is_string( $capability ) && '' !== $capability ) {
+			return current_user_can( $capability );
+		}
+
+		return PH_Template_Set_Request_Context::can_manage_template_set();
 	}
 
 	/**
