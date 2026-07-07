@@ -67,6 +67,48 @@
 		});
 	}
 
+	function dispatchSearchFormReplacementEvent(eventName, previousForm, nextForm) {
+		if (typeof window.CustomEvent !== 'function') {
+			return;
+		}
+
+		document.dispatchEvent(new window.CustomEvent(eventName, {
+			detail: {
+				form: nextForm,
+				previousForm: previousForm
+			}
+		}));
+	}
+
+	function initializeReplacedSearchForm(nextForm) {
+		if (typeof window.toggleDepartmentFields === 'function') {
+			window.toggleDepartmentFields();
+		}
+
+		if (typeof window.ph_init_dynamic_population === 'function') {
+			window.ph_init_dynamic_population(nextForm);
+		} else if (typeof window.ph_populate_subsequent_dropdowns === 'function') {
+			window.ph_populate_subsequent_dropdowns(false);
+		}
+
+		if (window.jQuery && window.jQuery.fn && window.jQuery.fn.multiselect) {
+			window.jQuery(nextForm).find('select.ph-form-multiselect').each(function () {
+				var select = window.jQuery(this);
+
+				if (select.data('ph-template-editor-multiselect') || select.data('plugin_multiselect')) {
+					return;
+				}
+
+				select.multiselect({
+					texts: {
+						placeholder: select.data('blank-option')
+					}
+				});
+				select.data('ph-template-editor-multiselect', true);
+			});
+		}
+	}
+
 	function replaceSearchFormPreview(html, searchFormConfig) {
 		var selector = searchFormConfig.previewSelector || '.property-search-form';
 		var currentForm = document.querySelector(selector);
@@ -84,15 +126,8 @@
 			return;
 		}
 
+		dispatchSearchFormReplacementEvent('propertyhive_template_set_search_form_replacing', currentForm, nextForm);
 		currentForm.parentNode.replaceChild(nextForm, currentForm);
-
-		if (typeof window.CustomEvent === 'function') {
-			document.dispatchEvent(new window.CustomEvent('propertyhive_template_set_search_form_replaced', {
-				detail: {
-					form: nextForm
-				}
-			}));
-		}
 
 		nextForm.querySelectorAll('script').forEach(function (script) {
 			var executable = document.createElement('script');
@@ -101,26 +136,8 @@
 			document.body.removeChild(executable);
 		});
 
-		if (typeof window.toggleDepartmentFields === 'function') {
-			window.toggleDepartmentFields();
-		}
-
-		if (window.jQuery && window.jQuery.fn && window.jQuery.fn.multiselect) {
-			window.jQuery(nextForm).find('select.ph-form-multiselect').each(function () {
-				var select = window.jQuery(this);
-
-				if (select.data('ph-template-editor-multiselect')) {
-					return;
-				}
-
-				select.multiselect({
-					texts: {
-						placeholder: select.data('blank-option')
-					}
-				});
-				select.data('ph-template-editor-multiselect', true);
-			});
-		}
+		initializeReplacedSearchForm(nextForm);
+		dispatchSearchFormReplacementEvent('propertyhive_template_set_search_form_replaced', currentForm, nextForm);
 	}
 
 	function initSearchFormBuilder(editor, form, labels) {
