@@ -103,7 +103,7 @@ class PH_Licenses {
 
         if ( $license_type != 'pro' || get_option('propertyhive_pro_license_key', '') == '' )
         {
-            return false;
+            return $can;
         }
 
         if ( !$this->is_valid_pro_license_key() )
@@ -129,7 +129,7 @@ class PH_Licenses {
             return false;
         }
 
-        return false;
+        return $can;
 	}
 
 	public function ph_check_add_on_can_be_updated( $can, $slug )
