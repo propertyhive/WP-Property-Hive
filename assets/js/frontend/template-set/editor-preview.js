@@ -54,16 +54,24 @@
 		return control.options[control.selectedIndex] || null;
 	}
 
-	function maybeNavigateTemplatePreview(control) {
-		var selectedOption;
-		var previewUrl;
+	function isTemplatePreviewControl(control) {
+		return !!control && (control.name === 'template_set_detail_template' || control.name === 'template_set_search_template');
+	}
 
-		if (control.name !== 'template_set_detail_template' && control.name !== 'template_set_search_template') {
-			return false;
+	function getTemplatePreviewUrl(control) {
+		var selectedOption;
+
+		if (!isTemplatePreviewControl(control)) {
+			return '';
 		}
 
 		selectedOption = getSelectedOption(control);
-		previewUrl = selectedOption ? selectedOption.getAttribute('data-ph-template-preview-url') : '';
+
+		return selectedOption ? selectedOption.getAttribute('data-ph-template-preview-url') : '';
+	}
+
+	function maybeNavigateTemplatePreview(control) {
+		var previewUrl = getTemplatePreviewUrl(control);
 
 		if (!previewUrl || previewUrl === window.location.href) {
 			return false;
@@ -173,6 +181,8 @@
 
 	modules.editorPreview = {
 		applyControl: applyEditorControl,
+		getTemplatePreviewUrl: getTemplatePreviewUrl,
+		isTemplatePreviewControl: isTemplatePreviewControl,
 		maybeNavigateTemplatePreview: maybeNavigateTemplatePreview
 	};
 }());

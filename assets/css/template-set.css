@@ -79,13 +79,14 @@
 }
 
 body.ph-template-editor-active {
-	padding-left: 380px;
+	--ph-template-editor-width: clamp(300px, 32vw, 380px);
+	padding-left: var(--ph-template-editor-width);
 }
 
 @media (min-width: 721px) {
 	body.ph-template-editor-active .ph-template-search,
 	body.ph-template-editor-active .ph-template-detail {
-		max-width: min(1180px, calc(100vw - 428px));
+		max-width: min(1180px, calc(100vw - var(--ph-template-editor-width) - 48px));
 	}
 }
 
@@ -110,7 +111,7 @@ body.ph-template-editor-active {
 	left: 0;
 	position: fixed;
 	top: 0;
-	width: 380px;
+	width: var(--ph-template-editor-width, 380px);
 	z-index: 100030;
 }
 
