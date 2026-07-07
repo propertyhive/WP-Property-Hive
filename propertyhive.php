@@ -285,6 +285,8 @@ if ( ! class_exists( 'PropertyHive' ) )
             }
             
             include_once( 'includes/ph-form-functions.php' );               // Form Renderers
+            include_once( 'includes/class-ph-search-form-field-catalog.php' ); // Search form field catalog
+            include_once( 'includes/class-ph-search-form-manager.php' );    // Search form settings manager
             include_once( 'includes/class-ph-form-handler.php' );           // Form Handlers
             include_once( 'includes/class-ph-shortcodes.php' );             // Shortcodes class
             include_once( 'includes/class-ph-template-set.php' );           // Frontend template set
