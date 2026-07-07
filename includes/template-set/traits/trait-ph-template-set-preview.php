@@ -33,7 +33,7 @@ trait PH_Template_Set_Preview {
 			'phone'   => '020 7946 0958',
 			'email'   => 'james.ashford@ashfordrowe.co.uk',
 			'address' => '18 Cavendish Parade, Marylebone, London W1U 4QT',
-			'portrait' => 'agent-james-ashford.png',
+			'portrait' => 'agent-james-ashford.jpg',
 		);
 	}
 
@@ -743,7 +743,7 @@ trait PH_Template_Set_Preview {
 	private static function get_demo_property_cards() {
 		return array(
 			array(
-				'image'   => 'cavendish-living-room.png',
+				'image'   => 'cavendish-living-room.jpg',
 				'badge'   => __( 'For sale', 'propertyhive' ),
 				'title'   => __( 'Cavendish House, Marylebone W1', 'propertyhive' ),
 				'price'   => __( 'Guide price ', 'propertyhive' ) . self::demo_price( '1,250,000' ),
@@ -751,7 +751,7 @@ trait PH_Template_Set_Preview {
 				'facts'   => array( __( '3 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( '1,480 sq ft', 'propertyhive' ), __( 'Freehold', 'propertyhive' ) ),
 			),
 			array(
-				'image'   => 'cavendish-kitchen-dining.png',
+				'image'   => 'cavendish-kitchen-dining.jpg',
 				'badge'   => __( 'New instruction', 'propertyhive' ),
 				'title'   => __( 'Upper Maisonette, Devonshire Street', 'propertyhive' ),
 				'price'   => self::demo_price( '925,000' ),
@@ -759,7 +759,7 @@ trait PH_Template_Set_Preview {
 				'facts'   => array( __( '2 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( 'Share of freehold', 'propertyhive' ) ),
 			),
 			array(
-				'image'   => 'cavendish-exterior.png',
+				'image'   => 'cavendish-exterior.jpg',
 				'badge'   => __( 'Viewing slots', 'propertyhive' ),
 				'title'   => __( 'Period House, Cavendish Road', 'propertyhive' ),
 				'price'   => __( 'Offers over ', 'propertyhive' ) . self::demo_price( '1,175,000' ),
@@ -767,7 +767,7 @@ trait PH_Template_Set_Preview {
 				'facts'   => array( __( '4 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( 'Garden', 'propertyhive' ) ),
 			),
 			array(
-				'image'   => 'atlas-apartment-living.png',
+				'image'   => 'atlas-apartment-living.jpg',
 				'badge'   => __( 'To let', 'propertyhive' ),
 				'title'   => __( 'Atlas Apartment, Riverside Quarter', 'propertyhive' ),
 				'price'   => self::demo_price( '2,450' ) . __( ' pcm', 'propertyhive' ),
@@ -775,7 +775,7 @@ trait PH_Template_Set_Preview {
 				'facts'   => array( __( '2 beds', 'propertyhive' ), __( '2 baths', 'propertyhive' ), __( 'Furnished', 'propertyhive' ) ),
 			),
 			array(
-				'image'   => 'elm-yard-development.png',
+				'image'   => 'elm-yard-development.jpg',
 				'badge'   => __( 'New homes', 'propertyhive' ),
 				'title'   => __( 'Elm Yard, Wokingham RG40', 'propertyhive' ),
 				'price'   => __( 'From ', 'propertyhive' ) . self::demo_price( '485,000' ),
@@ -783,7 +783,7 @@ trait PH_Template_Set_Preview {
 				'facts'   => array( __( '1-3 beds', 'propertyhive' ), __( 'EPC A-rated', 'propertyhive' ), __( 'Show home open', 'propertyhive' ) ),
 			),
 			array(
-				'image'   => 'cavendish-garden-terrace.png',
+				'image'   => 'cavendish-garden-terrace.jpg',
 				'badge'   => __( 'Private outside space', 'propertyhive' ),
 				'title'   => __( 'Garden Flat, Weymouth Street', 'propertyhive' ),
 				'price'   => self::demo_price( '1,050,000' ),
@@ -835,13 +835,13 @@ trait PH_Template_Set_Preview {
 					array_merge(
 						array( isset( $card['image'] ) ? $card['image'] : '' ),
 						array(
-							'cavendish-living-room.png',
-							'cavendish-kitchen-dining.png',
-							'cavendish-principal-bedroom.png',
-							'cavendish-garden-terrace.png',
-							'cavendish-exterior.png',
-							'atlas-apartment-living.png',
-							'elm-yard-development.png',
+							'cavendish-living-room.jpg',
+							'cavendish-kitchen-dining.jpg',
+							'cavendish-principal-bedroom.jpg',
+							'cavendish-garden-terrace.jpg',
+							'cavendish-exterior.jpg',
+							'atlas-apartment-living.jpg',
+							'elm-yard-development.jpg',
 						)
 					)
 				)
