@@ -342,8 +342,8 @@ class PH_Meta_Box_Property_Photos {
            {
               foreach ( $_POST['photo_url'] as $photo_url )
               {
-                  if ( ph_clean($photo_url) == '' ) { continue; }
-                  $photo_urls[] = array('url' => ph_clean($photo_url));
+                  if ( sanitize_url($photo_url) == '' ) { continue; }
+                  $photo_urls[] = array('url' => sanitize_url($photo_url));
               }
            }
            update_post_meta( $post_id, '_photo_urls', $photo_urls );
