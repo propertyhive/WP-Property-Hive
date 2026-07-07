@@ -423,8 +423,8 @@ class PH_Meta_Box_Property_Epcs {
            {
               foreach ( $_POST['epc_url'] as $epc_url )
               {
-                  if ( ph_clean($epc_url) == '' ) { continue; }
-                  $epc_urls[] = array('url' => ph_clean($epc_url));
+                  if ( sanitize_url($epc_url) == '' ) { continue; }
+                  $epc_urls[] = array('url' => sanitize_url($epc_url));
               }
            }
            update_post_meta( $post_id, '_epc_urls', $epc_urls );
