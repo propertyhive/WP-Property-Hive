@@ -895,9 +895,9 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_display_office_name( $property ) {
-		$office = $property->get_office_name();
+		$office = trim( wp_strip_all_tags( (string) $property->get_office_name() ) );
 
-		if ( $office && false === stripos( $office, 'demo' ) ) {
+		if ( '' !== $office && ! preg_match( '/^(demo|example|test)(\s|$)/i', $office ) ) {
 			return $office;
 		}
 
