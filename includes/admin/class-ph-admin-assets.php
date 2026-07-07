@@ -123,7 +123,6 @@ class PH_Admin_Assets {
         global $wp_query, $post, $tabs;
 
         $screen       = get_current_screen();
-        $ph_screen_id = sanitize_title( __( 'PropertyHive', 'propertyhive' ) );
         $suffix       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
         // Register scripts
