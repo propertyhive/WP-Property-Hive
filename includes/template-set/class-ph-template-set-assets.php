@@ -28,6 +28,10 @@ class PH_Template_Set_Assets {
 	 * @return array
 	 */
 	public static function enqueue_styles( $styles ) {
+		if ( ! self::should_enqueue_frontend_assets( true ) ) {
+			return $styles;
+		}
+
 		$styles['propertyhive-template-set'] = array(
 			'src'     => str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/css/template-set.css',
 			'deps'    => array( 'propertyhive-general' ),
@@ -42,11 +46,7 @@ class PH_Template_Set_Assets {
 	 * Register template-set scripts.
 	 */
 	public static function enqueue_scripts() {
-		if ( ! is_property() && ! is_post_type_archive( 'property' ) ) {
-			return;
-		}
-
-		if ( ! PH_Template_Set_Request_Context::is_enabled() && ! PH_Template_Set_Request_Context::can_show_template_switcher() ) {
+		if ( ! self::should_enqueue_frontend_assets() ) {
 			return;
 		}
 
@@ -89,6 +89,28 @@ class PH_Template_Set_Assets {
 		);
 
 		wp_localize_script( 'propertyhive-template-set', 'phTemplateSet', PH_Template_Set_Editor_Controller::get_script_data() );
+	}
+
+	/**
+	 * Should Template Set frontend assets be loaded for this request?
+	 *
+	 * @param bool $include_modules Whether module shortcode pages should match.
+	 * @return bool
+	 */
+	private static function should_enqueue_frontend_assets( $include_modules = false ) {
+		if ( is_property() || is_post_type_archive( 'property' ) ) {
+			return PH_Template_Set_Request_Context::is_enabled() || PH_Template_Set_Request_Context::can_show_template_switcher();
+		}
+
+		if ( $include_modules && is_singular() ) {
+			$post = get_post();
+
+			if ( $post && has_shortcode( $post->post_content, 'propertyhive_featured_template' ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
