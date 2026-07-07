@@ -1200,6 +1200,9 @@ class PH_Admin_Onboarding {
 						<header class="ph-onboarding__intro">
 							<h1><?php esc_html_e( 'Answer a few quick questions so Property Hive starts with the right departments, region and tools for your agency.', 'propertyhive' ); ?></h1>
 						</header>
+						<div class="ph-onboarding__intro-visual">
+							<img src="<?php echo esc_url( PH()->plugin_url() . '/assets/images/admin/onboarding-intro-search.png' ); ?>" alt="">
+						</div>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="departments">

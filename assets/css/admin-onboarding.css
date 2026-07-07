@@ -43,17 +43,21 @@ body.propertyhive-onboarding-screen {
 	color: #151515;
 	font-family: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	font-weight: 300;
+	height: auto;
+	min-height: 100%;
 }
 
 @media (min-width: 721px) {
 	html.propertyhive-onboarding-html {
-		overflow-y: hidden;
+		height: auto;
+		min-height: 100%;
+		overflow-y: auto;
 		scrollbar-gutter: stable;
 	}
 
 	html.propertyhive-onboarding-html body.propertyhive-onboarding-screen {
 		background: linear-gradient(to bottom, #151515 0 86px, #ffffff 86px);
-		overflow-y: hidden;
+		overflow-y: auto;
 	}
 }
 
@@ -168,6 +172,26 @@ body.propertyhive-onboarding-screen #wpbody-content > .updated {
 	max-width: 720px;
 }
 
+.ph-onboarding__intro-visual {
+	background: var(--ph-sunlight);
+	border-radius: 12px;
+	display: flex;
+	justify-content: center;
+	margin: 28px auto 0;
+	max-width: 640px;
+	padding: 24px 32px;
+	width: 100%;
+}
+
+.ph-onboarding__intro-visual img {
+	display: block;
+	height: auto;
+	max-height: clamp(160px, calc(100vh - 620px), 380px);
+	max-width: 560px;
+	object-fit: contain;
+	width: 100%;
+}
+
 .ph-onboarding__tracking {
 	background: var(--ph-mist);
 	border: 1px solid var(--ph-smoke);
@@ -250,6 +274,10 @@ body.propertyhive-onboarding-screen #wpbody-content > .updated {
 
 .ph-onboarding.is-intro-step .ph-onboarding__progress {
 	visibility: hidden;
+}
+
+.ph-onboarding.is-intro-step .ph-onboarding__content {
+	padding-bottom: 180px;
 }
 
 .ph-onboarding__progress span,
@@ -970,5 +998,16 @@ body.propertyhive-onboarding-screen #wpbody-content > .updated {
 	.ph-onboarding__tracking {
 		bottom: 18px;
 		width: calc(100vw - 36px);
+	}
+
+	.ph-onboarding__intro-visual {
+		margin-top: 20px;
+		padding: 14px 16px;
+	}
+}
+
+@media (max-height: 780px) {
+	.ph-onboarding__intro-visual {
+		display: none;
 	}
 }
