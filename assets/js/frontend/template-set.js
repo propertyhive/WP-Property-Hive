@@ -44,6 +44,40 @@
 		return data;
 	}
 
+	function hasUnsavedEditorChanges(editor, searchFormBuilder) {
+		return editor.classList.contains('is-dirty') || !!(searchFormBuilder && typeof searchFormBuilder.isDirty === 'function' && searchFormBuilder.isDirty());
+	}
+
+	function getControlValue(control) {
+		if (control.type === 'checkbox') {
+			return control.checked ? control.value : '';
+		}
+
+		if (control.type === 'radio') {
+			return control.checked ? control.value : '';
+		}
+
+		return control.value;
+	}
+
+	function restoreControlValue(control, value) {
+		if (control.type === 'checkbox') {
+			control.checked = value === control.value;
+			return;
+		}
+
+		if (control.type === 'radio') {
+			control.checked = value === control.value;
+			return;
+		}
+
+		control.value = value;
+	}
+
+	function confirmTemplateNavigation(labels) {
+		return window.confirm(labels.unsavedNavigation || 'You have unsaved changes. Leave this page without saving?');
+	}
+
 	function initTemplateEditor() {
 		var editor = document.querySelector('[data-ph-template-editor]');
 		var form;
@@ -77,24 +111,37 @@
 		}
 
 		form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
-				control.addEventListener('change', function () {
-					if (modules.editorPreview && typeof modules.editorPreview.maybeNavigateTemplatePreview === 'function' && modules.editorPreview.maybeNavigateTemplatePreview(control)) {
-						setEditorStatus(editor, labels.loading || 'Loading...', 'saving');
+			control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
+
+			control.addEventListener('change', function () {
+				var previousValue = control.getAttribute('data-ph-template-editor-previous-value') || '';
+				var previewUrl = modules.editorPreview && typeof modules.editorPreview.getTemplatePreviewUrl === 'function' ? modules.editorPreview.getTemplatePreviewUrl(control) : '';
+
+				if (previewUrl && previewUrl !== window.location.href) {
+					if (hasUnsavedEditorChanges(editor, searchFormBuilder) && !confirmTemplateNavigation(labels)) {
+						restoreControlValue(control, previousValue);
 						return;
 					}
 
-					if (modules.editorPreview && typeof modules.editorPreview.applyControl === 'function') {
-						modules.editorPreview.applyControl(control);
-					}
-					editor.classList.add('is-dirty');
-					setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
-				});
+					setEditorStatus(editor, labels.loading || 'Loading...', 'saving');
+					window.location.href = previewUrl;
+					return;
+				}
+
+				if (modules.editorPreview && typeof modules.editorPreview.applyControl === 'function') {
+					modules.editorPreview.applyControl(control);
+				}
+				control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
+				editor.classList.add('is-dirty');
+				setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
+			});
 
 			if (control.type === 'color') {
 				control.addEventListener('input', function () {
 					if (modules.editorPreview && typeof modules.editorPreview.applyControl === 'function') {
 						modules.editorPreview.applyControl(control);
 					}
+					control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
 					editor.classList.add('is-dirty');
 					setEditorStatus(editor, labels.changed || 'Unsaved changes', 'changed');
 				});
@@ -134,6 +181,9 @@
 				}
 			}).then(function () {
 				editor.classList.remove('is-dirty');
+				form.querySelectorAll('[data-ph-template-editor-control]').forEach(function (control) {
+					control.setAttribute('data-ph-template-editor-previous-value', getControlValue(control));
+				});
 				setEditorStatus(editor, labels.saved || 'Saved', 'saved');
 			}).catch(function (error) {
 				setEditorStatus(editor, error && error.message ? error.message : (labels.error || 'Could not save'), 'error');

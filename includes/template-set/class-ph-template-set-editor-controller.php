@@ -254,12 +254,13 @@ class PH_Template_Set_Editor_Controller {
 			'searchFormEditor'    => PH_Template_Set_Search_Form_Editor::get_script_data( self::get_template_editor_context() ),
 			'editorSidebarLayout' => self::get_editor_sidebar_layout(),
 			'labels'              => array(
-				'ready'   => __( 'Ready', 'propertyhive' ),
-				'changed' => __( 'Unsaved changes', 'propertyhive' ),
-				'loading' => __( 'Loading...', 'propertyhive' ),
-				'saving'  => __( 'Saving...', 'propertyhive' ),
-				'saved'   => __( 'Saved', 'propertyhive' ),
-				'error'   => __( 'Could not save', 'propertyhive' ),
+				'ready'             => __( 'Ready', 'propertyhive' ),
+				'changed'           => __( 'Unsaved changes', 'propertyhive' ),
+				'loading'           => __( 'Loading...', 'propertyhive' ),
+				'saving'            => __( 'Saving...', 'propertyhive' ),
+				'saved'             => __( 'Saved', 'propertyhive' ),
+				'error'             => __( 'Could not save', 'propertyhive' ),
+				'unsavedNavigation' => __( 'You have unsaved changes. Leave this page without saving?', 'propertyhive' ),
 			),
 		);
 	}
