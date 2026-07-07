@@ -729,11 +729,7 @@ jQuery( function( $ ) {
 			if ( response && response.data && response.data.errorMessage === 'Plugin already active' ) {
 				importFeatureSucceeded();
 			}
-		} ).fail( function() {
-			if ( window.console && window.console.log ) {
-				window.console.log( 'Property Import auto-enable failed.' );
-			}
-		} );
+		} ).fail( function() {} );
 	}
 
 	function activateLicense() {
