@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>12 · Lettings Practical — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root { --ph-brand: #0369a1; --ph-brand-dark: #0c4a6e; --ph-accent: #0d9488; }
+  body { background: #f0f9ff; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 16px 16px 100px; }
+  .alert {
+    background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 12px;
+    padding: 12px 16px; font-size: 14px; font-weight: 650; color: #0e7490;
+    margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between;
+  }
+  .layout { display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 16px; }
+  .gallery {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .gallery img:first-child { grid-column: 1 / -1; height: 280px; }
+  .gallery img { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; }
+  .panel {
+    background: #fff; border-radius: 16px; border: 1px solid #dbeafe;
+    padding: 20px; margin-bottom: 12px;
+  }
+  h1 { margin: 0 0 6px; font-size: 1.45rem; letter-spacing: -0.02em; }
+  .rent-hero .value { font-size: 2rem; color: var(--ph-brand-dark); }
+  .rent-hero .qualifier { font-size: 14px; }
+  .cost-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0;
+  }
+  .cost-grid .cell {
+    background: #f0f9ff; border-radius: 12px; padding: 12px 14px;
+  }
+  .cost-grid .l { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ph-muted); font-weight: 700; }
+  .cost-grid .v { font-weight: 750; font-size: 1.05rem; margin-top: 2px; }
+  .checklist { margin: 0; padding: 0; list-style: none; }
+  .checklist li {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-size: 14px;
+  }
+  .checklist li:last-child { border-bottom: 0; }
+  .checklist .k { color: var(--ph-muted); }
+  .checklist .v { font-weight: 700; text-align: right; }
+  .ok { color: #047857; }
+  .actions { display: grid; gap: 8px; }
+  .btn-primary { background: var(--ph-brand); }
+  .btn-primary:hover { background: var(--ph-brand-dark); }
+  .main-col .panel h2 { margin: 0 0 12px; font-size: 1.05rem; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>12 · Lettings Practical</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="11-photo-wall.html">← 11</a>
+    <a href="13-new-homes-release.html">13 →</a>
+  </nav>
+</div>
+<main class="page">
+  <div class="alert">
+    <span>To let · Available from demo date · Unfurnished example</span>
+    <span>Sales data shown for layout only — rent fields highlighted</span>
+  </div>
+  <div class="layout">
+    <div class="main-col">
+      <div class="gallery">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-1024x683.png" alt="" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="" />
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h2>Property</h2>
+        <h1>91 Waterman Court, Wokingham</h1>
+        <p style="margin:0 0 12px;color:var(--ph-muted);font-size:14px">RG41 3FL · Bungalow · 3 bed · 3 bath · 2 reception</p>
+        <ul class="feature-list">
+          <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+          <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+        </ul>
+        <h2 style="margin-top:20px">Description</h2>
+        <p style="color:var(--ph-ink-soft);font-size:14.5px;margin:0">Excepteur sint occaecat cupidatat non proident. Lettings template prioritises rent, deposit, availability, furnishing and fees over sales narrative.</p>
+      </div>
+      <div class="panel">
+        <h2>Location</h2>
+        <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham, RG41 3FL</span></div>
+      </div>
+    </div>
+    <aside>
+      <div class="panel rent-hero">
+        <div class="kicker" style="color:var(--ph-accent)">To let</div>
+        <div class="price-block">
+          <span class="qualifier">Guide rent (demo layout)</span>
+          <span class="value">£2,950 <small style="font-size:1rem;font-weight:600">pcm</small></span>
+        </div>
+        <div class="cost-grid">
+          <div class="cell"><div class="l">Deposit</div><div class="v">5 weeks</div></div>
+          <div class="cell"><div class="l">Available</div><div class="v">Soon</div></div>
+          <div class="cell"><div class="l">Furnishing</div><div class="v">Unfurnished</div></div>
+          <div class="cell"><div class="l">Council tax</div><div class="v">Band D*</div></div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary btn-block">Book rental viewing</button>
+          <button type="button" class="btn btn-secondary btn-block">Check availability</button>
+          <button type="button" class="btn btn-ghost btn-block">♡ Shortlist</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2 style="margin:0 0 8px;font-size:1rem">Tenant checklist</h2>
+        <ul class="checklist">
+          <li><span class="k">Pets</span><span class="v">Ask agent</span></li>
+          <li><span class="k">Smoking</span><span class="v">No</span></li>
+          <li><span class="k">Students</span><span class="v">Ask agent</span></li>
+          <li><span class="k">DSS / benefits</span><span class="v">Ask agent</span></li>
+          <li><span class="k">EPC</span><span class="v ok">Available</span></li>
+          <li><span class="k">Inventory</span><span class="v">On tenancy</span></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="agent-row">
+          <div class="avatar">AD</div>
+          <div class="agent-meta"><div class="name">Admin</div><div class="role">Lettings · Property Hive</div></div>
+        </div>
+        <p style="font-size:13px;color:var(--ph-muted);margin:12px 0 0">Call or email to arrange a rental viewing. Fees &amp; holding deposit explained before you apply.</p>
+      </div>
+      <div class="panel">
+        <div class="doc-links">
+          <a href="#">Brochure</a><a href="#">EPC</a><a href="#">Floorplan</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+<div class="mobile-cta"><button type="button" class="btn btn-ghost btn-call">♡</button><button type="button" class="btn btn-secondary">Call</button><button type="button" class="btn btn-primary">Book viewing</button></div>
+</body>
+</html>

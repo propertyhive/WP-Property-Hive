@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>02 · Luxury Editorial — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  body { background: #faf9f7; }
+  :root {
+    --ph-brand: #1c2b2e;
+    --ph-brand-dark: #0f181a;
+    --ph-accent: #9a7b4f;
+  }
+
+  .hero {
+    position: relative;
+    min-height: min(78vh, 720px);
+    display: grid;
+    place-items: end start;
+    color: #fff;
+    overflow: hidden;
+  }
+  .hero img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15,24,26,.15) 0%, rgba(15,24,26,.55) 70%, rgba(15,24,26,.78) 100%);
+  }
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    padding: 48px 6vw 56px;
+    max-width: 820px;
+  }
+  .hero .kicker { color: #e8d5b5; }
+  .hero h1 {
+    font-family: var(--ph-serif);
+    font-weight: 500;
+    font-size: clamp(2.1rem, 4.5vw, 3.4rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin: 12px 0 18px;
+  }
+  .hero .price-block .qualifier { color: rgba(255,255,255,.72); }
+  .hero .price-block .value { font-family: var(--ph-serif); font-weight: 500; font-size: clamp(1.5rem, 2.5vw, 2rem); }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: rgba(255,255,255,.88);
+  }
+  .hero-meta strong { font-weight: 650; color: #fff; }
+
+  .rail {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px 100px;
+  }
+  .lede {
+    font-family: var(--ph-serif);
+    font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+    line-height: 1.45;
+    color: var(--ph-ink);
+    margin: 0 0 36px;
+    max-width: 38ch;
+  }
+  .facts-inline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--ph-line);
+    border: 1px solid var(--ph-line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+  .facts-inline li {
+    background: #fff;
+    padding: 18px 14px;
+    list-style: none;
+  }
+  .facts-inline .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ph-muted);
+    margin-bottom: 6px;
+  }
+  .facts-inline .val { font-family: var(--ph-serif); font-size: 1.2rem; }
+
+  .story {
+    display: grid;
+    gap: 48px;
+  }
+  .story h2 {
+    font-family: var(--ph-serif);
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0 0 14px;
+  }
+  .story p { color: var(--ph-ink-soft); font-size: 15.5px; max-width: 62ch; }
+  .feature-list li::before { background: var(--ph-accent); }
+
+  .photo-essay {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 12px;
+    margin: 12px 0 8px;
+  }
+  .photo-essay img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+  .photo-essay img:first-child { height: 100%; min-height: 420px; grid-row: 1 / span 2; }
+  .photo-essay .stack { display: grid; gap: 12px; }
+
+  .quiet-cta {
+    margin-top: 56px;
+    padding: 36px 32px;
+    background: #fff;
+    border: 1px solid var(--ph-line);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  .quiet-cta h3 {
+    font-family: var(--ph-serif);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 0 0 8px;
+  }
+  .quiet-cta p { margin: 0; color: var(--ph-muted); font-size: 14px; }
+  .quiet-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+  .btn-primary { background: var(--ph-brand); border-radius: 2px; }
+  .btn-secondary { border-radius: 2px; border-color: var(--ph-brand); color: var(--ph-brand); }
+
+  .footer-docs {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--ph-line);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+  }
+  .agent-row .avatar { border-radius: 2px; background: var(--ph-brand); }
+
+  .map-block { border-radius: 2px; min-height: 280px; margin-top: 16px; }
+  .similar-grid { margin-top: 16px; }
+  .similar-card { border-radius: 2px; box-shadow: none; }
+
+  @media (max-width: 800px) {
+    .facts-inline { grid-template-columns: repeat(2, 1fr); }
+    .photo-essay { grid-template-columns: 1fr; }
+    .photo-essay img:first-child { min-height: 240px; height: 240px; grid-row: auto; }
+    .quiet-cta { grid-template-columns: 1fr; }
+    .quiet-actions { justify-content: stretch; }
+    .quiet-actions .btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>02 · Luxury Editorial</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="01-portal-split.html">← Prev</a>
+    <a href="03-conversion-stack.html">Next →</a>
+  </nav>
+</div>
+
+<header class="hero">
+  <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="Property exterior" />
+  <div class="hero-inner">
+    <div class="kicker">Featured home</div>
+    <h1>91 Waterman Court,<br />Wokingham</h1>
+    <div class="price-block">
+      <span class="qualifier">Offers over</span>
+      <span class="value">£1,340,000</span>
+    </div>
+    <div class="hero-meta">
+      <span><strong>3</strong> bedrooms</span>
+      <span><strong>3</strong> bathrooms</span>
+      <span><strong>2</strong> receptions</span>
+      <span><strong>Freehold</strong> bungalow</span>
+    </div>
+  </div>
+</header>
+
+<main class="rail">
+  <p class="lede">A considered family bungalow in Wokingham — light-filled living, a private terrace, and the calm of RG41.</p>
+
+  <ul class="facts-inline">
+    <li><span class="label">Type</span><span class="val">Bungalow</span></li>
+    <li><span class="label">Beds</span><span class="val">3</span></li>
+    <li><span class="label">Baths</span><span class="val">3</span></li>
+    <li><span class="label">Receptions</span><span class="val">2</span></li>
+    <li><span class="label">Tenure</span><span class="val">Freehold</span></li>
+  </ul>
+
+  <div class="story">
+    <section>
+      <h2>The home</h2>
+      <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+      <div class="photo-essay">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="Reception" />
+        <div class="stack">
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="Kitchen" />
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-1024x683.png" alt="Bedroom" />
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Highlights</h2>
+      <ul class="feature-list">
+        <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+        <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Full particulars</h2>
+      <p>Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui.</p>
+      <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra. Etiam a tortor quis justo posuere placerat.</p>
+    </section>
+
+    <section>
+      <h2>Setting</h2>
+      <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham, RG41 3FL</span></div>
+    </section>
+  </div>
+
+  <div class="quiet-cta">
+    <div>
+      <h3>Register your interest</h3>
+      <p>Ask for the brochure, floorplan or a private viewing.</p>
+      <div class="agent-row" style="margin-top:16px">
+        <div class="avatar">AD</div>
+        <div class="agent-meta">
+          <div class="name">Admin</div>
+          <div class="role">Property Hive · Private client</div>
+        </div>
+      </div>
+    </div>
+    <div class="quiet-actions">
+      <button type="button" class="btn btn-secondary">Download brochure</button>
+      <button type="button" class="btn btn-primary">Request viewing</button>
+    </div>
+  </div>
+
+  <div class="footer-docs">
+    <div class="doc-links">
+      <a href="#">Brochure</a>
+      <a href="#">EPC</a>
+      <a href="#">Floorplan</a>
+      <a href="#">Virtual tour</a>
+    </div>
+    <button type="button" class="btn btn-ghost">♡ Save home</button>
+  </div>
+
+  <section style="margin-top:56px">
+    <h2 class="section-title" style="font-family:var(--ph-serif);font-weight:500;font-size:1.5rem">You may also like</h2>
+    <div class="similar-grid">
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-300x200.png" alt="" />
+        <div class="body"><div class="p">£875,000</div><div class="t">Nearby home, Wokingham</div><div class="f">3 bed · 2 bath</div></div>
+      </article>
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" />
+        <div class="body"><div class="p">£1,100,000</div><div class="t">Similar bungalow, RG41</div><div class="f">3 bed · 2 bath</div></div>
+      </article>
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" />
+        <div class="body"><div class="p">£995,000</div><div class="t">Family home, Wokingham</div><div class="f">4 bed · 2 bath</div></div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<div class="mobile-cta">
+  <button type="button" class="btn btn-ghost btn-call">♡</button>
+  <button type="button" class="btn btn-secondary">Brochure</button>
+  <button type="button" class="btn btn-primary">Request viewing</button>
+</div>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>01 · Portal Split — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .page { max-width: var(--ph-max); margin: 0 auto; padding: 20px 20px 80px; }
+  .mosaic {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    height: min(52vh, 480px);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .mosaic .hero {
+    grid-row: 1 / -1;
+    position: relative;
+  }
+  .mosaic img { width: 100%; height: 100%; object-fit: cover; }
+  .mosaic .side { position: relative; overflow: hidden; }
+  .mosaic .count {
+    position: absolute;
+    right: 14px; bottom: 14px;
+    background: rgba(20,24,26,.82);
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 650;
+  }
+  .media-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 28px;
+    flex-wrap: wrap;
+  }
+  .media-tabs button {
+    background: var(--ph-surface);
+    color: var(--ph-ink-soft);
+    font-size: 13px;
+    font-weight: 650;
+    padding: 8px 14px;
+  }
+  .media-tabs button.is-active { background: var(--ph-ink); color: #fff; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 40px;
+    align-items: start;
+  }
+  .title-row h1 {
+    margin: 8px 0 10px;
+    font-size: clamp(1.55rem, 2.4vw, 2rem);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .addr { color: var(--ph-muted); font-size: 15px; margin-bottom: 18px; }
+  .facts-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border: 1px solid var(--ph-line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 20px 0 28px;
+  }
+  .facts-bar li {
+    flex: 1 1 90px;
+    padding: 14px 16px;
+    border-right: 1px solid var(--ph-line);
+    min-width: 90px;
+  }
+  .facts-bar li:last-child { border-right: 0; }
+  .content-block { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--ph-line); }
+  .content-block:last-of-type { border-bottom: 0; }
+  .content-block p { color: var(--ph-ink-soft); font-size: 15px; margin: 0 0 12px; }
+
+  .sticky-card {
+    position: sticky;
+    top: 64px;
+    border: 1px solid var(--ph-line);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: var(--ph-shadow);
+    background: #fff;
+  }
+  .sticky-card .price-block { margin-bottom: 16px; }
+  .sticky-card .actions { display: grid; gap: 10px; margin: 18px 0; }
+  .sticky-card .hint { font-size: 13px; color: var(--ph-muted); margin: 0 0 16px; }
+  .sticky-card .divider { height: 1px; background: var(--ph-line); margin: 18px 0; }
+  .trust { font-size: 12.5px; color: var(--ph-muted); margin-top: 14px; line-height: 1.45; }
+
+  .utility {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .utility button {
+    background: var(--ph-surface);
+    color: var(--ph-ink);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 12px;
+  }
+  .head-tools {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sticky-card { position: static; order: -1; }
+    .mosaic { grid-template-columns: 1fr 1fr; height: 280px; }
+    .mosaic .hero { grid-row: auto; grid-column: 1 / -1; height: 180px; }
+  }
+  @media (max-width: 560px) {
+    .mosaic { grid-template-columns: 1fr; height: auto; }
+    .mosaic .side { height: 120px; }
+    .mosaic .hero { height: 220px; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>01 · Portal Split</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="15-agent-spotlight.html">← Prev</a>
+    <a href="02-luxury-editorial.html">Next →</a>
+  </nav>
+</div>
+
+<main class="page">
+  <div class="mosaic" aria-label="Property gallery">
+    <div class="hero">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="Reception room" />
+      <span class="count">5 photos</span>
+    </div>
+    <div class="side"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="Kitchen" /></div>
+    <div class="side"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="Garden" /></div>
+  </div>
+  <div class="media-tabs" role="tablist">
+    <button type="button" class="is-active">Photos</button>
+    <button type="button">Floorplan</button>
+    <button type="button">Virtual tour</button>
+    <button type="button">Map</button>
+  </div>
+
+  <div class="layout">
+    <div class="main-col">
+      <div class="head-tools">
+        <div>
+          <div class="kicker"><span class="badge">For sale</span> · Freehold</div>
+          <h1>91 Waterman Court, Wokingham</h1>
+          <p class="addr">RG41 3FL · Residential sales</p>
+        </div>
+        <div class="utility">
+          <button type="button">♡ Save</button>
+          <button type="button">Share</button>
+        </div>
+      </div>
+
+      <ul class="facts-bar facts">
+        <li><span class="label">Type</span><span class="val">Bungalow</span></li>
+        <li><span class="label">Beds</span><span class="val">3</span></li>
+        <li><span class="label">Baths</span><span class="val">3</span></li>
+        <li><span class="label">Receptions</span><span class="val">2</span></li>
+        <li><span class="label">Parking</span><span class="val">On road</span></li>
+      </ul>
+
+      <section class="content-block" id="features">
+        <h2 class="section-title">Key features</h2>
+        <ul class="feature-list">
+          <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+          <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+        </ul>
+      </section>
+
+      <section class="content-block" id="overview">
+        <h2 class="section-title">Overview</h2>
+        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </section>
+
+      <section class="content-block" id="details">
+        <h2 class="section-title">Full details</h2>
+        <p><strong>Full Description</strong> — Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi.</p>
+        <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra. Etiam a tortor quis justo posuere placerat.</p>
+      </section>
+
+      <section class="content-block" id="docs">
+        <h2 class="section-title">Documents &amp; media</h2>
+        <div class="doc-links">
+          <a href="#">📄 Brochure</a>
+          <a href="#">⚡ EPC</a>
+          <a href="#">🗺 Floorplan</a>
+          <a href="#">▶ Virtual tour</a>
+        </div>
+      </section>
+
+      <section class="content-block" id="location">
+        <h2 class="section-title">Location</h2>
+        <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham, RG41 3FL</span></div>
+      </section>
+
+      <section id="similar">
+        <h2 class="section-title">Similar properties</h2>
+        <div class="similar-grid">
+          <article class="similar-card">
+            <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" />
+            <div class="body"><div class="p">£875,000</div><div class="t">Nearby home, Wokingham</div><div class="f">3 bed · 2 bath</div></div>
+          </article>
+          <article class="similar-card">
+            <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" />
+            <div class="body"><div class="p">£1,100,000</div><div class="t">Similar bungalow, RG41</div><div class="f">3 bed · 2 bath</div></div>
+          </article>
+          <article class="similar-card">
+            <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" />
+            <div class="body"><div class="p">£995,000</div><div class="t">Family home, Wokingham</div><div class="f">4 bed · 2 bath</div></div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <aside class="sticky-card" aria-label="Enquire">
+      <div class="price-block">
+        <span class="qualifier">Offers over</span>
+        <span class="value">£1,340,000</span>
+      </div>
+      <p class="hint">Call or request a viewing with the agent.</p>
+      <div class="actions">
+        <button type="button" class="btn btn-primary btn-block">Request viewing</button>
+        <button type="button" class="btn btn-secondary btn-block">Email agent</button>
+        <button type="button" class="btn btn-ghost btn-block">Call branch</button>
+      </div>
+      <div class="divider"></div>
+      <p style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ph-muted);margin:0 0 10px">Marketed by</p>
+      <div class="agent-row">
+        <div class="avatar">AD</div>
+        <div class="agent-meta">
+          <div class="name">Admin</div>
+          <div class="role">Property Hive</div>
+        </div>
+      </div>
+      <p class="trust">No obligation enquiry · We aim to respond the same working day.</p>
+    </aside>
+  </div>
+</main>
+
+<div class="mobile-cta" aria-label="Mobile actions">
+  <button type="button" class="btn btn-ghost btn-call">♡</button>
+  <button type="button" class="btn btn-secondary">Call</button>
+  <button type="button" class="btn btn-primary">Request viewing</button>
+</div>
+</body>
+</html>

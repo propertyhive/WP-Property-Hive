@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>07 · Private Client — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root { --ph-brand: #1a1a1a; --ph-accent: #c5a572; }
+  body { background: #0c0c0c; color: #f5f0e8; }
+  .proto-bar { background: rgba(0,0,0,.9); }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 24px 120px; text-align: center; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+    color: var(--ph-accent); font-weight: 600; margin-bottom: 28px;
+  }
+  h1 {
+    font-family: var(--ph-serif); font-weight: 400;
+    font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.15;
+    margin: 0 0 12px; letter-spacing: -0.02em;
+  }
+  .sub { color: rgba(245,240,232,.55); font-size: 14px; letter-spacing: .04em; margin-bottom: 36px; }
+  .price {
+    font-family: var(--ph-serif); font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    color: var(--ph-accent); margin-bottom: 40px;
+  }
+  .price small { display: block; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: rgba(245,240,232,.4); margin-bottom: 8px; font-family: var(--ph-font); }
+  .hero-frame {
+    position: relative; margin: 0 auto 48px; max-width: 780px;
+  }
+  .hero-frame img {
+    width: 100%; aspect-ratio: 16/10; object-fit: cover;
+    border: 1px solid rgba(197,165,114,.25);
+  }
+  .hero-frame::before, .hero-frame::after {
+    content: ""; position: absolute; width: 40px; height: 40px;
+    border: 1px solid rgba(197,165,114,.45);
+  }
+  .hero-frame::before { top: -10px; left: -10px; border-right: 0; border-bottom: 0; }
+  .hero-frame::after { bottom: -10px; right: -10px; border-left: 0; border-top: 0; }
+  .specs {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 28px;
+    margin: 0 0 40px; padding: 0; list-style: none;
+    font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: rgba(245,240,232,.65);
+  }
+  .specs strong { color: #fff; font-weight: 600; }
+  .copy {
+    max-width: 48ch; margin: 0 auto 40px;
+    font-family: var(--ph-serif); font-size: 1.15rem; line-height: 1.6;
+    color: rgba(245,240,232,.78); font-weight: 400;
+  }
+  .features {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 20px;
+    margin: 0 auto 48px; max-width: 560px; padding: 0; list-style: none;
+    font-size: 13px; color: rgba(245,240,232,.55);
+  }
+  .features li::before { content: "· "; color: var(--ph-accent); }
+  .appoint {
+    border-top: 1px solid rgba(197,165,114,.2);
+    border-bottom: 1px solid rgba(197,165,114,.2);
+    padding: 36px 16px; margin-bottom: 48px;
+  }
+  .appoint h2 {
+    font-family: var(--ph-serif); font-weight: 400; font-size: 1.5rem; margin: 0 0 10px;
+  }
+  .appoint p { color: rgba(245,240,232,.5); font-size: 14px; margin: 0 0 22px; }
+  .appoint .btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .btn-primary {
+    background: transparent; color: var(--ph-accent);
+    border: 1px solid var(--ph-accent); border-radius: 0; padding: 14px 28px;
+    letter-spacing: .12em; text-transform: uppercase; font-size: 12px; font-weight: 600;
+  }
+  .btn-primary:hover { background: var(--ph-accent); color: #0c0c0c; }
+  .btn-secondary {
+    border-radius: 0; border-color: rgba(255,255,255,.2); color: rgba(255,255,232,.7);
+    letter-spacing: .1em; text-transform: uppercase; font-size: 12px; padding: 14px 22px;
+  }
+  .agent { font-size: 13px; color: rgba(245,240,232,.45); }
+  .agent strong { color: rgba(245,240,232,.85); font-weight: 500; }
+  .gallery {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 48px 0;
+  }
+  .gallery img { width: 100%; height: 220px; object-fit: cover; opacity: .9; }
+  .docs a {
+    background: transparent; border: 1px solid rgba(255,255,255,.12);
+    color: rgba(245,240,232,.6); border-radius: 0;
+  }
+  .mobile-cta { background: rgba(12,12,12,.95); border-top-color: rgba(197,165,114,.2); }
+  .mobile-cta .btn-primary { background: var(--ph-accent); color: #0c0c0c; border: 0; }
+  .mobile-cta .btn-secondary { color: #fff; }
+  .mobile-cta .btn-ghost { background: rgba(255,255,255,.08); color: #fff; }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>07 · Private Client</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="06-neighbourhood-first.html">← 06</a>
+    <a href="08-soft-scandi.html">08 →</a>
+  </nav>
+</div>
+<main class="wrap">
+  <div class="eyebrow">By appointment · Private client</div>
+  <h1>91 Waterman Court</h1>
+  <p class="sub">Wokingham · Berkshire · RG41 3FL</p>
+  <div class="price"><small>Offers in excess of</small>£1,340,000</div>
+  <div class="hero-frame">
+    <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="" />
+  </div>
+  <ul class="specs">
+    <li><strong>3</strong> bedrooms</li>
+    <li><strong>3</strong> bathrooms</li>
+    <li><strong>2</strong> receptions</li>
+    <li><strong>Freehold</strong></li>
+  </ul>
+  <p class="copy">A discreet family bungalow for buyers who value calm, proportion, and privacy — presented by invitation rather than noise.</p>
+  <ul class="features">
+    <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+    <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+  </ul>
+  <div class="gallery">
+    <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="" />
+    <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="" />
+    <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-1024x683.png" alt="" />
+    <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="" />
+  </div>
+  <div class="appoint">
+    <h2>Arrange a private viewing</h2>
+    <p>Brochure, floorplan and timing arranged personally with your agent.</p>
+    <div class="btns">
+      <button type="button" class="btn btn-primary">Request appointment</button>
+      <button type="button" class="btn btn-secondary">Request brochure</button>
+    </div>
+  </div>
+  <p class="agent">Your contact · <strong>Admin</strong> · Property Hive</p>
+  <div class="doc-links docs" style="justify-content:center;margin-top:28px">
+    <a href="#">Brochure</a><a href="#">EPC</a><a href="#">Floorplan</a>
+  </div>
+</main>
+<div class="mobile-cta"><button type="button" class="btn btn-ghost btn-call">♡</button><button type="button" class="btn btn-secondary">Brochure</button><button type="button" class="btn btn-primary">Appointment</button></div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>15 · Agent Spotlight — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root { --ph-brand: #1d4e4f; --ph-brand-dark: #123536; --ph-accent: #d4a017; }
+  body { background: #f7f5f0; }
+  .band {
+    background: linear-gradient(120deg, #1d4e4f 0%, #2a6a6c 50%, #1d4e4f 100%);
+    color: #fff; padding: 36px 20px 80px;
+  }
+  .band-inner { max-width: 1000px; margin: 0 auto; }
+  .band .eyebrow {
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: #e8c96a; font-weight: 700; margin-bottom: 20px;
+  }
+  .agent-hero {
+    display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center;
+  }
+  .portrait {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: linear-gradient(145deg, #e8c96a, #a67c00);
+    color: #1d4e4f; display: grid; place-items: center;
+    font-size: 1.8rem; font-weight: 800;
+    box-shadow: 0 0 0 4px rgba(255,255,255,.2);
+  }
+  .agent-hero h1 { margin: 0 0 6px; font-size: 1.6rem; letter-spacing: -0.02em; }
+  .agent-hero p { margin: 0; opacity: .8; font-size: 14.5px; max-width: 42ch; }
+  .trust-row {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px;
+  }
+  .trust-row span {
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 650;
+  }
+  .page { max-width: 1000px; margin: -48px auto 0; padding: 0 16px 100px; position: relative; }
+  .property-card {
+    background: #fff; border-radius: 20px; overflow: hidden;
+    box-shadow: var(--ph-shadow); border: 1px solid #e8e4da;
+  }
+  .property-card .media {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 6px; padding: 6px;
+  }
+  .property-card .media img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+  .property-card .media .main { height: 280px; }
+  .property-card .media .side { display: grid; gap: 6px; }
+  .property-card .media .side img { height: 137px; }
+  .body { padding: 24px 24px 28px; display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 28px; }
+  .body h2 { margin: 0 0 8px; font-size: 1.45rem; letter-spacing: -0.02em; }
+  .body .addr { color: var(--ph-muted); font-size: 14px; margin-bottom: 14px; }
+  .price-block .value { color: var(--ph-brand-dark); }
+  .quote {
+    background: #f7f5f0; border-left: 3px solid var(--ph-accent);
+    padding: 14px 16px; margin: 18px 0; font-size: 14.5px; color: var(--ph-ink-soft);
+    font-style: italic;
+  }
+  .side-box {
+    background: #f0f7f7; border-radius: 16px; padding: 18px;
+  }
+  .side-box h3 { margin: 0 0 10px; font-size: 0.95rem; }
+  .side-box .actions { display: grid; gap: 8px; margin-top: 14px; }
+  .btn-primary { background: var(--ph-brand); }
+  .btn-primary:hover { background: var(--ph-brand-dark); }
+  .why {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px;
+  }
+  .why div {
+    background: #fff; border-radius: 14px; padding: 16px; border: 1px solid #e8e4da;
+    font-size: 13.5px;
+  }
+  .why strong { display: block; margin-bottom: 4px; font-size: 14px; }
+  .why span { color: var(--ph-muted); }
+  @media (max-width: 800px) {
+    .agent-hero { grid-template-columns: 1fr; }
+    .property-card .media, .body, .why { grid-template-columns: 1fr; }
+    .property-card .media .main { height: 200px; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>15 · Agent Spotlight</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="14-minimal-swiss.html">← 14</a>
+    <a href="01-portal-split.html">01 →</a>
+  </nav>
+</div>
+<section class="band">
+  <div class="band-inner">
+    <div class="eyebrow">Your local expert · Relationship first</div>
+    <div class="agent-hero">
+      <div class="portrait">AD</div>
+      <div>
+        <h1>Admin is marketing this home</h1>
+        <p>Trust and human contact lead — the property is the product, but the agent is the path. Ideal for boutique and high-touch agencies.</p>
+        <div class="trust-row">
+          <span>Property Hive</span>
+          <span>Branch available</span>
+          <span>Same-day response</span>
+          <span>Local to RG41</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<main class="page">
+  <article class="property-card">
+    <div class="media">
+      <img class="main" src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="" />
+      <div class="side">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="" />
+      </div>
+    </div>
+    <div class="body">
+      <div>
+        <div class="kicker"><span class="badge">For sale</span></div>
+        <h2>91 Waterman Court, Wokingham</h2>
+        <div class="addr">RG41 3FL · Bungalow · Freehold</div>
+        <div class="price-block">
+          <span class="qualifier">Offers over</span>
+          <span class="value">£1,340,000</span>
+        </div>
+        <ul class="facts" style="margin:16px 0">
+          <li><span class="label">Beds</span><span class="val">3</span></li>
+          <li><span class="label">Baths</span><span class="val">3</span></li>
+          <li><span class="label">Recs</span><span class="val">2</span></li>
+          <li><span class="label">Parking</span><span class="val">On road</span></li>
+        </ul>
+        <div class="quote">“I’ll walk you through the home and the area — ask me anything before you book.” — Admin</div>
+        <ul class="feature-list">
+          <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+          <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+        </ul>
+        <p style="color:var(--ph-ink-soft);font-size:14.5px;margin:16px 0 0">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <div class="doc-links" style="margin-top:16px">
+          <a href="#">Brochure</a><a href="#">EPC</a><a href="#">Floorplan</a><a href="#">Tour</a>
+        </div>
+      </div>
+      <aside class="side-box">
+        <h3>Talk to Admin</h3>
+        <p style="margin:0;font-size:13.5px;color:var(--ph-muted)">Direct line to the negotiator marketing this property — not a generic inbox wall.</p>
+        <div class="actions">
+          <button type="button" class="btn btn-primary btn-block">Request viewing</button>
+          <button type="button" class="btn btn-secondary btn-block">Email Admin</button>
+          <button type="button" class="btn btn-ghost btn-block">Call branch</button>
+          <button type="button" class="btn btn-ghost btn-block">♡ Shortlist home</button>
+        </div>
+      </aside>
+    </div>
+  </article>
+
+  <div class="why">
+    <div><strong>Why this layout</strong><span>High-trust boutiques win on people, not portals.</span></div>
+    <div><strong>PH fit</strong><span>Negotiator photo, name, phone, office, enquiry.</span></div>
+    <div><strong>Still complete</strong><span>Gallery, facts, docs, map, shortlist, mobile CTA.</span></div>
+  </div>
+
+  <div class="map-block" style="margin-top:20px"><span class="map-label">91 Waterman Court, Wokingham, RG41 3FL</span></div>
+
+  <h2 class="section-title" style="margin-top:32px">More from this agent</h2>
+  <div class="similar-grid">
+    <article class="similar-card"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" /><div class="body" style="padding:12px"><div class="p">£875,000</div><div class="t">Also with Admin</div></div></article>
+    <article class="similar-card"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" /><div class="body" style="padding:12px"><div class="p">£1,100,000</div><div class="t">Also with Admin</div></div></article>
+    <article class="similar-card"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" /><div class="body" style="padding:12px"><div class="p">£995,000</div><div class="t">Also with Admin</div></div></article>
+  </div>
+</main>
+<div class="mobile-cta"><button type="button" class="btn btn-ghost btn-call">♡</button><button type="button" class="btn btn-secondary">Call</button><button type="button" class="btn btn-primary">Request viewing</button></div>
+</body>
+</html>

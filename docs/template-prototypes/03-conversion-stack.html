@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>03 · Conversion Stack — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root { --ph-brand: #0f6b5c; --ph-brand-dark: #0a4d42; --ph-accent: #d97706; }
+
+  .top-cta {
+    position: sticky;
+    top: 42px;
+    z-index: 50;
+    background: #fff;
+    border-bottom: 1px solid var(--ph-line);
+    box-shadow: 0 4px 16px rgba(0,0,0,.04);
+  }
+  .top-cta-inner {
+    max-width: var(--ph-max);
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .top-cta .price-block { flex: 1 1 auto; min-width: 160px; }
+  .top-cta .price-block .value { font-size: 1.35rem; }
+  .top-cta .loc { font-size: 13px; color: var(--ph-muted); margin-top: 2px; }
+  .top-cta .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .top-cta .btn { border-radius: 10px; padding: 11px 16px; font-size: 14px; }
+
+  .page { max-width: var(--ph-max); margin: 0 auto; padding: 24px 20px 100px; }
+
+  .status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .badge-hot {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+    letter-spacing: -0.02em;
+  }
+
+  .quick-facts {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin: 20px 0 24px;
+  }
+  .quick-facts li {
+    list-style: none;
+    background: var(--ph-surface);
+    border-radius: 12px;
+    padding: 12px 12px 14px;
+    text-align: center;
+  }
+  .quick-facts .val { display: block; font-size: 1.2rem; font-weight: 750; color: var(--ph-brand-dark); }
+  .quick-facts .label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ph-muted); font-weight: 650; }
+
+  .cta-panel {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .cta-main {
+    background: linear-gradient(135deg, #0f6b5c, #0a4d42);
+    color: #fff;
+    border-radius: 16px;
+    padding: 22px 24px;
+  }
+  .cta-main h2 { margin: 0 0 6px; font-size: 1.25rem; }
+  .cta-main p { margin: 0 0 16px; opacity: .88; font-size: 14px; }
+  .cta-main .row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cta-main .btn-primary { background: #fff; color: var(--ph-brand-dark); }
+  .cta-main .btn-secondary { border-color: rgba(255,255,255,.55); color: #fff; }
+  .cta-side {
+    border: 1px solid var(--ph-line);
+    border-radius: 16px;
+    padding: 18px 20px;
+    background: #fff;
+  }
+  .cta-side .agent-row { margin-bottom: 12px; }
+  .cta-side .hint { font-size: 13px; color: var(--ph-muted); margin: 0 0 12px; }
+  .phone-lg {
+    font-size: 1.15rem;
+    font-weight: 750;
+    color: var(--ph-brand);
+    text-decoration: none;
+  }
+
+  .gallery-strip {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .gallery-strip img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+  .gallery-strip img:first-child { height: 100%; min-height: 220px; grid-row: 1 / span 2; }
+  .gallery-strip .stack { display: grid; gap: 8px; }
+  .gallery-strip .stack img { height: 106px; }
+  .media-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .media-actions button {
+    background: #fff;
+    border: 1px solid var(--ph-line);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 650;
+    padding: 8px 14px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 28px;
+    margin-bottom: 36px;
+  }
+  .card {
+    border: 1px solid var(--ph-line);
+    border-radius: 16px;
+    padding: 20px;
+    background: #fff;
+  }
+  .card p { color: var(--ph-ink-soft); font-size: 14.5px; margin: 0 0 10px; }
+  .checklist { margin: 0; padding: 0; list-style: none; }
+  .checklist li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--ph-line);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+  }
+  .checklist li:last-child { border-bottom: 0; }
+  .checklist .k { color: var(--ph-muted); }
+  .checklist .v { font-weight: 700; text-align: right; }
+
+  @media (max-width: 900px) {
+    .quick-facts { grid-template-columns: repeat(3, 1fr); }
+    .cta-panel, .two-col { grid-template-columns: 1fr; }
+    .gallery-strip { grid-template-columns: 1fr 1fr; }
+    .gallery-strip img:first-child { grid-row: auto; grid-column: 1 / -1; height: 200px; min-height: 0; }
+  }
+  @media (max-width: 560px) {
+    .top-cta { top: auto; position: relative; }
+    .quick-facts { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>03 · Conversion Stack</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="02-luxury-editorial.html">← Prev</a>
+    <a href="04-immersive-cinema.html">Next →</a>
+  </nav>
+</div>
+
+<div class="top-cta">
+  <div class="top-cta-inner">
+    <div class="price-block">
+      <span class="qualifier">Offers over</span>
+      <span class="value">£1,340,000</span>
+      <div class="loc">91 Waterman Court, Wokingham · RG41 3FL</div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost">♡ Save</button>
+      <button type="button" class="btn btn-secondary">Call</button>
+      <button type="button" class="btn btn-primary">Request viewing</button>
+    </div>
+  </div>
+</div>
+
+<main class="page">
+  <div class="status-row">
+    <span class="badge">For sale</span>
+    <span class="badge badge-hot">Viewing available</span>
+    <span class="badge">On market</span>
+  </div>
+  <h1>91 Waterman Court, Wokingham</h1>
+  <p style="margin:0;color:var(--ph-muted);font-size:15px">Bungalow · Freehold · Residential sales</p>
+
+  <ul class="quick-facts">
+    <li><span class="val">3</span><span class="label">Beds</span></li>
+    <li><span class="val">3</span><span class="label">Baths</span></li>
+    <li><span class="val">2</span><span class="label">Recs</span></li>
+    <li><span class="val">Bung.</span><span class="label">Type</span></li>
+    <li><span class="val">FH</span><span class="label">Tenure</span></li>
+    <li><span class="val">5</span><span class="label">Photos</span></li>
+  </ul>
+
+  <div class="cta-panel">
+    <div class="cta-main">
+      <h2>Book the next viewing</h2>
+      <p>Primary actions stay next to price and key facts so interested buyers can move quickly.</p>
+      <div class="row">
+        <button type="button" class="btn btn-primary">Request viewing</button>
+        <button type="button" class="btn btn-secondary">Email agent</button>
+      </div>
+    </div>
+    <div class="cta-side">
+      <div class="agent-row">
+        <div class="avatar">AD</div>
+        <div class="agent-meta">
+          <div class="name">Admin</div>
+          <div class="role">Property Hive</div>
+        </div>
+      </div>
+      <p class="hint">Call now or send a quick viewing request.</p>
+      <a class="phone-lg" href="tel:+440000000000">Call branch</a>
+    </div>
+  </div>
+
+  <div class="gallery-strip" aria-label="Gallery">
+    <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="Reception" />
+    <div class="stack">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="Kitchen" />
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="Garden" />
+    </div>
+    <div class="stack">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-1024x683.png" alt="Bedroom" />
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="Exterior" />
+    </div>
+  </div>
+  <div class="media-actions">
+    <button type="button">All 5 photos</button>
+    <button type="button">Floorplan</button>
+    <button type="button">Virtual tour</button>
+    <button type="button">Map</button>
+    <button type="button">Brochure / EPC</button>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h2 class="section-title">Why this home</h2>
+      <ul class="feature-list">
+        <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+        <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+      </ul>
+      <h2 class="section-title" style="margin-top:24px">Overview</h2>
+      <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      <p>Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra.</p>
+    </div>
+    <div class="card">
+      <h2 class="section-title">At a glance</h2>
+      <ul class="checklist">
+        <li><span class="k">Department</span><span class="v">Residential sales</span></li>
+        <li><span class="k">Availability</span><span class="v">For sale</span></li>
+        <li><span class="k">Tenure</span><span class="v">Freehold</span></li>
+        <li><span class="k">Sale by</span><span class="v">Auction</span></li>
+        <li><span class="k">Parking</span><span class="v">On road</span></li>
+        <li><span class="k">Brochure</span><span class="v">Available</span></li>
+        <li><span class="k">EPC</span><span class="v">Available</span></li>
+        <li><span class="k">Floorplan</span><span class="v">Available</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <section style="margin-bottom:36px">
+    <h2 class="section-title">Location</h2>
+    <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham, RG41 3FL</span></div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Similar properties</h2>
+    <div class="similar-grid">
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" />
+        <div class="body"><div class="p">£875,000</div><div class="t">Nearby home, Wokingham</div><div class="f">3 bed · 2 bath</div></div>
+      </article>
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" />
+        <div class="body"><div class="p">£1,100,000</div><div class="t">Similar bungalow, RG41</div><div class="f">3 bed · 2 bath</div></div>
+      </article>
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" />
+        <div class="body"><div class="p">£995,000</div><div class="t">Family home, Wokingham</div><div class="f">4 bed · 2 bath</div></div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<div class="mobile-cta">
+  <button type="button" class="btn btn-ghost btn-call">♡</button>
+  <button type="button" class="btn btn-secondary">Call</button>
+  <button type="button" class="btn btn-primary">Request viewing</button>
+</div>
+</body>
+</html>

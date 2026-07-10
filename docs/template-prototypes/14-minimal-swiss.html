@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>14 · Minimal Swiss — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root { --ph-brand: #000; --ph-accent: #e10600; }
+  body { background: #fff; color: #000; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 32px 20px 100px; }
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    border-top: 1px solid #000; border-left: 1px solid #000;
+  }
+  .cell {
+    border-right: 1px solid #000; border-bottom: 1px solid #000;
+    padding: 28px 24px; min-height: 120px;
+  }
+  .cell-img { padding: 0; min-height: 280px; }
+  .cell-img img { width: 100%; height: 100%; object-fit: cover; min-height: 280px; }
+  .span2 { grid-column: span 2; }
+  .label {
+    font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    font-weight: 700; margin-bottom: 12px;
+  }
+  .label i { color: var(--ph-accent); font-style: normal; margin-right: 6px; }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700;
+    letter-spacing: -0.04em; line-height: 0.98; margin: 0; text-transform: uppercase;
+  }
+  .price {
+    font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .price small {
+    display: block; font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
+  }
+  .mega-num {
+    font-size: clamp(3rem, 8vw, 5rem); font-weight: 700;
+    letter-spacing: -0.05em; line-height: 1;
+  }
+  .mega-num span {
+    display: block; font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; font-weight: 700; margin-top: 8px;
+  }
+  .stack { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .stack .cell { min-height: 100px; text-align: left; }
+  p.body { margin: 0; font-size: 15px; line-height: 1.55; max-width: 42ch; }
+  ul.clean { margin: 0; padding: 0; list-style: none; }
+  ul.clean li {
+    padding: 8px 0; border-bottom: 1px solid #000; font-size: 14px; font-weight: 500;
+  }
+  ul.clean li:last-child { border-bottom: 0; }
+  .btn {
+    border-radius: 0; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; font-size: 12px; padding: 14px 18px;
+  }
+  .btn-primary { background: #000; color: #fff; }
+  .btn-primary:hover { background: var(--ph-accent); }
+  .btn-secondary { border: 1px solid #000; color: #000; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0; }
+  .actions .btn { flex: 1; min-width: 140px; }
+  .map-block { border-radius: 0; min-height: 200px; }
+  .map-block::before { background: var(--ph-accent); }
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; }
+    .span2 { grid-column: span 1; }
+    .stack { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>14 · Minimal Swiss</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="13-new-homes-release.html">← 13</a>
+    <a href="15-agent-spotlight.html">15 →</a>
+  </nav>
+</div>
+<main class="page">
+  <div class="grid">
+    <div class="cell span2">
+      <div class="label"><i>●</i>For sale · Object 091</div>
+      <h1>91 Waterman<br />Court</h1>
+    </div>
+    <div class="cell">
+      <div class="label"><i>●</i>Price</div>
+      <div class="price"><small>Offers over</small>£1,340,000</div>
+    </div>
+    <div class="cell">
+      <div class="label"><i>●</i>Location</div>
+      <p class="body" style="font-weight:700;font-size:1.2rem;letter-spacing:-0.02em">Wokingham<br />RG41 3FL</p>
+    </div>
+    <div class="cell cell-img span2">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="" />
+    </div>
+  </div>
+
+  <div class="stack grid" style="border-top:0">
+    <div class="cell"><div class="mega-num">3<span>Beds</span></div></div>
+    <div class="cell"><div class="mega-num">3<span>Baths</span></div></div>
+    <div class="cell"><div class="mega-num">2<span>Recs</span></div></div>
+    <div class="cell"><div class="mega-num">FH<span>Tenure</span></div></div>
+  </div>
+
+  <div class="grid" style="border-top:0">
+    <div class="cell cell-img"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="" /></div>
+    <div class="cell cell-img"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="" /></div>
+    <div class="cell">
+      <div class="label"><i>●</i>Type</div>
+      <p class="body" style="font-size:1.4rem;font-weight:700">Bungalow</p>
+      <p class="body" style="margin-top:16px">Parking: on road · Department: residential sales · Availability: for sale</p>
+    </div>
+    <div class="cell">
+      <div class="label"><i>●</i>Features</div>
+      <ul class="clean">
+        <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+        <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+      </ul>
+    </div>
+    <div class="cell span2">
+      <div class="label"><i>●</i>Description</div>
+      <p class="body">Excepteur sint occaecat cupidatat non proident. Extreme hierarchy, hard grid, red accent — premium through restraint, not decoration.</p>
+    </div>
+    <div class="cell">
+      <div class="label"><i>●</i>Media</div>
+      <ul class="clean">
+        <li>Brochure</li><li>EPC</li><li>Floorplan</li><li>Virtual tour</li>
+      </ul>
+    </div>
+    <div class="cell">
+      <div class="label"><i>●</i>Agent</div>
+      <p class="body" style="font-weight:700;font-size:1.15rem">Admin</p>
+      <p class="body" style="margin-top:8px">Property Hive</p>
+    </div>
+    <div class="cell span2">
+      <div class="label"><i>●</i>Action</div>
+      <div class="actions">
+        <button type="button" class="btn btn-primary">Request viewing</button>
+        <button type="button" class="btn btn-secondary">Email</button>
+        <button type="button" class="btn btn-secondary">Save</button>
+      </div>
+    </div>
+    <div class="cell span2" style="padding:0">
+      <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham, RG41 3FL</span></div>
+    </div>
+  </div>
+</main>
+<div class="mobile-cta"><button type="button" class="btn btn-ghost btn-call">♡</button><button type="button" class="btn btn-secondary">Call</button><button type="button" class="btn btn-primary">Request viewing</button></div>
+</body>
+</html>

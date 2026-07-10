@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>10 · Bento Modular — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root { --ph-brand: #0f172a; --ph-accent: #6366f1; }
+  body { background: #e8eaef; }
+  .page { max-width: 1180px; margin: 0 auto; padding: 16px 16px 100px; }
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(80px, auto);
+    gap: 12px;
+  }
+  .tile {
+    background: #fff;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(15,23,42,.05);
+    border: 1px solid rgba(15,23,42,.04);
+  }
+  .tile-pad { padding: 20px; height: 100%; display: flex; flex-direction: column; }
+  .t-hero { grid-column: span 7; grid-row: span 3; min-height: 320px; position: relative; }
+  .t-hero img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .t-hero .overlay {
+    position: absolute; left: 16px; bottom: 16px; right: 16px;
+    background: rgba(255,255,255,.92); border-radius: 16px; padding: 14px 16px;
+    backdrop-filter: blur(8px);
+  }
+  .t-price { grid-column: span 5; grid-row: span 2; }
+  .t-price .value { font-size: 2rem; letter-spacing: -0.03em; }
+  .t-facts { grid-column: span 5; }
+  .facts-mini { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .facts-mini div {
+    background: #f1f5f9; border-radius: 14px; padding: 12px 8px; text-align: center;
+  }
+  .facts-mini b { display: block; font-size: 1.15rem; }
+  .facts-mini span { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--ph-muted); font-weight: 700; }
+  .t-cta { grid-column: span 4; background: linear-gradient(145deg, #0f172a, #1e293b); color: #fff; }
+  .t-cta p { color: rgba(255,255,255,.65); font-size: 13px; margin: 0 0 14px; }
+  .t-cta .btn-primary { background: var(--ph-accent); border-radius: 12px; }
+  .t-cta .btn-secondary { border-color: rgba(255,255,255,.3); color: #fff; border-radius: 12px; }
+  .t-photo { grid-column: span 4; min-height: 160px; }
+  .t-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .t-features { grid-column: span 5; }
+  .t-desc { grid-column: span 7; }
+  .t-docs { grid-column: span 4; }
+  .t-map { grid-column: span 5; min-height: 200px; }
+  .t-agent { grid-column: span 3; }
+  .t-similar { grid-column: span 12; }
+  .t-desc p { color: var(--ph-ink-soft); font-size: 14.5px; margin: 0; flex: 1; }
+  h2 { margin: 0 0 12px; font-size: 0.95rem; font-weight: 750; letter-spacing: -0.01em; }
+  .doc-links a { border-radius: 12px; }
+  .similar-grid { margin-top: 4px; }
+  @media (max-width: 900px) {
+    .t-hero, .t-price, .t-facts, .t-cta, .t-photo, .t-features, .t-desc, .t-docs, .t-map, .t-agent, .t-similar {
+      grid-column: span 12;
+    }
+    .t-hero { grid-row: span 2; min-height: 240px; }
+    .facts-mini { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>10 · Bento Modular</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="09-magazine-chapters.html">← 09</a>
+    <a href="11-photo-wall.html">11 →</a>
+  </nav>
+</div>
+<main class="page">
+  <div class="bento">
+    <div class="tile t-hero">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="" />
+      <div class="overlay">
+        <div class="kicker" style="color:var(--ph-accent)">For sale</div>
+        <strong style="font-size:1.15rem;letter-spacing:-0.02em">91 Waterman Court, Wokingham</strong>
+        <div style="font-size:13px;color:var(--ph-muted)">RG41 3FL · Bungalow · Freehold</div>
+      </div>
+    </div>
+    <div class="tile t-price">
+      <div class="tile-pad">
+        <span class="qualifier" style="color:var(--ph-muted);font-size:13px">Offers over</span>
+        <div class="value" style="font-weight:780">£1,340,000</div>
+        <p style="margin:auto 0 0;font-size:13px;color:var(--ph-muted)">Residential sales · On market</p>
+      </div>
+    </div>
+    <div class="tile t-facts">
+      <div class="tile-pad">
+        <h2>At a glance</h2>
+        <div class="facts-mini">
+          <div><b>3</b><span>Beds</span></div>
+          <div><b>3</b><span>Baths</span></div>
+          <div><b>2</b><span>Recs</span></div>
+          <div><b>5</b><span>Photos</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tile t-cta">
+      <div class="tile-pad">
+        <h2 style="color:#fff">Next step</h2>
+        <p>Request a viewing or save this home. Modules stay independent — easy to show/hide by data.</p>
+        <div style="display:grid;gap:8px;margin-top:auto">
+          <button type="button" class="btn btn-primary btn-block">Request viewing</button>
+          <button type="button" class="btn btn-secondary btn-block">♡ Shortlist</button>
+        </div>
+      </div>
+    </div>
+    <div class="tile t-photo"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="" /></div>
+    <div class="tile t-photo"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="" /></div>
+    <div class="tile t-photo"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="" /></div>
+    <div class="tile t-features">
+      <div class="tile-pad">
+        <h2>Key features</h2>
+        <ul class="feature-list">
+          <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+          <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tile t-desc">
+      <div class="tile-pad">
+        <h2>Overview</h2>
+        <p>Excepteur sint occaecat cupidatat non proident. Bento layout makes each PH module a tile — gallery, facts, CTA, docs, map, agent — rearrangeable by template profile.</p>
+      </div>
+    </div>
+    <div class="tile t-docs">
+      <div class="tile-pad">
+        <h2>Documents</h2>
+        <div class="doc-links" style="flex-direction:column;align-items:stretch">
+          <a href="#">📄 Brochure</a>
+          <a href="#">⚡ EPC</a>
+          <a href="#">🗺 Floorplan</a>
+          <a href="#">▶ Tour</a>
+        </div>
+      </div>
+    </div>
+    <div class="tile t-map">
+      <div class="map-block" style="height:100%;min-height:200px;border-radius:22px"><span class="map-label">Wokingham, RG41 3FL</span></div>
+    </div>
+    <div class="tile t-agent">
+      <div class="tile-pad">
+        <h2>Agent</h2>
+        <div class="agent-row" style="flex-direction:column;align-items:flex-start">
+          <div class="avatar" style="background:var(--ph-accent)">AD</div>
+          <div class="agent-meta"><div class="name">Admin</div><div class="role">Property Hive</div></div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-block" style="margin-top:auto">Email</button>
+      </div>
+    </div>
+    <div class="tile t-similar">
+      <div class="tile-pad">
+        <h2>Similar properties</h2>
+        <div class="similar-grid">
+          <article class="similar-card"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" /><div class="body"><div class="p">£875,000</div><div class="t">Nearby</div></div></article>
+          <article class="similar-card"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" /><div class="body"><div class="p">£1,100,000</div><div class="t">RG41</div></div></article>
+          <article class="similar-card"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" /><div class="body"><div class="p">£995,000</div><div class="t">Family</div></div></article>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="mobile-cta"><button type="button" class="btn btn-ghost btn-call">♡</button><button type="button" class="btn btn-secondary">Call</button><button type="button" class="btn btn-primary">Request viewing</button></div>
+</body>
+</html>

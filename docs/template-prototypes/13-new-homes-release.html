@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>13 · New Homes Release — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root { --ph-brand: #7c3aed; --ph-brand-dark: #5b21b6; --ph-accent: #f59e0b; }
+  body { background: #faf5ff; }
+  .hero {
+    position: relative; min-height: 420px; color: #fff;
+    display: grid; place-items: end start;
+  }
+  .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(100deg, rgba(55,20,90,.82), rgba(55,20,90,.25) 55%, rgba(0,0,0,.35));
+  }
+  .hero-inner { position: relative; z-index: 1; padding: 40px 6vw 44px; max-width: 640px; }
+  .hero .badge {
+    background: var(--ph-accent); color: #1a1000; margin-bottom: 12px;
+  }
+  .hero h1 { margin: 0 0 10px; font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.03em; line-height: 1.1; }
+  .hero p { margin: 0 0 18px; opacity: .9; font-size: 15px; max-width: 40ch; }
+  .hero .price-block .qualifier { color: rgba(255,255,255,.7); }
+  .hero .price-block .value { font-size: 1.8rem; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 28px 16px 100px; }
+  .register {
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; margin-top: -48px; position: relative; z-index: 2;
+  }
+  .card {
+    background: #fff; border-radius: 18px; padding: 22px;
+    box-shadow: var(--ph-shadow); border: 1px solid #ede9fe;
+  }
+  .card h2 { margin: 0 0 8px; font-size: 1.15rem; }
+  .card p { margin: 0 0 14px; color: var(--ph-ink-soft); font-size: 14px; }
+  .plot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .plot {
+    border: 1px solid #e9d5ff; border-radius: 12px; padding: 12px; text-align: center;
+    background: #faf5ff;
+  }
+  .plot b { display: block; font-size: 1.1rem; color: var(--ph-brand-dark); }
+  .plot span { font-size: 12px; color: var(--ph-muted); }
+  .plot.sold { opacity: .45; }
+  .plot.avail { border-color: #a78bfa; background: #fff; box-shadow: 0 0 0 1px #a78bfa; }
+  .btn-primary { background: var(--ph-brand); border-radius: 12px; }
+  .btn-primary:hover { background: var(--ph-brand-dark); }
+  .features-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px 0;
+  }
+  .features-row .f {
+    background: #fff; border-radius: 14px; padding: 16px; border: 1px solid #ede9fe;
+    font-size: 14px; font-weight: 650;
+  }
+  .features-row .f small { display: block; font-weight: 500; color: var(--ph-muted); margin-top: 4px; font-size: 12px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) {
+    .register, .two, .features-row, .plot-grid { grid-template-columns: 1fr 1fr; }
+    .register { grid-template-columns: 1fr; margin-top: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>13 · New Homes Release</strong>
+  <nav>
+    <a href="index.html">All 15</a>
+    <a href="12-lettings-practical.html">← 12</a>
+    <a href="14-minimal-swiss.html">14 →</a>
+  </nav>
+</div>
+<header class="hero">
+  <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="" />
+  <div class="hero-inner">
+    <span class="badge">New homes release</span>
+    <h1>Waterman Court</h1>
+    <p>Showhome-style presentation for developments and new-build stock — register for plot updates, brochures and appointments.</p>
+    <div class="price-block">
+      <span class="qualifier">From / offers over</span>
+      <span class="value">£1,340,000</span>
+    </div>
+  </div>
+</header>
+<main class="page">
+  <div class="register">
+    <div class="card">
+      <h2>Register your interest</h2>
+      <p>Plot updates, brochure pack, floorplans and appointment requests in one route — matches PH new-homes seed intent.</p>
+      <div style="display:grid;gap:8px">
+        <button type="button" class="btn btn-primary btn-block">Register for release details</button>
+        <button type="button" class="btn btn-secondary btn-block">Download brochure</button>
+      </div>
+      <div class="agent-row" style="margin-top:18px">
+        <div class="avatar" style="background:var(--ph-brand)">AD</div>
+        <div class="agent-meta"><div class="name">Admin</div><div class="role">Development sales · Property Hive</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Availability snapshot</h2>
+      <p>Illustrative plot grid — wire to real unit data later.</p>
+      <div class="plot-grid">
+        <div class="plot sold"><b>01</b><span>Sold</span></div>
+        <div class="plot avail"><b>02</b><span>Available</span></div>
+        <div class="plot"><b>03</b><span>Reserved</span></div>
+        <div class="plot avail"><b>04</b><span>Available</span></div>
+        <div class="plot sold"><b>05</b><span>Sold</span></div>
+        <div class="plot"><b>06</b><span>Coming</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features-row">
+    <div class="f">3 bedrooms<small>Example house type</small></div>
+    <div class="f">3 bathrooms<small>Incl. en-suite</small></div>
+    <div class="f">2 receptions<small>Open-plan living</small></div>
+    <div class="f">Freehold<small>Tenure</small></div>
+    <div class="f">Help to Buy*<small>Ask for schemes</small></div>
+    <div class="f">NHBC*<small>Warranty note</small></div>
+  </div>
+
+  <div class="two">
+    <div class="card">
+      <h2>Showhome gallery</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="" style="border-radius:12px;height:120px;width:100%;object-fit:cover" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="" style="border-radius:12px;height:120px;width:100%;object-fit:cover" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-1024x683.png" alt="" style="border-radius:12px;height:120px;width:100%;object-fit:cover" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="" style="border-radius:12px;height:120px;width:100%;object-fit:cover" />
+      </div>
+    </div>
+    <div class="card">
+      <h2>Specification highlights</h2>
+      <ul class="feature-list" style="margin-top:12px">
+        <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+        <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+      </ul>
+      <div class="doc-links" style="margin-top:16px">
+        <a href="#">Site plan</a><a href="#">Floorplans</a><a href="#">Brochure</a><a href="#">EPC</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>Location</h2>
+    <div class="map-block" style="margin-top:12px"><span class="map-label">Waterman Court development · Wokingham RG41</span></div>
+  </div>
+</main>
+<div class="mobile-cta"><button type="button" class="btn btn-ghost btn-call">♡</button><button type="button" class="btn btn-secondary">Brochure</button><button type="button" class="btn btn-primary">Register</button></div>
+</body>
+</html>
