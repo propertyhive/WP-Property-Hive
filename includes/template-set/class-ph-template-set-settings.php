@@ -25,12 +25,12 @@ class PH_Template_Set_Settings {
 			array(
 				PH_Template_Set::OPTION_ENABLED       => '',
 				'template_set_editor_mode'            => $default_editor_mode,
-				'template_set_detail_template'        => 'standard-sales-detail',
+				'template_set_detail_template'        => 'conversion-first-sales-detail',
 				'template_set_search_template'        => 'portal-style-search-results',
 				'template_set_search_layout'          => '',
 				'template_set_search_card_size'       => 'standard',
 				'template_set_search_grid_columns'    => 3,
-				'template_set_gallery_layout'         => 'showcase',
+				'template_set_gallery_layout'         => 'mosaic',
 				'template_set_brand_colour'           => '#155e63',
 				'template_set_accent_colour'          => '#b7791f',
 				'template_set_button_style'           => 'filled',
@@ -53,12 +53,26 @@ class PH_Template_Set_Settings {
 			$settings['template_set_contact_card_style'] = 'classic';
 		}
 
+		$settings['template_set_detail_template'] = PH_Template_Set_Catalog::normalize_detail_template_slug( $settings['template_set_detail_template'] );
+
 		if ( ! isset( PH_Template_Set_Catalog::get_detail_templates()[ $settings['template_set_detail_template'] ] ) ) {
 			$settings['template_set_detail_template'] = PH_Template_Set_Catalog::get_default_detail_template();
 		}
 
 		if ( ! isset( PH_Template_Set_Catalog::get_search_templates()[ $settings['template_set_search_template'] ] ) ) {
 			$settings['template_set_search_template'] = PH_Template_Set_Catalog::get_default_search_template();
+		}
+
+		// Fold any retired Standard Sales overrides into Portal Split.
+		if ( isset( $settings['template_overrides']['standard-sales-detail'] ) && is_array( $settings['template_overrides']['standard-sales-detail'] ) ) {
+			$portal_overrides = isset( $settings['template_overrides']['conversion-first-sales-detail'] ) && is_array( $settings['template_overrides']['conversion-first-sales-detail'] )
+				? $settings['template_overrides']['conversion-first-sales-detail']
+				: array();
+			$settings['template_overrides']['conversion-first-sales-detail'] = array_merge(
+				$settings['template_overrides']['standard-sales-detail'],
+				$portal_overrides
+			);
+			unset( $settings['template_overrides']['standard-sales-detail'] );
 		}
 
 		return $settings;
@@ -171,6 +185,7 @@ class PH_Template_Set_Settings {
 		$editor_modes     = PH_Template_Set_Options::get_editor_modes();
 
 		$detail_template = isset( $raw_settings['template_set_detail_template'] ) ? sanitize_title( $raw_settings['template_set_detail_template'] ) : sanitize_title( $current['template_set_detail_template'] );
+		$detail_template = PH_Template_Set_Catalog::normalize_detail_template_slug( $detail_template );
 		if ( ! isset( $detail_templates[ $detail_template ] ) ) {
 			$detail_template = PH_Template_Set_Catalog::get_default_detail_template();
 		}
@@ -331,7 +346,7 @@ class PH_Template_Set_Settings {
 		$overrides = is_array( $overrides ) ? $overrides : array();
 
 		foreach ( $overrides as $slug => $values ) {
-			$slug = sanitize_title( $slug );
+			$slug = PH_Template_Set_Catalog::normalize_detail_template_slug( $slug );
 
 			if ( ! isset( $templates[ $slug ] ) || ! is_array( $values ) ) {
 				continue;

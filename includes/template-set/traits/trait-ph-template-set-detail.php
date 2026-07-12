@@ -1036,7 +1036,8 @@ trait PH_Template_Set_Detail {
 	 * @return bool
 	 */
 	private static function detail_template_uses_facts_strip( $template ) {
-		return in_array( sanitize_title( $template ), array( 'standard-sales-detail', 'conversion-first-sales-detail' ), true );
+		// Portal owns the facts strip; Standard only remains as a partial fallback slug.
+		return in_array( sanitize_title( $template ), array( 'conversion-first-sales-detail', 'standard-sales-detail' ), true );
 	}
 
 	/**

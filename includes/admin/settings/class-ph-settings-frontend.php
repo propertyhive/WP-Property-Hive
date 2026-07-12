@@ -1437,7 +1437,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             'title'   => __( 'Property Detail Template', 'propertyhive' ),
             'id'      => 'template_set_detail_template',
             'type'    => 'select',
-            'default' => isset( $current_settings['template_set_detail_template'] ) ? $current_settings['template_set_detail_template'] : 'standard-sales-detail',
+            'default' => isset( $current_settings['template_set_detail_template'] ) ? $current_settings['template_set_detail_template'] : 'conversion-first-sales-detail',
             'options' => PH_Template_Set::get_detail_templates(),
         );
 
