@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>18 · Tenant Ready — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root {
+    --ph-brand: #4338ca;
+    --ph-brand-dark: #312e81;
+    --ph-accent: #059669;
+    --ph-surface: #f5f6fa;
+  }
+  body { background: #f8f9fc; }
+  .wrap { max-width: var(--ph-max); margin: 0 auto; padding: 20px 20px 90px; }
+
+  /* Hero: photo + the money card. Lettings leads with numbers. */
+  .hero {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 16px;
+    align-items: stretch;
+    margin-bottom: 18px;
+  }
+  .hero-media {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    min-height: 380px;
+  }
+  .hero-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero-media .avail {
+    position: absolute;
+    left: 14px; top: 14px;
+    background: var(--ph-accent);
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .hero-media .count {
+    position: absolute;
+    right: 14px; bottom: 14px;
+    background: rgba(20,24,26,.82);
+    color: #fff;
+    border-radius: 999px;
+    padding: 7px 13px;
+    font-size: 12.5px;
+    font-weight: 650;
+  }
+
+  .money-card {
+    background: #fff;
+    border: 1px solid var(--ph-line);
+    border-radius: 18px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--ph-shadow-soft);
+  }
+  .money-card h1 { margin: 4px 0 2px; font-size: 1.25rem; letter-spacing: -0.02em; line-height: 1.25; }
+  .money-card .addr { color: var(--ph-muted); font-size: 13.5px; margin: 0 0 14px; }
+  .rent { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .rent .n { font-size: 2.1rem; font-weight: 780; letter-spacing: -0.03em; color: var(--ph-brand-dark); }
+  .rent .freq { color: var(--ph-muted); font-weight: 600; }
+  .rent-alt { font-size: 13px; color: var(--ph-muted); margin-bottom: 16px; }
+
+  .cost-table { border-top: 1px solid var(--ph-line); margin-bottom: 16px; }
+  .cost-table .r {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 0;
+    font-size: 14px;
+    border-bottom: 1px solid var(--ph-line);
+  }
+  .cost-table .r span:first-child { color: var(--ph-ink-soft); }
+  .cost-table .r span:first-child small { display: block; color: var(--ph-muted); font-size: 12px; }
+  .cost-table .r span:last-child { font-weight: 700; white-space: nowrap; }
+  .cost-table .total { background: #eef2ff; margin: 0 -12px; padding: 11px 12px; border-radius: 10px; border-bottom: 0; }
+  .cost-table .total span { font-weight: 780; color: var(--ph-brand-dark); }
+  .money-card .actions { display: grid; gap: 8px; margin-top: auto; }
+  .money-card .protected { font-size: 12px; color: var(--ph-muted); margin: 10px 0 0; text-align: center; }
+
+  /* Tenancy terms strip */
+  .terms {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  .terms .t {
+    background: #fff;
+    border: 1px solid var(--ph-line);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .terms .l { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ph-muted); font-weight: 700; }
+  .terms .v { font-weight: 750; font-size: 15px; margin-top: 3px; }
+
+  .cols { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 36px; align-items: start; }
+  .panel {
+    background: #fff;
+    border: 1px solid var(--ph-line);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+  .panel h2 { margin: 0 0 14px; font-size: 1.05rem; font-weight: 750; letter-spacing: -0.01em; }
+  .panel p { margin: 0 0 12px; color: var(--ph-ink-soft); font-size: 14.5px; }
+
+  /* Included / not included matrix */
+  .inc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 22px; }
+  .inc-grid .i {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--ph-ink-soft);
+    border-bottom: 1px solid var(--ph-line);
+  }
+  .inc-grid .i:nth-last-child(-n+2) { border-bottom: 0; }
+  .inc-grid .yes::before { content: "✓"; color: var(--ph-accent); font-weight: 800; }
+  .inc-grid .no::before { content: "✕"; color: #b91c1c; font-weight: 800; }
+
+  /* Application steps */
+  .steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--ph-line);
+    font-size: 14.5px;
+    color: var(--ph-ink-soft);
+  }
+  .steps li:last-child { border-bottom: 0; }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: var(--ph-brand-dark);
+    display: grid;
+    place-items: center;
+    font-weight: 750;
+    font-size: 13px;
+  }
+  .steps strong { color: var(--ph-ink); display: block; }
+  .steps .eta { margin-left: auto; font-size: 12px; color: var(--ph-muted); white-space: nowrap; padding-top: 2px; }
+
+  .gallery-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .gallery-strip img { aspect-ratio: 4/3; object-fit: cover; width: 100%; border-radius: 10px; }
+
+  .side { position: sticky; top: 60px; }
+  .checklist { margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--ph-ink-soft); }
+  .checklist li { padding: 8px 0; border-bottom: 1px solid var(--ph-line); display: flex; gap: 8px; }
+  .checklist li:last-child { border-bottom: 0; }
+  .checklist li::before { content: "☐"; color: var(--ph-brand); }
+
+  @media (max-width: 960px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-media { min-height: 260px; }
+    .terms { grid-template-columns: repeat(3, 1fr); }
+    .cols { grid-template-columns: 1fr; }
+    .side { position: static; }
+  }
+  @media (max-width: 560px) {
+    .terms { grid-template-columns: 1fr 1fr; }
+    .inc-grid { grid-template-columns: 1fr; }
+    .inc-grid .i:nth-last-child(2) { border-bottom: 1px solid var(--ph-line); }
+    .gallery-strip { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>18 · Tenant Ready</strong>
+  <nav>
+    <a href="index.html">Shortlist</a>
+    <a href="17-private-office.html">← Prev</a>
+    <a href="19-bento-field-system.html">Next →</a>
+  </nav>
+</div>
+
+<main class="wrap">
+  <!-- Lettings dataset of the same home: numbers, dates and process first -->
+  <div class="hero">
+    <div class="hero-media">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="Reception room" />
+      <span class="avail">Available 4 September 2026</span>
+      <span class="count">5 photos · Floorplan · Tour</span>
+    </div>
+
+    <aside class="money-card" aria-label="Costs and enquiry">
+      <div class="kicker"><span class="badge">To let</span> · Unfurnished</div>
+      <h1>91 Waterman Court, Wokingham</h1>
+      <p class="addr">RG41 3FL · Bungalow · 3 bed / 3 bath / 2 reception</p>
+      <div class="rent"><span class="n">£4,250</span><span class="freq">per calendar month</span></div>
+      <p class="rent-alt">≈ £981 per week · No admin fees (Tenant Fees Act 2019)</p>
+      <div class="cost-table" aria-label="Move-in costs">
+        <div class="r"><span>Holding deposit <small>1 week · deducted from first payment</small></span><span>£980</span></div>
+        <div class="r"><span>First month's rent</span><span>£4,250</span></div>
+        <div class="r"><span>Tenancy deposit <small>5 weeks · held with DPS</small></span><span>£4,903</span></div>
+        <div class="r total"><span>Total to move in</span><span>£9,153</span></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-primary btn-block">Book a viewing</button>
+        <button type="button" class="btn btn-secondary btn-block">Check my affordability</button>
+      </div>
+      <p class="protected">Deposit protected · Client money protection · Redress: TPO</p>
+    </aside>
+  </div>
+
+  <div class="terms" aria-label="Tenancy terms">
+    <div class="t"><div class="l">Min term</div><div class="v">12 months</div></div>
+    <div class="t"><div class="l">Furnishing</div><div class="v">Unfurnished</div></div>
+    <div class="t"><div class="l">Council tax</div><div class="v">Band G</div></div>
+    <div class="t"><div class="l">EPC</div><div class="v">C (72)</div></div>
+    <div class="t"><div class="l">Pets</div><div class="v">Considered</div></div>
+    <div class="t"><div class="l">Smoking</div><div class="v">No</div></div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <section class="panel">
+        <h2>What's included</h2>
+        <div class="inc-grid">
+          <div class="i yes">Garden maintenance (front court)</div>
+          <div class="i no">Utilities &amp; council tax</div>
+          <div class="i yes">White goods: oven, hob, dishwasher</div>
+          <div class="i no">Broadband contract</div>
+          <div class="i yes">Garden studio / office use</div>
+          <div class="i no">Contents insurance</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>About the property</h2>
+        <p>A rarely available single-storey home of about 2,400 sq ft at the head of a private cul-de-sac on Wokingham's south-west side. Every principal room faces the landscaped garden, and each of the three double bedrooms has its own bath or shower room.</p>
+        <ul class="feature-list">
+          <li>Principal suite opening to the garden</li>
+          <li>Open-plan kitchen / dining, twin roof lanterns</li>
+          <li>South-west facing garden</li>
+          <li>Detached garden studio / office</li>
+          <li>Underfloor heating throughout</li>
+          <li>Station 0.8 mi · Waterloo from 57 min</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2>Photos, plan &amp; tour</h2>
+        <div class="gallery-strip">
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="Kitchen" />
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="Principal bedroom" />
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-300x200.png" alt="Garden" />
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="Exterior" />
+        </div>
+        <div class="doc-links" style="margin-top:14px">
+          <a href="#">🗺 Floorplan</a>
+          <a href="#">▶ Virtual tour</a>
+          <a href="#">⚡ EPC</a>
+          <a href="#">📄 Sample tenancy agreement</a>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Location</h2>
+        <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham, RG41 3FL · Station 0.8 mi · Waitrose 0.9 mi</span></div>
+      </section>
+
+      <section class="panel" style="margin-bottom:0">
+        <h2>More homes to let nearby</h2>
+        <div class="similar-grid">
+          <article class="similar-card">
+            <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" />
+            <div class="body"><div class="p">£2,400 pcm</div><div class="t">Nearby home, Wokingham</div><div class="f">3 bed · Avail now</div></div>
+          </article>
+          <article class="similar-card">
+            <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" />
+            <div class="body"><div class="p">£3,100 pcm</div><div class="t">Similar bungalow, RG41</div><div class="f">3 bed · Avail Oct</div></div>
+          </article>
+          <article class="similar-card">
+            <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" />
+            <div class="body"><div class="p">£2,850 pcm</div><div class="t">Family home, Wokingham</div><div class="f">4 bed · Avail Sep</div></div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <aside class="side">
+      <section class="panel">
+        <h2>How applying works</h2>
+        <ol class="steps">
+          <li><div><strong>Book a viewing</strong>In person or video walkthrough.</div><span class="eta">same day</span></li>
+          <li><div><strong>Reserve with holding deposit</strong>One week's rent, £980.</div><span class="eta">day 1</span></li>
+          <li><div><strong>Referencing</strong>ID, income (2.5× rent) and landlord reference.</div><span class="eta">3–5 days</span></li>
+          <li><div><strong>Sign &amp; move in</strong>Balance paid, keys and inventory handover.</div><span class="eta">from 4 Sep</span></li>
+        </ol>
+      </section>
+
+      <section class="panel">
+        <h2>Before you enquire</h2>
+        <ul class="checklist">
+          <li>Household income about £127,500+ (2.5× rent)</li>
+          <li>Photo ID for every adult (Right to Rent)</li>
+          <li>Current landlord's contact, if renting</li>
+          <li>Pets? Tell us breed &amp; age up front</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2>Lettings team</h2>
+        <div class="agent-row">
+          <div class="avatar">JO</div>
+          <div class="agent-meta">
+            <div class="name">James Okafor</div>
+            <div class="role">Property Hive Lettings · Wokingham</div>
+          </div>
+        </div>
+        <div style="display:grid; gap:8px; margin-top:14px">
+          <button type="button" class="btn btn-primary btn-block">Book a viewing</button>
+          <button type="button" class="btn btn-ghost btn-block">Call 0118 496 0000</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div class="mobile-cta" aria-label="Mobile actions">
+  <button type="button" class="btn btn-ghost btn-call">♡</button>
+  <button type="button" class="btn btn-secondary">Call</button>
+  <button type="button" class="btn btn-primary">Book a viewing</button>
+</div>
+</body>
+</html>

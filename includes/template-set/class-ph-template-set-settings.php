@@ -45,6 +45,7 @@ class PH_Template_Set_Settings {
 				'template_set_recommended_count'      => 3,
 				'template_set_recommended_layout'     => 'grid',
 				'template_set_recommended_image_size' => 'standard',
+				'template_overrides'                  => array(),
 			)
 		);
 
@@ -61,6 +62,42 @@ class PH_Template_Set_Settings {
 		}
 
 		return $settings;
+	}
+
+	/**
+	 * Resolve a detail setting for a specific template.
+	 *
+	 * Resolution order is locked value, template override, manifest default,
+	 * global setting, then the control's global default.
+	 *
+	 * @param string $key Setting key.
+	 * @param string $template_slug Detail template slug.
+	 * @param array  $settings Optional settings, primarily for deterministic callers/tests.
+	 * @return mixed
+	 */
+	public static function get_for_template( $key, $template_slug, $settings = null ) {
+		$template_slug = sanitize_title( $template_slug );
+		$manifest      = PH_Template_Set_Catalog::get_detail_template_manifest( $template_slug );
+		$controls      = PH_Template_Set_Catalog::get_detail_template_controls( $template_slug );
+		$settings      = is_array( $settings ) ? $settings : self::get_settings();
+
+		if ( array_key_exists( $key, (array) $manifest['locked'] ) ) {
+			return $manifest['locked'][ $key ];
+		}
+
+		if ( isset( $settings['template_overrides'][ $template_slug ] ) && array_key_exists( $key, (array) $settings['template_overrides'][ $template_slug ] ) ) {
+			return $settings['template_overrides'][ $template_slug ][ $key ];
+		}
+
+		if ( array_key_exists( $key, (array) $manifest['defaults'] ) ) {
+			return $manifest['defaults'][ $key ];
+		}
+
+		if ( array_key_exists( $key, $settings ) ) {
+			return $settings[ $key ];
+		}
+
+		return isset( $controls[ $key ] ) && array_key_exists( 'default', $controls[ $key ] ) ? $controls[ $key ]['default'] : null;
 	}
 
 	/**
@@ -238,7 +275,103 @@ class PH_Template_Set_Settings {
 			'template_set_recommended_image_size'     => $recommended_image_size,
 		);
 
+		$template_scoped_keys = array_keys( PH_Template_Set_Catalog::get_detail_shared_controls() );
+		$editor_context       = isset( $raw_settings['template_set_editor_context'] ) ? sanitize_title( $raw_settings['template_set_editor_context'] ) : '';
+		$is_detail_editor     = 'detail' === $editor_context;
+		$override_source      = isset( $raw_settings['template_overrides'] ) ? $raw_settings['template_overrides'] : ( isset( $current_settings['template_overrides'] ) ? $current_settings['template_overrides'] : array() );
+		$template_overrides   = self::sanitize_template_overrides( $override_source );
+
+		if ( in_array( $editor_context, array( 'detail', 'search' ), true ) ) {
+			foreach ( $template_scoped_keys as $key ) {
+				if ( array_key_exists( $key, $current ) ) {
+					$template_set_settings[ $key ] = $current[ $key ];
+				}
+			}
+
+		}
+
+		if ( $is_detail_editor ) {
+			$manifest = PH_Template_Set_Catalog::get_detail_template_manifest( $detail_template );
+			$controls = PH_Template_Set_Catalog::get_detail_template_controls( $detail_template );
+			$editable = array_unique( array_merge( (array) $manifest['supports'], array_keys( (array) $manifest['controls'] ) ) );
+
+			foreach ( $editable as $key ) {
+				if ( ! isset( $controls[ $key ] ) ) {
+					continue;
+				}
+
+				if ( 'checkbox' === $controls[ $key ]['type'] ) {
+					$value = self::normalise_checkbox_value( $raw_settings, $key );
+				} elseif ( array_key_exists( $key, $raw_settings ) ) {
+					$value = self::sanitize_manifest_control_value( $raw_settings[ $key ], $controls[ $key ] );
+				} else {
+					continue;
+				}
+
+				if ( null !== $value ) {
+					$template_overrides[ $detail_template ][ $key ] = $value;
+				}
+			}
+		}
+
+		$template_set_settings['template_overrides'] = $template_overrides;
+
 		return array_merge( $current_settings, $template_set_settings );
+	}
+
+	/**
+	 * Validate all stored per-template overrides against their manifests.
+	 *
+	 * @param array $overrides Raw overrides.
+	 * @return array
+	 */
+	public static function sanitize_template_overrides( $overrides ) {
+		$clean     = array();
+		$templates = PH_Template_Set_Catalog::get_detail_templates();
+		$overrides = is_array( $overrides ) ? $overrides : array();
+
+		foreach ( $overrides as $slug => $values ) {
+			$slug = sanitize_title( $slug );
+
+			if ( ! isset( $templates[ $slug ] ) || ! is_array( $values ) ) {
+				continue;
+			}
+
+			$manifest = PH_Template_Set_Catalog::get_detail_template_manifest( $slug );
+			$controls = PH_Template_Set_Catalog::get_detail_template_controls( $slug );
+			$allowed  = array_unique( array_merge( (array) $manifest['supports'], array_keys( (array) $manifest['controls'] ) ) );
+
+			foreach ( $allowed as $key ) {
+				if ( ! array_key_exists( $key, $values ) || ! isset( $controls[ $key ] ) ) {
+					continue;
+				}
+
+				$value = self::sanitize_manifest_control_value( $values[ $key ], $controls[ $key ] );
+
+				if ( null !== $value ) {
+					$clean[ $slug ][ $key ] = $value;
+				}
+			}
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Validate one manifest control value against its declared options.
+	 *
+	 * @param mixed $value Raw value.
+	 * @param array $control Control definition.
+	 * @return mixed|null
+	 */
+	private static function sanitize_manifest_control_value( $value, $control ) {
+		if ( ! is_scalar( $value ) || ! isset( $control['options'] ) || ! is_array( $control['options'] ) ) {
+			return null;
+		}
+
+		$value = 'checkbox' === $control['type'] ? ( in_array( $value, array( '1', 1, 'yes', 'on', true ), true ) ? 'yes' : '' ) : sanitize_title( $value );
+
+		return array_key_exists( $value, $control['options'] ) ? $value : null;
 	}
 
 	/**

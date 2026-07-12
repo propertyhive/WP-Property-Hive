@@ -17,7 +17,170 @@ class PH_Template_Set_Catalog {
 	public static function get_detail_templates() {
 		return apply_filters( 'propertyhive_template_set_detail_templates', array(
 			'standard-sales-detail'           => __( 'Standard Sales Detail', 'propertyhive' ),
+			'conversion-first-sales-detail'   => __( 'Portal Split', 'propertyhive' ),
+			'immersive-cinema-detail'         => __( 'Immersive Cinema', 'propertyhive' ),
+			'premium-editorial-detail'        => __( 'Private Office', 'propertyhive' ),
 		) );
+	}
+
+	/**
+	 * Get the control manifest for a detail template.
+	 *
+	 * @param string $slug Detail template slug.
+	 * @return array
+	 */
+	public static function get_detail_template_manifest( $slug ) {
+		$slug      = sanitize_title( $slug );
+		$templates = self::get_detail_templates();
+		$shared    = array_keys( self::get_detail_shared_controls() );
+		$manifest  = array(
+			'label'    => isset( $templates[ $slug ] ) ? $templates[ $slug ] : '',
+			'supports' => array(),
+			'locked'   => array(),
+			'defaults' => array(),
+			'controls' => array(),
+		);
+
+		switch ( $slug ) {
+			case 'standard-sales-detail':
+				$manifest['supports'] = $shared;
+				break;
+
+			case 'conversion-first-sales-detail':
+				$manifest['supports'] = array_values( array_diff( $shared, array( 'template_set_gallery_layout' ) ) );
+				$manifest['locked']   = array( 'template_set_gallery_layout' => 'mosaic' );
+				$manifest['defaults'] = array( 'template_set_button_style' => 'filled' );
+				$manifest['controls'] = array(
+					'template_set_portal_show_costs' => array(
+						'type'    => 'checkbox',
+						'label'   => __( 'Show purchase costs', 'propertyhive' ),
+						'options' => self::get_checkbox_options(),
+						'default' => 'yes',
+						'group'   => 'modules',
+					),
+				);
+				break;
+
+			case 'immersive-cinema-detail':
+				// Cinema owns gallery layout + floating-card chrome; button/contact styles
+				// are design-fixed and would be dead controls in the sidebar.
+				$manifest['supports'] = array_values(
+					array_diff(
+						$shared,
+						array(
+							'template_set_gallery_layout',
+							'template_set_button_style',
+							'template_set_contact_card_style',
+						)
+					)
+				);
+				$manifest['locked'] = array(
+					'template_set_gallery_layout'     => 'cinema',
+					'template_set_button_style'       => 'filled',
+					'template_set_contact_card_style' => 'classic',
+				);
+				$manifest['controls'] = array(
+					'template_set_cinema_card_position' => array(
+						'type'    => 'select',
+						'label'   => __( 'Hero card position', 'propertyhive' ),
+						'options' => array(
+							'right' => __( 'Right', 'propertyhive' ),
+							'left'  => __( 'Left', 'propertyhive' ),
+						),
+						'default' => 'right',
+						'group'   => 'media',
+					),
+				);
+				break;
+
+			case 'premium-editorial-detail':
+				// Private Office owns the editorial plate + closing letter chrome;
+				// free gallery/button/contact styles would be dead or misleading.
+				$manifest['supports'] = array_values(
+					array_diff(
+						$shared,
+						array(
+							'template_set_gallery_layout',
+							'template_set_button_style',
+							'template_set_contact_card_style',
+						)
+					)
+				);
+				$manifest['locked'] = array(
+					'template_set_gallery_layout'     => 'editorial',
+					'template_set_button_style'       => 'outline',
+					'template_set_contact_card_style' => 'editorial',
+				);
+				$manifest['controls'] = array(
+					'template_set_editorial_show_brief' => array(
+						'type'    => 'checkbox',
+						'label'   => __( 'Show masthead brief', 'propertyhive' ),
+						'options' => self::get_checkbox_options(),
+						'default' => 'yes',
+						'group'   => 'media',
+					),
+				);
+				break;
+		}
+
+		$manifest = apply_filters( 'propertyhive_template_set_detail_template_manifest', $manifest, $slug );
+
+		return is_array( $manifest ) ? wp_parse_args( $manifest, array(
+			'label'    => isset( $templates[ $slug ] ) ? $templates[ $slug ] : '',
+			'supports' => array(),
+			'locked'   => array(),
+			'defaults' => array(),
+			'controls' => array(),
+		) ) : array();
+	}
+
+	/**
+	 * Shared detail controls available to template manifests.
+	 *
+	 * @return array
+	 */
+	public static function get_detail_shared_controls() {
+		return array(
+			'template_set_gallery_layout' => array( 'type' => 'select', 'label' => __( 'Gallery layout', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_gallery_layouts(), 'default' => 'showcase', 'group' => 'media' ),
+			'template_set_show_floorplans' => array( 'type' => 'checkbox', 'label' => __( 'Show floorplans', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'media' ),
+			'template_set_show_virtual_tours' => array( 'type' => 'checkbox', 'label' => __( 'Show virtual tours', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => '', 'group' => 'media' ),
+			'template_set_button_style' => array( 'type' => 'select', 'label' => __( 'Button style', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_button_styles(), 'default' => 'filled', 'group' => 'enquiry' ),
+			'template_set_contact_card_style' => array( 'type' => 'select', 'label' => __( 'Contact card style', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_contact_card_styles(), 'default' => 'classic', 'group' => 'enquiry' ),
+			'template_set_show_mobile_cta' => array( 'type' => 'checkbox', 'label' => __( 'Show mobile enquiry bar', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'enquiry' ),
+			'template_set_show_recommended' => array( 'type' => 'checkbox', 'label' => __( 'Show related properties', 'propertyhive' ), 'options' => self::get_checkbox_options(), 'default' => 'yes', 'group' => 'recommended' ),
+			'template_set_recommended_count' => array( 'type' => 'select', 'label' => __( 'Number of properties', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_recommended_property_counts(), 'default' => 3, 'group' => 'recommended' ),
+			'template_set_recommended_layout' => array( 'type' => 'select', 'label' => __( 'Card layout', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_recommended_property_layouts(), 'default' => 'grid', 'group' => 'recommended' ),
+			'template_set_recommended_image_size' => array( 'type' => 'select', 'label' => __( 'Image size', 'propertyhive' ), 'options' => PH_Template_Set_Options::get_recommended_property_image_sizes(), 'default' => 'standard', 'group' => 'recommended' ),
+		);
+	}
+
+	/**
+	 * Get all controls valid for a detail template, including locked controls.
+	 *
+	 * @param string $slug Detail template slug.
+	 * @return array
+	 */
+	public static function get_detail_template_controls( $slug ) {
+		$manifest = self::get_detail_template_manifest( $slug );
+		$shared   = self::get_detail_shared_controls();
+		$controls = array();
+
+		foreach ( array_unique( array_merge( (array) $manifest['supports'], array_keys( (array) $manifest['locked'] ) ) ) as $key ) {
+			if ( isset( $shared[ $key ] ) ) {
+				$controls[ $key ] = $shared[ $key ];
+			}
+		}
+
+		return array_merge( $controls, (array) $manifest['controls'] );
+	}
+
+	/**
+	 * Stored values used by checkbox controls.
+	 *
+	 * @return array
+	 */
+	private static function get_checkbox_options() {
+		return array( 'yes' => __( 'Yes', 'propertyhive' ), '' => __( 'No', 'propertyhive' ) );
 	}
 
 	/**

@@ -50,17 +50,6 @@ class PH_Template_Set_Editor_Controller {
 				if ( 'search' === $context ) {
 					PH_Template_Set_Search_Form_Editor::render_sidebar_section();
 
-					self::render_template_editor_hidden( 'template_set_gallery_layout', $settings['template_set_gallery_layout'] );
-					self::render_template_editor_hidden( 'template_set_button_style', $settings['template_set_button_style'] );
-					self::render_template_editor_hidden( 'template_set_contact_card_style', $settings['template_set_contact_card_style'] );
-					self::render_template_editor_hidden( 'template_set_show_mobile_cta', $settings['template_set_show_mobile_cta'] );
-					self::render_template_editor_hidden( 'template_set_show_floorplans', $settings['template_set_show_floorplans'] );
-					self::render_template_editor_hidden( 'template_set_show_virtual_tours', $settings['template_set_show_virtual_tours'] );
-					self::render_template_editor_hidden( 'template_set_show_recommended', $settings['template_set_show_recommended'] );
-					self::render_template_editor_hidden( 'template_set_recommended_count', $settings['template_set_recommended_count'] );
-					self::render_template_editor_hidden( 'template_set_recommended_layout', $settings['template_set_recommended_layout'] );
-					self::render_template_editor_hidden( 'template_set_recommended_image_size', $settings['template_set_recommended_image_size'] );
-
 					self::render_template_editor_section_start( __( 'Search result cards', 'propertyhive' ) );
 					self::render_template_editor_select( 'template_set_search_layout', __( 'Results layout', 'propertyhive' ), PH_Template_Set_Options::get_search_layouts(), PH_Template_Set_Request_Context::get_search_view() );
 					self::render_template_editor_select( 'template_set_search_card_size', __( 'Card size', 'propertyhive' ), PH_Template_Set_Options::get_search_card_sizes(), $settings['template_set_search_card_size'] );
@@ -77,34 +66,7 @@ class PH_Template_Set_Editor_Controller {
 					self::render_template_editor_hidden( 'template_set_show_branch', $settings['template_set_show_branch'] );
 					self::render_template_editor_hidden( 'template_set_show_badges', $settings['template_set_show_badges'] );
 
-					self::render_template_editor_section_start( __( 'Gallery', 'propertyhive' ) );
-						echo '<div class="ph-template-editor-field ph-template-editor-field-template_set_gallery_layout">';
-							echo '<span>' . esc_html__( 'Gallery layout', 'propertyhive' ) . '</span>';
-							echo '<div class="ph-template-editor-segmented" role="radiogroup" aria-label="' . esc_attr__( 'Gallery layout', 'propertyhive' ) . '">';
-								foreach ( PH_Template_Set_Options::get_gallery_layouts() as $layout => $label ) {
-									echo '<label class="' . ( $layout === $settings['template_set_gallery_layout'] ? 'is-active' : '' ) . '">';
-										echo '<input type="radio" name="template_set_gallery_layout" value="' . esc_attr( $layout ) . '"' . checked( $layout, $settings['template_set_gallery_layout'], false ) . ' data-ph-template-editor-control>';
-										echo '<span>' . esc_html( $label ) . '</span>';
-									echo '</label>';
-								}
-							echo '</div>';
-						echo '</div>';
-					self::render_template_editor_section_end();
-
-					self::render_template_editor_section_start( __( 'Property page', 'propertyhive' ) );
-					self::render_template_editor_select( 'template_set_button_style', __( 'Button style', 'propertyhive' ), PH_Template_Set_Options::get_button_styles(), $settings['template_set_button_style'] );
-					self::render_template_editor_select( 'template_set_contact_card_style', __( 'Contact card style', 'propertyhive' ), PH_Template_Set_Options::get_contact_card_styles(), $settings['template_set_contact_card_style'] );
-					self::render_template_editor_checkbox( 'template_set_show_mobile_cta', __( 'Show mobile enquiry bar', 'propertyhive' ), $settings['template_set_show_mobile_cta'] );
-					self::render_template_editor_checkbox( 'template_set_show_floorplans', __( 'Show floorplans', 'propertyhive' ), $settings['template_set_show_floorplans'] );
-					self::render_template_editor_checkbox( 'template_set_show_virtual_tours', __( 'Show virtual tours', 'propertyhive' ), $settings['template_set_show_virtual_tours'] );
-					self::render_template_editor_section_end();
-
-					self::render_template_editor_section_start( __( 'Related properties', 'propertyhive' ) );
-					self::render_template_editor_checkbox( 'template_set_show_recommended', __( 'Show related properties', 'propertyhive' ), $settings['template_set_show_recommended'] );
-					self::render_template_editor_select( 'template_set_recommended_count', __( 'Number of properties', 'propertyhive' ), PH_Template_Set_Options::get_recommended_property_counts(), $settings['template_set_recommended_count'] );
-					self::render_template_editor_select( 'template_set_recommended_layout', __( 'Card layout', 'propertyhive' ), PH_Template_Set_Options::get_recommended_property_layouts(), $settings['template_set_recommended_layout'] );
-					self::render_template_editor_select( 'template_set_recommended_image_size', __( 'Image size', 'propertyhive' ), PH_Template_Set_Options::get_recommended_property_image_sizes(), $settings['template_set_recommended_image_size'] );
-					self::render_template_editor_section_end();
+					self::render_detail_manifest_controls( PH_Template_Set_Request_Context::get_detail_template() );
 				}
 
 				echo '<footer class="ph-template-editor-footer">';
@@ -215,6 +177,49 @@ class PH_Template_Set_Editor_Controller {
 	}
 
 	/**
+	 * Render only the controls declared by the current detail manifest.
+	 *
+	 * @param string $template Detail template slug.
+	 */
+	private static function render_detail_manifest_controls( $template ) {
+		$manifest = PH_Template_Set_Catalog::get_detail_template_manifest( $template );
+		$controls = PH_Template_Set_Catalog::get_detail_template_controls( $template );
+		$groups   = self::get_detail_control_groups( $template );
+
+		foreach ( $groups as $group ) {
+			self::render_template_editor_section_start( $group['label'] );
+
+			foreach ( $group['controls'] as $key ) {
+				if ( ! isset( $controls[ $key ] ) ) {
+					continue;
+				}
+
+				$control = $controls[ $key ];
+
+				if ( array_key_exists( $key, (array) $manifest['locked'] ) ) {
+					$value_label = isset( $control['options'][ $manifest['locked'][ $key ] ] ) ? $control['options'][ $manifest['locked'][ $key ] ] : $manifest['locked'][ $key ];
+					echo '<div class="ph-template-editor-field ph-template-editor-field-locked" data-ph-template-editor-panel-control="' . esc_attr( $key ) . '">';
+						echo '<span>' . esc_html( $control['label'] ) . '</span>';
+						echo '<input type="text" value="' . esc_attr( $value_label ) . '" disabled>';
+						echo '<small>' . esc_html__( "Set by this template's design", 'propertyhive' ) . '</small>';
+						echo '</div>';
+					continue;
+				}
+
+				$value = PH_Template_Set_Settings::get_for_template( $key, $template );
+
+				if ( 'checkbox' === $control['type'] ) {
+					self::render_template_editor_checkbox( $key, $control['label'], $value );
+				} else {
+					self::render_template_editor_select( $key, $control['label'], $control['options'], $value );
+				}
+			}
+
+			self::render_template_editor_section_end();
+		}
+	}
+
+	/**
 	 * Save template editor settings.
 	 */
 	public static function ajax_save_template_editor() {
@@ -271,10 +276,22 @@ class PH_Template_Set_Editor_Controller {
 	 * @return array
 	 */
 	public static function get_editor_sidebar_layout() {
+		$detail_groups = array_merge(
+			array(
+				array(
+					'id'       => 'template',
+					'label'    => __( 'Template', 'propertyhive' ),
+					'controls' => array( 'template_set_detail_template' ),
+				),
+			),
+			self::get_detail_control_groups( PH_Template_Set_Request_Context::get_detail_template() )
+		);
+		$detail_active = isset( $detail_groups[1]['id'] ) ? $detail_groups[1]['id'] : 'template';
+
 		return array(
 			'active' => array(
 				'search' => 'layout',
-				'detail' => 'media',
+				'detail' => $detail_active,
 			),
 			'groups' => array(
 				'search' => array(
@@ -304,29 +321,41 @@ class PH_Template_Set_Editor_Controller {
 						'controls' => array( 'template_set_show_branch', 'template_set_show_badges' ),
 					),
 				),
-				'detail' => array(
-					array(
-						'id'       => 'template',
-						'label'    => __( 'Template', 'propertyhive' ),
-						'controls' => array( 'template_set_detail_template' ),
-					),
-					array(
-						'id'       => 'media',
-						'label'    => __( 'Media', 'propertyhive' ),
-						'controls' => array( 'template_set_gallery_layout', 'template_set_show_floorplans', 'template_set_show_virtual_tours' ),
-					),
-					array(
-						'id'       => 'enquiry',
-						'label'    => __( 'Enquiries', 'propertyhive' ),
-						'controls' => array( 'template_set_button_style', 'template_set_contact_card_style', 'template_set_show_mobile_cta' ),
-					),
-					array(
-						'id'       => 'recommended',
-						'label'    => __( 'Related properties', 'propertyhive' ),
-						'controls' => array( 'template_set_show_recommended', 'template_set_recommended_count', 'template_set_recommended_layout', 'template_set_recommended_image_size' ),
-					),
-				),
+				'detail' => $detail_groups,
 			),
 		);
+	}
+
+	/**
+	 * Build grouped detail controls directly from the current manifest.
+	 *
+	 * @param string $template Detail template slug.
+	 * @return array
+	 */
+	private static function get_detail_control_groups( $template ) {
+		$controls = PH_Template_Set_Catalog::get_detail_template_controls( $template );
+		$labels   = array(
+			'media'       => __( 'Media', 'propertyhive' ),
+			'enquiry'     => __( 'Enquiries', 'propertyhive' ),
+			'modules'     => __( 'Modules', 'propertyhive' ),
+			'recommended' => __( 'Related properties', 'propertyhive' ),
+		);
+		$groups = array();
+
+		foreach ( $controls as $key => $control ) {
+			$group = isset( $control['group'] ) ? sanitize_title( $control['group'] ) : 'details';
+
+			if ( ! isset( $groups[ $group ] ) ) {
+				$groups[ $group ] = array(
+					'id'       => $group,
+					'label'    => isset( $labels[ $group ] ) ? $labels[ $group ] : ucwords( str_replace( '-', ' ', $group ) ),
+					'controls' => array(),
+				);
+			}
+
+			$groups[ $group ]['controls'][] = $key;
+		}
+
+		return array_values( $groups );
 	}
 }

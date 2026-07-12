@@ -92,6 +92,43 @@
 		photoTrigger.setAttribute('aria-label', 'Open larger photo: ' + label);
 	}
 
+	function updateCinemaCounter(gallery) {
+		var counter = gallery.querySelector('[data-ph-gallery-counter]');
+		var images;
+		var index;
+
+		if (!counter) {
+			return;
+		}
+
+		images = getGalleryImages(gallery);
+
+		if (!images.length) {
+			counter.textContent = '0 / 0';
+			return;
+		}
+
+		index = getActiveImageIndex(gallery);
+		counter.textContent = (index + 1) + ' / ' + images.length;
+	}
+
+	function moveGalleryImage(gallery, step) {
+		var images = getGalleryImages(gallery);
+		var nextIndex;
+
+		if (images.length < 2) {
+			return;
+		}
+
+		nextIndex = normaliseIndex(getActiveImageIndex(gallery) + step, images.length);
+
+		if (!images[nextIndex]) {
+			return;
+		}
+
+		showImage(gallery, images[nextIndex].thumb);
+	}
+
 	function showImage(gallery, thumb) {
 		var heroImage = gallery.querySelector('[data-ph-gallery-hero-image]');
 		var caption = gallery.querySelector('[data-ph-gallery-caption]');
@@ -113,6 +150,7 @@
 		setPhotoTriggerLabel(gallery, captionText);
 		setActiveThumb(gallery, thumb);
 		showPanel(gallery, 'photos');
+		updateCinemaCounter(gallery);
 	}
 
 	function getStoredGalleryVariant() {
@@ -348,9 +386,12 @@
 		var tabs = gallery.querySelectorAll('[data-ph-gallery-tab]');
 		var photoTrigger = gallery.querySelector('[data-ph-gallery-open]');
 		var variantButtons = gallery.querySelectorAll('[data-ph-gallery-variant]');
+		var prevButton = gallery.querySelector('[data-ph-gallery-prev]');
+		var nextButton = gallery.querySelector('[data-ph-gallery-next]');
 		var storedVariant = (!config.editorActive && variantButtons.length) ? getStoredGalleryVariant() : '';
 
 		setGalleryVariant(gallery, storedVariant || gallery.getAttribute('data-ph-gallery-current-variant') || 'showcase', false);
+		updateCinemaCounter(gallery);
 
 		thumbs.forEach(function (thumb) {
 			thumb.addEventListener('click', function () {
@@ -363,6 +404,22 @@
 				showPanel(gallery, tab.getAttribute('data-ph-gallery-tab') || 'photos');
 			});
 		});
+
+		if (prevButton) {
+			prevButton.addEventListener('click', function (event) {
+				event.preventDefault();
+				event.stopPropagation();
+				moveGalleryImage(gallery, -1);
+			});
+		}
+
+		if (nextButton) {
+			nextButton.addEventListener('click', function (event) {
+				event.preventDefault();
+				event.stopPropagation();
+				moveGalleryImage(gallery, 1);
+			});
+		}
 
 		if (photoTrigger) {
 			photoTrigger.addEventListener('click', function () {

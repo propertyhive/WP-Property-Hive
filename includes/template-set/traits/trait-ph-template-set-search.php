@@ -20,21 +20,24 @@ trait PH_Template_Set_Search {
 			return $classes;
 		}
 
-		$settings  = self::get_settings();
+		$settings      = self::get_settings();
+		$is_detail     = is_property();
+		$button_style  = $is_detail ? PH_Template_Set_Request_Context::get_button_style() : $settings['template_set_button_style'];
+		$contact_style = $is_detail ? PH_Template_Set_Request_Context::get_contact_card_style() : $settings['template_set_contact_card_style'];
 		$classes[] = 'ph-template-set-active';
 		$classes[] = 'ph-template-images-' . sanitize_html_class( $settings['template_set_image_style'] );
-		$classes[] = 'ph-template-buttons-' . sanitize_html_class( $settings['template_set_button_style'] );
-		$classes[] = 'ph-template-contact-card-' . sanitize_html_class( $settings['template_set_contact_card_style'] );
+		$classes[] = 'ph-template-buttons-' . sanitize_html_class( $button_style );
+		$classes[] = 'ph-template-contact-card-' . sanitize_html_class( $contact_style );
 		$classes[] = 'ph-template-editor-mode-' . sanitize_html_class( $settings['template_set_editor_mode'] );
 		$classes[] = 'yes' === $settings['template_set_show_branch'] ? 'ph-template-show-branch' : 'ph-template-hide-branch';
 		$classes[] = 'yes' === $settings['template_set_show_badges'] ? 'ph-template-show-badges' : 'ph-template-hide-badges';
-		$classes[] = 'yes' === $settings['template_set_show_mobile_cta'] ? 'ph-template-show-mobile-cta' : 'ph-template-hide-mobile-cta';
-		$classes[] = 'yes' === $settings['template_set_show_floorplans'] ? 'ph-template-show-floorplans' : 'ph-template-hide-floorplans';
-		$classes[] = 'yes' === $settings['template_set_show_virtual_tours'] ? 'ph-template-show-virtual-tours' : 'ph-template-hide-virtual-tours';
-		$classes[] = 'yes' === $settings['template_set_show_recommended'] ? 'ph-template-show-recommended' : 'ph-template-hide-recommended';
-		$classes[] = 'ph-template-recommended-count-' . absint( $settings['template_set_recommended_count'] );
-		$classes[] = 'ph-template-recommended-layout-' . sanitize_html_class( $settings['template_set_recommended_layout'] );
-		$classes[] = 'ph-template-recommended-images-' . sanitize_html_class( $settings['template_set_recommended_image_size'] );
+		$classes[] = 'yes' === ( $is_detail ? PH_Template_Set_Request_Context::get_show_mobile_cta() : $settings['template_set_show_mobile_cta'] ) ? 'ph-template-show-mobile-cta' : 'ph-template-hide-mobile-cta';
+		$classes[] = 'yes' === ( $is_detail ? PH_Template_Set_Request_Context::get_show_floorplans() : $settings['template_set_show_floorplans'] ) ? 'ph-template-show-floorplans' : 'ph-template-hide-floorplans';
+		$classes[] = 'yes' === ( $is_detail ? PH_Template_Set_Request_Context::get_show_virtual_tours() : $settings['template_set_show_virtual_tours'] ) ? 'ph-template-show-virtual-tours' : 'ph-template-hide-virtual-tours';
+		$classes[] = 'yes' === ( $is_detail ? PH_Template_Set_Request_Context::get_show_recommended() : $settings['template_set_show_recommended'] ) ? 'ph-template-show-recommended' : 'ph-template-hide-recommended';
+		$classes[] = 'ph-template-recommended-count-' . absint( $is_detail ? PH_Template_Set_Request_Context::get_recommended_count() : $settings['template_set_recommended_count'] );
+		$classes[] = 'ph-template-recommended-layout-' . sanitize_html_class( $is_detail ? PH_Template_Set_Request_Context::get_recommended_layout() : $settings['template_set_recommended_layout'] );
+		$classes[] = 'ph-template-recommended-images-' . sanitize_html_class( $is_detail ? PH_Template_Set_Request_Context::get_recommended_image_size() : $settings['template_set_recommended_image_size'] );
 
 		if ( self::is_template_editor_active() ) {
 			$classes[] = 'ph-template-editor-active';
@@ -45,7 +48,20 @@ trait PH_Template_Set_Search {
 		}
 
 		if ( is_property() ) {
-			$classes[] = 'ph-detail-template-' . sanitize_html_class( self::get_detail_template() );
+			$detail_template = self::get_detail_template();
+			$classes[] = 'ph-detail-template-' . sanitize_html_class( $detail_template );
+
+			if ( 'conversion-first-sales-detail' === $detail_template ) {
+				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_portal_show_costs() ? 'ph-template-show-portal-costs' : 'ph-template-hide-portal-costs';
+			}
+
+			if ( 'immersive-cinema-detail' === $detail_template ) {
+				$classes[] = 'ph-template-cinema-card-' . sanitize_html_class( PH_Template_Set_Request_Context::get_cinema_card_position() );
+			}
+
+			if ( 'premium-editorial-detail' === $detail_template ) {
+				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_editorial_show_brief() ? 'ph-template-show-editorial-brief' : 'ph-template-hide-editorial-brief';
+			}
 		}
 
 		if ( is_post_type_archive( 'property' ) ) {
@@ -627,11 +643,13 @@ trait PH_Template_Set_Search {
 	}
 
 	/**
-	 * Get a Shortlist add-on button for search result cards.
+	 * Get a Shortlist add-on button for search result cards / detail panels.
 	 *
+	 * @param string $class  Anchor class attribute.
+	 * @param array  $labels Optional add/remove labels: keys `add`, `remove`.
 	 * @return string
 	 */
-	private static function get_shortlist_button_markup( $class = 'ph-template-shortlist-button' ) {
+	private static function get_shortlist_button_markup( $class = 'ph-template-shortlist-button', $labels = array() ) {
 		if ( ! class_exists( 'PH_Shortlist' ) || ! self::is_add_on_usable( 'propertyhive-shortlist' ) || ! shortcode_exists( 'shortlist_button' ) ) {
 			return '';
 		}
@@ -642,7 +660,148 @@ trait PH_Template_Set_Search {
 			$class = 'ph-template-shortlist-button';
 		}
 
-		return do_shortcode( '[shortlist_button class="' . esc_attr( $class ) . '"]' );
+		$markup = do_shortcode( '[shortlist_button class="' . esc_attr( $class ) . '"]' );
+
+		if ( '' === $markup || empty( $labels ) || ! is_array( $labels ) ) {
+			return $markup;
+		}
+
+		$default_add    = __( 'Add To Shortlist', 'propertyhive' );
+		$default_remove = __( 'Remove From Shortlist', 'propertyhive' );
+		$add_label      = isset( $labels['add'] ) ? (string) $labels['add'] : $default_add;
+		$remove_label   = isset( $labels['remove'] ) ? (string) $labels['remove'] : $default_remove;
+
+		// Replace visible label text even when the shortcode wraps it in extra markup.
+		$markup = preg_replace(
+			'/(>(?:\s|&nbsp;)*)' . preg_quote( $default_add, '/' ) . '((?:\s|&nbsp;)*<\/)/u',
+			'$1' . $add_label . '$2',
+			$markup,
+			1
+		);
+		$markup = preg_replace(
+			'/(>(?:\s|&nbsp;)*)' . preg_quote( $default_remove, '/' ) . '((?:\s|&nbsp;)*<\/)/u',
+			'$1' . $remove_label . '$2',
+			$markup,
+			1
+		);
+		$markup = str_replace(
+			array( $default_add, $default_remove ),
+			array( $add_label, $remove_label ),
+			$markup
+		);
+
+		// Keep AJAX toggle labels in sync with custom microcopy.
+		// Prefer late localization so later default shortlist buttons do not clobber cinema labels.
+		$localize = static function() use ( $add_label, $remove_label ) {
+			wp_localize_script(
+				'ph-shortlist',
+				'propertyhive_shortlist',
+				array(
+					'ajax_url'         => admin_url( 'admin-ajax.php' ),
+					'add_link_text'    => $add_label,
+					'remove_link_text' => $remove_label,
+					'loading_text'     => __( 'Loading', 'propertyhive' ),
+				)
+			);
+		};
+		$localize();
+		// Late footer pass so default shortlist localizations cannot clobber cinema labels.
+		if ( ! has_action( 'wp_print_footer_scripts', $localize ) ) {
+			add_action( 'wp_print_footer_scripts', $localize, 99 );
+		}
+
+		return $markup;
+	}
+
+	/**
+	 * Whether the Send To Friend add-on is available for a Share control.
+	 *
+	 * @return bool
+	 */
+	private static function is_send_to_friend_available() {
+		if ( shortcode_exists( 'send_to_friend_form' ) && self::is_add_on_usable( 'propertyhive-send-to-friend' ) ) {
+			return true;
+		}
+
+		if ( class_exists( 'PH_Send_To_Friend' ) || class_exists( 'PH_Send_To_A_Friend' ) ) {
+			return self::is_add_on_usable( 'propertyhive-send-to-friend' );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get Share markup from the Send To Friend add-on (via propertyhive_single_property_actions).
+	 *
+	 * Returns empty string when the add-on is not active — no invented fallback.
+	 *
+	 * @param string $class Anchor class attribute.
+	 * @return string
+	 */
+	private static function get_share_button_markup( $class = 'ph-template-button ph-template-button-secondary ph-template-share-button' ) {
+		if ( ! self::is_send_to_friend_available() ) {
+			return '';
+		}
+
+		$actions = apply_filters( 'propertyhive_single_property_actions', array() );
+
+		if ( empty( $actions ) || ! is_array( $actions ) ) {
+			return '';
+		}
+
+		$share_action = null;
+
+		foreach ( $actions as $action ) {
+			if ( empty( $action ) || ! is_array( $action ) ) {
+				continue;
+			}
+
+			$action_class = isset( $action['class'] ) ? (string) $action['class'] : '';
+			$label        = isset( $action['label'] ) ? (string) $action['label'] : '';
+			$data_src     = '';
+
+			if ( ! empty( $action['attributes'] ) && is_array( $action['attributes'] ) && isset( $action['attributes']['data-src'] ) ) {
+				$data_src = (string) $action['attributes']['data-src'];
+			}
+
+			if (
+				false !== stripos( $action_class, 'friend' )
+				|| false !== stripos( $action_class, 'send-to-friend' )
+				|| false !== stripos( $label, 'friend' )
+				|| false !== stripos( $data_src, 'friend' )
+				|| false !== stripos( $data_src, 'sendToFriend' )
+			) {
+				$share_action = $action;
+				break;
+			}
+		}
+
+		if ( ! $share_action ) {
+			return '';
+		}
+
+		$class = trim( (string) $class );
+
+		if ( '' === $class ) {
+			$class = 'ph-template-button ph-template-button-secondary ph-template-share-button';
+		}
+
+		$href  = isset( $share_action['href'] ) ? (string) $share_action['href'] : '';
+		$attrs = array();
+
+		if ( ! empty( $share_action['attributes'] ) && is_array( $share_action['attributes'] ) ) {
+			foreach ( $share_action['attributes'] as $key => $value ) {
+				$key = sanitize_key( $key );
+				if ( '' === $key ) {
+					continue;
+				}
+				$attrs[] = esc_attr( $key ) . '="' . esc_attr( (string) $value ) . '"';
+			}
+		}
+
+		return '<a href="' . esc_url( $href ? $href : 'javascript:;' ) . '" class="' . esc_attr( $class ) . '"'
+			. ( $attrs ? ' ' . implode( ' ', $attrs ) : '' )
+			. '>' . esc_html__( 'Share', 'propertyhive' ) . '</a>';
 	}
 
 	/**

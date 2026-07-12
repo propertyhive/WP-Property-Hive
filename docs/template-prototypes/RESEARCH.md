@@ -179,3 +179,48 @@ Ship **patterns**, not fifteen PHP templates:
 4. **Bento thinking** — implement modules as independent partials regardless of visual skin  
 
 Optional later: New Homes Release (needs richer development data), Neighbourhood First (needs map/POI confidence).
+
+---
+
+## 7. Batch C — five orthogonal directions (16–20)
+
+Each deliberately avoids the retained bets (mosaic + sticky rail, dark cinema hero, spec matrix) and sharpens — rather than clones — the nearest discarded Batch B cousin.
+
+| # | Name | Primary bet | Sharper than Batch B because… |
+|---|------|-------------|-------------------------------|
+| 16 | **Area Dossier** | The *area* is above the fold: commute table, Ofsted-rated schools, categorised daily-life distances, "a Saturday from this door" | Not a decorative map hero (06) — it's structured decision data. Pattern: Zillow's Neighborhood tab (schools + walk scores as scannable rows) and personalised travel times; Booking.com's categorised distance tables |
+| 17 | **Private Office** | Appointment-led luxury: centred serif masthead, full-bleed plates with captions, dotted-leader "Particulars", closing letter from the negotiator, one quiet CTA | Merges 02 + 07 into a single coherent voice. Mobbin research returned only portal layouts for "luxury" — confirmation this direction must borrow from brand sites (Savills/KF conventions), not marketplaces |
+| 18 | **Tenant Ready** | Lettings dataset of the same home: rent pcm + weekly, itemised move-in costs to a total, availability badge, included/excluded matrix, 4-step application timeline, pre-enquiry checklist | 12 was a generic lettings skin; this is built around the tenant's actual anxiety — *can I afford it and will I pass referencing*. Pattern: Airbnb's line-item price breakdown to a bold total |
+| 19 | **Bento Field System** | Every tile is labelled with the PH field it renders (`get_formatted_price()`, `features`, `epc`…); an empty field's tile drops out and the grid reflows — one tile is shown in its empty state as proof | 10 was a visual bento; this one is the *implementation model* — tiles map 1:1 to template-set partials, so graceful absence is the system, not an afterthought |
+| 20 | **Walkthrough Chapters** | Room-by-room tour driven by PH room data (names + dimensions as chapter kickers), sticky chapter rail with IntersectionObserver active state, mid-scroll inline CTA, "end of the tour" close | 09 was editorial sections for their own sake; here chapters *are* the room-based description data, so the structure generates itself from the listing. Pattern: Perplexity Pages' sticky TOC with active highlight |
+
+**Coverage of buyer jobs-to-be-done:** 16 answers "can I live my life from here?", 17 "is this special?", 18 "can I afford and secure it?", 19 "give me everything at a glance", 20 "walk me through it". Combined with 01/04/05, the eight directions now span conversion, drama, density, location, restraint, department, system and story — no two share a primary bet.
+
+---
+
+## 8. Data-mapped build candidates (01b / 04b / 17b)
+
+Assessment of prototypes against actual PH data (source: `PH_Property` in `includes/class-ph-property.php`, the template-set engine in `includes/template-set/`, and the live Features-tab add-on catalogue). v1 files are preserved; corrections live in new `*-v2.html` files with an HTML comment on every module naming its PH source and empty-state rule.
+
+### Ground rules established by the audit
+
+| Claim in prototypes | Reality in core |
+|---|---|
+| Floor area (sq ft) for residential | **Does not exist** — `_floor_area_*` meta is schema-only; admin input + display are commercial-only (`ph-template-functions.php:680`) |
+| EPC rating / score (e.g. "C (72)") | **Does not exist** — EPCs are document attachments/URLs only (`_epcs`, `_epc_urls`); EPC Graph Generator add-on is the only rating-graphic path |
+| En-suite counts, embellished bed copy | **Does not exist** — `_bedrooms`/`_bathrooms`/`_reception_rooms` are plain numerics |
+| Council tax band | **Exists** — `_council_tax_band`, residential sales & lettings |
+| Freeform long description | Residential descriptions are **room-based**: `_rooms` count + `_room_name_{i}` / `_room_dimensions_{i}` / `_room_description_{i}` via `get_formatted_rooms()` |
+| Material information | **Exists** — `get_material_information()`: heating, electricity, water, sewerage, broadband, flood risk |
+| Save / Share buttons | Add-ons via `propertyhive_single_property_actions`: Shortlist, Send To Friend |
+| Virtual tour buttons | Core stores per-tour labels: `_virtual_tour_label_{i}` |
+
+### What each v2 changed
+
+- **01b Portal Split v2** — "Full details" lorem → room-based rendering; facts bar gains tenure + council tax (leasehold cluster conditional); new **Purchase costs** block (free Stamp Duty + Mortgage Calculator add-on shortcodes — natural portal-conversion fit); material information; labelled tours; negotiator + office contact fields; Save/Share annotated to their add-ons.
+- **04b Immersive Cinema v2** — new "Room by room" dark-styled section; new details table (price qualifier, tenure, council tax, parking, `_reference_number`); material information; labelled tour control; Save/Share split + annotated; agent panel on negotiator/office fields.
+- **17b Private Office v2** — removed invented sq-ft and EPC score; prose chapters → typeset room-by-room from `_rooms`; particulars restricted to core fields (+ reference, outside space); material information as quiet appendix; add-on slots: Viewing Request (primary CTA), Printable Brochures, what3words, LocRating report line, Shortlist/Send-to-friend quiet actions.
+
+### Template-set note for the build
+
+The catalog (`class-ph-template-set-catalog.php`) currently registers only `standard-sales-detail`; `premium-editorial-detail` and `new-homes-development-detail` are referenced in preview code but unregistered. 01b maps closest to the existing partial set (kicker, highlights, contact-panel, modules, similar-properties, mobile-cta, trust-note); 04b and 17b would ship as new catalog entries composed from the same partials plus new gallery/section treatments.

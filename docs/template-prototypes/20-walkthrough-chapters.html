@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>20 · Walkthrough Chapters — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root {
+    --ph-brand: #7c2d12;
+    --ph-brand-dark: #5c210d;
+    --ph-accent: #b45309;
+    --ph-surface: #faf7f4;
+  }
+  body { background: #fffdfb; }
+
+  /* Opening spread: half photo, half title. The tour starts at the door. */
+  .spread {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: min(78vh, 720px);
+  }
+  .spread .photo { position: relative; }
+  .spread .photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .spread .intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px clamp(24px, 5vw, 72px);
+    background: var(--ph-surface);
+  }
+  .spread h1 {
+    font-size: clamp(1.8rem, 3.4vw, 2.7rem);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin: 14px 0 12px;
+  }
+  .spread .price-line { font-size: 1.05rem; color: var(--ph-ink-soft); margin: 0 0 22px; }
+  .spread .price-line strong { color: var(--ph-ink); font-size: 1.2em; }
+  .spread .facts { margin-bottom: 28px; }
+  .spread .start {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .spread .tour-note { font-size: 13px; color: var(--ph-muted); margin-top: 18px; }
+
+  /* Body: sticky chapter rail + scroll story */
+  .story-shell {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 56px;
+    padding: 64px 20px 90px;
+    align-items: start;
+  }
+  .toc {
+    position: sticky;
+    top: 70px;
+  }
+  .toc .head {
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ph-muted);
+    margin-bottom: 14px;
+  }
+  .toc ol { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--ph-line); }
+  .toc a {
+    display: block;
+    padding: 8px 0 8px 16px;
+    margin-left: -2px;
+    border-left: 2px solid transparent;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ph-muted);
+    text-decoration: none;
+  }
+  .toc a:hover { color: var(--ph-ink); }
+  .toc a.is-active { color: var(--ph-brand); border-left-color: var(--ph-brand); }
+  .toc .toc-cta { margin-top: 20px; display: grid; gap: 8px; }
+
+  .chapter { margin-bottom: 72px; scroll-margin-top: 80px; }
+  .chapter:last-of-type { margin-bottom: 0; }
+  .chapter .ch-num {
+    font-size: 11.5px;
+    font-weight: 750;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ph-accent);
+  }
+  .chapter h2 {
+    font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+    letter-spacing: -0.02em;
+    margin: 8px 0 14px;
+  }
+  .chapter p { color: var(--ph-ink-soft); font-size: 15.5px; line-height: 1.65; margin: 0 0 14px; max-width: 62ch; }
+  .chapter figure { margin: 22px 0; }
+  .chapter figure img { width: 100%; border-radius: 16px; aspect-ratio: 16/9; object-fit: cover; }
+  .chapter figcaption { font-size: 12.5px; color: var(--ph-muted); margin-top: 8px; }
+  .dims {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 8px;
+  }
+  .dims span {
+    background: var(--ph-surface);
+    border: 1px solid #eee5db;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    font-weight: 650;
+    color: var(--ph-ink-soft);
+  }
+  .inline-cta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--ph-surface);
+    border: 1px solid #eee5db;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .inline-cta p { margin: 0; font-size: 14px; flex: 1; min-width: 200px; }
+  .chapter .feature-list { max-width: none; }
+  .chapter .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 22px 0; }
+  .chapter .two-up img { border-radius: 16px; aspect-ratio: 4/3; object-fit: cover; width: 100%; }
+
+  .details-table { width: 100%; border-collapse: collapse; font-size: 14.5px; max-width: 560px; }
+  .details-table td { padding: 10px 0; border-bottom: 1px solid var(--ph-line); }
+  .details-table td:first-child { color: var(--ph-muted); width: 42%; }
+  .details-table td:last-child { font-weight: 650; }
+
+  .closing {
+    background: var(--ph-brand);
+    color: #fff;
+    border-radius: 20px;
+    padding: 40px clamp(24px, 4vw, 48px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 64px;
+  }
+  .closing h2 { margin: 0 0 6px; font-size: 1.4rem; letter-spacing: -0.02em; }
+  .closing p { margin: 0; color: rgba(255,255,255,.8); font-size: 14.5px; }
+  .closing .btn-primary { background: #fff; color: var(--ph-brand-dark); }
+  .closing .btn-primary:hover { background: #f4e8df; }
+  .closing .btn-secondary { border-color: rgba(255,255,255,.5); color: #fff; }
+
+  .similar-band { max-width: 1140px; margin: 0 auto; padding: 0 20px 100px; }
+  .similar-band h2 { font-size: 1.2rem; letter-spacing: -0.01em; margin: 0 0 16px; }
+
+  @media (max-width: 900px) {
+    .spread { grid-template-columns: 1fr; min-height: 0; }
+    .spread .photo { min-height: 300px; }
+    .story-shell { grid-template-columns: 1fr; gap: 0; padding-top: 40px; }
+    .toc {
+      position: sticky;
+      top: 42px;
+      z-index: 40;
+      background: rgba(255,253,251,.95);
+      backdrop-filter: blur(8px);
+      margin: 0 -20px 32px;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--ph-line);
+    }
+    .toc .head, .toc .toc-cta { display: none; }
+    .toc ol { display: flex; overflow-x: auto; border-left: 0; gap: 4px; }
+    .toc a { border-left: 0; border-bottom: 2px solid transparent; white-space: nowrap; padding: 8px 10px; }
+    .toc a.is-active { border-bottom-color: var(--ph-brand); }
+    .chapter .two-up { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>20 · Walkthrough Chapters</strong>
+  <nav>
+    <a href="index.html">Shortlist</a>
+    <a href="19-bento-field-system.html">← Prev</a>
+    <a href="16-area-dossier.html">Next →</a>
+  </nav>
+</div>
+
+<header class="spread">
+  <div class="photo">
+    <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="Arriving at 91 Waterman Court" />
+  </div>
+  <div class="intro">
+    <div class="kicker"><span class="badge">For sale</span> · Freehold · Bungalow</div>
+    <h1>91 Waterman Court,<br />Wokingham</h1>
+    <p class="price-line">Offers over <strong>£1,340,000</strong></p>
+    <ul class="facts">
+      <li><span class="label">Beds</span><span class="val">3</span></li>
+      <li><span class="label">Baths</span><span class="val">3</span></li>
+      <li><span class="label">Receptions</span><span class="val">2</span></li>
+      <li><span class="label">Area</span><span class="val">2,400 ft²</span></li>
+    </ul>
+    <div class="start">
+      <a class="btn btn-primary" href="#arrival">Start the walkthrough ↓</a>
+      <button type="button" class="btn btn-secondary">Request viewing</button>
+    </div>
+    <p class="tour-note">7 chapters · about 3 minutes · or skip to <a href="#details">the details</a></p>
+  </div>
+</header>
+
+<div class="story-shell">
+  <nav class="toc" aria-label="Chapters">
+    <div class="head">The Tour</div>
+    <ol>
+      <li><a href="#arrival" class="is-active">01 · Arrival</a></li>
+      <li><a href="#living">02 · Living</a></li>
+      <li><a href="#kitchen">03 · Kitchen &amp; dining</a></li>
+      <li><a href="#bedrooms">04 · Bedrooms</a></li>
+      <li><a href="#garden">05 · Garden &amp; studio</a></li>
+      <li><a href="#area">06 · The area</a></li>
+      <li><a href="#details">07 · The details</a></li>
+    </ol>
+    <div class="toc-cta">
+      <button type="button" class="btn btn-primary btn-block">Request viewing</button>
+      <button type="button" class="btn btn-ghost btn-block">♡ Shortlist</button>
+    </div>
+  </nav>
+
+  <div>
+    <section class="chapter" id="arrival">
+      <span class="ch-num">Chapter 01</span>
+      <h2>Arrival</h2>
+      <p>Waterman Court is a private close of six houses, and number 91 holds the head of it — no through traffic, beech trees behind, and a low brick line that gives nothing away from the road.</p>
+      <figure>
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-1024x683.png" alt="The approach" />
+        <figcaption>The approach from the court · head-of-close position</figcaption>
+      </figure>
+    </section>
+
+    <section class="chapter" id="living">
+      <span class="ch-num">Chapter 02 · 24'1" × 16'4"</span>
+      <h2>Living</h2>
+      <div class="dims"><span>Sitting room · 24'1" × 16'4"</span><span>Snug · 13'2" × 11'8"</span></div>
+      <p>The sitting room faces south-west across the terrace, so it takes the afternoon and keeps it. A second, smaller reception works as snug, library or playroom — the house doesn't dictate.</p>
+      <figure>
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="The sitting room" />
+        <figcaption>Sitting room · evening light from the garden side</figcaption>
+      </figure>
+    </section>
+
+    <section class="chapter" id="kitchen">
+      <span class="ch-num">Chapter 03 · 28'6" × 15'9"</span>
+      <h2>Kitchen &amp; dining</h2>
+      <div class="dims"><span>Kitchen / dining · 28'6" × 15'9"</span><span>Utility · 8'4" × 6'2"</span></div>
+      <p>The working heart of the 2023 remodel: one room, full depth of the plan, under twin roof lanterns. Breakfast at the island, dinner for twelve at the garden end, and a separate utility keeping the machinery out of earshot.</p>
+      <figure>
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="Kitchen and dining space" />
+        <figcaption>Kitchen and dining under the roof lanterns</figcaption>
+      </figure>
+      <div class="inline-cta">
+        <p><strong>Halfway there.</strong> Rather see it in person? Viewings usually take 40 minutes.</p>
+        <button type="button" class="btn btn-primary">Request viewing</button>
+      </div>
+    </section>
+
+    <section class="chapter" id="bedrooms">
+      <span class="ch-num">Chapter 04 · three suites</span>
+      <h2>Bedrooms</h2>
+      <div class="dims"><span>Principal · 18'2" × 14'6" en suite</span><span>Bedroom 2 · 14'8" × 12'1" en suite</span><span>Bedroom 3 · 12'6" × 11'4" en suite</span></div>
+      <p>Three doubles, each with its own bath or shower room — rare in a single-storey house at any price. The principal suite opens straight onto the garden through glazed doors: coffee on the terrace before the day starts.</p>
+      <figure>
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-1024x683.png" alt="Principal bedroom" />
+        <figcaption>Principal suite · doors to the garden terrace</figcaption>
+      </figure>
+    </section>
+
+    <section class="chapter" id="garden">
+      <span class="ch-num">Chapter 05 · south-west facing</span>
+      <h2>Garden &amp; studio</h2>
+      <p>Landscaped in the same 2023 works: a stone terrace off the kitchen, lawn framed by mature beech, and a detached studio at the boundary — wired, insulated, and currently a home office.</p>
+      <div class="two-up">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="Garden terrace" />
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-768x512.png" alt="The studio" />
+      </div>
+    </section>
+
+    <section class="chapter" id="area">
+      <span class="ch-num">Chapter 06</span>
+      <h2>The area</h2>
+      <p>Ten minutes' walk to the market square, less to the woods. Wokingham station is 0.8 miles — Waterloo in under an hour, Reading in ten minutes — and the town's Outstanding-rated schools are the reason many families stop looking once they get here.</p>
+      <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham RG41 3FL · station 0.8 mi</span></div>
+    </section>
+
+    <section class="chapter" id="details">
+      <span class="ch-num">Chapter 07</span>
+      <h2>The details</h2>
+      <ul class="feature-list" style="margin-bottom:24px">
+        <li>Principal suite opening to the garden</li>
+        <li>Kitchen / dining under twin roof lanterns</li>
+        <li>South-west facing landscaped garden</li>
+        <li>Detached garden studio / office</li>
+        <li>Underfloor heating throughout</li>
+        <li>Head-of-court position</li>
+      </ul>
+      <table class="details-table">
+        <tr><td>Price</td><td>Offers over £1,340,000</td></tr>
+        <tr><td>Tenure</td><td>Freehold</td></tr>
+        <tr><td>Council tax</td><td>Band G · Wokingham BC</td></tr>
+        <tr><td>EPC</td><td>C (72)</td></tr>
+        <tr><td>Parking</td><td>On road</td></tr>
+      </table>
+      <div class="doc-links" style="margin-top:22px">
+        <a href="#">📄 Brochure</a>
+        <a href="#">⚡ EPC</a>
+        <a href="#">🗺 Floorplan</a>
+        <a href="#">▶ Virtual tour</a>
+      </div>
+
+      <div class="closing">
+        <div>
+          <h2>End of the tour. Start of yours?</h2>
+          <p>Sarah Pemberton · Property Hive, Wokingham · 0118 496 0000</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <button type="button" class="btn btn-secondary">Email Sarah</button>
+          <button type="button" class="btn btn-primary">Request viewing</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="similar-band">
+  <h2>Other homes worth a walkthrough</h2>
+  <div class="similar-grid">
+    <article class="similar-card">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" />
+      <div class="body"><div class="p">£875,000</div><div class="t">Nearby home, Wokingham</div><div class="f">3 bed · 2 bath</div></div>
+    </article>
+    <article class="similar-card">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" />
+      <div class="body"><div class="p">£1,100,000</div><div class="t">Similar bungalow, RG41</div><div class="f">3 bed · 2 bath</div></div>
+    </article>
+    <article class="similar-card">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" />
+      <div class="body"><div class="p">£995,000</div><div class="t">Family home, Wokingham</div><div class="f">4 bed · 2 bath</div></div>
+    </article>
+  </div>
+</section>
+
+<div class="mobile-cta" aria-label="Mobile actions">
+  <button type="button" class="btn btn-ghost btn-call">♡</button>
+  <button type="button" class="btn btn-secondary">Call</button>
+  <button type="button" class="btn btn-primary">Request viewing</button>
+</div>
+
+<script>
+  // Chapter rail active state — the one behaviour this direction depends on.
+  const links = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const targets = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const setActive = id => links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === '#' + id));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  targets.forEach(t => io.observe(t));
+</script>
+</body>
+</html>

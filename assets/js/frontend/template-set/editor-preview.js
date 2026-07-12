@@ -155,6 +155,15 @@
 		},
 		template_set_recommended_image_size: function (value) {
 			setBodyOption('ph-template-recommended-images-', value);
+		},
+		template_set_portal_show_costs: function (value) {
+			setBodyToggle('ph-template-show-portal-costs', 'ph-template-hide-portal-costs', value === 'yes');
+		},
+		template_set_cinema_card_position: function (value) {
+			setBodyOption('ph-template-cinema-card-', value);
+		},
+		template_set_editorial_show_brief: function (value) {
+			setBodyToggle('ph-template-show-editorial-brief', 'ph-template-hide-editorial-brief', value === 'yes');
 		}
 	};
 
