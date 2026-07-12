@@ -456,10 +456,73 @@ class PH_Template_Set_Request_Context {
 	 * @return string
 	 */
 	public static function get_gallery_layout() {
-		$settings = PH_Template_Set_Settings::get_settings();
-		$layout   = sanitize_title( $settings['template_set_gallery_layout'] );
+		$layout = sanitize_title( self::get_detail_setting( 'template_set_gallery_layout' ) );
 
 		return isset( PH_Template_Set_Options::get_gallery_layouts()[ $layout ] ) ? $layout : 'showcase';
+	}
+
+	/**
+	 * Get a setting resolved for the current detail template.
+	 *
+	 * @param string $key Setting key.
+	 * @return mixed
+	 */
+	public static function get_detail_setting( $key ) {
+		return PH_Template_Set_Settings::get_for_template( $key, self::get_detail_template() );
+	}
+
+	public static function get_button_style() {
+		$value = sanitize_title( self::get_detail_setting( 'template_set_button_style' ) );
+		return isset( PH_Template_Set_Options::get_button_styles()[ $value ] ) ? $value : 'filled';
+	}
+
+	public static function get_contact_card_style() {
+		$value = sanitize_title( self::get_detail_setting( 'template_set_contact_card_style' ) );
+		return isset( PH_Template_Set_Options::get_contact_card_styles()[ $value ] ) ? $value : 'classic';
+	}
+
+	public static function get_show_mobile_cta() {
+		return 'yes' === self::get_detail_setting( 'template_set_show_mobile_cta' ) ? 'yes' : '';
+	}
+
+	public static function get_show_floorplans() {
+		return 'yes' === self::get_detail_setting( 'template_set_show_floorplans' ) ? 'yes' : '';
+	}
+
+	public static function get_show_virtual_tours() {
+		return 'yes' === self::get_detail_setting( 'template_set_show_virtual_tours' ) ? 'yes' : '';
+	}
+
+	public static function get_show_recommended() {
+		return 'yes' === self::get_detail_setting( 'template_set_show_recommended' ) ? 'yes' : '';
+	}
+
+	public static function get_recommended_count() {
+		$value = absint( self::get_detail_setting( 'template_set_recommended_count' ) );
+		return isset( PH_Template_Set_Options::get_recommended_property_counts()[ $value ] ) ? $value : 3;
+	}
+
+	public static function get_recommended_layout() {
+		$value = sanitize_title( self::get_detail_setting( 'template_set_recommended_layout' ) );
+		return isset( PH_Template_Set_Options::get_recommended_property_layouts()[ $value ] ) ? $value : 'grid';
+	}
+
+	public static function get_recommended_image_size() {
+		$value = sanitize_title( self::get_detail_setting( 'template_set_recommended_image_size' ) );
+		return isset( PH_Template_Set_Options::get_recommended_property_image_sizes()[ $value ] ) ? $value : 'standard';
+	}
+
+	public static function get_portal_show_costs() {
+		return 'yes' === self::get_detail_setting( 'template_set_portal_show_costs' ) ? 'yes' : '';
+	}
+
+	public static function get_cinema_card_position() {
+		$value = sanitize_title( self::get_detail_setting( 'template_set_cinema_card_position' ) );
+		return in_array( $value, array( 'right', 'left' ), true ) ? $value : 'right';
+	}
+
+	public static function get_editorial_show_brief() {
+		return 'yes' === self::get_detail_setting( 'template_set_editorial_show_brief' ) ? 'yes' : '';
 	}
 
 	/**

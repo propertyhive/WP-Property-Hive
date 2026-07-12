@@ -66,14 +66,54 @@ trait PH_Template_Set_Preview {
 		}
 
 		remove_action( 'propertyhive_before_single_property_summary', 'propertyhive_show_property_images', 10 );
-		add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_detail_gallery' ), 10 );
-		add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_detail_facts_strip' ), 11 );
+
+		if ( 'premium-editorial-detail' === self::get_detail_template() ) {
+			// The content template only has an after-summary hook outside the
+			// summary wrapper. Use it to place the editorial plate after its
+			// masthead while retaining a full-width sibling in the document.
+			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_gallery' ), 1 );
+		} else {
+			add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_detail_gallery' ), 10 );
+		}
+
+		if ( 'conversion-first-sales-detail' === self::get_detail_template() ) {
+			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_facts_strip' ), 1 );
+		} else {
+			add_action( 'propertyhive_before_single_property_summary', array( __CLASS__, 'render_detail_facts_strip' ), 11 );
+		}
 
 		// Standard sales detail surfaces type/beds/baths/etc. in the facts strip
 		// below the gallery, so the default sidebar meta list is redundant. Drop
 		// it on the live frontend to match the editor preview.
-		if ( 'standard-sales-detail' === self::get_detail_template() ) {
+		if ( self::detail_template_uses_facts_strip( self::get_detail_template() ) ) {
 			remove_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_meta', 20 );
+		}
+
+		// Portal Split keeps price only in the sticky enquire card; the facts
+		// strip owns type/beds/baths/etc. Drop the summary price so it is not
+		// repeated above the strip.
+		if ( 'conversion-first-sales-detail' === self::get_detail_template() ) {
+			remove_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_price', 10 );
+		}
+
+		if ( self::detail_template_uses_rich_modules( self::get_detail_template() ) ) {
+			remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_actions', 10 );
+			remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_features', 20 );
+			remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_summary', 30 );
+			remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_description', 40 );
+			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_enquiry_modal' ), 10 );
+		}
+
+		if ( 'premium-editorial-detail' === self::get_detail_template() ) {
+			// The letter closes the page: after the similar-properties strip (60),
+			// before the mobile CTA bar (95).
+			remove_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_contact_panel' ), 5 );
+			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_contact_panel' ), 65 );
+		}
+
+		if ( 'immersive-cinema-detail' === self::get_detail_template() ) {
+			// Floating contact card is nested inside the cinema hero, not after summary.
+			remove_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_detail_contact_panel' ), 5 );
 		}
 	}
 
@@ -86,23 +126,35 @@ trait PH_Template_Set_Preview {
 			return;
 		}
 
+		$detail_template = self::get_detail_template();
+
 		remove_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_price', 10 );
-		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_demo_price' ), 10 );
+		// Portal Split price lives only on the sticky contact card.
+		if ( 'conversion-first-sales-detail' !== $detail_template ) {
+			add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_demo_price' ), 10 );
+		}
 
 		remove_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_meta', 20 );
-		add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_demo_meta' ), 15 );
+		// Facts-strip templates already list type/beds/baths; do not re-add a
+		// second meta list in the summary masthead.
+		if ( ! self::detail_template_uses_facts_strip( $detail_template ) ) {
+			add_action( 'propertyhive_single_property_summary', array( __CLASS__, 'render_demo_meta' ), 15 );
+		}
 
 		remove_action( 'propertyhive_single_property_summary', 'propertyhive_template_single_sharing', 30 );
 		remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_actions', 10 );
 
 		remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_features', 20 );
-		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_demo_features' ), 20 );
-
 		remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_summary', 30 );
-		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_demo_summary' ), 30 );
-
 		remove_action( 'propertyhive_after_single_property_summary', 'propertyhive_template_single_description', 40 );
-		add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_demo_description' ), 40 );
+
+		// Rich detail templates render this content through their modules partial.
+		// Keep the legacy demo sections for the standard preview only.
+		if ( ! self::detail_template_uses_rich_modules( $detail_template ) ) {
+			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_demo_features' ), 20 );
+			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_demo_summary' ), 30 );
+			add_action( 'propertyhive_after_single_property_summary', array( __CLASS__, 'render_demo_description' ), 40 );
+		}
 
 	}
 
@@ -118,42 +170,15 @@ trait PH_Template_Set_Preview {
 	}
 
 	/**
-	 * Render a quiet agency masthead at the top of preview pages so the demo
-	 * brand, not the generic site title, anchors the screenshot.
+	 * Preview masthead (deprecated no-op).
+	 *
+	 * Templates must not inject a second site header. Themes already own
+	 * branding/navigation; adding .ph-template-masthead doubled chrome on every
+	 * normal theme (and still does in template-editor preview). Keep the hook
+	 * for compatibility, but never output markup.
 	 */
 	public static function render_preview_masthead() {
-		if ( ! self::is_demo_preview() ) {
-			return;
-		}
-
-		if ( ! is_property() && ! is_post_type_archive( 'property' ) ) {
-			return;
-		}
-
-		$brand = '';
-		$phone = '';
-
-		if ( is_property() ) {
-			$property = self::get_current_property();
-
-			if ( $property ) {
-				$brand = self::get_display_office_name( $property );
-				$phone = $property->get_negotiator_telephone_number();
-			}
-		}
-
-		if ( ! $brand ) {
-			$agency = self::get_demo_agency();
-			$brand  = $agency['office'];
-			$phone  = $agency['phone'];
-		}
-
-		echo '<div class="ph-template-masthead"><div class="ph-template-masthead-inner">';
-			echo '<span class="ph-template-masthead-brand">' . esc_html( $brand ) . '</span>';
-			if ( $phone ) {
-				echo '<a class="ph-template-masthead-phone" href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>';
-			}
-		echo '</div></div>';
+		return;
 	}
 
 	/**
@@ -300,15 +325,21 @@ trait PH_Template_Set_Preview {
 			return;
 		}
 
-		$is_preview       = self::is_demo_preview();
-		$is_editorial     = ( 'premium-editorial-detail' === $template );
-		$hero             = reset( $images );
-		$rail             = array_slice( $images, 0, 5 );
-		$count            = count( $images );
-		$location         = self::get_property_location_label( $property );
-		$has_floor_map    = $is_preview && self::should_render_floorplans( $property );
-		$has_virtual_tour = $is_preview && self::should_render_virtual_tours( $property );
-		$gallery_layout   = self::get_gallery_layout();
+		$is_preview          = self::is_demo_preview();
+		$is_editorial        = ( 'premium-editorial-detail' === $template );
+		$gallery_layout      = self::get_gallery_layout();
+		$use_cinema_controls = ( 'immersive-cinema-detail' === $template ) || ( 'cinema' === $gallery_layout );
+		$hero                = reset( $images );
+		$rail                = $use_cinema_controls ? $images : array_slice( $images, 0, 5 );
+		$count               = count( $images );
+		$location            = self::get_property_location_label( $property );
+		$has_floor_map       = self::should_render_floorplans( $property );
+		$has_virtual_tour    = self::should_render_virtual_tours( $property );
+		$virtual_tours       = ( $has_virtual_tour && $property ) ? $property->get_virtual_tours() : array();
+		$show_floor_panel    = $is_preview && $has_floor_map;
+		$show_tour_panel     = $is_preview && $has_virtual_tour;
+		$show_map_panel      = ! $use_cinema_controls && $location;
+		$floorplan_url       = ( $has_floor_map && ! $is_preview ) ? self::get_first_property_document_url( $property, 'floorplan' ) : '';
 
 		echo '<div class="images ph-template-gallery ph-template-gallery-' . esc_attr( sanitize_html_class( $template ) ) . ' ph-gallery-variant-' . esc_attr( sanitize_html_class( $gallery_layout ) ) . '" data-ph-template-gallery data-ph-gallery-current-variant="' . esc_attr( $gallery_layout ) . '">';
 
@@ -321,7 +352,7 @@ trait PH_Template_Set_Preview {
 					echo '<img src="' . esc_url( $hero['src'] ) . '" alt="' . esc_attr( $hero['alt'] ) . '" loading="lazy" data-ph-gallery-hero-image>';
 					echo '<span class="ph-template-gallery-expand-label" aria-hidden="true">' . esc_html__( 'View larger', 'propertyhive' ) . '</span>';
 				echo '</button>';
-				if ( $has_floor_map ) {
+				if ( $show_floor_panel ) {
 					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-floorplan" hidden data-ph-gallery-panel="floorplan" aria-label="' . esc_attr__( 'Floor map preview', 'propertyhive' ) . '">';
 						echo '<div class="ph-template-floorplan" aria-hidden="true">';
 							echo '<span class="ph-template-floorplan-room ph-template-room-reception">' . esc_html__( 'Reception', 'propertyhive' ) . '</span>';
@@ -332,7 +363,7 @@ trait PH_Template_Set_Preview {
 						echo '</div>';
 					echo '</div>';
 				}
-				if ( $has_virtual_tour ) {
+				if ( $show_tour_panel ) {
 					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-virtual-tour" hidden data-ph-gallery-panel="virtual-tour" aria-label="' . esc_attr__( 'Virtual tour preview', 'propertyhive' ) . '">';
 						echo '<div class="ph-template-virtual-tour-preview" aria-hidden="true">';
 							echo '<span class="ph-template-virtual-tour-scene ph-template-virtual-tour-scene-living">' . esc_html__( 'Living room', 'propertyhive' ) . '</span>';
@@ -344,32 +375,72 @@ trait PH_Template_Set_Preview {
 						echo '</div>';
 					echo '</div>';
 				}
-				if ( $location ) {
+				if ( $show_map_panel ) {
 					echo '<div class="ph-template-gallery-panel ph-template-gallery-panel-map" hidden data-ph-gallery-panel="map" aria-label="' . esc_attr__( 'Map preview', 'propertyhive' ) . '"><span class="ph-template-map-pin"></span><span class="ph-template-map-label">' . esc_html( $location ) . '</span></div>';
 				}
 
-				if ( ! $is_editorial ) {
+				if ( $is_editorial ) {
+					echo '<figcaption data-ph-gallery-caption>' . esc_html( $hero['caption'] ) . '</figcaption>';
+				} elseif ( $use_cinema_controls ) {
+					echo '<div class="ph-template-cinema-controls" role="toolbar" aria-label="' . esc_attr__( 'Gallery controls', 'propertyhive' ) . '">';
+						echo '<button type="button" data-ph-gallery-prev aria-label="' . esc_attr__( 'Previous photo', 'propertyhive' ) . '"><span aria-hidden="true">&#9664;</span></button>';
+						echo '<button type="button" data-ph-gallery-next aria-label="' . esc_attr__( 'Next photo', 'propertyhive' ) . '"><span aria-hidden="true">&#9654;</span></button>';
+						echo '<span class="ph-template-cinema-counter" data-ph-gallery-counter aria-live="polite">' . esc_html( '1 / ' . (int) $count ) . '</span>';
+						if ( $has_floor_map ) {
+							if ( $show_floor_panel ) {
+								echo '<button type="button" class="ph-template-cinema-control-floorplan" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floorplan', 'propertyhive' ) . '</button>';
+							} elseif ( $floorplan_url ) {
+								echo '<a class="ph-template-cinema-control-link ph-template-cinema-control-floorplan" href="' . esc_url( $floorplan_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Floorplan', 'propertyhive' ) . '</a>';
+							}
+						}
+						if ( $has_virtual_tour ) {
+							if ( ! empty( $virtual_tours ) ) {
+								foreach ( $virtual_tours as $index => $tour ) {
+									$tour_label = isset( $tour['label'] ) ? trim( wp_strip_all_tags( (string) $tour['label'] ) ) : '';
+									if ( '' === $tour_label ) {
+										$tour_label = sprintf(
+											/* translators: %d: virtual tour number */
+											__( 'Virtual tour %d', 'propertyhive' ),
+											(int) $index + 1
+										);
+									}
+									$tour_url = ( ! $is_preview && ! empty( $tour['url'] ) ) ? esc_url_raw( $tour['url'] ) : '';
+									if ( $tour_url ) {
+										echo '<a class="ph-template-cinema-control-link ph-template-cinema-control-virtual-tour" href="' . esc_url( $tour_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $tour_label ) . '</a>';
+									} elseif ( $show_tour_panel ) {
+										echo '<button type="button" class="ph-template-cinema-control-virtual-tour" data-ph-gallery-tab="virtual-tour" aria-selected="false">' . esc_html( $tour_label ) . '</button>';
+									}
+								}
+							} elseif ( $show_tour_panel ) {
+								echo '<button type="button" class="ph-template-cinema-control-virtual-tour" data-ph-gallery-tab="virtual-tour" aria-selected="false">' . esc_html__( 'Virtual tour', 'propertyhive' ) . '</button>';
+							}
+						}
+					echo '</div>';
+				} else {
 					echo '<span class="ph-template-gallery-count"><span class="ph-template-gallery-count-icon" aria-hidden="true"></span>' . esc_html( sprintf(
 						/* translators: %d: number of property photos */
 						_n( '%d photo', '%d photos', $count, 'propertyhive' ),
 						(int) $count
 					) ) . '</span>';
 
-						echo '<div class="ph-template-gallery-tabs" role="tablist" aria-label="' . esc_attr__( 'Gallery views', 'propertyhive' ) . '">';
-							echo '<button type="button" class="is-active" data-ph-gallery-tab="photos" aria-selected="true">' . esc_html__( 'Photos', 'propertyhive' ) . '</button>';
-							if ( $has_floor_map ) {
-								echo '<button type="button" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floor map', 'propertyhive' ) . '</button>';
-							}
-							if ( $has_virtual_tour ) {
-								echo '<button type="button" data-ph-gallery-tab="virtual-tour" aria-selected="false">' . esc_html__( 'Virtual tour', 'propertyhive' ) . '</button>';
-							}
-							if ( $location ) {
-								echo '<button type="button" data-ph-gallery-tab="map" aria-selected="false">' . esc_html__( 'Map', 'propertyhive' ) . '</button>';
-							}
-						echo '</div>';
-					} else {
-						echo '<figcaption data-ph-gallery-caption>' . esc_html( $hero['caption'] ) . '</figcaption>';
-					}
+					echo '<div class="ph-template-gallery-tabs" role="tablist" aria-label="' . esc_attr__( 'Gallery views', 'propertyhive' ) . '">';
+						echo '<button type="button" class="is-active" data-ph-gallery-tab="photos" aria-selected="true">' . esc_html__( 'Photos', 'propertyhive' ) . '</button>';
+						if ( $show_floor_panel ) {
+							echo '<button type="button" data-ph-gallery-tab="floorplan" aria-selected="false">' . esc_html__( 'Floor map', 'propertyhive' ) . '</button>';
+						}
+						if ( $show_tour_panel ) {
+							echo '<button type="button" data-ph-gallery-tab="virtual-tour" aria-selected="false">' . esc_html__( 'Virtual tour', 'propertyhive' ) . '</button>';
+						}
+						if ( $show_map_panel ) {
+							echo '<button type="button" data-ph-gallery-tab="map" aria-selected="false">' . esc_html__( 'Map', 'propertyhive' ) . '</button>';
+						}
+					echo '</div>';
+				}
+
+				if ( 'immersive-cinema-detail' === $template ) {
+					self::render_detail_contact_panel();
+				}
+
 				echo '</figure>';
 
 				if ( ! empty( $rail ) ) {
@@ -397,7 +468,7 @@ trait PH_Template_Set_Preview {
 	 * Render Rightmove-style detail facts below the gallery.
 	 */
 	public static function render_detail_facts_strip() {
-		if ( ! self::is_enabled() || ! is_property() || 'standard-sales-detail' !== self::get_detail_template() ) {
+		if ( ! self::is_enabled() || ! is_property() || ! self::detail_template_uses_facts_strip( self::get_detail_template() ) ) {
 			return;
 		}
 
@@ -488,6 +559,12 @@ trait PH_Template_Set_Preview {
 		if ( 'conversion-first-sales-detail' === $template ) {
 			$listing['price']   = __( 'Offers over ', 'propertyhive' ) . self::demo_price( '1,250,000' );
 			$listing['summary'] = __( 'A chain-free Marylebone house with immediate viewing availability, polished presentation and the right blend of period detail, outside space and practical family accommodation.', 'propertyhive' );
+		}
+
+		if ( 'immersive-cinema-detail' === $template ) {
+			$listing['title']   = __( 'Waterman Court, Wokingham', 'propertyhive' );
+			$listing['price']   = __( 'Offers over ', 'propertyhive' ) . self::demo_price( '1,340,000' );
+			$listing['summary'] = __( 'A single-storey home arranged around its garden, with a calm cinematic sequence of reception, kitchen and terrace spaces.', 'propertyhive' );
 		}
 
 		if ( 'premium-editorial-detail' === $template ) {
@@ -636,7 +713,8 @@ trait PH_Template_Set_Preview {
 			return;
 		}
 
-		if ( 'standard-sales-detail' === self::get_detail_template() ) {
+		// Facts-strip templates already own type/beds/baths/tenure.
+		if ( self::detail_template_uses_facts_strip( self::get_detail_template() ) ) {
 			return;
 		}
 

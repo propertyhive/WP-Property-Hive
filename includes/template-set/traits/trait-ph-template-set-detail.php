@@ -24,7 +24,10 @@ trait PH_Template_Set_Detail {
 		}
 
 		$template       = self::get_detail_template();
-		$facts          = self::detail_template_uses_rich_modules( $template ) ? self::get_detail_key_facts( $property ) : array();
+		// Portal Split shows key facts in the shared facts strip, not again in modules.
+		$facts          = ( self::detail_template_uses_rich_modules( $template ) && 'conversion-first-sales-detail' !== $template )
+			? self::get_detail_key_facts( $property )
+			: array();
 		$rooms          = self::get_detail_room_items( $property );
 		$material       = self::get_detail_material_information( $property );
 		$features       = $property->get_features();
@@ -1284,6 +1287,17 @@ trait PH_Template_Set_Detail {
 				'value'     => $property->council_tax_band ? sprintf( __( 'Band %s', 'propertyhive' ), $property->council_tax_band ) : '',
 				'secondary' => '',
 				'icon'      => 'tenure',
+			);
+		}
+
+		// Portal Split prototype: parking sits in the facts bar with the other
+		// particulars, not in a second meta list under the title.
+		if ( 'conversion-first-sales-detail' === $template ) {
+			$items['parking'] = array(
+				'label'     => __( 'Parking', 'propertyhive' ),
+				'value'     => $property->parking ? $property->parking : '',
+				'secondary' => '',
+				'icon'      => 'parking',
 			);
 		}
 
