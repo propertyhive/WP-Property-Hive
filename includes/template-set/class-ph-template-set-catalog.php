@@ -16,7 +16,8 @@ class PH_Template_Set_Catalog {
 	 */
 	public static function get_detail_templates() {
 		return apply_filters( 'propertyhive_template_set_detail_templates', array(
-			'standard-sales-detail'           => __( 'Standard Sales Detail', 'propertyhive' ),
+			// Portal is the sole mainstream sales detail: conversion layout + full media/chrome controls.
+			// standard-sales-detail remains only as an internal partial fallback (not selectable).
 			'conversion-first-sales-detail'   => __( 'Portal Split', 'propertyhive' ),
 			'immersive-cinema-detail'         => __( 'Immersive Cinema', 'propertyhive' ),
 			'premium-editorial-detail'        => __( 'Private Office', 'propertyhive' ),
@@ -43,13 +44,18 @@ class PH_Template_Set_Catalog {
 
 		switch ( $slug ) {
 			case 'standard-sales-detail':
+				// Retired from the picker; keep a full-control manifest for any
+				// lingering saved settings / filters that still resolve this slug.
 				$manifest['supports'] = $shared;
 				break;
 
 			case 'conversion-first-sales-detail':
-				$manifest['supports'] = array_values( array_diff( $shared, array( 'template_set_gallery_layout' ) ) );
-				$manifest['locked']   = array( 'template_set_gallery_layout' => 'mosaic' );
-				$manifest['defaults'] = array( 'template_set_button_style' => 'filled' );
+				// Portal layout + Standard-level controls (gallery layout free).
+				$manifest['supports'] = $shared;
+				$manifest['defaults'] = array(
+					'template_set_gallery_layout' => 'mosaic',
+					'template_set_button_style'   => 'filled',
+				);
 				$manifest['controls'] = array(
 					'template_set_portal_show_costs' => array(
 						'type'    => 'checkbox',
@@ -209,7 +215,27 @@ class PH_Template_Set_Catalog {
 	 * @return string
 	 */
 	public static function get_default_detail_template() {
-		return self::get_default_template_from_list( self::get_detail_templates(), 'standard-sales-detail' );
+		return self::get_default_template_from_list( self::get_detail_templates(), 'conversion-first-sales-detail' );
+	}
+
+	/**
+	 * Map retired detail template slugs onto their replacement.
+	 *
+	 * Standard Sales was folded into Portal Split (same conversion shell with
+	 * the former Standard control surface). Keep the old slug working when it
+	 * appears in stored settings or query args.
+	 *
+	 * @param string $slug Detail template slug.
+	 * @return string
+	 */
+	public static function normalize_detail_template_slug( $slug ) {
+		$slug = sanitize_title( $slug );
+
+		if ( 'standard-sales-detail' === $slug ) {
+			return 'conversion-first-sales-detail';
+		}
+
+		return $slug;
 	}
 
 	/**

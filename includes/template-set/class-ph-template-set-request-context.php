@@ -50,6 +50,8 @@ class PH_Template_Set_Request_Context {
 			$template = sanitize_title( $settings['template_set_detail_template'] );
 		}
 
+		$template = PH_Template_Set_Catalog::normalize_detail_template_slug( $template );
+
 		return isset( $templates[ $template ] ) ? $template : PH_Template_Set_Catalog::get_default_detail_template();
 	}
 
@@ -533,11 +535,15 @@ class PH_Template_Set_Request_Context {
 	 * @return string
 	 */
 	public static function get_query_template( $query_arg, $templates ) {
-		if ( empty( $_GET[ $query_arg ] ) ) {
+		if ( empty( $_GET[ $query_arg ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return '';
 		}
 
-		$template = sanitize_title( wp_unslash( $_GET[ $query_arg ] ) );
+		$template = sanitize_title( wp_unslash( $_GET[ $query_arg ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( PH_Template_Set::DETAIL_QUERY_ARG === $query_arg ) {
+			$template = PH_Template_Set_Catalog::normalize_detail_template_slug( $template );
+		}
 
 		return isset( $templates[ $template ] ) ? $template : '';
 	}

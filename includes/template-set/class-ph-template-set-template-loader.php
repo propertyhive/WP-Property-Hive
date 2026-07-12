@@ -144,6 +144,8 @@ class PH_Template_Set_Template_Loader {
 				array(
 					self::get_default_slug( $type ),
 					self::get_bundled_default_slug( $type ),
+					// Shared classic partials still live under the retired Standard slug.
+					'detail' === $type ? 'standard-sales-detail' : '',
 				)
 			)
 		);
@@ -198,6 +200,7 @@ class PH_Template_Set_Template_Loader {
 			return 'featured-properties-homepage-module';
 		}
 
-		return 'standard-sales-detail';
+		// Portal is the selectable default; Standard remains the partial library.
+		return 'conversion-first-sales-detail';
 	}
 }
