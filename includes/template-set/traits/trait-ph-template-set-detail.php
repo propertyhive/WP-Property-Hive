@@ -13,7 +13,7 @@ trait PH_Template_Set_Detail {
 	 * Render supporting property modules in preview mode.
 	 */
 	public static function render_detail_modules() {
-		if ( ! self::is_demo_preview() || ! is_property() ) {
+		if ( ! is_property() || ( ! self::is_demo_preview() && ( ! self::is_enabled() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) ) ) {
 			return;
 		}
 
@@ -24,16 +24,47 @@ trait PH_Template_Set_Detail {
 		}
 
 		$template       = self::get_detail_template();
-		$facts          = ( 'standard-sales-detail' === $template ) ? array() : self::get_detail_meta_items( $property );
+		$facts          = self::detail_template_uses_rich_modules( $template ) ? self::get_detail_key_facts( $property ) : array();
+		$rooms          = self::get_detail_room_items( $property );
+		$material       = self::get_detail_material_information( $property );
+		$features       = $property->get_features();
+		$gallery_images = self::get_property_gallery_images( $property );
+		$duet_images    = ( 'premium-editorial-detail' === $template ) ? array_slice( $gallery_images, 1, 2 ) : array();
+		$description    = empty( $rooms ) ? $property->get_formatted_description() : '';
+
+		// The rich module partials provide their own context-specific heading.
+		// PropertyHive's formatted fallback starts with its own heading, so remove
+		// that one leading heading to avoid rendering two titles for one section.
+		if ( $description ) {
+			$description = preg_replace( '/^\s*<h[1-6]\b[^>]*>.*?<\/h[1-6]>\s*/is', '', $description );
+			$description = preg_replace_callback(
+				'/^\s*(<p\b[^>]*\bclass=(["\'])[^"\']*\broom\b[^"\']*\2[^>]*>)\s*<strong\b[^>]*\bclass=(["\'])[^"\']*\bname\b[^"\']*\3[^>]*>(.*?)<\/strong>\s*(?:&nbsp;)?\s*<br\s*\/?>\s*/is',
+				function ( $matches ) {
+					$name = strtolower( trim( wp_strip_all_tags( $matches[4] ) ) );
+
+					return in_array( $name, self::get_detail_generic_room_labels(), true ) ? $matches[1] : $matches[0];
+				},
+				$description
+			);
+		}
+		$overview       = has_excerpt( $property->id ) ? get_the_excerpt( $property->id ) : '';
 		$location_label = self::get_property_location_label( $property );
 		$address        = $property->get_formatted_full_address();
 		$documents      = self::get_property_document_labels( $property );
 		$office         = self::get_display_office_name( $property );
 		$has_floorplan  = self::should_render_floorplans( $property );
+		$phone          = $property->get_negotiator_telephone_number();
+		$email          = $property->get_negotiator_email_address();
+		$agent          = $property->get_negotiator_name();
+		$portrait       = $property->get_negotiator_photo();
+		$agent_role     = self::get_contact_agent_role( $agent, $office ? $office : __( 'Agent', 'propertyhive' ), $office );
+		$button         = self::get_primary_cta_label( $property, $template );
 
-		if ( empty( $facts ) && ! $location_label && ! $address && empty( $documents ) && ! $has_floorplan ) {
+		if ( empty( $facts ) && empty( $rooms ) && ! $description && empty( $features ) && ! $overview && empty( $material ) && ! $location_label && ! $address && empty( $documents ) && ! $has_floorplan && ! $agent && ! $office ) {
 			return;
 		}
+
+		global $post;
 
 		PH_Template_Set_Template_Loader::render(
 			'detail',
@@ -43,11 +74,25 @@ trait PH_Template_Set_Detail {
 				'property'       => $property,
 				'template'       => $template,
 				'facts'          => $facts,
+				'rooms'          => $rooms,
+				'material'       => $material,
+				'features'       => $features,
+				'description'    => $description,
+				'overview'       => $overview,
 				'location_label' => $location_label,
 				'address'        => $address,
 				'documents'      => $documents,
 				'office'         => $office,
 				'has_floorplan'  => $has_floorplan,
+				'duet_images'    => $duet_images,
+				'post_id'        => isset( $post->ID ) ? absint( $post->ID ) : 0,
+				'button'         => $button,
+				'phone'          => $phone,
+				'email'          => $email,
+				'agent'          => $agent,
+				'agent_role'     => $agent_role,
+				'agent_initials' => self::get_contact_agent_initials( $agent ),
+				'portrait'       => $portrait,
 			)
 		);
 	}
@@ -56,12 +101,11 @@ trait PH_Template_Set_Detail {
 	 * Render a similar-properties strip in preview mode.
 	 */
 	public static function render_similar_properties() {
-		if ( ! self::is_demo_preview() || ! is_property() ) {
+		if ( ! is_property() || ( ! self::is_demo_preview() && ( ! self::is_enabled() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) ) ) {
 			return;
 		}
 
-		$settings = self::get_settings();
-		if ( 'yes' !== $settings['template_set_show_recommended'] && ! self::is_template_editor_active() ) {
+		if ( 'yes' !== PH_Template_Set_Request_Context::get_show_recommended() && ! self::is_template_editor_active() ) {
 			return;
 		}
 
@@ -184,10 +228,7 @@ trait PH_Template_Set_Detail {
 	 * @return int
 	 */
 	private static function get_recommended_property_count() {
-		$settings = self::get_settings();
-		$count    = absint( $settings['template_set_recommended_count'] );
-
-		return isset( self::get_recommended_property_counts()[ $count ] ) ? $count : 3;
+		return PH_Template_Set_Request_Context::get_recommended_count();
 	}
 
 	/**
@@ -205,10 +246,7 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_recommended_property_layout() {
-		$settings = self::get_settings();
-		$layout   = sanitize_title( $settings['template_set_recommended_layout'] );
-
-		return isset( self::get_recommended_property_layouts()[ $layout ] ) ? $layout : 'grid';
+		return PH_Template_Set_Request_Context::get_recommended_layout();
 	}
 
 	/**
@@ -217,10 +255,7 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_recommended_property_image_size() {
-		$settings   = self::get_settings();
-		$image_size = sanitize_title( $settings['template_set_recommended_image_size'] );
-
-		return isset( self::get_recommended_property_image_sizes()[ $image_size ] ) ? $image_size : 'standard';
+		return PH_Template_Set_Request_Context::get_recommended_image_size();
 	}
 
 	/**
@@ -396,6 +431,7 @@ trait PH_Template_Set_Detail {
 
 		$template = self::get_detail_template();
 		$button   = self::get_primary_cta_label( $property, $template );
+		$kicker   = self::get_detail_kicker_label( $property, $template );
 		$hint     = self::get_contact_hint( $template );
 		$is_demo  = self::is_demo_preview();
 		$phone    = $property->get_negotiator_telephone_number();
@@ -404,9 +440,23 @@ trait PH_Template_Set_Detail {
 		$address  = $property->get_office_address();
 		$agent    = $property->get_negotiator_name();
 		$portrait = $property->get_negotiator_photo();
+		$price_qualifier = method_exists( $property, 'get_price_qualifier' ) ? $property->get_price_qualifier() : $property->price_qualifier;
+		$price_qualifier = self::format_price_qualifier_label( $price_qualifier );
 
 		$office_alt = $office ? $office : __( 'Agent', 'propertyhive' );
 		$agent_role = self::get_contact_agent_role( $agent, $office_alt, $office );
+
+		$shortlist_class  = 'ph-template-button ph-template-button-secondary ph-template-shortlist-button';
+		$shortlist_labels = array();
+		$share_button     = '';
+
+		if ( 'immersive-cinema-detail' === $template ) {
+			$shortlist_labels = array(
+				'add'    => '♡ ' . __( 'Save', 'propertyhive' ),
+				'remove' => __( 'Saved', 'propertyhive' ),
+			);
+			$share_button = self::get_share_button_markup( 'ph-template-button ph-template-button-secondary ph-template-share-button' );
+		}
 
 		PH_Template_Set_Template_Loader::render(
 			'detail',
@@ -417,6 +467,7 @@ trait PH_Template_Set_Detail {
 				'post_id'          => isset( $post->ID ) ? absint( $post->ID ) : 0,
 				'template'         => $template,
 				'button'           => $button,
+				'kicker'           => $kicker,
 				'hint'             => $hint,
 				'is_demo'          => $is_demo,
 				'phone'            => $phone,
@@ -428,8 +479,40 @@ trait PH_Template_Set_Detail {
 				'agent_role'       => $agent_role,
 				'agent_initials'   => self::get_contact_agent_initials( $agent ),
 				'portrait'         => $portrait,
+				'price_qualifier'  => $price_qualifier,
 				'media_links'      => self::get_property_document_labels( $property ),
-				'shortlist_button' => self::get_shortlist_button_markup( 'ph-template-button ph-template-button-secondary ph-template-shortlist-button' ),
+				'shortlist_button' => self::get_shortlist_button_markup( $shortlist_class, $shortlist_labels ),
+				'share_button'     => $share_button,
+			)
+		);
+	}
+
+	/**
+	 * Render the shared enquiry lightbox markup for rich detail templates.
+	 *
+	 * Rich templates replace PropertyHive's legacy actions box, which normally
+	 * supplies this inline Fancybox target. Keep the target separate from the
+	 * visible contact panel so each rich template has one matching form.
+	 */
+	public static function render_detail_enquiry_modal() {
+		if ( ! self::is_enabled() || ! is_property() || ! self::detail_template_uses_rich_modules( self::get_detail_template() ) ) {
+			return;
+		}
+
+		global $post;
+
+		$post_id = isset( $post->ID ) ? absint( $post->ID ) : absint( get_queried_object_id() );
+
+		if ( ! $post_id ) {
+			return;
+		}
+
+		PH_Template_Set_Template_Loader::render(
+			'detail',
+			self::get_detail_template(),
+			'enquiry-modal',
+			array(
+				'post_id' => $post_id,
 			)
 		);
 	}
@@ -541,8 +624,7 @@ trait PH_Template_Set_Detail {
 			return;
 		}
 
-		$settings = self::get_settings();
-		if ( 'yes' !== $settings['template_set_show_mobile_cta'] && ! self::is_template_editor_active() ) {
+		if ( 'yes' !== PH_Template_Set_Request_Context::get_show_mobile_cta() && ! self::is_template_editor_active() ) {
 			return;
 		}
 
@@ -556,6 +638,16 @@ trait PH_Template_Set_Detail {
 		$template = self::get_detail_template();
 		$button   = self::get_primary_cta_label( $property, $template );
 
+		$shortlist_class  = 'ph-template-button ph-template-button-secondary ph-template-shortlist-button';
+		$shortlist_labels = array();
+
+		if ( 'immersive-cinema-detail' === $template ) {
+			$shortlist_labels = array(
+				'add'    => '♡ ' . __( 'Save', 'propertyhive' ),
+				'remove' => __( 'Saved', 'propertyhive' ),
+			);
+		}
+
 		PH_Template_Set_Template_Loader::render(
 			'detail',
 			$template,
@@ -566,7 +658,7 @@ trait PH_Template_Set_Detail {
 				'template'         => $template,
 				'phone'            => $phone,
 				'button'           => $button,
-				'shortlist_button' => self::get_shortlist_button_markup( 'ph-template-button ph-template-button-secondary ph-template-shortlist-button' ),
+				'shortlist_button' => self::get_shortlist_button_markup( $shortlist_class, $shortlist_labels ),
 			)
 		);
 	}
@@ -597,23 +689,39 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_detail_kicker_label( $property, $template ) {
-		if ( 'lettings-detail' === $template ) {
+		$department = ph_get_custom_department_based_on( $property->department );
+		$department = $department ? $department : $property->department;
+
+		if ( 'lettings-detail' === $template || 'residential-lettings' === $department ) {
 			return __( 'To let', 'propertyhive' );
 		}
 
+		if ( 'commercial' === $department ) {
+			$for_sale = 'yes' === $property->for_sale;
+			$to_rent  = 'yes' === $property->to_rent;
+
+			if ( $for_sale && $to_rent ) {
+				return __( 'For sale or to let', 'propertyhive' );
+			}
+
+			if ( $to_rent ) {
+				return __( 'To let', 'propertyhive' );
+			}
+
+			return $for_sale ? __( 'For sale', 'propertyhive' ) : __( 'Commercial property', 'propertyhive' );
+		}
+
+		$tenure = trim( wp_strip_all_tags( (string) $property->tenure ) );
 		$labels = array(
 			'standard-sales-detail'         => __( 'For sale', 'propertyhive' ),
-			'conversion-first-sales-detail' => __( 'Viewing available', 'propertyhive' ),
-			'premium-editorial-detail'      => __( 'Featured home', 'propertyhive' ),
+			'conversion-first-sales-detail' => $tenure ? sprintf( __( 'For sale · %s', 'propertyhive' ), $tenure ) : __( 'For sale', 'propertyhive' ),
+			'immersive-cinema-detail'       => __( 'For sale', 'propertyhive' ),
+			'premium-editorial-detail'      => $tenure ? sprintf( __( 'For sale · %s', 'propertyhive' ), $tenure ) : __( 'For sale', 'propertyhive' ),
 			'new-homes-development-detail'  => __( 'New homes release', 'propertyhive' ),
 		);
 
 		if ( isset( $labels[ $template ] ) ) {
 			return $labels[ $template ];
-		}
-
-		if ( 'residential-lettings' === $property->department || 'residential-lettings' === ph_get_custom_department_based_on( $property->department ) ) {
-			return __( 'To let', 'propertyhive' );
 		}
 
 		return __( 'Property', 'propertyhive' );
@@ -637,37 +745,26 @@ trait PH_Template_Set_Detail {
 		$phone       = $property->get_negotiator_telephone_number();
 
 		if ( 'conversion-first-sales-detail' === $template ) {
+			return array();
+		}
+
+		if ( 'immersive-cinema-detail' === $template ) {
 			return array(
-				array(
-					'label' => __( 'Next step', 'propertyhive' ),
-					'value' => $button,
-				),
-				array(
-					'label' => __( 'Phone', 'propertyhive' ),
-					'value' => $phone ? __( 'Call agent', 'propertyhive' ) : __( 'Send enquiry', 'propertyhive' ),
-				),
-				array(
-					'label' => __( 'Route', 'propertyhive' ),
-					'value' => __( 'Short enquiry', 'propertyhive' ),
-				),
+				array( 'label' => __( 'Gallery', 'propertyhive' ), 'value' => $photos ),
+				array( 'label' => __( 'Facts', 'propertyhive' ), 'value' => self::get_fact_summary( $property ) ),
+				array( 'label' => __( 'Viewing', 'propertyhive' ), 'value' => $button ),
 			);
 		}
 
 		if ( 'premium-editorial-detail' === $template ) {
-			return array(
+			$brief = trim( wp_strip_all_tags( get_the_excerpt( $property->id ) ) );
+
+			return $brief ? array(
 				array(
-					'label' => __( 'Gallery', 'propertyhive' ),
-					'value' => $photos,
+					'label' => __( 'Brief', 'propertyhive' ),
+					'value' => $brief,
 				),
-				array(
-					'label' => __( 'Documents', 'propertyhive' ),
-					'value' => self::get_document_summary( $property ),
-				),
-				array(
-					'label' => __( 'Interest', 'propertyhive' ),
-					'value' => $button,
-				),
-			);
+			) : array();
 		}
 
 		if ( 'lettings-detail' === $template ) {
@@ -723,47 +820,11 @@ trait PH_Template_Set_Detail {
 		$phone  = $property->get_negotiator_telephone_number();
 
 		if ( 'conversion-first-sales-detail' === $template ) {
-			return array(
-				'kicker' => __( 'Ready to enquire', 'propertyhive' ),
-				'title'  => __( 'Book the next viewing', 'propertyhive' ),
-				'body'   => __( 'The main actions stay close to the price and key facts so interested buyers can move quickly.', 'propertyhive' ),
-				'items'  => array(
-					array(
-						'label' => __( 'Primary action', 'propertyhive' ),
-						'value' => $button,
-					),
-					array(
-						'label' => __( 'Phone route', 'propertyhive' ),
-						'value' => $phone ? $phone : __( 'Ask agent', 'propertyhive' ),
-					),
-					array(
-						'label' => __( 'Supporting docs', 'propertyhive' ),
-						'value' => self::get_document_summary( $property ),
-					),
-				),
-			);
+			return array();
 		}
 
 		if ( 'premium-editorial-detail' === $template ) {
-			return array(
-				'kicker' => __( 'Property story', 'propertyhive' ),
-				'title'  => __( 'Register your interest', 'propertyhive' ),
-				'body'   => __( 'Photography, brochure links and a quieter contact path give higher-value homes more room to breathe.', 'propertyhive' ),
-				'items'  => array(
-					array(
-						'label' => __( 'Gallery', 'propertyhive' ),
-						'value' => self::get_photo_count( $property ) > 1 ? self::get_photo_count( $property ) : __( 'Available', 'propertyhive' ),
-					),
-					array(
-						'label' => __( 'Documents', 'propertyhive' ),
-						'value' => self::get_document_summary( $property ),
-					),
-					array(
-						'label' => __( 'Enquiry', 'propertyhive' ),
-						'value' => $button,
-					),
-				),
-			);
+			return array();
 		}
 
 		if ( 'lettings-detail' === $template ) {
@@ -808,8 +869,9 @@ trait PH_Template_Set_Detail {
 	 */
 	private static function get_contact_hint( $template ) {
 		$hints = array(
-			'conversion-first-sales-detail' => __( 'Call now or send a quick viewing request.', 'propertyhive' ),
-			'premium-editorial-detail'      => __( 'Ask for the brochure, floorplan or viewing details.', 'propertyhive' ),
+			'conversion-first-sales-detail' => __( 'No obligation enquiry. We aim to respond the same working day.', 'propertyhive' ),
+			'immersive-cinema-detail'       => __( 'Arrange a viewing or save this property for later.', 'propertyhive' ),
+			'premium-editorial-detail'      => __( 'Enquiries and viewings are handled in confidence.', 'propertyhive' ),
 			'lettings-detail'               => __( 'Check availability and arrange a rental viewing.', 'propertyhive' ),
 			'new-homes-development-detail'  => __( 'Register for plot, brochure and appointment updates.', 'propertyhive' ),
 		);
@@ -957,11 +1019,214 @@ trait PH_Template_Set_Detail {
 			$items[] = $property->get_available_date();
 		}
 
-		if ( $property->floor_area ) {
+		if ( ( 'commercial' === $property->department || 'commercial' === ph_get_custom_department_based_on( $property->department ) ) && $property->floor_area ) {
 			$items[] = $property->get_formatted_floor_area();
 		}
 
 		return array_values( array_unique( array_filter( $items ) ) );
+	}
+
+	/**
+	 * Whether a detail template uses the shared, below-gallery facts strip.
+	 *
+	 * @param string $template Template slug.
+	 * @return bool
+	 */
+	private static function detail_template_uses_facts_strip( $template ) {
+		return in_array( sanitize_title( $template ), array( 'standard-sales-detail', 'conversion-first-sales-detail' ), true );
+	}
+
+	/**
+	 * Whether a detail template replaces core content with data-mapped modules.
+	 *
+	 * @param string $template Template slug.
+	 * @return bool
+	 */
+	private static function detail_template_uses_rich_modules( $template ) {
+		return in_array( sanitize_title( $template ), array( 'conversion-first-sales-detail', 'immersive-cinema-detail', 'premium-editorial-detail' ), true );
+	}
+
+	/**
+	 * Get room items for residential detail templates.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return array
+	 */
+	private static function get_detail_room_items( $property ) {
+		if ( ! $property || 'commercial' === $property->department || 'commercial' === ph_get_custom_department_based_on( $property->department ) ) {
+			return array();
+		}
+
+		$count = absint( $property->_rooms );
+		$rooms = array();
+
+		for ( $index = 0; $index < $count; $index++ ) {
+			$name        = trim( wp_strip_all_tags( (string) $property->{'_room_name_' . $index} ) );
+			$dimensions  = trim( wp_strip_all_tags( (string) $property->{'_room_dimensions_' . $index} ) );
+			$description = trim( wp_strip_all_tags( (string) $property->{'_room_description_' . $index} ) );
+
+			if ( '' === $name && '' === $dimensions && '' === $description ) {
+				continue;
+			}
+
+			$rooms[] = array(
+				'name'        => $name,
+				'dimensions'  => $dimensions,
+				'description' => $description,
+			);
+		}
+
+		if ( 1 === count( $rooms ) && in_array( strtolower( trim( $rooms[0]['name'] ) ), self::get_detail_generic_room_labels(), true ) ) {
+			return array();
+		}
+
+		return $rooms;
+	}
+
+	/**
+	 * Get generic room names used by single-field property descriptions.
+	 *
+	 * @return array
+	 */
+	private static function get_detail_generic_room_labels() {
+		return array_unique(
+			array_filter(
+				array(
+					'full description',
+					'description',
+					strtolower( trim( __( 'Full Description', 'propertyhive' ) ) ),
+				)
+			)
+		);
+	}
+
+	/**
+	 * Get the populated material-information rows used by detail templates.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return array
+	 */
+	private static function get_detail_material_information( $property ) {
+		if ( ! $property || ! method_exists( $property, 'get_material_information' ) ) {
+			return array();
+		}
+
+		$information = $property->get_material_information();
+		$utilities   = isset( $information['utilities'] ) && is_array( $information['utilities'] ) ? $information['utilities'] : array();
+		$labels      = array(
+			'heating'     => __( 'Heating', 'propertyhive' ),
+			'electricity' => __( 'Electricity', 'propertyhive' ),
+			'water'       => __( 'Water', 'propertyhive' ),
+			'sewerage'    => __( 'Sewerage', 'propertyhive' ),
+			'broadband'   => __( 'Broadband', 'propertyhive' ),
+		);
+		$items       = array();
+
+		foreach ( $labels as $key => $label ) {
+			$value = isset( $utilities[ $key ] ) ? trim( wp_strip_all_tags( (string) $utilities[ $key ] ) ) : '';
+			if ( '' !== $value ) {
+				$items[] = array( 'label' => $label, 'value' => $value );
+			}
+		}
+
+		if ( ! empty( $information['flood_risk'] ) ) {
+			$flood = is_array( $information['flood_risk'] ) ? implode( ', ', array_filter( array_map( 'wp_strip_all_tags', $information['flood_risk'] ) ) ) : wp_strip_all_tags( (string) $information['flood_risk'] );
+			if ( '' !== trim( $flood ) ) {
+				$items[] = array( 'label' => __( 'Flood risk', 'propertyhive' ), 'value' => trim( $flood ) );
+			}
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Get labelled particulars for the data-mapped detail templates.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return array
+	 */
+	private static function get_detail_key_facts( $property ) {
+		if ( 'immersive-cinema-detail' === self::get_detail_template() ) {
+			return self::get_cinema_detail_key_facts( $property );
+		}
+
+		$items = array();
+		$add   = function( $label, $value ) use ( &$items ) {
+			$value = trim( wp_strip_all_tags( (string) $value ) );
+			if ( '' !== $value ) {
+				$items[] = array( 'label' => $label, 'value' => $value );
+			}
+		};
+
+		$add( __( 'Price', 'propertyhive' ), $property->get_formatted_price( true ) );
+		$add( __( 'Type', 'propertyhive' ), $property->property_type );
+		$add( __( 'Bedrooms', 'propertyhive' ), $property->bedrooms > 0 ? (string) (int) $property->bedrooms : '' );
+		$add( __( 'Bathrooms', 'propertyhive' ), $property->bathrooms > 0 ? (string) (int) $property->bathrooms : '' );
+		$add( __( 'Receptions', 'propertyhive' ), $property->reception_rooms > 0 ? (string) (int) $property->reception_rooms : '' );
+		$tenure = trim( wp_strip_all_tags( (string) $property->tenure ) );
+		$add( __( 'Tenure', 'propertyhive' ), $tenure );
+		$add( __( 'Parking', 'propertyhive' ), $property->parking );
+		$add( __( 'Outside space', 'propertyhive' ), $property->outside_space );
+		$add( __( 'Council tax', 'propertyhive' ), $property->council_tax_band ? sprintf( __( 'Band %s', 'propertyhive' ), $property->council_tax_band ) : '' );
+		$add( __( 'Reference', 'propertyhive' ), $property->_reference_number );
+
+		self::append_leasehold_detail_facts( $property, $tenure, $add );
+
+		return $items;
+	}
+
+	/**
+	 * Slim "The details" rows for Immersive Cinema (type/beds live on the floating card).
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return array
+	 */
+	private static function get_cinema_detail_key_facts( $property ) {
+		$items = array();
+		$add   = function( $label, $value ) use ( &$items ) {
+			$value = trim( wp_strip_all_tags( (string) $value ) );
+			if ( '' !== $value ) {
+				$items[] = array( 'label' => $label, 'value' => $value );
+			}
+		};
+
+		$price     = trim( wp_strip_all_tags( (string) $property->get_formatted_price( true ) ) );
+		$qualifier = method_exists( $property, 'get_price_qualifier' ) ? $property->get_price_qualifier() : $property->price_qualifier;
+		$qualifier = self::format_price_qualifier_label( $qualifier );
+		if ( $qualifier && $price ) {
+			$price = $qualifier . ' ' . $price;
+		}
+		$add( __( 'Price', 'propertyhive' ), $price );
+
+		$tenure = trim( wp_strip_all_tags( (string) $property->tenure ) );
+		$add( __( 'Tenure', 'propertyhive' ), $tenure );
+		$add( __( 'Council tax', 'propertyhive' ), $property->council_tax_band ? sprintf( __( 'Band %s', 'propertyhive' ), $property->council_tax_band ) : '' );
+		$add( __( 'Parking', 'propertyhive' ), $property->parking );
+		$add( __( 'Reference', 'propertyhive' ), $property->_reference_number );
+
+		self::append_leasehold_detail_facts( $property, $tenure, $add );
+
+		return $items;
+	}
+
+	/**
+	 * Append leasehold cluster rows when tenure is leasehold / share of freehold.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @param string      $tenure   Tenure label.
+	 * @param callable    $add      Row adder.
+	 */
+	private static function append_leasehold_detail_facts( $property, $tenure, $add ) {
+		if ( false === stripos( $tenure, 'leasehold' ) && false === stripos( $tenure, 'share of freehold' ) ) {
+			return;
+		}
+
+		$years = absint( $property->_leasehold_years_remaining );
+		$add( __( 'Lease remaining', 'propertyhive' ), $years ? sprintf( _n( '%d year', '%d years', $years, 'propertyhive' ), $years ) : '' );
+		$add( __( 'Ground rent', 'propertyhive' ), $property->_ground_rent );
+		$add( __( 'Ground-rent review', 'propertyhive' ), $property->_ground_rent_review_years ? sprintf( _n( '%d year', '%d years', absint( $property->_ground_rent_review_years ), 'propertyhive' ), absint( $property->_ground_rent_review_years ) ) : '' );
+		$add( __( 'Service charge', 'propertyhive' ), $property->_service_charge );
+		$add( __( 'Service-charge review', 'propertyhive' ), $property->_service_charge_review_years ? sprintf( _n( '%d year', '%d years', absint( $property->_service_charge_review_years ), 'propertyhive' ), absint( $property->_service_charge_review_years ) ) : '' );
 	}
 
 	/**
@@ -971,7 +1236,8 @@ trait PH_Template_Set_Detail {
 	 * @return array
 	 */
 	private static function get_detail_facts_strip_items( $property ) {
-		$size  = self::split_detail_fact_size( $property->get_formatted_floor_area() );
+		$template = self::get_detail_template();
+		$size     = self::split_detail_fact_size( $property->get_formatted_floor_area() );
 		$items = array(
 			'type'      => array(
 				'label'     => __( 'Property type', 'propertyhive' ),
@@ -1010,6 +1276,16 @@ trait PH_Template_Set_Detail {
 				'icon'      => 'tenure',
 			),
 		);
+
+		if ( 'standard-sales-detail' !== $template ) {
+			unset( $items['size'] );
+			$items['council-tax'] = array(
+				'label'     => __( 'Council tax', 'propertyhive' ),
+				'value'     => $property->council_tax_band ? sprintf( __( 'Band %s', 'propertyhive' ), $property->council_tax_band ) : '',
+				'secondary' => '',
+				'icon'      => 'tenure',
+			);
+		}
 
 		return array_values(
 			array_filter(
@@ -1103,9 +1379,7 @@ trait PH_Template_Set_Detail {
 			return false;
 		}
 
-		$settings = self::get_settings();
-
-		return 'yes' === $settings['template_set_show_floorplans'] || self::is_template_editor_active();
+		return 'yes' === PH_Template_Set_Request_Context::get_show_floorplans() || self::is_template_editor_active();
 	}
 
 	/**
@@ -1129,9 +1403,7 @@ trait PH_Template_Set_Detail {
 			return false;
 		}
 
-		$settings = self::get_settings();
-
-		return 'yes' === $settings['template_set_show_virtual_tours'] || self::is_template_editor_active();
+		return 'yes' === PH_Template_Set_Request_Context::get_show_virtual_tours() || self::is_template_editor_active();
 	}
 
 	/**
@@ -1253,12 +1525,16 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_primary_cta_label( $property, $template ) {
-		if ( 'premium-editorial-detail' === $template || 'new-homes-development-detail' === $template ) {
+		if ( 'premium-editorial-detail' === $template ) {
+			return __( 'Arrange a private viewing', 'propertyhive' );
+		}
+
+		if ( 'new-homes-development-detail' === $template ) {
 			return __( 'Register interest', 'propertyhive' );
 		}
 
 		if ( 'conversion-first-sales-detail' === $template ) {
-			return __( 'Book viewing', 'propertyhive' );
+			return __( 'Request viewing', 'propertyhive' );
 		}
 
 		if ( 'lettings-detail' === $template || 'residential-lettings' === $property->department || 'residential-lettings' === ph_get_custom_department_based_on( $property->department ) ) {
@@ -1300,20 +1576,26 @@ trait PH_Template_Set_Detail {
 			$documents[] = array(
 				'label' => __( 'Floorplan', 'propertyhive' ),
 				'type'  => 'floorplan',
+				'url'   => self::get_first_property_document_url( $property, 'floorplan' ),
 			);
 		}
 
 		if ( self::should_render_virtual_tours( $property ) ) {
-			$documents[] = array(
-				'label' => __( 'Virtual tour', 'propertyhive' ),
-				'type'  => 'virtual-tour',
-			);
+			foreach ( $property->get_virtual_tours() as $index => $tour ) {
+				$label = isset( $tour['label'] ) ? trim( wp_strip_all_tags( (string) $tour['label'] ) ) : '';
+				$documents[] = array(
+					'label' => $label ? $label : sprintf( __( 'Virtual tour %d', 'propertyhive' ), (int) $index + 1 ),
+					'type'  => 'virtual-tour',
+					'url'   => self::is_demo_preview() || empty( $tour['url'] ) ? '' : esc_url_raw( $tour['url'] ),
+				);
+			}
 		}
 
 		if ( self::has_epc( $property ) ) {
 			$documents[] = array(
 				'label' => __( 'EPC', 'propertyhive' ),
 				'type'  => 'epc',
+				'url'   => self::get_first_property_document_url( $property, 'epc' ),
 			);
 		}
 
@@ -1321,9 +1603,71 @@ trait PH_Template_Set_Detail {
 			$documents[] = array(
 				'label' => __( 'Brochure', 'propertyhive' ),
 				'type'  => 'brochure',
+				'url'   => self::get_first_property_document_url( $property, 'brochure' ),
 			);
 		}
 
 		return $documents;
+	}
+
+	/**
+	 * Get the first usable URL for a supporting property document.
+	 *
+	 * Demo previews deliberately remain non-navigable so an editor cannot be
+	 * sent away from the preview by sample media controls.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @param string      $document_type Document type.
+	 * @return string
+	 */
+	private static function get_first_property_document_url( $property, $document_type ) {
+		if ( self::is_demo_preview() ) {
+			return '';
+		}
+
+		$document_type = sanitize_key( $document_type );
+		$attachment_ids = array();
+		$url_entries    = array();
+		$stored_as_urls = false;
+
+		if ( 'floorplan' === $document_type ) {
+			$attachment_ids = $property->get_floorplan_attachment_ids();
+			$url_entries    = $property->_floorplan_urls;
+			$stored_as_urls = 'urls' === get_option( 'propertyhive_floorplans_stored_as', '' );
+		} elseif ( 'epc' === $document_type ) {
+			$attachment_ids = $property->get_epc_attachment_ids();
+			$url_entries    = $property->_epc_urls;
+			$stored_as_urls = 'urls' === get_option( 'propertyhive_epcs_stored_as', '' );
+		} elseif ( 'brochure' === $document_type ) {
+			$attachment_ids = $property->get_brochure_attachment_ids();
+			$url_entries    = $property->_brochure_urls;
+			$stored_as_urls = 'urls' === get_option( 'propertyhive_brochures_stored_as', '' );
+		}
+
+		$document_sources = $stored_as_urls ? array( 'urls', 'attachments' ) : array( 'attachments', 'urls' );
+
+		foreach ( $document_sources as $source ) {
+			if ( 'attachments' === $source ) {
+				foreach ( (array) $attachment_ids as $attachment_id ) {
+					$url = wp_get_attachment_url( absint( $attachment_id ) );
+
+					if ( $url ) {
+						return esc_url_raw( $url );
+					}
+				}
+				continue;
+			}
+
+			foreach ( (array) $url_entries as $entry ) {
+				$url = is_array( $entry ) && isset( $entry['url'] ) ? $entry['url'] : $entry;
+				$url = esc_url_raw( $url );
+
+				if ( $url ) {
+					return $url;
+				}
+			}
+		}
+
+		return '';
 	}
 }
