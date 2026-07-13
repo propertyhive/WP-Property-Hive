@@ -11,11 +11,13 @@
  * @version 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 ?>
-<main class="ph-template-modules ph-template-modules-cinema" aria-label="<?php esc_attr_e( 'Property information', 'propertyhive' ); ?>">
+<section class="ph-template-modules ph-template-property-information ph-template-property-information-immersive-cinema ph-template-modules-cinema" aria-label="<?php esc_attr_e( 'Property information', 'propertyhive' ); ?>">
 	<?php if ( ! empty( $features ) ) : ?>
-		<section>
+		<section class="ph-template-module ph-template-module-features-section">
 			<h2><?php esc_html_e( 'Key features', 'propertyhive' ); ?></h2>
 			<ul class="ph-template-module-features">
 				<?php foreach ( $features as $feature ) : ?>
@@ -26,14 +28,14 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 	<?php endif; ?>
 
 	<?php if ( $overview ) : ?>
-		<section>
+		<section class="ph-template-module ph-template-module-overview">
 			<h2><?php esc_html_e( 'Overview', 'propertyhive' ); ?></h2>
 			<p><?php echo esc_html( $overview ); ?></p>
 		</section>
 	<?php endif; ?>
 
 	<?php if ( ! empty( $rooms ) || $description ) : ?>
-		<section class="ph-template-module-rooms">
+		<section class="ph-template-module ph-template-module-rooms">
 			<h2><?php esc_html_e( 'Room by room', 'propertyhive' ); ?></h2>
 			<?php if ( $rooms ) : ?>
 				<?php foreach ( $rooms as $room ) : ?>
@@ -50,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 	<?php endif; ?>
 
 	<?php if ( $facts ) : ?>
-		<section>
+		<section class="ph-template-module ph-template-module-facts">
 			<h2><?php esc_html_e( 'The details', 'propertyhive' ); ?></h2>
 			<dl class="ph-template-dark-facts">
 				<?php foreach ( $facts as $fact ) : ?>
@@ -64,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 	<?php endif; ?>
 
 	<?php if ( $material ) : ?>
-		<section>
+		<section class="ph-template-module ph-template-module-material">
 			<h2><?php esc_html_e( 'Material information', 'propertyhive' ); ?></h2>
 			<dl class="ph-template-material-grid">
 				<?php foreach ( $material as $item ) : ?>
@@ -78,7 +80,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 	<?php endif; ?>
 
 	<?php if ( $documents ) : ?>
-		<section>
+		<section class="ph-template-module ph-template-module-documents">
 			<h2><?php esc_html_e( 'Media & documents', 'propertyhive' ); ?></h2>
 			<div class="ph-template-doc-row">
 				<?php foreach ( $documents as $document ) : ?>
@@ -97,17 +99,17 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 	<?php endif; ?>
 
 	<?php if ( $location_label || $address ) : ?>
-		<section>
+		<section class="ph-template-module ph-template-module-location">
 			<h2><?php esc_html_e( 'Location', 'propertyhive' ); ?></h2>
 			<div class="ph-template-module-map-surface">
-				<span class="ph-template-map-pin"></span>
+				<span class="ph-template-map-pin" aria-hidden="true"></span>
 				<span class="ph-template-map-label"><?php echo esc_html( $location_label ? $location_label : $address ); ?></span>
 			</div>
 		</section>
 	<?php endif; ?>
 
 	<?php if ( $agent || $portrait || $office || $email || $phone ) : ?>
-		<section class="ph-template-cinema-agent-section">
+			<section class="ph-template-module ph-template-cinema-agent-section">
 			<div class="ph-template-cinema-agent-panel">
 				<div class="ph-template-cinema-agent-row">
 					<?php if ( $portrait ) : ?>
@@ -137,9 +139,9 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 					<?php if ( $email ) : ?>
 						<a class="ph-template-button ph-template-button-secondary" href="<?php echo esc_url( 'mailto:' . $email ); ?>"><?php esc_html_e( 'Email', 'propertyhive' ); ?></a>
 					<?php endif; ?>
-					<a class="ph-template-button ph-template-button-primary" data-fancybox data-src="#makeEnquiry<?php echo absint( $post_id ); ?>" href="javascript:;"><?php echo esc_html( $button ? $button : __( 'Request viewing', 'propertyhive' ) ); ?></a>
+					<button type="button" class="ph-template-button ph-template-button-primary" data-fancybox data-src="#makeEnquiry<?php echo absint( $post_id ); ?>" aria-haspopup="dialog" aria-controls="makeEnquiry<?php echo absint( $post_id ); ?>"><?php echo esc_html( $button ? $button : __( 'Request viewing', 'propertyhive' ) ); ?></button>
 				</div>
 			</div>
 		</section>
 	<?php endif; ?>
-</main>
+</section>
