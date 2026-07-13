@@ -404,8 +404,8 @@ class PH_Meta_Box_Property_Brochures {
            {
               foreach ( $_POST['brochure_url'] as $brochure_url )
               {
-                  if ( ph_clean($brochure_url) == '' ) { continue; }
-                  $brochure_urls[] = array('url' => ph_clean($brochure_url));
+                  if ( sanitize_url($brochure_url) == '' ) { continue; }
+                  $brochure_urls[] = array('url' => sanitize_url($brochure_url));
               }
            }
            update_post_meta( $post_id, '_brochure_urls', $brochure_urls );
