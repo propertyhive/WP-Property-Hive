@@ -25,21 +25,52 @@ class PH_Template_Set_Catalog {
 	}
 
 	/**
+	 * Get stable public aliases for bundled detail templates.
+	 *
+	 * The original internal slugs remain the storage and theme-override contract.
+	 * These aliases match the names shown in the template catalogue and may be
+	 * used in preview URLs and CSS without invalidating existing settings.
+	 *
+	 * @return array
+	 */
+	public static function get_detail_template_aliases() {
+		return array(
+			'portal-split'     => 'conversion-first-sales-detail',
+			'immersive-cinema' => 'immersive-cinema-detail',
+			'private-office'   => 'premium-editorial-detail',
+		);
+	}
+
+	/**
+	 * Get the public alias for a detail template.
+	 *
+	 * @param string $slug Internal or public detail template slug.
+	 * @return string
+	 */
+	public static function get_detail_template_public_slug( $slug ) {
+		$slug    = self::normalize_detail_template_slug( $slug );
+		$aliases = array_flip( self::get_detail_template_aliases() );
+
+		return isset( $aliases[ $slug ] ) ? $aliases[ $slug ] : $slug;
+	}
+
+	/**
 	 * Get the control manifest for a detail template.
 	 *
 	 * @param string $slug Detail template slug.
 	 * @return array
 	 */
 	public static function get_detail_template_manifest( $slug ) {
-		$slug      = sanitize_title( $slug );
+		$slug      = self::normalize_detail_template_slug( $slug );
 		$templates = self::get_detail_templates();
 		$shared    = array_keys( self::get_detail_shared_controls() );
 		$manifest  = array(
-			'label'    => isset( $templates[ $slug ] ) ? $templates[ $slug ] : '',
-			'supports' => array(),
-			'locked'   => array(),
-			'defaults' => array(),
-			'controls' => array(),
+			'label'       => isset( $templates[ $slug ] ) ? $templates[ $slug ] : '',
+			'public_slug' => self::get_detail_template_public_slug( $slug ),
+			'supports'    => array(),
+			'locked'      => array(),
+			'defaults'    => array(),
+			'controls'    => array(),
 		);
 
 		switch ( $slug ) {
@@ -132,11 +163,12 @@ class PH_Template_Set_Catalog {
 		$manifest = apply_filters( 'propertyhive_template_set_detail_template_manifest', $manifest, $slug );
 
 		return is_array( $manifest ) ? wp_parse_args( $manifest, array(
-			'label'    => isset( $templates[ $slug ] ) ? $templates[ $slug ] : '',
-			'supports' => array(),
-			'locked'   => array(),
-			'defaults' => array(),
-			'controls' => array(),
+			'label'       => isset( $templates[ $slug ] ) ? $templates[ $slug ] : '',
+			'public_slug' => self::get_detail_template_public_slug( $slug ),
+			'supports'    => array(),
+			'locked'      => array(),
+			'defaults'    => array(),
+			'controls'    => array(),
 		) ) : array();
 	}
 
@@ -230,6 +262,11 @@ class PH_Template_Set_Catalog {
 	 */
 	public static function normalize_detail_template_slug( $slug ) {
 		$slug = sanitize_title( $slug );
+		$aliases = self::get_detail_template_aliases();
+
+		if ( isset( $aliases[ $slug ] ) ) {
+			return $aliases[ $slug ];
+		}
 
 		if ( 'standard-sales-detail' === $slug ) {
 			return 'conversion-first-sales-detail';

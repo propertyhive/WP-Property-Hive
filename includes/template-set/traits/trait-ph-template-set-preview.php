@@ -341,7 +341,9 @@ trait PH_Template_Set_Preview {
 		$show_map_panel      = ! $use_cinema_controls && $location;
 		$floorplan_url       = ( $has_floor_map && ! $is_preview ) ? self::get_first_property_document_url( $property, 'floorplan' ) : '';
 
-		echo '<div class="images ph-template-gallery ph-template-gallery-' . esc_attr( sanitize_html_class( $template ) ) . ' ph-gallery-variant-' . esc_attr( sanitize_html_class( $gallery_layout ) ) . '" data-ph-template-gallery data-ph-gallery-current-variant="' . esc_attr( $gallery_layout ) . '">';
+			$public_template = PH_Template_Set_Catalog::get_detail_template_public_slug( $template );
+
+			echo '<div class="images ph-template-gallery ph-template-gallery-' . esc_attr( sanitize_html_class( $template ) ) . ' ph-template-gallery-' . esc_attr( sanitize_html_class( $public_template ) ) . ' ph-gallery-variant-' . esc_attr( sanitize_html_class( $gallery_layout ) ) . '" data-ph-template-gallery data-ph-gallery-current-variant="' . esc_attr( $gallery_layout ) . '">';
 
 			echo '<figure class="ph-template-gallery-hero">';
 				echo '<button type="button" class="ph-template-gallery-photo-trigger" data-ph-gallery-open aria-label="' . esc_attr( sprintf(

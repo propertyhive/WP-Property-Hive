@@ -49,7 +49,9 @@ trait PH_Template_Set_Search {
 
 		if ( is_property() ) {
 			$detail_template = self::get_detail_template();
+			$public_template = PH_Template_Set_Catalog::get_detail_template_public_slug( $detail_template );
 			$classes[] = 'ph-detail-template-' . sanitize_html_class( $detail_template );
+			$classes[] = 'ph-detail-template-' . sanitize_html_class( $public_template );
 
 			if ( 'conversion-first-sales-detail' === $detail_template ) {
 				$classes[] = 'yes' === PH_Template_Set_Request_Context::get_portal_show_costs() ? 'ph-template-show-portal-costs' : 'ph-template-hide-portal-costs';
@@ -109,9 +111,12 @@ trait PH_Template_Set_Search {
 		}
 
 		if ( self::is_enabled() && is_property() && (int) get_the_ID() === (int) $post_id ) {
+			$detail_template = self::get_detail_template();
+			$public_template = PH_Template_Set_Catalog::get_detail_template_public_slug( $detail_template );
 			$classes[] = 'ph-template-set';
 			$classes[] = 'ph-template-detail';
-			$classes[] = 'ph-detail-template-' . sanitize_html_class( self::get_detail_template() );
+			$classes[] = 'ph-detail-template-' . sanitize_html_class( $detail_template );
+			$classes[] = 'ph-detail-template-' . sanitize_html_class( $public_template );
 		}
 
 		if ( ( self::is_enabled() && ! is_property() ) || self::$rendering_module ) {
