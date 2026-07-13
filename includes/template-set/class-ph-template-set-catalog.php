@@ -89,11 +89,12 @@ class PH_Template_Set_Catalog {
 				);
 				$manifest['controls'] = array(
 					'template_set_portal_show_costs' => array(
-						'type'    => 'checkbox',
-						'label'   => __( 'Show purchase costs', 'propertyhive' ),
-						'options' => self::get_checkbox_options(),
-						'default' => 'yes',
-						'group'   => 'modules',
+						'type'                   => 'checkbox',
+						'label'                  => __( 'Show purchase costs', 'propertyhive' ),
+						'options'                => self::get_checkbox_options(),
+						'default'                => 'yes',
+						'group'                  => 'modules',
+						'requires_any_shortcode' => array( 'stamp_duty_calculator', 'mortgage_calculator' ),
 					),
 				);
 				break;
@@ -210,6 +211,47 @@ class PH_Template_Set_Catalog {
 		}
 
 		return array_merge( $controls, (array) $manifest['controls'] );
+	}
+
+	/**
+	 * Get controls currently available for a detail template.
+	 *
+	 * This is intentionally separate from get_detail_template_controls(), which
+	 * remains the stable schema used to validate and preserve stored settings.
+	 *
+	 * @param string $slug Detail template slug.
+	 * @return array
+	 */
+	public static function get_available_detail_template_controls( $slug ) {
+		$controls = self::get_detail_template_controls( $slug );
+
+		foreach ( $controls as $key => $control ) {
+			if ( ! self::is_detail_control_available( $control ) ) {
+				unset( $controls[ $key ] );
+			}
+		}
+
+		return $controls;
+	}
+
+	/**
+	 * Check whether a detail control's runtime requirements are satisfied.
+	 *
+	 * @param array $control Control definition.
+	 * @return bool
+	 */
+	private static function is_detail_control_available( $control ) {
+		if ( empty( $control['requires_any_shortcode'] ) ) {
+			return true;
+		}
+
+		foreach ( (array) $control['requires_any_shortcode'] as $shortcode ) {
+			if ( is_string( $shortcode ) && '' !== $shortcode && shortcode_exists( $shortcode ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

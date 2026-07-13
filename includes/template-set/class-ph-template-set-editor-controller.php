@@ -184,7 +184,7 @@ class PH_Template_Set_Editor_Controller {
 	 */
 	private static function render_detail_manifest_controls( $template ) {
 		$manifest = PH_Template_Set_Catalog::get_detail_template_manifest( $template );
-		$controls = PH_Template_Set_Catalog::get_detail_template_controls( $template );
+		$controls = PH_Template_Set_Catalog::get_available_detail_template_controls( $template );
 		$groups   = self::get_detail_control_groups( $template );
 
 		foreach ( $groups as $group ) {
@@ -334,7 +334,7 @@ class PH_Template_Set_Editor_Controller {
 	 * @return array
 	 */
 	private static function get_detail_control_groups( $template ) {
-		$controls = PH_Template_Set_Catalog::get_detail_template_controls( $template );
+		$controls = PH_Template_Set_Catalog::get_available_detail_template_controls( $template );
 		$labels   = array(
 			'media'       => __( 'Media', 'propertyhive' ),
 			'enquiry'     => __( 'Enquiries', 'propertyhive' ),
