@@ -902,7 +902,7 @@ add_filter( 'get_post_metadata', function ( $value, $post_id, $meta_key, $single
 	        if ( is_array($photos) && !empty($photos) )
 	        {
 	            $photos = array_filter( $photos );
-	            $value = $photos[0];
+	            if ( !empty($photos) ) { $value = $photos[0]; }
 	        }
 		}
 

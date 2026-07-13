@@ -383,8 +383,8 @@ class PH_Meta_Box_Property_Floorplans {
            {
               foreach ( $_POST['floorplan_url'] as $floorplan_url )
               {
-                  if ( ph_clean($floorplan_url) == '' ) { continue; }
-                  $floorplan_urls[] = array('url' => ph_clean($floorplan_url));
+                  if ( sanitize_url($floorplan_url) == '' ) { continue; }
+                  $floorplan_urls[] = array('url' => sanitize_url($floorplan_url));
               }
            }
            update_post_meta( $post_id, '_floorplan_urls', $floorplan_urls );
