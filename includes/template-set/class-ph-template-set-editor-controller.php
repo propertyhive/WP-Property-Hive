@@ -76,8 +76,9 @@ class PH_Template_Set_Editor_Controller {
 						echo '<button type="submit" class="ph-template-editor-save" data-ph-template-editor-save>' . esc_html__( 'Save', 'propertyhive' ) . '</button>';
 					echo '</div>';
 				echo '</footer>';
-			echo '</form>';
-		echo '</aside>';
+				echo '</form>';
+			echo '</aside>';
+			echo '<script type="application/json" data-ph-template-editor-config>' . wp_json_encode( self::get_script_data(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . '</script>';
 	}
 
 	/**

@@ -2,6 +2,8 @@
 	'use strict';
 
 	var modules = window.phTemplateSetModules = window.phTemplateSetModules || {};
+	var activeEditorForm = null;
+	var editorSidebarEventsReady = false;
 	var fallbackEditorSidebarLayout = {
 		active: { search: 'layout', detail: 'media' },
 		groups: {
@@ -35,6 +37,30 @@
 		}
 
 		return layout;
+	}
+
+	function getEditorGroupStorageKey(context) {
+		return 'propertyhive-template-editor-active-group-' + (context || 'search');
+	}
+
+	function getStoredEditorGroup(context) {
+		try {
+			return window.sessionStorage.getItem(getEditorGroupStorageKey(context)) || '';
+		} catch (error) {
+			return '';
+		}
+	}
+
+	function storeEditorGroup(context, groupId) {
+		try {
+			if (groupId) {
+				window.sessionStorage.setItem(getEditorGroupStorageKey(context), groupId);
+			} else {
+				window.sessionStorage.removeItem(getEditorGroupStorageKey(context));
+			}
+		} catch (error) {
+			// Storage can be unavailable in privacy modes; the in-page state still works.
+		}
 	}
 
 	function getEditorControlItem(control) {
@@ -213,7 +239,8 @@
 
 	function createEditorSidebarOrganizer(layoutId, layout, context, groups, items) {
 		var organizer = document.createElement('div');
-		var activeGroupId = layout.active && layout.active[context] ? layout.active[context] : groups[0].id;
+		var storedGroupId = getStoredEditorGroup(context);
+		var activeGroupId = storedGroupId || (layout.active && layout.active[context] ? layout.active[context] : groups[0].id);
 
 		if (!groups.some(function (group) { return group.id === activeGroupId; })) {
 			activeGroupId = groups[0].id;
@@ -230,7 +257,10 @@
 			if (button) {
 				button.addEventListener('click', function () {
 					var isOpen = panel.classList.contains('is-active');
-					setActiveEditorGroup(organizer, isOpen ? '' : group.id);
+					var nextGroupId = isOpen ? '' : group.id;
+					setActiveEditorGroup(organizer, nextGroupId);
+					organizer.setAttribute('data-ph-template-editor-active-group', nextGroupId);
+					storeEditorGroup(context, nextGroupId);
 					refreshActiveEditorGroupBodyOnNextFrame(organizer);
 				});
 			}
@@ -292,16 +322,24 @@
 	}
 
 	function initEditorSidebarGroups(editor, form, layout) {
+		activeEditorForm = form;
 		renderEditorSidebarGroups(editor, form, layout);
 
+		if (editorSidebarEventsReady) {
+			return;
+		}
+
+		editorSidebarEventsReady = true;
+
 		window.addEventListener('resize', function () {
-			var organizer = form.querySelector('[data-ph-template-editor-groups]');
+			var organizer = activeEditorForm ? activeEditorForm.querySelector('[data-ph-template-editor-groups]') : null;
 			refreshActiveEditorGroupBody(organizer);
 		});
 
 		if (document.fonts && document.fonts.ready) {
 			document.fonts.ready.then(function () {
-				refreshActiveEditorGroupBody(form.querySelector('[data-ph-template-editor-groups]'));
+				var organizer = activeEditorForm ? activeEditorForm.querySelector('[data-ph-template-editor-groups]') : null;
+				refreshActiveEditorGroupBody(organizer);
 			});
 		}
 	}
