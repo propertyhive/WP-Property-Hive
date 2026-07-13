@@ -257,6 +257,7 @@ class PH_Licenses {
 
 			$data['locale']           = get_locale();
 
+			// Import info
 			$property_import = get_option( 'propertyhive_property_import', array() );
 			if ( !is_array($property_import) )
 			{
@@ -267,10 +268,85 @@ class PH_Licenses {
             {
             	if ( $options['running'] == '1' )
             	{
+            		if ( $options['format'] == 'xml' )
+            		{
+            			$options['format'] .= ' (' . esc_url($options['xml_url']) . ')';
+            		}
+            		elseif ( $options['format'] == 'csv' )
+            		{
+            			$options['format'] .= ' (' . esc_url($options['csv_url']) . ')';
+            		}
             		$formats[] = $options['format'];
             	}
 			}
 			$data['property_import_formats'] = $formats;
+
+			// Exports
+			$formats = array();
+
+			$exports = array(
+			    'propertyhive_realtimefeed' => array(
+			        'label' => 'RTDF',
+			        'field' => 'send_property_api_url',
+			    ),
+			    'propertyhive_zooplarealtimefeed' => array(
+			        'label' => 'Zoopla',
+			        'field' => 'send_property_api_url',
+			    ),
+			    'propertyhive_blmexport' => array(
+			        'label' => 'BLM',
+			        'field' => 'ftp_host',
+			    ),
+			);
+
+			foreach ( $exports as $option_name => $config )
+			{
+			    $property_export = get_option( $option_name, array() );
+
+			    if ( ! is_array( $property_export ) ) {
+			    	continue;
+			    }
+
+		        if ( ! isset( $property_export['portals'] ) ) {
+		            continue;
+		        }
+
+		        if ( ! is_array( $property_export['portals'] ) ) {
+		            continue;
+		        }
+
+		        $portals = isset( $property_export['portals'] ) && is_array( $property_export['portals'] )
+		            ? $property_export['portals']
+		            : array();
+
+		        foreach ( $portals as $portal_id => $portal )
+		        {
+		            if ( ! is_array( $portal ) ) {
+		                continue;
+		            }
+
+		            if ( ! is_array( $portal ) || ( $portal['mode'] ?? '' ) !== 'live' ) {
+		                continue;
+		            }
+
+		            $destination = $portal[ $config['field'] ] ?? '';
+
+		            $formats[] = sprintf(
+		                '%s (%s)',
+		                $config['label'],
+		                $destination
+		            );
+		        }
+			}
+
+			$data['property_export_formats'] = $formats;
+
+			// Locrating
+			$locrating_settings = get_option( 'propertyhive_locrating', array() );
+			if ( !empty($locrating_settings) && isset($locrating_settings['enabled']) )
+			{
+				$data['locrating_enabled'] = ( $locrating_settings['enabled'] == 1 ? $locrating_settings['enabled'] : 0 );
+			}
 
 			// get counts
 			$post_types = array('office', 'property', 'contact', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'key_date');
@@ -298,6 +374,8 @@ class PH_Licenses {
 
 				wp_reset_postdata();
 			}
+
+			$data = apply_filters( 'propertyhive_license_check_data', $data );
 		}
 
 		return $data;
