@@ -1,0 +1,174 @@
+name: Deploy Property Hive
+
+on:
+  push:
+    branches:
+      - feature/property-template-system-spec
+
+permissions:
+  contents: read
+
+concurrency:
+  group: propertyhive-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy plugin to server
+    if: github.ref == 'refs/heads/feature/property-template-system-spec'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Validate deployment configuration
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.PROPERTYHIVE_DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.PROPERTYHIVE_DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.PROPERTYHIVE_DEPLOY_PATH }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.PROPERTYHIVE_DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_SSH_KEY: ${{ secrets.PROPERTYHIVE_DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+
+          required=(
+            DEPLOY_HOST
+            DEPLOY_USER
+            DEPLOY_PATH
+            DEPLOY_KNOWN_HOSTS
+            DEPLOY_SSH_KEY
+          )
+
+          for name in "${required[@]}"; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required deployment secret: ${name}"
+              exit 1
+            fi
+          done
+
+          case "${DEPLOY_PATH}" in
+            /*)
+              ;;
+            *)
+              echo "::error::PROPERTYHIVE_DEPLOY_PATH must be an absolute path."
+              exit 1
+              ;;
+          esac
+
+          case "${DEPLOY_PATH}" in
+            *[!A-Za-z0-9_./-]*)
+              echo "::error::PROPERTYHIVE_DEPLOY_PATH contains unsupported characters."
+              exit 1
+              ;;
+          esac
+
+          case "${DEPLOY_PATH}" in
+            */../*|*/..|../*|..)
+              echo "::error::PROPERTYHIVE_DEPLOY_PATH must not contain parent directory segments."
+              exit 1
+              ;;
+          esac
+
+          case "${DEPLOY_PATH}" in
+            */wp-content/plugins/propertyhive|*/wp-content/plugins/propertyhive/)
+              ;;
+            *)
+              echo "::error::PROPERTYHIVE_DEPLOY_PATH must point to the propertyhive plugin directory."
+              exit 1
+              ;;
+          esac
+
+      - name: Prepare SSH
+        shell: bash
+        env:
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.PROPERTYHIVE_DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_SSH_KEY: ${{ secrets.PROPERTYHIVE_DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${DEPLOY_SSH_KEY}" > ~/.ssh/propertyhive_deploy_key
+          chmod 600 ~/.ssh/propertyhive_deploy_key
+          printf '%s\n' "${DEPLOY_KNOWN_HOSTS}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Prepare remote plugin directory
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.PROPERTYHIVE_DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.PROPERTYHIVE_DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.PROPERTYHIVE_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i ~/.ssh/propertyhive_deploy_key \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "set -e; case '${DEPLOY_PATH}' in */../*|*/..|../*|..) echo 'Unsafe deploy path' >&2; exit 1 ;; esac; case '${DEPLOY_PATH}' in */wp-content/plugins/propertyhive|*/wp-content/plugins/propertyhive/) mkdir -p '${DEPLOY_PATH}' ;; *) echo 'Unsafe deploy path' >&2; exit 1 ;; esac"
+
+      - name: Sync committed plugin files
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.PROPERTYHIVE_DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.PROPERTYHIVE_DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.PROPERTYHIVE_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i ~/.ssh/propertyhive_deploy_key \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "set -e; test -d '${DEPLOY_PATH}' && test -f '${DEPLOY_PATH}/propertyhive.php' && rm -rf '${DEPLOY_PATH}/.playwright-cli' '${DEPLOY_PATH}/output'"
+
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/propertyhive_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.gitattributes' \
+            --exclude='.gitignore' \
+            --exclude='.playwright-cli/' \
+            --exclude='dev-tools/' \
+            --exclude='output/' \
+            --exclude='plans/' \
+            --exclude='includes/divi-extensions/node_modules/' \
+            ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
+
+      - name: Fix server file ownership and permissions
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.PROPERTYHIVE_DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.PROPERTYHIVE_DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.PROPERTYHIVE_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i ~/.ssh/propertyhive_deploy_key \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "set -e; test -f '${DEPLOY_PATH}/propertyhive.php' && chown -R www-data:www-data '${DEPLOY_PATH}' && find '${DEPLOY_PATH}' -type d -exec chmod 755 {} + && find '${DEPLOY_PATH}' -type f -exec chmod 644 {} +"
+
+      - name: Confirm deployment
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.PROPERTYHIVE_DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.PROPERTYHIVE_DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.PROPERTYHIVE_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i ~/.ssh/propertyhive_deploy_key \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "test -f '${DEPLOY_PATH}/propertyhive.php' && php -l '${DEPLOY_PATH}/propertyhive.php'"
