@@ -1,5 +1,7 @@
 .vscode
 .DS_Store
+/AGENTS.md
+/docs/
 .playwright-cli/
 dev-tools/
 includes/divi-extensions/node_modules/
