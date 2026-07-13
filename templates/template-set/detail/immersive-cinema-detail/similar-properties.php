@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <section class="ph-template-similar-properties ph-template-similar-layout-<?php echo esc_attr( sanitize_html_class( $layout ) ); ?> ph-template-similar-images-<?php echo esc_attr( sanitize_html_class( $image_style ) ); ?>" aria-label="<?php esc_attr_e( 'Similar properties', 'propertyhive' ); ?>" data-ph-recommended-properties>
 	<div class="ph-template-section-heading">
+		<p><?php esc_html_e( 'Also available', 'propertyhive' ); ?></p>
 		<h2><?php esc_html_e( 'Similar properties', 'propertyhive' ); ?></h2>
 	</div>
 	<div class="ph-template-similar-grid" data-ph-recommended-grid>

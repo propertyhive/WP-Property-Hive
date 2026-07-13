@@ -11,13 +11,43 @@
  * @version 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 ?>
-<aside class="ph-template-detail-contact-card ph-template-portal-contact<?php echo $is_demo ? ' is-demo' : ''; ?>" aria-label="<?php esc_attr_e( 'Enquire', 'propertyhive' ); ?>">
-	<?php if ( $price_qualifier ) : ?><p class="ph-template-contact-price-qualifier"><?php echo esc_html( $price_qualifier ); ?></p><?php endif; ?>
+<aside class="ph-template-detail-contact-card ph-template-contact-panel ph-template-contact-panel-portal-split ph-template-portal-contact<?php echo $is_demo ? ' is-demo' : ''; ?>" aria-label="<?php esc_attr_e( 'Enquire', 'propertyhive' ); ?>">
+	<?php if ( $price_qualifier ) : ?>
+		<p class="ph-template-contact-price-qualifier"><?php echo esc_html( $price_qualifier ); ?></p>
+	<?php endif; ?>
 	<div class="ph-template-contact-price"><?php echo wp_kses_post( $property->get_formatted_price() ); ?></div>
-	<?php if ( $hint ) : ?><p class="ph-template-contact-hint"><?php echo esc_html( $hint ); ?></p><?php endif; ?>
-	<div class="ph-template-contact-actions"><a class="ph-template-button ph-template-button-primary" data-fancybox data-src="#makeEnquiry<?php echo absint( $post_id ); ?>" href="javascript:;"><?php echo esc_html( $button ); ?></a><?php if ( $email ) : ?><a class="ph-template-button ph-template-button-secondary" href="<?php echo esc_url( 'mailto:' . $email ); ?>"><?php esc_html_e( 'Email agent', 'propertyhive' ); ?></a><?php endif; ?><?php if ( $phone ) : ?><a class="ph-template-button ph-template-button-secondary" href="<?php echo esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ); ?>"><?php esc_html_e( 'Call agent', 'propertyhive' ); ?></a><?php endif; ?></div>
-	<?php if ( $agent || $portrait || $office ) : ?><div class="ph-template-contact-agent"><?php if ( $portrait ) : ?><span class="ph-template-contact-portrait ph-template-contact-portrait-image"><?php echo wp_kses_post( $portrait ); ?></span><?php elseif ( $agent ) : ?><span class="ph-template-contact-portrait ph-template-contact-portrait-initials"><?php echo esc_html( $agent_initials ); ?></span><?php endif; ?><span class="ph-template-contact-agent-meta"><b><?php echo esc_html( $agent ? $agent : $office_alt ); ?></b><?php if ( $agent_role ) : ?><small><?php echo esc_html( $agent_role ); ?></small><?php endif; ?></span></div><?php endif; ?>
-	<?php if ( $shortlist_button ) : ?><?php echo wp_kses( $shortlist_button, array( 'a' => array( 'href' => true, 'class' => true, 'rel' => true, 'data-add-to-shortlist' => true ) ) ); ?><?php endif; ?>
+	<?php if ( $hint ) : ?>
+		<p class="ph-template-contact-hint"><?php echo esc_html( $hint ); ?></p>
+	<?php endif; ?>
+	<div class="ph-template-contact-actions">
+		<button type="button" class="ph-template-button ph-template-button-primary" data-fancybox data-src="#makeEnquiry<?php echo absint( $post_id ); ?>" aria-haspopup="dialog" aria-controls="makeEnquiry<?php echo absint( $post_id ); ?>"><?php echo esc_html( $button ); ?></button>
+		<?php if ( $email ) : ?>
+			<a class="ph-template-button ph-template-button-secondary" href="<?php echo esc_url( 'mailto:' . $email ); ?>"><?php esc_html_e( 'Email agent', 'propertyhive' ); ?></a>
+		<?php endif; ?>
+		<?php if ( $phone ) : ?>
+			<a class="ph-template-button ph-template-button-secondary" href="<?php echo esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ); ?>"><?php esc_html_e( 'Call agent', 'propertyhive' ); ?></a>
+		<?php endif; ?>
+	</div>
+	<?php if ( $agent || $portrait || $office ) : ?>
+		<div class="ph-template-contact-agent">
+			<?php if ( $portrait ) : ?>
+				<span class="ph-template-contact-portrait ph-template-contact-portrait-image"><?php echo wp_kses_post( $portrait ); ?></span>
+			<?php elseif ( $agent ) : ?>
+				<span class="ph-template-contact-portrait ph-template-contact-portrait-initials" aria-hidden="true"><?php echo esc_html( $agent_initials ); ?></span>
+			<?php endif; ?>
+			<span class="ph-template-contact-agent-meta">
+				<b><?php echo esc_html( $agent ? $agent : $office_alt ); ?></b>
+				<?php if ( $agent_role ) : ?>
+					<small><?php echo esc_html( $agent_role ); ?></small>
+				<?php endif; ?>
+			</span>
+		</div>
+	<?php endif; ?>
+	<?php if ( $shortlist_button ) : ?>
+		<?php echo wp_kses( $shortlist_button, array( 'a' => array( 'href' => true, 'class' => true, 'rel' => true, 'data-add-to-shortlist' => true ) ) ); ?>
+	<?php endif; ?>
 </aside>

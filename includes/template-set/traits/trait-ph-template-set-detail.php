@@ -23,7 +23,9 @@ trait PH_Template_Set_Detail {
 			return;
 		}
 
-		$template       = self::get_detail_template();
+		$template   = self::get_detail_template();
+		$department = self::get_detail_department( $property );
+		$is_sales   = 'residential-sales' === $department;
 		// Portal Split shows key facts in the shared facts strip, not again in modules.
 		$facts          = ( self::detail_template_uses_rich_modules( $template ) && 'conversion-first-sales-detail' !== $template )
 			? self::get_detail_key_facts( $property )
@@ -74,28 +76,29 @@ trait PH_Template_Set_Detail {
 			$template,
 			'modules',
 			array(
-				'property'       => $property,
-				'template'       => $template,
-				'facts'          => $facts,
-				'rooms'          => $rooms,
-				'material'       => $material,
-				'features'       => $features,
-				'description'    => $description,
-				'overview'       => $overview,
-				'location_label' => $location_label,
-				'address'        => $address,
-				'documents'      => $documents,
-				'office'         => $office,
-				'has_floorplan'  => $has_floorplan,
-				'duet_images'    => $duet_images,
-				'post_id'        => isset( $post->ID ) ? absint( $post->ID ) : 0,
-				'button'         => $button,
-				'phone'          => $phone,
-				'email'          => $email,
-				'agent'          => $agent,
-				'agent_role'     => $agent_role,
-				'agent_initials' => self::get_contact_agent_initials( $agent ),
-				'portrait'       => $portrait,
+				'property'            => $property,
+				'template'            => $template,
+				'facts'               => $facts,
+				'rooms'               => $rooms,
+				'material'            => $material,
+				'features'            => $features,
+				'description'         => $description,
+				'overview'            => $overview,
+				'location_label'      => $location_label,
+				'address'             => $address,
+				'documents'           => $documents,
+				'office'              => $office,
+				'has_floorplan'       => $has_floorplan,
+				'duet_images'         => $duet_images,
+				'post_id'             => isset( $post->ID ) ? absint( $post->ID ) : 0,
+				'button'              => $button,
+				'phone'               => $phone,
+				'email'               => $email,
+				'agent'               => $agent,
+				'agent_role'          => $agent_role,
+				'agent_initials'      => self::get_contact_agent_initials( $agent ),
+				'portrait'            => $portrait,
+				'show_purchase_costs' => $is_sales && ( 'yes' === PH_Template_Set_Request_Context::get_portal_show_costs() || self::is_template_editor_active() ) && ( shortcode_exists( 'stamp_duty_calculator' ) || shortcode_exists( 'mortgage_calculator' ) ),
 			)
 		);
 	}
@@ -486,6 +489,7 @@ trait PH_Template_Set_Detail {
 				'media_links'      => self::get_property_document_labels( $property ),
 				'shortlist_button' => self::get_shortlist_button_markup( $shortlist_class, $shortlist_labels ),
 				'share_button'     => $share_button,
+				'has_brochure'     => self::has_brochure( $property ),
 			)
 		);
 	}
@@ -582,6 +586,7 @@ trait PH_Template_Set_Detail {
 				'property'   => $property,
 				'template'   => $template,
 				'highlights' => $highlights,
+				'show_brief' => 'yes' === PH_Template_Set_Request_Context::get_editorial_show_brief() || self::is_template_editor_active(),
 			)
 		);
 	}
@@ -692,8 +697,7 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_detail_kicker_label( $property, $template ) {
-		$department = ph_get_custom_department_based_on( $property->department );
-		$department = $department ? $department : $property->department;
+		$department = self::get_detail_department( $property );
 
 		if ( 'lettings-detail' === $template || 'residential-lettings' === $department ) {
 			return __( 'To let', 'propertyhive' );
@@ -1540,6 +1544,10 @@ trait PH_Template_Set_Detail {
 	 * @return string
 	 */
 	private static function get_primary_cta_label( $property, $template ) {
+		if ( 'lettings-detail' === $template || 'residential-lettings' === self::get_detail_department( $property ) ) {
+			return __( 'Arrange viewing', 'propertyhive' );
+		}
+
 		if ( 'premium-editorial-detail' === $template ) {
 			return __( 'Arrange a private viewing', 'propertyhive' );
 		}
@@ -1552,11 +1560,23 @@ trait PH_Template_Set_Detail {
 			return __( 'Request viewing', 'propertyhive' );
 		}
 
-		if ( 'lettings-detail' === $template || 'residential-lettings' === $property->department || 'residential-lettings' === ph_get_custom_department_based_on( $property->department ) ) {
-			return __( 'Arrange viewing', 'propertyhive' );
+		return __( 'Request viewing', 'propertyhive' );
+	}
+
+	/**
+	 * Get the base Property Hive department for a property.
+	 *
+	 * @param PH_Property $property Property object.
+	 * @return string
+	 */
+	private static function get_detail_department( $property ) {
+		if ( ! $property ) {
+			return '';
 		}
 
-		return __( 'Request viewing', 'propertyhive' );
+		$department = ph_get_custom_department_based_on( $property->department );
+
+		return $department ? $department : $property->department;
 	}
 
 	/**

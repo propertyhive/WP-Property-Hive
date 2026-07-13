@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
-<aside class="ph-template-detail-contact-card<?php echo $is_demo ? ' is-demo' : ''; ?>" aria-label="<?php esc_attr_e( 'Property contact', 'propertyhive' ); ?>">
+<aside class="ph-template-detail-contact-card ph-template-contact-panel<?php echo $is_demo ? ' is-demo' : ''; ?>" aria-label="<?php esc_attr_e( 'Property contact', 'propertyhive' ); ?>">
 	<?php if ( $agent || $portrait ) : ?>
 		<div class="ph-template-contact-agent">
 			<?php if ( $portrait ) : ?>
@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php if ( $phone ) : ?>
 			<a class="ph-template-button ph-template-button-primary" href="<?php echo esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ); ?>"><?php esc_html_e( 'Call agent', 'propertyhive' ); ?></a>
 		<?php endif; ?>
-		<a class="ph-template-button <?php echo esc_attr( $phone ? 'ph-template-button-secondary' : 'ph-template-button-primary' ); ?>" data-fancybox data-src="#makeEnquiry<?php echo absint( $post_id ); ?>" href="javascript:;"><?php echo esc_html( $button ); ?></a>
+		<button type="button" class="ph-template-button <?php echo esc_attr( $phone ? 'ph-template-button-secondary' : 'ph-template-button-primary' ); ?>" data-fancybox data-src="#makeEnquiry<?php echo absint( $post_id ); ?>" aria-haspopup="dialog" aria-controls="makeEnquiry<?php echo absint( $post_id ); ?>"><?php echo esc_html( $button ); ?></button>
 		<?php if ( ! empty( $shortlist_button ) ) : ?>
 			<?php
 			echo wp_kses(

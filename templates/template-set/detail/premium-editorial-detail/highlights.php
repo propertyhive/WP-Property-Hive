@@ -4,15 +4,19 @@
  *
  * Override this template by copying it to yourtheme/propertyhive/template-set/detail/premium-editorial-detail/highlights.php
  *
- * Available variables: $property, $template, $highlights.
+ * Available variables: $property, $template, $highlights, $show_brief.
  *
  * @author  PropertyHive
  * @package PropertyHive/Templates/TemplateSet
  * @version 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
-if ( empty( $highlights[0]['value'] ) || ( 'yes' !== PH_Template_Set_Request_Context::get_editorial_show_brief() && ! PH_Template_Set_Request_Context::is_template_editor_active() ) ) { return; }
+if ( empty( $highlights[0]['value'] ) || ! $show_brief ) {
+	return;
+}
 ?>
 <p class="ph-template-editorial-brief"><?php echo esc_html( $highlights[0]['value'] ); ?></p>
