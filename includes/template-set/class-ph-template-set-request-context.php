@@ -18,7 +18,7 @@ class PH_Template_Set_Request_Context {
 	 * @return bool
 	 */
 	public static function is_demo_preview() {
-		return self::is_enabled() && self::is_previewing_template();
+		return self::is_enabled() && self::can_manage_template_set() && self::is_previewing_template();
 	}
 
 	/**
@@ -44,7 +44,7 @@ class PH_Template_Set_Request_Context {
 	public static function get_detail_template() {
 		$settings  = PH_Template_Set_Settings::get_settings();
 		$templates = PH_Template_Set_Catalog::get_detail_templates();
-		$template  = self::get_query_template( PH_Template_Set::DETAIL_QUERY_ARG, $templates );
+		$template  = self::can_manage_template_set() ? self::get_query_template( PH_Template_Set::DETAIL_QUERY_ARG, $templates ) : '';
 
 		if ( empty( $template ) ) {
 			$template = sanitize_title( $settings['template_set_detail_template'] );
@@ -63,7 +63,7 @@ class PH_Template_Set_Request_Context {
 	public static function get_search_template() {
 		$settings  = PH_Template_Set_Settings::get_settings();
 		$templates = PH_Template_Set_Catalog::get_search_templates();
-		$template  = self::get_query_template( PH_Template_Set::SEARCH_QUERY_ARG, $templates );
+		$template  = self::can_manage_template_set() ? self::get_query_template( PH_Template_Set::SEARCH_QUERY_ARG, $templates ) : '';
 
 		if ( empty( $template ) ) {
 			$template = sanitize_title( $settings['template_set_search_template'] );
@@ -79,7 +79,7 @@ class PH_Template_Set_Request_Context {
 	 */
 	public static function get_module_template() {
 		$templates = PH_Template_Set_Catalog::get_module_templates();
-		$template  = self::get_query_template( PH_Template_Set::MODULE_QUERY_ARG, $templates );
+		$template  = self::can_manage_template_set() ? self::get_query_template( PH_Template_Set::MODULE_QUERY_ARG, $templates ) : '';
 
 		return isset( $templates[ $template ] ) ? $template : '';
 	}
@@ -301,6 +301,10 @@ class PH_Template_Set_Request_Context {
 	 * @return bool
 	 */
 	public static function is_previewing_template() {
+		if ( ! self::can_manage_template_set() ) {
+			return false;
+		}
+
 		foreach ( self::get_preview_query_args() as $arg ) {
 			if ( ! empty( $_GET[ $arg ] ) ) {
 				return true;

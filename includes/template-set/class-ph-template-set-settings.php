@@ -90,7 +90,7 @@ class PH_Template_Set_Settings {
 	 * @return mixed
 	 */
 	public static function get_for_template( $key, $template_slug, $settings = null ) {
-		$template_slug = sanitize_title( $template_slug );
+		$template_slug = PH_Template_Set_Catalog::normalize_detail_template_slug( $template_slug );
 		$manifest      = PH_Template_Set_Catalog::get_detail_template_manifest( $template_slug );
 		$controls      = PH_Template_Set_Catalog::get_detail_template_controls( $template_slug );
 		$settings      = is_array( $settings ) ? $settings : self::get_settings();
