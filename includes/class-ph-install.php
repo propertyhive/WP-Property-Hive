@@ -127,6 +127,7 @@ class PH_Install {
         wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
         wp_clear_scheduled_hook( 'propertyhive_check_licenses' );
         wp_clear_scheduled_hook( 'propertyhive_update_address_concatenated' );
+        wp_clear_scheduled_hook( 'propertyhive_cleanup_search_analytics' );
 	}
 
 	/**
@@ -166,6 +167,7 @@ class PH_Install {
         wp_clear_scheduled_hook( 'propertyhive_auto_email_match' );
         wp_clear_scheduled_hook( 'propertyhive_check_licenses' );
         wp_clear_scheduled_hook( 'propertyhive_update_address_concatenated' );
+        wp_clear_scheduled_hook( 'propertyhive_cleanup_search_analytics' );
 
 		// Schedule for midnight as it's likely traffic will be quieter at that time
 		wp_schedule_event( strtotime( 'tomorrow' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ), 'daily', 'propertyhive_update_currency_exchange_rates' );
@@ -197,6 +199,8 @@ class PH_Install {
         wp_schedule_event( strtotime( 'tomorrow +1hours' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ), 'daily', 'propertyhive_check_licenses' );
 
         wp_schedule_event( strtotime( 'tomorrow +3hours' ) - ( (int)get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ), 'daily', 'propertyhive_update_address_concatenated' );
+
+        wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', 'propertyhive_cleanup_search_analytics' );
 	}
 
     public function custom_cron_recurrence( $schedules ) 
@@ -792,6 +796,14 @@ Should you need to cancel or amend this appraisal, please do not hesitate to con
         CREATE TABLE {$wpdb->prefix}ph_address_keyword_polygon (
             address_keyword varchar(255) NOT NULL,
             polygon_coordinates longtext NOT NULL
+        ) $collate;";
+
+        $tables .= "
+        CREATE TABLE {$wpdb->prefix}ph_search_log (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            searched_at datetime NOT NULL,
+            PRIMARY KEY (id),
+            KEY searched_at (searched_at)
         ) $collate;";
 
         dbDelta( $tables );
