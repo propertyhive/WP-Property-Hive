@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Property Hive plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Property Hive 2.2.4\n"
+"Project-Id-Version: Property Hive 2.2.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/propertyhive\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-18T19:59:36+01:00\n"
+"POT-Creation-Date: 2026-07-16T14:59:39+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: propertyhive\n"
@@ -68,8 +68,6 @@ msgid "Property Hive has everything you need to build estate agency websites"
 msgstr ""
 
 #. Author of the plugin
-#: includes/admin/class-ph-admin-assets.php:121
-#: includes/admin/ph-admin-functions.php:19
 msgid "PropertyHive"
 msgstr ""
 
@@ -85,7 +83,7 @@ msgstr ""
 #: includes/admin/class-ph-admin-applicant-list.php:77
 #: includes/admin/class-ph-admin-applicant-list.php:932
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:396
-#: includes/admin/settings/class-ph-settings-frontend.php:857
+#: includes/admin/settings/class-ph-settings-frontend.php:890
 #: includes/admin/views/html-admin-matching-applicants.php:100
 #: includes/admin/views/html-admin-matching-properties.php:45
 #: includes/ph-form-functions.php:558
@@ -129,8 +127,8 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:361
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1351
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2588
-#: includes/admin/settings/class-ph-settings-frontend.php:764
-#: includes/admin/settings/class-ph-settings-frontend.php:787
+#: includes/admin/settings/class-ph-settings-frontend.php:797
+#: includes/admin/settings/class-ph-settings-frontend.php:820
 #: includes/admin/views/html-admin-matching-applicants.php:188
 #: includes/admin/views/html-admin-matching-properties.php:245
 #: includes/elementor-widgets/property-location.php:14
@@ -285,7 +283,7 @@ msgid "Department"
 msgstr ""
 
 #: includes/admin/class-ph-admin-applicant-list.php:943
-#: includes/admin/settings/class-ph-settings-frontend.php:1080
+#: includes/admin/settings/class-ph-settings-frontend.php:1113
 msgid "Currency"
 msgstr ""
 
@@ -312,84 +310,84 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:201
+#: includes/admin/class-ph-admin-assets.php:200
 #: includes/class-ph-frontend-scripts.php:193
 msgid "selected"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:254
+#: includes/admin/class-ph-admin-assets.php:253
 msgid "Enter the Property's Display Address"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:255
+#: includes/admin/class-ph-admin-assets.php:254
 msgid "This is the title or address that will be shown publicly. Make it clear and appealing for your audience."
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:262
+#: includes/admin/class-ph-admin-assets.php:261
 msgid "Explore the Property Record"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:263
+#: includes/admin/class-ph-admin-assets.php:262
 msgid "The property record is organized into sections for easy navigation. Use these tabs to switch between sections.<br><br>Go ahead, try clicking them now."
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:272
+#: includes/admin/class-ph-admin-assets.php:271
 msgid "Enter the Property Details"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:273
+#: includes/admin/class-ph-admin-assets.php:272
 msgid "Use these fields to input essential property information like address, price, bedrooms, and more. You can also upload images to showcase the property."
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:281
+#: includes/admin/class-ph-admin-assets.php:280
 msgid "Put it on the Market"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:282
+#: includes/admin/class-ph-admin-assets.php:281
 msgid "For a property to show on your website it will need to be set to 'On Market' under the 'Marketing' tab."
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:291
+#: includes/admin/class-ph-admin-assets.php:290
 msgid "Publish your Property"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:292
+#: includes/admin/class-ph-admin-assets.php:291
 msgid "When you're done and are ready to save your changes, simply click 'Publish'"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:393
+#: includes/admin/class-ph-admin-assets.php:392
 msgid "Please check the box to confirm that you are happy to remove this term"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:394
+#: includes/admin/class-ph-admin-assets.php:393
 msgid "Please select at least one active department"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:395
+#: includes/admin/class-ph-admin-assets.php:394
 msgid "The chosen primary department has not been selected as active"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:396
+#: includes/admin/class-ph-admin-assets.php:395
 msgid "Please select which countries you operate in"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:397
+#: includes/admin/class-ph-admin-assets.php:396
 msgid "The default country hasn't been selected as a country you operate in"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:441
+#: includes/admin/class-ph-admin-assets.php:440
 msgid "If you have a moment, please let us know why you are deactivating:"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:442
+#: includes/admin/class-ph-admin-assets.php:441
 msgid "Quick Feedback"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:443
+#: includes/admin/class-ph-admin-assets.php:442
 msgid "Skip & Deactivate"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:444
+#: includes/admin/class-ph-admin-assets.php:443
 #: includes/admin/class-ph-admin-merge-contacts.php:139
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:154
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:215
@@ -416,39 +414,39 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:445
+#: includes/admin/class-ph-admin-assets.php:444
 msgid "Submit & Deactivate"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:447
+#: includes/admin/class-ph-admin-assets.php:446
 msgid "The plugin broke my site"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:448
+#: includes/admin/class-ph-admin-assets.php:447
 msgid "The plugin is confusing"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:449
+#: includes/admin/class-ph-admin-assets.php:448
 msgid "The support/documentation is inadequate"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:450
+#: includes/admin/class-ph-admin-assets.php:449
 msgid "The plugin is too slow/affects performance"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:451
+#: includes/admin/class-ph-admin-assets.php:450
 msgid "I no longer need the plugin"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:452
+#: includes/admin/class-ph-admin-assets.php:451
 msgid "I found a better plugin"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:453
+#: includes/admin/class-ph-admin-assets.php:452
 msgid "It's a temporary deactivation"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:454
+#: includes/admin/class-ph-admin-assets.php:453
 #: includes/class-ph-third-party-contacts.php:37
 #: includes/ph-property-functions.php:602
 #: includes/ph-property-functions.php:630
@@ -462,19 +460,19 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:456
+#: includes/admin/class-ph-admin-assets.php:455
 msgid "Oh no! Can you tell us more? (optional)"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:457
+#: includes/admin/class-ph-admin-assets.php:456
 msgid "What's the plugin's name? (optional)"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:458
+#: includes/admin/class-ph-admin-assets.php:457
 msgid "Additional feedback or comments: (optional)"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:460
+#: includes/admin/class-ph-admin-assets.php:459
 msgid "Anonymous feedback"
 msgstr ""
 
@@ -965,7 +963,7 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:73
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:109
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-record-details.php:81
-#: includes/admin/settings/class-ph-settings-frontend.php:1046
+#: includes/admin/settings/class-ph-settings-frontend.php:1079
 #: includes/admin/views/html-bulk-edit-property.php:108
 #: includes/admin/views/html-contact-enquiries-meta-box.php:51
 #: includes/admin/views/html-display-enquiries.php:12
@@ -1172,8 +1170,8 @@ msgstr[1] ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1976
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2184
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2266
-#: includes/admin/settings/class-ph-settings-frontend.php:475
-#: includes/admin/settings/class-ph-settings-frontend.php:515
+#: includes/admin/settings/class-ph-settings-frontend.php:489
+#: includes/admin/settings/class-ph-settings-frontend.php:529
 msgid "ID"
 msgstr ""
 
@@ -1245,7 +1243,7 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:34
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:36
 #: includes/admin/settings/class-ph-settings-emails.php:581
-#: includes/admin/settings/class-ph-settings-frontend.php:805
+#: includes/admin/settings/class-ph-settings-frontend.php:838
 #: includes/admin/views/html-contact-enquiries-meta-box.php:49
 #: includes/admin/views/html-contact-offers-meta-box.php:38
 #: includes/admin/views/html-contact-sales-meta-box.php:38
@@ -1357,23 +1355,23 @@ msgstr ""
 msgid "Contacts merged successfully"
 msgstr ""
 
-#: includes/admin/ph-admin-functions.php:312
+#: includes/admin/ph-admin-functions.php:310
 msgid "never"
 msgstr ""
 
 #. translators: %s: human-readable time difference (e.g. "5 minutes")
-#: includes/admin/ph-admin-functions.php:319
+#: includes/admin/ph-admin-functions.php:317
 #: includes/admin/views/html-display-notes.php:335
 #: includes/class-ph-ajax.php:1927
 msgid "%s ago"
 msgstr ""
 
 #. translators: %s: human-readable time difference (e.g. "5 minutes")
-#: includes/admin/ph-admin-functions.php:327
+#: includes/admin/ph-admin-functions.php:325
 msgid "in %s"
 msgstr ""
 
-#: includes/admin/ph-admin-functions.php:333
+#: includes/admin/ph-admin-functions.php:331
 msgid "now"
 msgstr ""
 
@@ -1601,8 +1599,8 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:226
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:97
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-sales-details.php:53
-#: includes/admin/settings/class-ph-settings-frontend.php:912
-#: includes/admin/settings/class-ph-settings-frontend.php:920
+#: includes/admin/settings/class-ph-settings-frontend.php:945
+#: includes/admin/settings/class-ph-settings-frontend.php:953
 #: includes/admin/views/html-admin-matching-properties.php:324
 #: includes/bricks-builder-widgets/property-price.php:19
 #: includes/elementor-widgets/property-price.php:14
@@ -1677,8 +1675,8 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-commercial-details.php:224
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-lettings-details.php:55
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:153
-#: includes/admin/settings/class-ph-settings-frontend.php:940
-#: includes/admin/settings/class-ph-settings-frontend.php:948
+#: includes/admin/settings/class-ph-settings-frontend.php:973
+#: includes/admin/settings/class-ph-settings-frontend.php:981
 #: includes/admin/views/html-admin-matching-properties.php:324
 #: includes/admin/views/html-contact-tenancies-meta-box.php:89
 #: includes/admin/views/html-property-tenancies-meta-box.php:89
@@ -1854,7 +1852,7 @@ msgstr ""
 #: includes/admin/post-types/class-ph-admin-meta-boxes.php:873
 #: includes/admin/settings/class-ph-settings-custom-fields.php:232
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2260
-#: includes/admin/settings/class-ph-settings-frontend.php:1062
+#: includes/admin/settings/class-ph-settings-frontend.php:1095
 #: includes/class-ph-post-types.php:493
 #: includes/divi-widgets/property-features.php:13
 #: templates/single-property/features.php:21
@@ -2323,8 +2321,8 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:198
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:231
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-residential-details.php:42
-#: includes/admin/settings/class-ph-settings-frontend.php:967
-#: includes/admin/settings/class-ph-settings-frontend.php:1031
+#: includes/admin/settings/class-ph-settings-frontend.php:1000
+#: includes/admin/settings/class-ph-settings-frontend.php:1064
 #: includes/bricks-builder-widgets/property-bedrooms.php:19
 #: includes/bricks-builder-widgets/property-bedrooms.php:51
 #: includes/bricks-builder-widgets/property-deposit.php:52
@@ -2390,7 +2388,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:363
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1485
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2641
-#: includes/admin/settings/class-ph-settings-frontend.php:793
+#: includes/admin/settings/class-ph-settings-frontend.php:826
 #: includes/class-ph-post-types.php:357
 #: includes/ph-template-functions.php:809
 msgid "Parking"
@@ -2406,7 +2404,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:365
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1567
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2684
-#: includes/admin/settings/class-ph-settings-frontend.php:799
+#: includes/admin/settings/class-ph-settings-frontend.php:832
 #: includes/ph-template-functions.php:817
 msgid "Outside Space"
 msgstr ""
@@ -2656,7 +2654,7 @@ msgid "Update"
 msgstr ""
 
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-relationships.php:568
-#: includes/admin/settings/class-ph-settings-frontend.php:881
+#: includes/admin/settings/class-ph-settings-frontend.php:914
 #: includes/admin/views/html-admin-matching-applicants.php:159
 #: includes/admin/views/html-admin-matching-properties.php:107
 #: includes/ph-form-functions.php:570
@@ -2979,7 +2977,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:370
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1731
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3024
-#: includes/admin/settings/class-ph-settings-frontend.php:889
+#: includes/admin/settings/class-ph-settings-frontend.php:922
 #: includes/class-ph-post-types.php:442
 msgid "Sale By"
 msgstr ""
@@ -2992,7 +2990,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1895
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3067
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3110
-#: includes/admin/settings/class-ph-settings-frontend.php:817
+#: includes/admin/settings/class-ph-settings-frontend.php:850
 #: includes/bricks-builder-widgets/property-tenure.php:19
 #: includes/elementor-widgets/property-tenure.php:14
 #: includes/elementor-widgets/property-tenure.php:34
@@ -3588,7 +3586,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:377
 #: includes/admin/settings/class-ph-settings-custom-fields.php:1977
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3153
-#: includes/admin/settings/class-ph-settings-frontend.php:895
+#: includes/admin/settings/class-ph-settings-frontend.php:928
 #: includes/class-ph-post-types.php:459
 #: includes/elementor-widgets/property-furnished.php:14
 #: includes/elementor-widgets/property-furnished.php:34
@@ -3609,7 +3607,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:382
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2185
 #: includes/admin/settings/class-ph-settings-custom-fields.php:3300
-#: includes/admin/settings/class-ph-settings-frontend.php:811
+#: includes/admin/settings/class-ph-settings-frontend.php:844
 #: includes/elementor-widgets/property-marketing-flag.php:14
 #: includes/elementor-widgets/property-marketing-flag.php:34
 msgid "Marketing Flag"
@@ -3772,7 +3770,7 @@ msgstr ""
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2292
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2714
 #: includes/admin/settings/class-ph-settings-custom-fields.php:2767
-#: includes/admin/settings/class-ph-settings-frontend.php:548
+#: includes/admin/settings/class-ph-settings-frontend.php:578
 #: includes/admin/settings/class-ph-settings-offices.php:200
 #: includes/admin/settings/class-ph-settings-offices.php:457
 #: includes/admin/views/html-display-notes.php:352
@@ -4344,139 +4342,144 @@ msgstr ""
 msgid "Frontend"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:100
+#: includes/admin/settings/class-ph-settings-frontend.php:47
+#: includes/admin/settings/class-ph-settings-frontend.php:80
+msgid "Sorry, you are not allowed to do this."
+msgstr ""
+
+#: includes/admin/settings/class-ph-settings-frontend.php:114
 msgid "Search Results"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:101
-#: includes/admin/settings/class-ph-settings-frontend.php:413
-#: includes/admin/settings/class-ph-settings-frontend.php:510
+#: includes/admin/settings/class-ph-settings-frontend.php:115
+#: includes/admin/settings/class-ph-settings-frontend.php:427
+#: includes/admin/settings/class-ph-settings-frontend.php:524
 msgid "Search Forms"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:102
-#: includes/admin/settings/class-ph-settings-frontend.php:1340
+#: includes/admin/settings/class-ph-settings-frontend.php:116
+#: includes/admin/settings/class-ph-settings-frontend.php:1373
 msgid "Flags"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:119
+#: includes/admin/settings/class-ph-settings-frontend.php:133
 msgid "Search Results Page Layout"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:124
+#: includes/admin/settings/class-ph-settings-frontend.php:138
 msgid "Default Sort Order"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:129
-#: includes/admin/settings/class-ph-settings-frontend.php:141
+#: includes/admin/settings/class-ph-settings-frontend.php:143
+#: includes/admin/settings/class-ph-settings-frontend.php:155
 msgid "default"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:136
+#: includes/admin/settings/class-ph-settings-frontend.php:150
 msgid "Properties Per Row"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:149
+#: includes/admin/settings/class-ph-settings-frontend.php:163
 msgid "Result Layout"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:279
+#: includes/admin/settings/class-ph-settings-frontend.php:293
 msgid "Fields Shown"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:294
+#: includes/admin/settings/class-ph-settings-frontend.php:308
 msgid "Image Size Used"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:310
+#: includes/admin/settings/class-ph-settings-frontend.php:324
 msgid "Customise CSS"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:328
+#: includes/admin/settings/class-ph-settings-frontend.php:342
 msgid "Apply CSS To All Pages"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:506
-#: includes/admin/settings/class-ph-settings-frontend.php:569
+#: includes/admin/settings/class-ph-settings-frontend.php:520
+#: includes/admin/settings/class-ph-settings-frontend.php:602
 msgid "Add New Search Form"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:516
+#: includes/admin/settings/class-ph-settings-frontend.php:530
 msgid "Shortcode"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:546
+#: includes/admin/settings/class-ph-settings-frontend.php:567
 msgid "Edit Fields"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:547
+#: includes/admin/settings/class-ph-settings-frontend.php:568
 msgid "Reset To Default Fields"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:556
+#: includes/admin/settings/class-ph-settings-frontend.php:589
 msgid "No search forms exist"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:627
-#: includes/admin/settings/class-ph-settings-frontend.php:634
-#: includes/admin/settings/class-ph-settings-frontend.php:833
+#: includes/admin/settings/class-ph-settings-frontend.php:660
+#: includes/admin/settings/class-ph-settings-frontend.php:667
+#: includes/admin/settings/class-ph-settings-frontend.php:866
 msgid "No Preference"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:772
+#: includes/admin/settings/class-ph-settings-frontend.php:805
 msgid "Radius"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:776
+#: includes/admin/settings/class-ph-settings-frontend.php:809
 msgid "This Area Only"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:777
+#: includes/admin/settings/class-ph-settings-frontend.php:810
 msgid "Within 1 Mile"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:778
+#: includes/admin/settings/class-ph-settings-frontend.php:811
 msgid "Within 2 Miles"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:779
+#: includes/admin/settings/class-ph-settings-frontend.php:812
 msgid "Within 3 Miles"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:780
+#: includes/admin/settings/class-ph-settings-frontend.php:813
 msgid "Within 5 Miles"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:781
+#: includes/admin/settings/class-ph-settings-frontend.php:814
 msgid "Within 10 Miles"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:823
+#: includes/admin/settings/class-ph-settings-frontend.php:856
 msgid "Commercial Tenure"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:829
+#: includes/admin/settings/class-ph-settings-frontend.php:862
 msgid "For Sale / To Rent"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:834
+#: includes/admin/settings/class-ph-settings-frontend.php:867
 #: includes/ph-form-functions.php:647
 msgid "For Sale"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:835
+#: includes/admin/settings/class-ph-settings-frontend.php:868
 #: includes/ph-form-functions.php:658
 msgid "To Rent"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:840
-#: includes/admin/settings/class-ph-settings-frontend.php:864
-#: includes/admin/settings/class-ph-settings-frontend.php:901
-#: includes/admin/settings/class-ph-settings-frontend.php:929
-#: includes/admin/settings/class-ph-settings-frontend.php:957
-#: includes/admin/settings/class-ph-settings-frontend.php:982
-#: includes/admin/settings/class-ph-settings-frontend.php:1006
-#: includes/admin/settings/class-ph-settings-frontend.php:1087
+#: includes/admin/settings/class-ph-settings-frontend.php:873
+#: includes/admin/settings/class-ph-settings-frontend.php:897
+#: includes/admin/settings/class-ph-settings-frontend.php:934
+#: includes/admin/settings/class-ph-settings-frontend.php:962
+#: includes/admin/settings/class-ph-settings-frontend.php:990
+#: includes/admin/settings/class-ph-settings-frontend.php:1015
+#: includes/admin/settings/class-ph-settings-frontend.php:1039
+#: includes/admin/settings/class-ph-settings-frontend.php:1120
 #: includes/ph-form-functions.php:175
 #: includes/ph-form-functions.php:206
 #: includes/ph-form-functions.php:238
@@ -4487,68 +4490,68 @@ msgstr ""
 msgid "No preference"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:850
+#: includes/admin/settings/class-ph-settings-frontend.php:883
 msgid "Minimum Price"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:874
+#: includes/admin/settings/class-ph-settings-frontend.php:907
 msgid "Minimum Rent"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:975
+#: includes/admin/settings/class-ph-settings-frontend.php:1008
 msgid "Max Beds"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:992
+#: includes/admin/settings/class-ph-settings-frontend.php:1025
 msgid "Min Bathrooms"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:999
+#: includes/admin/settings/class-ph-settings-frontend.php:1032
 msgid "Max Bathrooms"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1016
+#: includes/admin/settings/class-ph-settings-frontend.php:1049
 msgid "Min Receptions"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1023
+#: includes/admin/settings/class-ph-settings-frontend.php:1056
 msgid "Max Receptions"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1039
+#: includes/admin/settings/class-ph-settings-frontend.php:1072
 #: includes/elementor-widgets/property-let-available-date.php:56
 msgid "Available From"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1053
+#: includes/admin/settings/class-ph-settings-frontend.php:1086
 msgid "Keyword"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1097
+#: includes/admin/settings/class-ph-settings-frontend.php:1130
 msgid "Date Added"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1158
+#: includes/admin/settings/class-ph-settings-frontend.php:1191
 msgid "Active Fields"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1173
+#: includes/admin/settings/class-ph-settings-frontend.php:1206
 msgid "Inactive Fields"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1345
+#: includes/admin/settings/class-ph-settings-frontend.php:1378
 msgid "Show Flags On Search Results"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1353
+#: includes/admin/settings/class-ph-settings-frontend.php:1386
 msgid "Show Flags On Property Details"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1361
+#: includes/admin/settings/class-ph-settings-frontend.php:1394
 msgid "Position Over Thumbnail"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1376
+#: includes/admin/settings/class-ph-settings-frontend.php:1409
 #: includes/elementor-widgets/property-actions.php:116
 #: includes/elementor-widgets/property-actions.php:151
 #: includes/elementor-widgets/property-brochures-link.php:104
@@ -4563,7 +4566,7 @@ msgstr ""
 msgid "Background Colour"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-frontend.php:1383
+#: includes/admin/settings/class-ph-settings-frontend.php:1416
 #: includes/elementor-widgets/property-actions.php:127
 #: includes/elementor-widgets/property-actions.php:162
 msgid "Text Colour"
@@ -6375,7 +6378,7 @@ msgid "Property Enquiry"
 msgstr ""
 
 #: includes/class-ph-ajax.php:2524
-msgid " from "
+msgid "from"
 msgstr ""
 
 #: includes/class-ph-ajax.php:2831
@@ -6522,20 +6525,20 @@ msgstr ""
 msgid "Please ensure all required fields have been completed"
 msgstr ""
 
-#: includes/class-ph-install.php:206
+#: includes/class-ph-install.php:210
 msgid "Every 15 Minutes"
 msgstr ""
 
-#: includes/class-ph-install.php:222
+#: includes/class-ph-install.php:226
 msgid "Property Search"
 msgstr ""
 
-#: includes/class-ph-install.php:646
+#: includes/class-ph-install.php:650
 msgid "Thank you for your enquiry"
 msgstr ""
 
 #. translators: %s: blog name shown in the email sign-off
-#: includes/class-ph-install.php:649
+#: includes/class-ph-install.php:653
 msgid ""
 "Thank you for your recent property enquiry about [property_address_hyperlinked]. A member of our team will be in touch shortly.\n"
 "\n"
@@ -6546,11 +6549,11 @@ msgid ""
 "[similar_properties]"
 msgstr ""
 
-#: includes/class-ph-install.php:659
+#: includes/class-ph-install.php:663
 msgid "We found [property_count] that might be of interest to you"
 msgstr ""
 
-#: includes/class-ph-install.php:660
+#: includes/class-ph-install.php:664
 msgid ""
 "Hi [contact_dear],\n"
 "\n"
@@ -6565,11 +6568,11 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:673
+#: includes/class-ph-install.php:677
 msgid "Your Viewing On [property_address]"
 msgstr ""
 
-#: includes/class-ph-install.php:674
+#: includes/class-ph-install.php:678
 msgid ""
 "Dear [applicant_dear],\n"
 "\n"
@@ -6580,11 +6583,11 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:683
+#: includes/class-ph-install.php:687
 msgid "Your Viewing On [property_address] Has Been Cancelled"
 msgstr ""
 
-#: includes/class-ph-install.php:684
+#: includes/class-ph-install.php:688
 msgid ""
 "Dear [applicant_dear],\n"
 "\n"
@@ -6595,12 +6598,12 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:693
-#: includes/class-ph-install.php:713
+#: includes/class-ph-install.php:697
+#: includes/class-ph-install.php:717
 msgid "Viewing Booked On [property_address]"
 msgstr ""
 
-#: includes/class-ph-install.php:694
+#: includes/class-ph-install.php:698
 msgid ""
 "Dear [owner_dear],\n"
 "\n"
@@ -6611,12 +6614,12 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:703
-#: includes/class-ph-install.php:725
+#: includes/class-ph-install.php:707
+#: includes/class-ph-install.php:729
 msgid "Viewing Cancelled On [property_address]"
 msgstr ""
 
-#: includes/class-ph-install.php:704
+#: includes/class-ph-install.php:708
 msgid ""
 "Dear [owner_dear],\n"
 "\n"
@@ -6627,7 +6630,7 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:714
+#: includes/class-ph-install.php:718
 msgid ""
 "This is confirmation you've been assigned to attend a viewing at property, [property_address], for [viewing_time] on [viewing_date].\n"
 "\n"
@@ -6640,7 +6643,7 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:726
+#: includes/class-ph-install.php:730
 msgid ""
 "This is confirmation that a viewing you were assigned to carry out on [property_address] that was booked for [viewing_time] on [viewing_date] has been cancelled. [cancelled_reason]\n"
 "\n"
@@ -6653,11 +6656,11 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:737
+#: includes/class-ph-install.php:741
 msgid "Appraisal Booked On [property_address]"
 msgstr ""
 
-#: includes/class-ph-install.php:738
+#: includes/class-ph-install.php:742
 msgid ""
 "Dear [owner_dear],\n"
 "\n"
@@ -6668,108 +6671,108 @@ msgid ""
 ""
 msgstr ""
 
-#: includes/class-ph-install.php:815
+#: includes/class-ph-install.php:827
 msgid "Property Hive Contact"
 msgstr ""
 
-#: includes/class-ph-licenses.php:417
+#: includes/class-ph-licenses.php:523
 msgid "Failed to activate license status"
 msgstr ""
 
 #. translators: %s: HTTP header response code
-#: includes/class-ph-licenses.php:428
+#: includes/class-ph-licenses.php:534
 msgid "Received response code %s when activating license key status"
 msgstr ""
 
-#: includes/class-ph-licenses.php:443
+#: includes/class-ph-licenses.php:549
 msgid "Failed to decode response when activating license key status. Please try again"
 msgstr ""
 
-#: includes/class-ph-licenses.php:461
+#: includes/class-ph-licenses.php:567
 msgid "Error when activating license key"
 msgstr ""
 
-#: includes/class-ph-licenses.php:470
+#: includes/class-ph-licenses.php:576
 msgid "Something went wrong when trying to activate license key"
 msgstr ""
 
-#: includes/class-ph-licenses.php:516
+#: includes/class-ph-licenses.php:622
 msgid "Failed to deactivate license status"
 msgstr ""
 
 #. translators: %s: HTTP header response code
-#: includes/class-ph-licenses.php:527
+#: includes/class-ph-licenses.php:633
 msgid "Received response code %s when deactivating license key status"
 msgstr ""
 
-#: includes/class-ph-licenses.php:542
+#: includes/class-ph-licenses.php:648
 msgid "Failed to decode response when deactivating license key status. Please try again"
 msgstr ""
 
-#: includes/class-ph-licenses.php:560
+#: includes/class-ph-licenses.php:666
 msgid "Error when deactivating license key"
 msgstr ""
 
-#: includes/class-ph-licenses.php:569
+#: includes/class-ph-licenses.php:675
 msgid "Something went wrong when trying to deactivate license key"
 msgstr ""
 
-#: includes/class-ph-licenses.php:600
-#: includes/class-ph-licenses.php:791
+#: includes/class-ph-licenses.php:706
+#: includes/class-ph-licenses.php:897
 msgid "No license key entered"
 msgstr ""
 
-#: includes/class-ph-licenses.php:630
+#: includes/class-ph-licenses.php:736
 msgid "Failed to request license product list"
 msgstr ""
 
 #. translators: %s: HTTP header response code
-#: includes/class-ph-licenses.php:649
+#: includes/class-ph-licenses.php:755
 msgid "Received response code %s when requesting license key product list"
 msgstr ""
 
-#: includes/class-ph-licenses.php:672
+#: includes/class-ph-licenses.php:778
 msgid "Failed to decode response when requesting license key product list. Please try again"
 msgstr ""
 
-#: includes/class-ph-licenses.php:722
+#: includes/class-ph-licenses.php:828
 msgid "API key exists but unable to establish the plan"
 msgstr ""
 
-#: includes/class-ph-licenses.php:730
+#: includes/class-ph-licenses.php:836
 msgid "API key doesn't appear to belong to any orders"
 msgstr ""
 
-#: includes/class-ph-licenses.php:738
+#: includes/class-ph-licenses.php:844
 msgid "Error when requesting license key product list"
 msgstr ""
 
-#: includes/class-ph-licenses.php:750
+#: includes/class-ph-licenses.php:856
 msgid "Something went wrong when requesting license key product list"
 msgstr ""
 
-#: includes/class-ph-licenses.php:830
+#: includes/class-ph-licenses.php:936
 msgid "Failed to request license status"
 msgstr ""
 
 #. translators: %s: HTTP header response code
-#: includes/class-ph-licenses.php:849
+#: includes/class-ph-licenses.php:955
 msgid "Received response code %s when requesting license key status"
 msgstr ""
 
-#: includes/class-ph-licenses.php:865
+#: includes/class-ph-licenses.php:971
 msgid "Failed to decode response when requesting license key status. Please try again"
 msgstr ""
 
-#: includes/class-ph-licenses.php:893
+#: includes/class-ph-licenses.php:999
 msgid "License key inactive"
 msgstr ""
 
-#: includes/class-ph-licenses.php:901
+#: includes/class-ph-licenses.php:1007
 msgid "Error when requesting license key status"
 msgstr ""
 
-#: includes/class-ph-licenses.php:915
+#: includes/class-ph-licenses.php:1021
 msgid "Something went wrong when requesting license key status"
 msgstr ""
 
