@@ -310,6 +310,8 @@ if ( ! class_exists( 'PropertyHive' ) )
             include_once( 'includes/class-ph-aioseo.php' );                 // All In One SEO
             include_once( 'includes/class-ph-duplicate-post.php' );         // Duplicate Post
 
+            include_once( 'includes/class-ph-search-analytics.php' );       // Search Analytics
+
             include_once( 'includes/class-ph-additional-fields.php' );      // Additional Fields
             include_once( 'includes/class-ph-text-substitution.php' );      // Text Substitution
 

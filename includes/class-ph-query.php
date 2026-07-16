@@ -55,7 +55,6 @@ class PH_Query {
 	 */
 	public function __construct() {
 	    
-		//add_action( 'init', array( $this, 'add_endpoints' ) );
 		add_action( 'init', array( $this, 'layered_nav_init' ) );
 		add_action( 'init', array( $this, 'price_filter_init' ) );
 
@@ -222,14 +221,6 @@ class PH_Query {
 	public function get_errors() {
 		if ( ! empty( $_GET['ph_error'] ) && ( $error = sanitize_text_field( $_GET['ph_error'] ) ) && ! ph_has_notice( $error, 'error' ) )
 			ph_add_notice( $error, 'error' );
-	}
-
-	/**
-	 * Add endpoints for query vars
-	 */
-	public function add_endpoints() {
-		foreach ( $this->query_vars as $key => $var )
-			add_rewrite_endpoint( $var, EP_PAGES );
 	}
 
 	/**
