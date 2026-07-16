@@ -192,6 +192,8 @@ class PH_Licenses {
 
 	private function get_data_for_license_check()
 	{
+		global $wpdb;
+
 		$license_type = $this->get_license_type();
 
 		$data = array();
@@ -346,6 +348,32 @@ class PH_Licenses {
 			if ( !empty($locrating_settings) && isset($locrating_settings['enabled']) )
 			{
 				$data['locrating_enabled'] = ( $locrating_settings['enabled'] == 1 ? $locrating_settings['enabled'] : 0 );
+			}
+
+			// Search analytics
+			$table_name = $wpdb->prefix . 'ph_search_log';
+
+			$counts = $wpdb->get_row(
+				"SELECT
+					COALESCE(
+						SUM(searched_at >= UTC_TIMESTAMP() - INTERVAL 7 DAY),
+						0
+					) AS last_7_days,
+					COALESCE(
+						SUM(searched_at >= UTC_TIMESTAMP() - INTERVAL 30 DAY),
+						0
+					) AS last_30_days,
+					COUNT(*) AS last_90_days
+				FROM {$table_name}
+				WHERE searched_at >= UTC_TIMESTAMP() - INTERVAL 90 DAY",
+				ARRAY_A
+			);
+
+			if ( is_array($counts) )
+			{
+				$data['searches_last_7_days'] = (int) ( $counts['last_7_days'] ?? 0 );
+				$data['searches_last_30_days'] = (int) ( $counts['last_30_days'] ?? 0 );
+				$data['searches_last_90_days'] = (int) ( $counts['last_90_days'] ?? 0 );
 			}
 
 			// get counts
