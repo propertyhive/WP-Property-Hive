@@ -1,0 +1,42 @@
+{
+  "module": {
+    "meta": {
+      "adminLabel": {
+        "desktop": {
+          "value": "Property Actions"
+        }
+      }
+    }
+  },
+  "propertyActions": {
+    "advanced": {
+      "display": {
+        "desktop": {
+          "value": "list"
+        }
+      }
+    },
+    "decoration": {
+      "buttonBackgroundColor": {
+        "desktop": {
+          "value": "#000000"
+        }
+      },
+      "buttonTextColor": {
+        "desktop": {
+          "value": "#ffffff"
+        }
+      },
+      "buttonPadding": {
+        "desktop": {
+          "value": "10px 15px"
+        }
+      },
+      "buttonMargin": {
+        "desktop": {
+          "value": "0 5px 0 0"
+        }
+      }
+    }
+  }
+}
