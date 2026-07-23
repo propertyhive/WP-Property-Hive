@@ -107,7 +107,7 @@ In the search field type "Property Hive" and click Search Plugins. Once you've f
 
 = Manual installation =
 
-The manual installation method involves downloading the Property Hive plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
+The manual installation method involves downloading the Property Hive plugin and uploading it to your webserver via your favourite FTP application. WordPress has manual plugin installation instructions in its official documentation.
 
 = Updating =
 

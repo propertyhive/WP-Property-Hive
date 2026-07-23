@@ -431,6 +431,39 @@ class PH_Settings_General extends PH_Settings_Page {
             );
         }
 
+        if ( function_exists( 'ph_is_development_environment' ) && ph_is_development_environment() )
+        {
+            $settings[] = array(
+                'type' => 'sectionend',
+                'id'   => 'map_options',
+            );
+
+            $settings[] = array(
+                'title' => __( 'Address Lookup', 'propertyhive' ),
+                'type'  => 'title',
+                'desc'  => sprintf(
+                    /* translators: %s: WordPress environment type. */
+                    __( 'These settings are only shown when WordPress is running in a local, development or staging environment. Current environment: %s.', 'propertyhive' ),
+                    '<code>' . esc_html( ph_get_environment_type() ) . '</code>'
+                ),
+                'id'    => 'address_lookup_options',
+            );
+
+            $settings[] = array(
+                'title' => __( 'getAddress API Key', 'propertyhive' ),
+                'id'    => 'propertyhive_getaddress_api_key',
+                'type'  => 'password',
+                'desc'  => '<p>' . __( 'Used for testing the onboarding address lookup locally. This setting is hidden and ignored in production.', 'propertyhive' ) . '</p>',
+            );
+
+            $settings[] = array(
+                'type' => 'sectionend',
+                'id'   => 'address_lookup_options',
+            );
+
+            return apply_filters( 'propertyhive_general_map_settings', $settings );
+        }
+
 		$settings[] = array( 'type' => 'sectionend', 'id' => 'map_options');
 
         return apply_filters( 'propertyhive_general_map_settings', $settings );

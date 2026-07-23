@@ -63,6 +63,11 @@ class PH_Admin_Assets {
             }
         }
 
+        if ( in_array( $screen->id, array( 'dashboard_page_ph-onboarding' ), true ) )
+        {
+            wp_enqueue_style( 'propertyhive_admin_onboarding', PH()->plugin_url() . '/assets/css/admin-onboarding.css', array(), PH_VERSION );
+        }
+
         if ( in_array( $screen->id, array( 'property' ) ) )
         {
             if ( isset($_GET['tutorial']) && sanitize_text_field($_GET['tutorial']) == 'yes' )
@@ -130,6 +135,8 @@ class PH_Admin_Assets {
         wp_register_script( 'propertyhive_admin_meta_boxes', PH()->plugin_url() . '/assets/js/admin/meta-boxes' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker', 'jquery-ui-sortable' ), PH_VERSION );
 
         wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery', 'wp-color-picker' ), PH_VERSION );
+
+        wp_register_script( 'propertyhive_admin_onboarding', PH()->plugin_url() . '/assets/js/admin/onboarding' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
 
         wp_register_script( 'propertyhive_admin_recently_viewed', PH()->plugin_url() . '/assets/js/admin/recently-viewed' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
 
@@ -209,6 +216,11 @@ class PH_Admin_Assets {
                 'ajax_url'                      => admin_url('admin-ajax.php'),
             );
             wp_localize_script( 'propertyhive_dashboard', 'propertyhive_dashboard', $params );
+        }
+
+        if ( in_array( $screen->id, array( 'dashboard_page_ph-onboarding' ), true ) )
+        {
+            wp_enqueue_script( 'propertyhive_admin_onboarding' );
         }
 
 	    if ( in_array( $screen->id, array( 'edit-contact', 'edit-enquiry', 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale', 'edit-key_date' ) ) )

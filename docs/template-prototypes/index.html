@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Property detail templates — shortlist</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  body { background: #f4f6f7; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px 80px; }
+  header h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.7rem, 3vw, 2.25rem);
+    letter-spacing: -0.03em;
+  }
+  header p { color: var(--ph-ink-soft); max-width: 64ch; font-size: 16px; line-height: 1.55; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 28px; }
+  .meta span {
+    background: #fff; border: 1px solid var(--ph-line); border-radius: 999px;
+    padding: 6px 12px; font-size: 12.5px; font-weight: 650; color: var(--ph-ink-soft);
+  }
+  h2 { font-size: 1.15rem; margin: 40px 0 14px; letter-spacing: -0.01em; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: #fff; border: 1px solid var(--ph-line); border-radius: 16px;
+    padding: 18px; display: flex; flex-direction: column; gap: 8px;
+    box-shadow: var(--ph-shadow-soft); text-decoration: none; color: inherit;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--ph-shadow); }
+  .card .num { font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; color: var(--ph-brand); }
+  .card h3 { margin: 0; font-size: 1.08rem; letter-spacing: -0.02em; }
+  .card p { margin: 0; font-size: 13.5px; color: var(--ph-ink-soft); flex: 1; line-height: 1.45; }
+  .card .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .card .tags span {
+    font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+    background: var(--ph-surface); color: var(--ph-muted);
+  }
+  .card .cta { font-size: 12.5px; font-weight: 700; color: var(--ph-brand); margin-top: 2px; }
+  .card.rec-border { border-color: #9bc5c8; box-shadow: 0 0 0 1px #c5e0e2; }
+  .rec {
+    background: linear-gradient(135deg, #e8f3f4, #fff 55%);
+    border: 1px solid #c5dde0; border-radius: 16px; padding: 22px 24px; margin-top: 28px;
+  }
+  .rec h3 { margin: 0 0 8px; font-size: 1.1rem; }
+  .rec p { margin: 0; color: var(--ph-ink-soft); font-size: 14.5px; line-height: 1.55; }
+  .rec ol { margin: 10px 0 0; padding-left: 1.2em; color: var(--ph-ink-soft); font-size: 14px; }
+  .panel {
+    background: #fff; border: 1px solid var(--ph-line); border-radius: 16px;
+    padding: 20px 22px; margin-top: 8px;
+  }
+  .panel ul { margin: 0; padding-left: 1.15em; color: var(--ph-ink-soft); font-size: 14px; }
+  .panel li { margin-bottom: 6px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .two { grid-template-columns: 1fr; } }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--ph-line); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ph-muted); }
+  .live { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+  .live a { font-size: 13px; font-weight: 650; color: var(--ph-brand); }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>PH · 8 detail directions</strong>
+  <nav>
+    <a href="RESEARCH.md">Research</a>
+    <a href="http://propertyhive.local/property/91-waterman-court-wokingham/?ph_detail_template=standard-sales-detail">Live current</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <header>
+    <h1>Property detail shortlist</h1>
+    <p>
+      Same listing (91 Waterman Court), eight directions — the three retained from earlier rounds,
+      plus Batch C: five deliberately orthogonal layout bets.
+    </p>
+    <div class="meta">
+      <span>8 HTML prototypes</span>
+      <span>Waterman Court sample</span>
+      <span>Not production PHP yet</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <a class="card rec-border" href="01-portal-split.html">
+      <span class="num">01 · Portal conversion</span>
+      <h3>Portal Split</h3>
+      <p>Mosaic + sticky enquiry rail. Zillow/Airbnb pattern — widest proven conversion layout.</p>
+      <div class="tags"><span>Sticky CTA</span><span>Mosaic</span><span>High volume</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card" href="04-immersive-cinema.html">
+      <span class="num">04 · Photo drama</span>
+      <h3>Immersive Cinema</h3>
+      <p>Full-viewport cinema gallery, glass price card, dark filmstrip.</p>
+      <div class="tags"><span>Cinema</span><span>Dark</span><span>Drama</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card" href="05-spec-atelier.html">
+      <span class="num">05 · Spec density</span>
+      <h3>Spec Atelier</h3>
+      <p>Fact matrix, document tiles, tabbed content, trust rail.</p>
+      <div class="tags"><span>Matrix</span><span>Docs</span><span>Tabs</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card rec-border" href="01-portal-split-v2.html">
+      <span class="num">01b · Data-mapped build candidate</span>
+      <h3>Portal Split v2</h3>
+      <p>Room-based full details, tenure + council tax in facts, stamp duty &amp; mortgage add-on slots, material information, annotated PH sources.</p>
+      <div class="tags"><span>PH fields</span><span>Calculators</span><span>Build-ready</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card rec-border" href="04-immersive-cinema-v2.html">
+      <span class="num">04b · Data-mapped build candidate</span>
+      <h3>Immersive Cinema v2</h3>
+      <p>Room-by-room section, details table (council tax, reference), material information dark-styled, labelled tours, annotated PH sources.</p>
+      <div class="tags"><span>PH fields</span><span>Rooms</span><span>Build-ready</span></div>
+      <span class="cta">View →</span>
+    </a>
+  </div>
+
+  <h2>Batch C · Five new directions</h2>
+  <div class="grid">
+    <a class="card" href="16-area-dossier.html">
+      <span class="num">16 · Location decision</span>
+      <h3>Area Dossier</h3>
+      <p>The area is above the fold: map hero, commute table, rated schools, daily-life distances. Buys the postcode first, the house second.</p>
+      <div class="tags"><span>Map hero</span><span>Commutes</span><span>Schools</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card" href="17-private-office.html">
+      <span class="num">17 · Luxury restraint</span>
+      <h3>Private Office</h3>
+      <p>Serif editorial, typeset particulars, one quiet CTA — viewings by appointment. Desire through restraint, not portal furniture.</p>
+      <div class="tags"><span>Serif</span><span>Appointment</span><span>Quiet CTA</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card rec-border" href="17-private-office-v2.html">
+      <span class="num">17b · Data-mapped revision</span>
+      <h3>Private Office v2</h3>
+      <p>Same direction, every element mapped to a real PH field or add-on: room-based chapters, material information, core-only particulars (no invented sq ft / EPC score).</p>
+      <div class="tags"><span>PH fields</span><span>_rooms</span><span>Add-on slots</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card" href="18-tenant-ready.html">
+      <span class="num">18 · Lettings dept</span>
+      <h3>Tenant Ready</h3>
+      <p>Rent pcm, itemised move-in costs to a total, availability badge, application timeline. The lettings dataset of the same home.</p>
+      <div class="tags"><span>Costs</span><span>Availability</span><span>Process</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card" href="19-bento-field-system.html">
+      <span class="num">19 · Module system</span>
+      <h3>Bento Field System</h3>
+      <p>Every tile maps to one PH data field; empty fields drop out and the grid reflows. The graceful-absence model made visible.</p>
+      <div class="tags"><span>Tiles</span><span>PH fields</span><span>Empty states</span></div>
+      <span class="cta">View →</span>
+    </a>
+    <a class="card" href="20-walkthrough-chapters.html">
+      <span class="num">20 · Story scroll</span>
+      <h3>Walkthrough Chapters</h3>
+      <p>Room-by-room tour driven by PH room data, sticky chapter rail with active state, mid-scroll CTA. A viewing before the viewing.</p>
+      <div class="tags"><span>Chapters</span><span>Rooms</span><span>Sticky nav</span></div>
+      <span class="cta">View →</span>
+    </a>
+  </div>
+
+  <div class="rec">
+    <h3>Why these three</h3>
+    <ol>
+      <li><strong>Portal Split (01)</strong> — default conversion layout for high-volume sales.</li>
+      <li><strong>Immersive Cinema (04)</strong> — premium photo-first experience when photography is strong.</li>
+      <li><strong>Spec Atelier (05)</strong> — information-dense path for serious buyers and documents.</li>
+    </ol>
+  </div>
+
+  <h2>Pattern map</h2>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Primary bet</th><th>Risk if overused</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>01 Portal Split</td><td>Conversion + familiarity</td><td>Feels “portal-y” for luxury brands</td></tr>
+        <tr><td>04 Immersive Cinema</td><td>Photo drama</td><td>Needs great photography</td></tr>
+        <tr><td>05 Spec Atelier</td><td>Information density</td><td>Can feel admin-y</td></tr>
+        <tr><td>16 Area Dossier</td><td>Location as the product</td><td>Needs area data confidence; house can feel secondary</td></tr>
+        <tr><td>17 Private Office</td><td>Desire via restraint</td><td>Too quiet for mid-market stock</td></tr>
+        <tr><td>18 Tenant Ready</td><td>Cost &amp; process clarity</td><td>Lettings-only; sterile for sales</td></tr>
+        <tr><td>19 Bento Field System</td><td>Field-mapped modularity</td><td>Can read as dashboard, not home</td></tr>
+        <tr><td>20 Walkthrough Chapters</td><td>Narrative immersion</td><td>Slow path to CTA; needs room data + photos</td></tr>
+      </tbody>
+    </table>
+    <div class="live">
+      <a href="RESEARCH.md">Research notes →</a>
+      <a href="http://propertyhive.local/property/91-waterman-court-wokingham/?ph_detail_template=standard-sales-detail">Live standard-sales-detail →</a>
+    </div>
+  </div>
+
+  <h2>Essentials still required in every direction</h2>
+  <div class="two">
+    <div class="panel">
+      <ul>
+        <li>Price + qualifier / rent frequency / POA</li>
+        <li>Beds, baths, receptions, type, tenure</li>
+        <li>Gallery + floorplan + tour + map hooks</li>
+        <li>Features, summary, description</li>
+        <li>Brochure / EPC / documents</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <ul>
+        <li>Agent / office / request viewing</li>
+        <li>Shortlist (addon)</li>
+        <li>Similar properties</li>
+        <li>Mobile sticky CTA</li>
+        <li>Graceful empty states</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

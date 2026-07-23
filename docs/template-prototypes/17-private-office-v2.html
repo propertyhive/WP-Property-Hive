@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>17b · Private Office (data-mapped) — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<!--
+  DATA-MAPPED REVISION of 17-private-office.html.
+  Every rendered element below corresponds to a real PH field, method or add-on.
+  Removed from v1 because no core source exists:
+    · "Approx. area 2,400 sq ft"  (residential floor area: no core admin input / display)
+    · "EPC C (72)" rating         (EPC = document attachments only; no rating meta)
+    · "all en suite" bedroom copy (beds/baths/receptions are plain numerics)
+  Added because core/add-ons DO provide it:
+    · Room-by-room chapters       (_rooms: _room_name_{i} / _room_dimensions_{i} / _room_description_{i})
+    · Material information        (get_material_information(): heating, broadband, water, flood risk)
+    · Reference number            (_reference_number)
+    · Shortlist action            (propertyhive-shortlist → propertyhive_single_property_actions)
+    · Viewing request CTA         (propertyhive-viewing-request add-on; falls back to core enquiry)
+    · Labelled virtual tours      (_virtual_tour_{i} + _virtual_tour_label_{i})
+    · Optional add-on slots       (LocRating, what3words, Printable Brochures, EPC Graph Generator)
+-->
+<style>
+  :root {
+    --ph-brand: #1c1917;
+    --ph-brand-dark: #0c0a09;
+    --ph-accent: #9a7b4f;
+    --ink: #211d19;
+    --paper: #faf8f4;
+    --line: #e6e0d6;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--ph-serif);
+    line-height: 1.65;
+  }
+  .sans { font-family: var(--ph-font); }
+  .smallcaps {
+    font-family: var(--ph-font);
+    font-size: 11.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #8a7d6a;
+  }
+
+  /* Masthead */
+  .masthead {
+    text-align: center;
+    padding: 84px 20px 60px;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .masthead h1 {
+    font-size: clamp(2rem, 4.6vw, 3.3rem);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.12;
+    margin: 22px 0 18px;
+  }
+  .masthead .price {
+    font-size: 1.05rem;
+    color: #5c5347;
+  }
+  .masthead .price strong { font-weight: 600; color: var(--ink); }
+  .masthead .divider {
+    width: 44px; height: 1px;
+    background: var(--ph-accent);
+    margin: 30px auto;
+  }
+  .masthead .brief {
+    font-size: 1.06rem;
+    color: #4c453b;
+    font-style: italic;
+  }
+  .masthead .actions-quiet {
+    margin-top: 26px;
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    font-family: var(--ph-font);
+    font-size: 12.5px;
+  }
+  .masthead .actions-quiet button {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    padding: 4px 2px;
+    color: #5c5347;
+    letter-spacing: .06em;
+  }
+  .masthead .actions-quiet button:hover { border-bottom-color: var(--ph-accent); color: var(--ink); }
+
+  .plate { position: relative; margin: 0; }
+  .plate img {
+    width: 100%;
+    height: min(78vh, 760px);
+    object-fit: cover;
+  }
+  .plate figcaption {
+    text-align: center;
+    padding: 14px 20px 0;
+    color: #8a7d6a;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  .chapter {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 72px 22px;
+  }
+  .chapter h2 {
+    font-size: 1.55rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 14px 0 20px;
+  }
+  .chapter p { font-size: 1.04rem; color: #3d372f; margin: 0 0 18px; }
+  .chapter p.lede::first-letter {
+    font-size: 3.1em;
+    float: left;
+    line-height: .82;
+    padding: 4px 10px 0 0;
+    color: var(--ph-accent);
+  }
+
+  /* Room-by-room — direct rendering of PH _rooms data, typeset editorially */
+  .rooms { max-width: 640px; margin: 0 auto; padding: 0 22px 72px; }
+  .rooms .room { padding: 26px 0; border-top: 1px solid var(--line); margin: 0; }
+  .rooms .room:first-of-type { border-top: 0; padding-top: 0; }
+  .rooms .room .name {
+    display: block;
+    font-family: var(--ph-font);
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-weight: 650;
+    color: var(--ink);
+  }
+  .rooms .room .dimension {
+    display: block;
+    font-family: var(--ph-font);
+    font-size: 11.5px;
+    letter-spacing: .08em;
+    color: #8a7d6a;
+    margin: 4px 0 10px;
+  }
+  .rooms .room .desc { font-size: 1.02rem; color: #3d372f; }
+
+  /* Particulars — core fields only */
+  .particulars {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 56px 22px;
+  }
+  .particulars dl { margin: 26px 0 0; }
+  .particulars .row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 11px 0;
+  }
+  .particulars dt {
+    font-family: var(--ph-font);
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #8a7d6a;
+    min-width: 132px;
+  }
+  .particulars .dots {
+    flex: 1;
+    border-bottom: 1px dotted #cfc5b4;
+    transform: translateY(-4px);
+  }
+  .particulars dd { margin: 0; font-size: 1rem; }
+  .particulars .accoutrements {
+    margin: 34px 0 0;
+    padding: 0;
+    list-style: none;
+    columns: 2;
+    column-gap: 40px;
+    font-size: .98rem;
+    color: #3d372f;
+  }
+  .particulars .accoutrements li { padding: 5px 0; break-inside: avoid; }
+  .particulars .accoutrements li::before { content: "— "; color: var(--ph-accent); }
+
+  /* Material information — core get_material_information(), quiet two-column */
+  .material {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 56px 22px 0;
+  }
+  .material .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 40px;
+    margin-top: 22px;
+  }
+  .material .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 9px 0;
+    border-bottom: 1px dotted #dfd7c9;
+    font-size: .95rem;
+  }
+  .material .row .k { font-family: var(--ph-font); font-size: 12.5px; color: #8a7d6a; }
+  .material .note { font-family: var(--ph-font); font-size: 12px; color: #8a7d6a; margin-top: 16px; }
+
+  .duet {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .duet img { width: 100%; height: 440px; object-fit: cover; }
+
+  /* Appendix */
+  .appendix {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 64px 22px;
+    text-align: center;
+  }
+  .appendix .doc-links { justify-content: center; margin-top: 22px; }
+  .appendix .doc-links a {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: #4c453b;
+    font-family: var(--ph-font);
+  }
+  .appendix .doc-links a:hover { background: #fff; border-color: var(--ph-accent); color: var(--ink); }
+  .appendix .map-block {
+    margin-top: 28px;
+    background: linear-gradient(160deg, #eae4d8 0%, #f4f0e8 55%, #e7e0d2 100%);
+    color: #5c5347;
+  }
+  .appendix .map-block::before { background: var(--ph-accent); box-shadow: 0 0 0 8px rgba(154,123,79,.18); }
+  .appendix .map-block .map-label { background: rgba(250,248,244,.94); font-family: var(--ph-font); }
+  .appendix .w3w { font-family: var(--ph-font); font-size: 12.5px; color: #8a7d6a; margin-top: 12px; }
+
+  /* The letter */
+  .letter {
+    background: #211d19;
+    color: #ece5d8;
+    padding: 84px 20px;
+  }
+  .letter .inner { max-width: 560px; margin: 0 auto; text-align: center; }
+  .letter .smallcaps { color: #9a8d76; }
+  .letter h2 { font-size: 1.7rem; font-weight: 500; margin: 18px 0 20px; letter-spacing: -0.01em; }
+  .letter p { color: #c9c0af; font-size: 1.03rem; margin: 0 0 16px; }
+  .letter .neg-photo {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    margin: 8px auto 14px;
+    background: linear-gradient(145deg, #9a7b4f, #6e5533);
+    display: grid;
+    place-items: center;
+    font-family: var(--ph-font);
+    font-weight: 700;
+    color: #211d19;
+    font-size: 1.2rem;
+  }
+  .letter .sig { font-style: italic; font-size: 1.15rem; color: #ece5d8; margin: 0 0 4px; }
+  .letter .role { font-family: var(--ph-font); font-size: 12.5px; color: #9a8d76; letter-spacing: .08em; }
+  .letter .actions { display: flex; justify-content: center; gap: 12px; margin-top: 34px; flex-wrap: wrap; }
+  .letter .btn-primary {
+    background: transparent;
+    border: 1px solid var(--ph-accent);
+    color: #ece5d8;
+    border-radius: 0;
+    padding: 14px 30px;
+    font-family: var(--ph-font);
+    font-size: 13px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .letter .btn-primary:hover { background: var(--ph-accent); color: #211d19; }
+  .letter .quiet { font-family: var(--ph-font); font-size: 12.5px; color: #7d715d; margin-top: 18px; }
+
+  /* Further residences */
+  .further { max-width: 1080px; margin: 0 auto; padding: 70px 20px 100px; }
+  .further .smallcaps { display: block; text-align: center; margin-bottom: 30px; }
+  .further .similar-grid { gap: 22px; }
+  .further .similar-card {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+  .further .similar-card .body { padding: 14px 2px; text-align: center; }
+  .further .similar-card .p { font-family: var(--ph-serif); font-weight: 500; }
+  .further .similar-card .t, .further .similar-card .f { font-family: var(--ph-font); }
+
+  .mobile-cta { font-family: var(--ph-font); background: rgba(250,248,244,.95); border-top-color: var(--line); }
+  .mobile-cta .btn-primary { background: var(--ink); color: #faf8f4; }
+
+  @media (max-width: 800px) {
+    .masthead { padding: 56px 20px 40px; }
+    .duet { grid-template-columns: 1fr; }
+    .duet img { height: 300px; }
+    .plate img { height: 52vh; }
+    .particulars .accoutrements { columns: 1; }
+    .material .grid { grid-template-columns: 1fr; gap: 0; }
+    .chapter { padding: 52px 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar sans">
+  <strong>17b · Private Office (data-mapped)</strong>
+  <nav>
+    <a href="index.html">Shortlist</a>
+    <a href="17-private-office.html">v1 original</a>
+    <a href="16-area-dossier.html">← Prev</a>
+    <a href="18-tenant-ready.html">Next →</a>
+  </nav>
+</div>
+
+<!-- kicker: get_availability() + get_tenure() taxonomies · h1: post_title · price: get_formatted_price() + get_price_qualifier() · facts: _bedrooms/_bathrooms/_reception_rooms + get_property_type() -->
+<header class="masthead">
+  <span class="smallcaps">For Sale · Freehold</span>
+  <h1>91 Waterman Court<br />Wokingham</h1>
+  <p class="price sans">Offers over <strong>£1,340,000</strong> &nbsp;·&nbsp; Detached Bungalow &nbsp;·&nbsp; 3 bed · 3 bath · 2 reception</p>
+  <div class="divider"></div>
+  <!-- brief: post excerpt (WP summary field) — module hidden when excerpt empty -->
+  <p class="brief">A single-storey house arranged entirely around its garden, at the quiet head of a private court.</p>
+  <!-- quiet action row: propertyhive_single_property_actions hook — Shortlist add-on injects here; Send To Friend add-on likewise -->
+  <div class="actions-quiet">
+    <button type="button">♡ Shortlist</button>
+    <button type="button">Send to a friend</button>
+  </div>
+</header>
+
+<!-- plate: get_main_photo_src('full') · caption: attachment post_excerpt (hidden when empty) -->
+<figure class="plate">
+  <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="The sitting room" />
+  <figcaption>The sitting room, facing south-west across the terrace</figcaption>
+</figure>
+
+<!-- intro chapter: first room description or excerpt continuation; static template headings give the editorial voice -->
+<section class="chapter">
+  <span class="smallcaps">The House</span>
+  <h2>Rooms that keep their own company</h2>
+  <p class="lede">Waterman Court asks nothing of its owner but attention to the light. Remodelled in 2023, the house gives every principal room a garden aspect, so the day moves through it — morning in the kitchen beneath the roof lanterns, evening in the sitting room as the beeches take the last sun.</p>
+</section>
+
+<!-- room-by-room: get_formatted_rooms() — _rooms count, _room_name_{i}, _room_dimensions_{i}, _room_description_{i}.
+     Core outputs <p class="room"><strong class="name"><span class="dimension"><br>desc — restyled here, same markup shape.
+     Whole section hidden when _rooms is 0 (falls back to plain description paragraph). -->
+<section class="rooms" aria-label="Room by room">
+  <p class="room">
+    <strong class="name">Sitting Room</strong>
+    <span class="dimension">24'1" × 16'4" (7.34m × 4.98m)</span>
+    <span class="desc">Facing south-west across the terrace through full-height glazing, with a limestone fireplace and oak boards throughout.</span>
+  </p>
+  <p class="room">
+    <strong class="name">Kitchen / Dining Room</strong>
+    <span class="dimension">28'6" × 15'9" (8.69m × 4.80m)</span>
+    <span class="desc">The working heart of the 2023 remodel, running the full depth of the plan beneath twin roof lanterns; island breakfast bar and a garden-end table for twelve.</span>
+  </p>
+  <p class="room">
+    <strong class="name">Principal Bedroom Suite</strong>
+    <span class="dimension">18'2" × 14'6" (5.54m × 4.42m)</span>
+    <span class="desc">Glazed doors straight onto the terrace, dressing area and a marble-lined shower room.</span>
+  </p>
+  <p class="room">
+    <strong class="name">Bedrooms Two &amp; Three</strong>
+    <span class="dimension">14'8" × 12'1" · 12'6" × 11'4"</span>
+    <span class="desc">Both doubles, both garden-facing, each with its own bath or shower room.</span>
+  </p>
+  <p class="room">
+    <strong class="name">Garden &amp; Studio</strong>
+    <span class="dimension">South-west facing</span>
+    <span class="desc">Stone terrace off the kitchen, lawn framed by mature beech, and a detached, insulated studio at the boundary — currently a home office.</span>
+  </p>
+</section>
+
+<div class="duet">
+  <!-- gallery: get_gallery_attachment_ids() items 2–3 -->
+  <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-1024x683.png" alt="Kitchen and dining room" />
+  <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-1024x683.png" alt="Garden terrace" />
+</div>
+
+<section class="particulars" aria-label="Particulars">
+  <span class="smallcaps">Particulars</span>
+  <dl>
+    <!-- get_formatted_price() + get_price_qualifier() -->
+    <div class="row"><dt>Price</dt><span class="dots"></span><dd>Offers over £1,340,000</dd></div>
+    <!-- get_tenure() — when leasehold, the leasehold cluster (_leasehold_years_remaining, _ground_rent, _service_charge) renders as extra rows here -->
+    <div class="row"><dt>Tenure</dt><span class="dots"></span><dd>Freehold</dd></div>
+    <!-- get_property_type() -->
+    <div class="row"><dt>Type</dt><span class="dots"></span><dd>Detached bungalow</dd></div>
+    <!-- _bedrooms / _bathrooms / _reception_rooms — plain numerics, no embellished copy -->
+    <div class="row"><dt>Bedrooms</dt><span class="dots"></span><dd>3</dd></div>
+    <div class="row"><dt>Bathrooms</dt><span class="dots"></span><dd>3</dd></div>
+    <div class="row"><dt>Receptions</dt><span class="dots"></span><dd>2</dd></div>
+    <!-- get_parking() taxonomy -->
+    <div class="row"><dt>Parking</dt><span class="dots"></span><dd>On road</dd></div>
+    <!-- get_outside_space() taxonomy -->
+    <div class="row"><dt>Outside space</dt><span class="dots"></span><dd>Private garden</dd></div>
+    <!-- _council_tax_band — exists in core for residential -->
+    <div class="row"><dt>Council tax</dt><span class="dots"></span><dd>Band G · Wokingham BC</dd></div>
+    <!-- _reference_number -->
+    <div class="row"><dt>Reference</dt><span class="dots"></span><dd>WK-000091</dd></div>
+  </dl>
+  <!-- get_features(): taxonomy property_feature OR _feature_{i} list — row count adapts -->
+  <ul class="accoutrements" aria-label="Features">
+    <li>Principal suite opening to the garden</li>
+    <li>Kitchen and dining under twin roof lanterns</li>
+    <li>South-west facing landscaped garden</li>
+    <li>Detached garden studio</li>
+    <li>Underfloor heating throughout</li>
+    <li>Head-of-court position</li>
+  </ul>
+</section>
+
+<!-- get_material_information(): utilities + flood risk. Rows render only for populated fields; whole block hides when empty -->
+<section class="material" aria-label="Material information">
+  <span class="smallcaps">Material Information</span>
+  <div class="grid">
+    <div class="row"><span class="k">Heating</span><span>Gas central, underfloor</span></div>
+    <div class="row"><span class="k">Electricity</span><span>Mains</span></div>
+    <div class="row"><span class="k">Water</span><span>Mains, metered</span></div>
+    <div class="row"><span class="k">Sewerage</span><span>Mains</span></div>
+    <div class="row"><span class="k">Broadband</span><span>FTTP available</span></div>
+    <div class="row"><span class="k">Flood risk</span><span>None recorded in last five years</span></div>
+  </div>
+  <p class="note">Provided under Trading Standards material information guidance. Rows appear only where data is recorded.</p>
+</section>
+
+<section class="appendix">
+  <span class="smallcaps">Appendix</span>
+  <div class="doc-links sans">
+    <!-- get_brochure_attachment_ids() · get_floorplan_attachment_ids() · get_epc_attachment_ids() (documents only — no rating shown; EPC Graph Generator add-on can supply a chart image here) · get_virtual_tours() with _virtual_tour_label_{i} -->
+    <a href="#">Brochure</a>
+    <a href="#">Floorplan</a>
+    <a href="#">EPC certificate</a>
+    <a href="#">Film of the house</a>
+    <a href="#">Matterport tour</a>
+  </div>
+  <!-- map: _latitude/_longitude — block hides without coordinates. Precise-pin discretion is a template toggle, not missing data -->
+  <div class="map-block"><span class="map-label">Waterman Court, Wokingham RG41 3FL — precise location shared on enquiry</span></div>
+  <!-- optional add-on slot: what3words address · LocRating schools/transport links could sit here as quiet text links -->
+  <p class="w3w">///branch.quiet.court &nbsp;·&nbsp; Schools &amp; transport report available on request</p>
+</section>
+
+<section class="letter">
+  <div class="inner">
+    <span class="smallcaps">By Appointment</span>
+    <h2>Viewings are private, and unhurried</h2>
+    <!-- negotiator: get_negotiator_photo() (falls back to initials), get_negotiator_name(), office via get_office_name()/get_office_telephone_number() -->
+    <div class="neg-photo">SP</div>
+    <p>We show Waterman Court personally, at hours to suit you — including before market hours for those who prefer discretion. There is no open house.</p>
+    <p class="sig">Sarah Pemberton</p>
+    <p class="role">SENIOR NEGOTIATOR · PROPERTY HIVE, WOKINGHAM</p>
+    <div class="actions">
+      <!-- primary: Viewing Request add-on (day/time picker) when active; core enquiry modal otherwise -->
+      <button type="button" class="btn btn-primary">Arrange a private viewing</button>
+      <!-- secondary: brochure attachment, or Printable Brochures add-on PDF -->
+      <button type="button" class="btn btn-primary">Request the brochure</button>
+    </div>
+    <p class="quiet">Or telephone the office · 0118 496 0000 · enquiries held in confidence</p>
+  </div>
+</section>
+
+<!-- render_similar_properties(): nearest location term / outward postcode · count + layout from template_set_recommended_* settings -->
+<section class="further">
+  <span class="smallcaps">Further Residences</span>
+  <div class="similar-grid">
+    <article class="similar-card">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" />
+      <div class="body"><div class="p">£875,000</div><div class="t">Nearby home, Wokingham</div><div class="f">3 bed · 2 bath</div></div>
+    </article>
+    <article class="similar-card">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" />
+      <div class="body"><div class="p">£1,100,000</div><div class="t">Similar bungalow, RG41</div><div class="f">3 bed · 2 bath</div></div>
+    </article>
+    <article class="similar-card">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" />
+      <div class="body"><div class="p">£995,000</div><div class="t">Family home, Wokingham</div><div class="f">4 bed · 2 bath</div></div>
+    </article>
+  </div>
+</section>
+
+<!-- template_set_show_mobile_cta setting -->
+<div class="mobile-cta" aria-label="Mobile actions">
+  <button type="button" class="btn btn-ghost btn-call">♡</button>
+  <button type="button" class="btn btn-secondary">Call</button>
+  <button type="button" class="btn btn-primary">Arrange viewing</button>
+</div>
+</body>
+</html>

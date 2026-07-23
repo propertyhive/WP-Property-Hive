@@ -68,6 +68,20 @@ class PH_Licenses {
 
 	public function ph_check_add_on_can_be_used( $can, $slug )
 	{
+		$feature = get_ph_pro_feature( $slug );
+
+		if ( false === $feature || ! is_array( $feature ) )
+		{
+			return $can;
+		}
+
+		$plans = ( isset( $feature['plans'] ) && is_array( $feature['plans'] ) ) ? $feature['plans'] : array();
+
+		if ( in_array( 'free', $plans, true ) )
+		{
+			return $can;
+		}
+
 		// Check add on wasn't active before
 		$pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', array() );
 
@@ -87,37 +101,32 @@ class PH_Licenses {
 
         $license_type = $this->get_license_type();
 
-        if ( $license_type == 'pro' )
+        if ( $license_type != 'pro' || get_option('propertyhive_pro_license_key', '') == '' )
         {
-            if ( get_option('propertyhive_pro_license_key', '') != '' ) 
-            { 
-                if ( !$this->is_valid_pro_license_key() )
-                {
-                    // show warning
-                    return false;
-                }
+            return $can;
+        }
 
-                // Valid license. Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
-                $feature = get_ph_pro_feature( $slug );
-                $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
+        if ( !$this->is_valid_pro_license_key() )
+        {
+            // show warning
+            return false;
+        }
 
-                if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
-                {
-                    if ( 
-                        isset($feature['plans']) && 
-                        isset($product_id_and_package['package']) &&
-                        in_array($product_id_and_package['package'], $feature['plans'])
-                    )
-                    {
-                        
-                    }
-                    else
-                    {
-                    	// show warning
-                    	return false;
-                    }
-                }
+        // Valid license. Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
+        $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
+
+        if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
+        {
+            if (
+                isset($product_id_and_package['package']) &&
+                in_array($product_id_and_package['package'], $plans, true)
+            )
+            {
+                return $can;
             }
+
+            // show warning
+            return false;
         }
 
         return $can;
@@ -266,20 +275,20 @@ class PH_Licenses {
 				$property_import = array();
 			}
 			$formats = array();
-            foreach ( $property_import as $import_id => $options )
-            {
-            	if ( $options['running'] == '1' )
-            	{
-            		if ( $options['format'] == 'xml' )
-            		{
-            			$options['format'] .= ' (' . esc_url($options['xml_url']) . ')';
-            		}
-            		elseif ( $options['format'] == 'csv' )
-            		{
-            			$options['format'] .= ' (' . esc_url($options['csv_url']) . ')';
-            		}
-            		$formats[] = $options['format'];
-            	}
+			foreach ( $property_import as $import_id => $options )
+			{
+				if ( $options['running'] == '1' )
+				{
+					if ( $options['format'] == 'xml' )
+					{
+						$options['format'] .= ' (' . esc_url($options['xml_url']) . ')';
+					}
+					elseif ( $options['format'] == 'csv' )
+					{
+						$options['format'] .= ' (' . esc_url($options['csv_url']) . ')';
+					}
+					$formats[] = $options['format'];
+				}
 			}
 			$data['property_import_formats'] = $formats;
 
@@ -306,7 +315,7 @@ class PH_Licenses {
 			    $property_export = get_option( $option_name, array() );
 
 			    if ( ! is_array( $property_export ) ) {
-			    	continue;
+				continue;
 			    }
 
 		        if ( ! isset( $property_export['portals'] ) ) {

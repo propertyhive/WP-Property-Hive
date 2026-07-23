@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>19 · Bento Field System — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root {
+    --ph-brand: #155e63;
+    --ph-brand-dark: #0e4347;
+    --ph-accent: #b7791f;
+    --tile-r: 20px;
+  }
+  body { background: #edf0f0; }
+  .wrap { max-width: 1220px; margin: 0 auto; padding: 20px 16px 90px; }
+
+  /* Every tile = one PH data field/module. Tiles collapse out of the grid
+     when their field is empty — the grid reflows, no hollow sections. */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(84px, auto);
+    gap: 12px;
+  }
+  .tile {
+    background: #fff;
+    border: 1px solid #e0e5e5;
+    border-radius: var(--tile-r);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .tile .field {
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ph-muted);
+    margin-bottom: 8px;
+  }
+  .tile h2 { margin: 0 0 10px; font-size: 1rem; font-weight: 750; letter-spacing: -0.01em; }
+
+  /* Spans */
+  .t-gallery { grid-column: span 7; grid-row: span 4; padding: 0; }
+  .t-title   { grid-column: span 5; grid-row: span 2; }
+  .t-price   { grid-column: span 5; grid-row: span 2; background: var(--ph-brand); border-color: var(--ph-brand); color: #fff; }
+  .t-facts   { grid-column: span 4; grid-row: span 2; }
+  .t-epc     { grid-column: span 3; grid-row: span 2; }
+  .t-plan    { grid-column: span 5; grid-row: span 2; padding: 0; }
+  .t-feat    { grid-column: span 4; grid-row: span 3; }
+  .t-desc    { grid-column: span 8; grid-row: span 3; }
+  .t-map     { grid-column: span 5; grid-row: span 3; padding: 0; }
+  .t-docs    { grid-column: span 3; grid-row: span 3; }
+  .t-agent   { grid-column: span 4; grid-row: span 3; }
+  .t-similar { grid-column: span 12; }
+
+  .t-gallery img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .t-gallery .overlay {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 16px;
+    background: linear-gradient(transparent, rgba(0,0,0,.45));
+  }
+  .t-gallery .chip-set { display: flex; gap: 6px; }
+  .t-gallery .chip-set button {
+    background: rgba(255,255,255,.92);
+    color: var(--ph-ink);
+    font-size: 12.5px;
+    font-weight: 650;
+    padding: 8px 13px;
+  }
+  .t-gallery .count { color: #fff; font-size: 13px; font-weight: 650; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+
+  .t-title h1 { margin: 4px 0 6px; font-size: clamp(1.2rem, 1.9vw, 1.5rem); letter-spacing: -0.02em; line-height: 1.2; }
+  .t-title .addr { color: var(--ph-muted); font-size: 13.5px; margin: 0; }
+  .t-title .save { position: absolute; top: 16px; right: 16px; background: var(--ph-surface); font-size: 13px; font-weight: 650; padding: 8px 12px; }
+
+  .t-price .field { color: rgba(255,255,255,.6); }
+  .t-price .qualifier { color: rgba(255,255,255,.75); }
+  .t-price .value { color: #fff; }
+  .t-price .actions { display: flex; gap: 8px; margin-top: auto; }
+  .t-price .btn-primary { background: #fff; color: var(--ph-brand-dark); flex: 1; }
+  .t-price .btn-primary:hover { background: #e8f3f4; }
+  .t-price .btn-secondary { border-color: rgba(255,255,255,.5); color: #fff; }
+
+  .t-facts .facts { gap: 12px 18px; margin-top: 2px; }
+
+  .epc-scale { display: grid; gap: 4px; margin-top: 4px; }
+  .epc-scale .band {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 750;
+    color: #fff;
+  }
+  .epc-scale .bar { height: 16px; border-radius: 4px; display: flex; align-items: center; padding: 0 6px; }
+  .epc-scale .b-b .bar { width: 45%; background: #22a447; }
+  .epc-scale .b-c .bar { width: 60%; background: #8bc63f; }
+  .epc-scale .b-d .bar { width: 75%; background: #f7d117; color: #5a5000; }
+  .epc-scale .marker {
+    margin-left: auto;
+    background: var(--ph-ink);
+    color: #fff;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11.5px;
+    font-weight: 750;
+  }
+
+  .t-plan {
+    background:
+      linear-gradient(#fff, #fff) padding-box,
+      repeating-linear-gradient(0deg, #eef2f2 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(90deg, #eef2f2 0 1px, transparent 1px 28px),
+      #fff;
+    display: grid;
+    place-items: center;
+    min-height: 150px;
+  }
+  .t-plan .rooms {
+    border: 2px solid var(--ph-brand);
+    border-radius: 6px;
+    width: 70%;
+    height: 60%;
+    position: relative;
+    background: rgba(21,94,99,.04);
+  }
+  .t-plan .rooms::before { content: ""; position: absolute; top: 0; bottom: 40%; left: 55%; border-left: 2px solid var(--ph-brand); }
+  .t-plan .rooms::after { content: ""; position: absolute; top: 60%; left: 0; right: 30%; border-top: 2px solid var(--ph-brand); }
+  .t-plan .lbl {
+    position: absolute;
+    left: 16px; bottom: 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ph-brand-dark);
+  }
+  .t-plan .open { position: absolute; right: 12px; top: 12px; background: var(--ph-ink); color: #fff; font-size: 12px; font-weight: 650; padding: 7px 12px; }
+
+  .t-desc p { margin: 0 0 10px; color: var(--ph-ink-soft); font-size: 14.5px; }
+  .t-desc .more { margin-top: auto; align-self: flex-start; background: var(--ph-surface); font-size: 13px; font-weight: 650; padding: 8px 14px; }
+
+  .t-map .map-block { border-radius: 0; min-height: 100%; position: absolute; inset: 0; }
+
+  .t-docs .doc-links { flex-direction: column; align-items: stretch; }
+  .t-docs .doc-links a { justify-content: flex-start; }
+
+  .t-agent .actions { display: grid; gap: 8px; margin-top: auto; }
+  .t-agent .office { font-size: 13px; color: var(--ph-muted); margin: 10px 0 14px; }
+
+  .t-similar .similar-grid { margin-top: 4px; }
+
+  /* Graceful absence, demonstrated: fields with no data render as a quiet
+     placeholder in prototype view; in production the tile is simply omitted. */
+  .tile.is-empty {
+    background: transparent;
+    border: 1.5px dashed #c9d2d2;
+    color: var(--ph-muted);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 12.5px;
+    min-height: 84px;
+  }
+  .t-tour { grid-column: span 3; }
+
+  @media (max-width: 980px) {
+    .t-gallery { grid-column: span 12; grid-row: span 3; min-height: 300px; }
+    .t-title, .t-price { grid-column: span 6; }
+    .t-facts { grid-column: span 6; }
+    .t-epc { grid-column: span 6; }
+    .t-plan, .t-map { grid-column: span 6; }
+    .t-feat, .t-desc { grid-column: span 12; }
+    .t-docs, .t-tour { grid-column: span 6; }
+    .t-agent { grid-column: span 12; }
+  }
+  @media (max-width: 620px) {
+    .bento { grid-template-columns: 1fr; }
+    .tile { grid-column: 1 / -1 !important; grid-row: auto !important; }
+    .t-gallery { min-height: 240px; }
+    .t-map { min-height: 200px; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>19 · Bento Field System</strong>
+  <nav>
+    <a href="index.html">Shortlist</a>
+    <a href="18-tenant-ready.html">← Prev</a>
+    <a href="20-walkthrough-chapters.html">Next →</a>
+  </nav>
+</div>
+
+<main class="wrap">
+  <div class="bento">
+    <!-- gallery -->
+    <section class="tile t-gallery" aria-label="Gallery">
+      <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="Reception room" />
+      <div class="overlay">
+        <div class="chip-set">
+          <button type="button">Photos</button>
+          <button type="button">Floorplan</button>
+          <button type="button">Tour</button>
+        </div>
+        <span class="count">1 / 5</span>
+      </div>
+    </section>
+
+    <!-- title -->
+    <section class="tile t-title">
+      <span class="field">post_title · availability</span>
+      <div class="kicker"><span class="badge">For sale</span> · Freehold</div>
+      <h1>91 Waterman Court, Wokingham</h1>
+      <p class="addr">RG41 3FL · Residential sales</p>
+      <button type="button" class="save">♡ Save</button>
+    </section>
+
+    <!-- price + actions -->
+    <section class="tile t-price" aria-label="Price and enquiry">
+      <span class="field">get_formatted_price() · enquiry</span>
+      <div class="price-block">
+        <span class="qualifier">Offers over</span>
+        <span class="value">£1,340,000</span>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-primary">Request viewing</button>
+        <button type="button" class="btn btn-secondary">Call</button>
+      </div>
+    </section>
+
+    <!-- facts -->
+    <section class="tile t-facts">
+      <span class="field">meta: beds / baths / receptions / type / parking</span>
+      <ul class="facts">
+        <li><span class="label">Type</span><span class="val">Bungalow</span></li>
+        <li><span class="label">Beds</span><span class="val">3</span></li>
+        <li><span class="label">Baths</span><span class="val">3</span></li>
+        <li><span class="label">Recs</span><span class="val">2</span></li>
+        <li><span class="label">Parking</span><span class="val">On road</span></li>
+        <li><span class="label">Area</span><span class="val">2,400 ft²</span></li>
+      </ul>
+    </section>
+
+    <!-- EPC -->
+    <section class="tile t-epc" aria-label="Energy rating">
+      <span class="field">epc attachment</span>
+      <h2>Energy rating</h2>
+      <div class="epc-scale">
+        <div class="band b-b"><span class="bar">B</span></div>
+        <div class="band b-c"><span class="bar">C</span><span class="marker">72 · this home</span></div>
+        <div class="band b-d"><span class="bar">D</span></div>
+      </div>
+    </section>
+
+    <!-- floorplan -->
+    <section class="tile t-plan" aria-label="Floorplan">
+      <div class="rooms"></div>
+      <span class="lbl">Floorplan · 2,400 sq ft</span>
+      <button type="button" class="open">Open plan</button>
+    </section>
+
+    <!-- features -->
+    <section class="tile t-feat">
+      <span class="field">features</span>
+      <h2>Key features</h2>
+      <ul class="feature-list" style="grid-template-columns:1fr">
+        <li>Principal suite opening to the garden</li>
+        <li>Kitchen / dining under twin roof lanterns</li>
+        <li>South-west facing landscaped garden</li>
+        <li>Detached garden studio / office</li>
+        <li>Underfloor heating throughout</li>
+        <li>Head-of-court position</li>
+      </ul>
+    </section>
+
+    <!-- description -->
+    <section class="tile t-desc">
+      <span class="field">summary · description</span>
+      <h2>About this home</h2>
+      <p>A rarely available single-storey home at the head of a private cul-de-sac on Wokingham's south-west side, comprehensively remodelled in 2023 so that every principal room faces the garden.</p>
+      <p>The kitchen and dining space runs the full depth of the plan beneath two roof lanterns, with a separate sitting room for the evening and three en suite double bedrooms.</p>
+      <button type="button" class="more">Read full description</button>
+    </section>
+
+    <!-- map -->
+    <section class="tile t-map" aria-label="Location">
+      <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham RG41 3FL</span></div>
+    </section>
+
+    <!-- docs -->
+    <section class="tile t-docs">
+      <span class="field">brochure · epc · attachments</span>
+      <h2>Documents</h2>
+      <div class="doc-links">
+        <a href="#">📄 Brochure</a>
+        <a href="#">⚡ EPC certificate</a>
+        <a href="#">🗺 Floorplan PDF</a>
+      </div>
+    </section>
+
+    <!-- virtual tour: EMPTY-STATE DEMO — this tile is omitted in production when no tour exists -->
+    <div class="tile is-empty t-tour" aria-hidden="true">
+      No virtual tour on this listing —<br />tile omitted, grid reflows
+    </div>
+
+    <!-- agent -->
+    <section class="tile t-agent" aria-label="Agent">
+      <span class="field">office · negotiator</span>
+      <h2>Marketed by</h2>
+      <div class="agent-row">
+        <div class="avatar">SP</div>
+        <div class="agent-meta">
+          <div class="name">Sarah Pemberton</div>
+          <div class="role">Senior Negotiator</div>
+        </div>
+      </div>
+      <p class="office">Property Hive · Wokingham branch<br />0118 496 0000</p>
+      <div class="actions">
+        <button type="button" class="btn btn-primary btn-block">Request viewing</button>
+        <button type="button" class="btn btn-ghost btn-block">Email the branch</button>
+      </div>
+    </section>
+
+    <!-- similar -->
+    <section class="tile t-similar">
+      <span class="field">recommended module</span>
+      <h2>Similar properties</h2>
+      <div class="similar-grid">
+        <article class="similar-card">
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" />
+          <div class="body"><div class="p">£875,000</div><div class="t">Nearby home, Wokingham</div><div class="f">3 bed · 2 bath</div></div>
+        </article>
+        <article class="similar-card">
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" />
+          <div class="body"><div class="p">£1,100,000</div><div class="t">Similar bungalow, RG41</div><div class="f">3 bed · 2 bath</div></div>
+        </article>
+        <article class="similar-card">
+          <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" />
+          <div class="body"><div class="p">£995,000</div><div class="t">Family home, Wokingham</div><div class="f">4 bed · 2 bath</div></div>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="mobile-cta" aria-label="Mobile actions">
+  <button type="button" class="btn btn-ghost btn-call">♡</button>
+  <button type="button" class="btn btn-secondary">Call</button>
+  <button type="button" class="btn btn-primary">Request viewing</button>
+</div>
+</body>
+</html>

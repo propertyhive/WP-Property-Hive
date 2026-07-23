@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>04 · Immersive Cinema — Property Hive prototype</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  :root {
+    --ph-brand: #111827;
+    --ph-brand-dark: #030712;
+    --ph-accent: #c4a35a;
+  }
+  body { background: #0b0d10; color: #f3f4f6; }
+  .proto-bar { background: rgba(0,0,0,.75); }
+
+  .cinema {
+    position: relative;
+    height: min(86vh, 820px);
+    background: #000;
+    overflow: hidden;
+  }
+  .cinema img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: .92;
+  }
+  .cinema-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.15) 50%, rgba(0,0,0,.35) 100%),
+                linear-gradient(180deg, rgba(0,0,0,.2) 0%, transparent 35%, rgba(0,0,0,.75) 100%);
+    pointer-events: none;
+  }
+  .floating-card {
+    position: absolute;
+    right: 4vw;
+    bottom: 8vh;
+    width: min(360px, 90vw);
+    background: rgba(17, 24, 39, 0.72);
+    border: 1px solid rgba(255,255,255,.12);
+    backdrop-filter: blur(16px);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+  }
+  .floating-card .kicker { color: var(--ph-accent); }
+  .floating-card h1 {
+    font-size: 1.35rem;
+    margin: 8px 0 12px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .floating-card .price-block .qualifier { color: rgba(255,255,255,.6); }
+  .floating-card .price-block .value { color: #fff; font-size: 1.7rem; }
+  .floating-card .facts {
+    margin: 14px 0 18px;
+    gap: 14px;
+  }
+  .floating-card .facts .label { color: rgba(255,255,255,.5); }
+  .floating-card .facts .val { color: #fff; }
+  .floating-card .actions { display: grid; gap: 8px; }
+  .btn-primary { background: var(--ph-accent); color: #111; border-radius: 12px; }
+  .btn-primary:hover { background: #d4b56a; }
+  .btn-secondary {
+    border-color: rgba(255,255,255,.35);
+    color: #fff;
+    border-radius: 12px;
+  }
+  .cinema-controls {
+    position: absolute;
+    left: 4vw;
+    bottom: 8vh;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .cinema-controls button {
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(8px);
+    font-size: 13px;
+    font-weight: 650;
+    border-radius: 999px;
+  }
+  .filmstrip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 14px 4vw;
+    background: #111;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .filmstrip button {
+    flex: 0 0 auto;
+    padding: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background: transparent;
+    opacity: .7;
+  }
+  .filmstrip button.is-active,
+  .filmstrip button:hover { opacity: 1; border-color: var(--ph-accent); }
+  .filmstrip img { width: 112px; height: 72px; object-fit: cover; }
+
+  .below {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 20px 100px;
+  }
+  .below h2 {
+    font-size: 1.35rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    color: #fff;
+  }
+  .below p { color: rgba(243,244,246,.72); font-size: 15px; }
+  .section { margin-bottom: 40px; padding-bottom: 36px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .feature-list li { color: rgba(243,244,246,.78); }
+  .feature-list li::before { background: var(--ph-accent); }
+  .doc-links a { background: rgba(255,255,255,.06); color: rgba(255,244,246,.85); }
+  .doc-links a:hover { background: rgba(255,255,255,.12); color: #fff; }
+  .map-block {
+    background: linear-gradient(160deg, #1f2937, #111827 60%, #0b1220);
+    color: #e5e7eb;
+  }
+  .map-block .map-label { background: rgba(17,24,39,.92); color: #e5e7eb; }
+  .map-block::before { background: var(--ph-accent); box-shadow: 0 0 0 8px rgba(196,163,90,.2); }
+  .similar-card {
+    background: #151a22;
+    border-color: rgba(255,255,255,.08);
+    box-shadow: none;
+  }
+  .similar-card .p { color: #fff; }
+  .similar-card .t { color: rgba(243,244,246,.7); }
+  .similar-card .f { color: rgba(243,244,246,.45); }
+  .agent-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    background: #151a22;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .agent-meta .name { color: #fff; }
+  .agent-meta .role { color: rgba(243,244,246,.55); }
+  .avatar { background: linear-gradient(145deg, #c4a35a, #8a6d2f); color: #111; }
+
+  .mobile-cta {
+    background: rgba(11,13,16,.94);
+    border-top-color: rgba(255,255,255,.08);
+  }
+  .mobile-cta .btn-ghost { background: rgba(255,255,255,.08); color: #fff; }
+  .mobile-cta .btn-secondary { color: #fff; border-color: rgba(255,255,255,.3); }
+
+  @media (max-width: 800px) {
+    .cinema { height: 70vh; }
+    .floating-card {
+      position: relative;
+      right: auto; bottom: auto;
+      width: auto;
+      margin: -48px 16px 0;
+      z-index: 2;
+    }
+    .cinema-controls { left: 16px; bottom: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar">
+  <strong>04 · Immersive Cinema</strong>
+  <nav>
+    <a href="index.html">Shortlist</a>
+    <a href="01-portal-split.html">← Prev</a>
+    <a href="05-spec-atelier.html">Next →</a>
+  </nav>
+</div>
+
+<section class="cinema" aria-label="Cinema gallery">
+  <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-1024x683.png" alt="Reception room" />
+  <div class="cinema-overlay"></div>
+  <div class="cinema-controls">
+    <button type="button">◀</button>
+    <button type="button">▶</button>
+    <button type="button">1 / 5</button>
+    <button type="button">Floorplan</button>
+    <button type="button">Tour</button>
+  </div>
+  <aside class="floating-card">
+    <div class="kicker">For sale</div>
+    <h1>91 Waterman Court, Wokingham</h1>
+    <div class="price-block">
+      <span class="qualifier">Offers over</span>
+      <span class="value">£1,340,000</span>
+    </div>
+    <ul class="facts">
+      <li><span class="label">Beds</span><span class="val">3</span></li>
+      <li><span class="label">Baths</span><span class="val">3</span></li>
+      <li><span class="label">Recs</span><span class="val">2</span></li>
+      <li><span class="label">Tenure</span><span class="val">FH</span></li>
+    </ul>
+    <div class="actions">
+      <button type="button" class="btn btn-primary btn-block">Request viewing</button>
+      <button type="button" class="btn btn-secondary btn-block">Save · Share</button>
+    </div>
+  </aside>
+</section>
+
+<div class="filmstrip" aria-label="Photo filmstrip">
+  <button type="button" class="is-active"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-living-room-300x200.png" alt="" /></button>
+  <button type="button"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" /></button>
+  <button type="button"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" /></button>
+  <button type="button"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-garden-terrace-300x200.png" alt="" /></button>
+  <button type="button"><img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" /></button>
+</div>
+
+<main class="below">
+  <section class="section">
+    <h2>Key features</h2>
+    <ul class="feature-list">
+      <li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>
+      <li>Feature 4</li><li>Feature 5</li><li>Feature 6</li>
+    </ul>
+  </section>
+  <section class="section">
+    <h2>Overview</h2>
+    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+    <p>Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi.</p>
+  </section>
+  <section class="section">
+    <h2>Media &amp; documents</h2>
+    <div class="doc-links">
+      <a href="#">Brochure</a>
+      <a href="#">EPC</a>
+      <a href="#">Floorplan</a>
+      <a href="#">Virtual tour</a>
+    </div>
+  </section>
+  <section class="section">
+    <h2>Location</h2>
+    <div class="map-block"><span class="map-label">91 Waterman Court, Wokingham, RG41 3FL</span></div>
+  </section>
+  <section class="section">
+    <div class="agent-panel">
+      <div class="agent-row">
+        <div class="avatar">AD</div>
+        <div class="agent-meta">
+          <div class="name">Admin</div>
+          <div class="role">Marketed by Property Hive</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-secondary">Email</button>
+        <button type="button" class="btn btn-primary">Request viewing</button>
+      </div>
+    </div>
+  </section>
+  <section>
+    <h2>Similar properties</h2>
+    <div class="similar-grid" style="margin-top:16px">
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-exterior-300x200.png" alt="" />
+        <div class="body"><div class="p">£875,000</div><div class="t">Nearby home, Wokingham</div><div class="f">3 bed · 2 bath</div></div>
+      </article>
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-principal-bedroom-300x200.png" alt="" />
+        <div class="body"><div class="p">£1,100,000</div><div class="t">Similar bungalow, RG41</div><div class="f">3 bed · 2 bath</div></div>
+      </article>
+      <article class="similar-card">
+        <img src="http://propertyhive.local/wp-content/uploads/2026/06/cavendish-kitchen-dining-300x200.png" alt="" />
+        <div class="body"><div class="p">£995,000</div><div class="t">Family home, Wokingham</div><div class="f">4 bed · 2 bath</div></div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<div class="mobile-cta">
+  <button type="button" class="btn btn-ghost btn-call">♡</button>
+  <button type="button" class="btn btn-secondary">Call</button>
+  <button type="button" class="btn btn-primary">Request viewing</button>
+</div>
+</body>
+</html>

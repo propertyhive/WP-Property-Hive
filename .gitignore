@@ -1,4 +1,9 @@
 .vscode
 .DS_Store
+/AGENTS.md
+/docs/
+/.github/workflows/deploy-propertyhive.yml
+.playwright-cli/
+dev-tools/
 includes/divi-extensions/node_modules/
-+includes/divi-extensions/build/*.map
+includes/divi-extensions/build/*.map

@@ -42,32 +42,23 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     {
         if ( isset($_GET['action']) && $_GET['action'] == 'resetsearchform' && isset($_GET['id']) && $_GET['id'] != '' )
         {
-            if ( ! current_user_can( 'manage_options' ) ) 
-            {
-                wp_die( __( 'Sorry, you are not allowed to do this.', 'propertyhive' ) );
-            }
-
-            check_admin_referer( 'ph_reset_search_form_' . $_GET['id'] );
-
-            $current_settings = get_option( 'propertyhive_template_assistant', array() );
-
             $current_id = ( !isset( $_GET['id'] ) ) ? '' : sanitize_title( $_GET['id'] );
 
-            $existing_search_forms = ( (isset($current_settings['search_forms'])) ? $current_settings['search_forms'] : array() );
-
-            if ( !isset($existing_search_forms[$current_id]) )
-            {
-                die("Trying to reset a non-existant search form. Please go back and try again");
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_die( esc_html__( 'You do not have permission to reset search forms.', 'propertyhive' ) );
             }
 
-            if ( isset($existing_search_forms[$current_id]) )
-            {
-                $existing_search_forms[$current_id] = array();
+            check_admin_referer( 'ph_reset_search_form_' . $current_id );
+
+            $manager = new PH_Search_Form_Manager();
+            $result  = $manager->reset_form( $current_id );
+
+            if ( is_wp_error( $result ) ) {
+                wp_die( esc_html( $result->get_error_message() ) );
             }
 
-            $current_settings['search_forms'] = $existing_search_forms;
-
-            update_option( 'propertyhive_template_assistant', $current_settings );
+            wp_safe_redirect( admin_url( 'admin.php?page=ph-settings&tab=frontend&section=search-forms' ) );
+            exit;
         }
     }
 
@@ -75,32 +66,23 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     {
         if ( isset($_GET['action']) && $_GET['action'] == 'deletesearchform' && isset($_GET['id']) && $_GET['id'] != '' && $_GET['id'] != 'default' )
         {
-            if ( ! current_user_can( 'manage_options' ) ) 
-            {
-                wp_die( __( 'Sorry, you are not allowed to do this.', 'propertyhive' ) );
-            }
-
-            check_admin_referer( 'ph_delete_search_form_' . $_GET['id'] );
-
-            $current_settings = get_option( 'propertyhive_template_assistant', array() );
-
             $current_id = ( !isset( $_GET['id'] ) ) ? '' : sanitize_title( $_GET['id'] );
 
-            $existing_search_forms = ( (isset($current_settings['search_forms'])) ? $current_settings['search_forms'] : array() );
-
-            if ( !isset($existing_search_forms[$current_id]) )
-            {
-                die("Trying to delete a non-existant search form. Please go back and try again");
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_die( esc_html__( 'You do not have permission to delete search forms.', 'propertyhive' ) );
             }
 
-            if ( isset($existing_search_forms[$current_id]) )
-            {
-                unset($existing_search_forms[$current_id]);
+            check_admin_referer( 'ph_delete_search_form_' . $current_id );
+
+            $manager = new PH_Search_Form_Manager();
+            $result  = $manager->delete_form( $current_id );
+
+            if ( is_wp_error( $result ) ) {
+                wp_die( esc_html( $result->get_error_message() ) );
             }
 
-            $current_settings['search_forms'] = $existing_search_forms;
-
-            update_option( 'propertyhive_template_assistant', $current_settings );
+            wp_safe_redirect( admin_url( 'admin.php?page=ph-settings&tab=frontend&section=search-forms' ) );
+            exit;
         }
     }
 
@@ -114,6 +96,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 			'' => __( 'Search Results', 'propertyhive' ),
 			'search-forms' => __( 'Search Forms', 'propertyhive' ),
 			'flags' => __( 'Flags', 'propertyhive' ),
+			'template-set' => __( 'Template Set', 'propertyhive' ),
 		);
 
 		return apply_filters( 'propertyhive_get_sections_' . $this->id, $sections );
@@ -1424,6 +1407,232 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         return $settings;
     }
 
+    /**
+     * Get template set settings.
+     *
+     * @return array Array of settings
+     */
+    public function get_template_set_settings() {
+
+        $current_settings = get_option( 'propertyhive_template_assistant', array() );
+        $template_set_settings = PH_Template_Set::get_settings();
+        $settings         = array();
+        $catalog_html     = '<div class="ph-template-admin-catalog"><p>' . esc_html__( 'The template set includes the standard sales detail and portal-style search results examples. Use the preview links or the front-end visual editor to review either example in context.', 'propertyhive' ) . '</p><ul>';
+
+        foreach ( PH_Template_Set::get_template_catalog() as $slug => $template ) {
+            $catalog_html .= '<li><strong>' . esc_html( $template['label'] ) . '</strong> <span>' . esc_html( $template['group'] ) . '</span> <a href="' . esc_url( PH_Template_Set::get_template_preview_url( $slug ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Preview', 'propertyhive' ) . '</a></li>';
+        }
+
+        $catalog_html .= '</ul></div>';
+
+        $settings[] = array(
+            'title' => __( 'Template Set', 'propertyhive' ),
+            'type'  => 'title',
+            'desc'  => __( 'Choose the fixed front-end templates used for property detail pages and search results.', 'propertyhive' ),
+            'id'    => 'template_set_settings',
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Enable Template Set', 'propertyhive' ),
+            'id'      => 'template_set_enabled',
+            'type'    => 'checkbox',
+            'default' => ( isset( $current_settings['template_set_enabled'] ) && 'yes' === $current_settings['template_set_enabled'] ) ? 'yes' : '',
+            'desc'    => __( 'Use the selected template set on Property Hive front-end pages.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Editing Experience', 'propertyhive' ),
+            'id'      => 'template_set_editor_mode',
+            'type'    => 'select',
+            'default' => $template_set_settings['template_set_editor_mode'],
+            'desc'    => __( 'Fresh installs use the visual editor by default. Existing sites with legacy front-end settings stay on legacy controls until changed here.', 'propertyhive' ),
+            'options' => PH_Template_Set::get_editor_modes(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Property Detail Template', 'propertyhive' ),
+            'id'      => 'template_set_detail_template',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_detail_template'] ) ? $current_settings['template_set_detail_template'] : 'conversion-first-sales-detail',
+            'options' => PH_Template_Set::get_detail_templates(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Search Results Template', 'propertyhive' ),
+            'id'      => 'template_set_search_template',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_search_template'] ) ? $current_settings['template_set_search_template'] : 'portal-style-search-results',
+            'options' => PH_Template_Set::get_search_templates(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Search Listing Layout', 'propertyhive' ),
+            'id'      => 'template_set_search_layout',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_search_layout'] ) && '' !== $current_settings['template_set_search_layout'] ? $current_settings['template_set_search_layout'] : 'list',
+            'options' => PH_Template_Set::get_search_layouts(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Search Card Size', 'propertyhive' ),
+            'id'      => 'template_set_search_card_size',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_search_card_size'] ) ? $current_settings['template_set_search_card_size'] : 'standard',
+            'options' => PH_Template_Set::get_search_card_sizes(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Grid Properties Per Row', 'propertyhive' ),
+            'id'      => 'template_set_search_grid_columns',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_search_grid_columns'] ) ? $current_settings['template_set_search_grid_columns'] : 3,
+            'options' => PH_Template_Set::get_search_grid_column_options(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Gallery Layout', 'propertyhive' ),
+            'id'      => 'template_set_gallery_layout',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_gallery_layout'] ) ? $current_settings['template_set_gallery_layout'] : 'showcase',
+            'options' => PH_Template_Set::get_gallery_layouts(),
+        );
+
+        $settings[] = array(
+            'title' => __( 'Template Catalogue', 'propertyhive' ),
+            'type'  => 'html',
+            'html'  => $catalog_html,
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Brand Colour', 'propertyhive' ),
+            'id'      => 'template_set_brand_colour',
+            'type'    => 'color',
+            'default' => isset( $current_settings['template_set_brand_colour'] ) ? $current_settings['template_set_brand_colour'] : '#155e63',
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Accent Colour', 'propertyhive' ),
+            'id'      => 'template_set_accent_colour',
+            'type'    => 'color',
+            'default' => isset( $current_settings['template_set_accent_colour'] ) ? $current_settings['template_set_accent_colour'] : '#b7791f',
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Button Style', 'propertyhive' ),
+            'id'      => 'template_set_button_style',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_button_style'] ) ? $current_settings['template_set_button_style'] : 'filled',
+            'options' => array(
+                'filled'  => __( 'Filled', 'propertyhive' ),
+                'outline' => __( 'Outline', 'propertyhive' ),
+                'soft'    => __( 'Soft', 'propertyhive' ),
+            ),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Image Style', 'propertyhive' ),
+            'id'      => 'template_set_image_style',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_image_style'] ) ? $current_settings['template_set_image_style'] : 'soft',
+            'options' => array(
+                'square'  => __( 'Square', 'propertyhive' ),
+                'soft'    => __( 'Soft corners', 'propertyhive' ),
+                'rounded' => __( 'Rounded corners', 'propertyhive' ),
+            ),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Contact Card Style', 'propertyhive' ),
+            'id'      => 'template_set_contact_card_style',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_contact_card_style'] ) ? $current_settings['template_set_contact_card_style'] : 'classic',
+            'options' => PH_Template_Set::get_contact_card_styles(),
+        );
+
+        $settings[] = array(
+            'title'         => __( 'Display Options', 'propertyhive' ),
+            'id'            => 'template_set_show_branch',
+            'type'          => 'checkbox',
+            'checkboxgroup' => 'start',
+            'default'       => ( ! isset( $current_settings['template_set_show_branch'] ) || 'yes' === $current_settings['template_set_show_branch'] ) ? 'yes' : '',
+            'desc'          => __( 'Show branch contact details on property cards.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_badges',
+            'type'          => 'checkbox',
+            'checkboxgroup' => '',
+            'default'       => ( ! isset( $current_settings['template_set_show_badges'] ) || 'yes' === $current_settings['template_set_show_badges'] ) ? 'yes' : '',
+            'desc'          => __( 'Show badges on property cards.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_mobile_cta',
+            'type'          => 'checkbox',
+            'checkboxgroup' => '',
+            'default'       => ( ! isset( $current_settings['template_set_show_mobile_cta'] ) || 'yes' === $current_settings['template_set_show_mobile_cta'] ) ? 'yes' : '',
+            'desc'          => __( 'Show the mobile enquiry bar on property detail pages.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_floorplans',
+            'type'          => 'checkbox',
+            'checkboxgroup' => '',
+            'default'       => ( ! isset( $current_settings['template_set_show_floorplans'] ) || 'yes' === $current_settings['template_set_show_floorplans'] ) ? 'yes' : '',
+            'desc'          => __( 'Show floorplans on property detail pages when available.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_virtual_tours',
+            'type'          => 'checkbox',
+            'checkboxgroup' => '',
+            'default'       => ( isset( $current_settings['template_set_show_virtual_tours'] ) && 'yes' === $current_settings['template_set_show_virtual_tours'] ) ? 'yes' : '',
+            'desc'          => __( 'Show virtual tours on property detail pages when available.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'id'            => 'template_set_show_recommended',
+            'type'          => 'checkbox',
+            'checkboxgroup' => 'end',
+            'default'       => ( ! isset( $current_settings['template_set_show_recommended'] ) || 'yes' === $current_settings['template_set_show_recommended'] ) ? 'yes' : '',
+            'desc'          => __( 'Show recommended homes on property detail pages.', 'propertyhive' ),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Recommended Homes Count', 'propertyhive' ),
+            'id'      => 'template_set_recommended_count',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_recommended_count'] ) ? $current_settings['template_set_recommended_count'] : 3,
+            'options' => PH_Template_Set::get_recommended_property_counts(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Recommended Homes Layout', 'propertyhive' ),
+            'id'      => 'template_set_recommended_layout',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_recommended_layout'] ) ? $current_settings['template_set_recommended_layout'] : 'grid',
+            'options' => PH_Template_Set::get_recommended_property_layouts(),
+        );
+
+        $settings[] = array(
+            'title'   => __( 'Recommended Homes Images', 'propertyhive' ),
+            'id'      => 'template_set_recommended_image_size',
+            'type'    => 'select',
+            'default' => isset( $current_settings['template_set_recommended_image_size'] ) ? $current_settings['template_set_recommended_image_size'] : 'standard',
+            'options' => PH_Template_Set::get_recommended_property_image_sizes(),
+        );
+
+        $settings[] = array(
+            'title' => __( 'Shortcode', 'propertyhive' ),
+            'type'  => 'html',
+            'html'  => '<p><code>[propertyhive_featured_template title="Featured properties" per_page="3" columns="3"]</code></p>',
+        );
+
+        $settings[] = array( 'type' => 'sectionend', 'id' => 'template_set_settings');
+
+        return $settings;
+    }
+
 	/**
 	 * Output the settings.
 	 */
@@ -1438,6 +1647,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 case "addsearchform": { $settings = $this->get_search_form_settings(); break; }
                 case "editsearchform": { $settings = $this->get_search_form_settings(); break; }
             	case "flags": { $settings = $this->get_flags_settings();  break; }
+                case "template-set": { $settings = $this->get_template_set_settings(); break; }
                 default: { die("Unknown setting section"); }
             }
         }
@@ -1476,6 +1686,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
                     update_option( 'propertyhive_template_assistant', $propertyhive_template_assistant );
                     break; 
+                }
+                case "template-set":
+                {
+                    $propertyhive_template_assistant = PH_Template_Set::sanitize_template_set_settings( $_POST, $current_settings, false );
+
+                    update_option( 'propertyhive_template_assistant', $propertyhive_template_assistant );
+                    break;
                 }
         		case "addsearchform": 
                 case "editsearchform": 
