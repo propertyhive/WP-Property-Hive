@@ -614,6 +614,8 @@ class PH_Rest_Api {
 			'epcs',
 			'virtual_tours',
 			'views_total',
+			'views_today',
+			'views_yesterday',
 			'views_last_7_days',
 			'views_last_14_days',
 			'views_last_30_days',
@@ -852,38 +854,73 @@ class PH_Rest_Api {
 		            			$return = $property->get_virtual_tours();
 		            			break;
 		            		}
+		            		case "views_today":
+		            		case "views_yesterday":
 		            		case "views_last_7_days":
 		            		case "views_last_14_days":
 		            		case "views_last_30_days":
 		            		case "views_total":
 		            		{
 		            			$view_statistics = $property->_view_statistics;
-					            if ( !is_array($view_statistics) )
-					            {
-					                $view_statistics = array();
-					            }
+								if ( !is_array($view_statistics) )
+								{
+								    $view_statistics = array();
+								}
 
-					            $views = 0;
+								$views = 0;
 
-					            $date_from = '2001-01-01';
-					            switch ($field_name)
-					            {
-					            	case "views_last_7_days": { $date_from = date("Y-m-d", strtotime('7 days ago')); break; }
-				            		case "views_last_14_days": { $date_from = date("Y-m-d", strtotime('14 days ago')); break; }
-				            		case "views_last_30_days": { $date_from = date("Y-m-d", strtotime('30 days ago')); break; }
-						        }
-					            $date_from = strtotime($date_from);
+								$today = current_datetime()->setTime(0, 0, 0);
 
-					            $date_to = date("Y-m-d");
-					            $date_to = strtotime($date_to);
+								$date_from = new DateTimeImmutable('2001-01-01', wp_timezone());
+								$date_to   = $today;
 
-					            for ($i = $date_from; $i <= $date_to; $i += 86400) 
-            					{ 
-					                if ( isset($view_statistics[date("Y-m-d", $i)]) )
-					                {
-					                    $views += $view_statistics[date("Y-m-d", $i)];
-					                }
-            					}
+								switch ($field_name)
+								{
+								    case 'views_last_7_days':
+								    {
+								        $date_from = $today->modify('-7 days');
+								        $date_to   = $today->modify('-1 day');
+								        break;
+								    }
+
+								    case 'views_last_14_days':
+								    {
+								        $date_from = $today->modify('-14 days');
+								        $date_to   = $today->modify('-1 day');
+								        break;
+								    }
+
+								    case 'views_last_30_days':
+								    {
+								        $date_from = $today->modify('-30 days');
+								        $date_to   = $today->modify('-1 day');
+								        break;
+								    }
+
+								    case 'views_today':
+								    {
+								        $date_from = $today;
+								        $date_to   = $today;
+								        break;
+								    }
+
+								    case 'views_yesterday':
+								    {
+								        $date_from = $today->modify('-1 day');
+								        $date_to   = $date_from;
+								        break;
+								    }
+								}
+
+								for ( $date = $date_from; $date <= $date_to; $date = $date->modify('+1 day') )
+								{
+								    $date_key = $date->format('Y-m-d');
+
+								    if ( isset($view_statistics[$date_key]) )
+								    {
+								        $views += (int)$view_statistics[$date_key];
+								    }
+								}
 
 		            			$return = $views;
 		            			break;
