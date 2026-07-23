@@ -305,25 +305,41 @@ class PH_Admin_Matching_Properties {
                 'post__not_in' => $dismissed_properties
             );
 
-            if ( $date_added_from != '' )
-            {
-                // Convert stored UTC date to site timezone
-                $timezone = wp_timezone(); // Returns DateTimeZone object based on site settings
-
-                $datetime = new DateTime($date_added_from, new DateTimeZone('UTC'));
-                $datetime->setTimezone($timezone);
-                $local_date = $datetime->format('Y-m-d H:i:s');
-
-                $args['date_query'] = array(
-                    array(
-                        'after' => $local_date,
-                        'inclusive' => true,
-                    )
-                );
-            }
-
             // Meta query
             $meta_query = array('relation' => 'AND');
+
+            if ( $date_added_from != '' )
+            {
+                $datetime = new DateTimeImmutable(
+                    $date_added_from,
+                    new DateTimeZone( 'UTC' )
+                );
+
+                if ( apply_filters( 'propertyhive_matching_properties_use_on_market_change_date', false ) === true )
+                {
+                    // _on_market_change_date is currently stored using date(),
+                    // which will normally be UTC in WordPress.
+                    $meta_query[] = array(
+                        'key'     => '_on_market_change_date',
+                        'value'   => $datetime->format( 'Y-m-d H:i:s' ),
+                        'compare' => '>=',
+                        'type'    => 'DATETIME',
+                    );
+                }
+                else
+                {
+                    // post_date is stored in the site's local timezone.
+                    $local_datetime = $datetime->setTimezone( wp_timezone() );
+
+                    $args['date_query'] = array(
+                        array(
+                            'after'     => $local_datetime->format( 'Y-m-d H:i:s' ),
+                            'inclusive' => true,
+                        ),
+                    );
+                }
+            }
+
             $meta_query[] = array(
                 'key' => '_on_market',
                 'value' => 'yes'
