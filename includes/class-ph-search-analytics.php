@@ -46,6 +46,11 @@ class PH_Search_Analytics
 			return;
 		}
 
+		if ( apply_filters( 'propertyhive_enable_search_analytics', true ) === false )
+		{
+			return;
+		}
+
 		// Ignore page 2 onwards
 		if ( is_paged() )
 		{
