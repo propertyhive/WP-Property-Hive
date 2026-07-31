@@ -1289,7 +1289,12 @@ function ph_form_field( $key, $field )
             $prefix = '';
             $suffix = '';
 
-            if ( $key == 'price_slider' || $key == 'rent_slider' )
+            $slider_keys = apply_filters('propertyhive_search_form_currency_slider_keys', [
+                'price_slider',
+                'rent_slider',
+            ]);
+
+            if ( in_array($key, $slider_keys, true) )
             {
                 $prefix = '£';
 
