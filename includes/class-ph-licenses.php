@@ -87,40 +87,62 @@ class PH_Licenses {
 
         $license_type = $this->get_license_type();
 
-        if ( $license_type == 'pro' )
+        // Legacy ('old') licence holders can keep using add-ons without pro licence checks
+        if ( $license_type == 'old' )
         {
-            if ( get_option('propertyhive_pro_license_key', '') != '' ) 
-            { 
-                if ( !$this->is_valid_pro_license_key() )
-                {
-                    // show warning
-                    return false;
-                }
-
-                // Valid license. Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
-                $feature = get_ph_pro_feature( $slug );
-                $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
-
-                if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
-                {
-                    if ( 
-                        isset($feature['plans']) && 
-                        isset($product_id_and_package['package']) &&
-                        in_array($product_id_and_package['package'], $feature['plans'])
-                    )
-                    {
-                        
-                    }
-                    else
-                    {
-                    	// show warning
-                    	return false;
-                    }
-                }
-            }
+            return $can;
         }
 
-        return $can;
+        $pro_license_configured = ( $license_type == 'pro' && get_option( 'propertyhive_pro_license_key', '' ) != '' );
+
+        $feature = get_ph_pro_feature( $slug );
+
+        if ( false === $feature )
+        {
+            // A configured Pro licence must not bypass plan enforcement when
+            // the feature catalogue is unavailable, malformed, or incomplete.
+            return $pro_license_configured ? false : $can;
+        }
+
+        $plans = ( isset( $feature['plans'] ) && is_array( $feature['plans'] ) ) ? $feature['plans'] : array();
+
+        if ( in_array( 'free', $plans, true ) )
+        {
+            return $can;
+        }
+
+        // A paid add-on cannot be used without a valid Pro licence key
+        if ( ! $pro_license_configured )
+        {
+            return false;
+        }
+
+        if ( !$this->is_valid_pro_license_key() )
+        {
+            // show warning
+            return false;
+        }
+
+        // Valid license. Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
+        $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
+
+        if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
+        {
+            if (
+                isset($product_id_and_package['package']) &&
+                in_array($product_id_and_package['package'], $plans, true)
+            )
+            {
+                return $can;
+            }
+
+            // show warning
+            return false;
+        }
+
+        // The licence package could not be verified. Fail closed so a temporary
+        // upstream failure cannot unlock a paid add-on.
+        return false;
 	}
 
 	public function ph_check_add_on_can_be_updated( $can, $slug )
