@@ -403,6 +403,39 @@ class PH_Licenses {
 				wp_reset_postdata();
 			}
 
+			$departments = array_keys( ph_get_departments() );
+			foreach ( $departments as $department )
+			{
+				$department_option = 'propertyhive_active_departments_' . str_replace( 'residential-', '', $department );
+				if ( get_option( $department_option ) != 'yes' )
+				{
+					continue;
+				}
+
+				$args = array(
+					'post_type' => 'property',
+					'fields' => 'ids',
+					'nopaging' => TRUE,
+					'post_status' => 'publish',
+					'meta_query' => array(
+						array(
+							'key' => '_on_market',
+							'value' => 'yes'
+						),
+						array(
+							'key' => '_department',
+							'value' => $department
+						)
+					)
+				);
+
+				$post_query = new WP_Query( $args );
+
+				$data['property_count_by_department_' . $department] = $post_query->found_posts;
+
+				wp_reset_postdata();
+			}
+
 			$data = apply_filters( 'propertyhive_license_check_data', $data );
 		}
 
