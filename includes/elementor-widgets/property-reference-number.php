@@ -108,12 +108,12 @@ class Elementor_Property_Reference_Number_Widget extends \Elementor\Widget_Base 
 	        echo '<div class="elementor-widget-reference-number">';
 	        if ( isset($settings['before']) && !empty($settings['before']) )
 	        {
-	        	echo $settings['before'] . ' ';
+	        	echo wp_kses_post($settings['before']) . ' ';
 	        }
 	        echo esc_html($property->reference_number);
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
-	        	echo ' ' . $settings['after'];
+	        	echo ' ' . wp_kses_post($settings['after']);
 	        }
 	        echo '</div>';
 	    }

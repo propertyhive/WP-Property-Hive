@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <tr valign="top">
         <th scope="row" class="titledesc"><?php echo esc_html(__( 'To', 'propertyhive' )); ?></th>
         <td class="forminp">
-            <input type="text" name="to_email_address" value="<?php echo get_post_meta( $contact_id, '_email_address', TRUE ); ?>" style="width:100%; margin-bottom:5px;">
+            <input type="text" name="to_email_address" value="<?php echo esc_attr(get_post_meta( $contact_id, '_email_address', TRUE )); ?>" style="width:100%; margin-bottom:5px;">
             <a href="" class="show-cc">Show Cc</a> &nbsp;|&nbsp; <a href="" class="show-bcc">Show Bcc</a>
         </td>
     </tr>
@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <tr valign="top">
         <th scope="row" class="titledesc"><?php echo esc_html(__( 'Email Body', 'propertyhive' )); ?></th>
         <td class="forminp">
-            <textarea name="body" style="width:100%; height:300px;"><?php echo $body; ?></textarea>
+            <textarea name="body" style="width:100%; height:300px;"><?php echo esc_textarea($body); ?></textarea>
         </td>
     </tr>
 

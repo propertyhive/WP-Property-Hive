@@ -28,19 +28,63 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<th>' . esc_html(__( 'Status', 'propertyhive' )) . '</th>
 				</tr>
 			';
-			foreach ($properties as $property)
+			foreach ( $properties as $property )
 			{
-				$link_prefix = ( ( $property->on_market == 'yes' ) ? '<a href="' . esc_url(get_permalink( $property->id )) . '">' : '' );
-				$link_suffix = ( ( $property->on_market == 'yes' ) ? '</a>' : '' );
+			    $property_url = ( 'yes' === $property->on_market )
+			        ? get_permalink( $property->id )
+			        : '';
 
-				$image = $property->get_main_photo_src();
+			    $image = $property->get_main_photo_src();
 
-				echo '<tr>
-					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . esc_url($image) . '" width="75" alt="' . esc_attr(get_the_title( $property->id )) . '">' : '' ) . $link_suffix . '</td>
-					<td>' . $link_prefix . esc_html(get_the_title( $property->id )) . $link_suffix . '</td>
-					<td>' . $property->get_formatted_price() . '</td>
-					<td>' . esc_html($property->availability) . '<br>' . esc_html( ( $property->on_market == 'yes' ) ? 'On Market' : 'Not On Market' ) . '</td>
-				</tr>';
+			    echo '<tr>';
+
+			    echo '<td>';
+
+			    if ( false !== $image )
+			    {
+			        if ( $property_url )
+			        {
+			            echo '<a href="' . esc_url( $property_url ) . '">';
+			        }
+
+			        echo '<img src="' . esc_url( $image ) . '" width="75" alt="' . esc_attr( get_the_title( $property->id ) ) . '">';
+
+			        if ( $property_url )
+			        {
+			            echo '</a>';
+			        }
+			    }
+
+			    echo '</td>';
+
+			    echo '<td>';
+
+			    if ( $property_url )
+			    {
+			        echo '<a href="' . esc_url( $property_url ) . '">';
+			    }
+
+			    echo esc_html( get_the_title( $property->id ) );
+
+			    if ( $property_url )
+			    {
+			        echo '</a>';
+			    }
+
+			    echo '</td>';
+
+			    echo '<td>' . wp_kses_post( $property->get_formatted_price() ) . '</td>';
+
+			    echo '<td>' .
+				    esc_html( $property->availability ) .
+				    '<br>' .
+				    ( 'yes' === $property->on_market
+				        ? esc_html__( 'On Market', 'propertyhive' )
+				        : esc_html__( 'Not On Market', 'propertyhive' )
+				    ) .
+			    '</td>';
+
+			    echo '</tr>';
 			}
 			echo '</table>';
 		}

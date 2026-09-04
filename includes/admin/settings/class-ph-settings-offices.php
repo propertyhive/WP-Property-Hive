@@ -445,7 +445,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                             ' . esc_html($address) . '
                                         </td>
                                         <td class="contact">
-                                            ' . $contact_details . '
+                                            ' . wp_kses_post($contact_details) . '
                                         </td>';
                                     do_action( 'propertyhive_office_table_row_columns', get_the_ID() );
                                     echo '

@@ -39,7 +39,7 @@ global $post, $property;
                {
                    foreach ( $action['parent_attributes'] as $key => $value )
                    {
-                       echo ' ' . $key . '="' . esc_attr($value) . '"';
+                       echo ' ' . esc_attr($key) . '="' . esc_attr($value) . '"';
                    }
                }
                echo '><a href="' . esc_url($action['href']) . '"';
@@ -47,7 +47,7 @@ global $post, $property;
                {
                    foreach ( $action['attributes'] as $key => $value )
                    {
-                       echo ' ' . $key . '="' . esc_attr($value) . '"';
+                       echo ' ' . esc_attr($key) . '="' . esc_attr($value) . '"';
                    }
                }
                echo '>' . esc_html($action['label']) . '</a></li>

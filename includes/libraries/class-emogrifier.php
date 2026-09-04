@@ -432,7 +432,7 @@ class Emogrifier
 			self::CACHE_KEY_COMBINED_STYLES,
 		);
 		if ( ! in_array($key, $allowedCacheKeys, true) ) {
-			throw new InvalidArgumentException('Invalid cache key: ' . $key, 1391822035);
+			throw new InvalidArgumentException('Invalid cache key: ' . esc_html( $key ), 1391822035);
 		}
 
 		$this->caches[ $key ] = array();

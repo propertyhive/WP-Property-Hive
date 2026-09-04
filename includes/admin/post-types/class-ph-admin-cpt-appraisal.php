@@ -171,7 +171,7 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
                 
                 if ( $the_appraisal->status == 'carried_out' )
                 {
-                	echo $the_appraisal->get_formatted_price();
+                	echo wp_kses_post($the_appraisal->get_formatted_price());
                 }
                 else
                 {
@@ -297,32 +297,6 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
         unset( $actions['edit'] );
         return $actions;
     }
-
-	/**
-	 * Show a status filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'appraisal' != $typenow ) {
-			return;
-		}
-
-		echo apply_filters( 'propertyhive_appraisal_filters', $output );
-	}
-
-	/**
-	 * Filter the appraisal in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function appraisal_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'appraisal' == $typenow ) {
-
-		}
-	}
 }
 
 endif;

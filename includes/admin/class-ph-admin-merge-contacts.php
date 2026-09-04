@@ -123,7 +123,7 @@ class PH_Admin_Merge_Contacts {
 
                 $contact_parts = apply_filters( 'propertyhive_merge_contact_parts', $contact_parts );
 
-                echo implode( '<br>', $contact_parts );
+                echo wp_kses_post(implode( '<br>', $contact_parts ));
             ?>
             <label style="position:absolute; right:25px; top:25px;">
                 <?php echo esc_html(__( 'Use as Primary Contact', 'propertyhive' )); ?>
@@ -163,7 +163,7 @@ class PH_Admin_Merge_Contacts {
                             action:             'propertyhive_merge_contact_records',
                             contact_ids :       '<?php echo esc_js(ph_clean($_GET['merge_ids'])); ?>',
                             primary_contact_id: selected_primary,
-                            nonce:              '<?php echo wp_create_nonce( 'propertyhive_merge_contact' ); ?>',
+                            nonce:              '<?php echo esc_js(wp_create_nonce( 'propertyhive_merge_contact' )); ?>',
                         };
 
                         jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) {
@@ -178,7 +178,7 @@ class PH_Admin_Merge_Contacts {
                             if (response.success)
                             {
                                 // Redirect to referrer, adding message in admin_notices
-                                window.location.href = '<?php echo admin_url('edit.php?post_type=contact&propertyhive_contacts_merged=1'); ?>';
+                                window.location.href = '<?php echo esc_js(admin_url('edit.php?post_type=contact&propertyhive_contacts_merged=1')); ?>';
                             }
                         });
                     }

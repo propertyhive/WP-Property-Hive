@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_type', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -54,8 +56,9 @@ add_shortcode( 'avada_property_type', function( $atts ) {
 
     ob_start();
 
-    echo '<div ' . FusionBuilder::attributes( 'property-type-shortcode' ) . '>
-    	<div style="' . $style . '">';
+    echo '<div ' . FusionBuilder::attributes( 'property-type-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    echo '
+    	<div style="' . esc_attr($style) . '">';
 
         if ( ! empty($atts['icon']) ) 
         {
@@ -64,12 +67,12 @@ add_shortcode( 'avada_property_type', function( $atts ) {
 
         if ( isset($atts['before']) && !empty($atts['before']) )
         {
-            echo $atts['before'] . ' ';
+            echo wp_kses_post($atts['before']) . ' ';
         }
         echo esc_html($property->property_type);
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
-            echo ' ' . $atts['after'];
+            echo ' ' . wp_kses_post($atts['after']);
         }
     echo '
     	</div>

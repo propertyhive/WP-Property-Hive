@@ -237,7 +237,7 @@ class Elementor_Property_Features_Widget extends \Elementor\Widget_Base {
 			<?php
 		}
 
-		echo $output;
+		echo wp_kses_post($output);
 	}
 
 }

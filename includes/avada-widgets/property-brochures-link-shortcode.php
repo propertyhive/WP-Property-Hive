@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_brochures_link', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -54,10 +56,10 @@ add_shortcode( 'avada_property_brochures_link', function( $atts ) {
 
         if ( !empty($brochure_urls) )
         {
-            echo '<div ' . FusionBuilder::attributes( 'property-brochures-link-shortcode' ) . '>';
+            echo '<div ' . FusionBuilder::attributes( 'property-brochures-link-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             foreach ( $brochure_urls as $brochure )
             {
-                echo '<a href="' . esc_url($brochure['url']) . '" target="_blank" rel="nofollow" style="' . $style . '">' . esc_html($atts['label']) . '</a>';
+                echo '<a href="' . esc_url($brochure['url']) . '" target="_blank" rel="nofollow" style="' . esc_attr($style) . '">' . esc_html($atts['label']) . '</a>';
             }
             echo '</div>';
         }
@@ -68,10 +70,10 @@ add_shortcode( 'avada_property_brochures_link', function( $atts ) {
 
         if ( !empty($brochure_attachment_ids) )
         {
-            echo '<div ' . FusionBuilder::attributes( 'property-brochures-link-shortcode' ) . '>';
+            echo '<div ' . FusionBuilder::attributes( 'property-brochures-link-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             foreach ( $brochure_attachment_ids as $attachment_id )
             {
-                echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow" style="' . $style . '">' . esc_html($atts['label']) . '</a>';
+                echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank" rel="nofollow" style="' . esc_attr($style) . '">' . esc_html($atts['label']) . '</a>';
             }
             echo '</div>';
         }

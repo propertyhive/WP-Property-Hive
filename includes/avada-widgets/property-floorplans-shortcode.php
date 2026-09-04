@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_floorplans', function( $atts ) {
     $atts = shortcode_atts( array(
         'show_title'    => '',

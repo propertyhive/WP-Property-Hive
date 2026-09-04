@@ -41,34 +41,6 @@ class PH_Shortcodes {
 	}
 
 	/**
-	 * Shortcode Wrapper
-	 *
-	 * @param mixed $function
-	 * @param array $atts (default: array())
-	 * @return string
-	 */
-	public static function shortcode_wrapper(
-		$function,
-		$atts    = array(),
-		$wrapper = array(
-			'class'  => 'propertyhive',
-			'before' => null,
-			'after'  => null
-		)
-	) {
-		ob_start();
-
-		$before 	= empty( $wrapper['before'] ) ? '<div class="' . esc_attr( $wrapper['class'] ) . '">' : $wrapper['before'];
-		$after 		= empty( $wrapper['after'] ) ? '</div>' : $wrapper['after'];
-
-		echo $before;
-		call_user_func( $function, $atts );
-		echo $after;
-
-		return ob_get_clean();
-	}
-
-	/**
 	 * Output property search form
 	 *
 	 * @param array $atts
@@ -694,7 +666,7 @@ class PH_Shortcodes {
 				{
 					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
 				}
-				echo $loop_start;
+				echo wp_kses_post($loop_start);
 			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -993,7 +965,7 @@ class PH_Shortcodes {
 				{
 					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
 				}
-				echo $loop_start;
+				echo wp_kses_post($loop_start);
 			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -1283,7 +1255,7 @@ class PH_Shortcodes {
 				{
 					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
 				}
-				echo $loop_start;
+				echo wp_kses_post($loop_start);
 			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -1708,7 +1680,7 @@ class PH_Shortcodes {
 					{
 						$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
 					}
-					echo $loop_start;
+					echo wp_kses_post($loop_start);
 				?>
 
 					<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -1757,11 +1729,7 @@ class PH_Shortcodes {
 			'embed'  		=> 'false'
 		), $atts, 'property_map' );
 
-		ob_start();
-
-		echo get_property_map( $atts );
-
-		return ob_get_clean();
+		return get_property_map( $atts );
 	}
 
 	/**
@@ -1782,11 +1750,7 @@ class PH_Shortcodes {
 			'link'        	=> 'true',
 		), $atts, 'property_static_map' );
 
-		ob_start();
-
-		echo get_property_static_map( $atts );
-
-		return ob_get_clean();
+		return get_property_static_map( $atts );
 	}
 
 	/**
@@ -1806,11 +1770,7 @@ class PH_Shortcodes {
 			'embed'  		=> 'false'
 		), $atts, 'property_street_view' );
 
-		ob_start();
-
-		echo get_property_street_view( $atts );
-
-		return ob_get_clean();
+		return get_property_street_view( $atts );
 	}
 
 	/**
@@ -1846,7 +1806,7 @@ class PH_Shortcodes {
 
 				if ( $property->get_office_address( $atts['address_separator'] ) != '' )
 				{
-					echo '<div class="office-address">' . $property->get_office_address( $atts['address_separator'] ) . '</div>';
+					echo '<div class="office-address">' . wp_kses_post($property->get_office_address( $atts['address_separator'] )) . '</div>';
 				}
 
 				if ( $property->office_telephone_number != '' )
@@ -1914,7 +1874,7 @@ class PH_Shortcodes {
 	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 	    wp_enqueue_script('googlemaps');
 
-	    echo '<div id="office_map_canvas" style="height:' . str_replace( "px", "", ( ( isset($atts['height']) && !empty($atts['height']) && is_numeric($atts['height']) ) ? (int)$atts['height'] : '400' ) ) . 'px"></div>';
+	    echo '<div id="office_map_canvas" style="height:' . esc_attr(str_replace( "px", "", ( ( isset($atts['height']) && !empty($atts['height']) && is_numeric($atts['height']) ) ? (int)$atts['height'] : '400' ) )) . 'px"></div>';
 ?>
 <script>
 
@@ -1980,7 +1940,7 @@ class PH_Shortcodes {
 
   				if ( isset($map_add_on_settings['style_js']) && trim($map_add_on_settings['style_js']) != '' )
   				{
-  					echo 'map_options.styles = ' . trim($map_add_on_settings['style_js']) . ';';
+  					echo 'map_options.styles = ' . esc_js(trim($map_add_on_settings['style_js'])) . ';';
   				}
   			}
 

@@ -183,7 +183,7 @@ class PH_Meta_Box_Property_Department {
                 $material_information_sountry_js[] = 'selected_country == \'' . strtoupper($country) . '\'';
             }
             echo '
-                    if ( ' . implode(" || ", $material_information_sountry_js) . ' )
+                    if ( ' . esc_js(implode(" || ", $material_information_sountry_js)) . ' )
                     {
                         jQuery(\'#propertyhive-property-material-information\').show();
                     }

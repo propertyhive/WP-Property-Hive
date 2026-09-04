@@ -180,12 +180,12 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
                 break;
             case 'applicant' :
                 
-                echo $the_sale->get_applicants( false, true, false );
+                echo wp_kses_post($the_sale->get_applicants( false, true, false ));
                 
                 break;
             case 'amount' :
                 
-                echo $the_sale->get_formatted_amount();
+                echo wp_kses_post($the_sale->get_formatted_amount());
                 
                 break;
             case 'status' :
@@ -277,32 +277,6 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
         unset( $actions['edit'] );
         return $actions;
     }
-
-	/**
-	 * Show a status filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'sale' != $typenow ) {
-			return;
-		}
-
-		echo apply_filters( 'propertyhive_sale_filters', $output );
-	}
-
-	/**
-	 * Filter the sales in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function sale_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'sale' == $typenow ) {
-
-		}
-	}
 }
 
 endif;

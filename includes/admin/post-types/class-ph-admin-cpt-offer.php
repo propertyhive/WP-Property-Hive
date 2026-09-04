@@ -180,12 +180,12 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
                 break;
             case 'applicant' :
                 
-                echo $the_offer->get_applicants( false, true, false );
+                echo wp_kses_post($the_offer->get_applicants( false, true, false ));
 
                 break;
             case 'amount' :
                 
-                echo $the_offer->get_formatted_amount();
+                echo wp_kses_post($the_offer->get_formatted_amount());
                 
                 break;
             case 'status' :
@@ -276,32 +276,6 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
         unset( $actions['edit'] );
         return $actions;
     }
-
-	/**
-	 * Show a status filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'offer' != $typenow ) {
-			return;
-		}
-
-		echo apply_filters( 'propertyhive_offer_filters', $output );
-	}
-
-	/**
-	 * Filter the offers in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function offer_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'offer' == $typenow ) {
-
-		}
-	}
 }
 
 endif;

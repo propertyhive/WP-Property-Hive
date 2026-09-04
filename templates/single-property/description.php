@@ -20,7 +20,7 @@ if ( trim(strip_tags($description)) != '' )
     
     <h4><?php echo esc_html(__( 'Full Details', 'propertyhive' )); ?></h4>
     
-    <div class="description-contents"><?php echo $description; ?></div>
+    <div class="description-contents"><?php echo wp_kses_post($description); ?></div>
 
 </div>
 <?php

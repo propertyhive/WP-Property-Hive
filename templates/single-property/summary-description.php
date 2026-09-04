@@ -20,7 +20,7 @@ if ( $summary != '' )
     
     <h4><?php echo esc_html(__( 'Property Summary', 'propertyhive' )); ?></h4>
     
-    <div class="summary-contents"><?php echo apply_filters('propertyhive_summary_description_nl2br', true) ? ph_nl2br($summary) : $summary; ?></div>
+    <div class="summary-contents"><?php echo wp_kses_post(apply_filters('propertyhive_summary_description_nl2br', true) ? ph_nl2br($summary) : $summary); ?></div>
 
 </div>
 <?php

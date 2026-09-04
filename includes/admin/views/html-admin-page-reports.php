@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<nav class="nav-tab-wrapper">
 		<?php
 			foreach ( $reports as $key => $report_group ) {
-				echo '<a href="' . admin_url( 'admin.php?page=ph-reports&tab=' . urlencode( $key ) ) . '" class="nav-tab ';
+				echo '<a href="' . esc_url(admin_url( 'admin.php?page=ph-reports&tab=' . urlencode( $key ) )) . '" class="nav-tab ';
 				if ( $current_tab == $key ) {
 					echo 'nav-tab-active';
 				}
@@ -37,13 +37,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$link .= 'current';
 					}
 
-					$link .= '">' . $report['title'] . '</a>';
+					$link .= '">' . esc_html($report['title']) . '</a>';
 
 					$links[] = $link;
 
 				}
 
-				echo implode( ' | </li><li>', $links );
+				echo wp_kses_post(implode( ' | </li><li>', $links ));
 
 			?></li>
 		</ul>
@@ -62,7 +62,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		}
 
 		if ( $report['description'] ) {
-			echo '<p>' . $report['description'] . '</p>';
+			echo '<p>' . wp_kses_post($report['description']) . '</p>';
 		}
 
 		if ( $report['callback'] && ( is_callable( $report['callback'] ) ) ) {

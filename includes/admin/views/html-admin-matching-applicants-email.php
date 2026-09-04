@@ -20,7 +20,7 @@ $current_user = wp_get_current_user();
                 $contact_id = $explode_contact_applicant_profile_id[0];
                 $applicant_profile_id = $explode_contact_applicant_profile_id[1];
 
-                echo get_the_title($contact_id) . ' (' . get_post_meta( $contact_id, '_email_address', TRUE ) . ')<br>';
+                echo esc_html(get_the_title($contact_id)) . ' (' . esc_html(get_post_meta( $contact_id, '_email_address', TRUE )) . ')<br>';
             }
         ?>
         <div style="margin-top:5px;"><a href="" class="show-cc">Show Cc</a> &nbsp;|&nbsp; <a href="" class="show-bcc">Show Bcc</a></div>
@@ -65,7 +65,7 @@ $current_user = wp_get_current_user();
     <tr valign="top">
         <th scope="row" class="titledesc"><?php echo esc_html(__( 'Email Body', 'propertyhive' )); ?></th>
         <td class="forminp">
-            <textarea name="body" style="width:100%; height:300px;"><?php echo $body; ?></textarea>
+            <textarea name="body" style="width:100%; height:300px;"><?php echo esc_textarea($body); ?></textarea>
         </td>
     </tr>
 

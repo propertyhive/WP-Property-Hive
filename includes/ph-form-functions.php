@@ -10,6 +10,8 @@
  * @version     1.0.0
  */
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * Main function for drawing entire property search form. We give the ability for an ID to be passed so differently formatted forms can be used
  * (ie. a homepage search form might be different from a search form on search results)

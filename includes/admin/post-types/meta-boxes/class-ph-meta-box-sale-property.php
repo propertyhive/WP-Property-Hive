@@ -33,7 +33,7 @@ class PH_Meta_Box_Sale_Property {
             
                 <label>' . esc_html(__('Address', 'propertyhive')) . '</label>
                 
-                <a href="' . esc_url(get_edit_post_link($property_id, '')) . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . esc_url(get_permalink($property_id)) . '" target="_blank">'. __('View On Website', 'propertyhive') . '</a>)' : '' ) . '
+                <a href="' . esc_url(get_edit_post_link($property_id, '')) . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . esc_url(get_permalink($property_id)) . '" target="_blank">' . esc_html(__('View On Website', 'propertyhive')) . '</a>)' : '' ) . '
                 
             </p>';
 
@@ -74,7 +74,7 @@ class PH_Meta_Box_Sale_Property {
         }
         else
         {
-            echo __('No property found', 'propertyhive');
+            echo esc_html(__('No property found', 'propertyhive'));
         }
 
         do_action('propertyhive_sale_property_fields');

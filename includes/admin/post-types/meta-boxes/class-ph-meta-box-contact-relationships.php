@@ -219,7 +219,7 @@ class PH_Meta_Box_Contact_Relationships
 
             echo '<p class="form-field">';
             echo '<label>' . esc_html(__('Address', 'propertyhive')) . '</label>';
-            echo $the_property->get_formatted_full_address('<br>');
+            echo wp_kses_post($the_property->get_formatted_full_address('<br>'));
             echo '</p>';
 
             echo '<p class="form-field">';
@@ -256,7 +256,7 @@ class PH_Meta_Box_Contact_Relationships
 
             echo '<p class="form-field">';
             echo '<label>' . esc_html(__('Address', 'propertyhive')) . '</label>';
-            echo (($the_appraisal->get_formatted_full_address('<br>') != '') ? $the_appraisal->get_formatted_full_address('<br>') : '-');
+            echo (($the_appraisal->get_formatted_full_address('<br>') != '') ? wp_kses_post($the_appraisal->get_formatted_full_address('<br>')) : '-');
             echo '</p>';
 
             echo '<p class="form-field">';
@@ -393,14 +393,14 @@ class PH_Meta_Box_Contact_Relationships
 
             // Price
             echo '<p class="form-field">';
-            echo '<label for="_applicant_maximum_price_' . esc_attr($key) . '">' . esc_html(__('Maximum Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol maximum-price-currency-symbol">' . ( isset($currencies[$selected_currency]) ? $currencies[$selected_currency] : '' ) . '</span>)' : '' ) . '</label>';
+            echo '<label for="_applicant_maximum_price_' . esc_attr($key) . '">' . esc_html(__('Maximum Price', 'propertyhive')) . ( ( empty($currencies) || count($currencies) <= 1 )  ? ' (<span class="currency-symbol maximum-price-currency-symbol">' . ( isset($currencies[$selected_currency]) ? esc_html($currencies[$selected_currency]) : '' ) . '</span>)' : '' ) . '</label>';
 
             if ( count($currencies) > 1 )
             {
                 echo '<select id="_applicant_currency_sales_' . esc_attr($key) . '" name="_applicant_currency_sales_' . esc_attr($key) . '" class="select" style="width:auto; float:left;">';
                 foreach ( $currencies as $currency_code => $currency_symbol ) 
                 {
-                    echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
+                    echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . esc_html($currency_symbol) . '</option>';
                 }
                 echo '</select>';
             }
@@ -408,7 +408,7 @@ class PH_Meta_Box_Contact_Relationships
             {
                 echo '<input type="hidden" name="_applicant_currency_sales_' . esc_attr($key) .  '" id="_applicant_currency_sales_' . esc_attr($key) .'" value="' . esc_attr($selected_currency) . '">';
             }
-            echo '<input type="text" class="" name="_applicant_maximum_price_' . esc_attr($key) . '" id="_applicant_maximum_price_' . esc_attr($key) . '" value="' . ( isset($applicant_profile['max_price']) ? ph_display_price_field($applicant_profile['max_price']) : '' ) . '" placeholder="" style="width:100%; max-width:150px;">';
+            echo '<input type="text" class="" name="_applicant_maximum_price_' . esc_attr($key) . '" id="_applicant_maximum_price_' . esc_attr($key) . '" value="' . ( isset($applicant_profile['max_price']) ? wp_kses_post(ph_display_price_field($applicant_profile['max_price'])) : '' ) . '" placeholder="" style="width:100%; max-width:150px;">';
             echo '</p>';
 
             $percentage_lower = get_option('propertyhive_applicant_match_price_range_percentage_lower', '');
@@ -456,7 +456,7 @@ class PH_Meta_Box_Contact_Relationships
 
                 echo '<p class="form-field applicant_match_price_range_field ">
                             
-                    <label for="_applicant_match_price_range_' . esc_attr($key) . '">' . esc_html(__('Match Price Range', 'propertyhive')) . ' (<span class="currency-symbol price-range-currency-symbol">' . $currencies[$selected_currency] . '</span>)</label>
+                    <label for="_applicant_match_price_range_' . esc_attr($key) . '">' . esc_html(__('Match Price Range', 'propertyhive')) . ' (<span class="currency-symbol price-range-currency-symbol">' . esc_html($currencies[$selected_currency]) . '</span>)</label>
                     
                     <input type="text" class="" name="_applicant_match_price_range_lower_' . esc_attr($key) . '" id="_applicant_match_price_range_lower_' . esc_attr($key) . '" value="' . esc_attr(ph_display_price_field($match_price_range_lower)) . '" style="width:20%; max-width:150px;">
                     <span style="float:left; margin:0 5px;">to</span>
@@ -468,7 +468,7 @@ class PH_Meta_Box_Contact_Relationships
 
                 echo '<script>
 
-                                var previous_max_price_' . esc_js($key) . ' = ' . ((isset($applicant_profile['max_price']) && $applicant_profile['max_price'] != '') ? $applicant_profile['max_price'] : '\'\'') . ';
+                                var previous_max_price_' . esc_js($key) . ' = ' . ((isset($applicant_profile['max_price']) && $applicant_profile['max_price'] != '') ? esc_js($applicant_profile['max_price']) : '\'\'') . ';
 
                                 jQuery(document).ready(function()
                                 {
@@ -499,7 +499,7 @@ class PH_Meta_Box_Contact_Relationships
                                     {
                                         if ( previous_max_price_' . esc_js($key) . ' == \'\' )
                                         {
-                                            if ( jQuery(this).val().replace(/\D/g, \'\') != \'\' && jQuery(\'#_applicant_match_price_range_lower_' . $key . '\').val().replace(/[^\d.-]/g, \'\') == \'\' )
+                                            if ( jQuery(this).val().replace(/\D/g, \'\') != \'\' && jQuery(\'#_applicant_match_price_range_lower_' . esc_js($key) . '\').val().replace(/[^\d.-]/g, \'\') == \'\' )
                                             {
                                                 var max_price = jQuery(this).val().replace(/[^\d.-]/g, \'\');
 
@@ -508,7 +508,7 @@ class PH_Meta_Box_Contact_Relationships
                                                 jQuery(\'#_applicant_match_price_range_lower_' . esc_js($key) . '\').val(max_price.toFixed(0));
                                             }
 
-                                            if ( jQuery(this).val().replace(/\D/g, \'\') != \'\' && jQuery(\'#_applicant_match_price_range_higher_' . $key . '\').val().replace(/[^\d.-]/g, \'\') == \'\' )
+                                            if ( jQuery(this).val().replace(/\D/g, \'\') != \'\' && jQuery(\'#_applicant_match_price_range_higher_' . esc_js($key) . '\').val().replace(/[^\d.-]/g, \'\') == \'\' )
                                             {
                                                 var max_price = jQuery(this).val().replace(/[^\d.-]/g, \'\');
 
@@ -569,7 +569,7 @@ class PH_Meta_Box_Contact_Relationships
                 if (count($currencies) > 1) {
                     echo '<select id="_applicant_currency_' .  esc_attr($key) . '" name="_applicant_currency_lettings_' .  esc_attr($key) . '" class="select" style="width:auto; float:left;">';
                     foreach ($currencies as $currency_code => $currency_symbol) {
-                        echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . $currency_symbol . '</option>';
+                        echo '<option value="' . esc_attr($currency_code) . '"' . (($currency_code == $selected_currency) ? ' selected' : '') . '>' . esc_html($currency_symbol) . '</option>';
                     }
                     echo '</select>';
                 } else {
@@ -920,13 +920,13 @@ class PH_Meta_Box_Contact_Relationships
                                 href="' . esc_url(admin_url('admin.php?page=ph-matching-properties&contact_id=' . (int)$contact_id . '&applicant_profile=' . $key)) . '" 
                                 class="button view-matching-properties-' . esc_attr($key) . '" 
                                 ' . ((isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] == '') ? ' disabled title="Send Matching Properties not selected"' : '') . '
-                            >' . __('View Matching Properties', 'propertyhive') . '</a>
+                            >' . esc_html(__('View Matching Properties', 'propertyhive')) . '</a>
 
                             <a 
                                 href="' . esc_url(wp_nonce_url(admin_url('post.php?post=' . (int)$contact_id . '&action=edit#propertyhive-contact-relationships'), $key, 'delete_applicant_relationship')) . '" 
                                 class="button"
                                 onclick="var confirmBox = confirm(\'' . esc_js(__('Are you sure you wish to delete this applicant relationship?', 'propertyhive')) . '\'); return confirmBox;"
-                            >' . __('Delete Relationship', 'propertyhive') . '</a>
+                            >' . esc_html(__('Delete Relationship', 'propertyhive')) . '</a>
 
                             <div id="view_matching_properties_' . esc_attr($key) . '" style="display:none;">
                                 
@@ -954,10 +954,10 @@ class PH_Meta_Box_Contact_Relationships
 
                             jQuery(\'input[type=\\\'radio\\\'][name=\\\'_applicant_department_' . esc_js($key) . '\\\']\').change(function()
                             {
-                                 showHideApplicantDepartmentMetaBox_' . $key . '();
+                                 showHideApplicantDepartmentMetaBox_' . esc_js($key) . '();
                             });
 
-                            jQuery(\'.applicant-fields-' . esc_js($key) . ' input, .applicant-fields-' . esc_js($key) . ' select, .applicant-fields-' . $key . ' textarea\').change(function()
+                            jQuery(\'.applicant-fields-' . esc_js($key) . ' input, .applicant-fields-' . esc_js($key) . ' select, .applicant-fields-' . esc_js($key) . ' textarea\').change(function()
                             {
                                 applicant_details_changed_' . esc_js($key) . ' = true;
                             });

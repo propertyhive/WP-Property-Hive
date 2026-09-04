@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_embedded_virtual_tours', function( $atts ) {
     $atts = shortcode_atts( array(
         'show_title'    => '',
@@ -34,8 +36,23 @@ add_shortcode( 'avada_property_embedded_virtual_tours', function( $atts ) {
             {
                 if ( isset($atts['oembed']) && $atts['oembed'] == 'yes' )
                 {
-                    $embed_code = wp_oembed_get($virtual_tour['url']);
-                    echo $embed_code;
+                    $embed_code = wp_oembed_get( $virtual_tour['url'] );
+
+                    $allowed_html = wp_kses_allowed_html( 'post' );
+
+                    $allowed_html['iframe'] = array(
+                        'src'             => true,
+                        'width'           => true,
+                        'height'          => true,
+                        'frameborder'     => true,
+                        'allow'           => true,
+                        'allowfullscreen' => true,
+                        'loading'         => true,
+                        'title'           => true,
+                        'class'           => true,
+                    );
+
+                    echo wp_kses( $embed_code, $allowed_html );
                 }
                 else
                 {

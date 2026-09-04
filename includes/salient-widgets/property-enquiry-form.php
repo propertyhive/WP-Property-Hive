@@ -43,9 +43,9 @@ class Salient_Property_Enquiry_Form_Widget {
       		"params" => array(
          		array(
   					'type' => 'css_editor',
-  					'heading' => __( 'CSS box', 'js_composer' ),
+  					'heading' => __( 'CSS box', 'propertyhive' ),
   					'param_name' => 'css',
-  					'group' => __( 'Design Options', 'js_composer' ),
+  					'group' => __( 'Design Options', 'propertyhive' ),
   				),
       		)
    		));

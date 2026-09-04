@@ -13,7 +13,7 @@ global $property;
 ?>
 <div class="price">
 
-	<?php echo $property->get_formatted_price(); ?>
+	<?php echo wp_kses_post($property->get_formatted_price()); ?>
 	
 	<?php
         if ( $price_qualifier != '' )
@@ -25,7 +25,7 @@ global $property;
         {
             echo ' <span class="lettings-fees"><a data-fancybox data-src="#propertyhive_lettings_fees_popup" href="javascript:;">' . esc_html(__( 'Tenancy Info', 'propertyhive' )) . '</a></span>';
 
-            echo '<div id="propertyhive_lettings_fees_popup" style="display:none; max-width:500px;"><h3>' . esc_html(__( 'Tenancy Info', 'propertyhive' )) . '</h3>' . $fees . '</div>';
+            echo '<div id="propertyhive_lettings_fees_popup" style="display:none; max-width:500px;"><h3>' . esc_html(__( 'Tenancy Info', 'propertyhive' )) . '</h3>' . wp_kses_post($fees) . '</div>';
         }
 	?>
 

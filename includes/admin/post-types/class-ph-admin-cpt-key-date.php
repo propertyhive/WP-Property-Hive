@@ -64,7 +64,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 
 											$output .= '</select>';
 
-											echo $output;
+											echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										?>
 									</span>
 								</label>
@@ -140,12 +140,12 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 							$opening_link_tag = true; 
 						}
 					}
-					echo $key_date->description() . ( $opening_link_tag ? '</a>' : '' ) . '</div>';
+					echo wp_kses_post($key_date->description()) . ( $opening_link_tag ? '</a>' : '' ) . '</div>';
 					echo '<div class="row-actions">';
 					break;
 
 				case 'notes' :
-					echo '<div class="cell-main-content">' . ( !empty($key_date->notes()) ? nl2br( $key_date->notes() ) : '-' ) . '</div>';
+					echo '<div class="cell-main-content">' . ( !empty($key_date->notes()) ? wp_kses_post(nl2br( $key_date->notes() )) : '-' ) . '</div>';
 					break;
 
 				case 'property' :
@@ -155,7 +155,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 				case 'tenants' :
 					if ( $tenancy->id )
 					{
-						echo $tenancy->get_tenants(false, true);
+						echo wp_kses_post($tenancy->get_tenants(false, true));
 					}
 					else
 					{

@@ -42,7 +42,7 @@ class PH_Emails {
 	 * @since 1.0.0
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html(__( 'Cheatin&#8217; huh?', 'propertyhive' )), '1.0.0' );
 	}
 
 	/**
@@ -51,7 +51,7 @@ class PH_Emails {
 	 * @since 1.0.0
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html(__( 'Cheatin&#8217; huh?', 'propertyhive' )), '1.0.0' );
 	}
 
 	/**
@@ -188,55 +188,83 @@ class PH_Emails {
 
 		$lock_id = uniqid( "", true );
 
-		$wpdb->query("
-		    UPDATE " . $wpdb->prefix . "ph_email_log
-		    SET 
-				status = 'fail2',
-				lock_id = ''
-		    WHERE 
-		    	status = 'fail1'
-		    AND
-		    	lock_id <> '' 
-		    AND
-		    	locked_at <= '" . date("Y-m-d H:i:s", strtotime('24 hours ago')) . "'
-		");
+		$twenty_four_hours_ago = date( 'Y-m-d H:i:s', strtotime( '-24 hours' ) );
+		$now                   = date( 'Y-m-d H:i:s' );
 
-		$wpdb->query("
-		    UPDATE " . $wpdb->prefix . "ph_email_log
-		    SET 
-				status = 'fail1',
-				lock_id = ''
-		    WHERE 
-		    	status = ''
-		    AND
-		    	lock_id <> '' 
-		    AND
-		    	locked_at <= '" . date("Y-m-d H:i:s", strtotime('24 hours ago')) . "'
-		");
+		$wpdb->query(
+		    $wpdb->prepare(
+		        "
+		        UPDATE {$wpdb->prefix}ph_email_log
+		        SET
+		            status = 'fail2',
+		            lock_id = ''
+		        WHERE
+		            status = 'fail1'
+		            AND lock_id <> ''
+		            AND locked_at <= %s
+		        ",
+		        $twenty_four_hours_ago
+		    )
+		);
+
+		$wpdb->query(
+		    $wpdb->prepare(
+		        "
+		        UPDATE {$wpdb->prefix}ph_email_log
+		        SET
+		            status = 'fail1',
+		            lock_id = ''
+		        WHERE
+		            status = ''
+		            AND lock_id <> ''
+		            AND locked_at <= %s
+		        ",
+		        $twenty_four_hours_ago
+		    )
+		);
 		
 		// Lock/reserve all emails in log that are status blank or 'fail1' and lock_id blank and send_at in the past
 		// Only grab 25 at a time to prevent hanging/being seen as spamming
-		$wpdb->query("
-		    UPDATE " . $wpdb->prefix . "ph_email_log
-		    SET 
-				lock_id = '" . $lock_id . "',
-				locked_at = '" . date("Y-m-d H:i:s") . "'
-		    WHERE 
-		    	(status = '' OR status = 'fail1')
-		    AND
-		    	lock_id = ''
-		    AND
-		    	send_at <= '" . date("Y-m-d H:i:s") . "'
-		    LIMIT " . apply_filters( 'propertyhive_email_process_limit', 25 ) . "
-		");
+		$process_limit = absint(
+		    apply_filters( 'propertyhive_email_process_limit', 25 )
+		);
+
+		if ( 0 === $process_limit ) 
+		{
+		    $process_limit = 25;
+		}
+
+		$wpdb->query(
+		    $wpdb->prepare(
+		        "
+		        UPDATE {$wpdb->prefix}ph_email_log
+		        SET
+		            lock_id = %s,
+		            locked_at = %s
+		        WHERE
+		            ( status = '' OR status = 'fail1' )
+		            AND lock_id = ''
+		            AND send_at <= %s
+		        LIMIT %d
+		        ",
+		        $lock_id,
+		        $now,
+		        $now,
+		        $process_limit
+		    )
+		);
 
 		// We now have up to 25 emails locked. Get this 25 and attempt to send
-		$emails_to_send = $wpdb->get_results("
-			SELECT *
-			FROM " . $wpdb->prefix . "ph_email_log
-			WHERE 
-				lock_id = '" . $lock_id . "'
-		");
+		$emails_to_send = $wpdb->get_results(
+		    $wpdb->prepare(
+		        "
+		        SELECT *
+		        FROM {$wpdb->prefix}ph_email_log
+		        WHERE lock_id = %s
+		        ",
+		        $lock_id
+		    )
+		);
 
 		foreach ( $emails_to_send as $email_to_send ) 
 		{
@@ -332,7 +360,7 @@ class PH_Emails {
 
 		$auto_property_match_enabled = get_option( 'propertyhive_auto_property_match', '' );
 
-		if ( $dry_run === true ) { echo 'Auto-match setting enabled: ' . $auto_property_match_enabled . "<br>\n"; }
+		if ( $dry_run === true ) { echo esc_html('Auto-match setting enabled: ' . $auto_property_match_enabled) . "<br>\n"; }
 
 		if ( $auto_property_match_enabled == '' )
 		{
@@ -341,7 +369,7 @@ class PH_Emails {
 		
 		$auto_property_match_enabled_date = get_option( 'propertyhive_auto_property_match_enabled_date', '' );
 
-		if ( $dry_run === true ) { echo 'Auto-match setting enabled date: ' . $auto_property_match_enabled_date . "<br>\n"; }
+		if ( $dry_run === true ) { echo esc_html('Auto-match setting enabled date: ' . $auto_property_match_enabled_date) . "<br>\n"; }
 
 		if ( $auto_property_match_enabled_date == '' )
 		{
@@ -430,11 +458,11 @@ class PH_Emails {
 			'fields' => 'ids'
 		);
 
-		if ( $dry_run === true ) { echo 'Running query to get contacts with args: ' . print_r($args, true) . "<br>\n"; }
+		if ( $dry_run === true ) { echo esc_html('Running query to get contacts with args: ' . print_r($args, true)) . "<br>\n"; }
 
 		$contact_query = new WP_Query( $args );
 
-		if ( $dry_run === true ) { echo 'Found ' . $contact_query->found_posts . ' contacts' . "<br>\n"; }
+		if ( $dry_run === true ) { echo esc_html('Found ' . $contact_query->found_posts . ' contacts') . "<br>\n"; }
 
 		if ( $contact_query->have_posts() )
 		{
@@ -469,12 +497,12 @@ class PH_Emails {
 
 				$contact_id = get_the_ID();
 
-				if ( $dry_run === true ) { echo 'Doing contact: ' . get_the_title() . "<br>\n"; }
+				if ( $dry_run === true ) { echo esc_html('Doing contact: ' . get_the_title()) . "<br>\n"; }
 
 				// invalid email address
 				if ( strpos( get_post_meta( $contact_id, '_email_address', TRUE ), '@' ) === FALSE )
 				{
-					if ( $dry_run === true ) { echo 'Invalid email address. Skipping' . "<br>\n"; }
+					if ( $dry_run === true ) { echo esc_html('Invalid email address. Skipping') . "<br>\n"; }
 
 					continue;
 				}
@@ -483,7 +511,7 @@ class PH_Emails {
 				$forbidden_contact_methods = get_post_meta( $contact_id, '_forbidden_contact_methods', TRUE );
 				if ( is_array($forbidden_contact_methods) && in_array('email', $forbidden_contact_methods) )
 				{
-					if ( $dry_run === true ) { echo 'Email communication forbidden in contact preferences. Skipping' . "<br>\n"; }
+					if ( $dry_run === true ) { echo esc_html('Email communication forbidden in contact preferences. Skipping') . "<br>\n"; }
 
 					continue;
 				}
@@ -506,19 +534,19 @@ class PH_Emails {
 
 						if ( $applicant_profile == '' || !is_array($applicant_profile) || !isset($applicant_profile['department']) )
 						{
-							if ( $dry_run === true ) { echo 'Applicant relationship empty or no department set' . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Applicant relationship empty or no department set') . "<br>\n"; }
 							continue;
 						}
 
 						if ( !isset($applicant_profile['send_matching_properties']) || ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] != 'yes' ) )
 						{
-							if ( $dry_run === true ) { echo 'Send matching properties disabled' . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Send matching properties disabled') . "<br>\n"; }
 							continue;
 						}
 
 						if ( isset($applicant_profile['auto_match_disabled']) && $applicant_profile['auto_match_disabled'] == 'yes' )
 						{
-							if ( $dry_run === true ) { echo 'Auto match disabled' . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Auto match disabled') . "<br>\n"; }
 							continue;
 						}
 
@@ -526,7 +554,7 @@ class PH_Emails {
 
 						$matching_properties = $ph_admin_matching_properties->get_matching_properties( $contact_id, $i, $auto_property_match_enabled_date );
 
-						if ( $dry_run === true ) { echo 'Found ' . count($matching_properties) . ' matching properties' . "<br>\n"; }
+						if ( $dry_run === true ) { echo esc_html('Found ' . count($matching_properties) . ' matching properties') . "<br>\n"; }
 
 						if ( !empty($matching_properties) )
 						{
@@ -535,7 +563,7 @@ class PH_Emails {
 							// Remove from this array if on market changed or price changed
 							if ( is_array($already_sent_properties) )
 							{
-								if ( $dry_run === true ) { echo 'Already sent properties before: ' . print_r($already_sent_properties, true) . "<br>\n"; }
+								if ( $dry_run === true ) { echo esc_html('Already sent properties before: ' . print_r($already_sent_properties, true)) . "<br>\n"; }
 
 								foreach ( $already_sent_properties as $already_sent_property_id => $sends )
 								{
@@ -543,26 +571,26 @@ class PH_Emails {
 
 									if ( $highest_send != '' )
 									{
-										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last sent: ' . $highest_send . "<br>\n"; }
+										if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' last sent: ' . $highest_send) . "<br>\n"; }
 
 										$on_market_change_date = get_post_meta( $already_sent_property_id, '_on_market_change_date', TRUE );
 
-										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last on market change: ' . $on_market_change_date . "<br>\n"; }
+										if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' last on market change: ' . $on_market_change_date) . "<br>\n"; }
 
 										$price_change_date = get_post_meta( $already_sent_property_id, '_price_change_date', TRUE );
 
-										if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' last price change: ' . $price_change_date . "<br>\n"; }
+										if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' last price change: ' . $price_change_date) . "<br>\n"; }
 
 										if ( $on_market_change_date > $highest_send )
 										{
-											if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' has changed on market since last sent' . "<br>\n"; }
+											if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' has changed on market since last sent') . "<br>\n"; }
 
 											// This property has changed since it was last sent. Remove from already sent list so it gets sent again
 											unset($already_sent_properties[$already_sent_property_id]);
 										}
 										elseif ( $price_change_date > $highest_send )
 										{
-											if ( $dry_run === true ) { echo 'Property: ' . $already_sent_property_id . ' has changed price since last sent' . "<br>\n"; }
+											if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' has changed price since last sent') . "<br>\n"; }
 
 											// This property has changed since it was last sent. Remove from already sent list so it gets sent again
 											unset($already_sent_properties[$already_sent_property_id]);
@@ -570,10 +598,10 @@ class PH_Emails {
 									}
 								}
 
-								if ( $dry_run === true ) { echo 'Already sent properties after: ' . print_r($already_sent_properties, true) . "<br>\n"; }
+								if ( $dry_run === true ) { echo esc_html('Already sent properties after: ' . print_r($already_sent_properties, true)) . "<br>\n"; }
 							}
 
-							if ( $dry_run === true ) { echo 'Matching properties before removing already sent: ' . print_r($matching_properties, true) . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Matching properties before removing already sent: ' . print_r($matching_properties, true)) . "<br>\n"; }
 
 							// Check properties haven't already been sent and not marked as 'not interested'
 							$new_matching_properties = array();
@@ -585,7 +613,7 @@ class PH_Emails {
 								}
 							}
 
-							if ( $dry_run === true ) { echo 'Matching properties after removing already sent: ' . print_r($new_matching_properties, true) . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Matching properties after removing already sent: ' . print_r($new_matching_properties, true)) . "<br>\n"; }
 
 							$max_results = apply_filters( 'propertyhive_auto_match_maximum_results', FALSE);
 							if ( $max_results !== FALSE )
@@ -593,7 +621,7 @@ class PH_Emails {
 								$new_matching_properties = array_slice($new_matching_properties, 0, (int)$max_results);
 							}
 
-							if ( $dry_run === true ) { echo 'Found ' . count($new_matching_properties) . ' matching properties after removing already sent and dismissed' . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Found ' . count($new_matching_properties) . ' matching properties after removing already sent and dismissed') . "<br>\n"; }
 
 							if ( !empty($new_matching_properties) )
 							{
@@ -685,7 +713,7 @@ class PH_Emails {
 								}
 								else
 								{
-									echo 'Would\'ve sent email. Not sending due to being ran in dry run mode' . "<br>\n";
+									echo esc_html('Would\'ve sent email. Not sending due to being ran in dry run mode') . "<br>\n";
 								}
 							}
 						}
@@ -693,12 +721,12 @@ class PH_Emails {
 				}
 				else
 				{
-					if ( $dry_run === true ) { echo 'No applicant profiles found. Skipping' . "<br>\n"; }
+					if ( $dry_run === true ) { echo esc_html('No applicant profiles found. Skipping') . "<br>\n"; }
 				}
 			}
 		}
 
-		if ( $dry_run === true ) { echo 'Finished auto-match process' . "<br>\n"; die(); }
+		if ( $dry_run === true ) { echo esc_html('Finished auto-match process') . "<br>\n"; die(); }
 
 		wp_reset_postdata();
 	}

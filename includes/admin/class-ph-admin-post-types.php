@@ -457,7 +457,7 @@ class PH_Admin_Post_Types {
         $output .= $this->property_office_filter();
         $output .= $this->negotiator_filter();
 
-        echo apply_filters( 'propertyhive_property_filters', $output );
+        echo apply_filters( 'propertyhive_property_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
     
     /**
@@ -796,7 +796,7 @@ class PH_Admin_Post_Types {
 
         $output .= $this->date_range_filter('Date Created');
 
-        echo apply_filters( 'propertyhive_contact_filters', $output );
+        echo apply_filters( 'propertyhive_contact_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
     
     /**
@@ -814,7 +814,7 @@ class PH_Admin_Post_Types {
         $output .= $this->enquiry_office_filter();
         $output .= $this->enquiry_negotiator_filter();
 
-        echo apply_filters( 'propertyhive_enquiry_filters', $output );
+        echo apply_filters( 'propertyhive_enquiry_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
     
     /**
@@ -949,7 +949,7 @@ class PH_Admin_Post_Types {
         $output .= $this->negotiator_filter();
         $output .= $this->date_range_filter();
 
-        echo apply_filters( 'propertyhive_appraisal_filters', $output );
+        echo apply_filters( 'propertyhive_appraisal_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -1008,7 +1008,7 @@ class PH_Admin_Post_Types {
         $output .= $this->negotiator_filter();
         $output .= $this->date_range_filter();
 
-        echo apply_filters( 'propertyhive_viewing_filters', $output );
+        echo apply_filters( 'propertyhive_viewing_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -1073,7 +1073,7 @@ class PH_Admin_Post_Types {
         $output .= $this->property_office_filter();
         $output .= $this->date_range_filter();
 
-        echo apply_filters( 'propertyhive_offer_filters', $output );
+        echo apply_filters( 'propertyhive_offer_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -1115,7 +1115,7 @@ class PH_Admin_Post_Types {
         $output .= $this->property_office_filter();
         $output .= $this->date_range_filter();
 
-        echo apply_filters( 'propertyhive_sale_filters', $output );
+        echo apply_filters( 'propertyhive_sale_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -1156,7 +1156,7 @@ class PH_Admin_Post_Types {
         $output .= $this->tenancy_status_filter();
         $output .= $this->tenancy_management_type_filter();
 
-        echo apply_filters( 'propertyhive_tenancy_filters', $output );
+        echo apply_filters( 'propertyhive_tenancy_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -1228,7 +1228,7 @@ class PH_Admin_Post_Types {
 		$output .= $this->key_date_status_filter();
         $output .= $this->date_range_filter();
 
-		echo apply_filters( 'propertyhive_tenancy_filters', $output );
+		echo apply_filters( 'propertyhive_tenancy_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	public function key_date_type_filter() {

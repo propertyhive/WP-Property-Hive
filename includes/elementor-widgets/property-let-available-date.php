@@ -160,12 +160,12 @@ class Elementor_Property_Let_Available_Date_Widget extends \Elementor\Widget_Bas
         }
         if ( isset($settings['before']) && !empty($settings['before']) )
         {
-        	echo $settings['before'] . ' ';
+        	echo wp_kses_post($settings['before']) . ' ';
         }
-        echo $property->get_available_date();
+        echo esc_html($property->get_available_date());
         if ( isset($settings['after']) && !empty($settings['after']) )
         {
-        	echo ' ' . $settings['after'];
+        	echo ' ' . wp_kses_post($settings['after']);
         }
         echo '</div>';
 

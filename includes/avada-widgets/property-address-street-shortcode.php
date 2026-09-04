@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_address_street', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -51,8 +53,9 @@ add_shortcode( 'avada_property_address_street', function( $atts ) {
 
     ob_start();
 
-    echo '<div ' . FusionBuilder::attributes( 'property-address-street-shortcode' ) . '>
-    	<div style="' . $style . '">';
+    echo '<div ' . FusionBuilder::attributes( 'property-address-street-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    echo '
+    	<div style="' . esc_attr($style) . '">';
 
         echo esc_html($property->address_street);
 

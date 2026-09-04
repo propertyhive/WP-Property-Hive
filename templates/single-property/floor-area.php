@@ -13,6 +13,6 @@ global $property;
 ?>
 <div class="floor-area">
 
-	<?php echo $property->get_formatted_floor_area(); ?>
+	<?php echo esc_html($property->get_formatted_floor_area()); ?>
 
 </div>

@@ -107,7 +107,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 					$message .= '<a href="' . esc_url(get_edit_post_link( $next_viewing_id, '' )) . '">'. esc_html(__( 'Go to next', 'propertyhive' )) . ' >></a>';
 				}
 
-				echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
+				echo "<div class=\"notice notice-info\"><p>" . wp_kses_post($message) . "</p></div>";
 			}
 		}
 	}
@@ -213,7 +213,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
                     {
                         $applicants[] = esc_html(get_the_title($applicant_contact_id));
                     }
-                    echo implode("<br>", $applicants);
+                    echo wp_kses_post(implode("<br>", $applicants));
                 }
                 else
                 {
@@ -258,7 +258,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 				$related_viewings = get_post_meta( $post->ID, '_related_viewings', TRUE );
 				if ( isset($related_viewings['previous']) && count($related_viewings['previous']) > 0 )
 				{
-					echo '<br>' . ph_ordinal_suffix(count($related_viewings['previous'])+1) . ' Viewing' ;
+					echo '<br>' . esc_html(ph_ordinal_suffix(count($related_viewings['previous'])+1)) . ' Viewing' ;
 				}
                 
                 break;
@@ -279,7 +279,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	            			$negotiators[] = $user_info->display_name;
             			}
             		}
-            		echo implode(", ", $negotiators);
+            		echo esc_html(implode(", ", $negotiators));
             	}
             	else
             	{
@@ -362,32 +362,6 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
         unset( $actions['edit'] );
         return $actions;
     }
-
-	/**
-	 * Show a status filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'viewing' != $typenow ) {
-			return;
-		}
-
-		echo apply_filters( 'propertyhive_viewing_filters', $output );
-	}
-
-	/**
-	 * Filter the viewings in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function viewing_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'viewing' == $typenow ) {
-
-		}
-	}
 
 	public static function check_viewing_feedback_add( $object_id, $meta_key, $meta_value )
 	{

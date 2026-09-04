@@ -43,61 +43,67 @@ class PH_Admin {
     {
         if ( isset($_GET['bulk_archived_posts']) && !empty($_GET['bulk_archived_posts'])) 
         {
-            $post_type = isset($_GET['post_type']) ? $_GET['post_type'] : '';
+            $post_type = isset($_GET['post_type']) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
             if ( $post_type ) 
             {
                 $post_type_object = get_post_type_object($post_type);
 
                 $count = intval($_GET['bulk_archived_posts']);
 
-                $message = sprintf(
-                    /* translators: 1: number of items, 2: post type label */
-                    _n(
-                        '%1$s %2$s moved to archive.',
-                        '%1$s %2$s moved to archive.',
-                        $count,
-                        'propertyhive'
-                    ),
-                    number_format_i18n( $count ),
-                    $count === 1
-                        ? $post_type_object->labels->singular_name
-                        : $post_type_object->labels->name
-                );
+                if ( $post_type_object )
+                {
+                    $message = sprintf(
+                        /* translators: 1: number of items, 2: post type label */
+                        _n(
+                            '%1$s %2$s moved to archive.',
+                            '%1$s %2$s moved to archive.',
+                            $count,
+                            'propertyhive'
+                        ),
+                        number_format_i18n( $count ),
+                        $count === 1
+                            ? $post_type_object->labels->singular_name
+                            : $post_type_object->labels->name
+                    );
 
-                printf(
-                    '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
-                    $message
-                );
+                    printf(
+                        '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
+                         esc_html( $message )
+                    );
+                }
             }
         }
 
         if ( isset($_GET['bulk_unarchived_posts']) && !empty($_GET['bulk_unarchived_posts']) ) 
         {
-            $post_type = isset($_GET['post_type']) ? $_GET['post_type'] : '';
+            $post_type = isset($_GET['post_type']) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
             if ( $post_type ) 
             {
                 $post_type_object = get_post_type_object($post_type);
 
                 $count = intval($_GET['bulk_unarchived_posts']);
 
-                $message = sprintf(
-                    /* translators: 1: number of items, 2: post type label */
-                    _n(
-                        '%1$s %2$s removed from archive.',
-                        '%1$s %2$s removed from archive.',
-                        $count,
-                        'propertyhive'
-                    ),
-                    number_format_i18n( $count ),
-                    $count === 1
-                        ? $post_type_object->labels->singular_name
-                        : $post_type_object->labels->name
-                );
+                if ( $post_type_object )
+                {
+                    $message = sprintf(
+                        /* translators: 1: number of items, 2: post type label */
+                        _n(
+                            '%1$s %2$s removed from archive.',
+                            '%1$s %2$s removed from archive.',
+                            $count,
+                            'propertyhive'
+                        ),
+                        number_format_i18n( $count ),
+                        $count === 1
+                            ? $post_type_object->labels->singular_name
+                            : $post_type_object->labels->name
+                    );
 
-                printf(
-                    '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
-                    $message
-                );
+                    printf(
+                        '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
+                         esc_html( $message )
+                    );
+                }
             }
         }
     }
@@ -358,7 +364,7 @@ class PH_Admin {
             header("Content-Disposition: attachment;filename={$filename}");
             header("Content-Transfer-Encoding: binary");
 
-            echo $output;
+            echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
             die();
         }
@@ -665,7 +671,7 @@ class PH_Admin {
                 {
                     echo "<div class=\"notice notice-info\" id=\"ph_notice_leave_review\">
                         <p>
-                            " . __( '<strong>Finding Property Hive useful?</strong> Please take a minute to <a href="https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post" target="_blank">leave us a ★★★★★ review</a>', 'propertyhive' ) . "
+                            " . wp_kses_post(__( '<strong>Finding Property Hive useful?</strong> Please take a minute to <a href="https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post" target="_blank">leave us a ★★★★★ review</a>', 'propertyhive' )) . "
                         </p>
                         <p>
                             <a href=\"https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post\" target=\"_blank\" class=\"button-primary\">Leave a Review</a>
@@ -683,7 +689,7 @@ class PH_Admin {
             {
                 echo "<div class=\"notice notice-error\" id=\"ph_notice_epl\">
                         <p>
-                            " . __( '<strong>It looks like you\'re also running Easy Property Listings.</strong> This will cause conflicts with Property Hive and should be deactivated.', 'propertyhive' ) . "
+                            " . wp_kses_post(__( '<strong>It looks like you\'re also running Easy Property Listings.</strong> This will cause conflicts with Property Hive and should be deactivated.', 'propertyhive' )) . "
                         </p>
                         <p>
                             <a href=\"". esc_url(admin_url('plugins.php?s=easy%20property%20listings&plugin_status=all')) . "\" class=\"button-primary\">Deactivate Easy Property Listings</a>
@@ -708,7 +714,7 @@ class PH_Admin {
             {
                 echo "<div class=\"notice notice-info\" id=\"ph_notice_demo_data\">
                         <p>
-                            " . __( '<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?', 'propertyhive' ) . "
+                            " . wp_kses_post(__( '<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?', 'propertyhive' )) . "
                         </p>
                         <p>
                             <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data')) . "\" class=\"button-primary\">Import Demo Data</a>
@@ -732,7 +738,7 @@ class PH_Admin {
             {
                 echo "<div class=\"notice notice-info\" id=\"ph_notice_missing_search_results\">
                         <p>
-                            " . __( 'We noticed that you haven\'t assigned a page to be your \'Search Results\' page yet. We recommend that you do this in order to display properties on your site.', 'propertyhive' ) . "
+                            " . wp_kses_post(__( 'We noticed that you haven\'t assigned a page to be your \'Search Results\' page yet. We recommend that you do this in order to display properties on your site.', 'propertyhive' )) . "
                         </p>
                         <p>
                             <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=general')) . "\" class=\"button-primary\">" . esc_html(__( 'Go To Property Hive Settings', 'propertyhive' )) . "</a>
@@ -759,11 +765,11 @@ class PH_Admin {
             {
                 echo "<div class=\"notice notice-info\" id=\"ph_notice_missing_google_maps_api_key\">
                         <p>
-                            " . sprintf( 
+                            " . wp_kses_post(sprintf( 
                                     /* translators: %s: URL to plugin settings page where the Google Maps API key can be entered */
                                     __( 'We noticed that you haven\'t entered a Google Maps API key. If wishing to display a map on your website it\'s recommended that you <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">create one</a> and <a href="%s">enter it</a>.', 'propertyhive' ), 
-                                    admin_url('admin.php?page=ph-settings&tab=general&section=map') 
-                                ) . "
+                                    esc_url(admin_url('admin.php?page=ph-settings&tab=general&section=map'))
+                                )) . "
                         </p>
                         <p>
                             <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=general&section=map')) . "\" class=\"button-primary\">" . esc_html(__( 'Enter Google Maps API Key', 'propertyhive' )) . "</a>
@@ -873,7 +879,8 @@ class PH_Admin {
         // Check role, but also AJAX as request to admin-ajax.php will still need to be made
         if ( !defined( 'DOING_AJAX' ) && $user_role === 'property_hive_contact' )
         {
-            exit( wp_redirect( home_url( '/' ) ) );
+            wp_safe_redirect( home_url( '/' ) );
+            exit;
         }
     }
 
@@ -890,12 +897,25 @@ class PH_Admin {
         {
             if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'view-email' ) ) 
             {
-                die( 'Security check' );
+                wp_die( 'Security check' );
+            }
+
+            if ( ! current_user_can( 'manage_propertyhive' ) ) 
+            {
+                wp_die( esc_html__( 'Insufficient permissions.', 'propertyhive' ) );
             }
 
             if ( isset( $_GET['email_id'] ) )
             {
-                $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . esc_sql( (int)$_GET['email_id'] ) . "'" );
+                $email_id = absint( $_GET['email_id'] );
+
+                $email_log = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}ph_email_log WHERE email_id = %d",
+                        $email_id
+                    )
+                );
+
                 if ( null !== $email_log ) 
                 {
                     $body = $email_log->body;
@@ -905,8 +925,14 @@ class PH_Admin {
                         $body = gzuncompress($body);
                     }
 
-                    echo apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $body ) ) );
-                    
+                    $email_content = apply_filters(
+                        'propertyhive_mail_content',
+                        PH()->email->style_inline(
+                            PH()->email->wrap_message( $body )
+                        )
+                    );
+
+                    echo $email_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 }
                 else
                 {
@@ -1028,7 +1054,7 @@ class PH_Admin {
             $message = apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $body ) ) );
 
             // print the preview email
-            echo $message;
+            echo $message; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             exit;
         }
     }

@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_price', function( $atts ) {
     $atts = shortcode_atts( array(
         'show_price_qualifier' => 'on',
@@ -56,8 +58,10 @@ add_shortcode( 'avada_property_price', function( $atts ) {
 <?php
 	}
 
-    echo '<div ' . FusionBuilder::attributes( 'property-price-shortcode' ) . '>
-    	<div style="' . $style . '">';
+    echo '<div ' . FusionBuilder::attributes( 'property-price-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+    echo '
+    	<div style="' . esc_attr($style) . '">';
             propertyhive_template_single_price();
     echo '
     	</div>

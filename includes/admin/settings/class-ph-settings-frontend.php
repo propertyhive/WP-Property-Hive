@@ -44,7 +44,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         {
             if ( ! current_user_can( 'manage_options' ) ) 
             {
-                wp_die( __( 'Sorry, you are not allowed to do this.', 'propertyhive' ) );
+                wp_die( esc_html(__( 'Sorry, you are not allowed to do this.', 'propertyhive' )) );
             }
 
             check_admin_referer( 'ph_reset_search_form_' . $_GET['id'] );
@@ -77,7 +77,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         {
             if ( ! current_user_can( 'manage_options' ) ) 
             {
-                wp_die( __( 'Sorry, you are not allowed to do this.', 'propertyhive' ) );
+                wp_die( esc_html(__( 'Sorry, you are not allowed to do this.', 'propertyhive' )) );
             }
 
             check_admin_referer( 'ph_delete_search_form_' . $_GET['id'] );
@@ -608,145 +608,314 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     private function output_search_form_field( $id, $field )
     {
         echo '
-        <div class="group" id="' . $id . '">
-            <h3>' . trim( $id, '_' ) . '</h3>
+        <div class="group" id="' . esc_attr( $id ) . '">
+            <h3>' . esc_html( trim( $id, '_' ) ) . '</h3>
             <div>';
-        if ( $id == 'department' )
+
+        if ( 'department' === $id )
         {
-            echo '<p><label for="type_'.$id.'">Type:</label> <select name="type[' . $id . ']" id="type_'.$id.'">
-                <option value="radio"' . ( ( !isset($field['type']) || ( isset($field['type']) && $field['type'] == 'radio' ) ) ? ' selected' : '' ) . '>Radio Buttons</option>
-                <option value="select"' . ( ( isset($field['type']) && $field['type'] == 'select' ) ? ' selected' : '' ) . '>Dropdown</option>
-                ' . ( ( isset($field['type']) && $field['type'] != 'select' && $field['type'] != 'radio' ) ? '<option value="' . $field['type'] . '" selected>' . $field['type'] . '</option>' : '' ) . '
-            </select></p>';
+            echo '<p><label for="type_' . esc_attr( $id ) . '">Type:</label> 
+                <select name="type[' . esc_attr( $id ) . ']" id="type_' . esc_attr( $id ) . '">
+                    <option value="radio"' . ( ( ! isset( $field['type'] ) || 'radio' === $field['type'] ) ? ' selected' : '' ) . '>Radio Buttons</option>
+                    <option value="select"' . ( ( isset( $field['type'] ) && 'select' === $field['type'] ) ? ' selected' : '' ) . '>Dropdown</option>
+                    ';
+
+            if (
+                isset( $field['type'] ) &&
+                'select' !== $field['type'] &&
+                'radio' !== $field['type']
+            ) {
+                echo '<option value="' . esc_attr( $field['type'] ) . '" selected>' .
+                    esc_html( $field['type'] ) .
+                '</option>';
+            }
+
+            echo '
+                </select>
+            </p>';
         }
         else
         {
-            echo '<input type="hidden" name="type[' . $id . ']" id="type_'.$id.'" value="' . ( ( isset($field['type']) ) ? $field['type'] : '' ) . '">';
+            echo '<input type="hidden" 
+                name="type[' . esc_attr( $id ) . ']" 
+                id="type_' . esc_attr( $id ) . '" 
+                value="' . ( isset( $field['type'] ) ? esc_attr( $field['type'] ) : '' ) . '">';
         }
 
-        echo  ' <p><label for="show_label_'.$id.'">Show Label:</label> <input type="checkbox" name="show_label[' . $id . ']" id="show_label_'.$id.'" value="1"' . ( ( isset($field['show_label']) && $field['show_label'] === true ) ? ' checked' : '' ) . '></p>
-                
-                <p><label for="label_'.$id.'">Label:</label> <input type="text" name="label[' . $id . ']" id="label_'.$id.'" value="' . ( ( isset($field['label']) ) ? $field['label'] : '' ) . '"></p>
-                
-                <p><label for="before_'.$id.'">Before:</label> <input type="text" name="before[' . $id . ']" id="before_'.$id.'" value="' . ( ( isset($field['before']) ) ? htmlentities($field['before']) : '' ) . '"></p>
-                
-                <p><label for="after_'.$id.'">After:</label> <input type="text" name="after[' . $id . ']" id="after_'.$id.'" value="' . ( ( isset($field['after']) ) ? htmlentities($field['after']) : '' ) . '"></p>';
+        echo '
+            <p>
+                <label for="show_label_' . esc_attr( $id ) . '">Show Label:</label>
+                <input type="checkbox" 
+                    name="show_label[' . esc_attr( $id ) . ']" 
+                    id="show_label_' . esc_attr( $id ) . '" 
+                    value="1"' .
+                    ( ( isset( $field['show_label'] ) && true === $field['show_label'] ) ? ' checked' : '' ) .
+                '>
+            </p>
 
-        if ( isset($field['type']) && in_array($field['type'], array('text', 'email', 'date', 'number', 'password')) )
+            <p>
+                <label for="label_' . esc_attr( $id ) . '">Label:</label>
+                <input type="text" 
+                    name="label[' . esc_attr( $id ) . ']" 
+                    id="label_' . esc_attr( $id ) . '" 
+                    value="' . ( isset( $field['label'] ) ? esc_attr( $field['label'] ) : '' ) . '">
+            </p>
+
+            <p>
+                <label for="before_' . esc_attr( $id ) . '">Before:</label>
+                <input type="text" 
+                    name="before[' . esc_attr( $id ) . ']" 
+                    id="before_' . esc_attr( $id ) . '" 
+                    value="' . ( isset( $field['before'] ) ? esc_attr( $field['before'] ) : '' ) . '">
+            </p>
+
+            <p>
+                <label for="after_' . esc_attr( $id ) . '">After:</label>
+                <input type="text" 
+                    name="after[' . esc_attr( $id ) . ']" 
+                    id="after_' . esc_attr( $id ) . '" 
+                    value="' . ( isset( $field['after'] ) ? esc_attr( $field['after'] ) : '' ) . '">
+            </p>';
+
+        if (
+            isset( $field['type'] ) &&
+            in_array( $field['type'], array( 'text', 'email', 'date', 'number', 'password' ), true )
+        )
         {
             echo '
-            <p><label for="placeholder_'.$id.'">Placeholder:</label> <input type="text" name="placeholder[' . $id . ']" id="placeholder_'.$id.'" value="' . ( ( isset($field['placeholder']) ) ? htmlentities($field['placeholder']) : '' ) . '"></p>
-            ';
+            <p>
+                <label for="placeholder_' . esc_attr( $id ) . '">Placeholder:</label>
+                <input type="text" 
+                    name="placeholder[' . esc_attr( $id ) . ']" 
+                    id="placeholder_' . esc_attr( $id ) . '" 
+                    value="' . ( isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '' ) . '">
+            </p>';
         }
 
-        if ( isset($field['type']) && in_array($field['type'], array('slider')) )
+        if (
+            isset( $field['type'] ) &&
+            in_array( $field['type'], array( 'slider' ), true )
+        )
         {
             echo '
-            <p><label for="min_'.$id.'">Min:</label> <input type="number" name="min[' . $id . ']" id="min_'.$id.'" value="' . ( ( isset($field['min']) ) ? htmlentities($field['min']) : '0' ) . '"></p>
-            ';
+            <p>
+                <label for="min_' . esc_attr( $id ) . '">Min:</label>
+                <input type="number" 
+                    name="min[' . esc_attr( $id ) . ']" 
+                    id="min_' . esc_attr( $id ) . '" 
+                    value="' . ( isset( $field['min'] ) ? esc_attr( $field['min'] ) : '0' ) . '">
+            </p>';
 
             echo '
-            <p><label for="max_'.$id.'">Max:</label> <input type="number" name="max[' . $id . ']" id="max_'.$id.'" value="' . ( ( isset($field['max']) ) ? htmlentities($field['max']) : '' ) . '"></p>
-            ';
+            <p>
+                <label for="max_' . esc_attr( $id ) . '">Max:</label>
+                <input type="number" 
+                    name="max[' . esc_attr( $id ) . ']" 
+                    id="max_' . esc_attr( $id ) . '" 
+                    value="' . ( isset( $field['max'] ) ? esc_attr( $field['max'] ) : '' ) . '">
+            </p>';
 
             echo '
-            <p><label for="step_'.$id.'">Step:</label> <input type="number" name="step[' . $id . ']" id="step_'.$id.'" value="' . ( ( isset($field['step']) ) ? htmlentities($field['step']) : '1' ) . '"></p>
-            ';
+            <p>
+                <label for="step_' . esc_attr( $id ) . '">Step:</label>
+                <input type="number" 
+                    name="step[' . esc_attr( $id ) . ']" 
+                    id="step_' . esc_attr( $id ) . '" 
+                    value="' . ( isset( $field['step'] ) ? esc_attr( $field['step'] ) : '1' ) . '">
+            </p>';
         }
 
-        if ( isset($field['type']) && in_array($field['type'], array('office')) )
+        if (
+            isset( $field['type'] ) &&
+            in_array( $field['type'], array( 'office' ), true )
+        )
         {
             echo '
-            <p><label for="blank_option_'.$id.'">Blank Option:</label> <input type="text" name="blank_option[' . $id . ']" id="blank_option_'.$id.'" value="' . ( ( isset($field['blank_option']) ) ? htmlentities($field['blank_option']) : __( 'No Preference', 'propertyhive' ) ) . '"></p>
-            ';
+            <p>
+                <label for="blank_option_' . esc_attr( $id ) . '">Blank Option:</label>
+                <input type="text" 
+                    name="blank_option[' . esc_attr( $id ) . ']" 
+                    id="blank_option_' . esc_attr( $id ) . '" 
+                    value="' . (
+                        isset( $field['blank_option'] )
+                            ? esc_attr( $field['blank_option'] )
+                            : esc_attr__( 'No Preference', 'propertyhive' )
+                    ) . '">
+            </p>';
         }
 
-        if ( taxonomy_exists($id) || ( isset($field['custom_field']) && $field['custom_field'] === true && $field['type'] == 'select' ) )
+        if (
+            taxonomy_exists( $id ) ||
+            (
+                isset( $field['custom_field'] ) &&
+                true === $field['custom_field'] &&
+                isset( $field['type'] ) &&
+                'select' === $field['type']
+            )
+        )
         {
             echo '
-            <p><label for="blank_option_'.$id.'">Blank Option:</label> <input type="text" name="blank_option[' . $id . ']" id="blank_option_'.$id.'" value="' . ( ( isset($field['blank_option']) ) ? htmlentities($field['blank_option']) : __( 'No Preference', 'propertyhive' ) ) . '"></p>
-            ';
+            <p>
+                <label for="blank_option_' . esc_attr( $id ) . '">Blank Option:</label>
+                <input type="text" 
+                    name="blank_option[' . esc_attr( $id ) . ']" 
+                    id="blank_option_' . esc_attr( $id ) . '" 
+                    value="' . (
+                        isset( $field['blank_option'] )
+                            ? esc_attr( $field['blank_option'] )
+                            : esc_attr__( 'No Preference', 'propertyhive' )
+                    ) . '">
+            </p>';
 
-            if ( taxonomy_exists($id) && in_array( $id, apply_filters( 'propertyhive_template_assistant_multi_level_taxonomy_fields', array('property_type', 'commercial_property_type', 'location') ) ) )
+            if (
+                taxonomy_exists( $id ) &&
+                in_array(
+                    $id,
+                    apply_filters(
+                        'propertyhive_template_assistant_multi_level_taxonomy_fields',
+                        array( 'property_type', 'commercial_property_type', 'location' )
+                    ),
+                    true
+                )
+            )
             {
                 echo '
-                <p><label for="parent_terms_only_'.$id.'">Top-Level Terms Only:</label> <input type="checkbox" name="parent_terms_only[' . $id . ']" id="parent_terms_only_'.$id.'" value="yes"' . ( ( isset($field['parent_terms_only']) && $field['parent_terms_only'] === true ) ? ' checked' : '' ) . '></p>
-                ';
+                <p>
+                    <label for="parent_terms_only_' . esc_attr( $id ) . '">Top-Level Terms Only:</label>
+                    <input type="checkbox" 
+                        name="parent_terms_only[' . esc_attr( $id ) . ']" 
+                        id="parent_terms_only_' . esc_attr( $id ) . '" 
+                        value="yes"' .
+                        ( ( isset( $field['parent_terms_only'] ) && true === $field['parent_terms_only'] ) ? ' checked' : '' ) .
+                    '>
+                </p>';
 
                 echo '
-                <p><label for="hide_empty_'.$id.'">Hide Terms With No Properties Assigned:</label> <input type="checkbox" name="hide_empty[' . $id . ']" id="hide_empty_'.$id.'" value="yes"' . ( ( isset($field['hide_empty']) && $field['hide_empty'] === true ) ? ' checked' : '' ) . '></p>
-                ';
+                <p>
+                    <label for="hide_empty_' . esc_attr( $id ) . '">Hide Terms With No Properties Assigned:</label>
+                    <input type="checkbox" 
+                        name="hide_empty[' . esc_attr( $id ) . ']" 
+                        id="hide_empty_' . esc_attr( $id ) . '" 
+                        value="yes"' .
+                        ( ( isset( $field['hide_empty'] ) && true === $field['hide_empty'] ) ? ' checked' : '' ) .
+                    '>
+                </p>';
             }
 
-            if ( taxonomy_exists($id) && in_array( $id, apply_filters( 'propertyhive_template_assistant_dynamic_population_taxonomy_fields', array('location') ) ) )
+            if (
+                taxonomy_exists( $id ) &&
+                in_array(
+                    $id,
+                    apply_filters(
+                        'propertyhive_template_assistant_dynamic_population_taxonomy_fields',
+                        array( 'location' )
+                    ),
+                    true
+                )
+            )
             {
                 echo '
-                <p><label for="dynamic_population_'.$id.'">Dynamically Populate Cascading Dropdowns:</label> <input type="checkbox" name="dynamic_population[' . $id . ']" id="dynamic_population_'.$id.'" value="yes"' . ( ( isset($field['dynamic_population']) && $field['dynamic_population'] === true ) ? ' checked' : '' ) . '></p>
-                ';
+                <p>
+                    <label for="dynamic_population_' . esc_attr( $id ) . '">Dynamically Populate Cascading Dropdowns:</label>
+                    <input type="checkbox" 
+                        name="dynamic_population[' . esc_attr( $id ) . ']" 
+                        id="dynamic_population_' . esc_attr( $id ) . '" 
+                        value="yes"' .
+                        ( ( isset( $field['dynamic_population'] ) && true === $field['dynamic_population'] ) ? ' checked' : '' ) .
+                    '>
+                </p>';
             }
 
             echo '
-            <p><label for="multiselect_'.$id.'">Multi-Select:</label> <input type="checkbox" name="multiselect[' . $id . ']" id="multiselect_'.$id.'" value="yes"' . ( ( isset($field['multiselect']) && $field['multiselect'] === true ) ? ' checked' : '' ) . '></p>
-            ';
+            <p>
+                <label for="multiselect_' . esc_attr( $id ) . '">Multi-Select:</label>
+                <input type="checkbox" 
+                    name="multiselect[' . esc_attr( $id ) . ']" 
+                    id="multiselect_' . esc_attr( $id ) . '" 
+                    value="yes"' .
+                    ( ( isset( $field['multiselect'] ) && true === $field['multiselect'] ) ? ' checked' : '' ) .
+                '>
+            </p>';
         }
 
-        if ( $id == 'office' )
+        if ( 'office' === $id )
         {
             echo '
-            <p><label for="multiselect_'.$id.'">Multi-Select:</label> <input type="checkbox" name="multiselect[' . $id . ']" id="multiselect_'.$id.'" value="yes"' . ( ( isset($field['multiselect']) && $field['multiselect'] === true ) ? ' checked' : '' ) . '></p>
-            ';
+            <p>
+                <label for="multiselect_' . esc_attr( $id ) . '">Multi-Select:</label>
+                <input type="checkbox" 
+                    name="multiselect[' . esc_attr( $id ) . ']" 
+                    id="multiselect_' . esc_attr( $id ) . '" 
+                    value="yes"' .
+                    ( ( isset( $field['multiselect'] ) && true === $field['multiselect'] ) ? ' checked' : '' ) .
+                '>
+            </p>';
         }
 
-        if ( isset($field['options']) && !taxonomy_exists($id) && ( !isset($field['custom_field']) || ( isset($field['custom_field']) && $field['custom_field'] === false ) ) )
+        if (
+            isset( $field['options'] ) &&
+            ! taxonomy_exists( $id ) &&
+            (
+                ! isset( $field['custom_field'] ) ||
+                false === $field['custom_field']
+            )
+        )
         {
-            echo '<p><label for="">Options: ';
+            echo '<p><label>Options: ';
 
-            echo '<a href="" class="add-search-form-field-option" id="add_search_form_field_option_' . $id . '">Add Option</a>';
+            echo '<a href="" class="add-search-form-field-option" id="add_search_form_field_option_' .
+                esc_attr( $id ) .
+                '">Add Option</a>';
 
             echo '</label><br>';
 
-            echo '<span class="form-field-options" id="sortable_options_' . $id . '">';
-            $i = 0;
+            echo '<span class="form-field-options" id="sortable_options_' . esc_attr( $id ) . '">';
+
             foreach ( $field['options'] as $key => $value )
             {
                 echo '<span style="display:block"><i class="fa fa-reorder" style="cursor:pointer; opacity:0.3"></i> ';
-                echo '<input type="text" name="option_keys[' . $id . '][]" value="' . $key . '">';
-                echo '<input type="text" name="options_values[' . $id . '][]" value="' . $value . '">';
+
+                echo '<input type="text" 
+                    name="option_keys[' . esc_attr( $id ) . '][]" 
+                    value="' . esc_attr( $key ) . '">';
+
+                echo '<input type="text" 
+                    name="options_values[' . esc_attr( $id ) . '][]" 
+                    value="' . esc_attr( $value ) . '">';
+
                 echo '</span>';
-
-                ++$i;
             }
-            echo '</span>';
 
+            echo '</span>';
             echo '</p>';
-?>
-<script>
-            jQuery(document).ready(function($)
-            {
-                $( "#sortable_options_<?php echo $id; ?>" )
-                .sortable({
-                    axis: "y",
-                    handle: "i",
-                    stop: function( event, ui ) 
-                    {
-                        // IE doesn't register the blur when sorting
-                        // so trigger focusout handlers to remove .ui-state-focus
-                        //ui.item.children( "h3" ).triggerHandler( "focusout" );
-             
-                        // Refresh accordion to handle new order
-                        //$( this ).accordion( "refresh" );
-                    },
-                    update: function( event, ui ) 
-                    {
-                        // Update hidden fields
-                        var fields_order = $(this).sortable('toArray');
-                        
-                        //$('#active_fields_order').val( fields_order.join("|") );
-                    }
-                });
+    ?>
+    <script>
+    jQuery(document).ready(function($)
+    {
+        $( "#sortable_options_<?php echo esc_js( $id ); ?>" )
+            .sortable({
+                axis: "y",
+                handle: "i",
+                stop: function( event, ui )
+                {
+                    // IE doesn't register the blur when sorting
+                    // so trigger focusout handlers to remove .ui-state-focus
+                    // ui.item.children( "h3" ).triggerHandler( "focusout" );
+
+                    // Refresh accordion to handle new order
+                    // $( this ).accordion( "refresh" );
+                },
+                update: function( event, ui )
+                {
+                    // Update hidden fields
+                    var fields_order = $(this).sortable('toArray');
+
+                    // $('#active_fields_order').val( fields_order.join("|") );
+                }
             });
-        </script>
-<?php
+    });
+    </script>
+    <?php
         }
 
         echo '</div>
@@ -1232,7 +1401,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             {
                 $field_ids[] = $id;
             }
-            echo implode("|", $field_ids);
+            echo esc_attr(implode("|", $field_ids));
         ?>">
         <input type="hidden" name="inactive_fields_order" id="inactive_fields_order" value="<?php
             $field_ids = array();
@@ -1240,7 +1409,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             {
                 $field_ids[] = $id;
             }
-            echo implode("|", $field_ids);
+            echo esc_attr(implode("|", $field_ids));
         ?>">
 
         <script>

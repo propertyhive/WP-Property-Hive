@@ -22,14 +22,14 @@ global $post, $propertyhive, $property;
 
             foreach ($images as $image)
             {
-                echo '<li>' . apply_filters( 'propertyhive_single_property_image_html', sprintf( '<a href="%s" class="propertyhive-main-image" title="%s" data-fancybox="gallery-' . (int)$post->ID . '">%s</a>', esc_attr( $image['url'] ), esc_attr( $image['title'] ), $image['image'] ), $post->ID ) . '</li>';
+                echo '<li>' . wp_kses_post(apply_filters( 'propertyhive_single_property_image_html', sprintf( '<a href="%s" class="propertyhive-main-image" title="%s" data-fancybox="gallery-' . (int)$post->ID . '">%s</a>', esc_attr( $image['url'] ), esc_attr( $image['title'] ), $image['image'] ), $post->ID )) . '</li>';
             }
 
             echo '</ul></div>';
 
         } else {
 
-            echo apply_filters( 'propertyhive_single_property_image_html', sprintf( '<img src="%s" alt="Placeholder" />', ph_placeholder_img_src() ), $post->ID );
+            echo  wp_kses_post(apply_filters( 'propertyhive_single_property_image_html', sprintf( '<img src="%s" alt="Placeholder" />', ph_placeholder_img_src() ), $post->ID ));
 
         }
     ?>

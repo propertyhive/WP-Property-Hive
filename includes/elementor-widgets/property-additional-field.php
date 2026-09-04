@@ -198,7 +198,7 @@ class Elementor_Property_Additional_Field_Widget extends \Elementor\Widget_Base 
 
 		if ( !empty($field_value) )
 		{
-	        echo '<div class="elementor-widget-additional-field elementor-widget-additional-field-' . $settings['field'] . '">';
+	        echo '<div class="elementor-widget-additional-field elementor-widget-additional-field-' . esc_attr($settings['field']) . '">';
 	        if ( isset($settings['icon']) && !empty($settings['icon']) )
 	        {
 	        	\Elementor\Icons_Manager::render_icon( $settings['icon'], [ 'aria-hidden' => 'true' ] );
@@ -206,12 +206,12 @@ class Elementor_Property_Additional_Field_Widget extends \Elementor\Widget_Base 
 	        }
 	        if ( isset($settings['before']) && !empty($settings['before']) )
 	        {
-	        	echo $settings['before'] . ' ';
+	        	echo wp_kses_post($settings['before']) . ' ';
 	        }
-	        echo $field_value;
+	        echo wp_kses_post($field_value);
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
-	        	echo ' ' . $settings['after'];
+	        	echo ' ' . wp_kses_post($settings['after']);
 	        }
 	        echo '</div>';
 	    }

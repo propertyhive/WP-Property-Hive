@@ -28,14 +28,29 @@ if ( !empty($virtual_tours) )
 {
 	echo '<div class="embedded-virtual-tours">';
 
-		echo '<h4>' . __( 'Virtual Tours', 'propertyhive' ) . '</h4>';
+		echo '<h4>' . esc_html(__( 'Virtual Tours', 'propertyhive' )) . '</h4>';
 
 		foreach ( $virtual_tours as $virtual_tour )
 		{
 			if ( isset($settings['oembed']) && $settings['oembed'] == 'yes' )
 			{
-				$embed_code = wp_oembed_get($virtual_tour['url']);
-				echo $embed_code;
+				$embed_code = wp_oembed_get( $virtual_tour['url'] );
+
+				$allowed_html = wp_kses_allowed_html( 'post' );
+
+				$allowed_html['iframe'] = array(
+				    'src'             => true,
+				    'width'           => true,
+				    'height'          => true,
+				    'frameborder'     => true,
+				    'allow'           => true,
+				    'allowfullscreen' => true,
+				    'loading'         => true,
+				    'title'           => true,
+				    'class'           => true,
+				);
+
+				echo wp_kses( $embed_code, $allowed_html );
 			}
 			else
 			{

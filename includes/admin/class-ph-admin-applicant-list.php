@@ -276,7 +276,7 @@ class PH_Admin_Applicant_List {
                             {
                                 $contact_details[] = 'E: ' . esc_html($result['email_address']);
                             }
-                            echo !empty($contact_details) ? implode("<br>", $contact_details) : '-';
+                            echo !empty($contact_details) ? wp_kses_post(implode("<br>", $contact_details)) : '-';
                         ?></td>
                         <td><?php
                             if ( isset($result['profile']['department']) )
@@ -358,7 +358,7 @@ class PH_Admin_Applicant_List {
                                         {
                                             $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
-                                        echo( !empty($output) ? implode("<br>", $output) : '-' );
+                                        echo( !empty($output) ? wp_kses_post(implode("<br>", $output)) : '-' );
                                         break;
                                     }
                                     case "residential-lettings":
@@ -400,7 +400,7 @@ class PH_Admin_Applicant_List {
                                         {
                                             $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
-                                        echo( !empty($output) ? implode("<br>", $output) : '-' );
+                                        echo( !empty($output) ? wp_kses_post(implode("<br>", $output)) : '-' );
                                         break;
                                     }
                                     case "commercial":
@@ -419,7 +419,7 @@ class PH_Admin_Applicant_List {
                                         {
                                             $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
-                                        echo( !empty($output) ? implode("<br>", $output) : '-' );
+                                        echo( !empty($output) ? wp_kses_post(implode("<br>", $output)) : '-' );
                                         break;
                                     }
                                 }
@@ -1089,7 +1089,7 @@ jQuery(window).resize(function() {
 
         $results = $this->generate_results();
         
-        echo $this->array_2_csv($results);        
+        echo $this->array_2_csv($results); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSV download response; must not be HTML-escaped.
 
         die();
     }

@@ -167,7 +167,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                     $links[] = 'This feature has moved. <a href="https://wp-property-hive.com/template-assistant-is-now-part-of-property-hive-core-plugin?src=plugin-feature-settings" target="_blank" style="text-decoration:none">' . esc_html(__( 'Read More', 'propertyhive' )) . '</a>';
                     
                     echo '<div style="float:right; padding-top:6px;">';
-                    echo implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links);
+                    echo wp_kses_post(implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links));
                     echo '</div>';
 
                     echo '<label class="switch">
@@ -248,7 +248,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                 }
 
                 echo '<div style="float:right; padding-top:6px;">';
-                echo implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links);
+                echo wp_kses_post(implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links));
                 echo '</div>';
 
                 echo '<label class="switch">

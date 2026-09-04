@@ -52,7 +52,7 @@ class Elementor_Property_Negotiator_Photo_Widget extends \Elementor\Widget_Base 
 
 		if ( $property->negotiator_photo != '' )
 		{
-	        echo $property->negotiator_photo;
+	        echo wp_kses_post($property->negotiator_photo);
 	    }
 
 	}

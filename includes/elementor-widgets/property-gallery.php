@@ -225,7 +225,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             .gallery-column > a { 
                 display:block;
                 height:100%; 
-                padding-top:<?php echo $padding_top; ?>; 
+                padding-top:<?php echo esc_html($padding_top); ?>; 
                 background:center center no-repeat; 
                 background-size:cover; 
             }
@@ -315,14 +315,14 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                     $id_text = $image_number == ($max_images - 1) ? 'id="more-images-link"' : '';
                     $id_text_mobile = $image_number == 1 ? 'id="more-images-link-mobile"' : '';
 
-                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
+                    echo '<a ' . esc_attr($id_text) . ' ' . esc_attr($id_text_mobile) . ' href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
 
                     if ( $image_number == 1 )
                     {
                         echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
-                        printf( 
+                        echo sprintf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
-                            __( 'See all %d images', 'propertyhive' ), 
+                            esc_html(__( 'See all %d images', 'propertyhive' )), 
                             count($images) + count($images_hidden) 
                         );
                         echo '</a></div></div>';
@@ -330,9 +330,9 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                     if ( $image_number == ($max_images - 1) )
                     {
                         echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
-                        printf( 
+                        echo sprintf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
-                            __( 'See all %d images', 'propertyhive' ), 
+                            wp_kses_post(__( 'See all %d images', 'propertyhive' )), 
                             count($images) + count($images_hidden) 
                         );
                         echo '</a></div></div>';

@@ -167,7 +167,7 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				break;
 			case 'applicant' :
 
-				echo $the_tenancy->get_tenants(false, true);
+				echo wp_kses_post($the_tenancy->get_tenants(false, true));
 
 				break;
 			case 'start_date' :
@@ -180,12 +180,12 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				break;
 			case 'rent' :
 
-				echo $the_tenancy->get_formatted_rent();
+				echo wp_kses_post($the_tenancy->get_formatted_rent());
 
 				break;
 			case 'status' :
 
-				echo $the_tenancy->get_status();
+				echo wp_kses_post($the_tenancy->get_status());
 
 				break;
 			default :

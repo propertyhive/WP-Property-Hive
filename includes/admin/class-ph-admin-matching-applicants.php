@@ -98,7 +98,18 @@ class PH_Admin_Matching_Applicants {
             </p>
 
             <p>
-            <?php echo __( 'When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' );
+            <?php
+                /* translators: 1: Opening link tag to the WordPress.org SMTP plugins page, 2: Closing link tag. */
+                echo wp_kses_post(
+                    sprintf(
+                        __(
+                            'When sending out lots of emails we recommend using %1$sa plugin%2$s to send them out using SMTP. Your web developer or hosting company should be able to advise on this.',
+                            'propertyhive'
+                        ),
+                        '<a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank" rel="noopener noreferrer">',
+                        '</a>'
+                    )
+                );
             ?>
             </p>
 
@@ -123,7 +134,7 @@ class PH_Admin_Matching_Applicants {
     function showPreview()
     {
         jQuery('#mainform').attr('target', '_blank');
-        jQuery('#mainform').attr('action', '<?php echo admin_url( '?preview_propertyhive_email=true&property_id=' . (int)$_GET['property_id']); ?>');
+        jQuery('#mainform').attr('action', '<?php echo esc_url(admin_url( '?preview_propertyhive_email=true&property_id=' . (int)$_GET['property_id'])); ?>');
 
         jQuery('#mainform').submit();
         jQuery('#mainform').attr('target', '_self');
@@ -136,7 +147,7 @@ class PH_Admin_Matching_Applicants {
 
 					if ( $nothing_to_send == true )
                     {
-                        echo '<script>window.location.href = "' . get_edit_post_link( $property_id, 'url' ) . '&ph_message=2";</script>';
+                        echo '<script>window.location.href = "' . esc_url(get_edit_post_link( $property_id, 'url' )) . '&ph_message=2";</script>';
 
 						//header("Location: " . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2' ); // properties marked as not interested
                         //die();
@@ -222,7 +233,7 @@ class PH_Admin_Matching_Applicants {
 
                     do_action( 'propertyhive_applicant_match_step_send', $property_id );
 
-                    echo '<script>window.location.href = "' . get_edit_post_link( $property_id, 'url' ) . '&ph_message=1";</script>';
+                    echo '<script>window.location.href = "' . esc_url(get_edit_post_link( $property_id, 'url' )) . '&ph_message=1";</script>';
 				}
 			}
 		}

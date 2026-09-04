@@ -44,7 +44,12 @@ if ( !empty($notes) )
 			{
 				if ( isset($comment_content['method']) && $comment_content['method'] == 'email' && isset($comment_content['email_log_id']) )
 				{
-					$email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . $comment_content['email_log_id'] . "'" );
+					$email_log = $wpdb->get_row(
+					    $wpdb->prepare(
+					        "SELECT * FROM {$wpdb->prefix}ph_email_log WHERE email_id = %d",
+					        absint( $comment_content['email_log_id'] )
+					    )
+					);
 
 					if ( null !== $email_log )
 					{
@@ -332,7 +337,11 @@ if ($section != 'enquiry')
 							if ($time_diff > 86400) {
 								echo esc_html(date( $datetime_format, $note['timestamp'] ));
 							} else {
-								printf( __( '%s ago', 'propertyhive' ), human_time_diff( $note['timestamp'], current_time( 'timestamp', 1 ) ) );
+								/* translators: %s: Human-readable time difference, e.g. "5 minutes". */
+								printf(
+								    esc_html__( '%s ago', 'propertyhive' ),
+								    esc_html( human_time_diff( $note['timestamp'], current_time( 'timestamp', true ) ) )
+								);
 							}
 						?>
 					</abbr> 
@@ -341,7 +350,7 @@ if ($section != 'enquiry')
 						{
 							printf( 
 								/* translators: %s: author name */
-								__( 'by %s', 'propertyhive' ), 
+								esc_html(__( 'by %s', 'propertyhive' )), 
 								esc_html($note['author']) 
 							);
 						}
@@ -359,7 +368,7 @@ if ($section != 'enquiry')
 							
 							printf(
 								/* translators: %s: linked post type label, for example "Property" */
-								__( 'Note originally entered on %s', 'propertyhive' ),
+								esc_html(__( 'Note originally entered on %s', 'propertyhive' )),
 								'<a href="' . esc_url( get_edit_post_link( $note['post_id'] ) ) . '" style="color:inherit;">' . esc_html( $post_type_label ) . '</a>'
 							);
 						}
@@ -375,7 +384,7 @@ if ($section != 'enquiry')
 
 <?php if ( !isset($_POST['pinned']) ) { ?>
 <div class="add_note">
-	<h4><?php _e( 'Add Note', 'propertyhive' ); ?></h4>
+	<h4><?php echo esc_html(__( 'Add Note', 'propertyhive' )); ?></h4>
 	<p>
 		<textarea type="text" name="note" id="add_note" class="input-text" cols="20" rows="6" placeholder="Enter your note<?php if ( apply_filters('propertyhive_disable_notes_mention', false) === false ) { ?><br>Type <code style='background:#f9f9f9; border:1px solid #DDD; padding:0 2px; border-radius:5px; vertical-align:middle'>@</code> to tag a contact and property<?php } ?>"></textarea>
 		<br>

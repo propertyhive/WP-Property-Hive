@@ -805,13 +805,13 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             <th scope="row" class="titledesc">
                 <label for="field_type">Dropdown Options</label>
             </th>
-            <td class="forminp forminp-dropdown-options"><div id="sortable_options_' . $current_id . '">';
+            <td class="forminp forminp-dropdown-options"><div id="sortable_options_' . esc_attr($current_id) . '">';
         if ( isset($custom_field_details['dropdown_options']) && !empty($custom_field_details['dropdown_options']) )
         {
             foreach ( $custom_field_details['dropdown_options'] as $dropdown_option )
             {
                 echo '
-                    <div><i class="fa fa-reorder" style="cursor:pointer; opacity:0.3"></i> <input type="text" name="dropdown_options[]" value="' . $dropdown_option . '"> <a href="" class="delete-dropdown-option">Delete Option</a></div>
+                    <div><i class="fa fa-reorder" style="cursor:pointer; opacity:0.3"></i> <input type="text" name="dropdown_options[]" value="' . esc_attr($dropdown_option) . '"> <a href="" class="delete-dropdown-option">Delete Option</a></div>
                 ';
             }
         }
@@ -857,7 +857,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     }
                 });
 
-                jQuery( \'#sortable_options_' . $current_id . '\' )
+                jQuery( \'#sortable_options_' . esc_attr($current_id) . '\' )
                 .sortable({
                     axis: "y",
                     handle: "i",

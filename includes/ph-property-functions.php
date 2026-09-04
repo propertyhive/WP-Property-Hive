@@ -10,6 +10,8 @@
  * @version     1.0.0
  */
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 /**
  * Main function for returning properties, uses the PH_Property_Factory class.
  *
@@ -333,7 +335,7 @@ function get_property_map( $args = array() )
 		    do_action( 'propertyhive_property_map_actions', $property, $args, $id_suffix );
 		?>
 
-		L.marker([<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>]<?php echo $icon_code; ?>).addTo(property_map<?php echo esc_js($id_suffix); ?>);
+		L.marker([<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>]<?php echo esc_js($icon_code); ?>).addTo(property_map<?php echo esc_js($id_suffix); ?>);
 	}
 
 	<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
@@ -354,7 +356,7 @@ function get_property_map( $args = array() )
 			{
 				echo '<iframe
 				  width="100%"
-				  height="' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . '"
+				  height="' . esc_attr(str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) )) . '"
 				  style="border:0"
 				  loading="lazy"
 				  allowfullscreen
@@ -390,7 +392,7 @@ function get_property_map( $args = array() )
 
   				if ( isset($map_add_on_settings['style_js']) && trim($map_add_on_settings['style_js']) != '' )
   				{
-  					echo 'map_options.styles = ' . trim($map_add_on_settings['style_js']) . ';';
+  					echo 'map_options.styles = ' . esc_js(trim($map_add_on_settings['style_js'])) . ';';
   				}
   			}
 
@@ -422,7 +424,7 @@ function get_property_map( $args = array() )
 							$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
 							if ( $size !== FALSE && !empty($size) )
 							{
-								echo ', anchor: new google.maps.Point(' . floor( (int)$size[0] / 2 ) . ', ' . floor( (int)$size[1] / 2 ) . ')';
+								echo esc_js(', anchor: new google.maps.Point(' . floor( (int)$size[0] / 2 ) . ', ' . floor( (int)$size[1] / 2 ) . ')');
 							}
 						}   
 						echo '};';
@@ -484,7 +486,7 @@ function get_property_static_map( $args = array() )
 
 		    echo '<style type="text/css">
 		    	#property_static_map' . esc_attr($id_suffix) . ' {
-		    		height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px;
+		    		height:' . esc_js(str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) )) . 'px;
 		    		display: block;
 				    background-image: url("' . esc_url($map_url) . '");
 				    background-repeat: no-repeat;
@@ -523,7 +525,7 @@ function get_property_street_view( $args = array() )
 			{
 				echo '<iframe
 				  width="100%"
-				  height="' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . '"
+				  height="' . esc_attr(str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) )) . '"
 				  style="border:0"
 				  loading="lazy"
 				  allowfullscreen
@@ -536,7 +538,7 @@ function get_property_street_view( $args = array() )
 			    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
 			    wp_enqueue_script('googlemaps');
 
-			    echo '<div id="property_street_view_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px"></div>';
+			    echo '<div id="property_street_view_canvas" style="height:' . esc_attr(str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) )) . 'px"></div>';
 	?>
 	<script>
 

@@ -24,7 +24,6 @@ if ( isset($images) && is_array($images) && !empty($images) ) {
 
 		foreach ($images as $image)
         {
-
             $classes = array();
 
 			if ( $loop == 0 || $loop % $columns == 0 )
@@ -35,7 +34,7 @@ if ( isset($images) && is_array($images) && !empty($images) ) {
 
 			$image_class = esc_attr( implode( ' ', $classes ) );
 
-			echo '<li>' . apply_filters( 'propertyhive_single_property_image_thumbnail_html', $image['image'], ( isset($image['attachment_id']) ? $image['attachment_id'] : '' ) , $post->ID, $image_class ) . '</li>';
+			echo '<li>' . wp_kses_post(apply_filters( 'propertyhive_single_property_image_thumbnail_html', $image['image'], ( isset($image['attachment_id']) ? $image['attachment_id'] : '' ) , $post->ID, $image_class )) . '</li>';
 
 			++$loop;
 		}

@@ -71,24 +71,24 @@ class Bricks_Builder_Property_Tenure_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
-		echo "<div {$this->render_attributes( '_root' )}>";
+		echo "<div {$this->render_attributes( '_root' )}>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			if ( isset( $this->settings['icon'] ) ) 
 			{
-		    	echo self::render_icon( $this->settings['icon'] );
+		    	echo wp_kses_post(self::render_icon( $this->settings['icon'] ));
 		    	echo ' ';
 		    }
 
 		    if ( isset($this->settings['before']) && !empty($this->settings['before']) )
 	        {
-	        	echo $this->settings['before'] . ' ';
+	        	echo wp_kses_post($this->settings['before']) . ' ';
 	        }
 
 			echo esc_html($property->tenure);
 
 			if ( isset($this->settings['after']) && !empty($this->settings['after']) )
 	        {
-	        	echo ' ' . $this->settings['after'];
+	        	echo ' ' . wp_kses_post($this->settings['after']);
 	        }
 
 		echo '</div>';

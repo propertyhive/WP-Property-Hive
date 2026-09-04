@@ -59,14 +59,14 @@ class PH_Meta_Box_Sale_Applicant {
                 $fields = apply_filters( 'propertyhive_sale_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
                 $div_style = $i > 0 ? 'style="border-top:1px solid #ddd"' : '';
-                echo "<div " . $div_style . ">";
+                echo "<div " . $div_style . ">"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 foreach ( $fields as $key => $field )
                 {
                     echo '<p class="form-field ' . esc_attr($key) . '" >
 
                         <label>' . esc_html($field['label']) . '</label>
 
-                        ' . $field['value'] . '
+                        ' . wp_kses_post($field['value']) . '
 
                     </p>';
                 }

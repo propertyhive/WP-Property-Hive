@@ -58,10 +58,6 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		// Sort link
 		add_filter( 'views_edit-property', array( $this, 'remove_mine' ) );
 
-		// Prouct filtering
-		/*add_action( 'restrict_manage_posts', array( $this, 'property_filters' ) );
-		add_filter( 'parse_query', array( $this, 'property_filters_query' ) );*/
-
 		// Maintain hierarchy of terms
 		/*add_filter( 'wp_terms_checklist_args', array( $this, 'disable_checked_ontop' ) );*/
 
@@ -259,8 +255,8 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
         if ($screen->id == 'property' && $post->post_type == 'property' && $post->post_parent != 0 && $post->post_parent != '')
         {
         	$property = new PH_Property((int)$post->post_parent);
-            $message = __( "This property is a unit belonging to", 'propertyhive' ) . ' <a href="' . esc_url(get_edit_post_link( $post->post_parent )) . '">' . esc_html($property->get_formatted_full_address()) . '</a>';
-            echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
+            $message = esc_html(__( "This property is a unit belonging to", 'propertyhive' )) . ' <a href="' . esc_url(get_edit_post_link( $post->post_parent )) . '">' . esc_html($property->get_formatted_full_address()) . '</a>';
+            echo wp_kses_post("<div class=\"notice notice-info\"> <p>$message</p></div>");
         }
     }
 
@@ -429,7 +425,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 				// Excerpt view
 				if ( isset( $_GET['mode'] ) && 'excerpt' == $_GET['mode'] ) {
-					echo apply_filters( 'the_excerpt', $post->post_excerpt );
+					echo wp_kses_post(apply_filters( 'the_excerpt', $post->post_excerpt ));
 				}
 
 				if ( $the_property->bedrooms != '' || $the_property->property_type != '' || $the_property->reference_number != '' )
@@ -461,7 +457,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 					$details = apply_filters( 'propertyhive_admin_property_column_address_details', $details, $post->ID );
 
-					echo implode("<br>", $details);
+					echo wp_kses_post(implode("<br>", $details));
 				}
 
 				get_inline_data( $post );
@@ -480,12 +476,12 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 $floor_area = $the_property->get_formatted_floor_area();
                 if ( $floor_area != '' )
                 {
-                	echo 'Floor Area: ' . $floor_area . '<br>';
+                	echo 'Floor Area: ' . wp_kses_post($floor_area) . '<br>';
             	}
                 $site_area = $the_property->get_formatted_site_area();
                 if ( $site_area != '' )
                 {
-                	echo 'Site Area: ' . $site_area;
+                	echo 'Site Area: ' . wp_kses_post($site_area);
             	}
 
             	if ( $floor_area == '' && $site_area == '' )
@@ -512,7 +508,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 		$price .= '<br>' . esc_html($the_property->price_qualifier);
                 	}
                 }
-                echo $price;
+                echo wp_kses_post($price);
                 
 				break;
 			case 'status' :
@@ -541,7 +537,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
             	$marketing_flags = $the_property->marketing_flag;
             	if ( $marketing_flags != '' )
             	{
-            		echo '<br>' . implode( "<br>", explode( ",", esc_html($marketing_flags) ) );
+            		echo '<br>' . wp_kses_post(implode( "<br>", explode( ",", esc_html($marketing_flags) ) ));
             	}
                 
 				break;
@@ -687,32 +683,6 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	        unset( $views['mine'] );
 
 	    return $views;
-	}
-
-	/**
-	 * Show a category filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'property' != $typenow ) {
-			return;
-		}
-
-		echo apply_filters( 'propertyhive_property_filters', $output );
-	}
-
-	/**
-	 * Filter the products in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function property_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'property' == $typenow ) {
-			
-		}
 	}
 
 	/**

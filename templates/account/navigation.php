@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 		$i = 0;
 		foreach ( $pages as $id => $page )
 		{
-			echo '<li class="my-account-navigation-' . esc_attr($id) . '' . ( ( $i == 0 ) ? ' active' : '' ) . '"><a href="' . ( ( isset($page['href']) ) ? $page['href'] : '#my-account-' . esc_attr($id) ) . '">' . esc_html($page['name']) . '</a></li>';
+			echo '<li class="my-account-navigation-' . esc_attr($id) . '' . ( ( $i == 0 ) ? ' active' : '' ) . '"><a href="' . ( ( isset($page['href']) ) ? esc_url($page['href']) : '#my-account-' . esc_attr($id) ) . '">' . esc_html($page['name']) . '</a></li>';
 
 			++$i;
 		}

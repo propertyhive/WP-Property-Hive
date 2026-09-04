@@ -69,7 +69,7 @@
 		<?php
 			$section = 'viewing';
 
-	        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">';
+	        echo '<div class="propertyhive-notes-container" id="propertyhive_' . esc_attr($section) . '_notes_container">';
 	            include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
 	        echo '</div>';
 	    ?>

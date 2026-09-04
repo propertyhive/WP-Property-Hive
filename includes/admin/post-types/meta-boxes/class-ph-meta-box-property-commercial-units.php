@@ -58,12 +58,12 @@ class PH_Meta_Box_Property_Commercial_Units {
                         $floor_area = $the_property->get_formatted_floor_area();
                         if ( $floor_area != '' )
                         {
-                            echo 'Floor Area: ' . $floor_area . '<br>';
+                            echo 'Floor Area: ' . wp_kses_post($floor_area) . '<br>';
                         }
                         $site_area = $the_property->get_formatted_site_area();
                         if ( $site_area != '' )
                         {
-                            echo 'Site Area: ' . $site_area;
+                            echo 'Site Area: ' . wp_kses_post($site_area);
                         }
 
                         if ( $floor_area == '' && $site_area == '' )
@@ -77,14 +77,14 @@ class PH_Meta_Box_Property_Commercial_Units {
                         {
                             $price = '-';
                         }
-                        echo $price;
+                        echo wp_kses_post($price);
                         echo '</td>';
                         echo '<td style="text-align:left;">';
                         $term_list = wp_get_post_terms($post->ID, 'availability', array("fields" => "names"));
             
                         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
                         {
-                           echo $term_list[0]. '<br>';
+                           echo esc_html($term_list[0]) . '<br>';
                         }
 
                         if (isset($the_property->_on_market) && $the_property->_on_market == 'yes')

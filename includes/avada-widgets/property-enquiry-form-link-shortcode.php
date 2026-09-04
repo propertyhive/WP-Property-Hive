@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_enquiry_form_link', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -47,14 +49,14 @@ add_shortcode( 'avada_property_enquiry_form_link', function( $atts ) {
     ob_start();
 ?>
 
-    <a data-fancybox data-src="#makeEnquiry<?php echo $property->id; ?>" href="javascript:;" style="<?php echo $style; ?>"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
+    <a data-fancybox data-src="#makeEnquiry<?php echo (int)$property->id; ?>" href="javascript:;" style="<?php echo esc_attr($style); ?>"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
 
     <!-- LIGHTBOX FORM -->
     <div id="makeEnquiry<?php echo (int)$property->id; ?>" style="display:none;">
         
         <h2><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></h2>
         
-        <p><?php _e( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' ); ?></p>
+        <p><?php echo esc_html(__( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' )); ?></p>
         
         <?php propertyhive_enquiry_form(); ?>
         

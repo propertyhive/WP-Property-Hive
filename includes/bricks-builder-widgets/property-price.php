@@ -57,9 +57,9 @@ class Bricks_Builder_Property_Price_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
-		echo "<div {$this->render_attributes( '_root' )}>";
+		echo "<div {$this->render_attributes( '_root' )}>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-			echo $property->get_formatted_price();
+			echo wp_kses_post($property->get_formatted_price());
 
 		echo '</div>';
 	}

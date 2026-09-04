@@ -81,7 +81,7 @@ class Bricks_Builder_Property_Street_View_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
-		echo "<div {$this->render_attributes( '_root' )}>";
+		echo "<div {$this->render_attributes( '_root' )}>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			$attributes = array();
 			if ( isset($this->settings['height']) && $this->settings['height'] != '' )

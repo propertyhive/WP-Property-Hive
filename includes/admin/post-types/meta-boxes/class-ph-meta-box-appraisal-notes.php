@@ -37,7 +37,7 @@ class PH_Meta_Box_Appraisal_Notes {
             $i = 0;
             foreach ( $notes_filters as $class => $label )
             {
-                echo '<li><a href="" data-section="' . esc_attr($section) . '" data-filter-class="' . ( $class == '' ? '*' : 'note-type-' . esc_attr($class) ) . '"' . ( $class == '' ? ' class="current"' : '' ) . '>' . $label . '</a>';
+                echo '<li><a href="" data-section="' . esc_attr($section) . '" data-filter-class="' . ( $class == '' ? '*' : 'note-type-' . esc_attr($class) ) . '"' . ( $class == '' ? ' class="current"' : '' ) . '>' . esc_html($label) . '</a>';
                 if ( $i < count($notes_filters) - 1 ) { echo ' |&nbsp; '; }
                 echo '</li>';
                 ++$i;

@@ -288,7 +288,7 @@ class PH_Meta_Box_Contact_Actions {
 
 		        if ( !empty($actions) )
 		        {
-		        	echo implode("", $actions);
+		        	echo wp_kses_post(implode("", $actions));
 		        }
 		        else
 		        {
@@ -305,7 +305,7 @@ class PH_Meta_Box_Contact_Actions {
 var viewing_selected_properties = {};
 var offer_selected_properties = {};
 
-var viewing_selected_negotiators = {<?php echo get_current_user_id(); ?>: { post_title: '<?php $user_data = get_userdata(get_current_user_id()); echo esc_js($user_data->display_name); ?>' } };
+var viewing_selected_negotiators = {<?php echo (int)get_current_user_id(); ?>: { post_title: '<?php $user_data = get_userdata(get_current_user_id()); echo esc_js($user_data->display_name); ?>' } };
 
 jQuery(document).ready(function($)
 {

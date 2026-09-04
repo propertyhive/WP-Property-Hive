@@ -167,7 +167,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                         {
                             $message .= '<p><a href="' . esc_url(get_edit_post_link( $viewing_id )) . '" class="button">' . esc_html(__( 'Edit viewing', 'propertyhive' )) . '</a></p>';
                         }
-                        echo "<div class=\"notice notice-info\">$message</div>";
+                        echo "<div class=\"notice notice-info\">" . wp_kses_post($message) . "</div>";
                     }
                 }
             }
@@ -276,7 +276,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 
                 break;
             case 'status' :
-                echo $the_enquiry->status;
+                echo esc_html($the_enquiry->status);
                 break;
             case 'source' :
 
@@ -319,7 +319,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                     {
                         $properties_text_array[] = $the_enquiry->get_list_property_display_text( $property_id );
                     }
-                    echo implode(  '<br>', array_filter($properties_text_array) );
+                    echo wp_kses_post(implode( '<br>', array_filter($properties_text_array) ));
                 }
                 else
                 {
@@ -329,7 +329,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
             case 'negotiator' :
                 if ($the_enquiry->_negotiator_id == '' || $the_enquiry->_negotiator_id == 0)
                 {
-                    echo '<em>-- ' . esc_html(__( 'Unassigned', 'propertyhive' )) . ' --</em>';
+                    echo wp_kses_post('<em>-- ' . esc_html(__( 'Unassigned', 'propertyhive' )) . ' --</em>');
                 }
                 else
                 {

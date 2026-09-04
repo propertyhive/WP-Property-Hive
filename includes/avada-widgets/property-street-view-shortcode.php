@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_street_view', function( $atts ) {
     $atts = shortcode_atts( array(
         'height'    => '',

@@ -109,9 +109,7 @@ class PH_Admin_Settings {
 				    ),
 				);
 
-				$error = wp_kses($error, $allowed_tags);
-
-				echo '<div id="message" class="error fade"><p><strong>' . $error . '</strong></p></div>';
+				echo '<div id="message" class="error fade"><p><strong>' . wp_kses($error, $allowed_tags) . '</strong></p></div>';
 			}
 		} elseif ( sizeof( self::$messages ) > 0 ) {
 			foreach ( self::$messages as $message )
@@ -122,9 +120,7 @@ class PH_Admin_Settings {
 				    ),
 				);
 
-				$message = wp_kses($message, $allowed_tags);
-
-				echo '<div id="message" class="updated fade"><p><strong>' . $message . '</strong></p></div>';
+				echo '<div id="message" class="updated fade"><p><strong>' . wp_kses($message, $allowed_tags) . '</strong></p></div>';
 			}
 		}
 	}
@@ -305,11 +301,11 @@ class PH_Admin_Settings {
                 		<?php if ( $full_width !== true ) { ?>
                         <th scope="row" class="titledesc">
                             <label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-                            <?php echo $tip; ?>
+                            <?php echo wp_kses_post($tip); ?>
                         </th>
                     	<?php } ?>
-                        <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-                            <?php echo $value['html']; ?>
+                        <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
+                            <?php echo wp_kses_post($value['html']); ?>
                         </td>
                     </tr>
                 <?php
@@ -335,9 +331,9 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post($tip); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
 	                    	<input
 	                    		name="<?php echo esc_attr( $value['id'] ); ?>"
 	                    		id="<?php echo esc_attr( $value['id'] ); ?>"
@@ -346,7 +342,7 @@ class PH_Admin_Settings {
 	                    		value="<?php echo esc_attr( $option_value ); ?>"
 	                    		class="<?php echo esc_attr( $value['class'] ); ?>"
 	                    		<?php echo implode( ' ', $custom_attributes ); ?>
-	                    		/> <?php echo $description; ?>
+	                    		/> <?php echo wp_kses_post($description); ?>
 	                    </td>
 	                </tr><?php
 	            break;
@@ -371,9 +367,9 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post($tip); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
 	                    	<?php echo $description; ?>
 
 	                        <textarea
@@ -395,9 +391,9 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post($tip); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
 	                    	
 	                    	<?php wp_editor( $option_value, esc_attr( $value['id'] ), array( 'media_buttons' => false, 'textarea_rows' => 3, 'teeny' => true ) ); ?>
 
@@ -421,9 +417,9 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post($tip); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
 	                    	<select
 	                    		name="<?php echo esc_attr( $value['id'] ); ?><?php if ( $value['type'] == 'multiselect' ) echo '[]'; ?>"
 	                    		id="<?php echo esc_attr( $value['id'] ); ?>"
@@ -459,9 +455,9 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post($tip); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
 	                    	<fieldset>
 	                    		<?php echo $description; ?>
 	                    		<ul>
@@ -518,11 +514,11 @@ class PH_Admin_Settings {
 		            		<tr valign="top" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 								<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?></th>
 								<td class="forminp forminp-checkbox">
-									<fieldset style="<?php echo $fieldset_css; ?>">
+									<fieldset style="<?php echo esc_attr($fieldset_css); ?>">
 						<?php
 	            	} else { 
 	            		?>
-		            		<fieldset style="<?php echo $fieldset_css; ?>" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>">
+		            		<fieldset style="<?php echo esc_attr($fieldset_css); ?>" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>">
 	            		<?php
 	            	}
 
@@ -542,7 +538,7 @@ class PH_Admin_Settings {
 								<?php checked( $option_value, 'yes'); ?>
 								<?php echo implode( ' ', $custom_attributes ); ?>
 							/> <?php echo $description ?>
-						</label> <?php echo $tip; ?>
+						</label> <?php echo wp_kses_post($tip); ?>
 					<?php
 
 					if ( ! isset( $value['checkboxgroup'] ) || 'end' == $value['checkboxgroup'] ) {
@@ -610,7 +606,7 @@ class PH_Admin_Settings {
 	                </tr><?php
 	                echo '<script>
 
-		var file_frame' . $value['id'] . ';
+		var file_frame' . esc_js($value['id']) . ';
 
 		jQuery(document).ready(function()
         {
@@ -619,13 +615,13 @@ class PH_Admin_Settings {
 	            event.preventDefault();
 	         
 	            // If the media frame already exists, reopen it.
-	            if ( file_frame' . $value['id'] . ' ) {
-	              file_frame' . $value['id'] . '.open();
+	            if ( file_frame' . esc_js($value['id']) . ' ) {
+	              file_frame' . esc_js($value['id']) . '.open();
 	              return;
 	            }
 	         
 	            // Create the media frame.
-	            file_frame' . $value['id'] . ' = wp.media.frames.file_frame' . $value['id'] . ' = wp.media({
+	            file_frame' . $value['id'] . ' = wp.media.frames.file_frame' . esc_js($value['id']) . ' = wp.media({
 	              title: jQuery( this ).data( \'uploader_title\' ),
 	              button: {
 	                text: jQuery( this ).data( \'uploader_button_text\' ),
@@ -634,8 +630,8 @@ class PH_Admin_Settings {
 	            });
 	         
 	            // When an image is selected, run a callback.
-	            file_frame' . $value['id'] . '.on( \'select\', function() {
-	                var selection = file_frame' . $value['id'] . '.state().get(\'selection\');
+	            file_frame' . esc_js($value['id']) . '.on( \'select\', function() {
+	                var selection = file_frame' . esc_js($value['id']) . '.state().get(\'selection\');
 
 	                selection.map( function( attachment ) {
 	             
@@ -647,9 +643,9 @@ class PH_Admin_Settings {
 	                    // Add selected image to page
 	                    //add_photo_attachment_to_grid(attachment);
 
-	                    jQuery(\'#row_' . esc_attr( $value['id'] ) . '_uploaded\').show();
-	                    jQuery(\'#row_' . esc_attr( $value['id'] ) . '_uploaded td\').html(\'<img src="\' + attachment.url + \'" width="150" alt="">\');
-	                    jQuery(\'#' . esc_attr( $value['id'] ) . '\').val(attachment.id);
+	                    jQuery(\'#row_' . esc_js( $value['id'] ) . '_uploaded\').show();
+	                    jQuery(\'#row_' . esc_js( $value['id'] ) . '_uploaded td\').html(\'<img src="\' + attachment.url + \'" width="150" alt="">\');
+	                    jQuery(\'#' . esc_js( $value['id'] ) . '\').val(attachment.id);
 	                });
 	            });
 	         
@@ -699,13 +695,13 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post($tip); ?>
 						</th>
 	                    <td class="forminp">
 		                    <select name="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>">
 					        	<?php PH()->countries->country_dropdown_options( $country ); ?>
 					        </select>
-					        <?php echo $description; ?>
+					        <?php echo wp_kses_post($description); ?>
 	               		</td>
 	               	</tr><?php
 	            break;
@@ -724,7 +720,7 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post($tip); ?>
 						</th>
 	                    <td class="forminp">
 		                    <select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="<?php echo esc_attr( $value['css'] ); ?>">
@@ -733,7 +729,7 @@ class PH_Admin_Settings {
 					        			foreach ( $countries as $key => $val )
 		                    				echo '<option value="' . esc_attr( $key ) . '" ' . selected( in_array( $key, $selections ), true, false ).'>' . $val['name'] . '</option>';
 		                    	?>
-					        </select> <?php if ( $description ) echo $description; ?>
+					        </select> <?php if ( $description ) echo wp_kses_post($description); ?>
 	               		</td>
 	               	</tr><?php
 	            break;

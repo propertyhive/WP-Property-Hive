@@ -476,7 +476,7 @@ class PH_Countries {
 	 * @param string $selected_country (default: '')
 	 * @param bool   $escape (default: false)
 	 */
-	public function country_dropdown_options( $selected_country = '', $escape = false ) {
+	public function country_dropdown_options( $selected_country = '' ) {
 		if ( $this->countries ) 
 		{
 			foreach ( $this->countries as $key => $value )
@@ -485,7 +485,7 @@ class PH_Countries {
 				if ( $selected_country == $key || ( $selected_country == '' && $key == 'GB' ) ) {
 					echo ' selected="selected"';
 				}
-				echo ' value="' . esc_attr( $key ) . '">' . ( $escape ? esc_js( $value['name'] ) : $value['name'] ) . '</option>';
+				echo ' value="' . esc_attr( $key ) . '">' . esc_html( $value['name'] ) . '</option>';
 			}
 		}
 	}

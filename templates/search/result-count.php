@@ -17,20 +17,20 @@ global $propertyhive;
 <p class="propertyhive-result-count">
 	<?php
 	if ( 1 == $total ) {
-		_e( 'Showing the single result', 'propertyhive' );
+		echo esc_html(__( 'Showing the single result', 'propertyhive' ));
 	} elseif ( $total <= $per_page || -1 == $per_page ) {
 		printf( 
 			/* translators: %s: total number of properties */
-			__( 'Showing %s properties', 'propertyhive' ), 
-			number_format_i18n($total) 
+			esc_html(__( 'Showing %s properties', 'propertyhive' )), 
+			esc_html(number_format_i18n($total)) 
 		);
 	} else {
 		printf( 
 			/* translators: 1: first result number, 2: last result number, 3: total number of properties */
-			__( 'Showing %1$s–%2$s of %3$s properties', 'propertyhive' ), 
-			number_format_i18n($first), 
-			number_format_i18n($last), 
-			number_format_i18n($total) 
+			esc_html(__( 'Showing %1$s–%2$s of %3$s properties', 'propertyhive' )), 
+			esc_html(number_format_i18n($first)), 
+			esc_html(number_format_i18n($last)), 
+			esc_html(number_format_i18n($total))
 		);
 	}
 	?>

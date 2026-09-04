@@ -132,8 +132,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                 $recurrence_type = isset($recurrence_rules[$key_date_type_term->term_id]) ? $recurrence_rules[$key_date_type_term->term_id]['recurrence_type'] : '';
                 if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
                 {
-                    $selected = ( isset($selected_type_id) && $selected_type_id == $key_date_type_term->term_id ) ? ' selected' : '';
-                    echo '<option value="' . esc_attr($key_date_type_term->term_id) . '"' . $selected . '>' . esc_html($key_date_type_term->name) . '</option>';
+                    echo '<option value="' . esc_attr($key_date_type_term->term_id) . '"' .
+                    selected(
+                        isset( $selected_type_id ) ? $selected_type_id : '',
+                        $key_date_type_term->term_id,
+                        false
+                    ) .
+                    '>' . esc_html($key_date_type_term->name) . '</option>';
                 }
             }
         }
@@ -195,7 +200,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 ?>
                 <tr id="post-<?php echo (int)$key_date_post->ID; ?>" class="post-<?php echo esc_attr($key_date_post->ID); ?> key-date-row">
                     <td class="description column-description" data-colname="Description">
-                        <div class="cell-main-content"><?php echo $key_date->description(); ?></div>
+                        <div class="cell-main-content"><?php echo wp_kses_post($key_date->description()); ?></div>
                         <div class="row-actions">
                             <span class="inline hide-if-no-js">
                                 <button type="button" id="<?php echo esc_attr($key_date_post->ID); ?>" class="button-link meta-box-quick-edit">
@@ -221,7 +226,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 $tenancy = $key_date->tenancy();
                                 $tenants = $tenancy->get_tenants(false, true);
                             }
-                            echo !empty($tenants) ? $tenants : '-';
+                            echo !empty($tenants) ? wp_kses_post($tenants) : '-';
                         ?>
                         </div>
                     </td>

@@ -31,7 +31,7 @@ class PH_Meta_Box_Appraisal_Property_Owner {
 
             echo '<p class="form-field">
             
-                <label>' . __('Name', 'propertyhive') . '</label>
+                <label>' . esc_html(__('Name', 'propertyhive')) . '</label>
                 
                 <a 
                     href="' . esc_url(get_edit_post_link($property_owner_contact_id, '')) . '" 
@@ -44,7 +44,7 @@ class PH_Meta_Box_Appraisal_Property_Owner {
                     data-appraisal-property-owner-address-four="' . esc_attr( $contact->address_four ) . '" 
                     data-appraisal-property-owner-address-postcode="' . esc_attr( $contact->address_postcode ) . '" 
                     data-appraisal-property-owner-address-country="' . esc_attr( $contact->address_country ) . '" 
-                >' . get_the_title($property_owner_contact_id) . '</a>
+                >' . esc_html(get_the_title($property_owner_contact_id)) . '</a>
                 
             </p>';
 
@@ -68,7 +68,7 @@ class PH_Meta_Box_Appraisal_Property_Owner {
             
                 <label>' . esc_html(__('Correspondence Address', 'propertyhive')) . '</label>
                 
-                ' . $contact->get_formatted_full_address('<br>') . '
+                ' . wp_kses_post($contact->get_formatted_full_address('<br>')) . '
                 
             </p>';
         }

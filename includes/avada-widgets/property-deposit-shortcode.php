@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_deposit', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -59,8 +61,9 @@ add_shortcode( 'avada_property_deposit', function( $atts ) {
 
     ob_start();
 
-    echo '<div ' . FusionBuilder::attributes( 'property-deposit-shortcode' ) . '>
-    	<div style="' . $style . '">';
+    echo '<div ' . FusionBuilder::attributes( 'property-deposit-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    echo '
+    	<div style="' . esc_attr($style) . '">';
 
         if ( ! empty($atts['icon']) ) 
         {
@@ -69,12 +72,12 @@ add_shortcode( 'avada_property_deposit', function( $atts ) {
 
         if ( isset($atts['before']) && !empty($atts['before']) )
         {
-            echo $atts['before'] . ' ';
+            echo wp_kses_post($atts['before']) . ' ';
         }
-        echo $property->get_formatted_deposit();
+        echo wp_kses_post($property->get_formatted_deposit());
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
-            echo ' ' . $atts['after'];
+            echo ' ' . wp_kses_post($atts['after']);
         }
     echo '
     	</div>

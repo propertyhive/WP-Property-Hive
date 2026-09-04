@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_meta', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -46,8 +48,9 @@ add_shortcode( 'avada_property_meta', function( $atts ) {
 
     ob_start();
 
-    echo '<div ' . FusionBuilder::attributes( 'property-meta-shortcode' ) . '>
-    	<div style="' . $style . '">';
+    echo '<div ' . FusionBuilder::attributes( 'property-meta-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    echo '
+    	<div style="' . esc_attr($style) . '">';
         propertyhive_template_single_meta();
     echo '
     	</div>

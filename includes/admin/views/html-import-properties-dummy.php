@@ -74,9 +74,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	            	<strong>API Key:</strong> cvYG8ffdr32425Gdccc
 	            </td>
 	            <td class="frequency">Hourly</td>
-	            <td class="lastran"><?php echo date("jS F Y H:i", strtotime('-2 hours')); ?></td>
+	            <td class="lastran"><?php echo esc_html(date("jS F Y H:i", strtotime('-2 hours'))); ?></td>
 	            <td class="nextdue">
-	                Today at <?php echo date("H:i", strtotime('+10 mins')); ?>            
+	                Today at <?php echo esc_html(date("H:i", strtotime('+10 mins'))); ?>            
 	            </td>
 	        </tr>
 	    </tbody>

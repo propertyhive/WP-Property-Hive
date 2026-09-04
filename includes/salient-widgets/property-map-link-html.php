@@ -29,7 +29,7 @@ if ( ! empty( $atts['font_container'] ) && isset($atts['font_container']) )
 	$style = ph_extract_font_style_from_salient_font_container( $font_container );
 }
 
-echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
+echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	$link_type = ( isset($atts['map_link_type']) && !empty($atts['map_link_type']) ) ? $atts['map_link_type'] : '_blank';
 
@@ -42,7 +42,7 @@ echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
 		}
 		case "embedded":
 		{
-			echo '<a href="#map_lightbox" data-fancybox>' . __( 'View Map', 'propertyhive' ) . '</a>';
+			echo '<a href="#map_lightbox" data-fancybox>' . esc_html(__( 'View Map', 'propertyhive' )) . '</a>';
 	
 			echo '<div id="map_lightbox" style="display:none; width:90%; max-width:800px;">';
 	   	 		echo do_shortcode('[property_map]');

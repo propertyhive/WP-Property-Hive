@@ -160,12 +160,12 @@ class Elementor_Property_Deposit_Widget extends \Elementor\Widget_Base {
         }
         if ( isset($settings['before']) && !empty($settings['before']) )
         {
-        	echo $settings['before'] . ' ';
+        	echo wp_kses_post($settings['before']) . ' ';
         }
-        echo $property->get_formatted_deposit();
+        echo wp_kses_post($property->get_formatted_deposit());
         if ( isset($settings['after']) && !empty($settings['after']) )
         {
-        	echo ' ' . $settings['after'];
+        	echo ' ' . wp_kses_post($settings['after']);
         }
         echo '</div>';
 

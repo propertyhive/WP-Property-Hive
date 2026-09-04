@@ -52,7 +52,7 @@ class PH_Meta_Box_Offer_Property_Owner_Solicitor {
             
                     <label>' . esc_html($field['label']) . '</label>
                     
-                    ' . $field['value'] . '
+                    ' . wp_kses_post($field['value']) . '
                     
                 </p>';
             }
@@ -61,7 +61,7 @@ class PH_Meta_Box_Offer_Property_Owner_Solicitor {
             
                 <label></label>
                 
-                <a class="button" href="' . wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit' ), '1', 'remove_property_owner_solicitor' ) . '">' .  esc_html(__( 'Remove Solicitor', 'propertyhive' )) . '</a>
+                <a class="button" href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit' ), '1', 'remove_property_owner_solicitor' )) . '">' .  esc_html(__( 'Remove Solicitor', 'propertyhive' )) . '</a>
                 
             </p>';
         }

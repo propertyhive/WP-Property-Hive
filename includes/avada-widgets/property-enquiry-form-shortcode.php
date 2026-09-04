@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_enquiry_form', function( $atts ) {
     $atts = shortcode_atts( array(
 
@@ -21,7 +23,7 @@ add_shortcode( 'avada_property_enquiry_form', function( $atts ) {
 
     ob_start();
 
-    echo '<div ' . FusionBuilder::attributes( 'property-enquiry-form-shortcode' ) . '>';
+    echo '<div ' . FusionBuilder::attributes( 'property-enquiry-form-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         propertyhive_enquiry_form();
     echo '</div>';
 

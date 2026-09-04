@@ -52,7 +52,7 @@ class Bricks_Builder_Property_Enquiry_Form_Link_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
-		echo "<div {$this->render_attributes( '_root' )}>";
+		echo "<div {$this->render_attributes( '_root' )}>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		?>
 		<a data-fancybox data-src="#makeEnquiry<?php echo (int)$property->id; ?>" href="javascript:;"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
@@ -62,7 +62,7 @@ class Bricks_Builder_Property_Enquiry_Form_Link_Widget extends \Bricks\Element {
 	        
 	        <h2><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></h2>
 	        
-	        <p><?php _e( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' ); ?></p>
+	        <p><?php echo esc_html(__( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' )); ?></p>
 	        
 	        <?php propertyhive_enquiry_form(); ?>
 	        

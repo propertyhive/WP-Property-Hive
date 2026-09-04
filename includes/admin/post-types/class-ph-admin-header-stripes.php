@@ -41,10 +41,10 @@ class PH_Admin_Header_Stripes {
 
 				echo '<div style="background:#2ea2cc; border:1px solid #0074a2; border-radius:4px; padding:10px 15px; color:#FFF;">';
 
-				echo propertyhive_get_property_thumbnail('thumbnail', 'alignleft');
+				echo wp_kses_post(propertyhive_get_property_thumbnail('thumbnail', 'alignleft'));
 
 				echo '<h1>' . esc_html(get_the_title($post->ID)) . '</h1>';
-				echo '<h3>' . $property->get_formatted_price() . '</h3>';
+				echo '<h3>' . wp_kses_post($property->get_formatted_price()) . '</h3>';
 
 				echo '<div class="clear"></div>';
 

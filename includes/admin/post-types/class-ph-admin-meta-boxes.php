@@ -2478,7 +2478,7 @@ class PH_Admin_Meta_Boxes {
             {
                 if (isset($tab['post_type']) && $post->post_type == $tab['post_type'])
                 {
-                    echo '<a href="#' . implode("|#", $tab['metabox_ids']) . '" id="' . esc_attr($tab_id) . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '"';
+                    echo '<a href="#' . esc_attr(implode("|#", $tab['metabox_ids'])) . '" id="' . esc_attr($tab_id) . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '"';
                     if ( isset($tab['ajax_actions']) )
                     {
                         echo ' data-ajax-actions="' . esc_attr(implode("|", $tab['ajax_actions'])) . '"';

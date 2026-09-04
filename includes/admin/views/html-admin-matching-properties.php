@@ -256,7 +256,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 {
                     echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
                         <strong>' . esc_html($requirement['label']) . ':</strong><br>
-                        ' . $requirement['value'] . '
+                        ' . wp_kses_post($requirement['value']) . '
                     </div>';
                 }
             }
@@ -265,7 +265,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 echo '<div style="display:inline-block; width:100%; vertical-align:top; margin-top:15px;">
                         <strong>Additional Requirement Notes:</strong><br>
-                        ' . nl2br( strip_tags( $applicant_profile['notes'] ) ) . '
+                        ' . nl2br( wp_kses_post( $applicant_profile['notes'] ) ) . '
                     </div>';
             }
 
@@ -321,18 +321,18 @@ if ( ! defined( 'ABSPATH' ) ) {
                             echo '<h3 style="margin:0; padding:0; margin-bottom:9px;"><a href="' . esc_url(get_edit_post_link( $property->id )) . '" target="_blank">' . esc_html($property->get_formatted_summary_address()) . '</a></h3>';
 
                             echo '<div style="margin-bottom:7px; font-size:15px;">
-                                <strong>' . esc_html(( ($property->_department == 'residential-lettings') ? __('Rent', 'propertyhive') : __('Price', 'propertyhive') )) . ': ' . esc_html($property->price_qualifier) . ' ' . $property->get_formatted_price() . '</strong>
+                                <strong>' . esc_html(( ($property->_department == 'residential-lettings') ? __('Rent', 'propertyhive') : __('Price', 'propertyhive') )) . ': ' . esc_html($property->price_qualifier) . ' ' . wp_kses_post($property->get_formatted_price()) . '</strong>
                                 | ';
                             if ($property->department != 'commercial' || ph_get_custom_department_based_on($property->department) == 'commercial')
                             {
-                                echo $property->bedrooms . ' bed | ';
+                                echo esc_html($property->bedrooms) . ' bed | ';
                             }
                             else
                             {
                                 $floor_area = $property->get_formatted_floor_area();
                                 if ( $floor_area != '' )
                                 {
-                                    echo $floor_area . ' | ';
+                                    echo wp_kses_post($floor_area) . ' | ';
                                 }
                             }
                             $property_type = $property->get_property_type();

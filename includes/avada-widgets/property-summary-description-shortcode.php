@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_summary_description', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -56,8 +58,9 @@ add_shortcode( 'avada_property_summary_description', function( $atts ) {
 <?php
     }
 
-    echo '<div ' . FusionBuilder::attributes( 'property-summary-description-shortcode' ) . '>
-    	<div style="' . $style . '">';
+    echo '<div ' . FusionBuilder::attributes( 'property-summary-description-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    echo '
+    	<div style="' . esc_attr($style) . '">';
         propertyhive_template_single_summary();
     echo '
     	</div>

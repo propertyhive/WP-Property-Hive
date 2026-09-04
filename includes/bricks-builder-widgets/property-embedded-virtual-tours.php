@@ -63,16 +63,31 @@ class Bricks_Builder_Property_Embedded_Virtual_Tours_Widget extends \Bricks\Elem
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
-		echo "<div {$this->render_attributes( '_root' )}>";
+		echo "<div {$this->render_attributes( '_root' )}>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-			echo '<h4>' . __( 'Virtual Tours', 'propertyhive' ) . '</h4>';
+			echo '<h4>' . esc_html(__( 'Virtual Tours', 'propertyhive' )) . '</h4>';
 
 			foreach ( $virtual_tours as $virtual_tour )
 			{
 				if ( isset($this->settings['oembed']) && $this->settings['oembed'] == 'yes' )
 				{
-					$embed_code = wp_oembed_get($virtual_tour['url']);
-    				echo $embed_code;
+					$embed_code = wp_oembed_get( $virtual_tour['url'] );
+
+					$allowed_html = wp_kses_allowed_html( 'post' );
+
+					$allowed_html['iframe'] = array(
+					    'src'             => true,
+					    'width'           => true,
+					    'height'          => true,
+					    'frameborder'     => true,
+					    'allow'           => true,
+					    'allowfullscreen' => true,
+					    'loading'         => true,
+					    'title'           => true,
+					    'class'           => true,
+					);
+
+					echo wp_kses( $embed_code, $allowed_html );
 				}
 				else
 				{

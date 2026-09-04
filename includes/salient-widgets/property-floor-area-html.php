@@ -25,9 +25,9 @@ if ( $property->department == 'commercial' && ( ( $property->floor_area_to_sqft 
 		$style = ph_extract_font_style_from_salient_font_container( $font_container );
 	}
 
-	echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
+	echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-		echo $property->get_formatted_floor_area();
+		echo wp_kses_post($property->get_formatted_floor_area());
 
 	echo '</div>';
 }

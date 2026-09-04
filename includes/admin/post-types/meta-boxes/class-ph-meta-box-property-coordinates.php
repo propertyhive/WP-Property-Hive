@@ -178,7 +178,7 @@ class PH_Meta_Box_Property_Coordinates {
                                 $mapbox_geocoding_api_key = get_option( 'propertyhive_mapbox_api_key', '' );
                             }
                             echo '
-                            var url = \'https://api.mapbox.com/geocoding/v5/mapbox.places/\' + encodeURIComponent(address) + \'.json?access_token=' . $mapbox_geocoding_api_key . '\';
+                            var url = \'https://api.mapbox.com/geocoding/v5/mapbox.places/\' + encodeURIComponent(address) + \'.json?access_token=' . esc_js($mapbox_geocoding_api_key) . '\';
                             ';
 
                             echo '
@@ -438,7 +438,7 @@ class PH_Meta_Box_Property_Coordinates {
                 ';
             }
             echo '
-                    mapboxgl.accessToken = \'' . get_option( 'propertyhive_mapbox_api_key', '' ) . '\';
+                    mapboxgl.accessToken = \'' . esc_js(get_option( 'propertyhive_mapbox_api_key', '' )) . '\';
                     map = new mapboxgl.Map({
                         container: "map_canvas", // container ID
                         center: [' . (float)$longitude . ', ' . (float)$latitude . '], // starting position [lng, lat]. Note that lat must be set between -90 and 90
@@ -766,7 +766,7 @@ class PH_Meta_Box_Property_Coordinates {
                         position: new google.maps.LatLng(lat, lng),
                         map: map,
                         draggable: true,
-                        title: \''. __( 'Click and drag me to set the exact coordinates', 'propertyhive') . '\'
+                        title: \''. esc_js( __( 'Click and drag me to set the exact coordinates', 'propertyhive') ) . '\'
                     });
                     
                     jQuery(\'#help-marker-not-set\').fadeOut(\'fast\', function()

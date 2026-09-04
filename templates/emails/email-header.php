@@ -17,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!DOCTYPE html>
 <html dir="<?php echo is_rtl() ? 'rtl' : 'ltr'?>">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=<?php bloginfo( 'charset' ); ?>" />
-		<title><?php echo get_bloginfo( 'name', 'display' ); ?></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=<?php echo esc_attr(get_bloginfo( 'charset' )); ?>" />
+		<title><?php echo esc_html(get_bloginfo( 'name', 'display' )); ?></title>
 	</head>
 	<body <?php echo is_rtl() ? 'rightmargin' : 'leftmargin'; ?>="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
 		<div id="wrapper" dir="<?php echo is_rtl() ? 'rtl' : 'ltr'?>">
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 									<?php if ( $img = get_option( 'propertyhive_email_header_image' ) ) { ?>
 									<div id="template_header_image">
-										<?php echo '<a href="' . site_url() . '" target="_blank"><img src="' . esc_url( $img ) . '" alt="' . get_bloginfo( 'name', 'display' ) . '" /></a>';
+										<?php echo '<a href="' . esc_url(site_url()) . '" target="_blank"><img src="' . esc_url( $img ) . '" alt="' . esc_attr(get_bloginfo( 'name', 'display' )) . '" /></a>';
 										?>
 									</div>
 									<?php } ?>

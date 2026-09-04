@@ -102,7 +102,7 @@ class PH_Meta_Box_Tenancy_Details {
                 </select>
             </p>';
 
-        echo $lease_term_type_html;
+        echo $lease_term_type_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
         $args = array(
             'id' => '_start_date', 

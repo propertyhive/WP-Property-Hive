@@ -469,19 +469,16 @@ class PH_Settings_Emails extends PH_Settings_Page {
 
         $additional_query = '';
         $additional_query_string = '';
-        if ( isset($_GET['date_from']) && sanitize_text_field($_GET['date_from']) != '' )
+        if ( isset( $_GET['date_from'] ) ) 
         {
-        	$additional_query_string .= '&date_from=' . sanitize_text_field($_GET['date_from']);
-        	if ( sanitize_text_field($_GET['date_from']) != 'all' )
-        	{
-	        	$additional_query .= " AND send_at >= '" . sanitize_text_field($_GET['date_from']) . " 00:00:00' ";
-	        }
-        }
-        else
-        {
-        	// Default to 30 days
-        	$additional_query .= " AND send_at >= '" . date("Y-m-d", strtotime('-30 days')) . " 00:00:00' ";
-        }
+			$date_from = sanitize_text_field( wp_unslash( $_GET['date_from'] ) );
+
+			if ( '' !== $date_from ) 
+			{
+				$additional_query_string .= '&date_from=' . rawurlencode( $date_from );
+
+			}
+		}
         ?>
         <tr valign="top">
             <td style="padding:0">
@@ -592,24 +589,63 @@ class PH_Settings_Emails extends PH_Settings_Page {
 								subject,
 								status,
 								send_at
-							FROM " . $wpdb->prefix . "ph_email_log
-							WHERE 
-								1=1 ";
-						if ( isset($_GET['status']) )
+							FROM {$wpdb->prefix}ph_email_log
+							WHERE 1=1
+						";
+
+						$query_args = array();
+
+						if ( isset( $_GET['date_from'] ) ) 
 						{
-							switch ( ph_clean($_GET['status']) )
+							$date_from = sanitize_text_field( wp_unslash( $_GET['date_from'] ) );
+
+							if ( '' !== $date_from && 'all' !== $date_from ) 
 							{
-								case "queued": { $query .= " AND status = '' "; break; }
-								case "failed": { $query .= " AND status IN ('fail1', 'fail2') "; break; }
-								case "sent": { $query .= " AND status = 'sent' "; break; }
+								$date = DateTime::createFromFormat( 'Y-m-d', $date_from );
+
+								if ( $date && $date->format( 'Y-m-d' ) === $date_from ) 
+								{
+									$query       .= ' AND send_at >= %s';
+									$query_args[] = $date_from . ' 00:00:00';
+								}
 							}
 						}
-						$query .= $additional_query;
+						else
+						{
+							$query       .= ' AND send_at >= %s';
+							$query_args[] = gmdate( 'Y-m-d', strtotime( '-30 days' ) ) . ' 00:00:00';
+						}
 
-						$query .= " ORDER BY send_at DESC
+						if ( isset( $_GET['status'] ) )
+						{
+							$status = sanitize_key( wp_unslash( $_GET['status'] ) );
+
+							switch ( $status ) 
+							{
+								case 'queued':
+									$query .= " AND status = ''";
+									break;
+
+								case 'failed':
+									$query .= " AND status IN ( 'fail1', 'fail2' )";
+									break;
+
+								case 'sent':
+									$query .= " AND status = 'sent'";
+									break;
+							}
+						}
+
+						$query .= '
+							ORDER BY send_at DESC
 							LIMIT 250
-						";
-                   		$emails = $wpdb->get_results( $query );
+						';
+
+						if ( ! empty( $query_args ) ) {
+							$query = $wpdb->prepare( $query, $query_args );
+						}
+
+						$emails = $wpdb->get_results( $query );
 
                    		if ( is_array($emails) && !empty($emails) )
                    		{

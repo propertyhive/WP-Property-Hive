@@ -157,7 +157,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                             if ( isset( $column_data[$column_key] ) )
                             {
-                                echo $column_data[$column_key];
+                                echo wp_kses_post($column_data[$column_key]);
                             }
 
                             do_action( 'propertyhive_property_tenancies_custom_column', $column_key );

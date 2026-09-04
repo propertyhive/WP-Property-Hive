@@ -164,7 +164,7 @@ class PH_Plugin_Updates {
 		$this->new_version            = $response->new_version;
 		$this->upgrade_notice         = $this->get_upgrade_notice( $response->new_version );
 
-		echo apply_filters( 'propertyhive_in_plugin_update_message', $this->upgrade_notice ? '<br><span style="color:#900">' . wp_kses_post( $this->upgrade_notice ) . '</span>' : '' ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo apply_filters( 'propertyhive_in_plugin_update_message', $this->upgrade_notice ? '<br><span style="color:#900">' . wp_kses_post( $this->upgrade_notice ) . '</span>' : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**

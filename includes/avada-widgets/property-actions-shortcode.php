@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 add_shortcode( 'avada_property_actions', function( $atts ) {
     $atts = shortcode_atts( array(
 
@@ -21,7 +23,7 @@ add_shortcode( 'avada_property_actions', function( $atts ) {
 
     ob_start();
 
-    echo '<div ' . FusionBuilder::attributes( 'property-actions-shortcode' ) . '>';
+    echo '<div ' . FusionBuilder::attributes( 'property-actions-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         propertyhive_template_single_actions();
     echo '</div>';
 

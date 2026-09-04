@@ -438,7 +438,7 @@ class PH_Elementor {
             {
                 $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
-                echo '<div class="flag flag-' . sanitize_title($flag) . '" style="position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . $current_settings['flag_position'] . '; color:' . $current_settings['flag_text_color'] . '; background:' . $current_settings['flag_bg_color'] . ';">' . $flag . '</div>';
+                echo '<div class="flag flag-' . esc_attr(sanitize_title($flag)) . '" style="position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . esc_attr($current_settings['flag_position']) . '; color:' . esc_attr($current_settings['flag_text_color']) . '; background:' . esc_attr($current_settings['flag_bg_color']) . ';">' . wp_kses_post($flag) . '</div>';
             }
         }
     }

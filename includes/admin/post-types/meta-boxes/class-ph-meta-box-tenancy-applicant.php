@@ -75,14 +75,14 @@ class PH_Meta_Box_Tenancy_Applicant {
                 $fields = apply_filters( 'propertyhive_tenancy_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
                 $div_style = $i > 0 ? 'style="border-top:1px solid #ddd"' : '';
-                echo "<div id=\"existing-owner-details-" . $applicant_contact_id . "\" " . $div_style . ">";
+                echo "<div id=\"existing-owner-details-" . (int)$applicant_contact_id . "\" " . $div_style . ">"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 foreach ( $fields as $key => $field )
                 {
                     echo '<p class="form-field ' . esc_attr($key) . '" >
 
                         <label>' . esc_html($field['label']) . '</label>
 
-                        ' .  $field['value'] . '
+                        ' .  wp_kses_post($field['value']) . '
 
                     </p>';
                 }

@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 fusion_builder_map( array(
     'name'        => esc_attr__( $widget, 'propertyhive' ),
     'shortcode'   => 'avada_' . str_replace("-", "_", sanitize_title($widget)),

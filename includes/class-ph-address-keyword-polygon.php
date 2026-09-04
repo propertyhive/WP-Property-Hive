@@ -43,7 +43,7 @@ class PH_Address_Keyword_Polygon {
      * @since 1.0.0
      */
     public function __clone() {
-        _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
+        _doing_it_wrong( __FUNCTION__, esc_html( __( 'Cheatin&#8217; huh?', 'propertyhive' ) ), '1.0.0' );
     }
 
     /**
@@ -52,7 +52,7 @@ class PH_Address_Keyword_Polygon {
      * @since 1.0.0
      */
     public function __wakeup() {
-        _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
+        _doing_it_wrong( __FUNCTION__, esc_html( __( 'Cheatin&#8217; huh?', 'propertyhive' ) ), '1.0.0' );
     }
 
     /**

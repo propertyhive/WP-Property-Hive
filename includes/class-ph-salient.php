@@ -90,6 +90,7 @@ new PH_Salient();
 function ph_extract_font_style_from_salient_font_container( $font_container = '' )
 {
 	$style = '';
+	$styles = array();
 
 	if ( empty($font_container) || !function_exists('vc_parse_multi_attribute') )
 	{

@@ -51,7 +51,7 @@ class PH_Meta_Box_Contact_Solicitor {
 
                     <label>' . esc_html($field['label']) . '</label>
 
-                    ' . $field['value'] . '
+                    ' . wp_kses_post($field['value']) . '
 
                 </p>';
             }

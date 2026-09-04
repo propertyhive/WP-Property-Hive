@@ -379,7 +379,7 @@ function viewing_update_selected_properties()
                                     e.preventDefault();
 
                                     $(this).attr('disabled', 'disabled');
-                                    $(this).html('<?php echo __( 'Creating', 'propertyhive' ) . ' ' . $enquiry_contact_type . '...'; ?>');
+                                    $(this).html('<?php echo esc_js(__( 'Creating', 'propertyhive' )) . ' ' . esc_js($enquiry_contact_type) . '...'; ?>');
 
                                     var data = {
                                         action:         'propertyhive_create_contact_from_enquiry',
@@ -392,14 +392,14 @@ function viewing_update_selected_properties()
                                         if (response.error)
                                         {
                                             $(that).attr('disabled', false);
-                                            $(that).html('<?php echo __( 'Create ', 'propertyhive' ) . $enquiry_contact_type; ?>');
+                                            $(that).html('<?php echo esc_js(__( 'Create ', 'propertyhive' ) . $enquiry_contact_type); ?>');
                                         }
                                         if (response.success)
                                         {
                                             $(that).attr('disabled', false);
                                             $(that).addClass('button-primary');
                                             $(that).attr('href', response.success);
-                                            $(that).html('<?php echo $enquiry_contact_type . __(' Created. View Now', 'propertyhive' ); ?>');
+                                            $(that).html('<?php echo esc_js($enquiry_contact_type . __(' Created. View Now', 'propertyhive' )); ?>');
                                         }
                                     }, 'json');
                                 }

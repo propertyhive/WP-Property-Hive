@@ -106,7 +106,7 @@ class PH_Admin_Matching_Properties {
             </p>
 
             <p>
-            <?php echo __( 'When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' );
+            <?php echo wp_kses_post(__( 'When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ));
             ?>
             </p>
 
@@ -131,7 +131,18 @@ class PH_Admin_Matching_Properties {
     function showPreview()
     {
         jQuery('#mainform').attr('target', '_blank');
-        jQuery('#mainform').attr('action', '<?php echo admin_url( '?preview_propertyhive_email=true&contact_id=' . (int)$_GET['contact_id'] . '&applicant_profile=' . (int)$_GET['applicant_profile'] ); ?>');
+
+        <?php
+            $preview_url = add_query_arg(
+                array(
+                    'preview_propertyhive_email' => 'true',
+                    'contact_id'                 => isset( $_GET['contact_id'] ) ? absint( $_GET['contact_id'] ) : 0,
+                    'applicant_profile'          => isset( $_GET['applicant_profile'] ) ? absint( $_GET['applicant_profile'] ) : 0,
+                ),
+                admin_url()
+            );
+        ?>
+        jQuery('#mainform').attr('action', '<?php echo esc_js( $preview_url ); ?>');
 
         jQuery('#mainform').submit();
         jQuery('#mainform').attr('target', '_self');
@@ -144,7 +155,7 @@ class PH_Admin_Matching_Properties {
 
 					if ( $nothing_to_send == true )
                     {
-                        echo '<script>window.location.href = "' . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2";</script>';
+                        echo '<script>window.location.href = "' . esc_js(get_edit_post_link( $contact_id, 'url' )) . '&ph_message=2";</script>';
 
 						//header("Location: " . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2' ); // properties marked as not interested
                         //die();
@@ -219,7 +230,7 @@ class PH_Admin_Matching_Properties {
 
                     do_action( 'propertyhive_property_match_step_send', $contact_id, $applicant_profile_id );
 
-                    echo '<script>window.location.href = "' . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=1";</script>';
+                    echo '<script>window.location.href = "' . esc_js(get_edit_post_link( $contact_id, 'url' )) . '&ph_message=1";</script>';
 				}
 			}
 		}

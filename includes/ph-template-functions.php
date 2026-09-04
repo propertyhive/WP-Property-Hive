@@ -236,7 +236,7 @@ if ( ! function_exists( 'propertyhive_page_title' ) ) {
         $page_title = apply_filters( 'propertyhive_page_title', $page_title );
 
         if ( $echo )
-            echo $page_title;
+            echo wp_kses_post($page_title);
         else
             return $page_title;
     }
@@ -255,7 +255,7 @@ if ( ! function_exists( 'propertyhive_property_loop_start' ) ) {
         ob_start();
         ph_get_template( 'search/loop-start.php' );
         if ( $echo )
-            echo ob_get_clean();
+            echo wp_kses_post(ob_get_clean());
         else
             return ob_get_clean();
     }
@@ -275,7 +275,7 @@ if ( ! function_exists( 'propertyhive_property_loop_end' ) ) {
         ph_get_template( 'search/loop-end.php' );
 
         if ( $echo )
-            echo ob_get_clean();
+            echo wp_kses_post(ob_get_clean());
         else
             return ob_get_clean();
     }
@@ -291,7 +291,7 @@ if ( ! function_exists( 'propertyhive_template_loop_property_thumbnail' ) ) {
      * @return void
      */
     function propertyhive_template_loop_property_thumbnail() {
-        echo propertyhive_get_property_thumbnail( apply_filters( 'property_search_results_thumbnail_size', 'medium' ) );
+        echo wp_kses_post(propertyhive_get_property_thumbnail( apply_filters( 'property_search_results_thumbnail_size', 'medium' ) ));
     }
 }
 
@@ -1916,9 +1916,7 @@ function load_template_assistant_styles()
     {
         if ( isset($current_settings['search_result_css']) )
         {
-            echo '<style type="text/css">
-            ' . $current_settings['search_result_css'] . '
-            </style>';
+            echo '<style type="text/css">' . $current_settings['search_result_css'] . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         }
     }
 }
@@ -1987,17 +1985,17 @@ function template_assistant_search_result_field_changes()
                 }
                 case "availability":
                 {
-                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="availability">' . $property->availability . '</div>'; }, $priority );
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="availability">' . esc_html($property->availability) . '</div>'; }, $priority );
                     break;
                 }
                 case "property_type":
                 {
-                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="property-type">' . $property->property_type . '</div>'; }, $priority );
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="property-type">' . esc_html($property->property_type) . '</div>'; }, $priority );
                     break;
                 }
                 case "available_date":
                 {
-                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; if ( $property->department == 'residential-lettings' && $property->get_available_date() != '' ) { echo '<div class="available-date">' . $property->get_available_date() . '</div>'; } }, $priority );
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; if ( $property->department == 'residential-lettings' && $property->get_available_date() != '' ) { echo '<div class="available-date">' . esc_html($property->get_available_date()) . '</div>'; } }, $priority );
                     break;
                 }
                 case "rooms":
@@ -2008,9 +2006,9 @@ function template_assistant_search_result_field_changes()
                         if ( ($property->bedrooms != '' && $property->bedrooms != '0') || ($property->bathrooms != '' && $property->bathrooms != '0') || ($property->reception_rooms != '' && $property->reception_rooms != '0') )
                         {
                             echo '<div class="rooms">';
-                            if ( $property->bedrooms != '' && $property->bedrooms != '0' ) { echo '<div class="room room-bedrooms"><span class="room-count">' . $property->bedrooms . '</span> <span class="room-label">Bedroom' . ( $property->bedrooms != 1 ? 's' : '' ) . '</span></div>'; }
-                            if ( $property->bathrooms != '' && $property->bathrooms != '0' ) { echo '<div class="room room-bathrooms"><span class="room-count">' . $property->bathrooms . '</span> <span class="room-label">Bathroom' . ( $property->bathrooms != 1 ? 's' : '' ) . '</span></div>'; }
-                            if ( $property->reception_rooms != '' && $property->reception_rooms != '0' ) { echo '<div class="room room-receptions"><span class="room-count">' . $property->reception_rooms . '</span> <span class="room-label">Reception' . ( $property->reception_rooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            if ( $property->bedrooms != '' && $property->bedrooms != '0' ) { echo '<div class="room room-bedrooms"><span class="room-count">' . esc_html($property->bedrooms) . '</span> <span class="room-label">Bedroom' . ( $property->bedrooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            if ( $property->bathrooms != '' && $property->bathrooms != '0' ) { echo '<div class="room room-bathrooms"><span class="room-count">' . esc_html($property->bathrooms) . '</span> <span class="room-label">Bathroom' . ( $property->bathrooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            if ( $property->reception_rooms != '' && $property->reception_rooms != '0' ) { echo '<div class="room room-receptions"><span class="room-count">' . esc_html($property->reception_rooms) . '</span> <span class="room-label">Reception' . ( $property->reception_rooms != 1 ? 's' : '' ) . '</span></div>'; }
                             echo '</div>'; 
                         }
                     }, $priority );
@@ -2045,7 +2043,7 @@ function propertyhive_template_loop_custom_field()
 
             if ( $value != '' )
             {
-                echo '<div class="custom-field custom-field-' . sanitize_title(trim($custom_field, "_")) . '">' . $value . '</div>';
+                echo '<div class="custom-field custom-field-' . esc_attr(sanitize_title(trim($custom_field, "_"))) . '">' . wp_kses_post($value) . '</div>';
             }
         }
     }
@@ -2064,7 +2062,7 @@ function propertyhive_add_flag()
 
         if ( $flag != '' )
         {
-            echo '<div class="flag flag-' . sanitize_title($flag) . '" style="position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . $current_settings['flag_position'] . '; color:' . $current_settings['flag_text_color'] . '; background:' . $current_settings['flag_bg_color'] . ';">' . $flag . '</div>';
+            echo '<div class="flag flag-' . esc_attr(sanitize_title($flag)) . '" style="position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . esc_attr($current_settings['flag_position']) . '; color:' . esc_attr($current_settings['flag_text_color']) . '; background:' .esc_attr( $current_settings['flag_bg_color']) . ';">' . esc_html($flag) . '</div>';
         }
     }
 }
@@ -2082,7 +2080,7 @@ function propertyhive_add_flag_single()
 
         if ( $flag != '' )
         {
-            echo '<div class="flag flag-' . sanitize_title($flag) . '" style="position:absolute; z-index:99; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . $current_settings['flag_position'] . '; color:' . $current_settings['flag_text_color'] . '; background:' . $current_settings['flag_bg_color'] . ';">' . $flag . '</div>';
+            echo '<div class="flag flag-' . esc_attr(sanitize_title($flag)) . '" style="position:absolute; z-index:99; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . esc_attr($current_settings['flag_position']) . '; color:' . esc_attr($current_settings['flag_text_color']) . '; background:' . esc_attr($current_settings['flag_bg_color']) . ';">' . esc_html($flag) . '</div>';
         }
     }
 }

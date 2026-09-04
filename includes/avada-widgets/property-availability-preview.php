@@ -5,6 +5,7 @@
  * @package fusion-builder
  */
 
+if ( ! defined( 'ABSPATH' ) ) exit;
 ?>
 <script type="text/template" id="fusion-builder-block-module-property-availability-preview-template">
 

@@ -27,7 +27,7 @@ if ( ! empty( $atts['font_container'] ) && isset($atts['font_container']) )
 	$style = ph_extract_font_style_from_salient_font_container( $font_container );
 }
 
-echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
+echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	echo esc_html($property->tenure);
 

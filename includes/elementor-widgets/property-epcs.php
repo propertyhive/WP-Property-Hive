@@ -110,7 +110,7 @@ class Elementor_Property_EPCs_Widget extends \Elementor\Widget_Base {
             {
                 foreach ($epc_urls as $epc)
                 {
-                	echo '<a href="' . $epc['url'] . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt=""></a>';
+                	echo '<a href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt=""></a>';
                 }
             }
         }

@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                     $output .= '</select>';
 
-                    echo $output;
+                    echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 ?>
             </p>
             <p class="form-field">
@@ -92,7 +92,20 @@ if ( ! defined( 'ABSPATH' ) ) {
             </p>
             <p class="form-field">
                 <label for="date_notes_quick_edit">Notes</label>
-                <textarea id="date_notes_quick_edit" class="short"><?php echo ( isset( $_POST['notes'] ) && $_POST['notes'] != '-' ) ? stripslashes( sanitize_textarea_field($_POST['notes']) ) : ''; ?></textarea>
+                <?php
+                    $notes = '';
+
+                    if ( isset( $_POST['notes'] ) ) 
+                    {
+                        $notes = sanitize_textarea_field( wp_unslash( $_POST['notes'] ) );
+
+                        if ( '-' === $notes ) 
+                        {
+                            $notes = '';
+                        }
+                    }
+                ?>
+                <textarea id="date_notes_quick_edit" class="short"><?php echo esc_textarea( $notes ); ?></textarea>
             </p>
             <?php
             if ( isset($recurrence_rules[$_POST['type']]) && isset( $recurrence_rules[$_POST['type']]['recurrence_rule'] ) )

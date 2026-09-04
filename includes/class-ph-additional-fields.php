@@ -86,7 +86,7 @@ class PH_Additional_Fields {
 			                        }
 			                        elseif ( $custom_field['field_type'] == 'date' )
 			                        {
-			                            echo date(get_option( 'date_format' ), strtotime(get_post_meta( $post_id, $custom_field['field_name'], true )));
+			                            echo esc_html(date(get_option( 'date_format' ), strtotime(get_post_meta( $post_id, $custom_field['field_name'], true ))));
 			                        }
 			                        elseif ( $custom_field['field_type'] == 'image' )
 			                        {
@@ -594,7 +594,8 @@ class PH_Additional_Fields {
 
                     if ( !empty($values) )
                     {
-                        echo '<li class="' . esc_attr(trim($custom_field['field_name'], '_')) . '">' . $label;
+                        echo '<li class="' . esc_attr(trim($custom_field['field_name'], '_')) . '">';
+                        echo $label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                         echo esc_html(is_array($values) ? implode(", ", $values) : $values);
                         echo '</li>';
                     }
@@ -605,7 +606,10 @@ class PH_Additional_Fields {
                     {
                         ?>
                         <li class="<?php echo esc_attr(trim($custom_field['field_name'], '_')); ?>">
-                            <?php echo $label . date(get_option( 'date_format' ), strtotime($property->{$custom_field['field_name']})); ?>
+                            <?php 
+                            	echo $label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                            	echo esc_html(date(get_option( 'date_format' ), strtotime($property->{$custom_field['field_name']}))); 
+                            ?>
                         </li>
                         <?php
                     }
@@ -616,7 +620,10 @@ class PH_Additional_Fields {
                     {
                         ?>
                         <li class="<?php echo esc_attr(trim($custom_field['field_name'], '_')); ?>">
-                            <?php echo $label . wp_get_attachment_image($property->{$custom_field['field_name']}); ?>
+                            <?php 
+	                            echo $label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	                            echo wp_get_attachment_image($property->{$custom_field['field_name']}); 
+                            ?>
                         </li>
                         <?php
                         }
@@ -627,7 +634,10 @@ class PH_Additional_Fields {
                     {
                         ?>
                         <li class="<?php echo esc_attr(trim($custom_field['field_name'], '_')); ?>">
-                            <?php echo $label . '<a href="' . esc_url(wp_get_attachment_url($property->{$custom_field['field_name']})) . '" rel="noopener noreferrer" target="_blank">' . esc_html(__( 'View', 'propertyhive' )) . '</a>'; ?>
+                            <?php 
+                            	echo $label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                            	echo '<a href="' . esc_url(wp_get_attachment_url($property->{$custom_field['field_name']})) . '" rel="noopener noreferrer" target="_blank">' . esc_html(__( 'View', 'propertyhive' )) . '</a>'; 
+                            ?>
                         </li>
                         <?php
                     }
@@ -652,7 +662,7 @@ class PH_Additional_Fields {
                         }
                         ?>
                         <li class="<?php echo esc_attr(trim($custom_field['field_name'], '_')); ?>">
-                            <?php echo $label . $value; ?>
+                            <?php echo $label . $value; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                         </li>
                         <?php
                     }
@@ -971,8 +981,8 @@ class PH_Additional_Fields {
                 }
 ?>
                 <p class="form-field">
-                    <label for="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo $applicant_profile_id; ?>"><?php echo esc_html($custom_field['field_label']); ?></label>
-                    <select id="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo $applicant_profile_id; ?>" name="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo $applicant_profile_id; ?>[]" multiple="multiple" data-placeholder="Start typing to add <?php echo esc_attr($custom_field['field_label']); ?>..." class="multiselect attribute_values">
+                    <label for="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo (int)$applicant_profile_id; ?>"><?php echo esc_html($custom_field['field_label']); ?></label>
+                    <select id="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo (int)$applicant_profile_id; ?>" name="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo (int)$applicant_profile_id; ?>[]" multiple="multiple" data-placeholder="Start typing to add <?php echo esc_attr($custom_field['field_label']); ?>..." class="multiselect attribute_values">
                         <?php
                             foreach ( $options as $option )
                             {

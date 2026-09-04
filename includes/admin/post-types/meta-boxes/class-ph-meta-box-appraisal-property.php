@@ -29,7 +29,7 @@ class PH_Meta_Box_Appraisal_Property {
         {
             $appraisal = new PH_Appraisal((int)$thepostid);
 
-            echo '<p class="form-field"><label for="">Address</label>' . $appraisal->get_formatted_full_address('<br>') . '<br><a href="' . esc_url(get_edit_post_link( $appraisal->property_id )) . '">View Property</a></p>';
+            echo '<p class="form-field"><label for="">Address</label>' . wp_kses_post($appraisal->get_formatted_full_address('<br>')) . '<br><a href="' . esc_url(get_edit_post_link( $appraisal->property_id )) . '">View Property</a></p>';
 
             echo '<p class="form-field"><label for="">Department</label>' . esc_html(ucwords(str_replace("-", " ", $appraisal->department))) . '</p>';
 
@@ -47,7 +47,7 @@ class PH_Meta_Box_Appraisal_Property {
 
             echo '<p class="form-field"><label for="">Council Tax Band</label>' . esc_html($appraisal->council_tax_band) . '</p>';
 
-            echo '<p class="form-field"><label for="">Additional Information</label>' . $appraisal->additional_property_information . '</p>';
+            echo '<p class="form-field"><label for="">Additional Information</label>' . wp_kses_post($appraisal->additional_property_information) . '</p>';
         }
         else
         {        

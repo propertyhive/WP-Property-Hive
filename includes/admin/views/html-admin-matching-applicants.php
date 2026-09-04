@@ -224,7 +224,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     echo '<tr id="matching_contact_' . (int)$applicant['contact_id'] . '_applicant_profile_' . (int)$applicant['applicant_profile']['applicant_profile_id'] . '">';
                     foreach ( $columns as $key => $column )
                     {
-                        echo '<td style="border-bottom:1px solid #CCC; padding:5px 0;">' . $column . '</td>';
+                        echo '<td style="border-bottom:1px solid #CCC; padding:5px 0;">' . wp_kses_post($column) . '</td>';
                     }
                     echo '<td style="border-bottom:1px solid #CCC; padding:5px 0;">';
 
@@ -288,7 +288,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			}
             else
             {
-                echo __( 'No matching applicants found', 'propertyhive' );
+                echo esc_html(__( 'No matching applicants found', 'propertyhive' ));
             }
 		?>
 

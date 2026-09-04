@@ -17,7 +17,7 @@ global $property;
 <?php
      if ( post_password_required() ) 
      {
-        echo get_the_password_form();
+        echo wp_kses_post(get_the_password_form());
         return;
      }
 ?>

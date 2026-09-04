@@ -371,11 +371,11 @@ $actions = apply_filters( 'propertyhive_admin_post_actions', $actions, $post_id 
 
 if ( !empty($actions) )
 {
-    echo implode("", $actions);
+    echo wp_kses_post(implode("", $actions));
 }
 else
 {
-    echo '<div style="text-align:center">' . wp_kses_post( __( 'No actions to display', 'propertyhive' ) ) . '</div>';
+    echo '<div style="text-align:center">' . esc_html( __( 'No actions to display', 'propertyhive' ) ) . '</div>';
 }
 
 echo '</div>
@@ -409,7 +409,7 @@ if ( $show_customise_confirmation_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_owner_confirmation_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                <label for="_owner_confirmation_email_subject">' . esc_html(__( 'Subject', 'propertyhive' )) . '</label>
                 
                 <input id="_owner_confirmation_email_subject" name="_owner_confirmation_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
 
@@ -417,15 +417,15 @@ if ( $show_customise_confirmation_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_owner_confirmation_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                <label for="_owner_confirmation_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                 
-                <textarea id="_owner_confirmation_email_body" name="_owner_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+                <textarea id="_owner_confirmation_email_body" name="_owner_confirmation_email_body" style="width:100%; height:100px;">' . esc_textarea($body) . '</textarea>
 
             </div>
 
             <div class="form-field">
 
-                <label for="_owner_confirmation_email_attachment">' . __( 'Attach File(s)', 'propertyhive' ) . '</label>
+                <label for="_owner_confirmation_email_attachment">' . esc_html(__( 'Attach File(s)', 'propertyhive' )) . '</label>
                 
                 <input type="file" id="_owner_confirmation_email_attachment" name="_owner_confirmation_email_attachment" style="width:100%;" multiple>
 
@@ -457,7 +457,7 @@ if ( $show_customise_confirmation_meta_boxes )
 
                 <label for="_applicant_confirmation_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                 
-                <textarea id="_applicant_confirmation_email_body" name="_applicant_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+                <textarea id="_applicant_confirmation_email_body" name="_applicant_confirmation_email_body" style="width:100%; height:100px;">' . esc_textarea($body) . '</textarea>
 
             </div>
 
@@ -495,7 +495,7 @@ if ( $show_customise_confirmation_meta_boxes )
 
                 <label for="_attending_negotiator_confirmation_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                 
-                <textarea id="_attending_negotiator_confirmation_email_body" name="_attending_negotiator_confirmation_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+                <textarea id="_attending_negotiator_confirmation_email_body" name="_attending_negotiator_confirmation_email_body" style="width:100%; height:100px;">' . esc_textarea($body) . '</textarea>
 
             </div>
 
@@ -526,7 +526,7 @@ if ( $show_customise_cancellation_notification_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_owner_cancellation_notification_email_subject">' . __( 'Subject', 'propertyhive' ) . '</label>
+                <label for="_owner_cancellation_notification_email_subject">' . esc_html(__( 'Subject', 'propertyhive' )) . '</label>
                 
                 <input id="_owner_cancellation_notification_email_subject" name="_owner_cancellation_notification_email_subject" style="width:100%;" value="' . esc_attr($subject) . '">
 
@@ -534,15 +534,15 @@ if ( $show_customise_cancellation_notification_meta_boxes )
 
             <div class="form-field">
 
-                <label for="_owner_cancellation_notification_email_body">' . __( 'Body', 'propertyhive' ) . '</label>
+                <label for="_owner_cancellation_notification_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                 
-                <textarea id="_owner_cancellation_notification_email_body" name="_owner_cancellation_notification_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+                <textarea id="_owner_cancellation_notification_email_body" name="_owner_cancellation_notification_email_body" style="width:100%; height:100px;">' . esc_textarea($body) . '</textarea>
 
             </div>
 
             <div class="form-field">
 
-                <label for="_owner_cancellation_notification_email_attachment">' . __( 'Attach File(s)', 'propertyhive' ) . '</label>
+                <label for="_owner_cancellation_notification_email_attachment">' . esc_html(__( 'Attach File(s)', 'propertyhive' )) . '</label>
                 
                 <input type="file" id="_owner_cancellation_notification_email_attachment" name="_owner_cancellation_notification_email_attachment" style="width:100%;" multiple>
 
@@ -574,7 +574,7 @@ if ( $show_customise_cancellation_notification_meta_boxes )
 
                 <label for="_applicant_cancellation_notification_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                 
-                <textarea id="_applicant_cancellation_notification_email_body" name="_applicant_cancellation_notification_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+                <textarea id="_applicant_cancellation_notification_email_body" name="_applicant_cancellation_notification_email_body" style="width:100%; height:100px;">' . esc_textarea($body) . '</textarea>
 
             </div>
 
@@ -612,7 +612,7 @@ if ( $show_customise_cancellation_notification_meta_boxes )
 
                 <label for="_attending_negotiator_cancellation_notification_email_body">' . esc_html(__( 'Body', 'propertyhive' )) . '</label>
                 
-                <textarea id="_attending_negotiator_cancellation_notification_email_body" name="_attending_negotiator_cancellation_notification_email_body" style="width:100%; height:100px;">' . $body . '</textarea>
+                <textarea id="_attending_negotiator_cancellation_notification_email_body" name="_attending_negotiator_cancellation_notification_email_body" style="width:100%; height:100px;">' . esc_textarea($body) . '</textarea>
 
             </div>
 
@@ -642,7 +642,7 @@ if ( $show_cancelled_meta_boxes )
 
                 <label for="_cancelled_reason">' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . '</label>
                 
-                <textarea id="_cancelled_reason" name="_cancelled_reason" style="width:100%;">' . get_post_meta( $post_id, '_cancelled_reason', TRUE ) . '</textarea>
+                <textarea id="_cancelled_reason" name="_cancelled_reason" style="width:100%;">' . esc_textarea(get_post_meta( $post_id, '_cancelled_reason', TRUE )) . '</textarea>
 
             </div>
 
@@ -671,7 +671,7 @@ if ( $show_feedback_meta_boxes )
 
                 <label for="_viewing_interested_feedback">' . esc_html(__( 'Applicant Feedback', 'propertyhive' )) . '</label>
                 
-                <textarea id="_interested_feedback" name="_interested_feedback" style="width:100%;">' . get_post_meta( $post_id, '_feedback', TRUE ) . '</textarea>
+                <textarea id="_interested_feedback" name="_interested_feedback" style="width:100%;">' . esc_textarea(get_post_meta( $post_id, '_feedback', TRUE )) . '</textarea>
 
             </div>
 
@@ -690,7 +690,7 @@ if ( $show_feedback_meta_boxes )
 
                 <label for="_viewing_not_interested_feedback">' . esc_html(__( 'Applicant Feedback', 'propertyhive' )) . '</label>
                 
-                <textarea id="_not_interested_feedback" name="_not_interested_feedback" style="width:100%;">' . get_post_meta( $post_id, '_feedback', TRUE ) . '</textarea>
+                <textarea id="_not_interested_feedback" name="_not_interested_feedback" style="width:100%;">' . esc_textarea(get_post_meta( $post_id, '_feedback', TRUE )) . '</textarea>
 
             </div>
 

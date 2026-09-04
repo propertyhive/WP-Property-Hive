@@ -513,7 +513,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 									'onclick' => $onclick
 								] );
 					?>
-						<div <?php echo $this->get_render_attribute_string( $tab_title_setting_key ); ?>><?php echo $item['tab_title']; ?></div>
+						<div <?php echo $this->get_render_attribute_string( $tab_title_setting_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html($item['tab_title']); ?></div>
 					<?php
 								}
 							}
@@ -565,8 +565,8 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 								$this->add_inline_editing_attributes( $tab_content_setting_key, 'advanced' );
 						?>
-						<div <?php echo $this->get_render_attribute_string( $tab_title_mobile_setting_key ); ?>><?php echo esc_html($item['tab_title']); ?></div>
-						<div <?php echo $this->get_render_attribute_string( $tab_content_setting_key ); ?>><?php
+						<div <?php echo $this->get_render_attribute_string( $tab_title_mobile_setting_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html($item['tab_title']); ?></div>
+						<div <?php echo $this->get_render_attribute_string( $tab_content_setting_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php
 							foreach ( $item['tab_display'] as $display )
 							{
 								switch ( $display )
@@ -872,7 +872,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 										if ( ! empty( $item['tab_content'] ) ) 
 										{
 											echo '<div class="tabbed-custom-content">';
-											echo $this->parse_text_editor( $item['tab_content'] );
+											echo $this->parse_text_editor( $item['tab_content'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 											echo '</div>';
 										}
 										break;
