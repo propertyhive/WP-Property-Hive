@@ -47,11 +47,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				$image = $property->get_main_photo_src();
 
-				echo '<tr>
+				echo wp_kses_post( '<tr>
 					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . esc_url($image) . '" width="75" alt="' . esc_attr(get_the_title( $viewing->property_id )) . '">' : '' ) . $link_suffix . '</td>
 					<td>' . $date_prefix . esc_html(date( "H:i jS M Y", strtotime( $viewing->start_date_time ) )) . $date_suffix . '</td>
-					<td>' . $link_prefix . esc_html(get_the_title( $viewing->property_id )) . $link_suffix . '<br>' . $property->get_formatted_price() . '</td>
-				</tr>';
+					<td>' . $link_prefix . esc_html(get_the_title( $viewing->property_id )) . $link_suffix . '<br>' . wp_kses_post( $property->get_formatted_price() ) . '</td>
+				</tr>' );
 			}
 			echo '</table>';
 		}
@@ -91,11 +91,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				$image = $property->get_main_photo_src();
 
-				echo '<tr>
+				echo wp_kses_post( '<tr>
 					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . esc_url($image) . '" width="75" alt="' . esc_attr(get_the_title( $viewing->property_id )) . '">' : '' ) . $link_suffix . '</td>
 					<td>' . $date_prefix . esc_html(date( "H:i jS M Y", strtotime( $viewing->start_date_time ) )) . $date_suffix . '</td>
-					<td>' . $link_prefix . esc_html(get_the_title( $viewing->property_id )) . $link_suffix . '<br>' . $property->get_formatted_price() . '</td>
-				</tr>';
+					<td>' . $link_prefix . esc_html(get_the_title( $viewing->property_id )) . $link_suffix . '<br>' . wp_kses_post( $property->get_formatted_price() ) . '</td>
+				</tr>' );
 			}
 			echo '</table>';
 		}

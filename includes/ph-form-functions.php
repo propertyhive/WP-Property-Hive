@@ -1772,5 +1772,5 @@ var availabilities_order = <?php echo json_encode(array_keys($options)); ?>;
         }
     }
 
-    echo $output;
+    echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Form markup is assembled above with context-specific escaping; arbitrary HTML fields are an intentional extension point.
 }

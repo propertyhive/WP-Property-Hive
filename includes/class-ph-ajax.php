@@ -1921,11 +1921,11 @@ class PH_AJAX {
 ?>
                 <li rel="<?php echo absint( $comment_id ) ; ?>" class="note">
                     <div class="note_content">
-                        <?php echo wpautop( wptexturize( wp_kses_post( $note ) ) ); ?>
+                        <?php echo wp_kses_post( wpautop( wptexturize( $note ) ) ); ?>
                     </div>
                     <p class="meta">
-                        <abbr class="exact-date" title="<?php echo esc_attr($comment->comment_date_gmt); ?> GMT"><?php printf( __( '%s ago', 'propertyhive' ), human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ); ?></abbr>
-                        <?php if ( $comment->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . __( 'by %s', 'propertyhive' ), $comment->comment_author ); ?>
+                        <abbr class="exact-date" title="<?php echo esc_attr($comment->comment_date_gmt); ?> GMT"><?php printf( esc_html__( '%s ago', 'propertyhive' ), esc_html( human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ) ); ?></abbr>
+                        <?php if ( $comment->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . esc_html__( 'by %s', 'propertyhive' ), esc_html( $comment->comment_author ) ); ?>
                         <a href="#" class="delete_note"><?php echo esc_html(__( 'Delete', 'propertyhive' )); ?></a>
                     </p>
                 </li>
@@ -3703,7 +3703,7 @@ class PH_AJAX {
 
         if ( !empty($actions) )
         {
-            echo implode("", $actions);
+            echo wp_kses_post( implode("", $actions) );
         }
         else
         {
@@ -7172,7 +7172,7 @@ class PH_AJAX {
 
         if ( !empty($actions) )
         {
-            echo implode("", $actions);
+            echo wp_kses_post( implode("", $actions) );
         }
         else
         {
@@ -7402,7 +7402,7 @@ class PH_AJAX {
 
                 <div id="success_actions"></div>
 
-                <a class="button action-cancel" style="width:100%;" href="#">' . __( 'Back To Actions', 'propertyhive' ) . '</a>
+                <a class="button action-cancel" style="width:100%;" href="#">' . esc_html__( 'Back To Actions', 'propertyhive' ) . '</a>
 
             </div>
 
@@ -7455,7 +7455,7 @@ class PH_AJAX {
 
         if ( !empty($actions) )
         {
-            echo implode("", $actions);
+            echo wp_kses_post( implode("", $actions) );
         }
         else
         {

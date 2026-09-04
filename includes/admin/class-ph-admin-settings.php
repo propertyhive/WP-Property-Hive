@@ -275,7 +275,7 @@ class PH_Admin_Settings {
 	            		echo '<h3>' . esc_html( $value['title'] ) . '</h3>';
 	            	}
 	            	if ( ! empty( $value['desc'] ) ) {
-	            		echo wpautop( wptexturize( wp_kses_post( $value['desc'] ) ) );
+                        echo wp_kses_post( wpautop( wptexturize( $value['desc'] ) ) );
 	            	}
 	            	echo '<table class="form-table">'. "\n\n";
 	            	if ( ! empty( $value['id'] ) ) {
@@ -341,7 +341,7 @@ class PH_Admin_Settings {
 	                    		style="<?php echo esc_attr( $value['css'] ); ?>"
 	                    		value="<?php echo esc_attr( $option_value ); ?>"
 	                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-	                    		<?php echo implode( ' ', $custom_attributes ); ?>
+                                <?php echo implode( ' ', $custom_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Each attribute name and value is escaped when the array is built. ?>
 	                    		/> <?php echo wp_kses_post($description); ?>
 	                    </td>
 	                </tr><?php
@@ -370,14 +370,14 @@ class PH_Admin_Settings {
 							<?php echo wp_kses_post($tip); ?>
 						</th>
 	                    <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
-	                    	<?php echo $description; ?>
+                            <?php echo wp_kses_post( $description ); ?>
 
 	                        <textarea
 	                        	name="<?php echo esc_attr( $value['id'] ); ?>"
 	                        	id="<?php echo esc_attr( $value['id'] ); ?>"
 	                        	style="<?php echo esc_attr( $value['css'] ); ?>"
 	                        	class="<?php echo esc_attr( $value['class'] ); ?>"
-	                        	<?php echo implode( ' ', $custom_attributes ); ?>
+                                <?php echo implode( ' ', $custom_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Each attribute name and value is escaped when the array is built. ?>
 	                        	><?php echo esc_textarea( $option_value );  ?></textarea>
 	                    </td>
 	                </tr><?php
@@ -397,7 +397,7 @@ class PH_Admin_Settings {
 	                    	
 	                    	<?php wp_editor( $option_value, esc_attr( $value['id'] ), array( 'media_buttons' => false, 'textarea_rows' => 3, 'teeny' => true ) ); ?>
 
-	                    	<?php echo '<br>' . $description; ?>
+                            <?php echo '<br>' . wp_kses_post( $description ); ?>
 
 	                        <?php /*<textarea
 	                        	name="<?php echo esc_attr( $value['id'] ); ?>"
@@ -425,7 +425,7 @@ class PH_Admin_Settings {
 	                    		id="<?php echo esc_attr( $value['id'] ); ?>"
 	                    		style="<?php echo esc_attr( $value['css'] ); ?>"
 	                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-	                    		<?php echo implode( ' ', $custom_attributes ); ?>
+                                <?php echo implode( ' ', $custom_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Each attribute name and value is escaped when the array is built. ?>
 	                    		<?php if ( $value['type'] == 'multiselect' ) echo 'multiple="multiple"'; ?>
 	                    		>
 		                    	<?php
@@ -438,11 +438,11 @@ class PH_Admin_Settings {
 				                        	else
 				                        		selected( $option_value, $key );
 
-			                        	?>><?php echo $val ?></option>
+                                        ?>><?php echo esc_html( $val ); ?></option>
 			                        	<?php
 			                        }
 			                    ?>
-	                       </select> <?php echo $description; ?>
+	                       </select> <?php echo wp_kses_post( $description ); ?>
 	                    </td>
 	                </tr><?php
 	            break;
@@ -459,7 +459,7 @@ class PH_Admin_Settings {
 						</th>
 	                    <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
 	                    	<fieldset>
-	                    		<?php echo $description; ?>
+                                <?php echo wp_kses_post( $description ); ?>
 	                    		<ul>
 	                    		<?php
 	                    			foreach ( $value['options'] as $key => $val ) {
@@ -467,13 +467,13 @@ class PH_Admin_Settings {
 			                        	<li>
 			                        		<label><input
 				                        		name="<?php echo esc_attr( $value['id'] ); ?>"
-				                        		value="<?php echo $key; ?>"
+                                            value="<?php echo esc_attr( $key ); ?>"
 				                        		type="radio"
 					                    		style="<?php echo esc_attr( $value['css'] ); ?>"
 					                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-					                    		<?php echo implode( ' ', $custom_attributes ); ?>
+                                        <?php echo implode( ' ', $custom_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Each attribute name and value is escaped when the array is built. ?>
 					                    		<?php checked( $key, $option_value ); ?>
-				                        		/> <?php echo $val ?></label>
+                                        /> <?php echo esc_html( $val ); ?></label>
 			                        	</li>
 			                        	<?php
 			                        }
@@ -529,15 +529,15 @@ class PH_Admin_Settings {
 	            	}
 
 	            	?>
-						<label for="<?php echo $value['id'] ?>">
+						<label for="<?php echo esc_attr( $value['id'] ); ?>">
 							<input
 								name="<?php echo esc_attr( $name ); ?>"
 								id="<?php echo esc_attr( $value['id'] ); ?>"
 								type="checkbox"
 								value="1"
 								<?php checked( $option_value, 'yes'); ?>
-								<?php echo implode( ' ', $custom_attributes ); ?>
-							/> <?php echo $description ?>
+								<?php echo implode( ' ', $custom_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Each attribute name and value is escaped when the array is built. ?>
+							/> <?php echo wp_kses_post( $description ); ?>
 						</label> <?php echo wp_kses_post($tip); ?>
 					<?php
 
@@ -562,12 +562,12 @@ class PH_Admin_Settings {
 	            	$crop 	= checked( 1, self::get_option( $value['id'] . '[crop]', $value['default']['crop'] ), false );
 
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
-						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo wp_kses_post( $tip ); ?></th>
 	                    <td class="forminp image_width_settings">
 
-	                    	<input name="<?php echo esc_attr( $value['id'] ); ?>[width]" id="<?php echo esc_attr( $value['id'] ); ?>-width" type="text" size="3" value="<?php echo $width; ?>" /> &times; <input name="<?php echo esc_attr( $value['id'] ); ?>[height]" id="<?php echo esc_attr( $value['id'] ); ?>-height" type="text" size="3" value="<?php echo $height; ?>" />px
+                            <input name="<?php echo esc_attr( $value['id'] ); ?>[width]" id="<?php echo esc_attr( $value['id'] ); ?>-width" type="text" size="3" value="<?php echo esc_attr( $width ); ?>" /> &times; <input name="<?php echo esc_attr( $value['id'] ); ?>[height]" id="<?php echo esc_attr( $value['id'] ); ?>-height" type="text" size="3" value="<?php echo esc_attr( $height ); ?>" />px
 
-	                    	<label><input name="<?php echo esc_attr( $value['id'] ); ?>[crop]" id="<?php echo esc_attr( $value['id'] ); ?>-crop" type="checkbox" <?php echo $crop; ?> /> <?php _e( 'Hard Crop?', 'propertyhive' ); ?></label>
+                            <label><input name="<?php echo esc_attr( $value['id'] ); ?>[crop]" id="<?php echo esc_attr( $value['id'] ); ?>-crop" type="checkbox" <?php echo esc_attr( $crop ); ?> /> <?php esc_html_e( 'Hard Crop?', 'propertyhive' ); ?></label>
 
 	                    	</td>
 	                </tr><?php
@@ -586,7 +586,7 @@ class PH_Admin_Settings {
 	                    	$image = wp_get_attachment_image_src( $option_value, 'thumbnail' );
 							if ($image !== FALSE)
 							{
-								echo '<img src="' . $image[0] . '" width="150" alt="">';
+								echo '<img src="' . esc_url( $image[0] ) . '" width="150" alt="">';
 							}
 							else
 							{
@@ -596,11 +596,11 @@ class PH_Admin_Settings {
 	                    </td>
 	                </tr>
 	            	<tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
-						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo wp_kses_post( $tip ); ?></th>
 	                    <td class="forminp image_settings">
 
 	                    	<a href="" class="button button-primary ph_upload_photo_button<?php echo esc_attr( $value['id'] ); ?>">Select Image</a>
-	                    	<input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="hidden" value="<?php echo $option_value; ?>" />
+                            <input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="hidden" value="<?php echo esc_attr( $option_value ); ?>" />
 
 	                    </td>
 	                </tr><?php
@@ -610,7 +610,7 @@ class PH_Admin_Settings {
 
 		jQuery(document).ready(function()
         {
-        	jQuery(\'body\').on(\'click\', \'.ph_upload_photo_button' . $value['id'] . '\', function( event ){
+                jQuery(\'body\').on(\'click\', \'.ph_upload_photo_button' . esc_js( $value['id'] ) . '\', function( event ){
                  
 	            event.preventDefault();
 	         
@@ -621,7 +621,7 @@ class PH_Admin_Settings {
 	            }
 	         
 	            // Create the media frame.
-	            file_frame' . $value['id'] . ' = wp.media.frames.file_frame' . esc_js($value['id']) . ' = wp.media({
+	            file_frame' . esc_js( $value['id'] ) . ' = wp.media.frames.file_frame' . esc_js($value['id']) . ' = wp.media({
 	              title: jQuery( this ).data( \'uploader_title\' ),
 	              button: {
 	                text: jQuery( this ).data( \'uploader_button_text\' ),
@@ -650,7 +650,7 @@ class PH_Admin_Settings {
 	            });
 	         
 	            // Finally, open the modal
-	            file_frame' . $value['id'] . '.open();
+	            file_frame' . esc_js( $value['id'] ) . '.open();
 	        });
 		});
 
@@ -674,9 +674,9 @@ class PH_Admin_Settings {
 	            		$args = wp_parse_args( $value['args'], $args );
 
 	            	?><tr valign="top" class="single_select_page" id="row_<?php echo esc_attr( $value['id'] ); ?>">
-	                    <th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+	                    <th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo wp_kses_post( $tip ); ?></th>
 	                    <td class="forminp">
-				        	<?php echo str_replace(' id=', " data-placeholder='" . __( 'Select a page&hellip;', 'propertyhive' ) .  "' style='" . $value['css'] . "' class='" . $value['class'] . "' id=", wp_dropdown_pages( $args ) ); ?> <?php echo $description; ?>
+                        <?php echo str_replace(' id=', " data-placeholder='" . esc_attr__( 'Select a page&hellip;', 'propertyhive' ) .  "' style='" . esc_attr( $value['css'] ) . "' class='" . esc_attr( $value['class'] ) . "' id=", wp_dropdown_pages( $args ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_dropdown_pages() returns trusted core-generated HTML and all injected attributes are escaped. ?> <?php echo wp_kses_post( $description ); ?>
 				        </td>
 	               	</tr><?php
 	            break;
@@ -727,7 +727,7 @@ class PH_Admin_Settings {
 					        	<?php
 					        		if ( $countries )
 					        			foreach ( $countries as $key => $val )
-		                    				echo '<option value="' . esc_attr( $key ) . '" ' . selected( in_array( $key, $selections ), true, false ).'>' . $val['name'] . '</option>';
+                                        echo '<option value="' . esc_attr( $key ) . '" ' . selected( in_array( $key, $selections ), true, false ).'>' . esc_html( $val['name'] ) . '</option>';
 		                    	?>
 					        </select> <?php if ( $description ) echo wp_kses_post($description); ?>
 	               		</td>

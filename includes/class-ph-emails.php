@@ -526,7 +526,7 @@ class PH_Emails {
 						$dismissed_properties = array();
 					}
 
-					if ( $dry_run === true ) { if ( !empty($dismissed_properties) ) { echo 'Dismissed properties: ' . print_r($dismissed_properties, true) . "<br>\n"; } }
+					if ( $dry_run === true ) { if ( !empty($dismissed_properties) ) { echo 'Dismissed properties: ' . esc_html( print_r($dismissed_properties, true) ) . "<br>\n"; } }
 
 					for ( $i = 0; $i < $applicant_profiles; ++$i )
 					{
@@ -800,7 +800,7 @@ class PH_Emails {
 
 		do_action( 'propertyhive_email_header', $contact_id );
 
-		echo wpautop( wptexturize( $message ) );
+		echo wp_kses_post( wpautop( wptexturize( $message ) ) );
 
 		do_action( 'propertyhive_email_footer', $contact_id );
 
