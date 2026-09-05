@@ -2281,7 +2281,7 @@ class PH_AJAX {
         }
 
         // Check only expected fields are received
-        /*$allowed_keys = array_keys($form_controls);
+        $allowed_keys = array_keys($form_controls);
         $allowed_keys[] = 'action';
         $allowed_keys[] = 'utm_source';
         $allowed_keys[] = 'utm_medium';
@@ -2301,9 +2301,14 @@ class PH_AJAX {
             $allowed_keys
         );
 
+        if ( !is_array($allowed_keys) )
+        {
+            $allowed_keys = array();
+        }
+
         foreach ( $_POST as $key => $value )
         {
-            if ( !in_array($key, $allowed_keys) )
+            if ( !is_string($key) || sanitize_key($key) !== $key || !in_array($key, $allowed_keys, true) )
             {
                 // Unexpected field
                 $errors[] = sprintf(
@@ -2312,7 +2317,7 @@ class PH_AJAX {
                 );
                 break;
             }
-        }*/
+        }
 
         // Passed validation
         $property_ids = array_filter( array_map( 'absint', explode( '|', sanitize_text_field( wp_unslash( $_POST['property_id'] ) ) ) ) );
@@ -2543,16 +2548,22 @@ class PH_AJAX {
                     
                     foreach ($_POST as $key => $value)
                     {
-                        if ( $key == 'property_id' )
+                        $meta_key = is_string($key) ? sanitize_key($key) : '';
+                        if ( $meta_key === '' || $meta_key !== $key || !in_array($meta_key, $allowed_keys, true) )
+                        {
+                            continue;
+                        }
+
+                        if ( $meta_key == 'property_id' )
                         {
                             foreach ( $property_ids as $property_id )
                             {
-                                add_post_meta( $enquiry_post_id, $key, (int)$property_id );
+                                add_post_meta( $enquiry_post_id, $meta_key, (int)$property_id );
                             }
                         }
                         else
                         {
-                            add_post_meta( $enquiry_post_id, $key, sanitize_textarea_field(wp_unslash($value)) );
+                            add_post_meta( $enquiry_post_id, $meta_key, sanitize_textarea_field(wp_unslash($value)) );
                         }
                     }
                 }
