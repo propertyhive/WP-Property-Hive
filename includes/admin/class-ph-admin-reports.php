@@ -80,12 +80,27 @@ class PH_Admin_Reports {
 			);
 	    }
 
-	    $reports['properties']['reports']['incomplete_properties'] = array(
+		$reports['properties']['reports']['incomplete_properties'] = array(
 			'title'       => __( 'Incomplete Properties', 'propertyhive' ),
 			'description' => '',
 			'hide_title'  => true,
 			'callback'    => array( __CLASS__, 'get_report' )
 		);
+
+		if ( get_option('propertyhive_active_departments_sales', '') == 'yes' )
+		{
+			$reports['crm'] = array(
+				'title' => __( 'CRM', 'propertyhive' ),
+				'reports' => array(
+					'sales_pipeline' => array(
+						'title'       => __( 'Sales Pipeline', 'propertyhive' ),
+						'description' => '',
+						'hide_title'  => true,
+						'callback'    => array( __CLASS__, 'get_report' )
+					)
+			)
+			);
+		}
 
 		/*if ( get_option('propertyhive_module_disabled_contacts', '') != 'yes' )
 	    {
