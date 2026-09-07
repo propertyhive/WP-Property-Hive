@@ -2543,16 +2543,24 @@ class PH_AJAX {
                     
                     foreach ($_POST as $key => $value)
                     {
-                        if ( $key == 'property_id' )
+                        $meta_key = is_string( $key ) ? $key : '';
+
+                        // Only store non-empty keys containing characters safe for use as post meta.
+                        if ( $meta_key === '' || ! preg_match( '/\A[A-Za-z0-9_-]+\z/', $meta_key ) )
+                        {
+                            continue;
+                        }
+
+                        if ( $meta_key == 'property_id' )
                         {
                             foreach ( $property_ids as $property_id )
                             {
-                                add_post_meta( $enquiry_post_id, $key, (int)$property_id );
+                                add_post_meta( $enquiry_post_id, $meta_key, (int)$property_id );
                             }
                         }
                         else
                         {
-                            add_post_meta( $enquiry_post_id, $key, sanitize_textarea_field(wp_unslash($value)) );
+                            add_post_meta( $enquiry_post_id, $meta_key, sanitize_textarea_field(wp_unslash($value)) );
                         }
                     }
                 }
