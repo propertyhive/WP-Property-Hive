@@ -305,7 +305,71 @@ class PH_Admin_Settings {
                         </th>
                     	<?php } ?>
                         <td class="forminp forminp-<?php echo esc_attr(sanitize_title( $value['type'] )); ?>">
-                            <?php echo wp_kses_post($value['html']); ?>
+                            <?php
+                            	$allowed_html = wp_kses_allowed_html( 'post' );
+
+								$allowed_html['fieldset'] = array(
+									'id'    => true,
+									'class' => true,
+								);
+
+								$allowed_html['legend'] = array(
+									'class' => true,
+								);
+
+								$allowed_html['label'] = array(
+									'for'   => true,
+									'class' => true,
+								);
+
+								$allowed_html['input'] = array(
+									'type'        => true,
+									'name'        => true,
+									'id'          => true,
+									'value'       => true,
+									'class'       => true,
+									'style'       => true,
+									'checked'     => true,
+									'disabled'    => true,
+									'placeholder' => true,
+								);
+
+								$allowed_html['select'] = array(
+									'name'     => true,
+									'id'       => true,
+									'class'    => true,
+									'style'    => true,
+									'multiple' => true,
+									'disabled' => true,
+								);
+
+								$allowed_html['option'] = array(
+									'value'    => true,
+									'selected' => true,
+									'disabled' => true,
+								);
+
+								/**
+								 * Scripts are permitted for backward compatibility because existing
+								 * Property Hive extensions use HTML settings fields to output inline
+								 * administration scripts. To be revised in future after mentioned
+								 * extensions have been updated
+								 */
+								$allowed_html['script'] = array(
+									'type' => true,
+									'src'  => true,
+								);
+
+								$allowed_html['a']['data-department'] = true;
+
+								$allowed_html = apply_filters(
+									'propertyhive_admin_settings_html_allowed_tags',
+									$allowed_html,
+									$value
+								);
+
+								echo wp_kses( $value['html'], $allowed_html );
+                            ?>
                         </td>
                     </tr>
                 <?php
