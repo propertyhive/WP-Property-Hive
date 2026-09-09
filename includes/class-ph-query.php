@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Contains the query functions for PropertyHive which alter the front-end post queries and loops.
  *
@@ -17,6 +20,16 @@ if ( ! class_exists( 'PH_Query' ) ) :
  * PH_Query Class
  */
 class PH_Query {
+
+    /** Keyword normalized by this request's meta-query builder, shared across query instances. */
+    private static $normalized_keyword = null;
+
+    /** Read a department slug for this query without changing the shared request. */
+    private function get_requested_department() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- A public search filter only; it does not authorize a write.
+        return isset( $_REQUEST['department'] ) && is_string( $_REQUEST['department'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['department'] ) ) : null;
+    }
+
 
 	/** @public array Query vars to add to wp */
 	public $query_vars = array();
@@ -149,12 +162,16 @@ class PH_Query {
         {
         	global $wpdb;
 
-        	if ( isset($_REQUEST['keyword']) && ph_clean($_REQUEST['keyword']) != '' )
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public keyword filter reads the request, sanitizes/SQL-escapes it, and contributes only to the current SQL WHERE clause. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            if ( isset($_REQUEST['keyword']) && is_string( $_REQUEST['keyword'] ) && $_REQUEST['keyword'] != '' )
         	{
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only search; reuse the already-unslashed value produced by keyword_meta_query when available.
+                $keyword = isset( self::$normalized_keyword ) && $_REQUEST['keyword'] === self::$normalized_keyword ? self::$normalized_keyword : sanitize_text_field( wp_unslash( $_REQUEST['keyword'] ) );
         		$ref_pos = strpos($where, '_features_concatenated');
         		if ( $ref_pos !== FALSE )
         		{
-	        		$str_to_insert = " $wpdb->posts.post_excerpt LIKE '%" . esc_sql(ph_clean($_REQUEST['keyword'])) . "%' OR ";
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public keyword filter reads the request, sanitizes/SQL-escapes it, and contributes only to the current SQL WHERE clause. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                    $str_to_insert = " $wpdb->posts.post_excerpt LIKE '%" . esc_sql( $keyword ) . "%' OR ";
 	        		$where = substr_replace($where, $str_to_insert, $ref_pos - 18, 0);
 	        	}
         	}
@@ -184,7 +201,8 @@ class PH_Query {
         			$unit_filter_parameter_found = false;
         			foreach ( $unit_filter_parameters as $parameter )
         			{
-        				if ( isset($_REQUEST[$parameter]) && ph_clean($_REQUEST[$parameter]) != '' )
+                        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public commercial display filter reads a request flag and contributes only to the current SQL WHERE clause. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                        if ( isset($_REQUEST[$parameter]) && ph_clean( wp_unslash( $_REQUEST[$parameter] ) ) != '' )
         				{
         					$unit_filter_parameter_found = true;
         				}
@@ -219,7 +237,8 @@ class PH_Query {
 	 * Get any errors from querystring
 	 */
 	public function get_errors() {
-		if ( ! empty( $_GET['ph_error'] ) && ( $error = sanitize_text_field( $_GET['ph_error'] ) ) && ! ph_has_notice( $error, 'error' ) )
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public frontend reads ph_error to add a request-scoped notice; it does not write posts, options, user data, or other persistent state. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+		if ( ! empty( $_GET['ph_error'] ) && ( $error = sanitize_text_field( wp_unslash( $_GET['ph_error'] ) ) ) && ! ph_has_notice( $error, 'error' ) )
 			ph_add_notice( $error, 'error' );
 	}
 
@@ -253,7 +272,9 @@ class PH_Query {
 
 		// Map query vars to their keys, or get them if endpoints are not supported
 		foreach ( $this->query_vars as $key => $var ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public frontend normalizes a URL query variable into the current WP request query_vars; this is request/query state only and has no persistent write. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
 			if ( isset( $_GET[ $var ] ) ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public frontend normalizes a URL query variable into the current WP request query_vars; this is request/query state only and has no persistent write. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
 				$wp->query_vars[ $key ] = sanitize_text_field( wp_unslash( $_GET[ $var ] ) );
 			}
 
@@ -312,6 +333,7 @@ class PH_Query {
 				$q->set( 'paged', $q->query['paged'] );
 
 			// Define a variable so we know this is the front page search results later on
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Retain the existing frontend state constant for theme and extension compatibility.
 			define( 'SEARCH_RESULTS_IS_ON_FRONT', true );
 
 			// Get the actual WP page to avoid errors and let us use is_front_page()
@@ -513,6 +535,7 @@ class PH_Query {
         $q->set( 'tax_query', $tax_query );
         $q->set( 'date_query', $date_query );
 		$q->set( 'post__in', $post__in );
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public Property Hive extension hook loop_search_results_per_page; changing the established name would detach installed callbacks.
 		$q->set( 'posts_per_page', $q->get( 'posts_per_page' ) ? $q->get( 'posts_per_page' ) : apply_filters( 'loop_search_results_per_page', get_option( 'posts_per_page' ) ) );
 
 		// Set a special variable
@@ -586,6 +609,7 @@ class PH_Query {
 						'post_type' 	=> 'property',
 						'numberposts' 	=> -1,
 						'post_status' 	=> 'publish',
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Cached property IDs must preserve the current search metadata predicates; only IDs are fetched, without totals or metadata/term cache priming.
 						'meta_query' 	=> $this->meta_query,
 						'fields' 		=> 'ids',
 						'no_found_rows' => true,
@@ -622,9 +646,12 @@ class PH_Query {
 	 * @return array
 	 */
 	public function get_search_results_ordering_args( $orderby = '', $order = '' ) {
+        $request_department = $this->get_requested_department();
+
 		// Get ordering from query string unless defined
 		if ( ! $orderby ) {
-			$orderby_value = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : apply_filters( 'propertyhive_default_search_results_orderby', get_option( 'propertyhive_default_search_results_orderby' ) );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads ordering/filter inputs and returns ordering arguments for the current query only. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			$orderby_value = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : apply_filters( 'propertyhive_default_search_results_orderby', get_option( 'propertyhive_default_search_results_orderby' ) );
 
 			// Get order + orderby args from string
 			$orderby_value = explode( '-', $orderby_value );
@@ -639,21 +666,27 @@ class PH_Query {
 
 		// default - menu_order
 		if (
-			( isset($_REQUEST['department']) && $_REQUEST['department'] != 'commercial' && ph_get_custom_department_based_on($_REQUEST['department']) != 'commercial' ) ||
-			( !isset($_REQUEST['department']) && get_option( 'propertyhive_primary_department' ) != 'commercial' && ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) != 'commercial' )
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads ordering/filter inputs and returns ordering arguments for the current query only. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			( isset($request_department) && $request_department != 'commercial' && ph_get_custom_department_based_on($request_department) != 'commercial' ) ||
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads ordering/filter inputs and returns ordering arguments for the current query only. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			( !isset($request_department) && get_option( 'propertyhive_primary_department' ) != 'commercial' && ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) != 'commercial' )
 		)
 		{
 			$args['orderby']  = 'meta_value_num';
 			$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Search ordering maps supported price/floor-area/date choices to literal stored meta keys. switch cases and department branches set fixed keys; order direction is constrained to ASC/DESC.
 			$args['meta_key'] = '_price_actual';
 		}
 		elseif (
-			( isset($_REQUEST['department']) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) ) ||
-			( !isset($_REQUEST['department']) && ( get_option( 'propertyhive_primary_department' ) == 'commercial' || ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) == 'commercial' ) )
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads ordering/filter inputs and returns ordering arguments for the current query only. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			( isset($request_department) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) ) ||
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads ordering/filter inputs and returns ordering arguments for the current query only. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			( !isset($request_department) && ( get_option( 'propertyhive_primary_department' ) == 'commercial' || ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) == 'commercial' ) )
 		)
 		{
 			$args['orderby']  = 'meta_value_num';
 			$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Search ordering maps supported price/floor-area/date choices to literal stored meta keys. switch cases and department branches set fixed keys; order direction is constrained to ASC/DESC.
 			$args['meta_key'] = '_floor_area_from_sqft';
 		}
 
@@ -662,25 +695,31 @@ class PH_Query {
 				$args['orderby']  = 'meta_value_num';
 				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
 				if (
-					( isset($_REQUEST['department']) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) ) ||
-					( !isset($_REQUEST['department']) && ( get_option( 'propertyhive_primary_department' ) == 'commercial' || ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) == 'commercial' ) )
+					// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads ordering/filter inputs and returns ordering arguments for the current query only. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+					( isset($request_department) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) ) ||
+					// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads ordering/filter inputs and returns ordering arguments for the current query only. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+					( !isset($request_department) && ( get_option( 'propertyhive_primary_department' ) == 'commercial' || ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) == 'commercial' ) )
 				)
 				{
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Search ordering maps supported price/floor-area/date choices to literal stored meta keys. switch cases and department branches set fixed keys; order direction is constrained to ASC/DESC.
 					$args['meta_key'] = '_price_from_actual';
 				}
 				else
 				{
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Search ordering maps supported price/floor-area/date choices to literal stored meta keys. switch cases and department branches set fixed keys; order direction is constrained to ASC/DESC.
 					$args['meta_key'] = '_price_actual';
 				}
 			break;
 			case 'floor_area' :
 				$args['orderby']  = 'meta_value_num';
 				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Search ordering maps supported price/floor-area/date choices to literal stored meta keys. switch cases and department branches set fixed keys; order direction is constrained to ASC/DESC.
 				$args['meta_key'] = '_floor_area_from_sqft';
 			break;
 			case 'date' :
 				$args['orderby']  = 'meta_value';
 				$args['order']    = $order == 'ASC' ? 'ASC' : 'DESC';
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Search ordering maps supported price/floor-area/date choices to literal stored meta keys. switch cases and department branches set fixed keys; order direction is constrained to ASC/DESC.
 				$args['meta_key'] = '_on_market_change_date';
 			break;
 			default :
@@ -706,19 +745,23 @@ class PH_Query {
 
 		$date_query = array();
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
 		if ( isset( $_REQUEST['added_from'] ) && $_REQUEST['added_from'] != '' )
         {
             $date_query = array(
                 'column'  => 'post_date_gmt',
-                'after'   => sanitize_text_field( $_REQUEST['added_from'] ) 
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'after'   => sanitize_text_field( wp_unslash( $_REQUEST['added_from'] ) )
             );
         }
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
 		if ( isset( $_REQUEST['added_from_hours'] ) && $_REQUEST['added_from_hours'] != '' )
         {
             $date_query = array(
                 'column'  => 'post_date_gmt',
-                'after'   => sanitize_text_field( $_REQUEST['added_from_hours'] ) . ' hours ago'
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'after'   => sanitize_text_field( wp_unslash( $_REQUEST['added_from_hours'] ) ) . ' hours ago'
             );
         }
 
@@ -810,14 +853,16 @@ class PH_Query {
      * @return array
      */
     public function department_meta_query( $q ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
-        if ( isset( $_REQUEST['department'] ) && $_REQUEST['department'] != '' )
+        if ( isset( $request_department ) && $request_department != '' )
         {
             $meta_query = array(
                 'key'     => '_department',
-                'value'   => sanitize_text_field( $_REQUEST['department'] ),
+                'value'   => sanitize_text_field( $request_department ),
                 'compare' => '='
             );
         }
@@ -869,6 +914,7 @@ class PH_Query {
         
         $meta_query = array();
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         if ( isset( $_REQUEST['featured'] ) && $_REQUEST['featured'] != '' )
         {
             $meta_query = array(
@@ -891,11 +937,13 @@ class PH_Query {
 
         $meta_query = array();
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         if ( isset( $_REQUEST['date_added'] ) && $_REQUEST['date_added'] != '' && is_numeric($_REQUEST['date_added']) )
         {
             $meta_query = array(
                 'key'     => '_on_market_change_date',
-                'value'   => date('Y-m-d H:i:s', strtotime('-' . $_REQUEST['date_added'] . ' days')),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => gmdate('Y-m-d H:i:s', strtotime('-' . sanitize_text_field( wp_unslash( $_REQUEST['date_added'] ) ) . ' days')),
                 'compare' => '>=',
                 'type'    => 'DATETIME',
             );
@@ -913,16 +961,31 @@ class PH_Query {
 	public function address_keyword_meta_query( ) {
       	
       	$meta_query = array();
-      	
-      	if ( isset( $_REQUEST['address_keyword'] ) && !empty($_REQUEST['address_keyword']) )
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only search control; no persistent state change.
+        if ( isset( $_REQUEST['address_keyword'] ) && !empty($_REQUEST['address_keyword']) )
         {
-        	$_REQUEST['address_keyword'] = ph_clean( wp_unslash( $_REQUEST['address_keyword'] ) );
+
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only address search; values are validated below before query construction.
+            $address_input = ph_clean( wp_unslash( $_REQUEST['address_keyword'] ) );
+            if ( ! is_string( $address_input ) && ! is_array( $address_input ) ) {
+                return $meta_query;
+            }
+            foreach ( (array) $address_input as $address_value ) {
+                if ( ! is_string( $address_value ) ) {
+                    return $meta_query;
+                }
+            }
+            $address_input = ph_clean( $address_input );
+            // Preserve the normalized request value consumed by existing extensions.
+            $_REQUEST['address_keyword'] = $address_input;
 
         	$do_address_search = true;
-        	if ( get_option( 'propertyhive_address_keyword_compare', '=' ) == 'polygon' )
+            if ( is_string( $address_input ) && get_option( 'propertyhive_address_keyword_compare', '=' ) == 'polygon' )
         	{
         		$address_keyword_polygon = new PH_Address_Keyword_Polygon();
-        		$polygon_coordinates = $address_keyword_polygon->get_address_keyword_polygon_coordinates( $_REQUEST['address_keyword'] . ', UK' );
+
+                $polygon_coordinates = $address_keyword_polygon->get_address_keyword_polygon_coordinates( $address_input . ', UK' );
         		
         		if ( $polygon_coordinates !== FALSE )
         		{
@@ -934,7 +997,8 @@ class PH_Query {
 
         	if ( $do_address_search )
         	{
-	        	$address_keywords_to_query = is_array($_REQUEST['address_keyword']) ? $_REQUEST['address_keyword'] : array( $_REQUEST['address_keyword'] );
+
+                $address_keywords_to_query = is_array($address_input) ? $address_input : array( $address_input );
 
 	        	$address_fields_to_query = array(
 		      		'_reference_number',
@@ -1157,19 +1221,23 @@ class PH_Query {
         
         $meta_query = array();
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         if ( isset( $_REQUEST['country'] ) && $_REQUEST['country'] != '' )
         {
             $meta_query = array(
                 'key'     => '_address_country',
-                'value'   => ph_clean( $_REQUEST['country'] )
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['country'] ) )
             );
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         if ( isset( $_REQUEST['country_not'] ) && $_REQUEST['country_not'] != '' )
         {
             $meta_query = array(
                 'key'     => '_address_country',
-                'value'   => ph_clean( $_REQUEST['country_not'] ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['country_not'] ) ),
                 'compare' => '!='
             );
         }
@@ -1184,15 +1252,19 @@ class PH_Query {
      * @return array
      */
     public function minimum_price_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' ) && 
+            isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['minimum_price'] ) && $_REQUEST['minimum_price'] != '' 
         )
         {
-        	$minimum_price = $_REQUEST['minimum_price'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $minimum_price = is_string( $_REQUEST['minimum_price'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['minimum_price'] ) ) : '';
 
         	if ( !is_numeric($minimum_price) )
         	{
@@ -1228,15 +1300,19 @@ class PH_Query {
      * @return array
      */
     public function maximum_price_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' ) && 
+            isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['maximum_price'] ) && $_REQUEST['maximum_price'] != '' 
         )
         {
-        	$maximum_price = $_REQUEST['maximum_price'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $maximum_price = is_string( $_REQUEST['maximum_price'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['maximum_price'] ) ) : '';
 
         	if ( !is_numeric($maximum_price) )
         	{
@@ -1272,15 +1348,19 @@ class PH_Query {
      * @return array
      */
     public function price_range_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' ) && 
-            isset( $_REQUEST['price_range'] ) && $_REQUEST['price_range'] != '' 
+            isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            isset( $_REQUEST['price_range'] ) && is_string( $_REQUEST['price_range'] ) && $_REQUEST['price_range'] != ''
         )
         {
-        	$explode_price_range = explode("-", ph_clean($_REQUEST['price_range']));
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $explode_price_range = explode("-", ph_clean( wp_unslash( $_REQUEST['price_range'] ) ));
 
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
@@ -1345,15 +1425,19 @@ class PH_Query {
      * @return array
      */
     public function minimum_rent_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ) && 
+            isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['minimum_rent'] ) && $_REQUEST['minimum_rent'] != '' 
         )
         {
-        	$minimum_rent = $_REQUEST['minimum_rent'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $minimum_rent = is_string( $_REQUEST['minimum_rent'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['minimum_rent'] ) ) : '';
 
         	if ( !is_numeric($minimum_rent) )
         	{
@@ -1398,15 +1482,19 @@ class PH_Query {
      * @return array
      */
     public function maximum_rent_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ) && 
+            isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['maximum_rent'] ) && $_REQUEST['maximum_rent'] != '' 
         )
         {
-        	$maximum_rent = $_REQUEST['maximum_rent'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $maximum_rent = is_string( $_REQUEST['maximum_rent'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['maximum_rent'] ) ) : '';
 
         	if ( !is_numeric($maximum_rent) )
         	{
@@ -1451,15 +1539,19 @@ class PH_Query {
      * @return array
      */
     public function rent_range_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ) && 
-            isset( $_REQUEST['rent_range'] ) && $_REQUEST['rent_range'] != '' 
+            isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            isset( $_REQUEST['rent_range'] ) && is_string( $_REQUEST['rent_range'] ) && $_REQUEST['rent_range'] != ''
         )
         {
-        	$explode_rent_range = explode("-", ph_clean($_REQUEST['rent_range']));
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $explode_rent_range = explode("-", ph_clean( wp_unslash( $_REQUEST['rent_range'] ) ));
 
         	$search_form_currency = get_option( 'propertyhive_search_form_currency', 'GBP' );
         	$search_form_currency = apply_filters( 'propertyhive_query_search_form_currency', $search_form_currency );
@@ -1542,20 +1634,24 @@ class PH_Query {
      * @return array
      */
     public function bedrooms_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
         	(
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' )) ||
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ))
+                (isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' )) ||
+                (isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ))
         	) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         	isset( $_REQUEST['bedrooms'] ) && $_REQUEST['bedrooms'] != '' 
         )
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
-                'value'   => ph_clean( $_REQUEST['bedrooms'] ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['bedrooms'] ) ),
                 'compare' => '=',
                 'type'    => 'NUMERIC' 
             );
@@ -1571,20 +1667,24 @@ class PH_Query {
      * @return array
      */
     public function minimum_bedrooms_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
         	(
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' )) ||
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ))
+                (isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' )) ||
+                (isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ))
         	) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         	isset( $_REQUEST['minimum_bedrooms'] ) && $_REQUEST['minimum_bedrooms'] != '' 
         )
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
-                'value'   => ph_clean( $_REQUEST['minimum_bedrooms'] ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['minimum_bedrooms'] ) ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -1600,20 +1700,24 @@ class PH_Query {
      * @return array
      */
     public function maximum_bedrooms_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
         	(
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' )) ||
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ))
+                (isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' )) ||
+                (isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ))
         	) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         	isset( $_REQUEST['maximum_bedrooms'] ) && $_REQUEST['maximum_bedrooms'] != '' 
         )
         {
             $meta_query = array(
                 'key'     => '_bedrooms',
-                'value'   => ph_clean( $_REQUEST['maximum_bedrooms'] ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['maximum_bedrooms'] ) ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -1629,20 +1733,24 @@ class PH_Query {
      * @return array
      */
     public function minimum_bathrooms_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
         	(
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' )) ||
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ))
+                (isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' )) ||
+                (isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ))
         	) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         	isset( $_REQUEST['minimum_bathrooms'] ) && $_REQUEST['minimum_bathrooms'] != '' 
         )
         {
             $meta_query = array(
                 'key'     => '_bathrooms',
-                'value'   => ph_clean( $_REQUEST['minimum_bathrooms'] ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['minimum_bathrooms'] ) ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -1658,20 +1766,24 @@ class PH_Query {
      * @return array
      */
     public function maximum_bathrooms_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
         	(
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' )) ||
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ))
+                (isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' )) ||
+                (isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ))
         	) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         	isset( $_REQUEST['maximum_bathrooms'] ) && $_REQUEST['maximum_bathrooms'] != '' 
         )
         {
             $meta_query = array(
                 'key'     => '_bathrooms',
-                'value'   => ph_clean( $_REQUEST['maximum_bathrooms'] ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['maximum_bathrooms'] ) ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -1687,20 +1799,24 @@ class PH_Query {
      * @return array
      */
     public function minimum_reception_rooms_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
         	(
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' )) ||
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ))
+                (isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' )) ||
+                (isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ))
         	) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         	isset( $_REQUEST['minimum_reception_rooms'] ) && $_REQUEST['minimum_reception_rooms'] != '' 
         )
         {
             $meta_query = array(
                 'key'     => '_reception_rooms',
-                'value'   => ph_clean( $_REQUEST['minimum_reception_rooms'] ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['minimum_reception_rooms'] ) ),
                 'compare' => '>=',
                 'type'    => 'NUMERIC' 
             );
@@ -1716,20 +1832,24 @@ class PH_Query {
      * @return array
      */
     public function maximum_reception_rooms_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
         	(
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-sales' )) ||
-        		(isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ))
+                (isset( $request_department ) && ( $request_department == 'residential-sales' || ph_get_custom_department_based_on($request_department) == 'residential-sales' )) ||
+                (isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ))
         	) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         	isset( $_REQUEST['maximum_reception_rooms'] ) && $_REQUEST['maximum_reception_rooms'] != '' 
         )
         {
             $meta_query = array(
                 'key'     => '_reception_rooms',
-                'value'   => ph_clean( $_REQUEST['maximum_reception_rooms'] ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( $_REQUEST['maximum_reception_rooms'] ) ),
                 'compare' => '<=',
                 'type'    => 'NUMERIC' 
             );
@@ -1745,15 +1865,19 @@ class PH_Query {
      * @return array
      */
     public function available_date_from_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-        	isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_REQUEST['department']) == 'residential-lettings' ) &&
-        	isset( $_REQUEST['available_date_from'] ) && $_REQUEST['available_date_from'] != '' 
+            isset( $request_department ) && ( $request_department == 'residential-lettings' || ph_get_custom_department_based_on($request_department) == 'residential-lettings' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            isset( $_REQUEST['available_date_from'] ) && is_string( $_REQUEST['available_date_from'] ) && $_REQUEST['available_date_from'] != ''
         )
         {
-        	$available_date = ph_clean($_REQUEST['available_date_from']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $available_date = ph_clean( wp_unslash( $_REQUEST['available_date_from'] ) );
         	if ( strpos($available_date, '/') !== FALSE )
         	{
         		// it's been provided in the format dd/mm/yyyy
@@ -1780,19 +1904,25 @@ class PH_Query {
      * @return array
      */
     public function minimum_floor_area_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['minimum_floor_area'] ) && $_REQUEST['minimum_floor_area'] != '' &&
             (
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	!isset( $_REQUEST['maximum_floor_area'] ) ||
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] == '' )
             )
         )
         {
-			$value =  ph_clean( $_REQUEST['minimum_floor_area'] );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			$value =  ph_clean( wp_unslash( $_REQUEST['minimum_floor_area'] ) );
 			if ( apply_filters('propertyhive_default_commercial_search_floor_area_unit', 'sqft') != 'sqft' )
 			{
 				// Convert value from square metres to square feet
@@ -1817,19 +1947,25 @@ class PH_Query {
      * @return array
      */
     public function maximum_floor_area_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] != '' &&
             (
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	!isset( $_REQUEST['minimum_floor_area'] ) ||
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['minimum_floor_area'] ) && $_REQUEST['minimum_floor_area'] == '' )
             )
         )
         {
-			$value =  ph_clean( $_REQUEST['maximum_floor_area'] );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			$value =  ph_clean( wp_unslash( $_REQUEST['maximum_floor_area'] ) );
 			if ( apply_filters('propertyhive_default_commercial_search_floor_area_unit', 'sqft') != 'sqft' )
 			{
 				// Convert value from square metres to square feet
@@ -1854,17 +1990,23 @@ class PH_Query {
      * @return array
      */
     public function minimum_maximum_floor_area_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['minimum_floor_area'] ) && $_REQUEST['minimum_floor_area'] != '' &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['maximum_floor_area'] ) && $_REQUEST['maximum_floor_area'] != ''
         )
         {
-			$maximum_floor_area = ph_clean( $_REQUEST['maximum_floor_area'] );
-			$minimum_floor_area = ph_clean( $_REQUEST['minimum_floor_area'] );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			$maximum_floor_area = ph_clean( wp_unslash( $_REQUEST['maximum_floor_area'] ) );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+			$minimum_floor_area = ph_clean( wp_unslash( $_REQUEST['minimum_floor_area'] ) );
 			if ( apply_filters('propertyhive_default_commercial_search_floor_area_unit', 'sqft') != 'sqft' )
 			{
 				// Convert value from square metres to square feet
@@ -1897,15 +2039,19 @@ class PH_Query {
      * @return array
      */
     public function floor_area_range_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
-            isset( $_REQUEST['floor_area_range'] ) && $_REQUEST['floor_area_range'] != '' 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            isset( $_REQUEST['floor_area_range'] ) && is_string( $_REQUEST['floor_area_range'] ) && $_REQUEST['floor_area_range'] != ''
         )
         {
-        	$explode_floor_area_range = explode("-", ph_clean($_REQUEST['floor_area_range']));
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $explode_floor_area_range = explode("-", ph_clean( wp_unslash( $_REQUEST['floor_area_range'] ) ));
 
         	if ( isset($explode_floor_area_range[0]) && $explode_floor_area_range[0] != '' )
         	{
@@ -1937,11 +2083,14 @@ class PH_Query {
      * @return array
      */
     public function commercial_for_sale_to_rent_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'for_sale' 
         )
         {
@@ -1953,7 +2102,8 @@ class PH_Query {
         }
 
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'to_rent' 
         )
         {
@@ -1974,11 +2124,14 @@ class PH_Query {
      * @return array
      */
     public function commercial_for_sale_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['commercial_for_sale'] ) && $_REQUEST['commercial_for_sale'] == '1' 
         )
         {
@@ -1999,11 +2152,14 @@ class PH_Query {
      * @return array
      */
     public function commercial_to_rent_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['commercial_to_rent'] ) && $_REQUEST['commercial_to_rent'] == '1' 
         )
         {
@@ -2024,20 +2180,26 @@ class PH_Query {
      * @return array
      */
     public function commercial_minimum_price_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
             (
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'for_sale' )
             	||
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['commercial_for_sale'] ) && $_REQUEST['commercial_for_sale'] == '1' )
             ) && 
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['commercial_minimum_price'] ) && $_REQUEST['commercial_minimum_price'] != '' 
         )
         {
-        	$minimum_price = $_REQUEST['commercial_minimum_price'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $minimum_price = is_string( $_REQUEST['commercial_minimum_price'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['commercial_minimum_price'] ) ) : '';
 
         	if ( !is_numeric($minimum_price) )
         	{
@@ -2073,20 +2235,26 @@ class PH_Query {
      * @return array
      */
     public function commercial_maximum_price_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
             (
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'for_sale' )
             	||
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['commercial_for_sale'] ) && $_REQUEST['commercial_for_sale'] == '1' )
             ) && 
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['commercial_maximum_price'] ) && $_REQUEST['commercial_maximum_price'] != '' 
         )
         {
-        	$maximum_price = $_REQUEST['commercial_maximum_price'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $maximum_price = is_string( $_REQUEST['commercial_maximum_price'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['commercial_maximum_price'] ) ) : '';
 
         	if ( !is_numeric($maximum_price) )
         	{
@@ -2122,20 +2290,26 @@ class PH_Query {
      * @return array
      */
     public function commercial_minimum_rent_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
             (
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'to_rent' )
             	||
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['commercial_to_rent'] ) && $_REQUEST['commercial_to_rent'] == '1' )
             ) && 
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['commercial_minimum_rent'] ) && $_REQUEST['commercial_minimum_rent'] != '' 
         )
         {
-        	$minimum_rent = $_REQUEST['commercial_minimum_rent'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $minimum_rent = is_string( $_REQUEST['commercial_minimum_rent'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['commercial_minimum_rent'] ) ) : '';
 
         	if ( !is_numeric($minimum_rent) )
         	{
@@ -2171,20 +2345,26 @@ class PH_Query {
      * @return array
      */
     public function commercial_maximum_rent_meta_query( ) {
+        $request_department = $this->get_requested_department();
+
         
         $meta_query = array();
         
         if ( 
-            isset( $_REQUEST['department'] ) && ( $_REQUEST['department'] == 'commercial' || ph_get_custom_department_based_on($_REQUEST['department']) == 'commercial' ) && 
+            isset( $request_department ) && ( $request_department == 'commercial' || ph_get_custom_department_based_on($request_department) == 'commercial' ) &&
             (
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['commercial_for_sale_to_rent'] ) && $_REQUEST['commercial_for_sale_to_rent'] == 'to_rent' )
             	||
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             	( isset( $_REQUEST['commercial_to_rent'] ) && $_REQUEST['commercial_to_rent'] == '1' )
             ) && 
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
             isset( $_REQUEST['commercial_maximum_rent'] ) && $_REQUEST['commercial_maximum_rent'] != '' 
         )
         {
-        	$maximum_rent = $_REQUEST['commercial_maximum_rent'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+            $maximum_rent = is_string( $_REQUEST['commercial_maximum_rent'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['commercial_maximum_rent'] ) ) : '';
         	
         	if ( !is_numeric($maximum_rent) )
         	{
@@ -2223,10 +2403,12 @@ class PH_Query {
         
         $meta_query = array();
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         if ( isset( $_REQUEST['negotiator_id'] ) && $_REQUEST['negotiator_id'] != '' )
         {
     		$meta_query = array(
     		    'key'     => '_negotiator_id',
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
     		    'value'   => (int)$_REQUEST['negotiator_id'],
     		    'compare' => '='
     		);
@@ -2246,11 +2428,13 @@ class PH_Query {
         
         $meta_query = array();
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
         if ( isset( $_REQUEST['officeID'] ) && $_REQUEST['officeID'] != '' )
         {
     		$meta_query = array(
     		    'key'     => '_office_id',
-    		    'value'   => ph_clean( (is_array($_REQUEST['officeID'])) ? $_REQUEST['officeID'] : array( $_REQUEST['officeID'] ) ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The public property search reads a filter value and contributes query/meta/taxonomy arguments for the current request only; no persistent state-changing operation is reached. This exact annotation covers only NonceVerification.Recommended; retain all sanitizer and SQL-safety checks.
+                'value'   => ph_clean( wp_unslash( (array) $_REQUEST['officeID'] ) ),
     		    'compare' => 'IN'
     		);
 		}
@@ -2267,44 +2451,62 @@ class PH_Query {
 	public function keyword_meta_query( ) {
       	
       	$meta_query = array();
-      	
-      	if ( isset( $_REQUEST['keyword'] ) && $_REQUEST['keyword'] != '' )
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only search input; query construction does not change persistent state.
+        if ( isset( $_REQUEST['keyword'] ) && is_string( $_REQUEST['keyword'] ) && $_REQUEST['keyword'] != '' )
         {
-        	$_REQUEST['keyword'] = ph_clean( wp_unslash( $_REQUEST['keyword'] ) );
+
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only search input is type checked above.
+            $request_keyword = sanitize_text_field( wp_unslash( $_REQUEST['keyword'] ) );
 
         	// Remove country code from end (i.e. ', UK')
-        	$_REQUEST['keyword'] = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $_REQUEST['keyword']);
+
+            $request_keyword = preg_replace('/\,\s?[A-Z][A-Z]$/', '', $request_keyword);
 
         	// Extract postcode and use that if exists
 			$postcode_pattern = '/\b([A-Z]{1,2}[0-9][0-9A-Z]? ?[0-9]?[A-Z]{0,2})\b/i';
-			if ( preg_match($postcode_pattern, $_REQUEST['keyword'], $matches) ) 
+
+            if ( preg_match($postcode_pattern, $request_keyword, $matches) )
 			{
-			    $_REQUEST['keyword'] = $matches[1];
+			    $request_keyword = $matches[1];
 			}
 
-			$_REQUEST['keyword'] = trim($_REQUEST['keyword']);
+			$request_keyword = trim($request_keyword);
 
-        	$keywords = array( $_REQUEST['keyword'] );
+            // Keep the normalized request value available to the existing excerpt query and extension filters.
+            $_REQUEST['keyword'] = $request_keyword;
+            self::$normalized_keyword = $request_keyword;
 
-        	if ( strpos( $_REQUEST['keyword'], ' ' ) !== FALSE )
+            $keywords = array( $request_keyword );
+
+            if ( strpos( $request_keyword, ' ' ) !== FALSE )
         	{
-        		$keywords[] = str_replace(" ", "-", ph_clean($_REQUEST['keyword']));
+
+                $keywords[] = str_replace(" ", "-", ph_clean($request_keyword));
         	}
-        	if ( strpos( $_REQUEST['keyword'], '-' ) !== FALSE )
+
+            if ( strpos( $request_keyword, '-' ) !== FALSE )
         	{
-        		$keywords[] = str_replace("-", " ", ph_clean($_REQUEST['keyword']));
+
+                $keywords[] = str_replace("-", " ", ph_clean($request_keyword));
         	}
-			if ( strpos( $_REQUEST['keyword'], '.' ) !== FALSE )
+
+			if ( strpos( $request_keyword, '.' ) !== FALSE )
 			{
-				$keywords[] = str_replace(".", "", ph_clean($_REQUEST['keyword']));
+
+				$keywords[] = str_replace(".", "", ph_clean($request_keyword));
 			}
-			if ( stripos( $_REQUEST['keyword'], 'st ' ) !== FALSE )
+
+			if ( stripos( $request_keyword, 'st ' ) !== FALSE )
 			{
-				$keywords[] = str_ireplace("st ", "st. ", ph_clean($_REQUEST['keyword']));
+
+				$keywords[] = str_ireplace("st ", "st. ", ph_clean($request_keyword));
 			}
-			if ( strpos( $_REQUEST['keyword'], '\'' ) !== FALSE )
+
+			if ( strpos( $request_keyword, '\'' ) !== FALSE )
 			{
-				$keywords[] = str_replace("'", "", ph_clean($_REQUEST['keyword']));
+
+				$keywords[] = str_replace("'", "", ph_clean($request_keyword));
 			}
 
 	      	$meta_query = array( 'relation' => 'OR' );
@@ -2337,11 +2539,13 @@ class PH_Query {
 			}
 			if ( in_array('_address_postcode', $fields_to_query) )
 			{
-		      	if ( strlen($_REQUEST['keyword']) <= 4 )
+
+                if ( strlen($request_keyword) <= 4 )
 		      	{
 		      		$meta_query[] = array(
 					    'key'     => '_address_postcode',
-					    'value'   => ph_clean( $_REQUEST['keyword'] ),
+
+					    'value'   => ph_clean( $request_keyword ),
 					    'compare' => '='
 					);
 					// Run regex match where given keyword is at the start of the postcode ^
@@ -2349,13 +2553,15 @@ class PH_Query {
 					// then a single space [ ]
 		      		$meta_query[] = array(
 					    'key'     => '_address_postcode',
-					    'value'   => '^' . ph_clean( $_REQUEST['keyword'] ) . '[a-zA-Z]?[ ]',
+
+					    'value'   => '^' . ph_clean( $request_keyword ) . '[a-zA-Z]?[ ]',
 					    'compare' => 'RLIKE'
 					);
 		      	}
 		      	else
 		      	{
-		      		$postcode = ph_clean( $_REQUEST['keyword'] );
+
+                    $postcode = ph_clean( $request_keyword );
 
 		      		if ( preg_match('#^(GIR ?0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HK-Y][0-9]([0-9ABEHMNPRV-Y])?)|[0-9][A-HJKPS-UW])[0-9][ABD-HJLNP-UW-Z]{2})$#i', $postcode) )
 		      		{
@@ -2406,17 +2612,27 @@ class PH_Query {
         if ( ! is_array( $tax_query ) )
             $tax_query = array();
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only taxonomy search; this does not authorize a write.
         if ( isset($_REQUEST) && !empty($_REQUEST) )
         {
+
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only taxonomy search; each value is validated and sanitized below.
             foreach ( $_REQUEST as $key => $value )
             {
-                if ( taxonomy_exists($key) && isset( $_REQUEST[$key] ) && !empty($_REQUEST[$key]) && $this->taxonomy_allowed_for_department( $key ) )
+
+                if ( taxonomy_exists($key) && !empty($value) && $this->taxonomy_allowed_for_department( $key ) )
                 {
+                    $terms = (array) $value;
+                    foreach ( $terms as $term ) {
+                        if ( ! is_string( $term ) && ! is_int( $term ) ) {
+                            continue 2;
+                        }
+                    }
                     $operator = $key == 'property_feature' ? 'AND' : 'IN';
 
                     $tax_query[] = array(
                         'taxonomy'  => $key,
-                        'terms' => ph_clean( (is_array($value)) ? $value : array( $value ) ),
+                        'terms' => ph_clean( wp_unslash( $terms ) ),
                         'operator' => $operator,
                     );
                 }
@@ -2428,9 +2644,11 @@ class PH_Query {
 
     private function taxonomy_allowed_for_department( $taxonomy )
     {
-    	if ( isset( $_REQUEST['department'] ) && $_REQUEST['department'] != '' )
+        $request_department = $this->get_requested_department();
+
+        if ( isset( $request_department ) && $request_department != '' )
         {
-        	$department = ph_clean($_REQUEST['department']);
+            $department = ph_clean($request_department);
         }
         else
         {

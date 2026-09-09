@@ -17,6 +17,7 @@ global $property;
 <?php
      if ( post_password_required() ) 
      {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WordPress returns the escaped password form HTML and its trusted PHP form filter.
         echo get_the_password_form();
         return;
      }

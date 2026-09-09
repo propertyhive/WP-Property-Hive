@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Preserve the existing public PH_Yoast_SEO class name for plugin and extension compatibility.
 class PH_Yoast_SEO {
 
 	/** @var PH_Yoast_SEO The single instance of the class */
@@ -40,7 +41,7 @@ class PH_Yoast_SEO {
 
 		if ( in_array( $screen->id, array( 'property' ) ) )
         {
-        	wp_enqueue_script( 'propertyhive-yoast', PH()->plugin_url() . '/assets/js/admin/yoast.js', array(), PH_VERSION );
+            wp_enqueue_script( 'propertyhive-yoast', PH()->plugin_url() . '/assets/js/admin/yoast.js', array( 'jquery' ), PH_VERSION, true );
         }
     }
 
@@ -82,7 +83,7 @@ class PH_Yoast_SEO {
 		// Core listing bits
 		$department   = $property->_department;
 
-		$data['datePosted'] = date("Y-m-d\TH:i:s", strtotime($property->_on_market_change_date)) . "+00:00";
+		$data['datePosted'] = gmdate("Y-m-d\TH:i:s", strtotime($property->_on_market_change_date)) . "+00:00";
 
 		// Attach an Offer (price, currency, availability) that points at the Residence
 		if ( $department == 'residential-sales' || ph_get_custom_department_based_on($department) == 'residential-sales' ) 
@@ -273,6 +274,7 @@ class PH_Yoast_SEO {
             'fields'            => 'ids',
             'posts_per_page'    => -1,
             'post_type'         => 'property',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Sitemap exclusions require all property IDs explicitly marked off-market in the existing metadata schema; preserve the complete exclusion list and status semantics.
             'meta_query'        => array(
                 array(
                     'key'   => '_on_market',

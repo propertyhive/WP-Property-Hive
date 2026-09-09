@@ -19,6 +19,7 @@ if ( empty( $propertyhive_loop['loop'] ) )
 
 // Store column count for displaying the grid
 if ( empty( $propertyhive_loop['columns'] ) )
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public Property Hive extension hook loop_search_results_columns; changing the established name would detach installed callbacks.
 	$propertyhive_loop['columns'] = apply_filters( 'loop_search_results_columns', 1 );
 
 // Ensure visibility
@@ -29,12 +30,16 @@ if ( ! $property )
 ++$propertyhive_loop['loop'];
 
 // Extra post classes
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 $classes = array('clear');
 if ( 0 == ( $propertyhive_loop['loop'] - 1 ) % $propertyhive_loop['columns'] || 1 == $propertyhive_loop['columns'] )
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 	$classes[] = 'first';
 if ( 0 == $propertyhive_loop['loop'] % $propertyhive_loop['columns'] )
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 	$classes[] = 'last';
 if ( $property->featured == 'yes' )
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
     $classes[] = 'featured';
 ?>
 <li <?php post_class( $classes ); ?>>

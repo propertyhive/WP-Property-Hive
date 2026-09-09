@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * This class provides functions for converting CSS styles into inline style attributes in your HTML code.
  *
@@ -11,7 +15,8 @@
  * @author Oliver Klee <typo3-coding@oliverklee.de>
  * @author Roman Ožana <ozana@omdesign.cz>
  */
-class Emogrifier
+// Locally prefixed to avoid collisions with other plugins bundling this library.
+class PropertyHive_Emogrifier
 {
 	/**
 	 * @var int
@@ -432,6 +437,7 @@ class Emogrifier
 			self::CACHE_KEY_COMBINED_STYLES,
 		);
 		if ( ! in_array($key, $allowedCacheKeys, true) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal diagnostic; PH_Emails::style_inline() escapes caught exception messages before displaying them.
 			throw new InvalidArgumentException('Invalid cache key: ' . $key, 1391822035);
 		}
 
@@ -1227,4 +1233,8 @@ class Emogrifier
 
 		return $excludedNodes;
 	}
+}
+// Keep direct consumers of the bundled library compatible without using another plugin's implementation.
+if ( ! class_exists( 'Emogrifier', false ) ) {
+    class_alias( 'PropertyHive_Emogrifier', 'Emogrifier' );
 }

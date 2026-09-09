@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Preserve the existing public PH_Template_Loader class name for plugin and extension compatibility.
 class PH_Template_Loader {
 
 	/**
@@ -74,6 +75,7 @@ class PH_Template_Loader {
 						'no_found_rows'          => true,
 						'update_post_meta_cache' => false,
 						'update_post_term_cache' => false,
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Divi template lookup uses posts_per_page=1, fields=ids, no_found_rows and cache suppression. Fixed builder metadata predicates; one template is enough for the Divi branch.
 						'meta_query'             => array(
 							array(
 								'key'     => '_et_enabled',
@@ -111,15 +113,18 @@ class PH_Template_Loader {
 				$template_query = new WP_Query(
 					array(
 						'post_type'              => BRICKS_DB_TEMPLATE_SLUG,
+						'posts_per_page'         => -1,
 						'post_status'            => 'publish',
 						'fields'                 => 'ids',
 						'no_found_rows'          => true,
 						'update_post_meta_cache' => false,
 						'update_post_term_cache' => false,
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Bricks stores template types in metadata; inspect every candidate of the correct type because its property assignment is stored separately in template conditions.
 						'meta_query'             => array(
 							array(
 								'key'     => '_bricks_template_type',
-								'compare' => 'content',
+								'value'   => 'content',
+								'compare' => '=',
 							),
 						),
 					)
@@ -239,15 +244,18 @@ class PH_Template_Loader {
 				$template_query = new WP_Query(
 					array(
 						'post_type'              => BRICKS_DB_TEMPLATE_SLUG,
+						'posts_per_page'         => -1,
 						'post_status'            => 'publish',
 						'fields'                 => 'ids',
 						'no_found_rows'          => true,
 						'update_post_meta_cache' => false,
 						'update_post_term_cache' => false,
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Bricks stores template types in metadata; inspect every candidate of the correct type because its property assignment is stored separately in template conditions.
 						'meta_query'             => array(
 							array(
 								'key'     => '_bricks_template_type',
-								'compare' => 'archive',
+								'value'   => 'archive',
+								'compare' => '=',
 							),
 						),
 					)
@@ -272,6 +280,7 @@ class PH_Template_Loader {
 								if ( 
 									isset($templateCondition['main']) && 
 									$templateCondition['main'] == 'archiveType' &&
+									isset($templateCondition['archiveType'], $templateCondition['archivePostTypes']) &&
 									is_array($templateCondition['archiveType']) &&
 									in_array('postType', $templateCondition['archiveType']) &&
 									is_array($templateCondition['archivePostTypes']) &&
@@ -284,6 +293,7 @@ class PH_Template_Loader {
 						}
 					}
 				}
+				wp_reset_postdata();
 			}
 
 			if ( $use_property_hive_template )

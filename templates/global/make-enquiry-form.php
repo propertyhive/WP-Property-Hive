@@ -22,9 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
         <?php echo esc_html(__( 'Please ensure all required fields have been completed', 'propertyhive' )); ?>
     </div>
     
-    <?php foreach ( $form_controls as $key => $field ) : ?>
+    <?php foreach ( $form_controls as $propertyhive_key => $propertyhive_field ) : ?>
 
-        <?php ph_form_field( $key, $field ); ?>
+        <?php ph_form_field( $propertyhive_key, $propertyhive_field ); ?>
 
     <?php endforeach; ?>
 

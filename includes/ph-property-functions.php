@@ -1,4 +1,9 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * PropertyHive Property Functions
  *
@@ -17,6 +22,7 @@
  * @param array $args (default: array()) Contains all arguments to be used to get this property.
  * @return PH_Property
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_property; the established callable name is part of the plugin/extension API and must remain stable.
 function get_property( $the_property = false, $args = array() ) {
 	return new PH_Property( $the_property );
 }
@@ -27,6 +33,7 @@ function get_property( $the_property = false, $args = array() ) {
  * @access public
  * @return array
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_featured_property_ids; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_featured_property_ids() {
 
 	// Load from cache
@@ -40,6 +47,7 @@ function ph_get_featured_property_ids() {
 		'post_type'      => 'property',
 		'posts_per_page' => -1,
 		'post_status'    => 'publish',
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Featured/on-market flags use existing property metadata; all matching IDs are cached in the existing transient.
 		'meta_query'     => array(
 			array(
 				'key'   => '_on_market',
@@ -66,6 +74,7 @@ function ph_get_featured_property_ids() {
  * @access public
  * @return string
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_placeholder_img_src; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_placeholder_img_src() {
 	return apply_filters( 'propertyhive_placeholder_img_src', PH()->plugin_url() . '/assets/images/placeholder.png' );
 }
@@ -76,15 +85,17 @@ function ph_placeholder_img_src() {
  * @access public
  * @return string
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_placeholder_img; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_placeholder_img( $size = 'thumbnail' ) {
 	$dimensions = ph_get_image_size( $size );
 
-	return apply_filters('propertyhive_placeholder_img', '<img src="' . ph_placeholder_img_src() . '" alt="Placeholder" width="' . esc_attr( $dimensions['width'] ) . '" class="property-placeholder wp-post-image" height="' . esc_attr( $dimensions['height'] ) . '" />' );
+	return apply_filters('propertyhive_placeholder_img', '<img src="' . esc_url( ph_placeholder_img_src() ) . '" alt="Placeholder" width="' . esc_attr( $dimensions['width'] ) . '" class="property-placeholder wp-post-image" height="' . esc_attr( $dimensions['height'] ) . '" />' );
 }
 
 /**
  * Track property views
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_track_property_view; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_track_property_view() {
 	if ( ! is_singular( 'property' ) )
 		return;
@@ -94,16 +105,20 @@ function ph_track_property_view() {
 	// Track in cookie
 	if ( apply_filters( 'propertyhive_store_in_recently_viewed_cookie', true ) )
 	{
-		if ( empty( $_COOKIE['propertyhive_recently_viewed'] ) )
-			$viewed_properties = array();
-		else
-			$viewed_properties = (array) explode( '|', $_COOKIE['propertyhive_recently_viewed'] );
+		$viewed_properties = array();
+		$viewed_cookie = isset( $_COOKIE['propertyhive_recently_viewed'] ) && is_string( $_COOKIE['propertyhive_recently_viewed'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['propertyhive_recently_viewed'] ) ) : '';
+		foreach ( explode( '|', $viewed_cookie ) as $viewed_id ) {
+			if ( ctype_digit( $viewed_id ) && absint( $viewed_id ) > 0 ) {
+				$viewed_properties[] = absint( $viewed_id );
+			}
+		}
+		$viewed_properties = array_values( array_unique( $viewed_properties ) );
 
 		if ( ! in_array( $post->ID, $viewed_properties ) )
 			$viewed_properties[] = $post->ID;
 
-		if ( sizeof( $viewed_properties ) > 15 )
-			array_shift( $viewed_properties );
+		if ( count( $viewed_properties ) > 15 )
+			$viewed_properties = array_slice( $viewed_properties, -15 );
 
 		// Store for session only
 		ph_setcookie( 'propertyhive_recently_viewed', implode( '|', $viewed_properties ) );
@@ -121,12 +136,12 @@ function ph_track_property_view() {
 			$view_counts = array();
 		}
 
-		if ( !isset($view_counts[date("Y-m-d")]) )
+		if ( !isset($view_counts[gmdate("Y-m-d")]) )
 		{
-			$view_counts[date("Y-m-d")] = 0;
+			$view_counts[gmdate("Y-m-d")] = 0;
 		}
 
-		++$view_counts[date("Y-m-d")];
+		++$view_counts[gmdate("Y-m-d")];
 		
 		update_post_meta( $post->ID, '_view_statistics', $view_counts );
 	}
@@ -134,6 +149,7 @@ function ph_track_property_view() {
 
 add_action( 'template_redirect', 'ph_track_property_view', 20 );
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_property_map; the established callable name is part of the plugin/extension API and must remain stable.
 function get_property_map( $args = array() )
 {
 	global $property;
@@ -144,7 +160,7 @@ function get_property_map( $args = array() )
 
 		if ( get_option('propertyhive_maps_provider') == 'mapbox' )
 		{
-			echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
+			echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) ) . 'px"></div>';
 
 			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/mapbox/';
 
@@ -241,7 +257,7 @@ function get_property_map( $args = array() )
 		}
 		elseif ( get_option('propertyhive_maps_provider') == 'osm' )
 		{
-			echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
+			echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) ) . 'px"></div>';
 
 			$assets_path = str_replace( array( 'http:', 'https:' ), '', PH()->plugin_url() ) . '/assets/js/leaflet/';
 
@@ -333,7 +349,7 @@ function get_property_map( $args = array() )
 		    do_action( 'propertyhive_property_map_actions', $property, $args, $id_suffix );
 		?>
 
-		L.marker([<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>]<?php echo $icon_code; ?>).addTo(property_map<?php echo esc_js($id_suffix); ?>);
+		L.marker([<?php echo (float)$property->latitude; ?>, <?php echo (float)$property->longitude; ?>]<?php echo $icon_code === ', { icon: custom_icon }' ? ', { icon: custom_icon }' : ''; ?>).addTo(property_map<?php echo esc_js($id_suffix); ?>);
 	}
 
 	<?php if ( !isset($args['init_on_load']) || ( isset($args['init_on_load']) && ($args['init_on_load'] === 'true' || $args['init_on_load'] === TRUE) ) ) { ?>
@@ -354,7 +370,7 @@ function get_property_map( $args = array() )
 			{
 				echo '<iframe
 				  width="100%"
-				  height="' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . '"
+				  height="' . ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) . '"
 				  style="border:0"
 				  loading="lazy"
 				  allowfullscreen
@@ -364,9 +380,9 @@ function get_property_map( $args = array() )
 			}
 			else
 			{
-				echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) ) . 'px"></div>';
+				echo '<div id="property_map_canvas' . esc_attr($id_suffix) . '" style="background:#EEE; height:' . esc_attr( ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) ) . 'px"></div>';
 
-			    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+			    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3', true );
 			    wp_enqueue_script('googlemaps');
 ?>
 <script>
@@ -388,9 +404,13 @@ function get_property_map( $args = array() )
   			{
   				$map_add_on_settings = get_option( 'propertyhive_map_search', array() );
 
-  				if ( isset($map_add_on_settings['style_js']) && trim($map_add_on_settings['style_js']) != '' )
+                  if ( isset($map_add_on_settings['style_js']) && is_string($map_add_on_settings['style_js']) && trim($map_add_on_settings['style_js']) != '' )
   				{
-  					echo 'map_options.styles = ' . trim($map_add_on_settings['style_js']) . ';';
+                      // Google Maps styles are JSON arrays, including legacy Snazzy Maps style properties.
+                    $map_styles = json_decode( $map_add_on_settings['style_js'] );
+                    if ( is_array( $map_styles ) ) {
+                        echo 'map_options.styles = ' . wp_json_encode( $map_styles, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ';';
+                    }
   				}
   			}
 
@@ -422,7 +442,7 @@ function get_property_map( $args = array() )
 							$size = getimagesize( get_attached_file(  $map_add_on_settings['custom_icon_attachment_id'] ) );
 							if ( $size !== FALSE && !empty($size) )
 							{
-								echo ', anchor: new google.maps.Point(' . floor( (int)$size[0] / 2 ) . ', ' . floor( (int)$size[1] / 2 ) . ')';
+								echo ', anchor: new google.maps.Point(' . (int) floor( (int)$size[0] / 2 ) . ', ' . (int) floor( (int)$size[1] / 2 ) . ')';
 							}
 						}   
 						echo '};';
@@ -455,6 +475,7 @@ function get_property_map( $args = array() )
 	}
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_property_static_map; the established callable name is part of the plugin/extension API and must remain stable.
 function get_property_static_map( $args = array() )
 {
 	global $property;
@@ -476,7 +497,7 @@ function get_property_static_map( $args = array() )
 
 		    $map_url = 'https://maps.googleapis.com/maps/api/staticmap?' .
 		    	'center=' . (float)$property->latitude . ',' . (float)$property->longitude .
-		    	'&size=1024x' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) .  
+                '&size=1024x' . ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) .
 		    	'&zoom=' . ( ( isset($args['zoom']) && !empty($args['zoom']) ) ? (int)$args['zoom'] : '14' ) . 
 		    	'&maptype=roadmap' . 
 		    	'&markers=%7C%7C' . (float)$property->latitude . ',' . (float)$property->longitude .
@@ -484,7 +505,7 @@ function get_property_static_map( $args = array() )
 
 		    echo '<style type="text/css">
 		    	#property_static_map' . esc_attr($id_suffix) . ' {
-		    		height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px;
+                    height:' . ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) . 'px;
 		    		display: block;
 				    background-image: url("' . esc_url($map_url) . '");
 				    background-repeat: no-repeat;
@@ -505,6 +526,7 @@ function get_property_static_map( $args = array() )
 	}
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_property_street_view; the established callable name is part of the plugin/extension API and must remain stable.
 function get_property_street_view( $args = array() )
 {
 	global $property;
@@ -523,7 +545,7 @@ function get_property_street_view( $args = array() )
 			{
 				echo '<iframe
 				  width="100%"
-				  height="' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . '"
+				  height="' . ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) . '"
 				  style="border:0"
 				  loading="lazy"
 				  allowfullscreen
@@ -533,10 +555,10 @@ function get_property_street_view( $args = array() )
 			}
 			else
 			{
-			    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+			    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3', true );
 			    wp_enqueue_script('googlemaps');
 
-			    echo '<div id="property_street_view_canvas" style="height:' . str_replace( "px", "", ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : '400' ) ) . 'px"></div>';
+			    echo '<div id="property_street_view_canvas" style="height:' . ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) . 'px"></div>';
 	?>
 	<script>
 
@@ -586,6 +608,7 @@ function get_property_street_view( $args = array() )
 	}
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_electricity_types; the established callable name is part of the plugin/extension API and must remain stable.
 function get_electricity_types()
 {
 	$types = array(
@@ -604,6 +627,7 @@ function get_electricity_types()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_electricity_type; the established callable name is part of the plugin/extension API and must remain stable.
 function get_electricity_type( $type )
 {
 	$types = get_electricity_types();
@@ -616,6 +640,7 @@ function get_electricity_type( $type )
 	return '';
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_water_types; the established callable name is part of the plugin/extension API and must remain stable.
 function get_water_types()
 {
 	$types = array(
@@ -632,6 +657,7 @@ function get_water_types()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_water_type; the established callable name is part of the plugin/extension API and must remain stable.
 function get_water_type( $type )
 {
 	$types = get_water_types();
@@ -644,6 +670,7 @@ function get_water_type( $type )
 	return '';
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_broadband_types; the established callable name is part of the plugin/extension API and must remain stable.
 function get_broadband_types()
 {
 	$types = array(
@@ -663,6 +690,7 @@ function get_broadband_types()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_broadband_type; the established callable name is part of the plugin/extension API and must remain stable.
 function get_broadband_type( $type )
 {
 	$types = get_broadband_types();
@@ -675,6 +703,7 @@ function get_broadband_type( $type )
 	return '';
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_heating_types; the established callable name is part of the plugin/extension API and must remain stable.
 function get_heating_types()
 {
 	$types = array(
@@ -708,6 +737,7 @@ function get_heating_types()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_heating_type; the established callable name is part of the plugin/extension API and must remain stable.
 function get_heating_type( $type )
 {
 	$types = get_heating_types();
@@ -720,6 +750,7 @@ function get_heating_type( $type )
 	return '';
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_sewerage_types; the established callable name is part of the plugin/extension API and must remain stable.
 function get_sewerage_types()
 {
 	$types = array(
@@ -736,6 +767,7 @@ function get_sewerage_types()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_sewerage_type; the established callable name is part of the plugin/extension API and must remain stable.
 function get_sewerage_type( $type )
 {
 	$types = get_sewerage_types();
@@ -748,6 +780,7 @@ function get_sewerage_type( $type )
 	return '';
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_flooding_source_types; the established callable name is part of the plugin/extension API and must remain stable.
 function get_flooding_source_types()
 {
 	$types = array(
@@ -767,6 +800,7 @@ function get_flooding_source_types()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_flooding_source_type; the established callable name is part of the plugin/extension API and must remain stable.
 function get_flooding_source_type( $type )
 {
 	$types = get_flooding_source_types();
@@ -779,6 +813,7 @@ function get_flooding_source_type( $type )
 	return '';
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_accessibility_types; the established callable name is part of the plugin/extension API and must remain stable.
 function get_accessibility_types()
 {
 	$types = array(
@@ -802,6 +837,7 @@ function get_accessibility_types()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_accessibility_type; the established callable name is part of the plugin/extension API and must remain stable.
 function get_accessibility_type( $type )
 {
 	$types = get_accessibility_types();
@@ -814,6 +850,7 @@ function get_accessibility_type( $type )
 	return '';
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_restrictions; the established callable name is part of the plugin/extension API and must remain stable.
 function get_restrictions()
 {
 	$types = array(
@@ -838,6 +875,7 @@ function get_restrictions()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_restriction; the established callable name is part of the plugin/extension API and must remain stable.
 function get_restriction( $type )
 {
 	$types = get_restrictions();
@@ -850,6 +888,7 @@ function get_restriction( $type )
 	return '';
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_rights; the established callable name is part of the plugin/extension API and must remain stable.
 function get_rights()
 {
 	$types = array(
@@ -871,6 +910,7 @@ function get_rights()
 	return $types;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_right; the established callable name is part of the plugin/extension API and must remain stable.
 function get_right( $type )
 {
 	$types = get_rights();

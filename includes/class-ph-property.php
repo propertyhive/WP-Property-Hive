@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category    Class
  * @author      PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Property; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Property {
 
     /** @public int Property (post) ID */
@@ -103,6 +104,12 @@ class PH_Property {
             if ($value == '')
             {
                 $value = get_post_meta( $this->id, '_' . $key, true );
+            }
+            // Sanitize stored description HTML before trusted extension callbacks run.
+            // This also protects descriptions saved before the write-boundary checks.
+            if ( preg_match( '/^_?(?:room_(?:name|dimensions|description)|description(?:_name)?)_[0-9]+$/', $key ) ) {
+                $value = is_scalar( $value ) ? (string) $value : '';
+                $value = preg_match( '/^_?(?:room_description|description)_[0-9]+$/', $key ) ? propertyhive_sanitize_description( $value ) : wp_kses_post( $value );
             }
         }
         
@@ -315,7 +322,7 @@ class PH_Property {
                 $this->_to_rent == 'yes' && $this->_rent_poa == 'yes'
             )
             {
-                $return = __( 'POA', 'propertyhive' );
+                $return = esc_html__( 'POA', 'propertyhive' );
             }
             else
             {
@@ -345,7 +352,7 @@ class PH_Property {
         {
             if ( !$is_admin && $this->_poa == 'yes')
             {
-                $return = __( 'POA', 'propertyhive' );
+                $return = esc_html__( 'POA', 'propertyhive' );
             }
             else
             {
@@ -353,19 +360,22 @@ class PH_Property {
 
                 if ( !$is_admin )
                 {
-                    if ( isset($_GET['currency']) )
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public currency choice only affects displayed prices.
+                    if ( isset($_GET['currency']) && is_string( $_GET['currency'] ) )
                     {
-                        if ( $_GET['currency'] != '' )
+                        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public currency choice only affects displayed prices.
+                        $currency_code = sanitize_text_field( wp_unslash( $_GET['currency'] ) );
+                        if ( $currency_code != '' )
                         {
-                            $requested_currency = $ph_countries->get_currency( sanitize_text_field($_GET['currency']) );
+                            $requested_currency = $ph_countries->get_currency( $currency_code );
                             if ( $requested_currency !== FALSE )
                             {
                                 $currency = $requested_currency;
                                 $currency['exchange_rate'] = 1;
                                 $exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
-                                if ( isset($exchange_rates[$_GET['currency']]) )
+                                if ( isset($exchange_rates[$currency_code]) )
                                 {
-                                    $currency['exchange_rate'] = $exchange_rates[sanitize_text_field($_GET['currency'])];
+                                    $currency['exchange_rate'] = $exchange_rates[$currency_code];
                                 }
                             }
                         }
@@ -388,9 +398,9 @@ class PH_Property {
                             }
                         }
                     }
-                    elseif ( isset($_COOKIE['propertyhive_currency']) && $_COOKIE['propertyhive_currency'] != '' )
+                    elseif ( false !== ( $cookie_currency = $ph_countries->get_currency_from_cookie() ) )
                     {
-                        $currency = @json_decode(html_entity_decode($_COOKIE['propertyhive_currency']), true);
+                        $currency = $cookie_currency;
                     }
                     else
                     {
@@ -443,7 +453,7 @@ class PH_Property {
                             $price = round($this->_price_actual * $currency['exchange_rate'], 0);
                         }
 
-                        $return = ( ( $price != '' ) ? $prefix . ph_display_price_field($price, !$is_admin) . $suffix : '-' );
+                        $return = ( ( $price != '' ) ? $prefix . esc_html( ph_display_price_field($price, !$is_admin) ) . $suffix : '-' );
                         break;
                     }
                     case "residential-lettings":
@@ -462,13 +472,15 @@ class PH_Property {
                             }
                         }
 
-                        $return = ( ( $price != '' ) ? $prefix . ph_display_price_field($price, !$is_admin) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                        $return = ( ( $price != '' ) ? $prefix . esc_html( ph_display_price_field($price, !$is_admin) ) . $suffix . ' ' . esc_html( propertyhive_get_rent_frequency_label( $this->_rent_frequency ) ) : '-' );
                         break;
                     }
                 }
             }
+
         }
         
+        // Stored price/frequency text is escaped above; currency and commercial HTML filters remain trusted.
         return apply_filters( 'propertyhive_price_output', $return, $this, $currency, $prefix, $suffix );
     }
 
@@ -488,7 +500,7 @@ class PH_Property {
 
             if ( !$is_admin && $this->_price_poa == 'yes' )
             {
-                $price .= __( 'POA', 'propertyhive' );
+                $price .= esc_html__( 'POA', 'propertyhive' );
             }
             else
             {
@@ -506,7 +518,7 @@ class PH_Property {
 
                 if ( $this->_price_from != '' )
                 {
-                    $price .= $prefix . ph_display_price_field($this->_price_from, !$is_admin) . $suffix;
+                    $price .= $prefix . esc_html( ph_display_price_field($this->_price_from, !$is_admin) ) . $suffix;
                 }
                 if ( $this->_price_to != '' && $this->_price_to != $this->_price_from )
                 {
@@ -514,16 +526,17 @@ class PH_Property {
                     {
                         $price .= ' - ';
                     }
-                    $price .= $prefix . ph_display_price_field($this->_price_to, !$is_admin) . $suffix;
+                    $price .= $prefix . esc_html( ph_display_price_field($this->_price_to, !$is_admin) ) . $suffix;
                 }
                 if ( $price != '' )
                 {
                     $price_units = get_commercial_price_units( );
-                    $price .= ( isset($price_units[$this->_price_units]) ) ? ' ' . $price_units[$this->_price_units] : '';
+                    $price .= ( isset($price_units[$this->_price_units]) ) ? ' ' . esc_html( $price_units[$this->_price_units] ) : '';
                 }
             }
         }
 
+        // Stored price/unit text is escaped above; preserve trusted currency and price filter HTML.
         return apply_filters( 'propertyhive_commercial_price_output', $price, $this );
     }
 
@@ -543,7 +556,7 @@ class PH_Property {
 
             if ( !$is_admin && $this->_rent_poa == 'yes' )
             {
-                $rent .= __( 'POA', 'propertyhive' );
+                $rent .= esc_html__( 'POA', 'propertyhive' );
             }
             else
             {
@@ -561,7 +574,7 @@ class PH_Property {
 
                 if ( $this->_rent_from != '' )
                 {
-                    $rent .= $prefix . ph_display_price_field($this->_rent_from, !$is_admin) . $suffix;
+                    $rent .= $prefix . esc_html( ph_display_price_field($this->_rent_from, !$is_admin) ) . $suffix;
                 }
                 if ( $this->_rent_to != '' && $this->_rent_to != $this->_rent_from )
                 {
@@ -569,16 +582,17 @@ class PH_Property {
                     {
                         $rent .= ' - ';
                     }
-                    $rent .= $prefix . ph_display_price_field($this->_rent_to, !$is_admin) . $suffix;
+                    $rent .= $prefix . esc_html( ph_display_price_field($this->_rent_to, !$is_admin) ) . $suffix;
                 }
                 if ( $rent != '' )
                 {
                     $price_units = get_commercial_price_units( );
-                    $rent .= ' ' . __( ( isset($price_units[$this->_rent_units]) ? $price_units[$this->_rent_units] : $this->_rent_units ), 'propertyhive' );
+                    $rent .= ' ' . esc_html( isset( $price_units[$this->_rent_units] ) ? $price_units[$this->_rent_units] : $this->_rent_units );
                 }
             }
         }
 
+        // Stored rent/unit text is escaped above; preserve trusted currency and rent filter HTML.
         return apply_filters( 'propertyhive_commercial_rent_output', $rent, $this );
     }
 
@@ -621,7 +635,7 @@ class PH_Property {
             $area .= ( isset($area_units[$this->_floor_area_units]) ) ? ' ' . $area_units[$this->_floor_area_units] : '';
         }
 
-        return apply_filters( 'propertyhive_floor_area_output', $area, $this );
+        return apply_filters( 'propertyhive_floor_area_output', esc_html( $area ), $this );
 
     }
 
@@ -664,7 +678,7 @@ class PH_Property {
             $area .= ( isset($area_units[$this->_site_area_units]) ) ? ' ' . $area_units[$this->_site_area_units] : '';
         }
 
-        return apply_filters( 'propertyhive_site_area_output', $area, $this );
+        return apply_filters( 'propertyhive_site_area_output', esc_html( $area ), $this );
 
     }
 
@@ -713,7 +727,7 @@ class PH_Property {
 
         if (strtotime($this->_available_date) > time())
         {
-            return date( get_option( 'date_format' ), strtotime($this->_available_date) );
+            return gmdate( get_option( 'date_format' ), strtotime($this->_available_date) );
         }
         else
         {
@@ -793,7 +807,7 @@ class PH_Property {
                     {
                         $return .= "\n";
                     }
-                    $return .= strip_tags($this->{'_room_description_' . $i}) . "\n\n";
+                    $return .= wp_strip_all_tags($this->{'_room_description_' . $i}) . "\n\n";
                 }
             }
         }
@@ -837,7 +851,7 @@ class PH_Property {
                     {
                         $return .= $this->{'_description_name_' . $i} . "\n";
                     }
-                    $return .= strip_tags($this->{'_description_' . $i}) . "\n\n";
+                    $return .= wp_strip_all_tags($this->{'_description_' . $i}) . "\n\n";
                 }
             }
         }
@@ -1033,29 +1047,12 @@ class PH_Property {
      */
     public function get_imported_id()
     {
-        global $wpdb;
-
-        $row = $wpdb->get_row(
-            $wpdb->prepare(
-                "
-                SELECT meta_value 
-                FROM {$wpdb->prefix}postmeta 
-                WHERE 
-                    meta_key LIKE %s
-                    AND post_id = %d
-                LIMIT 1
-                ",
-                '_imported_ref_%',
-                $this->id
-            ),
-            ARRAY_A
-        );
-
-        if ( null !== $row ) 
-        {
-            return $row['meta_value'];
+        // Use WordPress's metadata cache and match the literal importer-key prefix.
+        foreach ( get_post_meta( $this->id ) as $key => $values ) {
+            if ( 0 === strpos( $key, '_imported_ref_' ) && isset( $values[0] ) ) {
+                return $values[0];
+            }
         }
-
         return '';
     }
 

@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Formatting
  *
@@ -15,10 +18,95 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Clean stored description HTML while retaining ordinary links and tour frames.
+ */
+function propertyhive_sanitize_description( $html ) {
+    $allowed = wp_kses_allowed_html( 'post' );
+    $allowed['iframe'] = array_fill_keys( array( 'src', 'title', 'width', 'height', 'allow', 'allowfullscreen', 'frameborder', 'loading', 'referrerpolicy' ), true );
+    $clean = wp_kses( $html, $allowed, wp_allowed_protocols() );
+
+    // KSES attribute callbacks are unavailable on WordPress 5.6. Check only the
+    // normalized iframe tags here, including quoted attributes containing >.
+    return preg_replace_callback( '~<iframe\b(?:[^>"\']++|"[^"]*+"|\'[^\']*+\')*>~i', static function( $match ) {
+        $attributes = wp_kses_hair( substr( $match[0], 7, -1 ), wp_allowed_protocols() );
+        $sources = array();
+        foreach ( $attributes as $name => $attribute ) {
+            if ( strtolower( $name ) === 'src' ) {
+                $sources[] = $attribute['value'];
+            }
+        }
+        if ( empty( $sources ) ) {
+            return $match[0];
+        }
+        if ( count( $sources ) !== 1 ) {
+            return '<iframe>';
+        }
+        $url = html_entity_decode( $sources[0], ENT_QUOTES, 'UTF-8' );
+        $parts = wp_parse_url( $url );
+        if ( ! is_array( $parts ) || empty( $parts['host'] ) || ! preg_match( '~^(?:https?:)?//~i', $url ) || ( isset( $parts['scheme'] ) && ! in_array( strtolower( $parts['scheme'] ), array( 'http', 'https' ), true ) ) ) {
+            return '<iframe>';
+        }
+        if ( ! apply_filters( 'propertyhive_description_iframe_url_allowed', true, $url ) ) {
+            return '<iframe>';
+        }
+        return $match[0];
+    }, $clean );
+}
+
+/**
+ * Translate built-in rent frequency labels, preserving custom labels.
+ *
+ * @param string $frequency Stored frequency.
+ * @return string Display label.
+ */
+function propertyhive_get_rent_frequency_label( $frequency ) {
+    $labels = array(
+        'pd'   => __( 'pd', 'propertyhive' ),
+        'pppw' => __( 'pppw', 'propertyhive' ),
+        'pw'   => __( 'pw', 'propertyhive' ),
+        'pcm'  => __( 'pcm', 'propertyhive' ),
+        'pq'   => __( 'pq', 'propertyhive' ),
+        'pa'   => __( 'pa', 'propertyhive' ),
+    );
+    return isset( $labels[$frequency] ) ? $labels[$frequency] : $frequency;
+}
+
+/**
+ * Translate built-in CRM statuses without passing dynamic text to gettext.
+ *
+ * @param string $status Stored status.
+ * @return string Display label.
+ */
+function propertyhive_get_status_label( $status ) {
+    $labels = array(
+        'pending' => __( 'Pending', 'propertyhive' ),
+        'confirmed' => __( 'Confirmed', 'propertyhive' ),
+        'unconfirmed' => __( 'Unconfirmed', 'propertyhive' ),
+        'carried_out' => __( 'Carried Out', 'propertyhive' ),
+        'awaiting_feedback' => __( 'Awaiting Feedback', 'propertyhive' ),
+        'feedback_passed_on' => __( 'Feedback Passed On', 'propertyhive' ),
+        'feedback_not_passed_on' => __( 'Feedback Not Passed On', 'propertyhive' ),
+        'cancelled' => __( 'Cancelled', 'propertyhive' ),
+        'no_show' => __( 'No Show', 'propertyhive' ),
+        'offer_made' => __( 'Offer Made', 'propertyhive' ),
+        'accepted' => __( 'Accepted', 'propertyhive' ),
+        'declined' => __( 'Declined', 'propertyhive' ),
+        'current' => __( 'Current', 'propertyhive' ),
+        'exchanged' => __( 'Exchanged', 'propertyhive' ),
+        'completed' => __( 'Completed', 'propertyhive' ),
+        'fallen_through' => __( 'Fallen Through', 'propertyhive' ),
+        'interested' => __( 'Interested', 'propertyhive' ),
+        'not_interested' => __( 'Not Interested', 'propertyhive' ),
+    );
+    return isset( $labels[$status] ) ? $labels[$status] : ucwords( str_replace( '_', ' ', $status ) );
+}
+
+/**
  * Clean variables using sanitize_text_field.
  * @param string|array $var
  * @return string|array
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_clean; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_clean( $var ) {
 
 	if ( is_array( $var ) ) {
@@ -34,6 +122,7 @@ function ph_clean( $var ) {
  * @return string
  */
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_clean_telephone_number; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_clean_telephone_number( $var ) {
 
 	return preg_replace( "/[^0-9,]/", "", $var );
@@ -44,6 +133,7 @@ function ph_clean_telephone_number( $var ) {
  * @param string
  * @return string
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_display_price_field; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_display_price_field( $var, $use_separator_setting = false )
 {
 	$float_var = (float)$var;
@@ -80,6 +170,7 @@ if ( ! function_exists( 'ph_rgb_from_hex' ) ) {
 	 * @param mixed $color
 	 * @return string
 	 */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_rgb_from_hex; the established callable name is part of the plugin/extension API and must remain stable.
 	function ph_rgb_from_hex( $color ) {
 		$color = str_replace( '#', '', $color );
 		// Convert shorthand colors to full format, e.g. "FFF" -> "FFFFFF"
@@ -103,6 +194,7 @@ if ( ! function_exists( 'ph_hex_darker' ) ) {
 	 * @param int $factor (default: 30)
 	 * @return string
 	 */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_hex_darker; the established callable name is part of the plugin/extension API and must remain stable.
 	function ph_hex_darker( $color, $factor = 30 ) {
 		$base  = ph_rgb_from_hex( $color );
 		$color = '#';
@@ -132,6 +224,7 @@ if ( ! function_exists( 'ph_hex_lighter' ) ) {
 	 * @param int $factor (default: 30)
 	 * @return string
 	 */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_hex_lighter; the established callable name is part of the plugin/extension API and must remain stable.
 	function ph_hex_lighter( $color, $factor = 30 ) {
 		$base  = ph_rgb_from_hex( $color );
 		$color = '#';
@@ -163,6 +256,7 @@ if ( ! function_exists( 'ph_light_or_dark' ) ) {
 	 * @param string $light (default: '#FFFFFF')
 	 * @return string
 	 */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_light_or_dark; the established callable name is part of the plugin/extension API and must remain stable.
 	function ph_light_or_dark( $color, $dark = '#000000', $light = '#FFFFFF' ) {
 
 		$hex = str_replace( '#', '', $color );
@@ -185,6 +279,7 @@ if ( ! function_exists( 'ph_format_hex' ) ) {
 	 * @param string $hex
 	 * @return string
 	 */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_format_hex; the established callable name is part of the plugin/extension API and must remain stable.
 	function ph_format_hex( $hex ) {
 
 		$hex = trim( str_replace( '#', '', $hex ) );
@@ -197,6 +292,7 @@ if ( ! function_exists( 'ph_format_hex' ) ) {
 	}
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_nl2br; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_nl2br($str) 
 {
     // Match any <ul> or <ol> with their content
@@ -214,6 +310,7 @@ function ph_nl2br($str)
     return implode('', $parts);
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_split_address_into_fields; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_split_address_into_fields( $address )
 {
 	$fields = [
@@ -278,4 +375,14 @@ function ph_split_address_into_fields( $address )
     if (isset($remainingParts[2])) $fields['address_four'] = $remainingParts[2];
 
     return $fields;
+}
+/**
+ * Resolve translated built-in or extension-provided department labels.
+ *
+ * @param string $department Department key.
+ * @return string Department label.
+ */
+function propertyhive_get_department_label( $department ) {
+    $labels = ph_get_departments();
+    return isset( $labels[$department] ) ? $labels[$department] : ucwords( str_replace( '-', ' ', $department ) );
 }

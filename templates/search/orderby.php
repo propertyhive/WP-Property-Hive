@@ -19,6 +19,7 @@ global $propertyhive;
 			( $department == '' && get_option( 'propertyhive_primary_department' ) != 'commercial' && ph_get_custom_department_based_on(get_option( 'propertyhive_primary_department' )) != 'commercial' )
 		)
 		{
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 			$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
 				'price-desc' => __( 'Default sorting', 'propertyhive' ),
 				'date'       => __( 'Sort by date added', 'propertyhive' ),
@@ -28,6 +29,7 @@ global $propertyhive;
 		}
 		else
 		{
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 			$results_orderby = apply_filters( 'propertyhive_results_orderby', array(
 				'floor_area-desc' => __( 'Default sorting', 'propertyhive' ),
 				'date'       => __( 'Sort by date added', 'propertyhive' ),
@@ -43,6 +45,7 @@ global $propertyhive;
     ?>
     <select name="orderby" class="orderby">
     <?php
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 		foreach ( $results_orderby as $id => $name )
 		{
 			echo '<option value="' . esc_attr( $id ) . '" ' . selected( $orderby, $id, false ) . '>' . esc_attr( $name ) . '</option>';
@@ -53,11 +56,13 @@ global $propertyhive;
 		}
 		
 		// Keep query string vars intact
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound, WordPress.Security.NonceVerification.Recommended -- Function-scoped template locals preserve read-only search filters; every hidden-field name/value is escaped below.
 		foreach ( $_GET as $key => $val ) {
 			if ( 'orderby' === $key || 'submit' === $key )
 				continue;
 			
 			if ( is_array( $val ) ) {
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				foreach( $val as $innerVal ) {
 					echo '<input type="hidden" name="' . esc_attr( $key ) . '[]" value="' . esc_attr( $innerVal ) . '" />';
 				}

@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Template
  *
@@ -18,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @param mixed $post
  * @return PH_Property
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_setup_property_data; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_setup_property_data( $post ) {
     unset( $GLOBALS['property'] );
 
@@ -27,6 +31,7 @@ function ph_setup_property_data( $post ) {
     if ( empty( $post->post_type ) || ! in_array( $post->post_type, array( 'property' ) ) )
         return;
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared frontend template global; Property Hive intentionally publishes the current property object for templates and builder integrations.
     $GLOBALS['property'] = get_property( $post );
 
     return $GLOBALS['property'];
@@ -39,6 +44,7 @@ add_action( 'the_post', 'ph_setup_property_data' );
  * @access public
  * @return void
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_properties_rss_feed; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_properties_rss_feed() {
     // Property RSS
     if ( is_post_type_archive( 'property' ) || is_singular( 'property' ) ) {
@@ -56,6 +62,7 @@ function ph_properties_rss_feed() {
  * @access public
  * @return void
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_generator_tag; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_generator_tag( $gen, $type ) {
     switch ( $type ) {
         case 'html':
@@ -74,6 +81,7 @@ function ph_generator_tag( $gen, $type ) {
  * @param  array $classes
  * @return array
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_body_class; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_body_class( $classes ) {
     global $wp_query;
 
@@ -136,6 +144,7 @@ function ph_body_class( $classes ) {
  * @param int $post_id
  * @return array
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_property_post_class; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_property_post_class( $classes, $class = '', $post_id = '' ) {
     if ( ! $post_id || get_post_type( $post_id ) !== 'property' )
         return $classes;
@@ -233,9 +242,10 @@ if ( ! function_exists( 'propertyhive_page_title' ) ) {
             $page_title   = get_the_title( $search_results_page_id );
         }
 
-        $page_title = apply_filters( 'propertyhive_page_title', $page_title );
+        $page_title = apply_filters( 'propertyhive_page_title', wp_kses_post( $page_title ) );
 
         if ( $echo )
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The core title is KSES-filtered before the trusted PHP propertyhive_page_title filter, which intentionally supports formatted titles.
             echo $page_title;
         else
             return $page_title;
@@ -255,6 +265,7 @@ if ( ! function_exists( 'propertyhive_property_loop_start' ) ) {
         ob_start();
         ph_get_template( 'search/loop-start.php' );
         if ( $echo )
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Captured trusted PHP loop template; the built-in template emits static list markup and theme overrides own their escaping.
             echo ob_get_clean();
         else
             return ob_get_clean();
@@ -275,6 +286,7 @@ if ( ! function_exists( 'propertyhive_property_loop_end' ) ) {
         ph_get_template( 'search/loop-end.php' );
 
         if ( $echo )
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Captured trusted PHP loop template; the built-in template emits static list markup and theme overrides own their escaping.
             echo ob_get_clean();
         else
             return ob_get_clean();
@@ -291,6 +303,7 @@ if ( ! function_exists( 'propertyhive_template_loop_property_thumbnail' ) ) {
      * @return void
      */
     function propertyhive_template_loop_property_thumbnail() {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.Security.EscapeOutput.OutputNotEscaped -- The thumbnail helper escapes image attributes; preserve its trusted PHP override and placeholder HTML hook, and the existing image-size hook name.
         echo propertyhive_get_property_thumbnail( apply_filters( 'property_search_results_thumbnail_size', 'medium' ) );
     }
 }
@@ -313,7 +326,7 @@ if ( ! function_exists( 'propertyhive_get_property_thumbnail' ) ) {
         $photo_url = $property->get_main_photo_src( $size );
 
         if ($photo_url !== FALSE)
-            return '<img src="' . $photo_url . '" alt="' . get_the_title($post->ID) . '" class="' . $class . '">';
+            return '<img src="' . esc_url( $photo_url ) . '" alt="' . esc_attr( get_the_title($post->ID) ) . '" class="' . esc_attr( $class ) . '">';
 
         if ( ph_placeholder_img_src() )
             return ph_placeholder_img( $size );
@@ -475,11 +488,13 @@ if ( ! function_exists( 'propertyhive_catalog_ordering' ) ) {
 
         if ( $orderby === '' )
         {
-            $orderby = isset( $_GET['orderby'] ) ? ph_clean( sanitize_text_field($_GET['orderby']) ) : apply_filters( 'propertyhive_default_search_results_orderby', get_option( 'propertyhive_default_search_results_orderby' ) );
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only public result ordering; no state change.
+            $orderby = isset( $_GET['orderby'] ) && is_string( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : apply_filters( 'propertyhive_default_search_results_orderby', get_option( 'propertyhive_default_search_results_orderby' ) );
         }
 
         $args = array(
-            'department' => $department !== '' ? $department : ( isset($_REQUEST['department']) ? $_REQUEST['department'] : '' ),
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only public ordering control; explicit PHP arguments retain precedence.
+            'department' => $department !== '' ? $department : ( isset($_REQUEST['department']) && is_string( $_REQUEST['department'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['department'] ) ) : '' ),
             'orderby' =>  $orderby,
         );
 
@@ -526,6 +541,7 @@ if ( ! function_exists( 'propertyhive_template_not_on_market' ) ) {
 
 if ( get_option('propertyhive_off_market_behaviour', '') == 'redirect' )
 {
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_redirect_off_market_properties; the established callable name is part of the plugin/extension API and must remain stable.
     function ph_redirect_off_market_properties()
     {
         // If we're viewing an off market property, redirect to the search form
@@ -535,7 +551,7 @@ if ( get_option('propertyhive_off_market_behaviour', '') == 'redirect' )
             {
                 if ( !is_user_logged_in() || !current_user_can('administrator') && !current_user_can('editor') )
                 {
-                    wp_redirect(get_permalink(ph_get_page_id('search_results')), 301);
+                    wp_safe_redirect(get_permalink(ph_get_page_id('search_results')), 301);
                     exit;
                 }
             }
@@ -573,7 +589,7 @@ if ( ! function_exists( 'propertyhive_show_property_images' ) ) {
                 $images[] = array(
                     'title' => isset($photo['title']) ? $photo['title'] : '',
                     'url'  => isset($photo['url']) ? $photo['url'] : '',
-                    'image' => '<img src="' . ( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . ( isset($photo['title']) ? $photo['title'] : '' ) . '">',
+                    'image' => '<img src="' . esc_url( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . esc_attr( isset($photo['title']) ? $photo['title'] : '' ) . '">',
                 );
             }
         }
@@ -628,7 +644,7 @@ if ( ! function_exists( 'propertyhive_show_property_thumbnails' ) ) {
                 $images[] = array(
                     'title' => isset($photo['title']) ? $photo['title'] : '',
                     'url'  => isset($photo['url']) ? $photo['url'] : '',
-                    'image' => '<img src="' . ( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . ( isset($photo['title']) ? $photo['title'] : '' ) . '">',
+                    'image' => '<img src="' . esc_url( isset($photo['url']) ? $photo['url'] : '' ) . '" alt="' . esc_attr( isset($photo['title']) ? $photo['title'] : '' ) . '">',
                 );
             }
         }
@@ -643,6 +659,7 @@ if ( ! function_exists( 'propertyhive_show_property_thumbnails' ) ) {
                     $images[] = array(
                         'title' => esc_attr( get_the_title( $gallery_attachment ) ),
                         'url'  => wp_get_attachment_url( $gallery_attachment ),
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public Property Hive extension hook single_property_small_thumbnail_size; changing the established name would detach installed callbacks.
                         'image' => wp_get_attachment_image( $gallery_attachment, apply_filters( 'single_property_small_thumbnail_size', 'thumbnail' ) ),
                         'attachment_id' => $gallery_attachment,
                     );
@@ -970,7 +987,7 @@ if ( ! function_exists( 'propertyhive_get_template_single_floorplans_action' ) )
             {
                 foreach ($floorplan_ids as $floorplan_id)
                 {
-                    $label = 'Floorplan';
+                    $label = __( 'Floorplan', 'propertyhive' );
 
                     $attachment_data = wp_prepare_attachment_for_js( $floorplan_id );
                     if ( isset( $attachment_data['caption'] ) && $attachment_data['caption'] != '' )
@@ -981,7 +998,7 @@ if ( ! function_exists( 'propertyhive_get_template_single_floorplans_action' ) )
 
                     $actions[] = array(
                         'href' => wp_get_attachment_url( $floorplan_id ),
-                        'label' => __( $label, 'propertyhive' ),
+                        'label' => $label,
                         'class' => 'action-floorplans',
                         'attributes' => array(
                             'data-fancybox' => 'floorplans'
@@ -1126,7 +1143,7 @@ if ( ! function_exists( 'propertyhive_get_template_single_virtual_tours_action' 
 
                 $actions[] = array(
                     'href' => $virtual_tour['url'],
-                    'label' => __( $virtual_tour['label'], 'propertyhive' ),
+                    'label' => $virtual_tour['label'],
                     'class' => 'action-virtual-tour',
                     'attributes' => $attributes,
                 );
@@ -1338,6 +1355,7 @@ function propertyhive_my_account_pages()
                     'posts_per_page'    => 1,
                     'post_status'   => 'publish',
                     'fields' => 'ids',
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Account page setup tests whether a contact has viewings; the first query and the owner-viewings query both use posts_per_page=1. The result is presence/count only and fields=ids; the owner query’s IN list is derived from the current owner’s properties.
                     'meta_query'  => array(
                         array(
                             'key' => '_applicant_contact_id',
@@ -1366,6 +1384,7 @@ function propertyhive_my_account_pages()
                 'nopaging'    => true,
                 'post_status'   => 'publish',
                 'fields' => 'ids',
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Account query is scoped to the current contact or their owned property IDs; these legacy relationship/date meta keys are required to return the complete account history using WordPress query APIs.
                 'meta_query'  => array(
                     'relation' => 'OR',
                     array(
@@ -1424,6 +1443,7 @@ function propertyhive_my_account_pages()
                         'posts_per_page'    => 1,
                         'post_status'   => 'publish',
                         'fields' => 'ids',
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Account page setup tests whether a contact has viewings; the first query and the owner-viewings query both use posts_per_page=1. The result is presence/count only and fields=ids; the owner query’s IN list is derived from the current owner’s properties.
                         'meta_query'  => array(
                             array(
                                 'key' => '_property_id',
@@ -1454,7 +1474,7 @@ function propertyhive_my_account_pages()
 
     $pages['logout'] = array(
         'name' => __( 'Logout', 'propertyhive' ),
-        'href' => home_url() . '?logout=1' // Logout URL
+        'href' => wp_nonce_url( add_query_arg( 'logout', '1', home_url( '/' ) ), 'log-out' ) // Logout URL
     );
     
     return $pages;
@@ -1601,7 +1621,9 @@ if ( ! function_exists( 'propertyhive_my_account_applicant_viewings' ) ) {
             'orderby'   => 'meta_value',
             'order'       => 'DESC',
             'post_status'   => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Account query is scoped to the current contact or their owned property IDs; these legacy relationship/date meta keys are required to return the complete account history using WordPress query APIs.
             'meta_key'  => '_start_date_time',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Account query is scoped to the current contact or their owned property IDs; these legacy relationship/date meta keys are required to return the complete account history using WordPress query APIs.
             'meta_query'  => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -1614,7 +1636,7 @@ if ( ! function_exists( 'propertyhive_my_account_applicant_viewings' ) ) {
         $args2 = $args;
         $args2['meta_query'][] = array(
             'key' => '_start_date_time',
-            'value' => date("Y-m-d H:i:s"),
+            'value' => gmdate("Y-m-d H:i:s"),
             'compare' => '<='
         );
 
@@ -1637,7 +1659,7 @@ if ( ! function_exists( 'propertyhive_my_account_applicant_viewings' ) ) {
         $args2 = $args;
         $args2['meta_query'][] = array(
             'key' => '_start_date_time',
-            'value' => date("Y-m-d H:i:s"),
+            'value' => gmdate("Y-m-d H:i:s"),
             'compare' => '>='
         );
 
@@ -1680,6 +1702,7 @@ if ( ! function_exists( 'propertyhive_my_account_owner_properties' ) ) {
             'nopaging'    => true,
             'post_status'   => 'publish',
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Account query is scoped to the current contact or their owned property IDs; these legacy relationship/date meta keys are required to return the complete account history using WordPress query APIs.
             'meta_query'  => array(
                 'relation' => 'OR',
                 array(
@@ -1733,6 +1756,7 @@ if ( ! function_exists( 'propertyhive_my_account_owner_viewings' ) ) {
             'nopaging'    => true,
             'post_status'   => 'publish',
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Account query is scoped to the current contact or their owned property IDs; these legacy relationship/date meta keys are required to return the complete account history using WordPress query APIs.
             'meta_query'  => array(
                 'relation' => 'OR',
                 array(
@@ -1776,7 +1800,9 @@ if ( ! function_exists( 'propertyhive_my_account_owner_viewings' ) ) {
                 'orderby'   => 'meta_value',
                 'order'       => 'DESC',
                 'post_status'   => 'publish',
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Account query is scoped to the current contact or their owned property IDs; these legacy relationship/date meta keys are required to return the complete account history using WordPress query APIs.
                 'meta_key'  => '_start_date_time',
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Account query is scoped to the current contact or their owned property IDs; these legacy relationship/date meta keys are required to return the complete account history using WordPress query APIs.
                 'meta_query'  => array(
                     array(
                         'key' => '_property_id',
@@ -1790,7 +1816,7 @@ if ( ! function_exists( 'propertyhive_my_account_owner_viewings' ) ) {
             $args2 = $args;
             $args2['meta_query'][] = array(
                 'key' => '_start_date_time',
-                'value' => date("Y-m-d H:i:s"),
+                'value' => gmdate("Y-m-d H:i:s"),
                 'compare' => '<='
             );
 
@@ -1813,7 +1839,7 @@ if ( ! function_exists( 'propertyhive_my_account_owner_viewings' ) ) {
             $args2 = $args;
             $args2['meta_query'][] = array(
                 'key' => '_start_date_time',
-                'value' => date("Y-m-d H:i:s"),
+                'value' => gmdate("Y-m-d H:i:s"),
                 'compare' => '>='
             );
 
@@ -1852,6 +1878,7 @@ if ( ! function_exists( 'propertyhive_my_account_delete' ) ) {
 }
 
 add_filter( 'loop_search_results_per_page', 'template_assistant_loop_search_results_per_page', 1 );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper template_assistant_loop_search_results_per_page; the established callable name is part of the plugin/extension API and must remain stable.
 function template_assistant_loop_search_results_per_page( $cols )
 {
     $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -1865,6 +1892,7 @@ function template_assistant_loop_search_results_per_page( $cols )
 }
 
 add_filter( 'loop_search_results_columns', 'template_assistant_search_result_columns', 1 );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper template_assistant_search_result_columns; the established callable name is part of the plugin/extension API and must remain stable.
 function template_assistant_search_result_columns( $cols = 1 )
 {
     $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -1878,6 +1906,7 @@ function template_assistant_search_result_columns( $cols = 1 )
 }
 
 add_filter( 'post_class', 'template_assistant_property_columns_post_class', 20, 3 );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper template_assistant_property_columns_post_class; the established callable name is part of the plugin/extension API and must remain stable.
 function template_assistant_property_columns_post_class( $classes, $class = '', $post_id = '' ) 
 {
     if ( ! $post_id || get_post_type( $post_id ) !== 'property' )
@@ -1904,6 +1933,7 @@ function template_assistant_property_columns_post_class( $classes, $class = '', 
 }
 
 add_action( 'wp_head',  'load_template_assistant_styles' );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper load_template_assistant_styles; the established callable name is part of the plugin/extension API and must remain stable.
 function load_template_assistant_styles()
 {
     $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -1914,16 +1944,20 @@ function load_template_assistant_styles()
         ( isset($current_settings['search_result_css_all_pages']) && $current_settings['search_result_css_all_pages'] == 'yes' )
     )
     {
-        if ( isset($current_settings['search_result_css']) )
+        if ( isset( $current_settings['search_result_css'] ) && is_string( $current_settings['search_result_css'] ) )
         {
-            echo '<style type="text/css">
-            ' . $current_settings['search_result_css'] . '
-            </style>';
+            // Escape HTML's raw-text terminator without stripping valid stylesheet syntax.
+            $css = preg_replace_callback( '~</style~i', static function( $match ) {
+                return '<\\/' . substr( $match[0], 2 );
+            }, $current_settings['search_result_css'] );
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Privileged custom stylesheet: closing style tags are escaped above; HTML escaping would corrupt valid CSS strings and selectors.
+            echo '<style type="text/css">' . $css . '</style>';
         }
     }
 }
 
 add_filter( 'propertyhive_default_search_results_orderby', 'template_assistant_change_default_order' );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper template_assistant_change_default_order; the established callable name is part of the plugin/extension API and must remain stable.
 function template_assistant_change_default_order( $orderby )
 {
     $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -1937,6 +1971,7 @@ function template_assistant_change_default_order( $orderby )
 }
 
 add_filter( 'property_search_results_thumbnail_size', 'template_assistant_search_result_image_size_changes' );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper template_assistant_search_result_image_size_changes; the established callable name is part of the plugin/extension API and must remain stable.
 function template_assistant_search_result_image_size_changes( $image_size )
 {
     $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -1950,6 +1985,7 @@ function template_assistant_search_result_image_size_changes( $image_size )
 }
 
 add_action( 'wp', 'template_assistant_search_result_field_changes' );
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper template_assistant_search_result_field_changes; the established callable name is part of the plugin/extension API and must remain stable.
 function template_assistant_search_result_field_changes()
 {
     $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -1987,17 +2023,17 @@ function template_assistant_search_result_field_changes()
                 }
                 case "availability":
                 {
-                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="availability">' . $property->availability . '</div>'; }, $priority );
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="availability">' . esc_html( $property->availability ) . '</div>'; }, $priority );
                     break;
                 }
                 case "property_type":
                 {
-                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="property-type">' . $property->property_type . '</div>'; }, $priority );
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; echo '<div class="property-type">' . esc_html( $property->property_type ) . '</div>'; }, $priority );
                     break;
                 }
                 case "available_date":
                 {
-                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; if ( $property->department == 'residential-lettings' && $property->get_available_date() != '' ) { echo '<div class="available-date">' . $property->get_available_date() . '</div>'; } }, $priority );
+                    add_action( 'propertyhive_after_search_results_loop_item_title', function() { global $property; if ( $property->department == 'residential-lettings' && $property->get_available_date() != '' ) { echo '<div class="available-date">' . esc_html( $property->get_available_date() ) . '</div>'; } }, $priority );
                     break;
                 }
                 case "rooms":
@@ -2008,9 +2044,9 @@ function template_assistant_search_result_field_changes()
                         if ( ($property->bedrooms != '' && $property->bedrooms != '0') || ($property->bathrooms != '' && $property->bathrooms != '0') || ($property->reception_rooms != '' && $property->reception_rooms != '0') )
                         {
                             echo '<div class="rooms">';
-                            if ( $property->bedrooms != '' && $property->bedrooms != '0' ) { echo '<div class="room room-bedrooms"><span class="room-count">' . $property->bedrooms . '</span> <span class="room-label">Bedroom' . ( $property->bedrooms != 1 ? 's' : '' ) . '</span></div>'; }
-                            if ( $property->bathrooms != '' && $property->bathrooms != '0' ) { echo '<div class="room room-bathrooms"><span class="room-count">' . $property->bathrooms . '</span> <span class="room-label">Bathroom' . ( $property->bathrooms != 1 ? 's' : '' ) . '</span></div>'; }
-                            if ( $property->reception_rooms != '' && $property->reception_rooms != '0' ) { echo '<div class="room room-receptions"><span class="room-count">' . $property->reception_rooms . '</span> <span class="room-label">Reception' . ( $property->reception_rooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            if ( $property->bedrooms != '' && $property->bedrooms != '0' ) { echo '<div class="room room-bedrooms"><span class="room-count">' . esc_html( $property->bedrooms ) . '</span> <span class="room-label">Bedroom' . ( $property->bedrooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            if ( $property->bathrooms != '' && $property->bathrooms != '0' ) { echo '<div class="room room-bathrooms"><span class="room-count">' . esc_html( $property->bathrooms ) . '</span> <span class="room-label">Bathroom' . ( $property->bathrooms != 1 ? 's' : '' ) . '</span></div>'; }
+                            if ( $property->reception_rooms != '' && $property->reception_rooms != '0' ) { echo '<div class="room room-receptions"><span class="room-count">' . esc_html( $property->reception_rooms ) . '</span> <span class="room-label">Reception' . ( $property->reception_rooms != 1 ? 's' : '' ) . '</span></div>'; }
                             echo '</div>'; 
                         }
                     }, $priority );
@@ -2045,9 +2081,31 @@ function propertyhive_template_loop_custom_field()
 
             if ( $value != '' )
             {
-                echo '<div class="custom-field custom-field-' . sanitize_title(trim($custom_field, "_")) . '">' . $value . '</div>';
+                echo '<div class="custom-field custom-field-' . esc_attr( sanitize_title(trim($custom_field, "_")) ) . '">' . wp_kses_post( $value ) . '</div>';
             }
         }
+    }
+}
+
+/**
+ * Sanitize configurable flag CSS while retaining CSS color functions.
+ */
+function propertyhive_get_flag_custom_style( $settings ) {
+    $css = ( isset( $settings['flag_position'] ) && is_string( $settings['flag_position'] ) ? $settings['flag_position'] : '' );
+    foreach ( array( 'flag_text_color' => 'color', 'flag_bg_color' => 'background' ) as $key => $property_name ) {
+        if ( isset( $settings[ $key ] ) && is_string( $settings[ $key ] ) ) {
+            $css .= ';' . $property_name . ':' . $settings[ $key ];
+        }
+    }
+    $allow_color = static function( $allowed, $declaration ) {
+        // The only parentheses accepted here enclose an RGB/HSL color value.
+        return $allowed || 1 === preg_match( '/^(?:color|background):\s*(?:rgba?|hsla?)\([0-9a-z\s.,%+\-\/]*\)(?:\s*!important)?$/i', $declaration );
+    };
+    add_filter( 'safecss_filter_attr_allow_css', $allow_color, 10, 2 );
+    try {
+        return safecss_filter_attr( $css );
+    } finally {
+        remove_filter( 'safecss_filter_attr_allow_css', $allow_color, 10 );
     }
 }
 
@@ -2064,7 +2122,7 @@ function propertyhive_add_flag()
 
         if ( $flag != '' )
         {
-            echo '<div class="flag flag-' . sanitize_title($flag) . '" style="position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . $current_settings['flag_position'] . '; color:' . $current_settings['flag_text_color'] . '; background:' . $current_settings['flag_bg_color'] . ';">' . $flag . '</div>';
+            echo '<div class="flag flag-' . esc_attr( sanitize_title($flag) ) . '" style="' . esc_attr( 'position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . propertyhive_get_flag_custom_style( $current_settings ) ) . '">' . esc_html( $flag ) . '</div>';
         }
     }
 }
@@ -2082,7 +2140,7 @@ function propertyhive_add_flag_single()
 
         if ( $flag != '' )
         {
-            echo '<div class="flag flag-' . sanitize_title($flag) . '" style="position:absolute; z-index:99; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . $current_settings['flag_position'] . '; color:' . $current_settings['flag_text_color'] . '; background:' . $current_settings['flag_bg_color'] . ';">' . $flag . '</div>';
+            echo '<div class="flag flag-' . esc_attr( sanitize_title($flag) ) . '" style="' . esc_attr( 'position:absolute; z-index:99; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . propertyhive_get_flag_custom_style( $current_settings ) ) . '">' . esc_html( $flag ) . '</div>';
         }
     }
 }

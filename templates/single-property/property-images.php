@@ -20,16 +20,19 @@ global $post, $propertyhive, $property;
 
             echo '<div id="slider" class="flexslider"><ul class="slides">';
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
             foreach ($images as $image)
             {
-                echo '<li>' . apply_filters( 'propertyhive_single_property_image_html', sprintf( '<a href="%s" class="propertyhive-main-image" title="%s" data-fancybox="gallery-' . (int)$post->ID . '">%s</a>', esc_attr( $image['url'] ), esc_attr( $image['title'] ), $image['image'] ), $post->ID ) . '</li>';
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Gallery URLs and attributes are escaped during assembly; preserve the trusted PHP gallery HTML filter.
+                echo '<li>' . apply_filters( 'propertyhive_single_property_image_html', sprintf( '<a href="%s" class="propertyhive-main-image" title="%s" data-fancybox="gallery-' . (int)$post->ID . '">%s</a>', esc_url( $image['url'] ), esc_attr( $image['title'] ), $image['image'] ), $post->ID ) . '</li>';
             }
 
             echo '</ul></div>';
 
         } else {
 
-            echo apply_filters( 'propertyhive_single_property_image_html', sprintf( '<img src="%s" alt="Placeholder" />', ph_placeholder_img_src() ), $post->ID );
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Gallery URLs and attributes are escaped during assembly; preserve the trusted PHP gallery HTML filter.
+            echo apply_filters( 'propertyhive_single_property_image_html', sprintf( '<img src="%s" alt="Placeholder" />', esc_url( ph_placeholder_img_src() ) ), $post->ID );
 
         }
     ?>
