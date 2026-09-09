@@ -59,6 +59,7 @@ class Bricks_Builder_Property_Virtual_Tours_Link_Widget extends \Bricks\Element 
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Bricks serializes registered attributes through its documented render_attributes() API.
 		echo "<div {$this->render_attributes( '_root' )}>";
 
 			foreach ($virtual_tours as $virtual_tour)
@@ -68,7 +69,7 @@ class Bricks_Builder_Property_Virtual_Tours_Link_Widget extends \Bricks\Element 
                 {
                     echo ' data-fancybox=""';
                 }
-				echo '>' . esc_html(__( $virtual_tour['label'], 'propertyhive' )) . '</a>';
+				echo '>' . esc_html($virtual_tour['label']) . '</a>';
 			}
 
 		echo '</div>';

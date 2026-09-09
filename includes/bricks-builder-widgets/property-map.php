@@ -39,7 +39,7 @@ class Bricks_Builder_Property_Map_Widget extends \Bricks\Element {
 		else
 		{
 			$api_key = get_option('propertyhive_google_maps_api_key');
-		    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+		    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3', true );
 		    wp_enqueue_script('googlemaps');
 		}
   	}
@@ -104,6 +104,7 @@ class Bricks_Builder_Property_Map_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Bricks serializes registered attributes through its documented render_attributes() API.
 		echo "<div {$this->render_attributes( '_root' )}>";
 
 			$attributes = array();

@@ -57,8 +57,10 @@ class Bricks_Builder_Property_Floor_Area_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Bricks serializes registered attributes through its documented render_attributes() API.
 		echo "<div {$this->render_attributes( '_root' )}>";
 
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The formatter escapes built-in area text before its trusted propertyhive_floor_area_output HTML filter.
 			echo $property->get_formatted_floor_area();
 
 		echo '</div>';

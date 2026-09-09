@@ -67,6 +67,7 @@ class Bricks_Builder_Property_Actions_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Bricks serializes registered attributes through its documented render_attributes() API.
 		echo "<div {$this->render_attributes( '_root' )}>";
 
 			propertyhive_template_single_actions();
