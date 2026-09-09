@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class PH_Plugin_Updates
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Plugin_Updates; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Plugin_Updates {
 
 	/**
@@ -79,6 +80,7 @@ class PH_Plugin_Updates {
 			if ( !$valid_license )
 			{
 				$add_ons = '';
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only refresh of public add-on metadata; this flag does not install, activate or change licensing.
 				if ( false === ( $add_ons = get_transient( 'propertyhive_features' ) ) || isset($_GET['ph_force_get_features']) ) 
 			    {
 			        // It wasn't there, so regenerate the data and save the transient
@@ -164,7 +166,7 @@ class PH_Plugin_Updates {
 		$this->new_version            = $response->new_version;
 		$this->upgrade_notice         = $this->get_upgrade_notice( $response->new_version );
 
-		echo apply_filters( 'propertyhive_in_plugin_update_message', $this->upgrade_notice ? '<br><span style="color:#900">' . wp_kses_post( $this->upgrade_notice ) . '</span>' : '' ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+		echo apply_filters( 'propertyhive_in_plugin_update_message', $this->upgrade_notice ? '<br><span style="color:#900">' . wp_kses_post( $this->upgrade_notice ) . '</span>' : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The remote notice is sanitized with wp_kses_post before this trusted PHP extension HTML filter.
 	}
 
 	/**

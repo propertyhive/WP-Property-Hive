@@ -44,7 +44,7 @@ class PH_Licenses {
 	 * @since 1.0.0
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
 	}
 
 	/**
@@ -53,7 +53,7 @@ class PH_Licenses {
 	 * @since 1.0.0
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
 	}
 
 	/**
@@ -212,12 +212,12 @@ class PH_Licenses {
 			$data['php_version'] = phpversion();
 			$data['ph_version'] = PH_VERSION;
 			$data['wp_version']  = get_bloginfo( 'version' );
-			$data['server']      = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
+			$data['server']      = isset( $_SERVER['SERVER_SOFTWARE'] ) && is_string( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
 
 			$data['install_date'] = get_option('propertyhive_install_timestamp', '');
 			if ( $data['install_date'] != '' && $data['install_date'] != 0 )
 			{
-				$data['install_date'] = date("jS F Y", $data['install_date']);
+				$data['install_date'] = gmdate("jS F Y", $data['install_date']);
 			}
 
 			$data['multisite']   = is_multisite();
@@ -351,8 +351,8 @@ class PH_Licenses {
 			}
 
 			// Search analytics
-			$table_name = $wpdb->prefix . 'ph_search_log';
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Aggregate current custom-table analytics for the license report; new search events and retention change these counts independently.
 			$counts = $wpdb->get_row(
 				"SELECT
 					COALESCE(
@@ -364,7 +364,7 @@ class PH_Licenses {
 						0
 					) AS last_30_days,
 					COUNT(*) AS last_90_days
-				FROM {$table_name}
+				FROM {$wpdb->prefix}ph_search_log
 				WHERE searched_at >= UTC_TIMESTAMP() - INTERVAL 90 DAY",
 				ARRAY_A
 			);
@@ -383,11 +383,12 @@ class PH_Licenses {
 				$args = array(
 					'post_type' => $post_type,
 					'fields' => 'ids',
-					'nopaging' => TRUE,
+					'posts_per_page' => 1,
 					'post_status' => 'publish'
 				);
 				if ( $post_type == 'property' )
 				{
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- On-market state is stored in property metadata; retrieve one ID and use found_posts for the aggregate count.
 					$args['meta_query'] = array(
 						array(
 							'key' => '_on_market',
@@ -423,16 +424,16 @@ class PH_Licenses {
 
 		update_option( 'propertyhive_last_license_check', time() );
 
-		// Start by removing what we already know about the license
-		update_option( 'propertyhive_license_key_details', '', 'no' );
+		// Retain last-known license details during outages; replace them only with a valid HTTPS response.
+		update_option( 'propertyhive_license_https_verified', false, 'no' );
 		update_option( 'propertyhive_license_key_error', '', 'no' );
 
 		$data = $this->get_data_for_license_check();
 
-		$request = wp_remote_post( 'http://license.wp-property-hive.com/check-license.php', array(
+		$request = wp_remote_post( 'https://license.wp-property-hive.com/check-license.php', array(
 			'method'      => 'POST',
 			'timeout'     => 20,
-			'redirection' => 5,
+			'redirection' => 0,
 			'httpversion' => '1.1',
 			'blocking'    => true,
 			'body'        => $data,
@@ -441,15 +442,13 @@ class PH_Licenses {
 
 		if ( is_wp_error( $request ) )
 		{
-			update_option( 'propertyhive_license_key_details', array(), 'no' );
-			update_option( 'propertyhive_license_key_error', $request->get_error_message(), 'no' );
+			update_option( 'propertyhive_license_key_error', __( 'The legacy license service could not be reached securely. Contact Property Hive support. Your saved license details have been retained.', 'propertyhive' ), 'no' );
 			return false;
 		}
 
-		if ( isset($request['body']) && $request['body'] == '' )
+		if ( 200 !== wp_remote_retrieve_response_code( $request ) || '' === wp_remote_retrieve_body( $request ) )
 		{
-			update_option( 'propertyhive_license_key_details', array(), 'no' );
-			update_option( 'propertyhive_license_key_error', 'No response received when checking license', 'no' );
+			update_option( 'propertyhive_license_key_error', __( 'The legacy license service returned an invalid response. Contact Property Hive support.', 'propertyhive' ), 'no' );
 			return false;
 		}
 
@@ -457,11 +456,11 @@ class PH_Licenses {
 		if ( $body !== FALSE && is_array($body) && !empty($body) )
 		{
 			update_option( 'propertyhive_license_key_details', $body, 'no' );
+			update_option( 'propertyhive_license_https_verified', true, 'no' );
 		}
 		else
 		{
-			update_option( 'propertyhive_license_key_details', array(), 'no' );
-			update_option( 'propertyhive_license_key_error', 'Failed to process response data: ' . print_r($request['body'], true), 'no' );
+			update_option( 'propertyhive_license_key_error', __( 'The legacy license service returned invalid license data. Contact Property Hive support.', 'propertyhive' ), 'no' );
 		}
 	}
 
@@ -508,7 +507,7 @@ class PH_Licenses {
 	    	$url .= 'wc-api=wc-am-api&';
 	    	$url .= 'wc_am_action=activate&';
 	    	$url .= 'instance=' . $instance_id . '&';
-	    	$url .= 'object=' . parse_url( get_site_url(), PHP_URL_HOST ) . '&';
+            $url .= 'object=' . wp_parse_url( get_site_url(), PHP_URL_HOST ) . '&';
 	    	$url .= 'product_id=' . $license['product_id'] . '&';
 	    	$url .= 'api_key=' . $license_key;
 
@@ -546,7 +545,7 @@ class PH_Licenses {
 			{
 				$return = array(
 	        		'success' => false,
-	        		'error' => __( 'Failed to decode response when activating license key status. Please try again', 'propertyhive' ) . ': ' . print_r( $result, true )
+                    'error' => __( 'Failed to decode response when activating license key status. Please try again', 'propertyhive' ) . ': ' . wp_json_encode( $result )
 	        	);
 	        	return $return;
 			}
@@ -573,7 +572,7 @@ class PH_Licenses {
 			{
 				$return = array(
 	        		'success' => false,
-	        		'error' => __( 'Something went wrong when trying to activate license key', 'propertyhive' ) . ': ' . print_r($body, true)
+                    'error' => __( 'Something went wrong when trying to activate license key', 'propertyhive' ) . ': ' . wp_json_encode( $body )
 	        	);
 				return $return;
 			}
@@ -607,7 +606,7 @@ class PH_Licenses {
 	    	$url .= 'wc-api=wc-am-api&';
 	    	$url .= 'wc_am_action=deactivate&';
 	    	$url .= 'instance=' . $instance_id . '&';
-	    	$url .= 'object=' . parse_url( get_site_url(), PHP_URL_HOST ) . '&';
+            $url .= 'object=' . wp_parse_url( get_site_url(), PHP_URL_HOST ) . '&';
 	    	$url .= 'product_id=' . $license['product_id'] . '&';
 	    	$url .= 'api_key=' . $license_key;
 
@@ -645,7 +644,7 @@ class PH_Licenses {
 			{
 				$return = array(
 	        		'success' => false,
-	        		'error' => __( 'Failed to decode response when deactivating license key status. Please try again', 'propertyhive' ) . ': ' . print_r( $result, true )
+                    'error' => __( 'Failed to decode response when deactivating license key status. Please try again', 'propertyhive' ) . ': ' . wp_json_encode( $result )
 	        	);
 	        	return $return;
 			}
@@ -672,7 +671,7 @@ class PH_Licenses {
 			{
 				$return = array(
 	        		'success' => false,
-	        		'error' => __( 'Something went wrong when trying to deactivate license key', 'propertyhive' ) . ': ' . print_r($body, true)
+                    'error' => __( 'Something went wrong when trying to deactivate license key', 'propertyhive' ) . ': ' . wp_json_encode( $body )
 	        	);
 				return $return;
 			}
@@ -775,7 +774,7 @@ class PH_Licenses {
 		{
         	$return = array(
         		'success' => false,
-        		'error' => __( 'Failed to decode response when requesting license key product list. Please try again', 'propertyhive' ) . ': ' . print_r( $result, true )
+                'error' => __( 'Failed to decode response when requesting license key product list. Please try again', 'propertyhive' ) . ': ' . wp_json_encode( $result )
         	);
         	
         	$last_known = get_option('ph_pro_last_known_license_product_id_and_package', array());
@@ -833,7 +832,7 @@ class PH_Licenses {
 				{
 					$return = array(
 		        		'success' => false,
-		        		'error' => __( 'API key doesn\'t appear to belong to any orders', 'propertyhive' ) . ': ' . print_r($body, true)
+                        'error' => __( 'API key doesn\'t appear to belong to any orders', 'propertyhive' ) . ': ' . wp_json_encode( $body )
 		        	);
 				}
 			}
@@ -853,7 +852,7 @@ class PH_Licenses {
 		{
 			$return = array(
         		'success' => false,
-        		'error' => __( 'Something went wrong when requesting license key product list', 'propertyhive' ) . ': ' . print_r($body, true)
+                'error' => __( 'Something went wrong when requesting license key product list', 'propertyhive' ) . ': ' . wp_json_encode( $body )
         	);
         	
 			$last_known = get_option('ph_pro_last_known_license_product_id_and_package', array());
@@ -968,7 +967,7 @@ class PH_Licenses {
 		{
         	$return = array(
         		'success' => false,
-        		'error' => __( 'Failed to decode response when requesting license key status. Please try again', 'propertyhive' ) . ': ' . print_r( $result, true )
+                'error' => __( 'Failed to decode response when requesting license key status. Please try again', 'propertyhive' ) . ': ' . wp_json_encode( $result )
         	);
         	
         	// error for some reason. Return last known status
@@ -1018,7 +1017,7 @@ class PH_Licenses {
 		{
 			$return = array(
         		'success' => false,
-        		'error' => __( 'Something went wrong when requesting license key status', 'propertyhive' ) . ': ' . print_r($body, true)
+                'error' => __( 'Something went wrong when requesting license key status', 'propertyhive' ) . ': ' . wp_json_encode( $body )
         	);
         	
 			// error for some reason. Return last known status
