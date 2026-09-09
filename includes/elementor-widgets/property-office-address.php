@@ -78,7 +78,7 @@ class Elementor_Property_Office_Address_Widget extends \Elementor\Widget_Base {
 
 		if ( $property->office_address != '' )
 		{
-	        echo $property->office_address;
+	        echo esc_html( $property->office_address );
 	    }
 
 	}

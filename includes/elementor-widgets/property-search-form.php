@@ -4,6 +4,7 @@
  *
  * @since 1.0.0
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Existing public Elementor widget class; retain its registered name for extension compatibility.
 class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 
 	public function get_name() {
@@ -383,34 +384,33 @@ class Elementor_Property_Search_Form_Widget extends \Elementor\Widget_Base {
 			</style>';
 		}
 
-		$original_department = isset($_GET['department']) ? sanitize_text_field($_GET['department']) : false;
-		$changed_department = false;
-		if ( 
-			isset($settings['default_department']) && !empty($settings['default_department']) && 
-			( 
-				!isset($_GET['department']) ||
-				( isset($_GET['department']) && empty($_GET['department']) )
-			)
-		)
-		{
-			$_GET['department'] = $settings['default_department'];
-			$_REQUEST['department'] = $settings['default_department'];
-
-			$changed_department = true;
-		}
-		ph_get_search_form( ( ( isset($settings['form_id']) && !empty($settings['form_id']) ) ? $settings['form_id'] : 'default' ) );
-		if ( $changed_department === true )
-		{
-			if ( $original_department === false )
-			{
-				unset($_GET['department']);
-				unset($_REQUEST['department']);
-			}
-			else
-			{
-				$_GET['department'] = $original_department;
-				$_REQUEST['department'] = $original_department;
-			}
-		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Snapshot read-only search state for exact restoration after rendering.
+        $original_get = $_GET;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- GET and REQUEST can differ; preserve each caller's original search state.
+        $original_request = $_REQUEST;
+        $department = isset( $original_get['department'] ) && is_string( $original_get['department'] ) ? sanitize_text_field( wp_unslash( $original_get['department'] ) ) : '';
+        if ( empty( $department ) && isset( $settings['default_department'] ) && is_string( $settings['default_department'] ) ) {
+            $department = sanitize_text_field( $settings['default_department'] );
+        }
+        if ( '' !== $department ) {
+            $_GET['department'] = wp_slash( $department );
+            $_REQUEST['department'] = wp_slash( $department );
+        } else {
+            unset( $_GET['department'], $_REQUEST['department'] );
+        }
+        try {
+            ph_get_search_form( ( isset( $settings['form_id'] ) && ! empty( $settings['form_id'] ) ) ? $settings['form_id'] : 'default' );
+        } finally {
+            if ( array_key_exists( 'department', $original_get ) ) {
+                $_GET['department'] = $original_get['department'];
+            } else {
+                unset( $_GET['department'] );
+            }
+            if ( array_key_exists( 'department', $original_request ) ) {
+                $_REQUEST['department'] = $original_request['department'];
+            } else {
+                unset( $_REQUEST['department'] );
+            }
+        }
 	}
 }

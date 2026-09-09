@@ -225,7 +225,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             .gallery-column > a { 
                 display:block;
                 height:100%; 
-                padding-top:<?php echo $padding_top; ?>; 
+                padding-top:<?php echo esc_attr( $padding_top ); ?>;
                 background:center center no-repeat; 
                 background-size:cover; 
             }
@@ -315,6 +315,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                     $id_text = $image_number == ($max_images - 1) ? 'id="more-images-link"' : '';
                     $id_text_mobile = $image_number == 1 ? 'id="more-images-link-mobile"' : '';
 
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Both ID attribute fragments are fixed plugin literals, including their quotes.
                     echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
 
                     if ( $image_number == 1 )
@@ -322,7 +323,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                         echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
-                            __( 'See all %d images', 'propertyhive' ), 
+                            esc_html__( 'See all %d images', 'propertyhive' ),
                             count($images) + count($images_hidden) 
                         );
                         echo '</a></div></div>';
@@ -332,7 +333,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                         echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
-                            __( 'See all %d images', 'propertyhive' ), 
+                            esc_html__( 'See all %d images', 'propertyhive' ),
                             count($images) + count($images_hidden) 
                         );
                         echo '</a></div></div>';

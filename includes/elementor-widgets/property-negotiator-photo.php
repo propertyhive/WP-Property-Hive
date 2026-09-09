@@ -52,6 +52,7 @@ class Elementor_Property_Negotiator_Photo_Widget extends \Elementor\Widget_Base 
 
 		if ( $property->negotiator_photo != '' )
 		{
+	        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WordPress generates attachment image HTML through wp_get_attachment_image().
 	        echo $property->negotiator_photo;
 	    }
 

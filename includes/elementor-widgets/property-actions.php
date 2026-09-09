@@ -243,12 +243,12 @@ class Elementor_Property_Actions_Widget extends \Elementor\Widget_Base {
 			$this->output_layout_css( $settings, '' );
 
 			// Tablet
-			echo '@media (max-width: ' . $tablet_breakpoint . 'px) {';
+			echo '@media (max-width: ' . (int) $tablet_breakpoint . 'px) {';
 			$this->output_layout_css( $settings, '_tablet' );
 			echo '}';
 
 			// Mobile
-			echo '@media (max-width: ' . $mobile_breakpoint . 'px) {';
+			echo '@media (max-width: ' . (int) $mobile_breakpoint . 'px) {';
 			$this->output_layout_css( $settings, '_mobile' );
 			echo '}';
 			echo '</style>';

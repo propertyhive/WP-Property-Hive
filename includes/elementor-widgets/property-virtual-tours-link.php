@@ -147,7 +147,7 @@ class Elementor_Property_Virtual_Tours_Link_Widget extends \Elementor\Widget_Bas
                 {
                     echo ' data-fancybox=""';
                 }
-				echo '>' . esc_html(__( $virtual_tour['label'], 'propertyhive' )) . '</a>';
+				echo '>' . esc_html($virtual_tour['label']) . '</a>';
 			}
 		}
 
