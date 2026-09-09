@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Department
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Department
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Department; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Department {
 
 	/**
@@ -29,14 +33,17 @@ class PH_Meta_Box_Property_Department {
         if ( isset( $args['args']['property_post'] ) )
         {
             $post = $args['args']['property_post'];
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
             $thepostid = $post->ID;
             setup_postdata($post);
         }
 
         $parent_post = false;
-        if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parent defaults; saving has independent nonce and permission guards.
+        $parent_id = isset( $_GET['post_parent'] ) && is_scalar( $_GET['post_parent'] ) ? absint( $_GET['post_parent'] ) : 0;
+        if ( $parent_id > 0 && 'property' === get_post_type( $parent_id ) && current_user_can( 'edit_post', $parent_id ) )
         {
-            $parent_post = (int)$_GET['post_parent'];
+            $parent_post = $parent_id;
         }
         
         echo '<div class="propertyhive_meta_box">';
@@ -175,15 +182,11 @@ class PH_Meta_Box_Property_Department {
 
         $countries_with_material_information = apply_filters( 'propertyhive_countries_with_material_information', array( 'GB' ) );
 
-        $material_information_sountry_js = array();
+        $countries_with_material_information = is_array( $countries_with_material_information ) ? array_values( array_filter( $countries_with_material_information, 'is_string' ) ) : array();
         if ( !empty($countries_with_material_information) )
         {
-            foreach ( $countries_with_material_information as $country )
-            {
-                $material_information_sountry_js[] = 'selected_country == \'' . strtoupper($country) . '\'';
-            }
             echo '
-                    if ( ' . implode(" || ", $material_information_sountry_js) . ' )
+                    if ( ' . wp_json_encode( array_map( 'strtoupper', $countries_with_material_information ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . '.indexOf(selected_country) !== -1 )
                     {
                         jQuery(\'#propertyhive-property-material-information\').show();
                     }
@@ -203,6 +206,7 @@ class PH_Meta_Box_Property_Department {
         echo '</div>';
 	    
         $post = $original_post;
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
         $thepostid = $original_thepostid;
         setup_postdata($post);
     }
@@ -211,9 +215,19 @@ class PH_Meta_Box_Property_Department {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
         
-        update_post_meta( $post_id, '_department', ph_clean($_POST['_department']) );
+        if ( isset( $_POST['_department'] ) && is_string( $_POST['_department'] ) ) {
+            update_post_meta( $post_id, '_department', wp_slash( ph_clean( wp_unslash( $_POST['_department'] ) ) ) );
+        }
 
         do_action( 'propertyhive_save_property_department', $post_id );
     }

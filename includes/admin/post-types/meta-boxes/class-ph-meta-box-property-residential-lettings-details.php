@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Residential Lettings Details
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Residential_Lettings_Details
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Residential_Lettings_Details; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Residential_Lettings_Details {
 
 	/**
@@ -107,7 +111,7 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'furnished', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'furnished' ) ) );
         
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -159,6 +163,25 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
+        $request_post = wp_unslash( $_POST );
+        $input = array();
+        foreach ( array( '_rent_currency', '_rent', '_rent_frequency', '_rent_poa', '_deposit', '_available_date', 'furnished_id' ) as $key )
+        {
+            if ( isset( $request_post[ $key ] ) && ! is_string( $request_post[ $key ] ) )
+            {
+                return;
+            }
+            $input[ $key ] = isset( $request_post[ $key ] ) ? sanitize_text_field( $request_post[ $key ] ) : '';
+        }
+
         global $wpdb;
         
         // Only save meta info if department is 'residential-lettings'
@@ -166,24 +189,24 @@ class PH_Meta_Box_Property_Residential_Lettings_Details {
         
         if ( $department == 'residential-lettings' || ph_get_custom_department_based_on( $department ) == 'residential-lettings' )
         {
-            update_post_meta( $post_id, '_currency', ph_clean($_POST['_rent_currency']) );
+            update_post_meta( $post_id, '_currency', wp_slash( $input['_rent_currency'] ) );
 
-            $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent']));
+            $rent = preg_replace("/[^0-9.]/", '', ph_clean($input['_rent']));
             update_post_meta( $post_id, '_rent', $rent );
-            update_post_meta( $post_id, '_rent_frequency', ph_clean($_POST['_rent_frequency']) );
+            update_post_meta( $post_id, '_rent_frequency', wp_slash( $input['_rent_frequency'] ) );
             
             // Store price in common currency (GBP) and frequency (PCM) used for ordering
             $ph_countries = new PH_Countries();
             $ph_countries->update_property_price_actual( $post_id );
 
-            update_post_meta( $post_id, '_poa', ( isset($_POST['_rent_poa']) ? ph_clean($_POST['_rent_poa']) : '' ) );
+            update_post_meta( $post_id, '_poa', ( isset($input['_rent_poa']) ? ph_clean($input['_rent_poa']) : '' ) );
             
-            update_post_meta( $post_id, '_deposit', preg_replace("/[^0-9.]/", '', ph_clean($_POST['_deposit'])) );
-            update_post_meta( $post_id, '_available_date', ph_clean($_POST['_available_date']) );
+            update_post_meta( $post_id, '_deposit', preg_replace("/[^0-9.]/", '', ph_clean($input['_deposit'])) );
+            update_post_meta( $post_id, '_available_date', wp_slash( $input['_available_date'] ) );
             
-            if ( !empty($_POST['furnished_id']) )
+            if ( !empty($input['furnished_id']) )
             {
-                wp_set_post_terms( $post_id, (int)$_POST['furnished_id'], 'furnished' );
+                wp_set_post_terms( $post_id, (int)$input['furnished_id'], 'furnished' );
             }
             else
             {

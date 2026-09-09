@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Address
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Address
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Address; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Address {
 
 	/**
@@ -21,6 +25,7 @@ class PH_Meta_Box_Property_Address {
 	public static function output( $post, $args = array() ) {
         global $wpdb, $thepostid, $pagenow;
 
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
         $thepostid = $post->ID;
 
         $original_post = $post;
@@ -30,22 +35,26 @@ class PH_Meta_Box_Property_Address {
         if ( isset( $args['args']['property_post'] ) )
         {
             $post = $args['args']['property_post'];
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
             $thepostid = $post->ID;
             setup_postdata($post);
         }
         
         wp_nonce_field( 'propertyhive_save_data', 'propertyhive_meta_nonce' );
         
+        echo '<input type="hidden" name="propertyhive_address_present" value="1">';
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
         
         $post_parent_id = ( ( isset($post->post_parent) ) ? $post->post_parent : 0 );
         $parent_post = false;
-        if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parent defaults; the parent must be an editable property and saving uses the metabox nonce.
+        $requested_parent = isset( $_GET['post_parent'] ) && is_scalar( $_GET['post_parent'] ) ? absint( $_GET['post_parent'] ) : 0;
+        if ( $requested_parent && get_post_type( $requested_parent ) === 'property' && current_user_can( 'manage_propertyhive' ) && current_user_can( 'edit_post', $requested_parent ) )
         {
-            $post_parent_id = (int)$_GET['post_parent'];
-            $parent_post = $post_parent_id;
+            $parent_post = $requested_parent;
+            $post_parent_id = $requested_parent;
         }
         propertyhive_wp_hidden_input( array( 
             'id' => 'post_parent', 
@@ -231,7 +240,7 @@ class PH_Meta_Box_Property_Address {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'location', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
         
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -244,7 +253,7 @@ class PH_Meta_Box_Property_Address {
                     'hide_empty' => false,
                     'parent' => $term->term_id
                 );
-                $subterms = get_terms( 'location', $args );
+                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                 
                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
@@ -256,7 +265,7 @@ class PH_Meta_Box_Property_Address {
                             'hide_empty' => false,
                             'parent' => $term->term_id
                         );
-                        $subsubterms = get_terms( 'location', $args );
+                        $subsubterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                         
                         if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                         {
@@ -287,7 +296,7 @@ class PH_Meta_Box_Property_Address {
                     'hide_empty' => false,
                     'parent' => 0
                 );
-                $terms = get_terms( 'location', $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                 
                 $selected_values = array();
                 $term_list = wp_get_post_terms($post->ID, 'location', array("fields" => "ids"));
@@ -316,7 +325,7 @@ class PH_Meta_Box_Property_Address {
                             'hide_empty' => false,
                             'parent' => $term->term_id
                         );
-                        $subterms = get_terms( 'location', $args );
+                        $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                         
                         if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                         {
@@ -333,7 +342,7 @@ class PH_Meta_Box_Property_Address {
                                     'hide_empty' => false,
                                     'parent' => $term->term_id
                                 );
-                                $subsubterms = get_terms( 'location', $args );
+                                $subsubterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                                 
                                 if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                                 {
@@ -532,6 +541,7 @@ class PH_Meta_Box_Property_Address {
         ';
 
         $post = $original_post;
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
         $thepostid = $original_thepostid;
         setup_postdata($post);
     }
@@ -540,25 +550,46 @@ class PH_Meta_Box_Property_Address {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
 
-        update_post_meta( $post_id, '_reference_number', ph_clean($_POST['_reference_number']) );
-        update_post_meta( $post_id, '_address_name_number', ph_clean($_POST['_address_name_number']) );
-        update_post_meta( $post_id, '_address_street', ph_clean($_POST['_address_street']) );
-        update_post_meta( $post_id, '_address_two', ph_clean($_POST['_address_two']) );
-        update_post_meta( $post_id, '_address_three', ph_clean($_POST['_address_three']) );
-        update_post_meta( $post_id, '_address_four', ph_clean($_POST['_address_four']) );
-        update_post_meta( $post_id, '_address_postcode', ph_clean($_POST['_address_postcode']) );
-        update_post_meta( $post_id, '_address_country', ph_clean($_POST['_address_country']) );
-
-        if ( !empty($_POST['location_id']) )
-        {
-            $location_ids = is_array($_POST['location_id']) ? array_map( 'intval', $_POST['location_id'] ) : (int)$_POST['location_id'];
-            wp_set_post_terms( $post_id, $location_ids, 'location' );
+        if ( isset( $_POST['_reference_number'] ) && is_string( $_POST['_reference_number'] ) ) {
+            update_post_meta( $post_id, '_reference_number', wp_slash( sanitize_text_field( wp_unslash( $_POST['_reference_number'] ) ) ) );
         }
-        else
-        {
-            // Setting to blank
+        if ( isset( $_POST['_address_name_number'] ) && is_string( $_POST['_address_name_number'] ) ) {
+            update_post_meta( $post_id, '_address_name_number', wp_slash( sanitize_text_field( wp_unslash( $_POST['_address_name_number'] ) ) ) );
+        }
+        if ( isset( $_POST['_address_street'] ) && is_string( $_POST['_address_street'] ) ) {
+            update_post_meta( $post_id, '_address_street', wp_slash( sanitize_text_field( wp_unslash( $_POST['_address_street'] ) ) ) );
+        }
+        if ( isset( $_POST['_address_two'] ) && is_string( $_POST['_address_two'] ) ) {
+            update_post_meta( $post_id, '_address_two', wp_slash( sanitize_text_field( wp_unslash( $_POST['_address_two'] ) ) ) );
+        }
+        if ( isset( $_POST['_address_three'] ) && is_string( $_POST['_address_three'] ) ) {
+            update_post_meta( $post_id, '_address_three', wp_slash( sanitize_text_field( wp_unslash( $_POST['_address_three'] ) ) ) );
+        }
+        if ( isset( $_POST['_address_four'] ) && is_string( $_POST['_address_four'] ) ) {
+            update_post_meta( $post_id, '_address_four', wp_slash( sanitize_text_field( wp_unslash( $_POST['_address_four'] ) ) ) );
+        }
+        if ( isset( $_POST['_address_postcode'] ) && is_string( $_POST['_address_postcode'] ) ) {
+            update_post_meta( $post_id, '_address_postcode', wp_slash( sanitize_text_field( wp_unslash( $_POST['_address_postcode'] ) ) ) );
+        }
+        if ( isset( $_POST['_address_country'] ) && is_string( $_POST['_address_country'] ) ) {
+            update_post_meta( $post_id, '_address_country', wp_slash( ph_clean( wp_unslash( $_POST['_address_country'] ) ) ) );
+        }
+
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Shape-only check rejects nested values before the separately sanitized text or integer conversion below.
+        if ( isset( $_POST['location_id'] ) && ( is_scalar( $_POST['location_id'] ) || ( is_array( $_POST['location_id'] ) && count( array_filter( $_POST['location_id'], 'is_scalar' ) ) === count( $_POST['location_id'] ) ) ) ) {
+            $location_ids = is_array( $_POST['location_id'] ) ? array_map( 'intval', $_POST['location_id'] ) : (int) $_POST['location_id'];
+            wp_set_post_terms( $post_id, $location_ids, 'location' );
+        } elseif ( ! isset( $_POST['location_id'] ) && isset( $_POST['propertyhive_address_present'] ) ) {
             wp_delete_object_term_relationships( $post_id, 'location' );
         }
 
@@ -569,9 +600,12 @@ class PH_Meta_Box_Property_Address {
             update_post_meta( $post_id, '_status', 'instructed' );
         }
 
-        if ( isset($_POST['next_auto_increment']) )
-        {
-            update_option( 'propertyhive_auto_incremental_next', ph_clean($_POST['next_auto_increment']) );
+        if ( isset( $_POST['next_auto_increment'] ) && current_user_can( 'manage_propertyhive' ) && 'yes' === get_option( 'propertyhive_auto_incremental_reference_numbers' ) ) {
+            // The hidden field signals allocation; the sequence value is server-controlled.
+            $next_reference = max( 1, absint( get_option( 'propertyhive_auto_incremental_next', 1 ) ) );
+            if ( $next_reference < PHP_INT_MAX ) {
+                update_option( 'propertyhive_auto_incremental_next', $next_reference + 1 );
+            }
         }
 
         do_action( 'propertyhive_save_property_address', $post_id );

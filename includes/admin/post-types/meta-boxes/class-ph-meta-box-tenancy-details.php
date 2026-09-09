@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Tenancy Details
  *
@@ -11,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Tenancy_Details
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Tenancy_Details; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Tenancy_Details {
 
 	/**
@@ -19,6 +23,7 @@ class PH_Meta_Box_Tenancy_Details {
 	public static function output( $post ) {
         global $wpdb, $thepostid;
 
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
         $thepostid = $post->ID;
 
         wp_nonce_field( 'propertyhive_save_data', 'propertyhive_meta_nonce' );
@@ -87,14 +92,14 @@ class PH_Meta_Box_Tenancy_Details {
         ';
 
         $lease_type_options = apply_filters( 'propertyhive_tenancy_lease_types', array(
-            'assured_shorthold' => 'Assured Shorthold',
-            'assured' => 'Assured',
+            'assured_shorthold' => __( 'Assured Shorthold', 'propertyhive' ),
+            'assured' => __( 'Assured', 'propertyhive' ),
         ) );
 
         $i = 1;
         foreach ( $lease_type_options as $lease_type_name => $lease_type_display )
         {
-            $lease_term_type_html .= '<option value="' . esc_attr($lease_type_name) . '"' . ( ($lease_type == $lease_type_name || ( $lease_type == '' && $i === 1 ) ) ? ' selected' : '') . '>' . esc_html(__($lease_type_display, 'propertyhive')) . '</option>';
+            $lease_term_type_html .= '<option value="' . esc_attr($lease_type_name) . '"' . ( ($lease_type == $lease_type_name || ( $lease_type == '' && $i === 1 ) ) ? ' selected' : '') . '>' . esc_html( $lease_type_display ) . '</option>';
             $i++;
         }
 
@@ -102,6 +107,7 @@ class PH_Meta_Box_Tenancy_Details {
                 </select>
             </p>';
 
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Lease controls are assembled above from fixed markup with escaped stored values and escaped filtered option labels/values.
         echo $lease_term_type_html;
 
         $args = array(
@@ -255,41 +261,59 @@ class PH_Meta_Box_Tenancy_Details {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
-	    //  die($_POST);
+
         $status = get_post_meta( $post_id, '_status', TRUE );
         if ( $status == '' )
         {
             update_post_meta( $post_id, '_status', 'application' );
         }
 
-        if ( isset( $_POST['_length'] ) )
+        $request_post = wp_unslash( $_POST );
+        if ( isset( $request_post['_length'] ) && is_scalar( $request_post['_length'] ) )
         {
-            update_post_meta( $post_id, '_length', (int)$_POST['_length'] );
+            update_post_meta( $post_id, '_length', (int) $request_post['_length'] );
         }
 
-        if ( isset( $_POST['_length_units'] ) )
+        // Keep extension-defined lease types and frequency values, sanitizing each
+        // scalar independently so malformed fields cannot overwrite stored data.
+        $text_fields = array(
+            '_length_units'   => '_length_units',
+            '_lease_type'     => '_lease_type',
+            '_start_date'     => '_start_date',
+            '_end_date'       => '_end_date',
+            '_rent_frequency' => '_rent_frequency',
+            '_rent_currency'  => '_currency',
+        );
+        foreach ( $text_fields as $request_key => $meta_key )
         {
-            update_post_meta( $post_id, '_length_units', ph_clean($_POST['_length_units']) );
+            if ( isset( $request_post[ $request_key ] ) && is_string( $request_post[ $request_key ] ) )
+            {
+                update_post_meta( $post_id, $meta_key, wp_slash( sanitize_text_field( $request_post[ $request_key ] ) ) );
+            }
         }
 
-        if ( isset( $_POST['_lease_type'] ) )
+        foreach ( array( '_rent', '_deposit' ) as $amount_key )
         {
-            update_post_meta( $post_id, '_lease_type', ph_clean($_POST['_lease_type']) );
+            if ( isset( $request_post[ $amount_key ] ) && is_string( $request_post[ $amount_key ] ) )
+            {
+                $amount = preg_replace( '/[^0-9.]/', '', sanitize_text_field( $request_post[ $amount_key ] ) );
+                update_post_meta( $post_id, $amount_key, $amount );
+            }
         }
 
-        update_post_meta( $post_id, '_start_date', ph_clean($_POST['_start_date']) );
-        update_post_meta( $post_id, '_end_date', ph_clean($_POST['_end_date']) );
-
-        $amount = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent']));
-        update_post_meta( $post_id, '_rent', $amount );
-        update_post_meta( $post_id, '_rent_frequency', ph_clean($_POST['_rent_frequency']) );
-        update_post_meta( $post_id, '_currency', ph_clean($_POST['_rent_currency']) );
-
-	    $amount = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_deposit']));
-	    update_post_meta( $post_id, '_deposit', $amount );
-
-        update_post_meta( $post_id, '_notes', sanitize_textarea_field($_POST['_notes']) );
+        if ( isset( $request_post['_notes'] ) && is_string( $request_post['_notes'] ) )
+        {
+            update_post_meta( $post_id, '_notes', wp_slash( sanitize_textarea_field( $request_post['_notes'] ) ) );
+        }
 
         do_action( 'propertyhive_save_tenancy_details', $post_id );
     }

@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Brochures
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Brochures; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Brochures {
 
 	/**
@@ -395,64 +396,36 @@ class PH_Meta_Box_Property_Brochures {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
         
         if ( get_option('propertyhive_brochures_stored_as', '') == 'urls' )
         {
-           $brochure_urls = array();
-           if ( isset($_POST['brochure_url']) && is_array($_POST['brochure_url']) && !empty($_POST['brochure_url']) )
-           {
-              foreach ( $_POST['brochure_url'] as $brochure_url )
-              {
-                  if ( sanitize_url($brochure_url) == '' ) { continue; }
-                  $brochure_urls[] = array('url' => sanitize_url($brochure_url));
-              }
-           }
-           update_post_meta( $post_id, '_brochure_urls', $brochure_urls );
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Shape-only validation rejects nested URLs before URL sanitization below.
+            if ( ! isset( $_POST['brochure_url'] ) || ! is_array( $_POST['brochure_url'] ) || count( array_filter( $_POST['brochure_url'], 'is_string' ) ) !== count( $_POST['brochure_url'] ) ) {
+                return;
+            }
+            $submitted_urls = array_map( 'sanitize_url', wp_unslash( $_POST['brochure_url'] ) );
+            $brochure_urls = array();
+            foreach ( $submitted_urls as $brochure_url ) {
+                if ( $brochure_url !== '' ) {
+                    $brochure_urls[] = array( 'url' => $brochure_url );
+                }
+            }
+            update_post_meta( $post_id, '_brochure_urls', wp_slash( $brochure_urls ) );
         }
         else
         {
-            $brochures = array();
-            if (trim($_POST['brochure_attachment_ids'], ',') != '')
-            {
-                $brochures = explode( ",", trim(ph_clean($_POST['brochure_attachment_ids']), ',') );
-
-                foreach ($brochures as $attachment_id)
-                {
-                    $attachment = array(
-                        'ID' => $attachment_id,
-                        'post_parent' => $post_id,
-                    );
-
-                    wp_update_post($attachment);
-
-                    clean_attachment_cache($attachment_id);
-                }
-            }
-            update_post_meta( $post_id, '_brochures', $brochures );
-
-            // Remove post attachment for brochures no longer in list
-            if (trim($_POST['previous_brochure_attachment_ids'], ',') != '')
-            {
-                $previous_brochures = explode( ",", trim(ph_clean($_POST['previous_brochure_attachment_ids']), ',') );
-
-                foreach ( $previous_brochures as $attachment_id )
-                {
-                    if ( !in_array($attachment_id, $brochures) )
-                    {
-                        // No longer in list, let's unattach it
-                        $attachment = array(
-                            'ID' => $attachment_id,
-                            'post_parent' => 0,
-                        );
-
-                        wp_update_post($attachment);
-
-                        clean_attachment_cache($attachment_id);
-                    }
-                }
+            if ( isset( $_POST['brochure_attachment_ids'] ) && is_string( $_POST['brochure_attachment_ids'] ) ) {
+                propertyhive_save_media_attachment_list( $post_id, '_brochures', sanitize_text_field( wp_unslash( $_POST['brochure_attachment_ids'] ) ) );
             }
         }
     }
-
 }

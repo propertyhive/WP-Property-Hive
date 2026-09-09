@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Residential Sales Details
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Residential_Sales_Details
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Residential_Sales_Details; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Residential_Sales_Details {
 
     /**
@@ -84,7 +88,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'price_qualifier', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'price_qualifier' ) ) );
         
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -120,7 +124,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'sale_by', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'sale_by' ) ) );
         
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -156,7 +160,7 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'tenure', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'tenure' ) ) );
         
         $selected_value = '';
         $selected_name = '';
@@ -263,6 +267,25 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
+        $request_post = wp_unslash( $_POST );
+        $input = array();
+        foreach ( array( '_price_currency', '_price', '_sale_poa', '_leasehold_years_remaining', '_ground_rent', '_ground_rent_review_years', '_service_charge', '_service_charge_review_years', '_shared_ownership', '_shared_ownership_percentage', 'price_qualifier_id', 'sale_by_id', 'tenure_id' ) as $key )
+        {
+            if ( isset( $request_post[ $key ] ) && ! is_string( $request_post[ $key ] ) )
+            {
+                return;
+            }
+            $input[ $key ] = isset( $request_post[ $key ] ) ? sanitize_text_field( $request_post[ $key ] ) : '';
+        }
+
         global $wpdb;
         
         // Only save meta info if department is 'residential-sales'
@@ -270,20 +293,20 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
         
         if ( $department == 'residential-sales' || ph_get_custom_department_based_on( $department ) == 'residential-sales' )
         {
-            update_post_meta( $post_id, '_currency', ph_clean($_POST['_price_currency']) );
+            update_post_meta( $post_id, '_currency', wp_slash( $input['_price_currency'] ) );
 
-            $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price']));
+            $price = preg_replace("/[^0-9.]/", '', ph_clean($input['_price']));
             update_post_meta( $post_id, '_price', $price );
             
             // Store price in common currency (GBP) used for ordering
             $ph_countries = new PH_Countries();
             $ph_countries->update_property_price_actual( $post_id );
 
-            update_post_meta( $post_id, '_poa', ( isset($_POST['_sale_poa']) ? ph_clean($_POST['_sale_poa']) : '' ) );
+            update_post_meta( $post_id, '_poa', ( isset($input['_sale_poa']) ? ph_clean($input['_sale_poa']) : '' ) );
             
-            if ( !empty($_POST['price_qualifier_id']) )
+            if ( !empty($input['price_qualifier_id']) )
             {
-                wp_set_post_terms( $post_id, (int)$_POST['price_qualifier_id'], 'price_qualifier' );
+                wp_set_post_terms( $post_id, (int)$input['price_qualifier_id'], 'price_qualifier' );
             }
             else
             {
@@ -291,9 +314,9 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
                 wp_delete_object_term_relationships( $post_id, 'price_qualifier' );
             }
             
-            if ( !empty($_POST['sale_by_id']) )
+            if ( !empty($input['sale_by_id']) )
             {
-                wp_set_post_terms( $post_id, (int)$_POST['sale_by_id'], 'sale_by' );
+                wp_set_post_terms( $post_id, (int)$input['sale_by_id'], 'sale_by' );
             }
             else
             {
@@ -301,9 +324,9 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
                 wp_delete_object_term_relationships( $post_id, 'sale_by' );
             }
             
-            if ( !empty($_POST['tenure_id']) )
+            if ( !empty($input['tenure_id']) )
             {
-                wp_set_post_terms( $post_id, (int)$_POST['tenure_id'], 'tenure' );
+                wp_set_post_terms( $post_id, (int)$input['tenure_id'], 'tenure' );
             }
             else
             {
@@ -311,23 +334,23 @@ class PH_Meta_Box_Property_Residential_Sales_Details {
                 wp_delete_object_term_relationships( $post_id, 'tenure' );
             }
 
-            update_post_meta( $post_id, '_leasehold_years_remaining', ( !empty($_POST['_leasehold_years_remaining']) ? (int)$_POST['_leasehold_years_remaining'] : '' ) );
+            update_post_meta( $post_id, '_leasehold_years_remaining', ( !empty($input['_leasehold_years_remaining']) ? (int)$input['_leasehold_years_remaining'] : '' ) );
 
-            $ground_rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_ground_rent']));
+            $ground_rent = preg_replace("/[^0-9.]/", '', ph_clean($input['_ground_rent']));
             update_post_meta( $post_id, '_ground_rent', $ground_rent );
 
-            $ground_rent_review_years = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_ground_rent_review_years']));
+            $ground_rent_review_years = preg_replace("/[^0-9.]/", '', ph_clean($input['_ground_rent_review_years']));
             update_post_meta( $post_id, '_ground_rent_review_years', $ground_rent_review_years );
 
-            $service_charge = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_service_charge']));
+            $service_charge = preg_replace("/[^0-9.]/", '', ph_clean($input['_service_charge']));
             update_post_meta( $post_id, '_service_charge', $service_charge );
 
-            $service_charge_review_years = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_service_charge_review_years']));
+            $service_charge_review_years = preg_replace("/[^0-9.]/", '', ph_clean($input['_service_charge_review_years']));
             update_post_meta( $post_id, '_service_charge_review_years', $service_charge_review_years );
 
-            update_post_meta( $post_id, '_shared_ownership', ( isset($_POST['_shared_ownership']) ? ph_clean($_POST['_shared_ownership']) : '' ) );
+            update_post_meta( $post_id, '_shared_ownership', ( isset($input['_shared_ownership']) ? ph_clean($input['_shared_ownership']) : '' ) );
 
-            $shared_ownership_percentage = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_shared_ownership_percentage']));
+            $shared_ownership_percentage = preg_replace("/[^0-9.]/", '', ph_clean($input['_shared_ownership_percentage']));
             update_post_meta( $post_id, '_shared_ownership_percentage', $shared_ownership_percentage );
 
             do_action( 'propertyhive_save_property_residential_sales_details', $post_id );

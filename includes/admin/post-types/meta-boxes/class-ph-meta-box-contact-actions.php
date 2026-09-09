@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Contact_Actions
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Contact_Actions; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Contact_Actions {
 
 	/**
@@ -24,10 +25,10 @@ class PH_Meta_Box_Contact_Actions {
         if ( get_option('propertyhive_module_disabled_enquiries', '') != 'yes' )
         {
         	$actions[] = '<a 
-                href="' . admin_url( 'post-new.php' ) . '?post_type=enquiry&name=' . urlencode(get_the_title($post->ID)) . '&email=' . urlencode(get_post_meta($post->ID, '_email_address', TRUE)) . '&telephone=' .  urlencode(get_post_meta($post->ID, '_telephone_number', TRUE)) . '"
+                href="' . esc_url( admin_url( 'post-new.php' ) . '?post_type=enquiry&name=' . urlencode(get_the_title($post->ID)) . '&email=' . urlencode(get_post_meta($post->ID, '_email_address', TRUE)) . '&telephone=' . urlencode(get_post_meta($post->ID, '_telephone_number', TRUE)) ) . '"
                 class="button"
                 style="width:100%; margin-bottom:7px; text-align:center" 
-            >' . __('Record Enquiry', 'propertyhive') . '</a>';
+            >' . esc_html__( 'Record Enquiry', 'propertyhive' ) . '</a>';
         }
         
         $contact_types = get_post_meta( $post->ID, '_contact_types', TRUE );
@@ -39,7 +40,7 @@ class PH_Meta_Box_Contact_Actions {
 		                href="#action_panel_book_viewing" 
 		                class="button contact-action"
 		                style="width:100%; margin-bottom:7px; text-align:center" 
-		            >' . __('Book Viewing', 'propertyhive') . '</a>';
+		            >' . esc_html__( 'Book Viewing', 'propertyhive' ) . '</a>';
 	        }
 
 	        if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
@@ -89,7 +90,7 @@ class PH_Meta_Box_Contact_Actions {
 		                href="#action_panel_record_offer" 
 		                class="button contact-action"
 		                style="width:100%; margin-bottom:7px; text-align:center" 
-		            >' . __('Record Offer', 'propertyhive') . '</a>';
+		            >' . esc_html__( 'Record Offer', 'propertyhive' ) . '</a>';
 	            }
 	        }
 
@@ -102,13 +103,13 @@ class PH_Meta_Box_Contact_Actions {
 
 			            <label for="_viewing_start_date">' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</label>
 
-		            	<input type="date" class="small" name="_viewing_start_date" id="_viewing_start_date" value="' . esc_attr(date("Y-m-d")) . '" placeholder="" style="width:55%">
+                        <input type="date" class="small" name="_viewing_start_date" id="_viewing_start_date" value="' . esc_attr(gmdate("Y-m-d")) . '" placeholder="" style="width:55%">
 						<select id="_viewing_start_time_hours" name="_viewing_start_time_hours" class="select short" style="max-width:20%">';
 		            	for ( $i = 0; $i <= 23; ++$i )
 		            	{
 		            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
 		            		echo '<option value="' . esc_attr($j) . '"';
-		            		if ( $j == date("H") ) { echo ' selected'; }
+                            if ( $j == gmdate("H") ) { echo ' selected'; }
 		            		echo '>' . esc_html($j) . '</option>';
 		            	}
 		            	echo '</select><select id="_viewing_start_time_minutes" name="_viewing_start_time_minutes" class="select short" style="max-width:20%">';
@@ -167,13 +168,13 @@ class PH_Meta_Box_Contact_Actions {
 
 			            <label for="_offer_date">' . esc_html(__( 'Offer Date/Time', 'propertyhive' )) . '</label>
 
-		            	<input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(date("Y-m-d")) . '" placeholder="" style="width:55%">
+                        <input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(gmdate("Y-m-d")) . '" placeholder="" style="width:55%">
 						<select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="max-width:20%">';
 		            	for ( $i = 0; $i <= 23; ++$i )
 		            	{
 		            		$j = str_pad($i, 2, '0', STR_PAD_LEFT);
 		            		echo '<option value="' . esc_attr($j) . '"';
-		            		if ( $j == date("H") ) { echo ' selected'; }
+                            if ( $j == gmdate("H") ) { echo ' selected'; }
 		            		echo '>' . esc_html($j) . '</option>';
 		            	}
 		            	echo '</select><select id="_offer_time_minutes" name="_offer_time_minutes" class="select short" style="max-width:20%">';
@@ -228,10 +229,10 @@ class PH_Meta_Box_Contact_Actions {
 	        {
 	        	// Has a user associated
 		        $actions[] = '<a 
-			                href="' . get_edit_user_link( $user_id ) . '&wp_http_referer=' . urlencode(get_edit_post_link($post->ID)) . '" 
+                            href="' . esc_url( get_edit_user_link( $user_id ) . '&wp_http_referer=' . urlencode(get_edit_post_link($post->ID)) ) . '"
 			                class="button"
 			                style="width:100%; margin-bottom:7px; text-align:center" 
-			            >' . __('View User / Change Password', 'propertyhive') . '</a>';
+			            >' . esc_html__( 'View User / Change Password', 'propertyhive' ) . '</a>';
 		    }
 		    else
 		    {
@@ -239,7 +240,7 @@ class PH_Meta_Box_Contact_Actions {
 			                href="#action_panel_create_login" 
 			                class="button contact-action"
 			                style="width:100%; margin-bottom:7px; text-align:center" 
-			            >' . __('Create User Login', 'propertyhive') . '</a>';
+			            >' . esc_html__( 'Create User Login', 'propertyhive' ) . '</a>';
 		    }
 		}
 
@@ -288,7 +289,8 @@ class PH_Meta_Box_Contact_Actions {
 
 		        if ( !empty($actions) )
 		        {
-		        	echo implode("", $actions);
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in action URLs/labels are escaped when assembled; preserve trusted extension HTML from the property/contact and propertyhive_admin_post_actions filters.
+                    echo implode("", $actions);
 		        }
 		        else
 		        {
@@ -302,10 +304,44 @@ class PH_Meta_Box_Contact_Actions {
 ?>
 <script>
 
+// Build dynamic search/action UI through DOM text and attribute setters.
+function propertyhiveContactActionNoResults(selector, keyword, canCreate) {
+    var box = jQuery('<div style="padding:10px;"></div>').text(<?php echo wp_json_encode( __( 'No results found for', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> + " '" + keyword + "'");
+    if (canCreate) {
+        box.append('<br>').append(jQuery('<a></a>').attr('href', 'new-applicant').attr('data-name', keyword).text(<?php echo wp_json_encode( __( 'Add as new applicant?', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>));
+    }
+    jQuery(selector).empty().append(box);
+}
+function propertyhiveContactActionResult(selector, result, details) {
+    if (!result || !/^[0-9]+$/.test(String(result.ID))) { return; }
+    var link = jQuery('<a style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;"></a>').attr('href', String(result.ID)).attr('data-applicant-name', result.post_title);
+    if (details) {
+        link.append(jQuery('<strong></strong>').text(result.post_title));
+        var summary = jQuery('<small style="color:#999; padding-top:1px; display:block; line-height:1.5em"></small>');
+        [result.address_full_formatted, result.telephone_number, result.email_address].forEach(function(value) {
+            if (value) { if (summary.contents().length) { summary.append('<br>'); } summary.append(document.createTextNode(String(value))); }
+        });
+        link.append(summary);
+    } else { link.text(result.post_title); }
+    jQuery(selector).append(jQuery('<li style="margin:0; padding:0;"></li>').append(link));
+}
+function propertyhiveContactActionSelected(selector, id, removeClass, title) {
+    var remove = jQuery('<a style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a>').attr('href', String(id)).addClass(removeClass);
+    jQuery(selector).append(jQuery('<li></li>').append(remove).append(document.createTextNode(' ' + String(title || ''))));
+}
+function propertyhiveContactActionSuccess(url, title) {
+    try {
+        var parsed = new URL(String(url), window.location.href);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') { return; }
+        jQuery('#success_actions').append(jQuery('<a class="button button-primary" style="width:100%; margin-bottom:5px;"></a>').attr('href', parsed.href).text(title));
+    } catch (error) { return; }
+}
+
+
 var viewing_selected_properties = {};
 var offer_selected_properties = {};
 
-var viewing_selected_negotiators = {<?php echo get_current_user_id(); ?>: { post_title: '<?php $user_data = get_userdata(get_current_user_id()); echo esc_js($user_data->display_name); ?>' } };
+var viewing_selected_negotiators = {<?php echo (int) get_current_user_id(); ?>: { post_title: <?php $user_data = get_userdata( get_current_user_id() ); echo wp_json_encode( $user_data ? $user_data->display_name : '', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> } };
 
 jQuery(document).ready(function($)
 {
@@ -376,7 +412,7 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<strong><?php echo esc_html__( 'User login created successfully.', 'propertyhive' ); ?></strong><br><?php echo esc_html__( 'This contact can now login using their email address and password.', 'propertyhive' ); ?><br><br>');
+                $('#success_actions').append('<strong><?php echo esc_js( esc_html__( 'User login created successfully.', 'propertyhive' ) ); ?></strong><br><?php echo esc_js( esc_html__( 'This contact can now login using their email address and password.', 'propertyhive' ) ); ?><br><br>');
 
         		$('#action_panel_create_login').stop().fadeOut(300, function()
 				{
@@ -424,7 +460,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
+			$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_js( esc_html__( 'Enter', 'propertyhive' ) ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_js( esc_html__( 'more characters', 'propertyhive' ) ); ?>...</div>');
 			$('#viewing_search_property_results').show();
 			return false;
 		}
@@ -440,14 +476,14 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
+                propertyhiveContactActionNoResults('#viewing_search_property_results', keyword, false);
 	        }
 	        else
 	        {
 	        	$('#viewing_search_property_results').html('<ul style="margin:0; padding:0;"></ul>');
 	        	for ( var i in response )
 	        	{
-	        		$('#viewing_search_property_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;">' + response[i].post_title + '</a></li>');
+                    propertyhiveContactActionResult('#viewing_search_property_results ul', response[i], false);
 	        	}
 	        }
 			$('#viewing_search_property_results').show();
@@ -506,7 +542,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
+			$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_js( esc_html__( 'Enter', 'propertyhive' ) ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_js( esc_html__( 'more characters', 'propertyhive' ) ); ?>...</div>');
 			$('#viewing_search_negotiator_results').show();
 			return false;
 		}
@@ -522,14 +558,14 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#viewing_search_negotiator_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
+                propertyhiveContactActionNoResults('#viewing_search_negotiator_results', keyword, false);
 	        }
 	        else
 	        {
 	        	$('#viewing_search_negotiator_results').html('<ul style="margin:0; padding:0;"></ul>');
 	        	for ( var i in response )
 	        	{
-	        		$('#viewing_search_negotiator_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;">' + response[i].post_title + '</a></li>');
+                    propertyhiveContactActionResult('#viewing_search_negotiator_results ul', response[i], false);
 	        	}
 	        }
 			$('#viewing_search_negotiator_results').show();
@@ -635,11 +671,11 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<a href="' + response.success.viewing.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Viewing', 'propertyhive' ); ?></a>');
+                propertyhiveContactActionSuccess(response.success.viewing.edit_link, <?php echo wp_json_encode( __( 'Edit Viewing', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>);
         		
         		for ( var i in response.success.properties )
         		{
-        			$('#success_actions').append('<a href="' + response.success.properties[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Property', 'propertyhive' ); ?></a>');
+                    propertyhiveContactActionSuccess(response.success.properties[i].edit_link, <?php echo wp_json_encode( __( 'Edit Property', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>);
         		}
 
         		$('#action_panel_book_viewing').stop().fadeOut(300, function()
@@ -686,7 +722,7 @@ jQuery(document).ready(function($)
 
 		if (keyword.length < 3)
 		{
-			$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
+			$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_js( esc_html__( 'Enter', 'propertyhive' ) ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_js( esc_html__( 'more characters', 'propertyhive' ) ); ?>...</div>');
 			$('#offer_search_property_results').show();
 			return false;
 		}
@@ -702,14 +738,14 @@ jQuery(document).ready(function($)
         {
         	if (response == '' || response.length == 0)
         	{
-	        	$('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
+                propertyhiveContactActionNoResults('#offer_search_property_results', keyword, false);
 	        }
 	        else
 	        {
 	        	$('#offer_search_property_results').html('<ul style="margin:0; padding:0;"></ul>');
 	        	for ( var i in response )
 	        	{
-	        		$('#offer_search_property_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;">' + response[i].post_title + '</a></li>');
+                    propertyhiveContactActionResult('#offer_search_property_results ul', response[i], false);
 	        	}
 	        }
 			$('#offer_search_property_results').show();
@@ -795,11 +831,11 @@ jQuery(document).ready(function($)
         	{
         		$('#success_actions').html('');
 
-        		$('#success_actions').append('<a href="' + response.success.offer.edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Offer', 'propertyhive' ); ?></a>');
+                propertyhiveContactActionSuccess(response.success.offer.edit_link, <?php echo wp_json_encode( __( 'Edit Offer', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>);
         		
         		for ( var i in response.success.properties )
         		{
-        			$('#success_actions').append('<a href="' + response.success.properties[i].edit_link + '" class="button button-primary" style="width:100%; margin-bottom:5px;"><?php echo esc_html__( 'Edit Property', 'propertyhive' ); ?></a>');
+                    propertyhiveContactActionSuccess(response.success.properties[i].edit_link, <?php echo wp_json_encode( __( 'Edit Property', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>);
         		}
 
         		$('#action_panel_record_offer').stop().fadeOut(300, function()
@@ -822,7 +858,7 @@ function viewing_update_selected_properties()
 		jQuery('#viewing_selected_properties').html('<ul></ul>');
 		for ( var i in viewing_selected_properties )
 		{
-			jQuery('#viewing_selected_properties ul').append('<li><a href="' + i + '" class="viewing-remove-property" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_properties[i].post_title + '</li>');
+			propertyhiveContactActionSelected('#viewing_selected_properties ul', i, 'viewing-remove-property', viewing_selected_properties[i].post_title);
 		}
 		jQuery('#viewing_selected_properties').show();
 	}
@@ -841,13 +877,13 @@ function viewing_update_selected_negotiators()
 		jQuery('#viewing_selected_negotiators').html('<ul></ul>');
 		for ( var i in viewing_selected_negotiators )
 		{
-			jQuery('#viewing_selected_negotiators ul').append('<li><a href="' + i + '" class="viewing-remove-negotiator" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_negotiators[i].post_title + '</li>');
+			propertyhiveContactActionSelected('#viewing_selected_negotiators ul', i, 'viewing-remove-negotiator', viewing_selected_negotiators[i].post_title);
 		}
 		jQuery('#viewing_selected_negotiators').show();
 	}
 	else
 	{
-		jQuery('#viewing_selected_negotiators').html('<ul><li><em><?php echo esc_html__( 'Unattended', 'propertyhive' ); ?></em></li></ul>');
+		jQuery('#viewing_selected_negotiators').html('<ul><li><em><?php echo esc_js( esc_html__( 'Unattended', 'propertyhive' ) ); ?></em></li></ul>');
 		jQuery('#viewing_selected_negotiators').show();
 	}
 }
@@ -859,7 +895,7 @@ function offer_update_selected_properties()
 		jQuery('#offer_selected_properties').html('<ul></ul>');
 		for ( var i in offer_selected_properties )
 		{
-			jQuery('#offer_selected_properties ul').append('<li><a href="' + i + '" class="offer-remove-property" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + offer_selected_properties[i].post_title + '</li>');
+			propertyhiveContactActionSelected('#offer_selected_properties ul', i, 'offer-remove-property', offer_selected_properties[i].post_title);
 		}
 		jQuery('#offer_selected_properties').show();
 	}

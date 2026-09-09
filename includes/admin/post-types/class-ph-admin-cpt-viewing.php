@@ -21,6 +21,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Viewing' ) ) :
 /**
  * PH_Admin_CPT_Viewing Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_CPT_Viewing; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 	/**
@@ -66,9 +67,11 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
 		$screen = get_current_screen();
 
-		if ( $screen->id == 'viewing' && isset($_GET['post']) && get_post_type($_GET['post']) == 'viewing' )
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only viewing screen context.
+		$viewing_id = isset( $_GET['post'] ) && is_string( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+		if ( $screen && $screen->id == 'viewing' && 'viewing' === get_post_type( $viewing_id ) && current_user_can( 'edit_post', $viewing_id ) )
 		{
-			$viewing = new PH_Viewing((int)$_GET['post']);
+			$viewing = new PH_Viewing( $viewing_id );
 			$related_viewings = $viewing->_related_viewings;
 
 			// There is either a previous or next viewing for this applicant/property combination
@@ -107,7 +110,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 					$message .= '<a href="' . esc_url(get_edit_post_link( $next_viewing_id, '' )) . '">'. esc_html(__( 'Go to next', 'propertyhive' )) . ' >></a>';
 				}
 
-				echo "<div class=\"notice notice-info\"> <p>$message</p></div>";
+				echo '<div class="notice notice-info"><p>' . wp_kses_post( $message ) . '</p></div>';
 			}
 		}
 	}
@@ -116,18 +119,15 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	 * Check if we're editing or adding a viewing
 	 * @return boolean
 	 */
-	private function is_editing_viewing() {
-		if ( ! empty( $_GET['post_type'] ) && 'viewing' == $_GET['post_type'] ) {
-			return true;
-		}
-		if ( ! empty( $_GET['post'] ) && 'viewing' == get_post_type( (int)$_GET['post'] ) ) {
-			return true;
-		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'viewing' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
-			return true;
-		}
-		return false;
-	}
+    private function is_editing_viewing() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection; mutations have separate save guards.
+        $post_type = isset( $_GET['post_type'] ) && is_string( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection.
+        $post_id = isset( $_GET['post'] ) && is_string( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection for AJAX requests.
+        $request_id = isset( $_REQUEST['post_id'] ) && is_string( $_REQUEST['post_id'] ) ? absint( $_REQUEST['post_id'] ) : 0;
+        return 'viewing' === $post_type || ( $post_id > 0 && 'viewing' === get_post_type( $post_id ) ) || ( $request_id > 0 && 'viewing' === get_post_type( $request_id ) );
+    }
 
 	/**
 	 * @param int $post_id
@@ -175,8 +175,9 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	public function custom_columns( $column ) {
 		global $post, $propertyhive, $the_viewing;
 
-		if ( empty( $the_viewing ) || $the_viewing->ID != $post->ID ) 
+		if ( empty( $the_viewing ) || $the_viewing->ID != $post->ID )
 		{
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Retain the legacy global name for compatibility with external admin column callbacks.
 			$the_viewing = new PH_Viewing( $post->ID );
 		}
 
@@ -185,7 +186,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 				
 				$edit_link        = get_edit_post_link( $post->ID );
 				//$title            = _draft_or_post_title();
-                $title            = date("H:i jS F Y", strtotime($the_viewing->start_date_time));
+                $title            = gmdate("H:i jS F Y", strtotime($the_viewing->start_date_time));
                 
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
@@ -194,7 +195,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 			 break;
             case 'property' :
                 
-                if ( $the_viewing->property_id != '' ) 
+                if ( $the_viewing->property_id != '' )
                 {
 	                $property = new PH_Property((int)$the_viewing->property_id);
 	                echo esc_html($property->get_formatted_full_address());
@@ -213,6 +214,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
                     {
                         $applicants[] = esc_html(get_the_title($applicant_contact_id));
                     }
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every applicant title is escaped above; only literal br separators are added.
                     echo implode("<br>", $applicants);
                 }
                 else
@@ -223,12 +225,12 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
                 break;
             case 'status' :
                 
-                echo esc_html(__( ucwords(str_replace("_", " ", $the_viewing->status)), 'propertyhive' ));
+                echo esc_html(propertyhive_get_status_label( $the_viewing->status ));
                 if ( $the_viewing->status == 'pending' )
                 {
                 	echo '<br>';
                 	// confirmation status
-                	if ( $the_viewing->all_confirmed == 'yes' )
+                    if ( $the_viewing->all_confirmed == 'yes' )
                 	{
                 		echo esc_html(__( 'All Parties Confirmed', 'propertyhive' ));
                 	}
@@ -250,7 +252,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 
                     if ( $the_viewing->feedback_status == 'interested' || $the_viewing->feedback_status == 'not_interested' )
                     {
-                    	echo '<br>' . esc_html( $the_viewing->feedback_passed_on == 'yes' ? __( 'Feedback Passed On', 'propertyhive' ) : __( 'Feedback Not Passed On', 'propertyhive' ) );
+                        echo '<br>' . esc_html( $the_viewing->feedback_passed_on == 'yes' ? __( 'Feedback Passed On', 'propertyhive' ) : __( 'Feedback Not Passed On', 'propertyhive' ) );
                     }
 				}
 
@@ -258,7 +260,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 				$related_viewings = get_post_meta( $post->ID, '_related_viewings', TRUE );
 				if ( isset($related_viewings['previous']) && count($related_viewings['previous']) > 0 )
 				{
-					echo '<br>' . ph_ordinal_suffix(count($related_viewings['previous'])+1) . ' Viewing' ;
+					echo '<br>' . esc_html( ph_ordinal_suffix(count($related_viewings['previous'])+1) ) . ' Viewing' ;
 				}
                 
                 break;
@@ -279,7 +281,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	            			$negotiators[] = $user_info->display_name;
             			}
             		}
-            		echo implode(", ", $negotiators);
+                    echo esc_html( implode(", ", $negotiators) );
             	}
             	else
             	{
@@ -347,6 +349,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 		if ( is_admin() && $vars['post_type'] == 'viewing' )
 		{
 			$vars = array_merge( $vars, array(
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 				'meta_key' 	=> '_start_date_time',
 				'orderby' 	=> 'meta_value'
 			) );
@@ -373,7 +376,8 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 			return;
 		}
 
-		echo apply_filters( 'propertyhive_viewing_filters', $output );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The empty base is safe; trusted PHP extensions supply admin form controls through this HTML filter.
+		echo apply_filters( 'propertyhive_viewing_filters', '' );
 	}
 
 	/**
@@ -393,7 +397,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 	{
 		if ( get_post_type($object_id) == 'viewing' && $meta_key == '_feedback_status' && in_array($meta_value, array( 'interested', 'not_interested' )) )
 		{
-			update_post_meta( (int)$object_id, '_feedback_received_date', date("Y-m-d H:i:s") );
+			update_post_meta( (int)$object_id, '_feedback_received_date', gmdate("Y-m-d H:i:s") );
 		}
 	}
 
@@ -404,7 +408,7 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
 			$original_value = get_post_meta( $object_id, '_feedback_status', TRUE );
 			if ( in_array($original_value, array( '', 'not_required' )) )
 			{
-				update_post_meta( (int)$object_id, '_feedback_received_date', date("Y-m-d H:i:s") );
+				update_post_meta( (int)$object_id, '_feedback_received_date', gmdate("Y-m-d H:i:s") );
 			}
 		}
 	}

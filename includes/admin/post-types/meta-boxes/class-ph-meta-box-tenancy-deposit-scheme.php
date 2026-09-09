@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Tenancy Deposit Scheme
  *
@@ -11,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Tenancy_Deposit_Scheme
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Tenancy_Deposit_Scheme; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Tenancy_Deposit_Scheme {
 
 	/**
@@ -73,11 +77,25 @@ class PH_Meta_Box_Tenancy_Deposit_Scheme {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
 
-        update_post_meta( $post_id, '_deposit_scheme', ph_clean($_POST['_deposit_scheme']) );
-        update_post_meta( $post_id, '_deposit_registration_date', ph_clean($_POST['_deposit_registration_date']) );
-        update_post_meta( $post_id, '_deposit_reference', ph_clean($_POST['_deposit_reference']) );
+        if ( isset( $_POST['_deposit_scheme'] ) && is_string( $_POST['_deposit_scheme'] ) ) {
+            update_post_meta( $post_id, '_deposit_scheme', wp_slash( ph_clean( wp_unslash( $_POST['_deposit_scheme'] ) ) ) );
+        }
+        if ( isset( $_POST['_deposit_registration_date'] ) && is_string( $_POST['_deposit_registration_date'] ) ) {
+            update_post_meta( $post_id, '_deposit_registration_date', wp_slash( ph_clean( wp_unslash( $_POST['_deposit_registration_date'] ) ) ) );
+        }
+        if ( isset( $_POST['_deposit_reference'] ) && is_string( $_POST['_deposit_reference'] ) ) {
+            update_post_meta( $post_id, '_deposit_reference', wp_slash( sanitize_text_field( wp_unslash( $_POST['_deposit_reference'] ) ) ) );
+        }
 
 	    do_action( 'propertyhive_save_tenancy_deposit_scheme', $post_id );
     }

@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Offer_Property
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Offer_Property; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Offer_Property {
 
 	/**
@@ -25,6 +26,14 @@ class PH_Meta_Box_Offer_Property {
         
         $property_id = get_post_meta( $post->ID, '_property_id', true );
 
+        // Read-only property preselection; the relationship is saved only by the nonce-checked save method.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Admin prefill link only, without persistent changes.
+        $prefill_id = isset( $_GET['property_id'] ) && is_string( $_GET['property_id'] ) && ctype_digit( sanitize_text_field( wp_unslash( $_GET['property_id'] ) ) ) ? absint( $_GET['property_id'] ) : 0;
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post->ID ) || get_post_type( $post->ID ) !== 'offer' || get_post_type( $prefill_id ) !== 'property' || ! current_user_can( 'read_post', $prefill_id ) ) {
+            $prefill_id = 0;
+        }
+
+
         if ( !empty($property_id) )
         {
             $property = new PH_Property((int)$property_id);
@@ -33,7 +42,7 @@ class PH_Meta_Box_Offer_Property {
             
                 <label>' . esc_html(__('Address', 'propertyhive')) . '</label>
                 
-                <a href="' . esc_url(get_edit_post_link($property_id, '')) . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . esc_url(get_permalink($property_id)) . '" target="_blank">'. __('View On Website', 'propertyhive') . '</a>)' : '' ) . '
+                <a href="' . esc_url(get_edit_post_link($property_id, '')) . '">' . esc_html($property->get_formatted_full_address()) . '</a>' . ( !in_array($property->post_status, array('trash', 'archive')) ? ' (<a href="' . esc_url(get_permalink($property_id)) . '" target="_blank">'. esc_html__('View On Website', 'propertyhive') . '</a>)' : '' ) . '
                 
             </p>';
 
@@ -95,8 +104,8 @@ echo '<p class="form-field">
 <script>
 
 var offer_selected_properties = [];
-<?php if (isset($_GET['property_id']) && $_GET['property_id'] != '') { $property = new PH_Property((int)$_GET['property_id']); ?>
-offer_selected_properties[<?php echo (int)$_GET['property_id']; ?>] = ({ post_title: '<?php echo esc_js($property->get_formatted_full_address()); ?>' });
+<?php if ( $prefill_id ) { $property = new PH_Property( $prefill_id ); ?>
+offer_selected_properties[<?php echo (int) $prefill_id; ?>] = ({ post_title: <?php echo wp_json_encode( $property->get_formatted_full_address(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> });
 <?php } ?>
 
 jQuery(document).ready(function($)
@@ -126,7 +135,7 @@ jQuery(document).ready(function($)
 
         if (keyword.length < 3)
         {
-            $('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'Enter', 'propertyhive' ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_html__( 'more characters', 'propertyhive' ); ?>...</div>');
+            $('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_js( esc_html__( 'Enter', 'propertyhive' ) ); ?> ' + (3 - keyword.length ) + ' <?php echo esc_js( esc_html__( 'more characters', 'propertyhive' ) ); ?>...</div>');
             $('#offer_search_property_results').show();
             return false;
         }
@@ -141,14 +150,16 @@ jQuery(document).ready(function($)
         {
             if (response == '' || response.length == 0)
             {
-                $('#offer_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
+                jQuery('#offer_search_property_results').empty().append(jQuery('<div style="padding:10px;"></div>').text(<?php echo wp_json_encode( __( 'No results found for', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> + " '" + keyword + "'"));
             }
             else
             {
                 $('#offer_search_property_results').html('<ul style="margin:0; padding:0;"></ul>');
                 for ( var i in response )
                 {
-                    $('#offer_search_property_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;">' + response[i].post_title + '</a></li>');
+                    if (!/^[0-9]+$/.test(String(response[i].ID))) { continue; }
+                    var link = jQuery('<a style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;"></a>').attr('href', String(response[i].ID)).text(response[i].post_title);
+                    jQuery('#offer_search_property_results ul').append(jQuery('<li style="margin:0; padding:0;"></li>').append(link));
                 }
             }
             $('#offer_search_property_results').show();
@@ -185,7 +196,9 @@ jQuery(document).ready(function($)
 
                     jQuery('#offer_selected_property_owner_solicitors').html('<ul></ul>');
 
-                    jQuery('#offer_selected_property_owner_solicitors ul').append('<li><a href="' + solicitor_data['id'] + '" class="offer-remove-property_owner-solicitor" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + solicitor_data['name'] + '</li>');
+                    if (!/^[0-9]+$/.test(String(solicitor_data.id))) { return; }
+                    var remove = jQuery('<a class="offer-remove-property_owner-solicitor" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a>').attr('href', String(solicitor_data.id));
+                    jQuery('#offer_selected_property_owner_solicitors ul').append(jQuery('<li></li>').append(remove).append(document.createTextNode(' ' + solicitor_data.name)));
 
                     jQuery('#_property_owner_solicitor_contact_ids').val(solicitor_data['id']);
 
@@ -209,14 +222,15 @@ jQuery(document).ready(function($)
 
 function offer_update_selected_properties()
 {
-    jQuery('#_property_id').val();
+    jQuery('#_property_id').val('');
 
     if ( Object.keys(offer_selected_properties).length > 0 )
     {
         jQuery('#offer_selected_properties').html('<ul></ul>');
         for ( var i in offer_selected_properties )
         {
-            jQuery('#offer_selected_properties ul').append('<li><a href="' + i + '" class="offer-remove-property" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + offer_selected_properties[i].post_title + '</li>');
+            var remove = jQuery('<a class="offer-remove-property" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a>').attr('href', String(i));
+            jQuery('#offer_selected_properties ul').append(jQuery('<li></li>').append(remove).append(document.createTextNode(' ' + offer_selected_properties[i].post_title)));
 
             jQuery('#_property_id').val(i);
         }
@@ -245,11 +259,22 @@ function offer_update_selected_properties()
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
 
-        if ( isset($_POST['_property_id']) && !empty($_POST['_property_id']) )
-        {
-            update_post_meta( $post_id, '_property_id', (int)$_POST['_property_id'] );
+        if ( get_post_type( $post_id ) !== 'offer' || ! isset( $_POST['_property_id'] ) || ! is_string( $_POST['_property_id'] ) || ! ctype_digit( sanitize_text_field( wp_unslash( $_POST['_property_id'] ) ) ) ) {
+            return;
+        }
+        $property_id = absint( $_POST['_property_id'] );
+        if ( $property_id && 'property' === get_post_type( $property_id ) && current_user_can( 'read_post', $property_id ) ) {
+            update_post_meta( $post_id, '_property_id', $property_id );
         }
     }
 

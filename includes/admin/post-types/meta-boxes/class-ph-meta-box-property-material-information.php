@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Material Information
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Material_Information
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Material_Information; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Material_Information {
 
 	/**
@@ -29,6 +33,7 @@ class PH_Meta_Box_Property_Material_Information {
         if ( isset( $args['args']['property_post'] ) )
         {
             $post = $args['args']['property_post'];
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
             $thepostid = $post->ID;
             setup_postdata($post);
         }
@@ -87,7 +92,8 @@ class PH_Meta_Box_Property_Material_Information {
                 echo esc_attr(
                     sprintf(
                         /* translators: %s: utility type (e.g. "gas type", "electricity type") */
-                        __( 'Select ' . $utility_label, 'propertyhive' ),
+                        /* translators: %s: Utility name. */
+                        sprintf( __( 'Select %s', 'propertyhive' ), $utility_label ),
                         $utility_label
                     )
                 ); 
@@ -156,7 +162,8 @@ class PH_Meta_Box_Property_Material_Information {
                 echo esc_attr(
                     sprintf(
                         /* translators: %s: utility type (e.g. "gas type", "electricity type") */
-                        __( 'Select ' . $utility_label, 'propertyhive' ),
+                        /* translators: %s: Utility name. */
+                        sprintf( __( 'Select %s', 'propertyhive' ), $utility_label ),
                         $utility_label
                     )
                 ); 
@@ -358,6 +365,7 @@ class PH_Meta_Box_Property_Material_Information {
         echo '</div>';
         
         $post = $original_post;
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
         $thepostid = $original_thepostid;
         setup_postdata($post);
     }
@@ -366,6 +374,14 @@ class PH_Meta_Box_Property_Material_Information {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
 
         $department = get_post_meta($post_id, '_department', TRUE);
@@ -377,99 +393,42 @@ class PH_Meta_Box_Property_Material_Information {
             in_array( ph_get_custom_department_based_on( $department ), $departments_with_residential_details )
         )
         {
-            $utilities = array( 
-                'electricity' => __( 'Electricity Type', 'propertyhive' ), 
-                'water' => __( 'Water Type', 'propertyhive' ),  
-                'heating' => __( 'Heating Type', 'propertyhive' ), 
-                'broadband' => __( 'Broadband Type', 'propertyhive' ), 
-                'sewerage' => __( 'Sewerage Type', 'propertyhive' ),  
+            $list_fields = array(
+                'electricity_type', 'water_type', 'heating_type', 'broadband_type',
+                'sewerage_type', 'accessibility', 'restriction', 'right', 'flood_source_type',
             );
-            foreach ( $utilities as $utility_key => $utility_label )
-            {
-                $utility_types = array();
-                if ( isset( $_POST[$utility_key . '_type'] ) && !empty( $_POST[$utility_key . '_type'] ) )
-                {
-                    foreach ( $_POST[$utility_key . '_type'] as $utility_type )
-                    {
-                        $utility_types[] = ph_clean($utility_type);
-
-                        if ( ph_clean($utility_type) == 'other' )
-                        {
-                            update_post_meta( $post_id, '_' . $utility_key . '_type_other', $_POST['_' . $utility_key . '_type_other'] );
+            foreach ( $list_fields as $field ) {
+                $selected = array();
+                if ( isset( $_POST[ $field ] ) ) {
+                    // A multiselect submits a flat array. Reject malformed shapes without replacing saved data.
+                    if ( ! is_array( $_POST[ $field ] ) ) {
+                        continue;
+                    }
+                    // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Each array member is checked for string shape, unslashed, and sanitized immediately below before storage.
+                    foreach ( $_POST[ $field ] as $item ) {
+                        if ( ! is_string( $item ) ) {
+                            continue 2;
                         }
+                        $selected[] = sanitize_text_field( wp_unslash( $item ) );
                     }
                 }
-                update_post_meta( $post_id, '_' . $utility_key . '_type', $utility_types );
-            }
-
-            $utilities = array( 
-                'accessibility' => __( 'Accessibility', 'propertyhive' ), 
-            );
-            foreach ( $utilities as $utility_key => $utility_label )
-            {
-                $utility_types = array();
-                if ( isset( $_POST[$utility_key] ) && !empty( $_POST[$utility_key] ) )
-                {
-                    foreach ( $_POST[$utility_key] as $utility_type )
-                    {
-                        $utility_types[] = ph_clean($utility_type);
-
-                        if ( ph_clean($utility_type) == 'other' )
-                        {
-                            update_post_meta( $post_id, '_' . $utility_key . '_other', $_POST['_' . $utility_key . '_other'] );
-                        }
+                if ( in_array( 'other', $selected, true ) ) {
+                    $other_key = '_' . $field . '_other';
+                    if ( ! isset( $_POST[ $other_key ] ) || is_string( $_POST[ $other_key ] ) ) {
+                        $other = isset( $_POST[ $other_key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $other_key ] ) ) : '';
+                        update_post_meta( $post_id, $other_key, wp_slash( $other ) );
                     }
                 }
-                update_post_meta( $post_id, '_' . $utility_key, $utility_types );
+                update_post_meta( $post_id, '_' . $field, wp_slash( $selected ) );
             }
 
-            $restrictions = array();
-            if ( isset( $_POST['restriction'] ) && !empty( $_POST['restriction'] ) )
-            {
-                foreach ( $_POST['restriction'] as $restriction )
-                {
-                    $restrictions[] = ph_clean($restriction);
-
-                    if ( ph_clean($restriction) == 'other' )
-                    {
-                        update_post_meta( $post_id, '_restriction_other', $_POST['_restriction_other'] );
-                    }
+            foreach ( array( '_flooded_in_last_five_years', '_flood_defences' ) as $field ) {
+                if ( isset( $_POST[ $field ] ) && ! is_string( $_POST[ $field ] ) ) {
+                    continue;
                 }
+                $value = isset( $_POST[ $field ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) : '';
+                update_post_meta( $post_id, $field, wp_slash( $value ) );
             }
-            update_post_meta( $post_id, '_restriction', $restrictions );
-
-            $rights = array();
-            if ( isset( $_POST['right'] ) && !empty( $_POST['right'] ) )
-            {
-                foreach ( $_POST['right'] as $right )
-                {
-                    $rights[] = ph_clean($right);
-
-                    if ( ph_clean($right) == 'other' )
-                    {
-                        update_post_meta( $post_id, '_right_other', $_POST['_right_other'] );
-                    }
-                }
-            }
-            update_post_meta( $post_id, '_right', $rights );
-
-            $flood_source_types = array();
-            if ( isset( $_POST['flood_source_type'] ) && !empty( $_POST['flood_source_type'] ) )
-            {
-                foreach ( $_POST['flood_source_type'] as $flood_source_type )
-                {
-                    $flood_source_types[] = ph_clean($flood_source_type);
-
-                    if ( ph_clean($flood_source_type) == 'other' )
-                    {
-                        update_post_meta( $post_id, '_flood_source_type_other', $_POST['_flood_source_type_other'] );
-                    }
-                }
-            }
-            update_post_meta( $post_id, '_flood_source_type', $flood_source_types );
-
-            update_post_meta($post_id, '_flooded_in_last_five_years', ( isset($_POST['_flooded_in_last_five_years']) ? ph_clean($_POST['_flooded_in_last_five_years']) : '' ) );
-            update_post_meta($post_id, '_flood_defences', ( isset($_POST['_flood_defences']) ? ph_clean($_POST['_flood_defences']) : '' ) );
 
             do_action( 'propertyhive_save_property_material_information', $post_id );
         }

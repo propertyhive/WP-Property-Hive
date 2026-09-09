@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Marketing
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Marketing
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Marketing; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Marketing {
 
 	/**
@@ -41,7 +45,7 @@ class PH_Meta_Box_Property_Marketing {
                     'hide_empty' => false,
                     'parent' => 0
                 );
-                $terms = get_terms( 'availability', $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'availability' ) ) );
 
                 $selected_availability = '';
                 if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -82,7 +86,7 @@ class PH_Meta_Box_Property_Marketing {
                     'hide_empty' => false,
                     'parent' => 0
                 );
-                $terms = get_terms( 'marketing_flag', $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'marketing_flag' ) ) );
 
                 if ( !empty( $terms ) && !is_wp_error( $terms ) )
                 {
@@ -124,7 +128,7 @@ class PH_Meta_Box_Property_Marketing {
 ?>
 <script>
 var selected_availability = '<?php echo esc_js($selected_availability); ?>';
-var availability_departments = <?php echo json_encode($availability_departments); ?>;
+var availability_departments = <?php echo wp_json_encode( $availability_departments, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
 
 let availabilities = new Map();
 <?php foreach ( $department_options as $term_id => $name ) { ?>
@@ -188,30 +192,58 @@ function fill_availability_dropdown()
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
         
-        update_post_meta($post_id, '_on_market', ( isset($_POST['_on_market']) ? ph_clean($_POST['_on_market']) : '' ) );
-        update_post_meta($post_id, '_featured', ( isset($_POST['_featured']) ? ph_clean($_POST['_featured']) : '' ) );
-		if ( isset($_POST['_featured']) )
-		{
-			// Flush the cache when submitted
-			delete_transient("ph_featured_properties");
-		}
-
-        if ( !empty($_POST['_availability']) )
-        {
-            wp_set_post_terms( $post_id, (int)$_POST['_availability'], 'availability' );
-        }
-        else
-        {
-            // Setting to blank
-            wp_delete_object_term_relationships( $post_id, 'availability' );
+        foreach ( array( '_on_market', '_featured' ) as $field ) {
+            if ( isset( $_POST[ $field ] ) && ! is_string( $_POST[ $field ] ) ) {
+                continue;
+            }
+            $value = isset( $_POST[ $field ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) : '';
+            update_post_meta( $post_id, $field, wp_slash( $value ) );
+            if ( '_featured' === $field ) {
+                // Both checking and unchecking featured changes the cached property selection.
+                delete_transient( 'ph_featured_properties' );
+            }
         }
 
-        wp_delete_object_term_relationships( $post_id, 'marketing_flag' );
-        if ( !empty($_POST['_marketing_flags']) )
-        {
-            wp_set_post_terms( $post_id, ph_clean($_POST['_marketing_flags']), 'marketing_flag' );
+        if ( ! isset( $_POST['_availability'] ) || is_string( $_POST['_availability'] ) ) {
+            $availability = isset( $_POST['_availability'] ) ? absint( $_POST['_availability'] ) : 0;
+            if ( $availability ) {
+                wp_set_post_terms( $post_id, $availability, 'availability' );
+            } else {
+                wp_delete_object_term_relationships( $post_id, 'availability' );
+            }
+        }
+
+        $marketing_flags = array();
+        $valid_flags = true;
+        if ( isset( $_POST['_marketing_flags'] ) ) {
+            if ( ! is_array( $_POST['_marketing_flags'] ) ) {
+                $valid_flags = false;
+            } else {
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Each checkbox value is shape-checked, unslashed and sanitized below before being passed to the taxonomy API.
+                foreach ( $_POST['_marketing_flags'] as $flag ) {
+                    if ( ! is_string( $flag ) ) {
+                        $valid_flags = false;
+                        break;
+                    }
+                    $marketing_flags[] = sanitize_text_field( wp_unslash( $flag ) );
+                }
+            }
+        }
+        if ( $valid_flags ) {
+            wp_delete_object_term_relationships( $post_id, 'marketing_flag' );
+            if ( $marketing_flags ) {
+                wp_set_post_terms( $post_id, $marketing_flags, 'marketing_flag' );
+            }
         }
 
         do_action( 'propertyhive_save_property_marketing', $post_id );

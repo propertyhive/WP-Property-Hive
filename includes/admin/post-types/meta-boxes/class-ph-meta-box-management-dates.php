@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Management_Dates
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Management_Dates; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Management_Dates {
 
 	/**

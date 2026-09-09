@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Owner / Landlord
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Owner
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Owner; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Owner {
 
 	/**
@@ -29,16 +33,19 @@ class PH_Meta_Box_Property_Owner {
         if ( isset( $args['args']['property_post'] ) )
         {
             $post = $args['args']['property_post'];
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
             $thepostid = $post->ID;
             setup_postdata($post);
         }
         
         $owner_contact_ids = array();
-        if ( isset($_GET['owner_contact_id']) && ! empty( $_GET['owner_contact_id'] ) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only owner prefill; saving requires the meta-box nonce and object capabilities.
+        $owner_prefill_id = isset( $_GET['owner_contact_id'] ) && is_string( $_GET['owner_contact_id'] ) ? absint( $_GET['owner_contact_id'] ) : 0;
+        if ( $owner_prefill_id > 0 )
         {
-            if ( get_post_type( (int)$_GET['owner_contact_id'] ) == 'contact' )
+            if ( get_post_type( $owner_prefill_id ) == 'contact' && current_user_can( 'edit_post', $owner_prefill_id ) )
             {
-                $owner_contact_ids = (int)$_GET['owner_contact_id'];
+                $owner_contact_ids = $owner_prefill_id;
             }   
         }
         else
@@ -412,6 +419,7 @@ class PH_Meta_Box_Property_Owner {
         </script>';
         
         $post = $original_post;
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally set for the meta-box output and its included field helpers.
         $thepostid = $original_thepostid;
         setup_postdata($post);
     }
@@ -420,53 +428,82 @@ class PH_Meta_Box_Property_Owner {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
 
-        $contact_post_ids = isset($_POST['_owner_contact_id']) ? explode( "|", ph_clean($_POST['_owner_contact_id']) ) : array();
-        
-        if ( isset($_POST['_owner_contact_add_new']) && $_POST['_owner_contact_add_new'] == '1' )
+        $request_post = wp_unslash( $_POST );
+        if ( isset( $request_post['_owner_contact_id'] ) && ! is_string( $request_post['_owner_contact_id'] ) )
         {
-            if (
-                $_POST['_owner_name'] != '' ||
-                $_POST['_owner_address_name_number'] != '' ||
-                $_POST['_owner_address_street'] != '' ||
-                $_POST['_owner_address_two'] != '' ||
-                $_POST['_owner_address_three'] != '' ||
-                $_POST['_owner_address_four'] != '' ||
-                $_POST['_owner_address_postcode'] != '' ||
-                $_POST['_owner_telephone_number'] != '' ||
-                $_POST['_owner_email_address'] != ''
-
-            )
+            return;
+        }
+        $contact_post_ids = array();
+        if ( ! empty( $request_post['_owner_contact_id'] ) )
+        {
+            foreach ( explode( '|', $request_post['_owner_contact_id'] ) as $contact_id )
             {
-                // Insert contact
-                $owner_post = array(
-                    'post_title'    => ph_clean($_POST['_owner_name']),
-                    'post_content'  => '',
-                    'post_status'   => 'publish',
-                    'post_type'  => 'contact',
-                    'comment_status'    => 'closed',
-                    'ping_status'    => 'closed',
-                );
-              
-                // Insert the post into the database
-                $contact_post_id = wp_insert_post( $owner_post );
-                if ( !is_wp_error($contact_post_id) && $contact_post_id != 0 )
+                if ( '' === $contact_id )
+                {
+                    continue;
+                }
+                if ( ! ctype_digit( $contact_id ) || (int) $contact_id < 1 || 'contact' !== get_post_type( (int) $contact_id ) || ! current_user_can( 'edit_post', (int) $contact_id ) )
+                {
+                    return;
+                }
+                $contact_post_ids[] = (int) $contact_id;
+            }
+        }
+        if ( isset( $request_post['_owner_contact_add_new'] ) && ! is_string( $request_post['_owner_contact_add_new'] ) )
+        {
+            return;
+        }
+        if ( isset( $request_post['_owner_contact_add_new'] ) && '1' === $request_post['_owner_contact_add_new'] )
+        {
+            $owner_fields = array( 'name', 'address_name_number', 'address_street', 'address_two', 'address_three', 'address_four', 'address_postcode', 'address_country', 'telephone_number', 'email_address' );
+            $owner = array();
+            foreach ( $owner_fields as $field )
+            {
+                $key = '_owner_' . $field;
+                if ( isset( $request_post[ $key ] ) && ! is_string( $request_post[ $key ] ) )
+                {
+                    return;
+                }
+                $owner[ $field ] = isset( $request_post[ $key ] ) ? sanitize_text_field( $request_post[ $key ] ) : '';
+            }
+            $owner_details = $owner;
+            unset( $owner_details['address_country'] );
+            if ( count( array_filter( $owner_details, 'strlen' ) ) > 0 )
+            {
+                $contact_type = get_post_type_object( 'contact' );
+                if ( ! $contact_type || ! current_user_can( $contact_type->cap->create_posts ) )
+                {
+                    return;
+                }
+                $contact_post_id = wp_insert_post( array(
+                    'post_title' => wp_slash( $owner['name'] ),
+                    'post_content' => '',
+                    'post_status' => 'publish',
+                    'post_type' => 'contact',
+                    'comment_status' => 'closed',
+                    'ping_status' => 'closed',
+                ) );
+                if ( ! is_wp_error( $contact_post_id ) && $contact_post_id > 0 )
                 {
                     $contact_post_ids[] = $contact_post_id;
-                  
-                    update_post_meta( $contact_post_id, '_address_name_number', ph_clean($_POST['_owner_address_name_number']) );
-                    update_post_meta( $contact_post_id, '_address_street', ph_clean($_POST['_owner_address_street']) );
-                    update_post_meta( $contact_post_id, '_address_two', ph_clean($_POST['_owner_address_two']) );
-                    update_post_meta( $contact_post_id, '_address_three', ph_clean($_POST['_owner_address_three']) );
-                    update_post_meta( $contact_post_id, '_address_four', ph_clean($_POST['_owner_address_four']) );
-                    update_post_meta( $contact_post_id, '_address_postcode', ph_clean($_POST['_owner_address_postcode']) );
-                    update_post_meta( $contact_post_id, '_address_country', ph_clean($_POST['_owner_address_country']) );
-                  
-                    update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['_owner_telephone_number']) );
-                    update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean( ph_clean_telephone_number($_POST['_owner_telephone_number']) ) );
-                    
-                    update_post_meta( $contact_post_id, '_email_address', ph_clean($_POST['_owner_email_address']) );
+                    foreach ( $owner as $field => $value )
+                    {
+                        if ( 'name' !== $field )
+                        {
+                            update_post_meta( $contact_post_id, '_' . $field, wp_slash( $value ) );
+                        }
+                    }
+                    update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number( $owner['telephone_number'] ) ) );
                 }
             }
         }

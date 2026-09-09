@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Contact Details
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Contact_Contact_Details
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Contact_Contact_Details; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Contact_Contact_Details {
 
 	/**
@@ -21,6 +25,7 @@ class PH_Meta_Box_Contact_Contact_Details {
 	public static function output( $post ) {
         global $post, $wpdb, $thepostid;
         
+        echo '<input type="hidden" name="propertyhive_contact_details_present" value="1">';
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
@@ -118,15 +123,37 @@ class PH_Meta_Box_Contact_Contact_Details {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
         
-        update_post_meta( $post_id, '_telephone_number',  ph_clean($_POST['_telephone_number']) );
-        update_post_meta( $post_id, '_telephone_number_clean',  ph_clean( ph_clean_telephone_number( $_POST['_telephone_number'] ) ) );
-
-        update_post_meta( $post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_email_address'])) );
-        update_post_meta( $post_id, '_contact_notes', sanitize_textarea_field($_POST['_contact_notes']) );
-        update_post_meta( $post_id, '_forbidden_contact_methods', ( (isset($_POST['_forbidden_contact_methods'])) ? ph_clean($_POST['_forbidden_contact_methods']) : '' ) );
-        update_post_meta( $post_id, '_dear',  ph_clean($_POST['_dear']) );
+        if ( isset( $_POST['_telephone_number'] ) && is_string( $_POST['_telephone_number'] ) ) {
+            $ph_contact_telephone_value = sanitize_text_field( wp_unslash( $_POST['_telephone_number'] ) );
+            update_post_meta( $post_id, '_telephone_number', wp_slash( $ph_contact_telephone_value ) );
+            update_post_meta( $post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number( $ph_contact_telephone_value ) ) );
+        }
+        if ( isset( $_POST['_email_address'] ) && is_string( $_POST['_email_address'] ) ) {
+            $ph_contact_email_value = sanitize_text_field( wp_unslash( $_POST['_email_address'] ) );
+            update_post_meta( $post_id, '_email_address', str_replace( ' ', '', wp_slash( $ph_contact_email_value ) ) );
+        }
+        if ( isset( $_POST['_contact_notes'] ) && is_string( $_POST['_contact_notes'] ) ) {
+            update_post_meta( $post_id, '_contact_notes', wp_slash( sanitize_textarea_field( wp_unslash( $_POST['_contact_notes'] ) ) ) );
+        }
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Check list element types before unslashing and sanitizing the complete list below.
+        if ( isset( $_POST['_forbidden_contact_methods'] ) && is_array( $_POST['_forbidden_contact_methods'] ) && count( array_filter( $_POST['_forbidden_contact_methods'], 'is_string' ) ) === count( $_POST['_forbidden_contact_methods'] ) ) {
+            update_post_meta( $post_id, '_forbidden_contact_methods', wp_slash( ph_clean( wp_unslash( $_POST['_forbidden_contact_methods'] ) ) ) );
+        } elseif ( ! isset( $_POST['_forbidden_contact_methods'] ) && isset( $_POST['propertyhive_contact_details_present'] ) ) {
+            update_post_meta( $post_id, '_forbidden_contact_methods', '' );
+        }
+        if ( isset( $_POST['_dear'] ) && is_string( $_POST['_dear'] ) ) {
+            update_post_meta( $post_id, '_dear', wp_slash( sanitize_text_field( wp_unslash( $_POST['_dear'] ) ) ) );
+        }
 
         do_action( 'propertyhive_save_contact_contact_details', $post_id );
     }

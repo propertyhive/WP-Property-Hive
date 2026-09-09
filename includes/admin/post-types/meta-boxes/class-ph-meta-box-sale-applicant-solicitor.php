@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Sale_Applicant_Solicitor
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Sale_Applicant_Solicitor; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Sale_Applicant_Solicitor {
 
 	/**
@@ -52,7 +53,10 @@ class PH_Meta_Box_Sale_Applicant_Solicitor {
             
                     <label>' . esc_html($field['label']) . '</label>
                     
-                    ' . $field['value'] . '
+                    ';
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core field values are escaped above before the trusted PHP propertyhive_sale_applicant_solictor_fields filter, which intentionally permits extension HTML.
+                echo $field['value'];
+                echo '
                     
                 </p>';
             }
@@ -61,7 +65,7 @@ class PH_Meta_Box_Sale_Applicant_Solicitor {
             
                 <label></label>
                 
-                <a class="button" href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit' ), '1', 'remove_applicant_solicitor' ) ) . '">' . esc_html(__( 'Remove Solicitor', 'propertyhive' )) . '</a>
+                <a class="button" href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post->ID . '&action=edit' ), 'propertyhive-remove_applicant_solicitor-' . $post->ID, 'remove_applicant_solicitor' ) ) . '">' . esc_html(__( 'Remove Solicitor', 'propertyhive' )) . '</a>
                 
             </p>';
         }
@@ -209,6 +213,14 @@ function sale_update_selected_applicant_solicitors()
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
 
         if ( isset($_POST['_applicant_solicitor_contact_ids']) && $_POST['_applicant_solicitor_contact_ids'] != '' )

@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean,propertyhive_sanitize_description
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Rooms
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Rooms
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Rooms; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Rooms {
 
 	/**
@@ -228,19 +232,44 @@ class PH_Meta_Box_Property_Rooms {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
-        global $wpdb;
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
+        // Reject malformed repeaters before changing any existing rows.
+        if ( ! isset( $_POST['_room_name'] ) || ! is_array( $_POST['_room_name'] ) || ! isset( $_POST['_room_dimensions'] ) || ! is_array( $_POST['_room_dimensions'] ) || ! isset( $_POST['_room_description'] ) || ! is_array( $_POST['_room_description'] ) ) {
+            return;
+        }
+        $row_count = count( $_POST['_room_name'] );
+        if ( $row_count < 1 || count( $_POST['_room_dimensions'] ) !== $row_count || count( $_POST['_room_description'] ) !== $row_count ) {
+            return;
+        }
+        $clean_rows = array();
+        for ( $row = 0; $row < $row_count; ++$row ) {
+            if ( ! isset( $_POST['_room_name'][ $row ] ) || ! is_string( $_POST['_room_name'][ $row ] ) || ! isset( $_POST['_room_dimensions'][ $row ] ) || ! is_string( $_POST['_room_dimensions'][ $row ] ) || ! isset( $_POST['_room_description'][ $row ] ) || ! is_string( $_POST['_room_description'][ $row ] ) ) {
+                return;
+            }
+            $clean_rows['_room_name'][$row] = sanitize_text_field( wp_unslash( $_POST['_room_name'][$row] ) );
+            $clean_rows['_room_dimensions'][$row] = sanitize_text_field( wp_unslash( $_POST['_room_dimensions'][$row] ) );
+            $clean_rows['_room_description'][$row] = propertyhive_sanitize_description( wp_unslash( $_POST['_room_description'][$row] ) );
+        }
+
         
         // Get existing number of rooms to see if we need to remove any
         $existing_num_property_rooms = get_post_meta($post_id, '_rooms', TRUE);
         if ($existing_num_property_rooms == '') { $existing_num_property_rooms = 0; }
         
-        $new_num_property_rooms = count($_POST['_room_name']) - 1; // Minus one because of the template room. Don't want to include this
+        $new_num_property_rooms = $row_count - 1; // Minus one because of the template room. Don't want to include this
 
         if ($new_num_property_rooms < $existing_num_property_rooms)
         {
             // There are less now than before
             // Delete the additional ones
-            for ($i = ($new_num_property_rooms - 1); $i < $existing_num_property_rooms; ++$i)
+            for ($i = $new_num_property_rooms; $i < $existing_num_property_rooms; ++$i)
             {
                 delete_post_meta($post_id, '_room_name_' . $i);
                 delete_post_meta($post_id, '_room_dimensions_' . $i);
@@ -252,24 +281,10 @@ class PH_Meta_Box_Property_Rooms {
         
         for ($i = 0; $i < $new_num_property_rooms; ++$i)
         {
-            update_post_meta($post_id, '_room_name_' . $i, ph_clean($_POST['_room_name'][$i]));
-            update_post_meta($post_id, '_room_dimensions_' . $i, ph_clean($_POST['_room_dimensions'][$i]));
+            update_post_meta($post_id, '_room_name_' . $i, wp_slash( $clean_rows['_room_name'][$i] ));
+            update_post_meta($post_id, '_room_dimensions_' . $i, wp_slash( $clean_rows['_room_dimensions'][$i] ));
 
-            $allowed_html = array(
-                'p' => array(),
-                'br' => array(),
-                'i' => array(),
-                'em' => array(),
-                'u' => array(),
-                'strong' => array(),
-                'b' => array(),
-                'a' => array(
-                    'href' => array(),
-                    'target' => array(),
-                    'title' => array()
-                ),
-            );
-            update_post_meta($post_id, '_room_description_' . $i, wp_kses($_POST['_room_description'][$i], $allowed_html));
+            update_post_meta($post_id, '_room_description_' . $i, wp_slash( $clean_rows['_room_description'][$i] ));
         }
     }
 

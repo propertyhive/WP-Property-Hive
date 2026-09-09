@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Enquiry Details
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Enquiry_Details
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Enquiry_Details; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Enquiry_Details {
 
 	/**
@@ -27,6 +31,15 @@ class PH_Meta_Box_Enquiry_Details {
 
         if ( $current_screen->action == 'add' )
         {
+            // These GET values only prefill the read-only add form; saving the enquiry
+            // is separately protected by the meta-box nonce and CRM capabilities.
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Add-screen prefill values do not mutate state and are escaped by the field helpers below.
+            $request_get = wp_unslash( $_GET );
+            $name_prefill = ( isset( $request_get['name'] ) && is_scalar( $request_get['name'] ) ) ? sanitize_text_field( $request_get['name'] ) : '';
+            $email_prefill = ( isset( $request_get['email'] ) && is_scalar( $request_get['email'] ) ) ? sanitize_text_field( $request_get['email'] ) : '';
+            $telephone_prefill = ( isset( $request_get['telephone'] ) && is_scalar( $request_get['telephone'] ) ) ? sanitize_text_field( $request_get['telephone'] ) : '';
+            $property_id_prefill = ( isset( $request_get['property_id'] ) && is_scalar( $request_get['property_id'] ) ) ? absint( $request_get['property_id'] ) : 0;
+
             $args = array( 
                 'id' => '_added_manually', 
                 'value' => 'yes'
@@ -38,7 +51,7 @@ class PH_Meta_Box_Enquiry_Details {
                 'label' => __( 'Name', 'propertyhive' ), 
                 'desc_tip' => false,
                 'type' => 'text',
-                'value' => ( isset($_GET['name']) ? $_GET['name'] : '' )
+                'value' => $name_prefill
             );
             propertyhive_wp_text_input( $args );
 
@@ -47,7 +60,7 @@ class PH_Meta_Box_Enquiry_Details {
                 'label' => __( 'Email Address', 'propertyhive' ), 
                 'desc_tip' => false,
                 'type' => 'email',
-                'value' => ( isset($_GET['email']) ? $_GET['email'] : '' )
+                'value' => $email_prefill
             );
             propertyhive_wp_text_input( $args );
 
@@ -56,7 +69,7 @@ class PH_Meta_Box_Enquiry_Details {
                 'label' => __( 'Telephone', 'propertyhive' ), 
                 'desc_tip' => false,
                 'type' => 'text',
-                'value' => ( isset($_GET['telephone']) ? $_GET['telephone'] : '' )
+                'value' => $telephone_prefill
             );
             propertyhive_wp_text_input( $args );
 
@@ -88,10 +101,10 @@ echo '<p class="form-field">
 <script>
 
 var viewing_selected_properties = [<?php 
-    if ( isset($_GET['property_id']) && ph_clean($_GET['property_id']) != '' ) 
+    if ( $property_id_prefill > 0 )
     { 
-        $property = new PH_Property( (int)$_GET['property_id'] );
-        echo '{ id: ' . (int)$_GET['property_id'] . ', post_title: "' . esc_js($property->get_formatted_full_address()) . '" }';
+        $property = new PH_Property( $property_id_prefill );
+        echo wp_json_encode( array( 'id' => $property_id_prefill, 'post_title' => $property->get_formatted_full_address() ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
     } 
 ?>];
 var viewing_search_properties_timeout;
@@ -106,7 +119,7 @@ jQuery(document).ready(function($)
         var keyCode = e.charCode || e.keyCode || e.which;
         if (keyCode == 13)
         {
-            event.preventDefault();
+            e.preventDefault();
             return false;
         }
     });
@@ -178,14 +191,15 @@ function viewing_perform_property_search()
     {
         if (response == '' || response.length == 0)
         {
-            jQuery('#viewing_search_property_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
+            jQuery('#viewing_search_property_results').empty().append(jQuery('<div>').css('padding', '10px').text(<?php echo wp_json_encode( __( 'No results found for', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> + " '" + keyword + "'"));
         }
         else
         {
             jQuery('#viewing_search_property_results').html('<ul style="margin:0; padding:0;"></ul>');
             for ( var i in response )
             {
-                jQuery('#viewing_search_property_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-viewing-owner-id="' + response[i].owner_id + '" data-viewing-owner-name="' + response[i].owner_name + '">' + response[i].post_title + '</a></li>');
+                var result_link = jQuery('<a>').attr({ href: response[i].ID, 'data-viewing-owner-id': response[i].owner_id, 'data-viewing-owner-name': response[i].owner_name }).css({ color: '#666', display: 'block', padding: '7px 10px', background: '#FFF', borderBottom: '1px solid #DDD', textDecoration: 'none' }).text(response[i].post_title);
+                jQuery('#viewing_search_property_results ul').append(jQuery('<li>').css({ margin: 0, padding: 0 }).append(result_link));
             }
         }
         jQuery('#viewing_search_property_results').show();
@@ -202,7 +216,8 @@ function viewing_update_selected_properties()
         var hidden_field_values = new Array();
         for ( var i in viewing_selected_properties )
         {
-            jQuery('#viewing_selected_properties ul').append('<li><a href="' + viewing_selected_properties[i].id + '" class="viewing-remove-property" style="color:inherit; text-decoration:none;" data-viewing-owner-id="' + viewing_selected_properties[i].owner_id + '" data-viewing-owner-name="' + viewing_selected_properties[i].owner_name + '"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_properties[i].post_title + '</li>');
+            var remove_link = jQuery('<a>').attr({ href: viewing_selected_properties[i].id, 'data-viewing-owner-id': viewing_selected_properties[i].owner_id, 'data-viewing-owner-name': viewing_selected_properties[i].owner_name }).addClass('viewing-remove-property').css({ color: 'inherit', textDecoration: 'none' }).append(jQuery('<span>').addClass('dashicons dashicons-no-alt'));
+            jQuery('#viewing_selected_properties ul').append(jQuery('<li>').append(remove_link).append(document.createTextNode(' ' + viewing_selected_properties[i].post_title)));
             if (hidden_field_values.indexOf(viewing_selected_properties[i].id) === -1) 
             {
                 hidden_field_values.push(viewing_selected_properties[i].id);
@@ -328,10 +343,11 @@ function viewing_update_selected_properties()
                         'post_status' => 'any',
                         'posts_per_page' => 1,
                         'fields' => 'ids',
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Enquiry detail looks up a contact by email with posts_per_page=1 and fields=ids. One scalar email equality; posts_per_page=1.
                         'meta_query' => array(
                             array(
                                 'key' => '_email_address',
-                                'value' => strip_tags($email),
+                                'value' => wp_strip_all_tags($email),
                             )
                         )
                     );
@@ -379,7 +395,7 @@ function viewing_update_selected_properties()
                                     e.preventDefault();
 
                                     $(this).attr('disabled', 'disabled');
-                                    $(this).html('<?php echo __( 'Creating', 'propertyhive' ) . ' ' . $enquiry_contact_type . '...'; ?>');
+                                    $(this).text(<?php echo wp_json_encode( __( 'Creating', 'propertyhive' ) . ' ' . $enquiry_contact_type . '...' ); ?>);
 
                                     var data = {
                                         action:         'propertyhive_create_contact_from_enquiry',
@@ -392,14 +408,14 @@ function viewing_update_selected_properties()
                                         if (response.error)
                                         {
                                             $(that).attr('disabled', false);
-                                            $(that).html('<?php echo __( 'Create ', 'propertyhive' ) . $enquiry_contact_type; ?>');
+                                            $(that).text(<?php echo wp_json_encode( __( 'Create ', 'propertyhive' ) . $enquiry_contact_type ); ?>);
                                         }
                                         if (response.success)
                                         {
                                             $(that).attr('disabled', false);
                                             $(that).addClass('button-primary');
                                             $(that).attr('href', response.success);
-                                            $(that).html('<?php echo $enquiry_contact_type . __(' Created. View Now', 'propertyhive' ); ?>');
+                                            $(that).text(<?php echo wp_json_encode( $enquiry_contact_type . __( ' Created. View Now', 'propertyhive' ) ); ?>);
                                         }
                                     }, 'json');
                                 }
@@ -423,23 +439,43 @@ function viewing_update_selected_properties()
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+
+        // The meta-box nonce was verified above before any submitted fields are read.
+        $request_post = wp_unslash( $_POST );
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $request_post['post_ID'] ) || ! is_scalar( $request_post['post_ID'] ) || absint( $request_post['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
-        
-        if ( isset($_POST['_added_manually']) && $_POST['_added_manually'] == 'yes' )
+
+        $added_manually = ( isset( $request_post['_added_manually'] ) && is_scalar( $request_post['_added_manually'] ) ) ? sanitize_key( $request_post['_added_manually'] ) : '';
+        if ( 'yes' === $added_manually )
         {
-            update_post_meta( $post_id, '_added_manually', ph_clean($_POST['_added_manually']) );
-            update_post_meta( $post_id, 'name', ph_clean($_POST['name']) );
-            update_post_meta( $post_id, 'email', ph_clean($_POST['email']) );
-            update_post_meta( $post_id, 'telephone', ph_clean($_POST['telephone']) );
-            update_post_meta( $post_id, 'body', sanitize_textarea_field($_POST['body']) );
+            update_post_meta( $post_id, '_added_manually', $added_manually );
+            $name = ( isset( $request_post['name'] ) && is_scalar( $request_post['name'] ) ) ? sanitize_text_field( $request_post['name'] ) : '';
+            $email = ( isset( $request_post['email'] ) && is_scalar( $request_post['email'] ) ) ? sanitize_text_field( $request_post['email'] ) : '';
+            $telephone = ( isset( $request_post['telephone'] ) && is_scalar( $request_post['telephone'] ) ) ? sanitize_text_field( $request_post['telephone'] ) : '';
+            $body = ( isset( $request_post['body'] ) && is_scalar( $request_post['body'] ) ) ? sanitize_textarea_field( $request_post['body'] ) : '';
+            update_post_meta( $post_id, 'name', wp_slash( $name ) );
+            update_post_meta( $post_id, 'email', wp_slash( $email ) );
+            update_post_meta( $post_id, 'telephone', wp_slash( $telephone ) );
+            update_post_meta( $post_id, 'body', wp_slash( $body ) );
 
             delete_post_meta( $post_id, 'property_id' );
-            if ( isset($_POST['property_id']) && $_POST['property_id'] != '' ) 
+            $property_id_input = ( isset( $request_post['property_id'] ) && is_scalar( $request_post['property_id'] ) ) ? sanitize_text_field( $request_post['property_id'] ) : '';
+            if ( '' !== $property_id_input )
             {
-                $explode_property_id = explode("|", sanitize_text_field($_POST['property_id']));
+                $explode_property_id = explode( '|', $property_id_input );
                 foreach ( $explode_property_id as $property_id )
                 {
-                    add_post_meta( $post_id, 'property_id', (int)$property_id ); 
+                    $property_id = absint( $property_id );
+                    if ( $property_id > 0 ) {
+                        add_post_meta( $post_id, 'property_id', $property_id );
+                    }
                 }
             }
         }

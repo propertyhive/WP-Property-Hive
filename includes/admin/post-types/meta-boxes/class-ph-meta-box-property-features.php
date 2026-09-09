@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Features
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Features
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Features; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Features {
 
 	/**
@@ -22,7 +26,8 @@ class PH_Meta_Box_Property_Features {
         
         if ( get_option('propertyhive_features_type') == 'checkbox' )
         {
-            echo '<div class="propertyhive_meta_box">';
+            echo '<input type="hidden" name="propertyhive_features_present" value="1">';
+        echo '<div class="propertyhive_meta_box">';
 
             echo '<div class="options_group">';
 
@@ -31,7 +36,7 @@ class PH_Meta_Box_Property_Features {
                 'hide_empty' => false,
                 'parent' => 0
             );
-            $terms = get_terms( 'property_feature', $args );
+            $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_feature' ) ) );
             
             if ( !empty( $terms ) && !is_wp_error( $terms ) )
             {
@@ -92,7 +97,7 @@ class PH_Meta_Box_Property_Features {
                 // No features
                 echo sprintf(
                     /* translators: %s: URL to settings page */
-                    __( 'No features available to choose from. These can be edited in the <a href="%s" target="_blank">settings area</a>.', 'propertyhive' ), 
+                    wp_kses_post( __( 'No features available to choose from. These can be edited in the <a href="%s" target="_blank">settings area</a>.', 'propertyhive' ) ),
                     esc_url( admin_url('admin.php?page=ph-settings&tab=customfields&section=property-feature') )
                 );
             }
@@ -222,18 +227,26 @@ class PH_Meta_Box_Property_Features {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
         
         if ( get_option('propertyhive_features_type') == 'checkbox' )
         {
-            $features = array();
-            if ( isset( $_POST['feature_ids'] ) && !empty( $_POST['feature_ids'] ) )
-            {
-                foreach ( $_POST['feature_ids'] as $feature_id )
-                {
-                    $features[] = (int)$feature_id;
-                }
+            if ( ! isset( $_POST['feature_ids'] ) && ! isset( $_POST['propertyhive_features_present'] ) ) {
+                return;
             }
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Shape-only check rejects nested values before the separately sanitized text or integer conversion below.
+            if ( isset( $_POST['feature_ids'] ) && ( ! is_array( $_POST['feature_ids'] ) || count( array_filter( $_POST['feature_ids'], 'is_scalar' ) ) !== count( $_POST['feature_ids'] ) ) ) {
+                return;
+            }
+            $features = isset( $_POST['feature_ids'] ) ? array_map( 'intval', $_POST['feature_ids'] ) : array();
             if ( !empty($features) )
             {
                 wp_set_post_terms( $post_id, $features, 'property_feature' );
@@ -245,11 +258,16 @@ class PH_Meta_Box_Property_Features {
         }
         else
         {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Shape-only check rejects nested values before the separately sanitized text or integer conversion below.
+            if ( ! isset( $_POST['feature'] ) || ! is_array( $_POST['feature'] ) || count( array_filter( $_POST['feature'], 'is_string' ) ) !== count( $_POST['feature'] ) ) {
+                return;
+            }
+            $features = array_values( ph_clean( wp_unslash( $_POST['feature'] ) ) );
             // Get existing number of features to see if we need to remove any
             $existing_num_property_features = get_post_meta($post_id, '_features', TRUE);
             if ($existing_num_property_features == '') { $existing_num_property_features = 0; }
             
-            $new_num_property_features = count($_POST['feature']) - 1; // Minus one because of the template feature. Don't want to include this
+            $new_num_property_features = max( 0, count($features) - 1 ); // Minus one because of the template feature. Don't want to include this
             
             if ($new_num_property_features < $existing_num_property_features)
             {
@@ -265,7 +283,7 @@ class PH_Meta_Box_Property_Features {
             
             for ($i = 0; $i < $new_num_property_features; ++$i)
             {
-                update_post_meta($post_id, '_feature_' . $i, ph_clean($_POST['feature'][$i]));
+                update_post_meta($post_id, '_feature_' . $i, wp_slash( $features[$i] ));
             }
         }
     }

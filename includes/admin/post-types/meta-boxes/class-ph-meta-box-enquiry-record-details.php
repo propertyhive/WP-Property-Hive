@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Enquiry Record Details
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Enquiry_Record_Details
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Enquiry_Record_Details; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Enquiry_Record_Details {
 
 	/**
@@ -53,6 +57,7 @@ class PH_Meta_Box_Enquiry_Record_Details {
                 'id' => '_negotiator_id', 
                 'class' => 'select short',
                 'selected' => $negotiator_id,
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy Property Negotiator compatibility filter; existing role filters depend on this exact public hook name.
                 'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
             );
             wp_dropdown_users($args);
@@ -134,12 +139,28 @@ class PH_Meta_Box_Enquiry_Record_Details {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
 
-        update_post_meta( $post_id, '_status', ph_clean($_POST['_status']) );
-        update_post_meta( $post_id, '_negotiator_id', ( ( $_POST['_negotiator_id'] != -1 ) ? (int)$_POST['_negotiator_id'] : '' ) );
-        update_post_meta( $post_id, '_office_id', (int)$_POST['_office_id'] );
-        update_post_meta( $post_id, '_source', ph_clean($_POST['_source']) );
+        if ( isset( $_POST['_status'] ) && is_string( $_POST['_status'] ) ) {
+            update_post_meta( $post_id, '_status', ph_clean( wp_unslash( $_POST['_status'] ) ) );
+        }
+        if ( isset( $_POST['_negotiator_id'] ) && is_scalar( $_POST['_negotiator_id'] ) ) {
+            update_post_meta( $post_id, '_negotiator_id', ( ( $_POST['_negotiator_id'] != -1 ) ? (int) $_POST['_negotiator_id'] : '' ) );
+        }
+        if ( isset( $_POST['_office_id'] ) && is_scalar( $_POST['_office_id'] ) ) {
+            update_post_meta( $post_id, '_office_id', (int) $_POST['_office_id'] );
+        }
+        if ( isset( $_POST['_source'] ) && is_string( $_POST['_source'] ) ) {
+            update_post_meta( $post_id, '_source', ph_clean( wp_unslash( $_POST['_source'] ) ) );
+        }
 
         do_action( 'propertyhive_save_enquiry_record_details', $post_id );
     }

@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Coordinates
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Address
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Coordinates; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Coordinates {
 
 	/**
@@ -22,9 +26,11 @@ class PH_Meta_Box_Property_Coordinates {
         global $post, $wpdb, $wp_query, $thepostid;
 
         $parent_post = false;
-        if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only coordinate defaults; saving has independent nonce and capability checks.
+        $parent_id = isset( $_GET['post_parent'] ) && is_scalar( $_GET['post_parent'] ) ? absint( $_GET['post_parent'] ) : 0;
+        if ( $parent_id > 0 && 'property' === get_post_type( $parent_id ) && current_user_can( 'edit_post', $parent_id ) )
         {
-            $parent_post = (int)$_GET['post_parent'];
+            $parent_post = $parent_id;
         }
         
         echo '<div class="propertyhive_meta_box">';
@@ -178,7 +184,7 @@ class PH_Meta_Box_Property_Coordinates {
                                 $mapbox_geocoding_api_key = get_option( 'propertyhive_mapbox_api_key', '' );
                             }
                             echo '
-                            var url = \'https://api.mapbox.com/geocoding/v5/mapbox.places/\' + encodeURIComponent(address) + \'.json?access_token=' . $mapbox_geocoding_api_key . '\';
+                            var url = \'https://api.mapbox.com/geocoding/v5/mapbox.places/\' + encodeURIComponent(address) + \'.json?access_token=\' + encodeURIComponent(' . wp_json_encode( $mapbox_geocoding_api_key, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ');
                             ';
 
                             echo '
@@ -438,7 +444,7 @@ class PH_Meta_Box_Property_Coordinates {
                 ';
             }
             echo '
-                    mapboxgl.accessToken = \'' . get_option( 'propertyhive_mapbox_api_key', '' ) . '\';
+                    mapboxgl.accessToken = ' . wp_json_encode( get_option( 'propertyhive_mapbox_api_key', '' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ';
                     map = new mapboxgl.Map({
                         container: "map_canvas", // container ID
                         center: [' . (float)$longitude . ', ' . (float)$latitude . '], // starting position [lng, lat]. Note that lat must be set between -90 and 90
@@ -766,7 +772,7 @@ class PH_Meta_Box_Property_Coordinates {
                         position: new google.maps.LatLng(lat, lng),
                         map: map,
                         draggable: true,
-                        title: \''. __( 'Click and drag me to set the exact coordinates', 'propertyhive') . '\'
+                        title: ' . wp_json_encode( __( 'Click and drag me to set the exact coordinates', 'propertyhive' ) ) . '
                     });
                     
                     jQuery(\'#help-marker-not-set\').fadeOut(\'fast\', function()
@@ -805,10 +811,22 @@ class PH_Meta_Box_Property_Coordinates {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
         
-        update_post_meta( $post_id, '_latitude', ph_clean($_POST['_latitude']) );
-        update_post_meta( $post_id, '_longitude', ph_clean($_POST['_longitude']) );
+        if ( isset( $_POST['_latitude'] ) && is_string( $_POST['_latitude'] ) ) {
+            update_post_meta( $post_id, '_latitude', wp_slash( ph_clean( wp_unslash( $_POST['_latitude'] ) ) ) );
+        }
+        if ( isset( $_POST['_longitude'] ) && is_string( $_POST['_longitude'] ) ) {
+            update_post_meta( $post_id, '_longitude', wp_slash( ph_clean( wp_unslash( $_POST['_longitude'] ) ) ) );
+        }
 
         do_action('propertyhive_save_property_coordinates', $post_id);
     }

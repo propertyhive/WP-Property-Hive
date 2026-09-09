@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Admin functions for the contact post type
  *
@@ -21,6 +24,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Contact' ) ) :
 /**
  * PH_Admin_CPT_Contact Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_CPT_Contact; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 
 	/**
@@ -92,9 +96,11 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 	{
 	    if ( $path === 'post-new.php?post_type=contact' ) 
 	    {
-	    	if ( isset($_GET['_contact_type']) )
+      // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( isset($_GET['_contact_type']) && is_string( $_GET['_contact_type'] ) )
 	    	{
-		        $url .= '&contact_type=' . ph_clean($_GET['_contact_type']);
+          // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+		        $url = add_query_arg( 'contact_type', rawurlencode( ph_clean( wp_unslash( $_GET['_contact_type'] ) ) ), $url );
 		    }
 	    }
 	    return $url;
@@ -104,8 +110,10 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
     {
         $message = '';
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
         if ( isset($_GET['ph_message']) )
         {
+         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
 	        switch ( $_GET['ph_message'] )
 	        {
 	        	case "1": {
@@ -132,12 +140,15 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 	 * @return boolean
 	 */
 	private function is_editing_contact() {
+  // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
 		if ( ! empty( $_GET['post_type'] ) && 'contact' == $_GET['post_type'] ) {
 			return true;
 		}
+  // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
 		if ( ! empty( $_GET['post'] ) && 'contact' == get_post_type( (int)$_GET['post'] ) ) {
 			return true;
 		}
+  // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
 		if ( ! empty( $_REQUEST['post_id'] ) && 'contact' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
 			return true;
 		}
@@ -207,8 +218,9 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 	public function custom_columns( $column ) {
 		global $post, $propertyhive, $the_contact;
 
-		if ( empty( $the_contact ) || $the_contact->ID != $post->ID ) 
+		if ( empty( $the_contact ) || $the_contact->ID != $post->ID )
 		{
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Retain the legacy global name for compatibility with external admin column callbacks.
 			$the_contact = new PH_Contact( $post->ID );
 		}
 
@@ -224,7 +236,8 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
 
 				echo '<strong><a class="row-title" href="' . esc_url( $edit_link ) .'">' . esc_html($title) . '</a>';
-				if ( isset( $_GET['_contact_type'] ) && strpos( ph_clean($_GET['_contact_type']), 'applicant' ) !== FALSE && is_array($contact_types) && in_array('applicant', $contact_types) && $the_contact->_hot_applicant == 'yes' )
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+				if ( isset( $_GET['_contact_type'] ) && is_string( $_GET['_contact_type'] ) && strpos( ph_clean( wp_unslash( $_GET['_contact_type'] ) ), 'applicant' ) !== FALSE && is_array($contact_types) && in_array('applicant', $contact_types) && $the_contact->_hot_applicant == 'yes' )
 				{
 					echo ' <span style="color:#C00;">(' . esc_html(__( 'Hot Applicant', 'propertyhive' )) . ')</span>';
 				}
@@ -462,10 +475,10 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 		if ( ! isset( $_REQUEST['propertyhive_quick_edit_nonce'] ) && ! isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) ) {
 			return $post_id;
 		}
-		if ( isset( $_REQUEST['propertyhive_quick_edit_nonce'] ) && ! wp_verify_nonce( $_REQUEST['propertyhive_quick_edit_nonce'], 'propertyhive_quick_edit_nonce' ) ) {
+		if ( isset( $_REQUEST['propertyhive_quick_edit_nonce'] ) && ! wp_verify_nonce( ( isset( $_REQUEST['propertyhive_quick_edit_nonce'] ) && is_string( $_REQUEST['propertyhive_quick_edit_nonce'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['propertyhive_quick_edit_nonce'] ) ) : '', 'propertyhive_quick_edit_nonce' ) ) {
 			return $post_id;
 		}
-		if ( isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) && ! wp_verify_nonce( $_REQUEST['propertyhive_bulk_edit_nonce'], 'propertyhive_bulk_edit_nonce' ) ) {
+		if ( isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) && ! wp_verify_nonce( ( isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) && is_string( $_REQUEST['propertyhive_bulk_edit_nonce'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['propertyhive_bulk_edit_nonce'] ) ) : '', 'propertyhive_bulk_edit_nonce' ) ) {
 			return $post_id;
 		}
 
@@ -522,7 +535,8 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 	 */
 	public function upload_dir( $pathdata ) {
 		// Change upload dir for downloadable files
-		if ( isset( $_POST['type'] ) && 'downloadable_product' == $_POST['type'] ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Directory selection only; the calling WordPress upload handler authorizes and verifies the upload before writing any files.
+		if ( isset( $_POST['type'] ) && is_string( $_POST['type'] ) && 'downloadable_product' === $_POST['type'] ) {
 			if ( empty( $pathdata['subdir'] ) ) {
 				$pathdata['path']   = $pathdata['path'] . '/propertyhive_uploads';
 				$pathdata['url']    = $pathdata['url']. '/propertyhive_uploads';
@@ -547,6 +561,7 @@ class PH_Admin_CPT_Contact extends PH_Admin_CPT {
 			return;
 		}
 
+  // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
 		if ( $which == 'top' && isset($_GET['_contact_type']) && $_GET['_contact_type'] == 'applicant' )
 		{
 			echo '<div class="alignleft actions"><a href="' . esc_url(admin_url('admin.php?page=ph-generate-applicant-list')) . '" id="generate_applicant_list_button" class="button">' . esc_html(__( 'Generate Applicant List', 'propertyhive' )) . '</a></div>';

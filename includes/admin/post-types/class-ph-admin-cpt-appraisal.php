@@ -21,6 +21,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Appraisal' ) ) :
 /**
  * PH_Admin_CPT_Appraisal Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_CPT_Appraisal; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
 
 	/**
@@ -55,18 +56,15 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
 	 * Check if we're editing or adding a appraisal
 	 * @return boolean
 	 */
-	private function is_editing_appraisal() {
-		if ( ! empty( $_GET['post_type'] ) && 'appraisal' == $_GET['post_type'] ) {
-			return true;
-		}
-		if ( ! empty( $_GET['post'] ) && 'appraisal' == get_post_type( (int)$_GET['post'] ) ) {
-			return true;
-		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'appraisal' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
-			return true;
-		}
-		return false;
-	}
+    private function is_editing_appraisal() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection; mutations have separate save guards.
+        $post_type = isset( $_GET['post_type'] ) && is_string( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection.
+        $post_id = isset( $_GET['post'] ) && is_string( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection for AJAX requests.
+        $request_id = isset( $_REQUEST['post_id'] ) && is_string( $_REQUEST['post_id'] ) ? absint( $_REQUEST['post_id'] ) : 0;
+        return 'appraisal' === $post_type || ( $post_id > 0 && 'appraisal' === get_post_type( $post_id ) ) || ( $request_id > 0 && 'appraisal' === get_post_type( $request_id ) );
+    }
 
 	/**
 	 * @param int $post_id
@@ -115,8 +113,9 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
 	public function custom_columns( $column ) {
 		global $post, $propertyhive, $the_appraisal;
 
-		if ( empty( $the_appraisal ) || $the_appraisal->ID != $post->ID ) 
+		if ( empty( $the_appraisal ) || $the_appraisal->ID != $post->ID )
 		{
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Retain the legacy global name for compatibility with external admin column callbacks.
 			$the_appraisal = new PH_Appraisal( $post->ID );
 		}
 
@@ -125,7 +124,7 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
 				
 				$edit_link        = get_edit_post_link( $post->ID );
 				//$title            = _draft_or_post_title();
-                $title            = date("H:i jS F Y", strtotime($the_appraisal->start_date_time));
+                $title            = gmdate("H:i jS F Y", strtotime($the_appraisal->start_date_time));
                 
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
@@ -171,7 +170,7 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
                 
                 if ( $the_appraisal->status == 'carried_out' )
                 {
-                	echo $the_appraisal->get_formatted_price();
+                    echo wp_kses_post( $the_appraisal->get_formatted_price() );
                 }
                 else
                 {
@@ -186,7 +185,7 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
                 {
                 	echo '<br>';
                 	// confirmation status
-                	if ( $the_appraisal->all_confirmed == 'yes' )
+                    if ( $the_appraisal->all_confirmed == 'yes' )
                 	{
                 		echo esc_html(__( 'All Parties Confirmed', 'propertyhive' ));
                 	}
@@ -282,6 +281,7 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
 		if ( is_admin() && $vars['post_type'] == 'appraisal' )
 		{
 			$vars = array_merge( $vars, array(
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 				'meta_key' 	=> '_start_date_time',
 				'orderby' 	=> 'meta_value'
 			) );
@@ -308,7 +308,8 @@ class PH_Admin_CPT_Appraisal extends PH_Admin_CPT {
 			return;
 		}
 
-		echo apply_filters( 'propertyhive_appraisal_filters', $output );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Empty base is safe; trusted PHP extensions supply admin form controls through this HTML filter.
+		echo apply_filters( 'propertyhive_appraisal_filters', '' );
 	}
 
 	/**

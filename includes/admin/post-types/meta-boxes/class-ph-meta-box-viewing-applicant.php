@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Viewing Applicant Details
  *
@@ -11,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Viewing_Applicant
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Viewing_Applicant; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Viewing_Applicant {
 
 	/**
@@ -24,9 +28,11 @@ class PH_Meta_Box_Viewing_Applicant {
         echo '<div class="options_group">';
 
         $applicant_contact_ids = array();
-        if ( isset($_GET['applicant_contact_id']) && ! empty( $_GET['applicant_contact_id'] ) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preselection in the authorized editor; selected IDs are checked as contacts below.
+        $requested_applicants = isset( $_GET['applicant_contact_id'] ) && is_string( $_GET['applicant_contact_id'] ) ? sanitize_text_field( wp_unslash( $_GET['applicant_contact_id'] ) ) : '';
+        if ( $requested_applicants !== '' )
         {
-            $explode_applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
+            $explode_applicant_contact_ids = explode('|', $requested_applicants);
             foreach ($explode_applicant_contact_ids as $explode_applicant_contact_id)
             {
                 if ( get_post_type( (int)$explode_applicant_contact_id ) == 'contact' )
@@ -59,7 +65,7 @@ class PH_Meta_Box_Viewing_Applicant {
                 $fields = array(
                     'name' => array(
                         'label' => __('Name', 'propertyhive'),
-                        'value' => '<a href="' . esc_url(get_edit_post_link($applicant_contact_id, '')) . '" data-viewing-applicant-id="' . esc_attr($applicant_contact_id) . '" data-viewing-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
+                        'value' => '<a href="' . esc_url(esc_url( get_edit_post_link($applicant_contact_id, '') )) . '" data-viewing-applicant-id="' . esc_attr($applicant_contact_id) . '" data-viewing-applicant-name="' . esc_attr(get_the_title($applicant_contact_id)) . '">' . esc_html(get_the_title($applicant_contact_id)) . '</a>',
                     ),
                     'telephone_number' => array(
                         'label' => __('Telephone Number', 'propertyhive'),
@@ -75,14 +81,17 @@ class PH_Meta_Box_Viewing_Applicant {
                 $fields = apply_filters( 'propertyhive_viewing_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
                 $div_style = $i > 0 ? 'style="border-top:1px solid #ddd"' : '';
-                echo "<div " . $div_style . ">";
+                echo $i > 0 ? '<div style="border-top:1px solid #ddd">' : '<div >';
                 foreach ( $fields as $key => $field )
                 {
                     echo '<p class="form-field ' . esc_attr($key) . '" >
 
                         <label>' . esc_html($field['label']) . '</label>
 
-                        ' . $field['value'] . '
+                        ';
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core field values are escaped above before the trusted PHP propertyhive_viewing_applicant_fields filter, which intentionally permits extension HTML.
+                    echo $field['value'];
+                    echo '
 
                     </p>';
                 }
@@ -170,15 +179,20 @@ class PH_Meta_Box_Viewing_Applicant {
         <input type="hidden" name="_viewing_applicant_create_new" id="_viewing_applicant_create_new" value="">
         <script>
 
+        function viewing_applicant_escape(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function(character) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character];
+            });
+        }
+
         var viewing_selected_applicants = [];
         <?php
-            if (isset($_GET['applicant_contact_id']) && $_GET['applicant_contact_id'] != '')
+            if ( $requested_applicants !== '' )
             {
-                $applicant_contact_ids = explode('|', $_GET['applicant_contact_id']);
                 foreach ($applicant_contact_ids as $applicant_contact_id)
                 {
                     ?>
-                    viewing_selected_applicants.push({ id: <?php echo (int)$_GET['applicant_contact_id']; ?>, post_title: '<?php echo esc_js(get_the_title((int)$_GET['applicant_contact_id'])); ?>' });
+                    viewing_selected_applicants.push({ id: <?php echo (int)$applicant_contact_id; ?>, post_title: '<?php echo esc_js(get_the_title((int)$applicant_contact_id)); ?>' });
                     <?php
                 }
             }
@@ -294,14 +308,14 @@ class PH_Meta_Box_Viewing_Applicant {
             {
                 if (response == '' || response.length == 0)
                 {
-                    jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
+                    jQuery('#viewing_search_applicant_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + viewing_applicant_escape(keyword) + '\'</div>');
                 }
                 else
                 {
                     jQuery('#viewing_search_applicant_results').html('<ul style="margin:0; padding:0;"></ul>');
                     for ( var i in response )
                     {
-                        jQuery('#viewing_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-applicant-name="' + response[i].post_title + '"><strong>' + response[i].post_title + '</strong><br><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
+                        jQuery('#viewing_search_applicant_results ul').append('<li style="margin:0; padding:0;"><a href="' + viewing_applicant_escape(response[i].ID) + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-applicant-name="' + viewing_applicant_escape(response[i].post_title) + '"><strong>' + viewing_applicant_escape(response[i].post_title) + '</strong><br><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? viewing_applicant_escape(response[i].address_full_formatted) + '<br>' : '' ) + ( response[i].telephone_number != '' ? viewing_applicant_escape(response[i].telephone_number) + '<br>' : '' ) + ( response[i].email_address != '' ? viewing_applicant_escape(response[i].email_address) : '' ) + '</small></a></li>');
                     }
                 }
                 jQuery('#viewing_search_applicant_results').show();
@@ -320,7 +334,7 @@ class PH_Meta_Box_Viewing_Applicant {
 
                 for ( var i in viewing_selected_applicants )
                 {
-                    jQuery('#viewing_selected_applicants ul').append('<li><a href="' + viewing_selected_applicants[i].id + '" class="viewing-remove-applicant" data-viewing-applicant-id="' + viewing_selected_applicants[i].id + '" data-viewing-applicant-name="' + viewing_selected_applicants[i].post_title + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_selected_applicants[i].post_title + '</li>');
+                    jQuery('#viewing_selected_applicants ul').append('<li><a href="' + viewing_applicant_escape(viewing_selected_applicants[i].id) + '" class="viewing-remove-applicant" data-viewing-applicant-id="' + viewing_applicant_escape(viewing_selected_applicants[i].id) + '" data-viewing-applicant-name="' + viewing_applicant_escape(viewing_selected_applicants[i].post_title) + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + viewing_applicant_escape(viewing_selected_applicants[i].post_title) + '</li>');
 
                     applicant_contact_ids.push(viewing_selected_applicants[i].id);
                 }
@@ -347,7 +361,38 @@ class PH_Meta_Box_Viewing_Applicant {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
+
+        foreach ( array( '_applicant_name', '_applicant_address', '_applicant_contact_ids', '_viewing_applicant_create_new', '_property_id', '_applicant_telephone_number', '_applicant_email_address' ) as $input_key ) {
+            if ( isset( $_POST[ $input_key ] ) && ! is_string( $_POST[ $input_key ] ) ) {
+                return;
+            }
+        }
+        if ( ! empty( $_POST['_viewing_applicant_create_new'] ) && ! current_user_can( get_post_type_object( 'contact' )->cap->create_posts ) ) {
+            return;
+        }
+        $submitted_property = isset( $_POST['_property_id'] ) ? sanitize_text_field( wp_unslash( $_POST['_property_id'] ) ) : '';
+        if ( $submitted_property !== '' && $submitted_property !== '0' && ( ! ctype_digit( $submitted_property ) || get_post_type( (int) $submitted_property ) !== 'property' ) ) {
+            return;
+        }
+        $submitted_applicants = isset( $_POST['_applicant_contact_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['_applicant_contact_ids'] ) ) : '';
+        $validated_applicants = array();
+        if ( $submitted_applicants !== '' ) {
+            foreach ( array_unique( explode( '|', $submitted_applicants ) ) as $contact_id ) {
+                if ( ! ctype_digit( $contact_id ) || get_post_type( (int) $contact_id ) !== 'contact' || ! current_user_can( 'edit_post', (int) $contact_id ) ) {
+                    return;
+                }
+                $validated_applicants[] = (int) $contact_id;
+            }
+        }
 
         $viewing_notes_to_write = array();
 
@@ -360,7 +405,7 @@ class PH_Meta_Box_Viewing_Applicant {
             {
                 // Need to create contact/applicant
                 $contact_post = array(
-                    'post_title'    => ph_clean($_POST['_applicant_name']),
+                    'post_title'    => wp_slash( sanitize_text_field( wp_unslash( $_POST['_applicant_name'] ) ) ),
                     'post_content'  => '',
                     'post_type'     => 'contact',
                     'post_status'   => 'publish',
@@ -384,21 +429,23 @@ class PH_Meta_Box_Viewing_Applicant {
                     // Successfully added contact post
                     update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
 
-                    update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['_applicant_telephone_number']) );
-                    update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean(ph_clean_telephone_number($_POST['_applicant_telephone_number'])) );
+                    $ph_contact_telephone_value = ( isset( $_POST['_applicant_telephone_number'] ) && is_string( $_POST['_applicant_telephone_number'] ) ) ? sanitize_text_field( wp_unslash( $_POST['_applicant_telephone_number'] ) ) : '';
+                    update_post_meta( $contact_post_id, '_telephone_number', wp_slash( $ph_contact_telephone_value ) );
+                    update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean(ph_clean_telephone_number($ph_contact_telephone_value)) );
 
-                    update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_applicant_email_address'])) );
+                    $ph_contact_email_value = ( isset( $_POST['_applicant_email_address'] ) && is_string( $_POST['_applicant_email_address'] ) ) ? sanitize_text_field( wp_unslash( $_POST['_applicant_email_address'] ) ) : '';
+                    update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", wp_slash( $ph_contact_email_value )) );
 
-                    if ( isset($_POST['_applicant_address']) && !empty(sanitize_textarea_field($_POST['_applicant_address'])) )
+                    if ( isset($_POST['_applicant_address']) && !empty(sanitize_textarea_field( wp_unslash( $_POST['_applicant_address'] ) )) )
                     {
-                        $address = ph_split_address_into_fields( sanitize_textarea_field($_POST['_applicant_address']) );
+                        $address = ph_split_address_into_fields( sanitize_textarea_field( wp_unslash( $_POST['_applicant_address'] ) ) );
 
-                        update_post_meta( $contact_post_id, '_address_name_number', $address['address_name_number'] );
-                        update_post_meta( $contact_post_id, '_address_street', $address['address_street'] );
-                        update_post_meta( $contact_post_id, '_address_two', $address['address_two'] );
-                        update_post_meta( $contact_post_id, '_address_three', $address['address_three'] );
-                        update_post_meta( $contact_post_id, '_address_four', $address['address_four'] );
-                        update_post_meta( $contact_post_id, '_address_postcode', $address['address_postcode'] );
+                        update_post_meta( $contact_post_id, '_address_name_number', wp_slash( $address['address_name_number'] ) );
+                        update_post_meta( $contact_post_id, '_address_street', wp_slash( $address['address_street'] ) );
+                        update_post_meta( $contact_post_id, '_address_two', wp_slash( $address['address_two'] ) );
+                        update_post_meta( $contact_post_id, '_address_three', wp_slash( $address['address_three'] ) );
+                        update_post_meta( $contact_post_id, '_address_four', wp_slash( $address['address_four'] ) );
+                        update_post_meta( $contact_post_id, '_address_postcode', wp_slash( $address['address_postcode'] ) );
                         update_post_meta( $contact_post_id, '_address_country', get_option( 'propertyhive_default_country', 'GB' ) );
                     }
 
@@ -426,7 +473,7 @@ class PH_Meta_Box_Viewing_Applicant {
         {
             if ( isset($_POST['_applicant_contact_ids']) && !empty($_POST['_applicant_contact_ids']) )
             {
-                $applicant_contact_ids = array_unique(explode("|", $_POST['_applicant_contact_ids']));
+                $applicant_contact_ids = $validated_applicants;
 
                 if ( !is_array($existing_applicants) )
                 {
@@ -481,7 +528,7 @@ class PH_Meta_Box_Viewing_Applicant {
                     'comment_author'       => $current_user->display_name,
                     'comment_author_email' => 'propertyhive@noreply.com',
                     'comment_author_url'   => '',
-                    'comment_date'         => date("Y-m-d H:i:s"),
+                    'comment_date'         => gmdate("Y-m-d H:i:s"),
                     'comment_content'      => serialize($comment),
                     'comment_approved'     => 1,
                     'comment_type'         => 'propertyhive_note',

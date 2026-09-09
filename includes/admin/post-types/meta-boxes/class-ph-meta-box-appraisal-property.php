@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Appraisal Property Details
  *
@@ -11,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Appraisal_Property
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Appraisal_Property; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Appraisal_Property {
 
 	/**
@@ -28,8 +32,14 @@ class PH_Meta_Box_Appraisal_Property {
         if ( $status == 'instructed' )
         {
             $appraisal = new PH_Appraisal((int)$thepostid);
+            $formatted_address = $appraisal->get_formatted_full_address( '<br>' );
+            $additional_information = $appraisal->additional_property_information;
+            if ( ! is_scalar( $additional_information ) )
+            {
+                $additional_information = '';
+            }
 
-            echo '<p class="form-field"><label for="">Address</label>' . $appraisal->get_formatted_full_address('<br>') . '<br><a href="' . esc_url(get_edit_post_link( $appraisal->property_id )) . '">View Property</a></p>';
+            echo '<p class="form-field"><label for="">Address</label>' . wp_kses( $formatted_address, array( 'br' => array() ) ) . '<br><a href="' . esc_url(get_edit_post_link( $appraisal->property_id )) . '">View Property</a></p>';
 
             echo '<p class="form-field"><label for="">Department</label>' . esc_html(ucwords(str_replace("-", " ", $appraisal->department))) . '</p>';
 
@@ -47,7 +57,7 @@ class PH_Meta_Box_Appraisal_Property {
 
             echo '<p class="form-field"><label for="">Council Tax Band</label>' . esc_html($appraisal->council_tax_band) . '</p>';
 
-            echo '<p class="form-field"><label for="">Additional Information</label>' . $appraisal->additional_property_information . '</p>';
+            echo '<p class="form-field"><label for="">Additional Information</label>' . nl2br( esc_html( (string) $additional_information ) ) . '</p>';
         }
         else
         {        
@@ -220,7 +230,7 @@ class PH_Meta_Box_Appraisal_Property {
                 'hide_empty' => false,
                 'parent' => 0
             );
-            $terms = get_terms( 'property_type', $args );
+            $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
             
             $selected_value = '';
             if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -233,7 +243,7 @@ class PH_Meta_Box_Appraisal_Property {
                         'hide_empty' => false,
                         'parent' => $term->term_id
                     );
-                    $subterms = get_terms( 'property_type', $args );
+                    $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
                     
                     if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                     {
@@ -260,7 +270,7 @@ class PH_Meta_Box_Appraisal_Property {
                     'hide_empty' => false,
                     'parent' => 0
                 );
-                $terms = get_terms( 'property_type', $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
                 
                 $selected_values = array();
                 $term_list = wp_get_post_terms($post->ID, 'property_type', array("fields" => "ids"));
@@ -287,7 +297,7 @@ class PH_Meta_Box_Appraisal_Property {
                             'hide_empty' => false,
                             'parent' => $term->term_id
                         );
-                        $subterms = get_terms( 'property_type', $args );
+                        $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
                         
                         if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                         {
@@ -304,7 +314,7 @@ class PH_Meta_Box_Appraisal_Property {
                                     'hide_empty' => false,
                                     'parent' => $term->term_id
                                 );
-                                $subsubterms = get_terms( 'property_type', $args );
+                                $subsubterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
                                 
                                 if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                                 {
@@ -333,7 +343,7 @@ class PH_Meta_Box_Appraisal_Property {
                     'hide_empty' => false,
                     'parent' => 0
                 );
-                $terms = get_terms( 'parking', $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'parking' ) ) );
                 
                 $selected_values = array();
                 $term_list = wp_get_post_terms($post->ID, 'parking', array("fields" => "ids"));
@@ -368,7 +378,7 @@ class PH_Meta_Box_Appraisal_Property {
                     'hide_empty' => false,
                     'parent' => 0
                 );
-                $terms = get_terms( 'outside_space', $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'outside_space' ) ) );
                 
                 $selected_values = array();
                 $term_list = wp_get_post_terms($post->ID, 'outside_space', array("fields" => "ids"));
@@ -479,40 +489,53 @@ class PH_Meta_Box_Appraisal_Property {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
+        $request_post = wp_unslash( $_POST );
+
         global $wpdb;
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status != 'instructed' )
         {
-            update_post_meta( $post_id, '_address_name_number', ph_clean($_POST['_address_name_number']) );
-            update_post_meta( $post_id, '_address_street', ph_clean($_POST['_address_street']) );
-            update_post_meta( $post_id, '_address_two', ph_clean($_POST['_address_two']) );
-            update_post_meta( $post_id, '_address_three', ph_clean($_POST['_address_three']) );
-            update_post_meta( $post_id, '_address_four', ph_clean($_POST['_address_four']) );
-            update_post_meta( $post_id, '_address_postcode', ph_clean($_POST['_address_postcode']) );
-            update_post_meta( $post_id, '_address_country', ph_clean($_POST['_address_country']) );
+            $address_name_number = ( isset( $request_post['_address_name_number'] ) && is_string( $request_post['_address_name_number'] ) ) ? sanitize_text_field( $request_post['_address_name_number'] ) : '';
+            $address_street = ( isset( $request_post['_address_street'] ) && is_string( $request_post['_address_street'] ) ) ? sanitize_text_field( $request_post['_address_street'] ) : '';
+            $address_two = ( isset( $request_post['_address_two'] ) && is_string( $request_post['_address_two'] ) ) ? sanitize_text_field( $request_post['_address_two'] ) : '';
+            $address_three = ( isset( $request_post['_address_three'] ) && is_string( $request_post['_address_three'] ) ) ? sanitize_text_field( $request_post['_address_three'] ) : '';
+            $address_four = ( isset( $request_post['_address_four'] ) && is_string( $request_post['_address_four'] ) ) ? sanitize_text_field( $request_post['_address_four'] ) : '';
+            $address_postcode = ( isset( $request_post['_address_postcode'] ) && is_string( $request_post['_address_postcode'] ) ) ? sanitize_text_field( $request_post['_address_postcode'] ) : '';
+            $address_country = ( isset( $request_post['_address_country'] ) && is_string( $request_post['_address_country'] ) ) ? sanitize_text_field( $request_post['_address_country'] ) : '';
+            $department = ( isset( $request_post['_department'] ) && is_string( $request_post['_department'] ) ) ? sanitize_text_field( $request_post['_department'] ) : '';
+            update_post_meta( $post_id, '_address_name_number', wp_slash( $address_name_number ) );
+            update_post_meta( $post_id, '_address_street', wp_slash( $address_street ) );
+            update_post_meta( $post_id, '_address_two', wp_slash( $address_two ) );
+            update_post_meta( $post_id, '_address_three', wp_slash( $address_three ) );
+            update_post_meta( $post_id, '_address_four', wp_slash( $address_four ) );
+            update_post_meta( $post_id, '_address_postcode', wp_slash( $address_postcode ) );
+            update_post_meta( $post_id, '_address_country', wp_slash( $address_country ) );
 
-            update_post_meta( $post_id, '_department', ph_clean($_POST['_department']) );
+            update_post_meta( $post_id, '_department', wp_slash( $department ) );
 
-            $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bedrooms']));
-            update_post_meta( $post_id, '_bedrooms', $rooms );
+            $bedrooms = ( isset( $request_post['_bedrooms'] ) && is_string( $request_post['_bedrooms'] ) ) ? preg_replace( '/[^0-9]/', '', sanitize_text_field( $request_post['_bedrooms'] ) ) : '';
+            $bathrooms = ( isset( $request_post['_bathrooms'] ) && is_string( $request_post['_bathrooms'] ) ) ? preg_replace( '/[^0-9]/', '', sanitize_text_field( $request_post['_bathrooms'] ) ) : '';
+            $reception_rooms = ( isset( $request_post['_reception_rooms'] ) && is_string( $request_post['_reception_rooms'] ) ) ? preg_replace( '/[^0-9]/', '', sanitize_text_field( $request_post['_reception_rooms'] ) ) : '';
+            update_post_meta( $post_id, '_bedrooms', $bedrooms );
+            update_post_meta( $post_id, '_bathrooms', $bathrooms );
+            update_post_meta( $post_id, '_reception_rooms', $reception_rooms );
 
-            $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_bathrooms']));
-            update_post_meta( $post_id, '_bathrooms', $_POST['_bathrooms'] );
-
-            $rooms = preg_replace("/[^0-9]/", '', ph_clean($_POST['_reception_rooms']));
-            update_post_meta( $post_id, '_reception_rooms', $_POST['_reception_rooms'] );
-
-            $property_types = array();
-            if ( isset( $_POST['property_type_id'] ) && !empty( $_POST['property_type_id'] ) )
+            $property_types = self::normalize_term_ids( $request_post, 'property_type_id' );
+            if ( null === $property_types )
             {
-                foreach ( $_POST['property_type_id'] as $property_type_id )
-                {
-                    $property_types[] = (int)$property_type_id;
-                }
+                // Ignore malformed scalar submissions and preserve existing terms.
             }
-            if ( !empty($property_types) )
+            elseif ( ! empty( $property_types ) )
             {
                 wp_set_post_terms( $post_id, $property_types, 'property_type' );
             }
@@ -522,15 +545,12 @@ class PH_Meta_Box_Appraisal_Property {
                 wp_delete_object_term_relationships( $post_id, 'property_type' );
             }
 
-            $parkings = array();
-            if ( isset( $_POST['parking_ids'] ) && !empty( $_POST['parking_ids'] ) )
+            $parkings = self::normalize_term_ids( $request_post, 'parking_ids' );
+            if ( null === $parkings )
             {
-                foreach ( $_POST['parking_ids'] as $parking_id )
-                {
-                    $parkings[] = (int)$parking_id;
-                }
+                // Ignore malformed scalar submissions and preserve existing terms.
             }
-            if ( !empty($parkings) )
+            elseif ( ! empty( $parkings ) )
             {
                 wp_set_post_terms( $post_id, $parkings, 'parking' );
             }
@@ -539,15 +559,12 @@ class PH_Meta_Box_Appraisal_Property {
                 wp_delete_object_term_relationships( $post_id, 'parking' );
             }
             
-            $outside_spaces = array();
-            if ( isset( $_POST['outside_space_ids'] ) && !empty( $_POST['outside_space_ids'] ) )
+            $outside_spaces = self::normalize_term_ids( $request_post, 'outside_space_ids' );
+            if ( null === $outside_spaces )
             {
-                foreach ( $_POST['outside_space_ids'] as $outside_space_id )
-                {
-                    $outside_spaces[] = (int)$outside_space_id;
-                }
+                // Ignore malformed scalar submissions and preserve existing terms.
             }
-            if ( !empty($outside_spaces) )
+            elseif ( ! empty( $outside_spaces ) )
             {
                 wp_set_post_terms( $post_id, $outside_spaces, 'outside_space' );
             }
@@ -556,15 +573,49 @@ class PH_Meta_Box_Appraisal_Property {
                 wp_delete_object_term_relationships( $post_id, 'outside_space' );
             }
 
-            if ( isset( $_POST['_council_tax_band'] ) )
+            if ( isset( $request_post['_council_tax_band'] ) && is_string( $request_post['_council_tax_band'] ) )
             {
-                update_post_meta( $post_id, '_council_tax_band', $_POST['_council_tax_band'] );
+                update_post_meta( $post_id, '_council_tax_band', wp_slash( sanitize_text_field( $request_post['_council_tax_band'] ) ) );
             }
 
-            update_post_meta( $post_id, '_additional_property_information', sanitize_textarea_field($_POST['_additional_property_information']) );
+            $additional_property_information = ( isset( $request_post['_additional_property_information'] ) && is_string( $request_post['_additional_property_information'] ) ) ? sanitize_textarea_field( $request_post['_additional_property_information'] ) : '';
+            update_post_meta( $post_id, '_additional_property_information', wp_slash( $additional_property_information ) );
         }
 
         do_action( 'propertyhive_save_appraisal_property_details', $post_id );
+    }
+
+    /**
+     * Normalize a multi-select taxonomy request value.
+     *
+     * @param array  $request_post Uns lashed request data.
+     * @param string $key          Request key.
+     * @return array|null
+     */
+    private static function normalize_term_ids( $request_post, $key ) {
+        if ( ! array_key_exists( $key, $request_post ) )
+        {
+            return array();
+        }
+        if ( ! is_array( $request_post[ $key ] ) )
+        {
+            return null;
+        }
+
+        $term_ids = array();
+        foreach ( $request_post[ $key ] as $term_id )
+        {
+            if ( ! is_scalar( $term_id ) )
+            {
+                return null;
+            }
+            if ( absint( $term_id ) > 0 )
+            {
+                $term_ids[] = absint( $term_id );
+            }
+        }
+
+        return array_values( array_unique( $term_ids ) );
     }
 
 }
