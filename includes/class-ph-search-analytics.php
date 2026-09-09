@@ -71,6 +71,7 @@ class PH_Search_Analytics
 
 		$this->recorded = true;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Append a UTC timestamp to the plugin's custom analytics table using wpdb field formats.
 		$result = $wpdb->insert(
 			$wpdb->prefix . 'ph_search_log',
 			array(
@@ -91,14 +92,14 @@ class PH_Search_Analytics
 	{
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'ph_search_log';
 		$cutoff     = gmdate( 'Y-m-d H:i:s', strtotime( '-90 days' ) );
 
 		do
 		{
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Retention deletes batches from the custom analytics table; its counts are read live and have no object-cache entries.
 			$deleted = $wpdb->query(
 				$wpdb->prepare(
-					"DELETE FROM {$table_name}
+					"DELETE FROM {$wpdb->prefix}ph_search_log
 					WHERE searched_at < %s
 					ORDER BY searched_at ASC
 					LIMIT 500",

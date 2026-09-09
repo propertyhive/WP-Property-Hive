@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Preserve the existing public PH_User_Contacts extension-compatible class name.
 class PH_User_Contacts {
 
 	/**
@@ -37,6 +38,7 @@ class PH_User_Contacts {
 	 */
 	public static function redirect_to_my_account_if_logged_in() {
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only Divi builder indicator only bypasses the account-page redirect; it performs no state change.
 		if ( is_admin() || ( defined('DOING_AJAX') && DOING_AJAX ) || isset($_GET['et_fb']) )
 		{
 			return;
@@ -57,7 +59,7 @@ class PH_User_Contacts {
 			$my_account_page_id = get_option( 'propertyhive_my_account_page_id', '' );
 			if ( !empty($my_account_page_id) )
 			{
-				wp_redirect( get_permalink($my_account_page_id) );
+				wp_safe_redirect( get_permalink($my_account_page_id) );
 				exit();
 			}
 		}
@@ -67,17 +69,35 @@ class PH_User_Contacts {
 	 * Listen for logout parameter
 	 * @return void
 	 */
-	public static function listen_for_logout( $user_id ) {
+	public static function listen_for_logout( $user_id = 0 ) {
 
-		if ( isset($_GET['logout']) && $_GET['logout'] == 1 )
-		{
-			wp_logout();
+        if ( ! isset( $_GET['logout'] ) || ! is_string( $_GET['logout'] ) || $_GET['logout'] !== '1' ) {
+            return;
+        }
+        if ( ! isset( $_GET['_wpnonce'] ) || ! is_string( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'log-out' ) ) {
+            // Cached/legacy links must ask for confirmation without logging out first.
+            // Keep the confirmation on our route so the existing post-logout redirect filter still runs.
+            $confirmation_url = static function( $url ) {
+                return wp_nonce_url( add_query_arg( 'logout', '1', home_url( '/' ) ), 'log-out' );
+            };
+            add_filter( 'logout_url', $confirmation_url, PHP_INT_MAX );
+            // Core wp_nonce_ays reads redirect_to before calling logout_url. This route
+            // uses its own redirect hook and must not forward arbitrary request values.
+            $_REQUEST['redirect_to'] = '';
+            try {
+                wp_nonce_ays( 'log-out' );
+            } finally {
+                remove_filter( 'logout_url', $confirmation_url, PHP_INT_MAX );
+            }
+            return;
+        }
 
-			// For now redirect to homepage with filter
-			wp_redirect( apply_filters( 'property_logout_redirect_url', home_url( '/' ) ) );
-			exit;
-		}
-	}
+        wp_logout();
+
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public property_logout_redirect_url hook must remain available to installed extensions.
+        wp_safe_redirect( apply_filters( 'property_logout_redirect_url', home_url( '/' ) ) );
+        exit;
+    }
 
 	/**
 	 * When user is registered ensure they're also entered as a contact
@@ -185,8 +205,7 @@ class PH_User_Contacts {
 			else
 			{
 				// Something went wrong when inserting the user
-				var_dump($user_id);
-				die();
+				wp_die( esc_html( implode( ' ', $user_id->get_error_messages() ) ) );
 			}
 		}
 		else

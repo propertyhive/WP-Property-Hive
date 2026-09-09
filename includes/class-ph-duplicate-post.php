@@ -44,6 +44,7 @@ class PH_Duplicate_Post {
 		}
 
 		$post = get_post( $new_post_id );
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core hook save_post; renaming it would break the core hook contract.
 		do_action( "save_post", $new_post_id, $post, false );
 	}
 }

@@ -24,6 +24,7 @@ function propertyhive_update_1468_on_market_change_dates() {
         'post_type' => 'property',
         'fields' => 'ids',
         'post_status' => 'publish',
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- This maintenance backfill must select records missing the destination metadata; removing the predicate would overwrite existing values.
         'meta_query' => array(
             array(
                 'key' => '_on_market',
@@ -35,6 +36,7 @@ function propertyhive_update_1468_on_market_change_dates() {
             )
         ),
         'nopaging' => true,
+        // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters -- Maintenance must cover every language; front-end language filters would omit records from this backfill.
         'suppress_filters' => true,
     );
     $property_query =  new WP_Query($args);

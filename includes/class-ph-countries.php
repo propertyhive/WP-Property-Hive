@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -37,17 +40,39 @@ class PH_Countries {
 		}
 	}
 
+	/**
+	 * Resolve a cookie choice using trusted currency definitions and current rates.
+	 */
+	public function get_currency_from_cookie() {
+		if ( ! isset( $_COOKIE['propertyhive_currency'] ) || ! is_string( $_COOKIE['propertyhive_currency'] ) ) {
+			return false;
+		}
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Decode the JSON envelope, then validate its only accepted field against the server's currency definitions below.
+		$stored = json_decode( html_entity_decode( wp_unslash( $_COOKIE['propertyhive_currency'] ) ), true );
+		if ( ! is_array( $stored ) || ! isset( $stored['currency_code'] ) || ! is_string( $stored['currency_code'] ) ) {
+			return false;
+		}
+		$code = sanitize_text_field( $stored['currency_code'] );
+		$currency = $this->get_currency( $code );
+		if ( false === $currency ) {
+			return false;
+		}
+		$rates = get_option( 'propertyhive_currency_exchange_rates', array() );
+		$currency['exchange_rate'] = isset( $rates[ $code ] ) && is_numeric( $rates[ $code ] ) ? (float) $rates[ $code ] : 1;
+		return $currency;
+	}
+
 	public function ensure_currency_value_set( $form_controls )
 	{
 		if ( isset($form_controls['currency']) )
 		{
-			if ( isset($_GET['currency']) && $_GET['currency'] != '' )
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Currency is a read-only display preference.
+			if ( isset($_GET['currency']) && is_string( $_GET['currency'] ) && $_GET['currency'] != '' )
 			{
 
 			}
-			elseif ( isset($_COOKIE['propertyhive_currency']) && $_COOKIE['propertyhive_currency'] != '' )
+			elseif ( false !== ( $currency = $this->get_currency_from_cookie() ) )
 			{
-				$currency = @json_decode(html_entity_decode($_COOKIE['propertyhive_currency']), TRUE);
 				if ( !empty($currency) && isset($currency['currency_code']) && array_key_exists(ph_clean($currency['currency_code']), $form_controls['currency']['options']) )
 				{
 					$form_controls['currency']['value'] = $currency['currency_code'];
@@ -60,9 +85,12 @@ class PH_Countries {
 
 	public function ph_check_currency_change()
 	{
-		if ( is_post_type_archive('property') && isset($_GET['currency']) )
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public currency choice changes only the visitor's display-preference cookie.
+		if ( is_post_type_archive('property') && isset($_GET['currency']) && is_string( $_GET['currency'] ) )
 		{
-			if ( $_GET['currency'] == '' )
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public currency choice changes only the visitor's display-preference cookie.
+			$currency_code = sanitize_text_field( wp_unslash( $_GET['currency'] ) );
+			if ( $currency_code == '' )
 			{
 				// Set to blank to reset back to properties entered currency
 				unset( $_COOKIE['propertyhive_currency'] );
@@ -70,7 +98,7 @@ class PH_Countries {
 				return true;
 			}
 
-			$currency = $this->get_currency( sanitize_text_field($_GET['currency']) );
+			$currency = $this->get_currency( $currency_code );
 			if ( $currency === FALSE )
 			{
 				$default_country = get_option( 'propertyhive_default_country', 'GB' );
@@ -81,9 +109,9 @@ class PH_Countries {
 
 			$currency['exchange_rate'] = 1;
 			$exchange_rates = get_option( 'propertyhive_currency_exchange_rates', array() );
-			if ( isset($exchange_rates[$_GET['currency']]) )
+			if ( isset($exchange_rates[$currency_code]) )
 			{
-				$currency['exchange_rate'] = $exchange_rates[sanitize_text_field($_GET['currency'])];
+				$currency['exchange_rate'] = $exchange_rates[$currency_code];
 			}
 			
 			ph_setcookie( 'propertyhive_currency', htmlentities(json_encode($currency)), time() + (30 * DAY_IN_SECONDS), is_ssl() );
@@ -485,7 +513,7 @@ class PH_Countries {
 				if ( $selected_country == $key || ( $selected_country == '' && $key == 'GB' ) ) {
 					echo ' selected="selected"';
 				}
-				echo ' value="' . esc_attr( $key ) . '">' . ( $escape ? esc_js( $value['name'] ) : $value['name'] ) . '</option>';
+				echo ' value="' . esc_attr( $key ) . '">' . ( $escape ? esc_js( $value['name'] ) : esc_html( $value['name'] ) ) . '</option>';
 			}
 		}
 	}
@@ -700,7 +728,7 @@ class PH_Countries {
 			{
 				// Get all currency exchange rates from GBP
 				// We're using the API from https://github.com/fawazahmed0/exchange-api
-				$url = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/gbp.json';
+				$url = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/gbp.json'; // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- Retrieves current exchange-rate data from the configured currency service.
 				$response = wp_remote_get( $url );
 
 				if ( is_array( $response ) )
@@ -736,7 +764,7 @@ class PH_Countries {
 			{
 				$exchange_rates['GBP'] = "1.0000";
 				update_option( 'propertyhive_currency_exchange_rates', $exchange_rates );
-				update_option( 'propertyhive_currency_exchange_rates_updated', date("Y-m-d") );
+				update_option( 'propertyhive_currency_exchange_rates_updated', gmdate("Y-m-d") );
 			}
 
 			do_action('propertyhive_exchange_rates_updated', $exchange_rates);
@@ -746,6 +774,7 @@ class PH_Countries {
 				'post_type' => 'property',
 				'fields' => 'ids',
 				'post_status' => 'publish',
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Currency recalculation must select all published on-market properties outside GB using their stored market/country metadata.
 				'meta_query' => array(
 					array(
 						'key' => '_on_market',

@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category    Class
  * @author      PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Third_Party_Contacts; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Third_Party_Contacts {
 
 	private $categories;

@@ -15,6 +15,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PH_Form_Handler {
 
+    /** Normalize only database-backed form markup, before trusted PHP filters. */
+    public static function sanitize_saved_search_form_fields( $fields ) {
+        foreach ( $fields as $field_id => $field ) {
+            if ( ! is_array( $field ) ) {
+                unset( $fields[$field_id] );
+                continue;
+            }
+            foreach ( array( 'label', 'before', 'after' ) as $key ) {
+                if ( isset( $field[$key] ) ) {
+                    $fields[$field_id][$key] = is_string( $field[$key] ) ? wp_kses_post( $field[$key] ) : '';
+                }
+            }
+        }
+        return $fields;
+    }
+
 	public function __construct() {
 
 		add_action( 'init', array( $this, 'add_captcha_to_forms' ) );
@@ -35,9 +51,9 @@ class PH_Form_Handler {
                         ( 
                             isset($current_settings['search_forms'][$form_id]['active_fields'])
                             &&
-                            !empty($current_settings['search_forms'][$form_id]['active_fields'])
+                            is_array($current_settings['search_forms'][$form_id]['active_fields']) && !empty($current_settings['search_forms'][$form_id]['active_fields'])
                         ) ? 
-                        $current_settings['search_forms'][$form_id]['active_fields'] : 
+                        self::sanitize_saved_search_form_fields( $current_settings['search_forms'][$form_id]['active_fields'] ) :
                         $fields 
                     );
                     

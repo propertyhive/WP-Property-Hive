@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category    Class
  * @author      PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Contact; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Contact {
 
     /** @public int Contact (post) ID */
@@ -30,6 +31,7 @@ class PH_Contact {
         if ( $user_id > 0 )
         {
             // We've been passed a user ID. Need to get contact ID based on user_id
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- PH_Contact maps one WordPress user ID to one contact with fields=ids and posts_per_page=1. Both meta key and scalar value are fixed/typed; one-row result.
             $contact_query = new WP_Query( array( 'post_type' => 'contact', 'meta_key' =>  '_user_id', 'meta_value' => $user_id, 'fields' => 'ids', 'posts_per_page' => 1 ) );
 
             if ( $contact_query->have_posts() )

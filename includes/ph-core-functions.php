@@ -27,6 +27,7 @@ include( 'ph-property-functions.php' );
  * @param string $name (default: '')
  * @return void
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_template_part; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_template_part( $slug, $name = '' ) {
     $template = '';
 
@@ -46,6 +47,7 @@ function ph_get_template_part( $slug, $name = '' ) {
     }
 
     // Allow 3rd party plugin filter template file from their plugin
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public Property Hive extension hook ph_get_template_part; changing the established name would detach installed callbacks.
     $template = apply_filters( 'ph_get_template_part', $template, $slug, $name );
 
     if ( $template ) {
@@ -63,6 +65,7 @@ function ph_get_template_part( $slug, $name = '' ) {
  * @param string $default_path (default: '')
  * @return void
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_template; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_template( $template_name, $args = array(), $template_path = '', $default_path = '' ) {
     if ( $args && is_array( $args ) ) {
         extract( $args );
@@ -71,7 +74,7 @@ function ph_get_template( $template_name, $args = array(), $template_path = '', 
     $located = ph_locate_template( $template_name, $template_path, $default_path );
 
     if ( ! file_exists( $located ) ) {
-        _doing_it_wrong( __FUNCTION__, sprintf( '<code>%s</code> does not exist.', $located ), '2.1' );
+        _doing_it_wrong( __FUNCTION__, sprintf( '<code>%s</code> does not exist.', esc_html( $located ) ), '2.1' );
         return;
     }
 
@@ -97,6 +100,7 @@ function ph_get_template( $template_name, $args = array(), $template_path = '', 
  * @param string $default_path (default: '')
  * @return string
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_locate_template; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_locate_template( $template_name, $template_path = '', $default_path = '' ) {
     if ( ! $template_path ) {
         $template_path = PH()->template_path();
@@ -131,10 +135,12 @@ function ph_locate_template( $template_name, $template_path = '', $default_path 
  * @param  integer $expire Expiry of the cookie
  * @param  string  $secure Whether the cookie should be served only over https
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_setcookie; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_setcookie( $name, $value, $expire = 0, $secure = false ) {
     if ( ! headers_sent() ) {
         return setcookie( $name, $value, $expire, COOKIEPATH, COOKIE_DOMAIN, $secure );
     } elseif ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error -- Intentional developer notice, enabled only by WP_DEBUG, for a failed cookie API call; no request or private data is included.
         trigger_error( "Cookie cannot be set - headers already sent", E_USER_NOTICE );
     }
     return false;
@@ -146,6 +152,7 @@ function ph_setcookie( $name, $value, $expire = 0, $secure = false ) {
  * @param mixed $image_size
  * @return array
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_image_size; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_image_size( $image_size ) {
     if ( is_array( $image_size ) ) {
         $width  = isset( $image_size[0] ) ? $image_size[0] : '300';
@@ -170,6 +177,7 @@ function ph_get_image_size( $image_size ) {
     return $size;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_custom_departments; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_custom_departments( $active_only = true )
 {
     $return = array();
@@ -190,6 +198,7 @@ function ph_get_custom_departments( $active_only = true )
     return $return;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_custom_department_based_on; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_custom_department_based_on( $department )
 {
     $custom_departments = get_option( 'propertyhive_custom_departments', array() );
@@ -202,6 +211,7 @@ function ph_get_custom_department_based_on( $department )
     return false;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_departments; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_departments( $raw = false )
 {
     $departments = array(
@@ -213,6 +223,7 @@ function ph_get_departments( $raw = false )
     return $raw ? $departments : apply_filters( 'propertyhive_departments', $departments );
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_viewing_statuses; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_viewing_statuses()
 {
     $viewing_statuses = array(
@@ -230,6 +241,7 @@ function ph_get_viewing_statuses()
     return $viewing_statuses;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper add_viewing_status_meta_query; the established callable name is part of the plugin/extension API and must remain stable.
 function add_viewing_status_meta_query( $meta_query, $selected_status )
 {
     switch ( $selected_status )
@@ -322,6 +334,7 @@ function add_viewing_status_meta_query( $meta_query, $selected_status )
     return $meta_query;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_offer_statuses; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_offer_statuses()
 {
     $offer_statuses = array(
@@ -333,6 +346,7 @@ function ph_get_offer_statuses()
     return $offer_statuses;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_sale_statuses; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_sale_statuses()
 {
     $sale_statuses = array(
@@ -345,6 +359,7 @@ function ph_get_sale_statuses()
     return $sale_statuses;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_enquiry_statuses; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_enquiry_statuses()
 {
     $enquiry_statuses = array(
@@ -355,6 +370,7 @@ function ph_get_enquiry_statuses()
     return $enquiry_statuses;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_area_units; the established callable name is part of the plugin/extension API and must remain stable.
 function get_area_units()
 {
     $size_options = array(
@@ -371,6 +387,7 @@ function get_area_units()
     return $size_options;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper convert_size_to_sqft; the established callable name is part of the plugin/extension API and must remain stable.
 function convert_size_to_sqft( $size, $unit = 'sqft' )
 {
     $size_sqft = $size;
@@ -387,6 +404,7 @@ function convert_size_to_sqft( $size, $unit = 'sqft' )
     return $size_sqft;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_commercial_price_units; the established callable name is part of the plugin/extension API and must remain stable.
 function get_commercial_price_units( )
 {
     $price_options = array(
@@ -406,6 +424,7 @@ function get_commercial_price_units( )
  * @param bool $return_number Include $n in the string returned
  * @return string $number including its ordinal suffix
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_ordinal_suffix; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_ordinal_suffix( $number, $return_words = true, $return_number = true )
 {
     $n_last = $number % 100;
@@ -445,4 +464,59 @@ function ph_ordinal_suffix( $number, $return_words = true, $return_number = true
         }
     }
     return $return_words ? $number_in_words : ( $return_number ? $number . $suffix : $suffix );
+}
+/**
+ * Save an ordered property media list without modifying unauthorized attachments.
+ * The caller verifies the property form nonce before invoking this helper.
+ *
+ * @param int    $post_id Property ID.
+ * @param string $meta_key Media list key.
+ * @param string $submitted_ids Comma-separated attachment IDs.
+ * @return bool Whether the list was saved.
+ */
+function propertyhive_save_media_attachment_list( $post_id, $meta_key, $submitted_ids ) {
+    if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || 'property' !== get_post_type( $post_id ) ) {
+        return false;
+    }
+    if ( ! in_array( $meta_key, array( '_photos', '_floorplans', '_brochures', '_epcs' ), true ) || ! is_string( $submitted_ids ) || ! preg_match( '/^[0-9,\s]*$/D', $submitted_ids ) ) {
+        return false;
+    }
+    $ids = array_values( array_unique( array_filter( array_map( 'absint', explode( ',', $submitted_ids ) ) ) ) );
+    $previous_ids = get_post_meta( $post_id, $meta_key, true );
+    $previous_ids = is_array( $previous_ids ) ? array_map( 'absint', $previous_ids ) : array();
+    foreach ( $ids as $attachment_id ) {
+        if ( 'attachment' !== get_post_type( $attachment_id ) || ! current_user_can( 'edit_post', $attachment_id ) ) {
+            return false;
+        }
+    }
+    foreach ( $ids as $attachment_id ) {
+        wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $post_id ) );
+        clean_attachment_cache( $attachment_id );
+    }
+    update_post_meta( $post_id, $meta_key, $ids );
+    foreach ( array_diff( $previous_ids, $ids ) as $attachment_id ) {
+        if ( 'attachment' === get_post_type( $attachment_id ) && (int) get_post_field( 'post_parent', $attachment_id ) === (int) $post_id && current_user_can( 'edit_post', $attachment_id ) ) {
+            wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => 0 ) );
+            clean_attachment_cache( $attachment_id );
+        }
+    }
+    return true;
+}
+
+/**
+ * Determine public visibility on all supported WordPress versions.
+ *
+ * @param int|WP_Post $post Post to inspect.
+ * @return bool Whether anonymous visitors may view it.
+ */
+function propertyhive_is_post_publicly_viewable( $post ) {
+    if ( function_exists( 'is_post_publicly_viewable' ) ) {
+        return is_post_publicly_viewable( $post );
+    }
+    $post = get_post( $post );
+    if ( ! $post || ! is_post_type_viewable( get_post_type_object( $post->post_type ) ) ) {
+        return false;
+    }
+    $status = get_post_status_object( $post->post_status );
+    return $status && ! empty( $status->public );
 }

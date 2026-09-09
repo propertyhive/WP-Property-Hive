@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category    Class
  * @author      PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Tenancy; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Tenancy {
 
     /** @public int Tenancy (post) ID */
@@ -118,7 +119,7 @@ class PH_Tenancy {
 
         $amount = $this->_rent;
 
-        return ( ( $amount != '' ) ? $prefix . ph_display_price_field($amount) : '-' ) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' );
+        return ( ( $amount != '' ) ? $prefix . ph_display_price_field($amount) : '-' ) . $suffix . ' ' . propertyhive_get_rent_frequency_label( $this->_rent_frequency );
 
     }
 
@@ -162,7 +163,7 @@ class PH_Tenancy {
             $applicants = array();
             foreach ( $applicant_contact_ids as $applicant_contact_id )
             {
-                $applicant_name = get_the_title($applicant_contact_id);
+                $applicant_name = esc_html( get_the_title( $applicant_contact_id ) );
                 if ( $add_hyperlinks )
                 {
                     $edit_link = get_edit_post_link( $applicant_contact_id );
@@ -174,13 +175,13 @@ class PH_Tenancy {
                     $telephone_number = get_post_meta( $applicant_contact_id, '_telephone_number', true );
                     if( !empty($telephone_number) )
                     {
-                        $contact_details[] = 'T: ' . $telephone_number;
+                        $contact_details[] = 'T: ' . esc_html( $telephone_number );
                     }
 
                     $email_address = get_post_meta( $applicant_contact_id, '_email_address', true );
                     if( !empty($email_address) )
                     {
-                        $contact_details[] = 'E: ' . $email_address;
+                        $contact_details[] = 'E: ' . esc_html( $email_address );
                     }
 
                     if ( !empty($contact_details) )

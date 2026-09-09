@@ -53,7 +53,7 @@ class PH_Comments {
             {
             	if ( apply_filters( 'propertyhive_add_property_availability_change_note', true ) === true )
             	{
-	                $all_availability_terms = get_terms( 'availability', array( 'hide_empty' => 0 ) );
+	                $all_availability_terms = get_terms( array_merge( wp_parse_args( array( 'hide_empty' => 0 ) ), array( 'taxonomy' => 'availability' ) ) );
 
 	                $old_availability_id = '';
 	                $old_availability_name = '';
@@ -102,7 +102,7 @@ class PH_Comments {
 		                'comment_author'       => $current_user->display_name,
 		                'comment_author_email' => 'propertyhive@noreply.com',
 		                'comment_author_url'   => '',
-		                'comment_date'         => date("Y-m-d H:i:s"),
+		                'comment_date'         => gmdate("Y-m-d H:i:s"),
 		                'comment_content'      => serialize($comment),
 		                'comment_approved'     => 1,
 		                'comment_type'         => 'propertyhive_note',
@@ -110,7 +110,7 @@ class PH_Comments {
 		            $comment_id = wp_insert_comment( $data );
 		        }
 
-	            update_post_meta( $object_id, '_availability_change_date', date("Y-m-d H:i:s") );
+	            update_post_meta( $object_id, '_availability_change_date', gmdate("Y-m-d H:i:s") );
             }
         }
     }
@@ -175,6 +175,7 @@ class PH_Comments {
 			case "contact": {
 				// check contact type, then add to property if owner
 				$contact_types = get_post_meta( $post_id, '_contact_types', TRUE );
+				$contact_types = is_array( $contact_types ) ? $contact_types : ( is_string( $contact_types ) && '' !== $contact_types ? array( $contact_types ) : array() );
 				if ( in_array('owner', $contact_types) )
 				{
 					// this contact is an owner
@@ -183,6 +184,7 @@ class PH_Comments {
 						'post_type' => 'property',
 						'nopaging' => true,
 						'fields' => 'ids',
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Notes must link every owned property; supports both scalar and serialized legacy owner IDs and fetches IDs only.
 						'meta_query' => array(
 							'relation' => 'OR',
 							array(
@@ -278,6 +280,7 @@ class PH_Comments {
 			}
 		}
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public Property Hive extension hook property_insert_note_related_to; changing the established name would detach installed callbacks.
 		$related_to = apply_filters( 'property_insert_note_related_to', $related_to, $post_id );
 
 		$related_to = array_filter( $related_to );
@@ -294,7 +297,7 @@ class PH_Comments {
             'comment_author'       => $current_user->display_name,
             'comment_author_email' => 'propertyhive@noreply.com',
             'comment_author_url'   => '',
-            'comment_date'         => date("Y-m-d H:i:s"),
+            'comment_date'         => gmdate("Y-m-d H:i:s"),
             'comment_content'      => serialize($comment),
             'comment_approved'     => 1,
             'comment_type'         => 'propertyhive_note',
@@ -302,7 +305,7 @@ class PH_Comments {
             	'related_to' => $new_related_to,
             ),
         );
-        $comment_id = wp_insert_comment( $data );
+        $comment_id = wp_insert_comment( wp_slash( $data ) );
 
         return $comment_id;
 	}
@@ -332,7 +335,7 @@ class PH_Comments {
 		                'comment_author'       => $current_user->display_name,
 		                'comment_author_email' => 'propertyhive@noreply.com',
 		                'comment_author_url'   => '',
-		                'comment_date'         => date("Y-m-d H:i:s"),
+		                'comment_date'         => gmdate("Y-m-d H:i:s"),
 		                'comment_content'      => serialize($comment),
 		                'comment_approved'     => 1,
 		                'comment_type'         => 'propertyhive_note',
@@ -340,7 +343,7 @@ class PH_Comments {
 		            $comment_id = wp_insert_comment( $data );
 		        }
 
-	            update_post_meta( $object_id, '_price_change_date', date("Y-m-d H:i:s") );
+	            update_post_meta( $object_id, '_price_change_date', gmdate("Y-m-d H:i:s") );
 			}
 		}
 	}
@@ -368,7 +371,7 @@ class PH_Comments {
 		                'comment_author'       => $current_user->display_name,
 		                'comment_author_email' => 'propertyhive@noreply.com',
 		                'comment_author_url'   => '',
-		                'comment_date'         => date("Y-m-d H:i:s"),
+		                'comment_date'         => gmdate("Y-m-d H:i:s"),
 		                'comment_content'      => serialize($comment),
 		                'comment_approved'     => 1,
 		                'comment_type'         => 'propertyhive_note',
@@ -376,7 +379,7 @@ class PH_Comments {
 		            $comment_id = wp_insert_comment( $data );
 				}
 
-				update_post_meta( $object_id, '_on_market_change_date', date("Y-m-d H:i:s") );
+				update_post_meta( $object_id, '_on_market_change_date', gmdate("Y-m-d H:i:s") );
 			}
 		}
 	}
@@ -410,7 +413,7 @@ class PH_Comments {
 		                'comment_author'       => $current_user->display_name,
 		                'comment_author_email' => 'propertyhive@noreply.com',
 		                'comment_author_url'   => '',
-		                'comment_date'         => date("Y-m-d H:i:s"),
+		                'comment_date'         => gmdate("Y-m-d H:i:s"),
 		                'comment_content'      => serialize($comment),
 		                'comment_approved'     => 1,
 		                'comment_type'         => 'propertyhive_note',
@@ -418,7 +421,7 @@ class PH_Comments {
 		            $comment_id = wp_insert_comment( $data );
 				}
 
-				update_post_meta( $object_id, '_on_market_change_date', date("Y-m-d H:i:s") );
+				update_post_meta( $object_id, '_on_market_change_date', gmdate("Y-m-d H:i:s") );
 			}
 		}
 	}
@@ -433,18 +436,24 @@ class PH_Comments {
 	public static function exclude_note_comments( $clauses ) {
 		//global $wpdb, $typenow;
 
-		if ( is_admin() && function_exists( 'get_current_screen' ) )
+		if ( is_admin() && current_user_can( 'manage_propertyhive' ) && function_exists( 'get_current_screen' ) )
 		{
 			$screen = get_current_screen();
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only query visibility filter; the authorized CRM action verifies its own nonce before requesting notes.
+			$post_action = isset( $_POST['action'] ) && is_string( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only CRM screen context; manage_propertyhive is checked above.
+			$get_action = isset( $_GET['action'] ) && is_string( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only CRM screen context; manage_propertyhive is checked above.
+			$page = isset( $_GET['page'] ) && is_string( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
 
 			if ( 
 				( isset($screen->id) && in_array( $screen->id, apply_filters( 'propertyhive_post_types_with_notes', array( 'property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale', 'tenancy' ) ) ) )
 				||
-				( wp_doing_ajax() && isset($_POST['action']) && ($_POST['action'] == 'propertyhive_get_notes_grid' || $_POST['action'] == 'propertyhive_get_pinned_notes_grid' || $_POST['action'] == 'propertyhive_merge_contact_records') )
+				( wp_doing_ajax() && in_array( $post_action, array( 'propertyhive_get_notes_grid', 'propertyhive_get_pinned_notes_grid', 'propertyhive_merge_contact_records' ), true ) )
 				||
-				( wp_doing_ajax() && isset($_GET['action']) && strpos($_GET['action'], 'propertyhive_') !== FALSE && strpos($_GET['action'], '_lightbox') !== FALSE )
+				( wp_doing_ajax() && strpos( $get_action, 'propertyhive_' ) !== FALSE && strpos( $get_action, '_lightbox' ) !== FALSE )
 				||
-				( isset($_GET['page']) && substr($_GET['page'], 0, 3) == 'ph-' )
+				( substr( $page, 0, 3 ) == 'ph-' )
 			)
 			{
 				return $clauses; // Don't hide when viewing Property Hive record
@@ -480,6 +489,7 @@ class PH_Comments {
 			$stats = get_transient( 'ph_count_comments' );
 			if ( ! $stats ) {
 				$stats = array();
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Aggregate excludes private CRM notes; ph_count_comments transient above caches this result and comment mutations invalidate it.
 				$count = $wpdb->get_results( "SELECT comment_approved, COUNT( * ) AS num_comments FROM {$wpdb->comments} WHERE comment_type != 'propertyhive_note' GROUP BY comment_approved", ARRAY_A );
 				$total = 0;
 				$approved = array( '0' => 'moderated', '1' => 'approved', 'spam' => 'spam', 'trash' => 'trash', 'post-trashed' => 'post-trashed' );

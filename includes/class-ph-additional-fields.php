@@ -1,9 +1,13 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Preserve the existing public PH_Additional_Fields extension-compatible class name.
 class PH_Additional_Fields {
 
 	public function __construct() {
@@ -51,7 +55,7 @@ class PH_Additional_Fields {
 			                	substr($custom_field['meta_box'], 0, (strlen($post_type)+1)) == $post_type .'_' 
 			                )
 			                {
-			                    $existing_columns[$custom_field['field_name']] = __( $custom_field['field_label'], 'propertyhive' );
+			                    $existing_columns[$custom_field['field_name']] = $custom_field['field_label'];
 			                }
 			            }
 			        }
@@ -86,7 +90,7 @@ class PH_Additional_Fields {
 			                        }
 			                        elseif ( $custom_field['field_type'] == 'date' )
 			                        {
-			                            echo date(get_option( 'date_format' ), strtotime(get_post_meta( $post_id, $custom_field['field_name'], true )));
+			                            echo esc_html( gmdate(get_option( 'date_format' ), strtotime(get_post_meta( $post_id, $custom_field['field_name'], true ))) );
 			                        }
 			                        elseif ( $custom_field['field_type'] == 'image' )
 			                        {
@@ -182,6 +186,7 @@ class PH_Additional_Fields {
 		                        if ( $custom_field['field_name'] == $vars['orderby'] )
 		                        {
 		                            $vars = array_merge( $vars, array(
+		                                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Only a configured sortable custom field for this admin post type reaches this metadata ordering; preserve its existing text-sort contract.
 		                                'meta_key'  => $custom_field['field_name'],
 		                                'orderby'   => 'meta_value'
 		                            ) );
@@ -218,17 +223,18 @@ class PH_Additional_Fields {
 
 	        $meta_boxes_done = array();
             $office_details_fields_exist = false;
-            $offices_opening_section_done = false;
+            $propertyhive_offices_opening_section_done = false;
             foreach ( $current_settings['custom_fields'] as $custom_field )
             {
                 if ( !in_array( $custom_field['meta_box'], $meta_boxes_done ) )
                 {
                     if ( substr( $custom_field['meta_box'], 0, 6 ) == 'office' )
                     {
-                        add_filter( 'propertyhive_' . $custom_field['meta_box'] . '_settings', function( $settings )
+                        add_filter( 'propertyhive_' . $custom_field['meta_box'] . '_settings', function( $settings ) use ( &$propertyhive_offices_opening_section_done )
                         {
-                            global $offices_opening_section_done;
+
                             
+                            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The settings filter reads an optional id to populate office setting defaults and returns a settings array. It does not save options or posts; settings writes occur in a separate guarded save callback.
                             $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
 
                             $meta_box_being_done = str_replace( "propertyhive_", "", current_filter() );
@@ -240,10 +246,10 @@ class PH_Additional_Fields {
                             {
                                 if ( $custom_field['meta_box'] == $meta_box_being_done )
                                 {
-                                    if ( !$offices_opening_section_done )
+                                    if ( !$propertyhive_offices_opening_section_done )
                                     {
                                         $settings[] = array( 'title' => __( 'Additional Fields', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'office_template_assistant_additional_field' );
-                                        $offices_opening_section_done = true;
+                                        $propertyhive_offices_opening_section_done = true;
                                     }
 
                                     switch ( $custom_field['field_type'] )
@@ -297,7 +303,7 @@ class PH_Additional_Fields {
                                 }
                             }
 
-                            if ( $offices_opening_section_done )
+                            if ( $propertyhive_offices_opening_section_done )
                             {
                                 $settings[] = array( 'type' => 'sectionend', 'id' => 'office_template_assistant_additional_field');
                             }
@@ -321,7 +327,10 @@ class PH_Additional_Fields {
                                 {
                                     if ( $custom_field['meta_box'] == $meta_box_being_done )
                                     {
-                                        update_post_meta( $post_id, $custom_field['field_name'], (isset($_POST[$custom_field['field_name']]) ? $_POST[$custom_field['field_name']] : '') );
+                                        $field_value = $this->get_submitted_custom_field_value( $custom_field, true );
+                                        if ( null !== $field_value ) {
+                                            update_post_meta( $post_id, $custom_field['field_name'], wp_slash( $field_value ) );
+                                        }
                                     }
                                 }
                             }
@@ -362,8 +371,8 @@ class PH_Additional_Fields {
                                     elseif ( isset($custom_field['field_type']) && $custom_field['field_type'] == 'multiselect' )
                                     {
     ?>
-    <p class="form-field <?php echo esc_attr($custom_field['field_name']); ?>_field"><label for="<?php echo esc_attr($custom_field['field_name']); ?>"><?php echo esc_html(__( $custom_field['field_label'], 'propertyhive' )); ?></label>
-            <select id="<?php echo esc_attr($custom_field['field_name']); ?>" name="<?php echo esc_attr($custom_field['field_name']); ?>[]" multiple="multiple" data-placeholder="<?php echo esc_attr(__( 'Select ' . $custom_field['field_label'], 'propertyhive' )); ?>" class="multiselect attribute_values">
+    <p class="form-field <?php echo esc_attr($custom_field['field_name']); ?>_field"><label for="<?php echo esc_attr($custom_field['field_name']); ?>"><?php echo esc_html($custom_field['field_label']); ?></label>
+            <select id="<?php echo esc_attr($custom_field['field_name']); ?>" name="<?php echo esc_attr($custom_field['field_name']); ?>[]" multiple="multiple" data-placeholder="<?php echo esc_attr(/* translators: %s: Field label. */ sprintf( __( 'Select %s', 'propertyhive' ), $custom_field['field_label'] )); ?>" class="multiselect attribute_values">
                 <?php
                     $selected_values = get_post_meta( $thepostid, $custom_field['field_name'], true );
                     if ( !is_array($selected_values) && $selected_values == '' )
@@ -463,14 +472,10 @@ class PH_Additional_Fields {
                                 {
                                     if ( $custom_field['meta_box'] == $meta_box_being_done )
                                     {
-                                    	if ( isset($custom_field['field_type']) && $custom_field['field_type'] == 'textarea' )
-                                    	{
-                                    		update_post_meta( $post_id, $custom_field['field_name'], (isset($_POST[$custom_field['field_name']]) ? sanitize_textarea_field($_POST[$custom_field['field_name']]) : '') );
-                                    	}
-                                    	else
-                                    	{
-	                                        update_post_meta( $post_id, $custom_field['field_name'], (isset($_POST[$custom_field['field_name']]) ? ph_clean($_POST[$custom_field['field_name']]) : '') );
-	                                    }
+                                        $field_value = $this->get_submitted_custom_field_value( $custom_field, true );
+                                        if ( null !== $field_value ) {
+                                            update_post_meta( $post_id, $custom_field['field_name'], wp_slash( $field_value ) );
+                                        }
                                     }
                                 }
                             }
@@ -483,7 +488,7 @@ class PH_Additional_Fields {
 
             if ( $office_details_fields_exist  )
             {
-                add_filter( 'propertyhive_' . $custom_field['meta_box'] . '_settings', function( $settings )
+                add_filter( 'propertyhive_' . $custom_field['meta_box'] . '_settings', function( $settings ) use ( &$propertyhive_offices_opening_section_done )
                 {
                     $settings[] = array( 'type' => 'sectionend', 'id' => 'office_location_options' );
 
@@ -535,6 +540,7 @@ class PH_Additional_Fields {
                                 {
                                     if ( !isset($args['meta_query']) )
                                     {
+                                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Configured shortcode fields are stored in post metadata; append their existing scalar/multiselect predicates without replacing other query constraints.
                                         $args['meta_query'] = array();
                                     }
 
@@ -594,7 +600,7 @@ class PH_Additional_Fields {
 
                     if ( !empty($values) )
                     {
-                        echo '<li class="' . esc_attr(trim($custom_field['field_name'], '_')) . '">' . $label;
+                        echo '<li class="' . esc_attr(trim($custom_field['field_name'], '_')) . '">' . wp_kses_post( $label );
                         echo esc_html(is_array($values) ? implode(", ", $values) : $values);
                         echo '</li>';
                     }
@@ -605,7 +611,7 @@ class PH_Additional_Fields {
                     {
                         ?>
                         <li class="<?php echo esc_attr(trim($custom_field['field_name'], '_')); ?>">
-                            <?php echo $label . date(get_option( 'date_format' ), strtotime($property->{$custom_field['field_name']})); ?>
+                            <?php echo wp_kses_post( $label ) . esc_html( gmdate(get_option( 'date_format' ), strtotime($property->{$custom_field['field_name']})) ); ?>
                         </li>
                         <?php
                     }
@@ -616,7 +622,7 @@ class PH_Additional_Fields {
                     {
                         ?>
                         <li class="<?php echo esc_attr(trim($custom_field['field_name'], '_')); ?>">
-                            <?php echo $label . wp_get_attachment_image($property->{$custom_field['field_name']}); ?>
+                            <?php echo wp_kses_post( $label . wp_get_attachment_image($property->{$custom_field['field_name']}) ); ?>
                         </li>
                         <?php
                         }
@@ -627,7 +633,7 @@ class PH_Additional_Fields {
                     {
                         ?>
                         <li class="<?php echo esc_attr(trim($custom_field['field_name'], '_')); ?>">
-                            <?php echo $label . '<a href="' . esc_url(wp_get_attachment_url($property->{$custom_field['field_name']})) . '" rel="noopener noreferrer" target="_blank">' . esc_html(__( 'View', 'propertyhive' )) . '</a>'; ?>
+                            <?php echo wp_kses_post( $label ) . '<a href="' . esc_url(wp_get_attachment_url($property->{$custom_field['field_name']})) . '" rel="noopener noreferrer" target="_blank">' . esc_html(__( 'View', 'propertyhive' )) . '</a>'; ?>
                         </li>
                         <?php
                     }
@@ -652,7 +658,7 @@ class PH_Additional_Fields {
                         }
                         ?>
                         <li class="<?php echo esc_attr(trim($custom_field['field_name'], '_')); ?>">
-                            <?php echo $label . $value; ?>
+                            <?php echo wp_kses_post( $label . $value ); ?>
                         </li>
                         <?php
                     }
@@ -713,6 +719,42 @@ class PH_Additional_Fields {
         return $form_controls;
     }
 
+    /**
+     * Read a configured custom field without changing the shared request.
+     *
+     * A null result indicates a malformed value and leaves existing metadata intact.
+     * Callers run through the office, meta-box or user-registration save gates.
+     */
+    private function get_submitted_custom_field_value( $custom_field, $multiline = false, $default = '' )
+    {
+        $field_name = $custom_field['field_name'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Internal input helper used by the nonce-checked office, meta-box and user-details save callbacks; authorization belongs to those distinct entry points.
+        if ( ! isset( $_POST[$field_name] ) ) {
+            return $default;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Input helper; the calling save entry point verifies its own nonce.
+        if ( is_string( $_POST[$field_name] ) ) {
+            if ( $multiline && isset( $custom_field['field_type'] ) && 'textarea' === $custom_field['field_type'] ) {
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Input helper; the calling save entry point verifies its own nonce.
+                return sanitize_textarea_field( wp_unslash( $_POST[$field_name] ) );
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Input helper; the calling save entry point verifies its own nonce.
+            return sanitize_text_field( wp_unslash( $_POST[$field_name] ) );
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Input helper; the calling save entry point verifies its own nonce.
+        if ( isset( $custom_field['field_type'] ) && 'multiselect' === $custom_field['field_type'] && is_array( $_POST[$field_name] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- This loop validates element types only; every accepted element is sanitized and unslashed in the return below.
+            foreach ( $_POST[$field_name] as $field_value ) {
+                if ( ! is_string( $field_value ) ) {
+                    return null;
+                }
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Input helper; the calling save entry point verifies its own nonce.
+            return ph_clean( wp_unslash( $_POST[$field_name] ) );
+        }
+        return null;
+    }
+
     public function save_custom_fields_on_user_details( $contact_post_id, $user_id )
     {
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -723,19 +765,47 @@ class PH_Additional_Fields {
         {
             if ( isset($custom_field['display_on_user_details']) && $custom_field['display_on_user_details'] == '1' && substr($custom_field['meta_box'], 0, 8) == 'contact_' )
             {
-                update_post_meta( $contact_post_id, $custom_field['field_name'], (isset($_POST[$custom_field['field_name']]) ? ph_clean($_POST[$custom_field['field_name']]) : '') );
+                $field_value = $this->get_submitted_custom_field_value( $custom_field );
+                if ( null !== $field_value ) {
+                    update_post_meta( $contact_post_id, $custom_field['field_name'], wp_slash( $field_value ) );
+                }
             }
         }
     }
 
+    /** Validate the scalar or flat selection-list shape used by search controls. */
+    private function is_valid_custom_field_filter( $value, $field_type )
+    {
+        if ( is_string( $value ) ) {
+            return true;
+        }
+        if ( ! in_array( $field_type, array( 'select', 'multiselect' ), true ) || ! is_array( $value ) ) {
+            return false;
+        }
+        foreach ( $value as $selection ) {
+            if ( ! is_string( $selection ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public function custom_fields_in_meta_query( $meta_query )
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only property/applicant search filter; no data is saved or sent.
+        $filter_department = ( isset( $_REQUEST['department'] ) && is_string( $_REQUEST['department'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['department'] ) ) : null;
+
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
         if ( isset($current_settings['custom_fields']) && !empty($current_settings['custom_fields']) )
         {
             foreach ( $current_settings['custom_fields'] as $custom_field )
             {
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only property/applicant search filter; no data is saved or sent.
+                $filter_value = isset( $_REQUEST[$custom_field['field_name']] ) ? ph_clean( wp_unslash( $_REQUEST[$custom_field['field_name']] ) ) : null;
+                if ( null !== $filter_value && ! $this->is_valid_custom_field_filter( $filter_value, $custom_field['field_type'] ) ) {
+                    continue;
+                }
                 if ( 
                     $custom_field['meta_box'] == 'property_residential_sales_details' 
                     ||
@@ -750,8 +820,10 @@ class PH_Additional_Fields {
                     $meta_box_department = str_replace("_", "-", $meta_box_department);
 
                     if ( 
-                        isset( $_REQUEST['department'] ) && 
-                        ( $_REQUEST['department'] == $meta_box_department || ph_get_custom_department_based_on($_REQUEST['department']) == $meta_box_department )
+
+                        null !== $filter_department &&
+
+                        ( $filter_department == $meta_box_department || ph_get_custom_department_based_on($filter_department) == $meta_box_department )
                     )
                     {
 
@@ -767,18 +839,21 @@ class PH_Additional_Fields {
                     if ( $custom_field['exact_match'] == '' )
                     {
                         // not exact match (i.e. pets allowed)
-                        if ( isset($_REQUEST[$custom_field['field_name']]) && ph_clean( $_REQUEST[$custom_field['field_name']] ) == 'yes' )
+
+                        if ( null !== $filter_value && ph_clean( $filter_value ) == 'yes' )
                         {
                             $meta_query[] = array(
                                 'key'     => $custom_field['field_name'],
-                                'value'   => ph_clean( $_REQUEST[$custom_field['field_name']] ),
+
+                                'value'   => ph_clean( $filter_value ),
                             );
                         }
                     }
                     else
                     {
                         // should match exactly only (i.e. something only)
-                        if ( isset($_REQUEST[$custom_field['field_name']]) && ph_clean( $_REQUEST[$custom_field['field_name']] ) == 'yes' )
+
+                        if ( null !== $filter_value && ph_clean( $filter_value ) == 'yes' )
                         {
                             $meta_query[] = array(
                                 'key' => $custom_field['field_name'],
@@ -805,16 +880,19 @@ class PH_Additional_Fields {
                 else
                 {
                     if ( 
-                        isset( $_REQUEST[$custom_field['field_name']] ) && $_REQUEST[$custom_field['field_name']] != '' 
+
+                        null !== $filter_value && $filter_value != ''
                     )
                     {
                         if ( 
                             ( $custom_field['field_type'] == 'select' || $custom_field['field_type'] == 'multiselect' ) &&
-                            is_array($_REQUEST[$custom_field['field_name']])
+
+                            is_array($filter_value)
                         )
                         {
                             $sub_meta_query = array('relation' => 'OR');
-                            foreach ( $_REQUEST[$custom_field['field_name']] as $value )
+
+                            foreach ( $filter_value as $value )
                             {
                                 $sub_meta_query[] = array(
                                     'key'     => $custom_field['field_name'],
@@ -833,7 +911,8 @@ class PH_Additional_Fields {
                         {
                             $meta_query[] = array(
                                 'key'     => $custom_field['field_name'],
-                                'value'   => ph_clean( $_REQUEST[$custom_field['field_name']] ),
+
+                                'value'   => ph_clean( $filter_value ),
                                 'compare' => '=',
                             );
                         }
@@ -841,7 +920,8 @@ class PH_Additional_Fields {
                         {
                             $meta_query[] = array(
                                 'key'     => $custom_field['field_name'],
-                                'value'   => ph_clean( $_REQUEST[$custom_field['field_name']] ),
+
+                                'value'   => ph_clean( $filter_value ),
                                 'compare' => 'LIKE',
                             );
                         }
@@ -971,8 +1051,8 @@ class PH_Additional_Fields {
                 }
 ?>
                 <p class="form-field">
-                    <label for="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo $applicant_profile_id; ?>"><?php echo esc_html($custom_field['field_label']); ?></label>
-                    <select id="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo $applicant_profile_id; ?>" name="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo $applicant_profile_id; ?>[]" multiple="multiple" data-placeholder="Start typing to add <?php echo esc_attr($custom_field['field_label']); ?>..." class="multiselect attribute_values">
+                    <label for="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo esc_attr( $applicant_profile_id ); ?>"><?php echo esc_html($custom_field['field_label']); ?></label>
+                    <select id="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo esc_attr( $applicant_profile_id ); ?>" name="_applicant<?php echo esc_attr($custom_field['field_name']); ?>_<?php echo esc_attr( $applicant_profile_id ); ?>[]" multiple="multiple" data-placeholder="Start typing to add <?php echo esc_attr($custom_field['field_label']); ?>..." class="multiselect attribute_values">
                         <?php
                             foreach ( $options as $option )
                             {
@@ -1108,6 +1188,9 @@ class PH_Additional_Fields {
     public function save_applicant_requirements_fields( $contact_post_id, $applicant_profile_id )
     {
         $applicant_profile = get_post_meta( $contact_post_id, '_applicant_profile_' . $applicant_profile_id, TRUE );
+        if ( ! is_array( $applicant_profile ) ) {
+            $applicant_profile = array();
+        }
 
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
@@ -1117,22 +1200,30 @@ class PH_Additional_Fields {
             {
                 if ( isset($custom_field['display_on_applicant_requirements']) && $custom_field['display_on_applicant_requirements'] == '1' && substr($custom_field['meta_box'], 0, 9) == 'property_' )
                 {
+                    $submitted_field = $custom_field;
+                    $submitted_field['field_name'] = '_applicant' . $custom_field['field_name'] . '_' . $applicant_profile_id;
+                    $field_value = $this->get_submitted_custom_field_value( $submitted_field );
+                    if ( null === $field_value ) {
+                        continue;
+                    }
                     switch ( $custom_field['field_type'] )
                     {
                         case "select":
                         case "multiselect":
                         {
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Presence check only; the contact save entry point verifies the nonce before this hook and values are normalized by get_submitted_custom_field_value.
                             if ( isset($_POST['_applicant' . $custom_field['field_name'] . '_' . $applicant_profile_id]) )
                             {
-                                $applicant_profile[$custom_field['field_name']] = ph_clean($_POST['_applicant' . $custom_field['field_name'] . '_' . $applicant_profile_id]);
+                                $applicant_profile[$custom_field['field_name']] = $field_value;
                             }
                             break;
                         }
                         case "checkbox":
                         {
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Presence check only; the contact save entry point verifies the nonce before this hook and values are normalized by get_submitted_custom_field_value.
                             if ( isset($_POST['_applicant' . $custom_field['field_name'] . '_' . $applicant_profile_id]) )
                             {
-                                $applicant_profile[$custom_field['field_name']] = ph_clean($_POST['_applicant' . $custom_field['field_name'] . '_' . $applicant_profile_id]);
+                                $applicant_profile[$custom_field['field_name']] = $field_value;
                             }
                             else
                             {
@@ -1145,7 +1236,7 @@ class PH_Additional_Fields {
             }
         }
 
-        update_post_meta( $contact_post_id, '_applicant_profile_' . $applicant_profile_id, $applicant_profile );
+        update_post_meta( $contact_post_id, '_applicant_profile_' . $applicant_profile_id, wp_slash( $applicant_profile ) );
     }
 
     public function applicant_requirements_display( $requirements, $contact_post_id, $applicant_profile )
@@ -1528,7 +1619,16 @@ class PH_Additional_Fields {
 
     public function applicant_registered( $contact_post_id, $user_id )
     {
-        $applicant_profile = get_post_meta( $contact_post_id, '_applicant_profile_' . ( isset($_POST['profile_id']) && $_POST['profile_id'] != '' ? (int)$_POST['profile_id'] : '0' ), TRUE );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Registration/account callback runs after its parent AJAX nonce and ownership checks; this hook only updates the supplied contact.
+        if ( isset( $_POST['profile_id'] ) && ! is_string( $_POST['profile_id'] ) ) {
+            return;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- The parent registration/account AJAX callback verifies its nonce before dispatching this hook.
+        $profile_id = isset( $_POST['profile_id'] ) ? absint( $_POST['profile_id'] ) : 0;
+        $applicant_profile = get_post_meta( $contact_post_id, '_applicant_profile_' . $profile_id, TRUE );
+        if ( ! is_array( $applicant_profile ) ) {
+            $applicant_profile = array();
+        }
 
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
@@ -1538,28 +1638,25 @@ class PH_Additional_Fields {
             {
                 if ( isset($custom_field['display_on_applicant_requirements']) && $custom_field['display_on_applicant_requirements'] == '1' && substr($custom_field['meta_box'], 0, 9) == 'property_' )
                 {
+                    $field_value = $this->get_submitted_custom_field_value( $custom_field, false, 'multiselect' === $custom_field['field_type'] ? array() : '' );
+                    if ( null === $field_value ) {
+                        continue;
+                    }
                     switch ( $custom_field['field_type'] )
                     {
                         case "select":
                         {
-                            $applicant_profile[$custom_field['field_name']] = isset($_POST[$custom_field['field_name']]) ? ph_clean($_POST[$custom_field['field_name']]) : '';
+                            $applicant_profile[$custom_field['field_name']] = $field_value;
                             break;
                         }
                         case "multiselect":
                         {
-                            if ( isset($_POST[$custom_field['field_name']]) )
-                            {
-                                if ( !is_array($_POST[$custom_field['field_name']]) )
-                                {
-                                    $_POST[$custom_field['field_name']] = array($_POST[$custom_field['field_name']]);
-                                }
-                            }
-                            $applicant_profile[$custom_field['field_name']] = isset($_POST[$custom_field['field_name']]) ? ph_clean($_POST[$custom_field['field_name']]) : array();
+                            $applicant_profile[$custom_field['field_name']] = is_array( $field_value ) ? $field_value : array( $field_value );
                             break;
                         }
                         case "checkbox":
                         {
-                            $applicant_profile[$custom_field['field_name']] = isset($_POST[$custom_field['field_name']]) ? ph_clean($_POST[$custom_field['field_name']]) : '';
+                            $applicant_profile[$custom_field['field_name']] = $field_value;
                             break;
                         }
                     }
@@ -1567,17 +1664,25 @@ class PH_Additional_Fields {
             }
         }
 
-        update_post_meta( $contact_post_id, '_applicant_profile_' . ( isset($_POST['profile_id']) && $_POST['profile_id'] != '' ? (int)$_POST['profile_id'] : '0' ), $applicant_profile );
+        update_post_meta( $contact_post_id, '_applicant_profile_' . $profile_id, wp_slash( $applicant_profile ) );
     }
 
     public function applicant_list_check( $check, $contact_post_id, $applicant_profile )
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only property/applicant search filter; no data is saved or sent.
+        $filter_department = ( isset( $_POST['department'] ) && is_string( $_POST['department'] ) ) ? sanitize_text_field( wp_unslash( $_POST['department'] ) ) : null;
+
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
         if ( isset($current_settings['custom_fields']) && !empty($current_settings['custom_fields']) )
         {
             foreach ( $current_settings['custom_fields'] as $custom_field )
             {
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only property/applicant search filter; no data is saved or sent.
+                $filter_value = isset( $_POST[$custom_field['field_name']] ) ? ph_clean( wp_unslash( $_POST[$custom_field['field_name']] ) ) : null;
+                if ( null !== $filter_value && ! $this->is_valid_custom_field_filter( $filter_value, $custom_field['field_type'] ) ) {
+                    return false;
+                }
                 if ( isset($custom_field['display_on_applicant_requirements']) && $custom_field['display_on_applicant_requirements'] == '1' && substr($custom_field['meta_box'], 0, 9) == 'property_' )
                 {
                     // ensure if field is specific to department it's taken into account, else ignored
@@ -1594,8 +1699,10 @@ class PH_Additional_Fields {
                         $meta_box_department = str_replace("_", "-", $meta_box_department);
 
                         if ( 
-                            isset( $_POST['department'] ) && 
-                            ( $_POST['department'] == $meta_box_department || ph_get_custom_department_based_on($_POST['department']) == $meta_box_department )
+
+                            null !== $filter_department &&
+
+                            ( $filter_department == $meta_box_department || ph_get_custom_department_based_on($filter_department) == $meta_box_department )
                         )
                         {
 
@@ -1613,11 +1720,13 @@ class PH_Additional_Fields {
                         {
                             case "select":
                             {
-                                if ( !empty($_POST[$custom_field['field_name']]) )
+
+                                if ( !empty($filter_value) )
                                 {
                                     if ( 
                                         $applicant_profile[$custom_field['field_name']] == '' ||
-                                        $_POST[$custom_field['field_name']] == $applicant_profile[$custom_field['field_name']]
+
+                                        $filter_value == $applicant_profile[$custom_field['field_name']]
                                     )
                                     {
 
@@ -1631,7 +1740,8 @@ class PH_Additional_Fields {
                             }
                             case "multiselect":
                             {
-                                if ( !empty($_POST[$custom_field['field_name']]) )
+
+                                if ( !empty($filter_value) )
                                 {
                                     if ( !is_array($applicant_profile[$custom_field['field_name']]) && $applicant_profile[$custom_field['field_name']] != '' )
                                     {
@@ -1644,7 +1754,8 @@ class PH_Additional_Fields {
                                     }
                                     else
                                     {
-                                        $property_values = $_POST[$custom_field['field_name']];
+
+                                        $property_values = is_array( $filter_value ) ? $filter_value : array( $filter_value );
                                         if ( empty($property_values) )
                                         {
                                             return false;
@@ -1681,7 +1792,8 @@ class PH_Additional_Fields {
                                     // not exact match (i.e. pets allowed)
                                     if ( 
                                         $applicant_profile[$custom_field['field_name']] == '' ||
-                                        $_POST[$custom_field['field_name']] == $applicant_profile[$custom_field['field_name']]
+
+                                        $filter_value == $applicant_profile[$custom_field['field_name']]
                                     )
                                     {
 
@@ -1694,10 +1806,12 @@ class PH_Additional_Fields {
                                 else
                                 {
                                     // exact match
-                                    if ( isset($_POST[$custom_field['field_name']]) )
+
+                                    if ( null !== $filter_value )
                                     {
                                         if (
-                                            $_POST[$custom_field['field_name']] == $applicant_profile[$custom_field['field_name']]
+
+                                            $filter_value == $applicant_profile[$custom_field['field_name']]
                                         )
                                         {
 
@@ -1746,7 +1860,7 @@ class PH_Additional_Fields {
                     {
                         $room_data[] = array(
                             'class' => sanitize_title($custom_field['field_name']),
-                            'label' => __( $custom_field['field_label'], 'propertyhive' ),
+                            'label' => $custom_field['field_label'],
                             'value' => $room->{$custom_field['field_name']}
                         );
                     }
