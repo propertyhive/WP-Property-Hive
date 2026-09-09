@@ -74,9 +74,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	            	<strong>API Key:</strong> cvYG8ffdr32425Gdccc
 	            </td>
 	            <td class="frequency">Hourly</td>
-	            <td class="lastran"><?php echo date("jS F Y H:i", strtotime('-2 hours')); ?></td>
+	            <td class="lastran"><?php echo esc_html( gmdate("jS F Y H:i", strtotime('-2 hours')) ); ?></td>
 	            <td class="nextdue">
-	                Today at <?php echo date("H:i", strtotime('+10 mins')); ?>            
+	                Today at <?php echo esc_html( gmdate("H:i", strtotime('+10 mins')) ); ?>
 	            </td>
 	        </tr>
 	    </tbody>
@@ -123,7 +123,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	
 	<div class="promo-window">
 
-		<img src="https://wp-property-hive.com/wp-content/uploads/2015/12/property-import-banner-1024x301.png" alt="Automated property imports">
+		<img src="<?php echo esc_url( PH()->plugin_url() . '/assets/images/property-import-banner.png' ); ?>" alt="Automated property imports">
 
 		<div class="modal-content">
 

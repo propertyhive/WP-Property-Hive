@@ -1,4 +1,7 @@
-	<?php
+<?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Admin Generate Applicant List Class.
  *
@@ -15,6 +18,7 @@ if ( ! class_exists( 'PH_Admin_Applicant_List' ) ) :
 /**
  * PH_Admin_Applicant_List
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Applicant_List; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Applicant_List {
 
 	/**
@@ -25,7 +29,34 @@ class PH_Admin_Applicant_List {
 	 */
 	public function output() {
 
-        $property_types = array();
+		// Applicant filters are read-only; the export endpoint verifies its nonce and capability.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This request only repopulates the read-only filter form and renders its results.
+		$request_post = wp_unslash( $_POST );
+		$has_department_input = isset( $request_post['department'] ) && is_scalar( $request_post['department'] );
+		$department_input = $has_department_input ? sanitize_text_field( $request_post['department'] ) : '';
+		$maximum_price_input = ( isset( $request_post['maximum_price'] ) && is_scalar( $request_post['maximum_price'] ) ) ? sanitize_text_field( $request_post['maximum_price'] ) : '';
+		$maximum_rent_input = ( isset( $request_post['maximum_rent'] ) && is_scalar( $request_post['maximum_rent'] ) ) ? sanitize_text_field( $request_post['maximum_rent'] ) : '';
+		$minimum_bedrooms_input = ( isset( $request_post['minimum_bedrooms'] ) && is_scalar( $request_post['minimum_bedrooms'] ) ) ? sanitize_text_field( $request_post['minimum_bedrooms'] ) : '';
+		$property_types_input = array();
+		if ( isset( $request_post['property_types'] ) && is_array( $request_post['property_types'] ) ) {
+			foreach ( $request_post['property_types'] as $property_type_input ) {
+				if ( is_scalar( $property_type_input ) ) {
+					$property_types_input[] = absint( $property_type_input );
+				}
+			}
+		}
+		$locations_input = array();
+		if ( isset( $request_post['locations'] ) && is_array( $request_post['locations'] ) ) {
+			foreach ( $request_post['locations'] as $location_input ) {
+				if ( is_scalar( $location_input ) ) {
+					$locations_input[] = absint( $location_input );
+				}
+			}
+		}
+		$include_non_send_matching_properties_input = ( isset( $request_post['include_non_send_matching_properties'] ) && is_scalar( $request_post['include_non_send_matching_properties'] ) ) ? sanitize_text_field( $request_post['include_non_send_matching_properties'] ) : '';
+		$submitted_applicant_list = ( isset( $request_post['submitted_applicant_list'] ) && is_scalar( $request_post['submitted_applicant_list'] ) ) ? sanitize_key( $request_post['submitted_applicant_list'] ) : '';
+
+	        $property_types = array();
         $locations = array();
 ?>
 <div class="wrap propertyhive">
@@ -58,11 +89,13 @@ class PH_Admin_Applicant_List {
                         foreach ( $department_options as $key => $department )
                         {
                         	echo '<option value="' . esc_attr($key) . '"';
-                        	if ( isset($_POST['department']) && $_POST['department'] == $key )
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+							if ( $has_department_input && $department_input == $key )
                         	{
                         		echo ' selected';
                         	}
-                        	elseif ( !isset($_POST['department']) && $key == get_option( 'propertyhive_primary_department' ) )
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+							elseif ( ! $has_department_input && $key == get_option( 'propertyhive_primary_department' ) )
                         	{
                         		echo ' selected';
                         	}
@@ -75,17 +108,23 @@ class PH_Admin_Applicant_List {
 
 			<p class="form-field sales-only">
 				<label><?php echo esc_html__( 'Maximum Price', 'propertyhive' ); ?> <img class="help_tip" data-tip="This will search the applicant's Match Price Range if one is set and return applicants where the price entered falls into this range. Otherwise it will search the Maximum Price and return applicants that have maximum price higher than the value entered" src="<?php echo esc_url(PH()->plugin_url()); ?>/assets/images/help.png" height="16" width="16" /></label>
-				<input type="text" name="maximum_price" value="<?php if ( isset($_POST['maximum_price']) ) { echo esc_attr( $_POST['maximum_price'] ); } ?>">
+				<input type="text" name="maximum_price" value="<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+	 if ( $maximum_price_input !== '' ) { echo esc_attr( $maximum_price_input ); } ?>">
 			</p>
 
 			<p class="form-field lettings-only">
 				<label><?php echo esc_html__( 'Maximum Rent (PCM)', 'propertyhive' ); ?></label>
-				<input type="text" name="maximum_rent" value="<?php if ( isset($_POST['maximum_rent']) ) { echo esc_attr( $_POST['maximum_rent'] ); } ?>">
+				<input type="text" name="maximum_rent" value="<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+	 if ( $maximum_rent_input !== '' ) { echo esc_attr( $maximum_rent_input ); } ?>">
 			</p>
 
 			<p class="form-field residential-only">
 				<label><?php echo esc_html__( 'Minimum Bedrooms', 'propertyhive' ); ?></label>
-				<input type="number" name="minimum_bedrooms" class="short" value="<?php if ( isset($_POST['minimum_bedrooms']) ) { echo esc_attr( $_POST['minimum_bedrooms'] ); } ?>">
+				<input type="number" name="minimum_bedrooms" class="short" value="<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+	 if ( $minimum_bedrooms_input !== '' ) { echo esc_attr( $minimum_bedrooms_input ); } ?>">
 			</p>
 
 			<p class="form-field residential-only">
@@ -97,16 +136,17 @@ class PH_Admin_Applicant_List {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'property_type', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
 
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
                             foreach ($terms as $term)
                             {
-                                $property_types[$term->term_id] = esc_html( $term->name );
+                                $property_types[$term->term_id] = $term->name;
 
                                 echo '<option value="' . esc_attr( $term->term_id ) . '"';
-                                if ( isset($_POST['property_types']) && in_array( $term->term_id, $_POST['property_types'] ) )
+                                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                                if ( ! empty( $property_types_input ) && in_array( $term->term_id, $property_types_input ) )
                                 {
                                     echo ' selected';
                                 }
@@ -116,16 +156,17 @@ class PH_Admin_Applicant_List {
                                     'hide_empty' => false,
                                     'parent' => $term->term_id
                                 );
-                                $subterms = get_terms( 'property_type', $args );
+                                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
                                 
                                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                                 {
                                     foreach ($subterms as $term)
                                     {
-                                        $property_types[$term->term_id] = esc_html( $term->name );
+                                        $property_types[$term->term_id] = $term->name;
 
                                         echo '<option value="' . esc_attr( $term->term_id ) . '"';
-                                        if ( isset($_POST['property_types']) && in_array( $term->term_id, $_POST['property_types'] ) )
+                                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                                        if ( ! empty( $property_types_input ) && in_array( $term->term_id, $property_types_input ) )
                                         {
                                             echo ' selected';
                                         }
@@ -147,16 +188,17 @@ class PH_Admin_Applicant_List {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'location', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
 
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
                             foreach ($terms as $term)
                             {
-                                $locations[$term->term_id] = esc_html( $term->name );
+                                $locations[$term->term_id] = $term->name;
 
                                 echo '<option value="' . esc_attr( $term->term_id ) . '"';
-                                if ( isset($_POST['locations']) && in_array( $term->term_id, $_POST['locations'] ) )
+                                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                                if ( ! empty( $locations_input ) && in_array( $term->term_id, $locations_input ) )
                                 {
                                     echo ' selected';
                                 }
@@ -166,16 +208,17 @@ class PH_Admin_Applicant_List {
                                     'hide_empty' => false,
                                     'parent' => $term->term_id
                                 );
-                                $subterms = get_terms( 'location', $args );
+                                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                                 
                                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                                 {
                                     foreach ($subterms as $term)
                                     {
-                                        $locations[$term->term_id] = esc_html( $term->name );
+                                        $locations[$term->term_id] = $term->name;
 
                                         echo '<option value="' . esc_attr( $term->term_id ) . '"';
-                                        if ( isset($_POST['locations']) && in_array( $term->term_id, $_POST['locations'] ) )
+                                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                                        if ( ! empty( $locations_input ) && in_array( $term->term_id, $locations_input ) )
                                         {
                                             echo ' selected';
                                         }
@@ -185,16 +228,17 @@ class PH_Admin_Applicant_List {
                                             'hide_empty' => false,
                                             'parent' => $term->term_id
                                         );
-                                        $subsubterms = get_terms( 'location', $args );
+                                        $subsubterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                                         
                                         if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                                         {
                                             foreach ($subsubterms as $term)
                                             {
-                                                $locations[$term->term_id] = esc_html( $term->name );
+                                                $locations[$term->term_id] = $term->name;
 
                                                 echo '<option value="' . esc_attr( $term->term_id ) . '"';
-                                                if ( isset($_POST['locations']) && in_array( $term->term_id, $_POST['locations'] ) )
+                                                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                                                if ( ! empty( $locations_input ) && in_array( $term->term_id, $locations_input ) )
                                                 {
                                                     echo ' selected';
                                                 }
@@ -211,7 +255,9 @@ class PH_Admin_Applicant_List {
 
             <p class="form-field">
                 <label><?php echo esc_html__( 'Include Applicants with \'Send Matching Properties\' Unticked', 'propertyhive' ); ?></label>
-                <input type="checkbox" name="include_non_send_matching_properties" value="yes"<?php if ( isset($_POST['include_non_send_matching_properties']) && sanitize_text_field($_POST['include_non_send_matching_properties']) == 'yes' ) { echo ' checked'; } ?>>
+                <input type="checkbox" name="include_non_send_matching_properties" value="yes"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+ if ( $include_non_send_matching_properties_input !== '' && sanitize_text_field($include_non_send_matching_properties_input) == 'yes' ) { echo ' checked'; } ?>>
             </p>
 
             <?php do_action('propertyhive_applicant_list_additional_fields'); ?>
@@ -229,7 +275,8 @@ class PH_Admin_Applicant_List {
     <div class="applicant-list-results">
 
         <?php 
-            if ( isset($_POST['submitted_applicant_list']) && $_POST['submitted_applicant_list'] == '1' ) 
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+            if ( $submitted_applicant_list !== '' && $submitted_applicant_list == '1' )
             { 
                 $results = $this->generate_results();
         ?>
@@ -265,7 +312,7 @@ class PH_Admin_Applicant_List {
                                 }
                     ?>
                     <tr>
-                        <td><a href="<?php echo esc_attr($result['edit_link']); ?>" target="_blank"><?php echo esc_html($result['name']); ?></a></td>
+                        <td><a href="<?php echo esc_url($result['edit_link']); ?>" target="_blank"><?php echo esc_html($result['name']); ?></a></td>
                         <td><?php
                             $contact_details = array();
                             if ( $result['telephone_number'] != '' )
@@ -276,6 +323,7 @@ class PH_Admin_Applicant_List {
                             {
                                 $contact_details[] = 'E: ' . esc_html($result['email_address']);
                             }
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Telephone and email text are escaped above; only fixed br markup joins them.
                             echo !empty($contact_details) ? implode("<br>", $contact_details) : '-';
                         ?></td>
                         <td><?php
@@ -297,7 +345,7 @@ class PH_Admin_Applicant_List {
                                                 {
                                                     if ( isset($result['profile']['max_price']) && $result['profile']['max_price'] != '' )
                                                     {
-                                                        $match_price_range_lower = $result['profile']['max_price'] - ( $result['profile']['max_price'] * ( $percentage_lower / 100 ) );
+                                                        $match_price_range_lower = (float) $result['profile']['max_price'] - ( (float) $result['profile']['max_price'] * ( (float) $percentage_lower / 100 ) );
                                                     }
                                                 }
                                                 else
@@ -310,7 +358,7 @@ class PH_Admin_Applicant_List {
                                                 {
                                                     if ( isset($result['profile']['max_price']) && $result['profile']['max_price'] != '' )
                                                     {
-                                                        $match_price_range_higher = $result['profile']['max_price'] + ( $result['profile']['max_price'] * ( $percentage_higher / 100 ) );
+                                                        $match_price_range_higher = (float) $result['profile']['max_price'] + ( (float) $result['profile']['max_price'] * ( (float) $percentage_higher / 100 ) );
                                                     }
                                                 }
                                                 else
@@ -328,15 +376,14 @@ class PH_Admin_Applicant_List {
                                         }
                                         if ( isset($result['profile']['min_beds']) && $result['profile']['min_beds'] != '' && $result['profile']['min_beds'] != 0 )
                                         {
-                                            $output[] = '<strong>Min Beds:</strong> ' . esc_html(number_format($result['profile']['min_beds']));
+                                            $output[] = '<strong>Min Beds:</strong> ' . esc_html(number_format( (float) $result['profile']['min_beds'] ));
                                         }
                                         if ( isset($result['profile']['property_types']) && is_array($result['profile']['property_types']) && !empty($result['profile']['property_types']) )
                                         {
                                             $output_types = array();
                                             foreach ( $result['profile']['property_types'] as $profile_type )
                                             {
-                                                if ( isset($property_types[$profile_type]) )
-                                                {
+                                                if ( is_scalar( $profile_type ) && isset( $property_types[$profile_type] ) ) {
                                                     $output_types[] = $property_types[$profile_type];
                                                 }
                                             }
@@ -347,8 +394,7 @@ class PH_Admin_Applicant_List {
                                             $output_locations = array();
                                             foreach ( $result['profile']['locations'] as $profile_location )
                                             {
-                                                if ( isset($locations[$profile_location]) )
-                                                {
+                                                if ( is_scalar( $profile_location ) && isset( $locations[$profile_location] ) ) {
                                                     $output_locations[] = $locations[$profile_location];
                                                 }
                                             }
@@ -358,6 +404,7 @@ class PH_Admin_Applicant_List {
                                         {
                                             $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
+                                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Requirement text is escaped when assembled above; strong/br markup is fixed and currency-symbol filter HTML remains trusted.
                                         echo( !empty($output) ? implode("<br>", $output) : '-' );
                                         break;
                                     }
@@ -370,15 +417,14 @@ class PH_Admin_Applicant_List {
                                         }
                                         if ( isset($result['profile']['min_beds']) && $result['profile']['min_beds'] != '' && $result['profile']['min_beds'] != 0 )
                                         {
-                                            $output[] = '<strong>Min Beds:</strong> ' . esc_html(number_format($result['profile']['min_beds']));
+                                            $output[] = '<strong>Min Beds:</strong> ' . esc_html(number_format( (float) $result['profile']['min_beds'] ));
                                         }
                                         if ( isset($result['profile']['property_types']) && is_array($result['profile']['property_types']) && !empty($result['profile']['property_types']) )
                                         {
                                             $output_types = array();
                                             foreach ( $result['profile']['property_types'] as $profile_type )
                                             {
-                                                if ( isset($property_types[$profile_type]) )
-                                                {
+                                                if ( is_scalar( $profile_type ) && isset( $property_types[$profile_type] ) ) {
                                                     $output_types[] = $property_types[$profile_type];
                                                 }
                                             }
@@ -389,8 +435,7 @@ class PH_Admin_Applicant_List {
                                             $output_locations = array();
                                             foreach ( $result['profile']['locations'] as $profile_location )
                                             {
-                                                if ( isset($locations[$profile_location]) )
-                                                {
+                                                if ( is_scalar( $profile_location ) && isset( $locations[$profile_location] ) ) {
                                                     $output_locations[] = $locations[$profile_location];
                                                 }
                                             }
@@ -400,6 +445,7 @@ class PH_Admin_Applicant_List {
                                         {
                                             $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
+                                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Requirement text is escaped when assembled above; strong/br markup is fixed and currency-symbol filter HTML remains trusted.
                                         echo( !empty($output) ? implode("<br>", $output) : '-' );
                                         break;
                                     }
@@ -411,7 +457,9 @@ class PH_Admin_Applicant_List {
                                             $output_locations = array();
                                             foreach ( $result['profile']['locations'] as $profile_location )
                                             {
-                                                $output_locations[] = $locations[$profile_location];
+                                                if ( is_scalar( $profile_location ) && isset( $locations[$profile_location] ) ) {
+                                                    $output_locations[] = $locations[$profile_location];
+                                                }
                                             }
                                             $output[] = '<strong>Locations:</strong> ' . esc_html(implode(", ", $output_locations));
                                         }
@@ -419,6 +467,7 @@ class PH_Admin_Applicant_List {
                                         {
                                             $output[] = '<strong>Additional Requirements:</strong> ' . nl2br(esc_html($result['profile']['notes']));
                                         }
+                                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Requirement text is escaped when assembled above; strong/br markup is fixed and currency-symbol filter HTML remains trusted.
                                         echo( !empty($output) ? implode("<br>", $output) : '-' );
                                         break;
                                     }
@@ -527,20 +576,55 @@ jQuery(window).resize(function() {
 
     public function generate_results()
     {
+		// Results are read-only. Normalize the submitted filters before they are used in comparisons or queries.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This method only reads applicant filters; the separate export endpoint verifies its nonce and capability.
+		$request_post = wp_unslash( $_POST );
+		$has_department = isset( $request_post['department'] ) && is_scalar( $request_post['department'] );
+		$department_input = $has_department ? sanitize_text_field( $request_post['department'] ) : '';
+		$maximum_price_input = ( isset( $request_post['maximum_price'] ) && is_scalar( $request_post['maximum_price'] ) ) ? sanitize_text_field( $request_post['maximum_price'] ) : '';
+		$maximum_rent_input = ( isset( $request_post['maximum_rent'] ) && is_scalar( $request_post['maximum_rent'] ) ) ? sanitize_text_field( $request_post['maximum_rent'] ) : '';
+		$minimum_bedrooms_input = ( isset( $request_post['minimum_bedrooms'] ) && is_scalar( $request_post['minimum_bedrooms'] ) ) ? sanitize_text_field( $request_post['minimum_bedrooms'] ) : '';
+		$has_property_types = isset( $request_post['property_types'] ) && is_array( $request_post['property_types'] );
+		$property_types_input = array();
+		if ( $has_property_types ) {
+			foreach ( $request_post['property_types'] as $property_type_input ) {
+				if ( is_scalar( $property_type_input ) ) {
+					$property_types_input[] = absint( $property_type_input );
+				}
+			}
+		}
+		$has_locations = isset( $request_post['locations'] ) && is_array( $request_post['locations'] );
+		$locations_input = array();
+		if ( $has_locations ) {
+			foreach ( $request_post['locations'] as $location_input ) {
+				if ( is_scalar( $location_input ) ) {
+					$locations_input[] = absint( $location_input );
+				}
+			}
+		}
+		$has_include_non_send_matching_properties = isset( $request_post['include_non_send_matching_properties'] );
+
         $search_property_types = array();
         if ( 
-            isset($_POST['department']) && 
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+            $has_department &&
             ( 
-                $_POST['department'] == 'residential-sales' || 
-                $_POST['department'] == 'residential-lettings' ||
-                ph_get_custom_department_based_on($_POST['department']) == 'residential-sales' ||
-                ph_get_custom_department_based_on($_POST['department']) == 'residential-lettings'
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                $department_input == 'residential-sales' ||
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                $department_input == 'residential-lettings' ||
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                ph_get_custom_department_based_on($department_input) == 'residential-sales' ||
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                ph_get_custom_department_based_on($department_input) == 'residential-lettings'
             ) 
         )
         {
-            if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+            if ( $has_property_types && ! empty( $property_types_input ) )
             {
-                foreach ( $_POST['property_types'] as $property_type )
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                foreach ( $property_types_input as $property_type )
                 {
                     $search_property_types[] = (int)$property_type;
 
@@ -548,7 +632,7 @@ jQuery(window).resize(function() {
                         'hide_empty' => false,
                         'parent' => $property_type
                     );
-                    $terms = get_terms( 'property_type', $args );
+                    $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
 
                     if ( !empty( $terms ) && !is_wp_error( $terms ) )
                     {
@@ -560,7 +644,7 @@ jQuery(window).resize(function() {
                                 'hide_empty' => false,
                                 'parent' => $term->term_id
                             );
-                            $subterms = get_terms( 'property_type', $args );
+                            $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
                             
                             if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                             {
@@ -577,9 +661,11 @@ jQuery(window).resize(function() {
         }
 
         $search_locations = array();
-        if ( isset($_POST['locations']) && is_array($_POST['locations']) && !empty($_POST['locations']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+        if ( $has_locations && ! empty( $locations_input ) )
         {
-            foreach ( $_POST['locations'] as $location )
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+            foreach ( $locations_input as $location )
             {
                 $search_locations[] = (int)$location;
 
@@ -587,7 +673,7 @@ jQuery(window).resize(function() {
                     'hide_empty' => false,
                     'parent' => $location
                 );
-                $terms = get_terms( 'location', $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
 
                 if ( !empty( $terms ) && !is_wp_error( $terms ) )
                 {
@@ -599,7 +685,7 @@ jQuery(window).resize(function() {
                             'hide_empty' => false,
                             'parent' => $term->term_id
                         );
-                        $subterms = get_terms( 'location', $args );
+                        $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                         
                         if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                         {
@@ -620,6 +706,7 @@ jQuery(window).resize(function() {
             'nopaging' => true,
         );
 
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Existing applicant membership is stored in serialized _contact_types metadata; preserve complete list/export results and their extension match checks. Query fetches IDs only.
         $args['meta_query'] = array();
 
         $args['meta_query'][] = array(
@@ -653,7 +740,8 @@ jQuery(window).resize(function() {
 
                     $match = true;
 
-                    if ( !isset($_POST['include_non_send_matching_properties']) )
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                    if ( !$has_include_non_send_matching_properties )
                     {
                         if ( !isset($profile['send_matching_properties']) || ( isset($profile['send_matching_properties']) && $profile['send_matching_properties'] != 'yes' ) )
                         {
@@ -661,19 +749,24 @@ jQuery(window).resize(function() {
                         }
                     }
 
-                    if ( isset($_POST['department']) )
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                    if ( $has_department )
                     {
-                        if ( isset($profile['department']) && $profile['department'] != ph_clean($_POST['department']) )
+                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                        if ( isset($profile['department']) && $profile['department'] != ph_clean($department_input) )
                         {
                             $match = false;
                         }
                     }
 
-                    if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-sales' || ph_get_custom_department_based_on($_POST['department']) == 'residential-sales' ) )
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                    if ( $has_department && ( $department_input == 'residential-sales' || ph_get_custom_department_based_on($department_input) == 'residential-sales' ) )
                     {
-                        if ( isset($_POST['maximum_price']) && ph_clean($_POST['maximum_price']) != '' ) 
+                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                        if ( $maximum_price_input !== '' && ph_clean($maximum_price_input) != '' )
                         {
-                            $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                            $price = preg_replace("/[^0-9.]/", '', ph_clean($maximum_price_input));
 
                             if ( $percentage_lower != '' && $percentage_higher != '' )
                             {
@@ -732,11 +825,14 @@ jQuery(window).resize(function() {
                             }
                         }
                     }
-                    if ( isset($_POST['department']) && ( $_POST['department'] == 'residential-lettings' || ph_get_custom_department_based_on($_POST['department']) == 'residential-lettings' ) )
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                    if ( $has_department && ( $department_input == 'residential-lettings' || ph_get_custom_department_based_on($department_input) == 'residential-lettings' ) )
                     {
-                        if ( isset($_POST['maximum_rent']) && ph_clean($_POST['maximum_rent']) != '' )
+                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                        if ( $maximum_rent_input !== '' && ph_clean($maximum_rent_input) != '' )
                         {
-                            $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_rent']));
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                            $price = preg_replace("/[^0-9.]/", '', ph_clean($maximum_rent_input));
 
                             if ( isset($profile['max_price_actual']) && $profile['max_price_actual'] != '' && $profile['max_price_actual'] != 0 && $profile['max_price_actual'] < $price )
                             {
@@ -745,18 +841,25 @@ jQuery(window).resize(function() {
                         }
                     }
                     if ( 
-                        isset($_POST['department']) && 
+                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                        $has_department &&
                         ( 
-                            $_POST['department'] == 'residential-sales' || 
-                            $_POST['department'] == 'residential-lettings' ||
-                            ph_get_custom_department_based_on($_POST['department']) == 'residential-sales' ||
-                            ph_get_custom_department_based_on($_POST['department']) == 'residential-lettings'
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                            $department_input == 'residential-sales' ||
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                            $department_input == 'residential-lettings' ||
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                            ph_get_custom_department_based_on($department_input) == 'residential-sales' ||
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                            ph_get_custom_department_based_on($department_input) == 'residential-lettings'
                         ) 
                     )
                     {
-                        if ( isset($_POST['minimum_bedrooms']) && ph_clean($_POST['minimum_bedrooms']) != '' ) 
+                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                        if ( $minimum_bedrooms_input !== '' && ph_clean($minimum_bedrooms_input) != '' )
                         {
-                            $beds = preg_replace("/[^0-9.]/", '', ph_clean($_POST['minimum_bedrooms']));
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                            $beds = preg_replace("/[^0-9.]/", '', ph_clean($minimum_bedrooms_input));
 
                             if ( isset($profile['min_beds']) && $profile['min_beds'] != '' && $profile['min_beds'] != 0 && $profile['min_beds'] > $beds )
                             {
@@ -765,7 +868,8 @@ jQuery(window).resize(function() {
                         }
 
                         // Property Types
-                        if ( isset($_POST['property_types']) && is_array($_POST['property_types']) && !empty($_POST['property_types']) )
+                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                        if ( $has_property_types && ! empty( $property_types_input ) )
                         {
                             $found_type = false;
                             foreach ( $search_property_types as $search_property_type )
@@ -783,7 +887,8 @@ jQuery(window).resize(function() {
                         }
                     }
 
-                    if ( isset($_POST['locations']) && is_array($_POST['locations']) && !empty($_POST['locations']) )
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only applicant filters and form display; CSV export separately verifies its nonce and CRM capability.
+                    if ( $has_locations && ! empty( $locations_input ) )
                     {
                         $found_type = false;
                         foreach ( $search_locations as $search_location )
@@ -828,42 +933,48 @@ jQuery(window).resize(function() {
 
     private function array_2_csv($results)
     {
+		// export() verifies the nonce and capability before calling this formatter.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This private formatter only reads the already-authorized export filters.
+		$request_post = wp_unslash( $_POST );
+		$has_department = isset( $request_post['department'] ) && is_scalar( $request_post['department'] );
+		$department_input = $has_department ? sanitize_text_field( $request_post['department'] ) : '';
+
         $locations = array();
         $args = array(
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'location', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
 
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
             foreach ($terms as $term)
             {
-                $locations[$term->term_id] = esc_html( $term->name );
+                $locations[$term->term_id] = html_entity_decode( $term->name, ENT_QUOTES, get_bloginfo( 'charset' ) );
 
                 $args = array(
                     'hide_empty' => false,
                     'parent' => $term->term_id
                 );
-                $subterms = get_terms( 'location', $args );
+                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                 
                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
                     foreach ($subterms as $term)
                     {
-                        $locations[$term->term_id] = esc_html( $term->name );
+                        $locations[$term->term_id] = html_entity_decode( $term->name, ENT_QUOTES, get_bloginfo( 'charset' ) );
 
                         $args = array(
                             'hide_empty' => false,
                             'parent' => $term->term_id
                         );
-                        $subsubterms = get_terms( 'location', $args );
+                        $subsubterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                         
                         if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                         {
                             foreach ($subsubterms as $term)
                             {
-                                $locations[$term->term_id] = esc_html( $term->name );
+                                $locations[$term->term_id] = html_entity_decode( $term->name, ENT_QUOTES, get_bloginfo( 'charset' ) );
                             }
                         }
                     }
@@ -876,25 +987,25 @@ jQuery(window).resize(function() {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'property_type', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
 
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
             foreach ($terms as $term)
             {
-                $property_types[$term->term_id] = esc_html( $term->name );
+                $property_types[$term->term_id] = html_entity_decode( $term->name, ENT_QUOTES, get_bloginfo( 'charset' ) );
 
                 $args = array(
                     'hide_empty' => false,
                     'parent' => $term->term_id
                 );
-                $subterms = get_terms( 'property_type', $args );
+                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
                 
                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
                     foreach ($subterms as $term)
                     {
-                        $property_types[$term->term_id] = esc_html( $term->name );
+                        $property_types[$term->term_id] = html_entity_decode( $term->name, ENT_QUOTES, get_bloginfo( 'charset' ) );
                     }
                 }
             }
@@ -915,9 +1026,9 @@ jQuery(window).resize(function() {
             'department' => __( 'Department', 'propertyhive' ),
         );
 
-        if ( isset($_POST['department']) )
+        if ( $has_department )
         {
-            $department = ph_clean($_POST['department']);
+            $department = ph_clean( $department_input );
             if ( ph_get_custom_department_based_on($department) !== FALSE )
             {
                 $department = ph_get_custom_department_based_on($department);
@@ -930,6 +1041,9 @@ jQuery(window).resize(function() {
                 case "residential-sales":
                 {
                     $columns['maximum_price'] = __( 'Maximum Price', 'propertyhive' );
+                    if ( $percentage_lower != '' && $percentage_higher != '' ) {
+                        $columns['maximum_price_range'] = __( 'Maximum Price Range', 'propertyhive' );
+                    }
                     break;
                 }
                 case "residential-lettings":
@@ -949,9 +1063,11 @@ jQuery(window).resize(function() {
         $columns['locations'] = __( 'Locations', 'propertyhive' );
         $columns['additional_requirements'] = __( 'Additional Requirements', 'propertyhive' );
 
+        // Keep the historical raw POST value as the filter contract for extensions.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Export nonce and capability are verified by export() before this private formatter is called; the raw value is retained for extension compatibility.
         $columns = apply_filters( 'propertyhive_export_applicant_list_columns', $columns, $_POST );
 
-        fputcsv($df, $columns);
+        fputcsv( $df, $columns, ',', '"', '' );
 
         foreach ($results as $result) 
         {
@@ -960,7 +1076,7 @@ jQuery(window).resize(function() {
                 'email_address' => $result['email_address'],
                 'telephone_number' => $result['telephone_number'],
                 'address' => $result['address'],
-                'department' => ( isset($result['profile']['department']) ? __( ucwords(str_replace("-", " ", $result['profile']['department'])), 'propertyhive' ) : '-' ),
+                'department' => ( isset($result['profile']['department']) ? propertyhive_get_department_label( $result['profile']['department'] ) : '-' ),
             );
 
             if ( isset($department) )
@@ -970,6 +1086,9 @@ jQuery(window).resize(function() {
                     case "residential-sales":
                     {
                         $columns['maximum_price'] = ( isset($result['profile']['max_price']) ? $result['profile']['max_price'] : '' );
+                        if ( $percentage_lower != '' && $percentage_higher != '' ) {
+                            $columns['maximum_price_range'] = '';
+                        }
 
                         if ( !empty($columns['maximum_price']) )
                         {
@@ -980,7 +1099,7 @@ jQuery(window).resize(function() {
                                 {
                                     if ( isset($result['profile']['max_price']) && $result['profile']['max_price'] != '' )
                                     {
-                                        $match_price_range_lower = $result['profile']['max_price'] - ( $result['profile']['max_price'] * ( $percentage_lower / 100 ) );
+                                        $match_price_range_lower = (float) $result['profile']['max_price'] - ( (float) $result['profile']['max_price'] * ( (float) $percentage_lower / 100 ) );
                                     }
                                 }
                                 else
@@ -993,7 +1112,7 @@ jQuery(window).resize(function() {
                                 {
                                     if ( isset($result['profile']['max_price']) && $result['profile']['max_price'] != '' )
                                     {
-                                        $match_price_range_higher = $result['profile']['max_price'] + ( $result['profile']['max_price'] * ( $percentage_higher / 100 ) );
+                                        $match_price_range_higher = (float) $result['profile']['max_price'] + ( (float) $result['profile']['max_price'] * ( (float) $percentage_higher / 100 ) );
                                     }
                                 }
                                 else
@@ -1030,7 +1149,9 @@ jQuery(window).resize(function() {
                     {
                         foreach ( $result['profile']['property_types'] as $profile_type )
                         {
-                            $output_types[] = $property_types[$profile_type];
+                            if ( is_scalar( $profile_type ) && isset( $property_types[$profile_type] ) ) {
+                                $output_types[] = $property_types[$profile_type];
+                            }
                         }
                     }
                     $columns['property_types'] = implode(", ", $output_types);
@@ -1042,18 +1163,22 @@ jQuery(window).resize(function() {
             {
                 foreach ( $result['profile']['locations'] as $profile_location )
                 {
-                    $output_locations[] = $locations[$profile_location];
+                    if ( is_scalar( $profile_location ) && isset( $locations[$profile_location] ) ) {
+                        $output_locations[] = $locations[$profile_location];
+                    }
                 }
             }
             $columns['locations'] = implode(", ", $output_locations);
 
             $columns['additional_requirements'] = isset($result['profile']['notes']) ? $result['profile']['notes'] : '';          
 
+            // Keep the historical raw POST value as the filter contract for extensions.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Export nonce and capability are verified by export() before this private formatter is called; the raw value is retained for extension compatibility.
             $columns = apply_filters( 'propertyhive_export_applicant_list_row_data', $columns, $_POST, $result['contact_id'], $result['applicant_profile_id'] );
 
-            fputcsv($df, $columns);
+            fputcsv( $df, $columns, ',', '"', '' );
         }
-        fclose($df);
+        fclose($df); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Closes the php://output CSV stream.
 
         return ob_get_clean();
     }
@@ -1070,7 +1195,7 @@ jQuery(window).resize(function() {
             wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), 403 );
         }
 
-        $filename = 'applicant-list-' . date("YmdHis") . '.csv';
+        $filename = 'applicant-list-' . gmdate("YmdHis") . '.csv';
 
         // disable caching
         $now = gmdate("D, d M Y H:i:s");
@@ -1089,6 +1214,7 @@ jQuery(window).resize(function() {
 
         $results = $this->generate_results();
         
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Attachment response is CSV encoded by fputcsv, not HTML; HTML escaping would corrupt exported values.
         echo $this->array_2_csv($results);        
 
         die();

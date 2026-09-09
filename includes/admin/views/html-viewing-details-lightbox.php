@@ -11,12 +11,14 @@
 
 			<div id="propertyhive_viewing_details_meta_box_container">
 				<?php
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 					$readonly = true;
 			        include( PH()->plugin_path() . '/includes/admin/views/html-viewing-details-meta-box.php' );
 			    ?>
 			</div>
 
 			<?php
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 				$readonly = true;
 		        include( PH()->plugin_path() . '/includes/admin/views/html-viewing-event-meta-box.php' );
 		    ?>
@@ -29,6 +31,7 @@
 			<h3><?php echo esc_html(__( 'Property Details', 'propertyhive' )); ?></h3>
 
 			<?php
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 				$property_id = $viewing->property_id;
 		        include( PH()->plugin_path() . '/includes/admin/views/html-lightbox-property-details.php' );
 		    ?>
@@ -38,9 +41,10 @@
 		<!-- OWNER/LANDLORD DETAILS -->
 		<div class="propertyhive-lightbox-contact-details">
 
-			<h3><?php echo esc_html(__( ( get_post_meta((int)$viewing->property_id, '_department', TRUE) == 'residential-lettings' ? 'Landlord' : 'Owner' ) . ' Details', 'propertyhive' )); ?></h3>
+			<h3><?php echo ( get_post_meta( (int) $viewing->property_id, '_department', true ) == 'residential-lettings' ? esc_html__( 'Landlord Details', 'propertyhive' ) : esc_html__( 'Owner Details', 'propertyhive' ) ); ?></h3>
 
 			<?php
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 				$contact_ids = get_post_meta((int)$viewing->property_id, '_owner_contact_id', TRUE);
 		        include( PH()->plugin_path() . '/includes/admin/views/html-lightbox-contact-details.php' );
 		    ?>
@@ -53,6 +57,7 @@
 			<h3><?php echo esc_html(__( 'Applicant Details', 'propertyhive' )); ?></h3>
 
 			<?php
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 				$contact_ids = get_post_meta($post->ID, '_applicant_contact_id');
 		        include( PH()->plugin_path() . '/includes/admin/views/html-lightbox-contact-details.php' );
 		    ?>
@@ -67,9 +72,10 @@
 		<h3><?php echo esc_html(__( 'Notes', 'propertyhive' )); ?></h3>
 
 		<?php
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 			$section = 'viewing';
 
-	        echo '<div class="propertyhive-notes-container" id="propertyhive_' . $section . '_notes_container">';
+	        echo '<div class="propertyhive-notes-container" id="propertyhive_' . esc_attr( $section ) . '_notes_container">';
 	            include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
 	        echo '</div>';
 	    ?>

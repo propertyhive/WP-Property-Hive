@@ -3,22 +3,28 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-    $key_date_type_terms = get_terms( 'management_key_date_type', array(
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+    $key_date_type_terms = get_terms( array_merge( wp_parse_args( array(
         'hide_empty' => false,
         'parent' => 0
-    ) );
+    ) ), array( 'taxonomy' => 'management_key_date_type' ) ) );
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $recurrence_rules = get_option( 'propertyhive_key_date_type', array() );
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $recurrence_rules = is_array( $recurrence_rules ) ? $recurrence_rules : array();
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $parent_post_type = get_post_type( $post_id );
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $meta_query = array();
 
     switch ( $parent_post_type )
     {
         case 'property' :
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $meta_query = array(
                 array(
                     'key' => '_property_id',
@@ -33,7 +39,9 @@ if ( ! defined( 'ABSPATH' ) ) {
         }
         case 'tenancy' :
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $parent_property_id = get_post_meta( $post_id, '_property_id', true );
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $meta_query = array(
                 array(
                     'relation' => 'OR',
@@ -57,13 +65,16 @@ if ( ! defined( 'ABSPATH' ) ) {
         {
             case 'upcoming_and_overdue':
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $meta_query[] = array(
                     'key' => '_key_date_status',
                     'value' => array('pending', 'booked'),
                     'compare' => 'IN'
                 );
 
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $upcoming_threshold = new DateTime('+ ' . apply_filters( 'propertyhive_key_date_upcoming_days', 7 ) . ' DAYS');
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $meta_query[] = array(
                     'key' => '_date_due',
                     'value' => $upcoming_threshold->format('Y-m-d'),
@@ -74,15 +85,17 @@ if ( ! defined( 'ABSPATH' ) ) {
             }
             case 'overdue':
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $meta_query[] = array(
                     'key' => '_key_date_status',
                     'value' => array('pending', 'booked'),
                     'compare' => 'IN'
                 );
 
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $meta_query[] = array(
                     'key' => '_date_due',
-                    'value' => date('Y-m-d'),
+                    'value' => gmdate('Y-m-d'),
                     'type' => 'date',
                     'compare' => '<',
                 );
@@ -90,6 +103,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             }
             default:
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $meta_query[] = array(
                     'key' => '_key_date_status',
                     'value' => $selected_status,
@@ -101,17 +115,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     if ( isset($selected_type_id) && !empty($selected_type_id) )
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         $meta_query[] = array(
             'key' => '_key_date_type_id',
             'value' => $selected_type_id,
         );
     }
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $key_dates = get_posts(array (
         'post_type' => 'key_date',
         'nopaging' => true,
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- The complete management-date grid selects records by existing property/tenancy relationships and date/status metadata.
         'meta_query' => $meta_query,
         'orderby' => 'meta_value',
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Management dates are ordered by their stored due date to preserve the grid's chronological behavior.
         'meta_key' => '_date_due',
         'order' => 'DESC',
 
@@ -127,12 +145,16 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php
         if ( !empty( $key_date_type_terms ) && !is_wp_error( $key_date_type_terms ) )
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             foreach ($key_date_type_terms as $key_date_type_term)
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $recurrence_type = isset($recurrence_rules[$key_date_type_term->term_id]) ? $recurrence_rules[$key_date_type_term->term_id]['recurrence_type'] : '';
                 if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $selected = ( isset($selected_type_id) && $selected_type_id == $key_date_type_term->term_id ) ? ' selected' : '';
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The selected fragment is only the fixed literal ' selected' or an empty string; option name/value are escaped.
                     echo '<option value="' . esc_attr($key_date_type_term->term_id) . '"' . $selected . '>' . esc_html($key_date_type_term->name) . '</option>';
                 }
             }
@@ -189,13 +211,15 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php
         if ( count($key_dates) > 0 )
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             foreach ( $key_dates as $key_date_post )
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $key_date = new PH_Key_Date( $key_date_post );
                 ?>
                 <tr id="post-<?php echo (int)$key_date_post->ID; ?>" class="post-<?php echo esc_attr($key_date_post->ID); ?> key-date-row">
                     <td class="description column-description" data-colname="Description">
-                        <div class="cell-main-content"><?php echo $key_date->description(); ?></div>
+                        <div class="cell-main-content"><?php echo esc_html( $key_date->description() ); ?></div>
                         <div class="row-actions">
                             <span class="inline hide-if-no-js">
                                 <button type="button" id="<?php echo esc_attr($key_date_post->ID); ?>" class="button-link meta-box-quick-edit">
@@ -215,13 +239,16 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <td class="tenants column-tenants" data-colname="Tenants">
                         <div class="cell-main-content">
                         <?php
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                             $tenants = '';
                             if ( !empty($key_date->tenancy_id) )
                             {
+                                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                                 $tenancy = $key_date->tenancy();
+                                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                                 $tenants = $tenancy->get_tenants(false, true);
                             }
-                            echo !empty($tenants) ? $tenants : '-';
+                            echo !empty($tenants) ? wp_kses_post( $tenants ) : '-';
                         ?>
                         </div>
                     </td>
@@ -229,10 +256,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <?php
                             if ( $key_date->date_due()->format( 'H:i' ) == '00:00' )
                             {
+                                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                                 $date_format = 'jS F Y';
                             }
                             else
                             {
+                                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                                 $date_format = 'H:i jS F Y';
                             }
                         ?>
@@ -290,8 +319,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php
                 if ( !empty( $key_date_type_terms ) && !is_wp_error( $key_date_type_terms ) )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     foreach ($key_date_type_terms as $key_date_type_term)
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $recurrence_type = isset($recurrence_rules[$key_date_type_term->term_id]) ? $recurrence_rules[$key_date_type_term->term_id]['recurrence_type'] : '';
                         if ( $parent_post_type == 'tenancy' || ( $parent_post_type == 'property' && $recurrence_type == 'property_management' ) )
                         {
@@ -308,12 +339,14 @@ if ( ! defined( 'ABSPATH' ) ) {
         </p>
         <p class="form-field _add_key_date_due_field">
             <label for="_add_key_date_due"><?php echo esc_html(__('Date Due', 'propertyhive')); ?></label>
-            <input type="date" class="small" name="_add_key_date_due" id="_add_key_date_due" value="<?php echo esc_attr(date("Y-m-d")); ?>" placeholder="">
+            <input type="date" class="small" name="_add_key_date_due" id="_add_key_date_due" value="<?php echo esc_attr(gmdate("Y-m-d")); ?>" placeholder="">
 
             <select id="_add_key_date_due_hours" name="_add_key_date_due_hours" class="select short" style="width:55px">';
                 <?php
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 for ( $i = 0; $i < 23; ++$i )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $j = str_pad($i, 2, '0', STR_PAD_LEFT);
                     echo '<option value="' . esc_attr($j) . '">' . esc_html($j) . '</option>';
                 }
@@ -322,8 +355,10 @@ if ( ! defined( 'ABSPATH' ) ) {
             :
             <select id="_add_key_date_due_minutes" name="_add_key_date_due_minutes" class="select short" style="width:55px">
                 <?php
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 for ( $i = 0; $i < 60; $i+=5 )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $j = str_pad($i, 2, '0', STR_PAD_LEFT);
                     echo '<option value="' . esc_attr($j) . '">' . esc_html($j) . '</option>';
                 }

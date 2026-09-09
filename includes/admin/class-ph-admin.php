@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
@@ -12,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     PropertyHive/Admin
  * @version     1.0.0
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin {
 
     /**
@@ -41,14 +45,20 @@ class PH_Admin {
 
     public function archive_admin_notices() 
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
         if ( isset($_GET['bulk_archived_posts']) && !empty($_GET['bulk_archived_posts'])) 
         {
-            $post_type = isset($_GET['post_type']) ? $_GET['post_type'] : '';
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            $post_type = ( isset($_GET['post_type']) && is_string($_GET['post_type']) ) ? sanitize_key( wp_unslash($_GET['post_type']) ) : '';
             if ( $post_type ) 
             {
                 $post_type_object = get_post_type_object($post_type);
+                if ( ! $post_type_object ) {
+                    return;
+                }
 
-                $count = intval($_GET['bulk_archived_posts']);
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+                $count = is_string($_GET['bulk_archived_posts']) ? absint($_GET['bulk_archived_posts']) : 0;
 
                 $message = sprintf(
                     /* translators: 1: number of items, 2: post type label */
@@ -66,19 +76,25 @@ class PH_Admin {
 
                 printf(
                     '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
-                    $message
+                    esc_html( $message )
                 );
             }
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
         if ( isset($_GET['bulk_unarchived_posts']) && !empty($_GET['bulk_unarchived_posts']) ) 
         {
-            $post_type = isset($_GET['post_type']) ? $_GET['post_type'] : '';
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            $post_type = ( isset($_GET['post_type']) && is_string($_GET['post_type']) ) ? sanitize_key( wp_unslash($_GET['post_type']) ) : '';
             if ( $post_type ) 
             {
                 $post_type_object = get_post_type_object($post_type);
+                if ( ! $post_type_object ) {
+                    return;
+                }
 
-                $count = intval($_GET['bulk_unarchived_posts']);
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+                $count = is_string($_GET['bulk_unarchived_posts']) ? absint($_GET['bulk_unarchived_posts']) : 0;
 
                 $message = sprintf(
                     /* translators: 1: number of items, 2: post type label */
@@ -96,7 +112,7 @@ class PH_Admin {
 
                 printf(
                     '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
-                    $message
+                    esc_html( $message )
                 );
             }
         }
@@ -120,12 +136,18 @@ class PH_Admin {
 
     public function check_install_add_on()
     {
-        if ( 
-            isset($_GET['ph_action']) && $_GET['ph_action'] == 'install_add_on' && 
-            isset($_GET['ph_add_on_slug']) && !empty($_GET['ph_add_on_slug']) && 
-            isset($_GET['ph_add_on_plugin']) && !empty($_GET['ph_add_on_plugin']) 
-        )
+        $request_get = wp_unslash( $_GET );
+        $ph_action = isset( $request_get['ph_action'] ) && is_string( $request_get['ph_action'] ) ? sanitize_key( $request_get['ph_action'] ) : '';
+        $encoded_slug = isset( $request_get['ph_add_on_slug'] ) && is_string( $request_get['ph_add_on_slug'] ) ? sanitize_text_field( $request_get['ph_add_on_slug'] ) : '';
+        $encoded_plugin = isset( $request_get['ph_add_on_plugin'] ) && is_string( $request_get['ph_add_on_plugin'] ) ? sanitize_text_field( $request_get['ph_add_on_plugin'] ) : '';
+
+        if ( 'install_add_on' === $ph_action && '' !== $encoded_slug && '' !== $encoded_plugin )
         {
+            if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'install_plugins' ) ) {
+                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+            }
+            check_admin_referer( 'propertyhive-install-add-on' );
+
             $installed_plugins = get_option( 'propertyhive_pre_pro_add_ons', array());
 
             if ( empty($installed_plugins) )
@@ -133,41 +155,84 @@ class PH_Admin {
                 $installed_plugins = array();
             }
 
+            $decoded_slug = base64_decode( $encoded_slug, true );
+            $decoded_plugin = base64_decode( $encoded_plugin, true );
+            if ( false === $decoded_slug || false === $decoded_plugin ) {
+                wp_die( esc_html__( 'Invalid add-on request.', 'propertyhive' ), '', array( 'response' => 400 ) );
+            }
+
             $installed_plugins[] = array(
-                'slug' => ph_clean(base64_decode($_GET['ph_add_on_slug'])),
-                'plugin' => ph_clean(base64_decode($_GET['ph_add_on_plugin']))
+                'slug' => ph_clean( $decoded_slug ),
+                'plugin' => ph_clean( $decoded_plugin )
             );
 
             update_option( 'propertyhive_pre_pro_add_ons', $installed_plugins );
 
-            wp_redirect( admin_url('admin.php?page=ph-settings&tab=features') );
+            wp_safe_redirect( admin_url('admin.php?page=ph-settings&tab=features') );
             die();
         }
     }
 
     public function check_hide_demo_data_tab()
     {
-        if ( isset($_GET['tab']) && $_GET['tab'] == 'demo_data' && isset($_GET['hidetab']) )
+        $request_get = wp_unslash( $_GET );
+        $tab = isset( $request_get['tab'] ) && is_string( $request_get['tab'] ) ? sanitize_key( $request_get['tab'] ) : '';
+        $hide_tab = isset( $request_get['hidetab'] ) && is_scalar( $request_get['hidetab'] ) ? (string) $request_get['hidetab'] : '';
+
+        if ( 'demo_data' === $tab && '' !== $hide_tab )
         {
+            if ( ! current_user_can( 'manage_propertyhive' ) ) {
+                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+            }
+            check_admin_referer( 'propertyhive-hide-demo-data' );
+
             update_option( 'propertyhive_hide_demo_data_tab', 'yes' );
-            wp_redirect( admin_url('admin.php?page=ph-settings') );
+            wp_safe_redirect( admin_url('admin.php?page=ph-settings') );
             die();
         }
     }
 
     public function export_sub_grid()
     {
-        if ( 
-            isset($_GET['sub_grid']) && !empty(ph_clean($_GET['sub_grid']))
-        ) 
+        $request_get = wp_unslash( $_GET );
+        $sub_grid = isset( $request_get['sub_grid'] ) && is_string( $request_get['sub_grid'] ) ? sanitize_key( $request_get['sub_grid'] ) : '';
+        $raw_record_ids = isset( $request_get['record_ids'] ) && is_string( $request_get['record_ids'] ) ? sanitize_text_field( $request_get['record_ids'] ) : '';
+
+        if ( '' !== $sub_grid )
         {
+            if ( ! current_user_can( 'manage_propertyhive' ) ) {
+                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+            }
+            check_admin_referer( 'propertyhive-export-sub-grid', 'ph_export_nonce' );
+
+            $export_types = array(
+                'property-viewings-grid' => 'viewing',
+                'contact-viewings-grid'  => 'viewing',
+                'property-offers-grid'   => 'offer',
+                'contact-offers-grid'    => 'offer',
+                'property-sales-grid'    => 'sale',
+                'contact-sales-grid'     => 'sale',
+            );
+            $record_ids = '' !== $raw_record_ids
+                ? array_values( array_filter( array_map( 'absint', explode( '|', $raw_record_ids ) ) ) )
+                : array();
+
+            if ( ! isset( $export_types[ $sub_grid ] ) || empty( $record_ids ) ) {
+                wp_die( esc_html__( 'Invalid export request', 'propertyhive' ), '', array( 'response' => 400 ) );
+            }
+            foreach ( $record_ids as $record_id ) {
+                if ( get_post_type( $record_id ) !== $export_types[ $sub_grid ] || ! current_user_can( 'edit_post', $record_id ) ) {
+                    wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+                }
+            }
+
             ob_start();
 
             $df = fopen("php://output", 'w');
 
             $columns = array( 'id' => __( 'ID', 'propertyhive' ) );
 
-            if ( strpos(ph_clean($_GET['sub_grid']), 'viewings') )
+            if ( strpos( $sub_grid, 'viewings' ) !== false )
             {
                 $columns['datetime'] = __( 'Date/Time', 'propertyhive' );
                 $columns['property'] = __( 'Property', 'propertyhive' );
@@ -177,7 +242,7 @@ class PH_Admin {
                 $columns['status'] = __( 'Status', 'propertyhive' );
                 $columns['feedback'] = __( 'Feedback', 'propertyhive' );
             }
-            elseif ( strpos(ph_clean($_GET['sub_grid']), 'offers') )
+            elseif ( strpos( $sub_grid, 'offers' ) !== false )
             {
                 $columns['datetime'] = __( 'Date/Time', 'propertyhive' );
                 $columns['property'] = __( 'Property', 'propertyhive' );
@@ -186,7 +251,7 @@ class PH_Admin {
                 $columns['status'] = __( 'Status', 'propertyhive' );
                 $columns['amount'] = __( 'Offer Amount', 'propertyhive' );
             }
-            elseif ( strpos(ph_clean($_GET['sub_grid']), 'sales') )
+            elseif ( strpos( $sub_grid, 'sales' ) !== false )
             {
                 $columns['date'] = __( 'Date', 'propertyhive' );
                 $columns['property'] = __( 'Property', 'propertyhive' );
@@ -198,13 +263,11 @@ class PH_Admin {
 
             fputcsv($df, $columns);
 
-            if ( isset($_GET['record_ids']) && !empty(ph_clean($_GET['record_ids'])) )
+            if ( ! empty( $record_ids ) )
             {
-                $record_ids = explode("|", ph_clean($_GET['record_ids']));
-
                 if ( !empty($record_ids) )
                 {
-                    if ( strpos(ph_clean($_GET['sub_grid']), 'viewings') )
+                    if ( strpos( $sub_grid, 'viewings' ) !== false )
                     {
                         $args = array(
                             'post_type' => 'viewing',
@@ -213,6 +276,7 @@ class PH_Admin {
                             'post__in' => $record_ids,
                             'order' => 'ASC',
                             'orderby' => 'meta_value',
+                            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- The export sorts a bounded, capability-checked viewing list by its fixed date-time metadata key.
                             'meta_key' => '_start_date_time',
                         );
 
@@ -236,7 +300,7 @@ class PH_Admin {
 
                                 $columns = array(
                                     get_the_ID(),
-                                    date("H:i jS F Y", strtotime($viewing->_start_date_time)),
+                                    gmdate("H:i jS F Y", strtotime($viewing->_start_date_time)),
                                     $property_address,
                                     str_replace("<br>", "\n", $viewing->get_applicants()),
                                     $viewing->get_negotiators(),
@@ -248,7 +312,7 @@ class PH_Admin {
                             }
                         }
                     }
-                    elseif ( strpos(ph_clean($_GET['sub_grid']), 'offers') )
+                    elseif ( strpos( $sub_grid, 'offers' ) !== false )
                     {
                         $args = array(
                             'post_type' => 'offer',
@@ -257,6 +321,7 @@ class PH_Admin {
                             'post__in' => $record_ids,
                             'order' => 'ASC',
                             'orderby' => 'meta_value',
+                            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- The export sorts a bounded, capability-checked offer list by its fixed date-time metadata key.
                             'meta_key' => '_offer_date_time',
                         );
 
@@ -280,7 +345,7 @@ class PH_Admin {
 
                                 $columns = array(
                                     get_the_ID(),
-                                    date("H:i jS F Y", strtotime($offer->_offer_date_time)),
+                                    gmdate("H:i jS F Y", strtotime($offer->_offer_date_time)),
                                     $property_address,
                                     str_replace("<br>", "\n", $offer->get_applicants()),
                                     $offer->_status,
@@ -291,7 +356,7 @@ class PH_Admin {
                             }
                         }
                     }
-                    elseif ( strpos(ph_clean($_GET['sub_grid']), 'sales') )
+                    elseif ( strpos( $sub_grid, 'sales' ) !== false )
                     {
                         $args = array(
                             'post_type' => 'sale',
@@ -300,6 +365,7 @@ class PH_Admin {
                             'post__in' => $record_ids,
                             'order' => 'ASC',
                             'orderby' => 'meta_value',
+                            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- The export sorts a bounded, capability-checked sale list by its fixed date-time metadata key.
                             'meta_key' => '_sale_date_time',
                         );
 
@@ -323,7 +389,7 @@ class PH_Admin {
 
                                 $columns = array(
                                     get_the_ID(),
-                                    date("jS F Y", strtotime($sale->_sale_date_time)),
+                                    gmdate("jS F Y", strtotime($sale->_sale_date_time)),
                                     $property_address,
                                     str_replace("<br>", "\n", $sale->get_applicants()),
                                     $sale->_status,
@@ -337,11 +403,11 @@ class PH_Admin {
                 }
             }
 
-            fclose($df);
+            fclose($df); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Closes the php://output CSV stream.
 
             $output = ob_get_clean();
 
-            $filename = sanitize_title(ph_clean($_GET['sub_grid'])) . '-' . date("YmdHis") . '.csv';
+            $filename = sanitize_title( $sub_grid ) . '-' . gmdate("YmdHis") . '.csv';
 
             // disable caching
             $now = gmdate("D, d M Y H:i:s");
@@ -358,6 +424,7 @@ class PH_Admin {
             header("Content-Disposition: attachment;filename={$filename}");
             header("Content-Transfer-Encoding: binary");
 
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSV download produced by fputcsv, not HTML; HTML escaping would corrupt exported field values.
             echo $output;
 
             die();
@@ -366,10 +433,14 @@ class PH_Admin {
 
     public function export_applicant_list()
     {
-        if ( 
-            isset($_POST['submitted_applicant_list']) && $_POST['submitted_applicant_list'] == '1' &&
-            isset($_POST['export_applicant_list_results']) && $_POST['export_applicant_list_results'] == '1' 
-        ) 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- These flags only trigger PH_Admin_Applicant_List::export(), which verifies ph_applicant_export_nonce and manage_propertyhive before generating the CSV.
+        $request_post = wp_unslash( $_POST );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- These flags only trigger PH_Admin_Applicant_List::export(), which verifies ph_applicant_export_nonce and manage_propertyhive before generating the CSV.
+        $submitted_applicant_list = isset( $request_post['submitted_applicant_list'] ) && '1' === (string) $request_post['submitted_applicant_list'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- These flags only trigger PH_Admin_Applicant_List::export(), which verifies ph_applicant_export_nonce and manage_propertyhive before generating the CSV.
+        $export_applicant_list_results = isset( $request_post['export_applicant_list_results'] ) && '1' === (string) $request_post['export_applicant_list_results'];
+
+        if ( $submitted_applicant_list && $export_applicant_list_results )
         {
             include_once( 'class-ph-admin-applicant-list.php' );
             $ph_admin_applicant_list = new PH_Admin_Applicant_List();
@@ -381,11 +452,16 @@ class PH_Admin {
     {
         global $pagenow;
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This records the current user's own read-only navigation history; it performs no cross-user or CRM state change.
+        $request_get = wp_unslash( $_GET );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This records the current user's own read-only navigation history; it performs no cross-user or CRM state change.
+        $recent_post_id = isset( $request_get['post'] ) && is_scalar( $request_get['post'] ) ? absint( $request_get['post'] ) : 0;
+
         if ( 
             'post.php' === $pagenow &&
-            isset($_GET['post']) && 
+            $recent_post_id > 0 &&
             in_array(
-                get_post_type((int)$_GET['post']), 
+                get_post_type( $recent_post_id ),
                 apply_filters( 'propertyhive_post_types_with_tabs', array('property', 'contact', 'enquiry', 'appraisal', 'viewing', 'offer', 'sale') )
             ) 
         )
@@ -399,25 +475,25 @@ class PH_Admin {
 
             foreach ( $recently_viewed as $time => $post )
             {
-                if ( (int)$_GET['post'] == $post['id'] )
+                if ( $recent_post_id == $post['id'] )
                 {
                     unset($recently_viewed[$time]);
                 }
             }
 
-            $title = get_the_title((int)$_GET['post']);
+            $title = get_the_title( $recent_post_id );
 
-            switch ( get_post_type((int)$_GET['post']) )
+            switch ( get_post_type( $recent_post_id ) )
             {
                 case "appraisal":
                 {
-                    $appraisal = new PH_Appraisal( (int)$_GET['post'] );
+                    $appraisal = new PH_Appraisal( $recent_post_id );
                     $title = $appraisal->get_formatted_summary_address();
                     break;
                 }
                 case "property":
                 {
-                    $property = new PH_Property( (int)$_GET['post'] );
+                    $property = new PH_Property( $recent_post_id );
                     $title = $property->get_formatted_summary_address();
                     break;
                 }
@@ -426,7 +502,7 @@ class PH_Admin {
                 case "offer":
                 case "sale":
                 {
-                    $property_id = get_post_meta( (int)$_GET['post'], '_property_id', TRUE );
+                    $property_id = get_post_meta( $recent_post_id, '_property_id', TRUE );
                     if ( $property_id != '' )
                     {
                         $property = new PH_Property( (int)$property_id );
@@ -436,13 +512,13 @@ class PH_Admin {
                 }
             }
 
-            $title = ucfirst(get_post_type((int)$_GET['post'])) . ' - ' . $title;
+            $title = ucfirst( get_post_type( $recent_post_id ) ) . ' - ' . $title;
 
             $recently_viewed = array(time() => array(
-                'id' => (int)$_GET['post'],
+                'id' => $recent_post_id,
                 'title' => $title,
-                'post_type' => get_post_type((int)$_GET['post']),
-                'edit_link' => get_edit_post_link((int)$_GET['post']),
+                'post_type' => get_post_type( $recent_post_id ),
+                'edit_link' => get_edit_post_link( $recent_post_id ),
             )) + $recently_viewed;
 
             $recently_viewed = array_slice($recently_viewed, 0, 10, TRUE);
@@ -453,9 +529,13 @@ class PH_Admin {
     
     public function admin_dashboard_pages()
     {
-        if ( ! empty( $_GET['page'] ) ) 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This registers a read-only admin dashboard page and does not change state.
+        $request_get = wp_unslash( $_GET );
+        $admin_page = isset( $request_get['page'] ) && is_string( $request_get['page'] ) ? sanitize_title( $request_get['page'] ) : '';
+
+        if ( '' !== $admin_page )
         {
-            switch ( sanitize_title($_GET['page']) ) 
+            switch ( $admin_page )
             {
                 case 'ph-installed':
                 {
@@ -463,7 +543,7 @@ class PH_Admin {
                         __( 'Welcome to Property Hive', 'propertyhive'  ),
                         __( 'Welcome to Property Hive', 'propertyhive'  ),
                         'manage_propertyhive',
-                        sanitize_title($_GET['page']),
+                        $admin_page,
                         array( $this, 'installed_screen' )
                     );
 
@@ -546,7 +626,7 @@ class PH_Admin {
                 <a href="https://wp-property-hive.com/honeycomb" target="_blank"><img src="<?php echo esc_url(PH()->plugin_url()); ?>/assets/images/admin/installed-screen/honeycomb-screenshot.png" style="margin:0 auto; display:block; max-width:80%;" alt="Property Hive Free Honeycomb Theme"></a>
 
                 <p><strong style="font-size:14px;">Leave a Review</strong><br>
-                If you've found Property Hive useful we'd love it if you could spare a moment to tell others just how great we are by <a href="https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5" target="_blank">leaving a review</a>.</p>
+                If you've found Property Hive useful we'd love it if you could spare a moment to tell others just how great we are by <a href="https://wordpress.org/support/plugin/propertyhive/reviews/" target="_blank">leaving a review</a>.</p>
 
                 <p><strong style="font-size:14px;">Contribute</strong><br>
                 Property Hive is completely open-source meaning anyone can access and contribute to the code. Fixing bugs and adding functionality can be done by anyone with coding knowledge. <a href="https://github.com/propertyhive/WP-Property-Hive" target="_blank">Visit us on GitHub</a> to get started.</p>
@@ -656,6 +736,15 @@ class PH_Admin {
     {
 	    global $wpdb;
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This method only renders read-only admin notices.
+        $request_get = wp_unslash( $_GET );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- This method only checks whether a settings POST is present to suppress a duplicate read-only notice; it does not process or save the value.
+        $request_post = wp_unslash( $_POST );
+        $admin_page_present = isset( $request_get['page'] );
+        $admin_page = $admin_page_present && is_string( $request_get['page'] ) ? sanitize_title( $request_get['page'] ) : '';
+        $plugin_status_present = isset( $request_get['plugin_status'] );
+        $maps_api_key_submitted = isset( $request_post['propertyhive_google_maps_api_key'] );
+
         if ( current_user_can( 'manage_options' ) )
         {
             $propertyhive_review_prompt_due_timestamp = get_option( 'propertyhive_review_prompt_due_timestamp', 0 );
@@ -665,10 +754,10 @@ class PH_Admin {
                 {
                     echo "<div class=\"notice notice-info\" id=\"ph_notice_leave_review\">
                         <p>
-                            " . __( '<strong>Finding Property Hive useful?</strong> Please take a minute to <a href="https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post" target="_blank">leave us a ★★★★★ review</a>', 'propertyhive' ) . "
+                            " . wp_kses_post( __( '<strong>Finding Property Hive useful?</strong> Please take a minute to <a href="https://wordpress.org/support/plugin/propertyhive/reviews/#new-post" target="_blank">leave us a review</a>', 'propertyhive' ) ) . "
                         </p>
                         <p>
-                            <a href=\"https://wordpress.org/support/plugin/propertyhive/reviews/?filter=5#new-post\" target=\"_blank\" class=\"button-primary\">Leave a Review</a>
+                            <a href=\"https://wordpress.org/support/plugin/propertyhive/reviews/#new-post\" target=\"_blank\" class=\"button-primary\">Leave a Review</a>
                             <a href=\"\" class=\"button\" id=\"ph_dismiss_notice_leave_review\">No Thanks</a>
                         </p>
                     </div>";
@@ -677,13 +766,13 @@ class PH_Admin {
 
             if ( 
                 class_exists('Easy_Property_Listings') && 
-                !isset($_GET['plugin_status']) && 
+                ! $plugin_status_present &&
                 get_option( 'epl_notice_dismissed', '' ) != 'yes'
             )
             {
                 echo "<div class=\"notice notice-error\" id=\"ph_notice_epl\">
                         <p>
-                            " . __( '<strong>It looks like you\'re also running Easy Property Listings.</strong> This will cause conflicts with Property Hive and should be deactivated.', 'propertyhive' ) . "
+                            " . wp_kses_post( __( '<strong>It looks like you\'re also running Easy Property Listings.</strong> This will cause conflicts with Property Hive and should be deactivated.', 'propertyhive' ) ) . "
                         </p>
                         <p>
                             <a href=\"". esc_url(admin_url('plugins.php?s=easy%20property%20listings&plugin_status=all')) . "\" class=\"button-primary\">Deactivate Easy Property Listings</a>
@@ -698,17 +787,17 @@ class PH_Admin {
                 get_option( 'propertyhive_install_timestamp', '' ) >= 1618268400 &&
                 get_option( 'propertyhive_hide_demo_data_tab', '' ) != 'yes' && 
                 (
-                    !isset($_GET['page'])
+                    ! $admin_page_present
                     ||
                     (
-                        isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed' && sanitize_title($_GET['page']) != 'ph-settings'
+                        $admin_page_present && 'ph-installed' !== $admin_page && 'ph-settings' !== $admin_page
                     )
                 )
             )
             {
                 echo "<div class=\"notice notice-info\" id=\"ph_notice_demo_data\">
                         <p>
-                            " . __( '<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?', 'propertyhive' ) . "
+                            " . wp_kses_post( __( '<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?', 'propertyhive' ) ) . "
                         </p>
                         <p>
                             <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data')) . "\" class=\"button-primary\">Import Demo Data</a>
@@ -721,10 +810,10 @@ class PH_Admin {
             if ( 
                 get_option('propertyhive_search_results_page_id', '') == '' && 
                 (
-                    !isset($_GET['page'])
+                    ! $admin_page_present
                     ||
                     (
-                        isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed' && sanitize_title($_GET['page']) != 'ph-settings'
+                        $admin_page_present && 'ph-installed' !== $admin_page && 'ph-settings' !== $admin_page
                     )
                 ) &&
                 get_option( 'missing_search_results_notice_dismissed', '' ) != 'yes'
@@ -732,7 +821,7 @@ class PH_Admin {
             {
                 echo "<div class=\"notice notice-info\" id=\"ph_notice_missing_search_results\">
                         <p>
-                            " . __( 'We noticed that you haven\'t assigned a page to be your \'Search Results\' page yet. We recommend that you do this in order to display properties on your site.', 'propertyhive' ) . "
+                            " . esc_html__( 'We noticed that you haven\'t assigned a page to be your \'Search Results\' page yet. We recommend that you do this in order to display properties on your site.', 'propertyhive' ) . "
                         </p>
                         <p>
                             <a href=\"". esc_url(admin_url('admin.php?page=ph-settings&tab=general')) . "\" class=\"button-primary\">" . esc_html(__( 'Go To Property Hive Settings', 'propertyhive' )) . "</a>
@@ -746,12 +835,12 @@ class PH_Admin {
                 get_option('propertyhive_maps_provider') !== 'osm' &&
                 get_option('propertyhive_maps_provider') !== 'mapbox' &&
                 get_option('propertyhive_google_maps_api_key', '') == '' && 
-                !isset($_POST['propertyhive_google_maps_api_key']) &&
+                ! $maps_api_key_submitted &&
                 (
-                    !isset($_GET['page'])
+                    ! $admin_page_present
                     ||
                     (
-                        isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed'
+                        $admin_page_present && 'ph-installed' !== $admin_page
                     )
                 ) &&
                 get_option( 'missing_google_maps_api_key_notice_dismissed', '' ) != 'yes'
@@ -761,8 +850,8 @@ class PH_Admin {
                         <p>
                             " . sprintf( 
                                     /* translators: %s: URL to plugin settings page where the Google Maps API key can be entered */
-                                    __( 'We noticed that you haven\'t entered a Google Maps API key. If wishing to display a map on your website it\'s recommended that you <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">create one</a> and <a href="%s">enter it</a>.', 'propertyhive' ), 
-                                    admin_url('admin.php?page=ph-settings&tab=general&section=map') 
+                                    wp_kses_post( __( 'We noticed that you haven\'t entered a Google Maps API key. If wishing to display a map on your website it\'s recommended that you <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank">create one</a> and <a href="%s">enter it</a>.', 'propertyhive' ) ),
+                                    esc_url( admin_url('admin.php?page=ph-settings&tab=general&section=map') )
                                 ) . "
                         </p>
                         <p>
@@ -777,10 +866,10 @@ class PH_Admin {
                 get_option('propertyhive_license_key', '') != '' &&
                 get_option( 'missing_invalid_expired_license_key_notice_dismissed', '' ) != 'yes' && 
                 (
-                    !isset($_GET['page'])
+                    ! $admin_page_present
                     ||
                     (
-                        isset($_GET['page']) && sanitize_title($_GET['page']) != 'ph-installed' && sanitize_title($_GET['page']) != 'ph-settings'
+                        $admin_page_present && 'ph-installed' !== $admin_page && 'ph-settings' !== $admin_page
                     )
                 )
             )
@@ -816,6 +905,7 @@ class PH_Admin {
             if ( in_array( $screen->id, array( 'dashboard' ) ) )
             {
                 // Email Cron Warning
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is a custom plugin table; this read-only dashboard notice has no WordPress API equivalent.
                 $queuedEmailsExist = (bool)$wpdb->get_var("SELECT 1 FROM " . $wpdb->prefix . "ph_email_log WHERE status = '' LIMIT 1");
                 $cronIsNextScheduled = wp_next_scheduled('propertyhive_process_email_log');
     	        if ( $queuedEmailsExist && ( $cronIsNextScheduled === false || $cronIsNextScheduled < strtotime('24 hours ago') ) )
@@ -833,7 +923,7 @@ class PH_Admin {
             }
         }
 
-        if ( isset($_GET['propertyhive_contacts_merged']) )
+        if ( isset( $request_get['propertyhive_contacts_merged'] ) )
         {
             echo '
                 <div class="notice notice-info">
@@ -854,6 +944,7 @@ class PH_Admin {
             delete_transient( '_ph_activation_redirect' );
 
             // Don't do redirect if part of multisite, doing batch-activate, or if no permission
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( is_network_admin() || isset( $_GET['activate-multi'] ) || ! current_user_can( 'manage_propertyhive' ) ) {
                 return;
             }
@@ -873,7 +964,8 @@ class PH_Admin {
         // Check role, but also AJAX as request to admin-ajax.php will still need to be made
         if ( !defined( 'DOING_AJAX' ) && $user_role === 'property_hive_contact' )
         {
-            exit( wp_redirect( home_url( '/' ) ) );
+            wp_safe_redirect( home_url( '/' ) );
+            exit;
         }
     }
 
@@ -888,14 +980,19 @@ class PH_Admin {
 
         if ( isset( $_GET['view_propertyhive_email'] ) ) 
         {
-            if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'view-email' ) ) 
+            if ( ! current_user_can( 'manage_propertyhive' ) ) {
+                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+            }
+            if ( ! wp_verify_nonce( ( isset( $_REQUEST['_wpnonce'] ) && is_string( $_REQUEST['_wpnonce'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ) : '', 'view-email' ) )
             {
                 die( 'Security check' );
             }
 
             if ( isset( $_GET['email_id'] ) )
             {
-                $email_log = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "ph_email_log WHERE email_id = '" . esc_sql( (int)$_GET['email_id'] ) . "'" );
+                $email_id = is_string( $_GET['email_id'] ) ? absint( $_GET['email_id'] ) : 0;
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Email logs are stored in a custom plugin table and this is a single protected administrative lookup.
+                $email_log = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ph_email_log WHERE email_id = %d", $email_id ) );
                 if ( null !== $email_log ) 
                 {
                     $body = $email_log->body;
@@ -905,7 +1002,10 @@ class PH_Admin {
                         $body = gzuncompress($body);
                     }
 
-                    echo apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $body ) ) );
+                    $message = apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $body ) ) );
+
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- This is the rendered HTML email viewer. The body was sanitized before entering the email log; propertyhive_mail_content and email templates are intentional trusted HTML extension points.
+                    echo $message;
                     
                 }
                 else
@@ -926,21 +1026,27 @@ class PH_Admin {
     public function preview_emails() {
         if ( isset( $_GET['preview_propertyhive_email'] ) ) 
         {
-            if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-properties' ) && ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-applicants' ) ) 
+            if ( ! current_user_can( 'manage_propertyhive' ) ) {
+                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+            }
+            if ( ! wp_verify_nonce( ( isset( $_REQUEST['_wpnonce'] ) && is_string( $_REQUEST['_wpnonce'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ) : '', 'propertyhive-matching-properties' ) && ! wp_verify_nonce( ( isset( $_REQUEST['_wpnonce'] ) && is_string( $_REQUEST['_wpnonce'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ) : '', 'propertyhive-matching-applicants' ) )
             {
                 die( 'Security check' );
             }
 
             $current_user = wp_get_current_user();
+            $request_get = wp_unslash( $_GET );
+            $request_post = wp_unslash( $_POST );
 
             // get the preview email content
-            if ( isset($_GET['property_id']) )
+            $email_property_ids = array();
+            if ( isset( $request_get['property_id'] ) && is_scalar( $request_get['property_id'] ) )
             {
-                $email_property_ids = array((int)$_GET['property_id']);
+                $email_property_ids = array( absint( $request_get['property_id'] ) );
             }
-            elseif ( isset($_POST['email_property_id']) )
+            elseif ( isset( $request_post['email_property_id'] ) && is_string( $request_post['email_property_id'] ) )
             {
-                $email_property_ids = explode(",", sanitize_text_field($_POST['email_property_id']));
+                $email_property_ids = array_values( array_filter( array_map( 'absint', explode( ',', sanitize_text_field( $request_post['email_property_id'] ) ) ) ) );
             }
 
             $allowed_tags = array(
@@ -963,15 +1069,16 @@ class PH_Admin {
             );
             $allowed_tags = apply_filters( 'propertyhive_match_email_allowed_tags', $allowed_tags );
 
-            $body = wp_kses(wp_unslash($_POST['body']), $allowedposttags);
+            $raw_body = ( isset( $request_post['body'] ) && is_string( $request_post['body'] ) ) ? $request_post['body'] : '';
+            $body = wp_kses( $raw_body, $allowed_tags );
 
-            if ( isset($_GET['contact_id']) )
+            if ( isset( $request_get['contact_id'] ) && is_scalar( $request_get['contact_id'] ) )
             {
-                $contact = new PH_Contact((int)$_GET['contact_id']);
-                $body = str_replace("[contact_name]", $contact->post_title, $body);
-                $body = str_replace("[contact_dear]", $contact->dear(), $body);
+                $contact = new PH_Contact( absint( $request_get['contact_id'] ) );
+                $body = str_replace( '[contact_name]', esc_html( $contact->post_title ), $body );
+                $body = str_replace( '[contact_dear]', esc_html( $contact->dear() ), $body );
             }
-            $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
+            $body = str_replace( '[property_count]', count( $email_property_ids ) . ' propert' . ( ( count( $email_property_ids ) != 1 ) ? 'ies' : 'y' ), $body );
 
             $office_counts = array();
 
@@ -1014,20 +1121,21 @@ class PH_Admin {
 
             if ( !empty($office_id) )
             {
-                $office_name = get_the_title($office_id);
-                $office_email_address = get_post_meta( $office_id, '_office_email_address_sales', TRUE );
+                $office_name = get_the_title( (int) $office_id );
+                $office_email_address = get_post_meta( (int) $office_id, '_office_email_address_sales', TRUE );
             }
 
-            $body = str_replace("[office_name]", $office_name, $body);
-            $body = str_replace("[office_email_address]", $office_email_address, $body);
+            $body = str_replace( '[office_name]', esc_html( $office_name ), $body );
+            $body = str_replace( '[office_email_address]', esc_html( $office_email_address ), $body );
 
-            $body = str_replace("[negotiator_name]", $current_user->display_name, $body);
-            $body = str_replace("[negotiator_email_address]", $current_user->user_email, $body);
+            $body = str_replace( '[negotiator_name]', esc_html( $current_user->display_name ), $body );
+            $body = str_replace( '[negotiator_email_address]', esc_html( $current_user->user_email ), $body );
 
             // wrap the content with the email template and then add styles
             $message = apply_filters( 'propertyhive_mail_content', PH()->email->style_inline( PH()->email->wrap_message( $body ) ) );
 
             // print the preview email
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- This is the rendered HTML email preview. The request body was passed through the explicit match allowlist; templates and propertyhive_mail_content are intentional trusted HTML extension points.
             echo $message;
             exit;
         }

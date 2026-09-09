@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<form method="post" id="mainform" action="" enctype="multipart/form-data">
 		<div class="icon32 icon32-propertyhive-settings" id="icon-propertyhive"><br /></div><h2 class="nav-tab-wrapper">
 			<?php
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 				foreach ( $tabs as $name => $label )
 					echo '<a href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=' . $name )) . '" class="nav-tab nav-tab-' . esc_attr(sanitize_title($name)) . ' ' . ( $current_tab == $name ? 'nav-tab-active' : '' ) . '">' . esc_html($label) . '</a>';
 
@@ -25,9 +26,11 @@ if ( ! defined( 'ABSPATH' ) ) {
         	<?php 
         	   if ( ! isset( $GLOBALS['hide_save_button'] ) )
                {
+                   // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                    $button_text = __( 'Save changes', 'propertyhive' );
                    if ( isset( $GLOBALS['save_button_text'] ) && ! empty( $GLOBALS['save_button_text'] ) )
                    {
+                       // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                        $button_text = $GLOBALS['save_button_text'];
                    }
             ?>
@@ -38,9 +41,11 @@ if ( ! defined( 'ABSPATH' ) ) {
         	<?php 
         	   if ( isset( $GLOBALS['show_cancel_button'] ) && $GLOBALS['show_cancel_button'] === TRUE )
         	   {
+                   // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         	       $cancel_href = 'javascript:history.go(-1);';
                    if ( isset( $GLOBALS['cancel_button_href'] ) && ! empty( $GLOBALS['cancel_button_href'] ) )
                    {
+                       // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                        $cancel_href = $GLOBALS['cancel_button_href'];
                    }
         	?>

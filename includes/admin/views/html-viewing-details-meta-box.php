@@ -2,6 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 $readonly = isset($readonly) ? $readonly : false;
 
 echo '<div class="propertyhive_meta_box">';
@@ -12,9 +13,10 @@ echo '<div class="propertyhive_meta_box">';
     
         <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
         
-        ' . esc_html(__( ucwords(str_replace("_", " ", $viewing->status)), 'propertyhive' ));
+        ' . esc_html(propertyhive_get_status_label( $viewing->status ));
 
         // Add text if this a second, third etc viewing
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         $related_viewings = get_post_meta( $viewing->id, '_related_viewings', TRUE );
         if ( isset($related_viewings['previous']) && count($related_viewings['previous']) > 0 )
         {
@@ -25,9 +27,11 @@ echo '<div class="propertyhive_meta_box">';
     {
         if ( get_option('propertyhive_module_disabled_offers_sales', '') != 'yes' )
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $offer_id = get_post_meta( $viewing->id, '_offer_id', TRUE );
             if ( $offer_id != '' && get_post_status($offer_id) != 'publish' )
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $offer_id = '';
             }
 
@@ -62,6 +66,7 @@ echo '<div class="propertyhive_meta_box">';
         }
         else
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $args = array( 
                 'id' => '_cancelled_reason', 
                 'label' => __( 'Reason Cancelled', 'propertyhive' ), 
@@ -74,6 +79,7 @@ echo '<div class="propertyhive_meta_box">';
             );
             propertyhive_wp_textarea_input( $args );
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $args = array( 
                 'id' => '_cancelled_reason_public', 
                 'label' => __( 'Make Reason Public?', 'propertyhive' ),
@@ -129,6 +135,7 @@ echo '<div class="propertyhive_meta_box">';
             }
             else
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $args = array( 
                     'id' => '_feedback', 
                     'label' => __( 'Feedback', 'propertyhive' ), 
@@ -146,13 +153,14 @@ echo '<div class="propertyhive_meta_box">';
 
     if ( ($viewing->status == 'carried_out' || $viewing->status == 'offer_made') && ( $viewing->feedback_status == 'interested' || $viewing->feedback_status == 'not_interested' ) )
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         $datetime_format = get_option('date_format')." \a\\t ".get_option('time_format');
 
         echo '<p class="form-field">
 
             <label for="">' . esc_html(__('Date Feedback Received', 'propertyhive')) . '</label>';
 
-            echo esc_html( !empty($viewing->feedback_received_date) ? date( $datetime_format, strtotime($viewing->feedback_received_date) ) : __( 'Unknown', 'propertyhive' ) );
+            echo esc_html( !empty($viewing->feedback_received_date) ? gmdate( $datetime_format, strtotime($viewing->feedback_received_date) ) : __( 'Unknown', 'propertyhive' ) );
 
         echo '</p>';
 

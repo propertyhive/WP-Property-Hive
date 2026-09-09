@@ -2,6 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 $readonly = isset($readonly) ? $readonly : false;
 
 echo '<div class="propertyhive_meta_box">';
@@ -10,15 +11,22 @@ echo '<div class="propertyhive_meta_box">';
 
     wp_nonce_field( 'propertyhive_save_data', 'propertyhive_meta_nonce' );
     
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only calendar prefill; saving has separate nonce and object guards.
+    $propertyhive_calendar_input = wp_unslash( $_GET );
+    $propertyhive_calendar_start = isset( $propertyhive_calendar_input['start'] ) && is_scalar( $propertyhive_calendar_input['start'] ) ? absint( $propertyhive_calendar_input['start'] ) : null;
+    $propertyhive_calendar_end = isset( $propertyhive_calendar_input['end'] ) && is_scalar( $propertyhive_calendar_input['end'] ) ? absint( $propertyhive_calendar_input['end'] ) : null;
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view.
     $start_date_time = get_post_meta( $post->ID, '_start_date_time', true );
     if ( $start_date_time == '' )
     {
-        $start_date_time = date("Y-m-d H:i:s");
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+        $start_date_time = gmdate("Y-m-d H:i:s");
 
-        if ( isset($_GET['start']) && $_GET['start'] != '' )
+        if ( $propertyhive_calendar_start !== null )
         {
             // $_GET['start'] should be a unix timestamp
-            $start_date_time = date("Y-m-d H:i:s", $_GET['start']);
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+            $start_date_time = gmdate("Y-m-d H:i:s", $propertyhive_calendar_start);
         }
     }
 
@@ -28,23 +36,27 @@ echo '<div class="propertyhive_meta_box">';
     
     if ( $readonly )
     {
-        echo esc_html(date("H:i", strtotime($start_date_time)) . ' on ' . date("l jS F Y", strtotime($start_date_time)));
+        echo esc_html(gmdate("H:i", strtotime($start_date_time)) . ' on ' . gmdate("l jS F Y", strtotime($start_date_time)));
     }
     else
     {
-        echo '<input type="date" class="small" name="_start_date" id="_start_date" value="' . esc_attr(date("Y-m-d", strtotime($start_date_time))) . '" placeholder="">
+        echo '<input type="date" class="small" name="_start_date" id="_start_date" value="' . esc_attr(gmdate("Y-m-d", strtotime($start_date_time))) . '" placeholder="">
             <select id="_start_time_hours" name="_start_time_hours" class="select short" style="width:55px">';
         
         if ( $start_date_time == '' )
         {
-            $value = date("H");
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+            $value = gmdate("H");
         }
         else
         {
-            $value = date( "H", strtotime( $start_date_time ) );
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+            $value = gmdate( "H", strtotime( $start_date_time ) );
         }
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         for ( $i = 0; $i < 23; ++$i )
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $j = str_pad($i, 2, '0', STR_PAD_LEFT);
             echo '<option value="' . esc_attr($j) . '"';
             if ($i == $value) { echo ' selected'; }
@@ -57,14 +69,18 @@ echo '<div class="propertyhive_meta_box">';
         
         if ( $start_date_time == '' )
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $value = '';
         }
         else
         {
-            $value = date( "i", strtotime( $start_date_time ) );
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+            $value = gmdate( "i", strtotime( $start_date_time ) );
         }
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         for ( $i = 0; $i < 60; $i+=5 )
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $j = str_pad($i, 2, '0', STR_PAD_LEFT);
             echo '<option value="' . esc_attr($j) . '"';
             if ($i == $value) { echo ' selected'; }
@@ -75,21 +91,27 @@ echo '<div class="propertyhive_meta_box">';
     }
     echo '</p>';
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $durations = array(15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180);
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $durations = apply_filters( 'propertyhive_viewing_durations', $durations );
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $value = get_post_meta( $post->ID, '_duration', true );
     if ($value == '')
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         $value = apply_filters( 'propertyhive_viewing_default_duration_minutes', 30 ) * 60; // Default is 30 minutes, unless modified by filter
 
-        if ( isset($_GET['start']) && $_GET['start'] != '' && isset($_GET['end']) && $_GET['end'] != '' )
+        if ( $propertyhive_calendar_start !== null && $propertyhive_calendar_end !== null )
         {
             // $_GET['start'] and $_GET['end'] should be a unix timestamp
-            $duration = ($_GET['end'] - $_GET['start']) / 60;
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+            $duration = ($propertyhive_calendar_end - $propertyhive_calendar_start) / 60;
 
             if ( in_array($duration, $durations) )
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $value = $duration * 60;
             }
         }
@@ -103,16 +125,21 @@ echo '<div class="propertyhive_meta_box">';
             
             <select id="_duration" name="_duration" class="select short">';
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             foreach ( $durations as $duration )
             {
                 // convert duration to reable format (i.e. 1 hour 15 minutes)
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $hours = floor($duration / 60);
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $minutes = $duration % 60;
                 echo '<option value="' . esc_attr(($duration * 60)) . '"' . ( $value == ($duration * 60) ? 'selected' : '' ) . '>' . esc_html(( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' '. $minutes . ' minutes' : '' )) . '</option>';
             }
             if ( !in_array( $value / 60, $durations))
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $hours = floor(($value / 60) / 60);
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $minutes = ($value / 60) % 60;
                 echo '<option value="' . esc_attr($value) . '" selected>' . esc_html(( $hours > 0 ? $hours . ' hour' . ( $hours != 1 ? 's' : '' ) : '' ) . ( $minutes != '' ? ' ' . $minutes . ' minutes' : '' )) . '</option>';
             }
@@ -125,14 +152,17 @@ echo '<div class="propertyhive_meta_box">';
     echo '
     <p class="form-field"><label for="_negotiator_ids">' . esc_html(__( 'Attending Negotiator(s)', 'propertyhive' )) . '</label>';
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $negotiator_ids = get_post_meta( $post->ID, '_negotiator_id' );
     if ( $readonly )
     {
         if ( !empty($negotiator_ids) )
         {
             $names = array();
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             foreach ( $negotiator_ids as $negotiator_id )
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $user_info = get_userdata($negotiator_id);
                 if ( $user_info !== FALSE )
                 {
@@ -153,21 +183,27 @@ echo '<div class="propertyhive_meta_box">';
         
         if ( isset($pagenow) && $pagenow == 'post-new.php' )
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $negotiator_ids = array( get_current_user_id() );
         }
 
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         $args = array(
             'number' => 9999,
             'orderby' => 'display_name',
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy Property Negotiator compatibility filter; existing role filters depend on this exact public hook name.
             'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
         );
 
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         $args = apply_filters( 'propertyhive_negotiators_query', $args );
         
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         $user_query = new WP_User_Query( $args );
 
         if ( ! empty( $user_query->results ) ) 
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             foreach ( $user_query->results as $user ) 
             {
                 echo '<option value="' . esc_attr($user->ID) . '"';
@@ -234,23 +270,27 @@ echo '<div class="propertyhive_meta_box">';
     
     echo '</div>';
     
-    if ( isset($_GET['viewing_id']) )
+    $propertyhive_original_viewing_id = isset( $propertyhive_calendar_input['viewing_id'] ) && is_scalar( $propertyhive_calendar_input['viewing_id'] ) ? absint( $propertyhive_calendar_input['viewing_id'] ) : 0;
+    if ( $propertyhive_original_viewing_id > 0 )
     {
-        echo '<input type="hidden" name="_original_viewing_id" value="' . esc_attr((int)$_GET['viewing_id']) . '">';
+        echo '<input type="hidden" name="_original_viewing_id" value="' . esc_attr( $propertyhive_original_viewing_id ) . '">';
     }
 
     echo '<input type="hidden" name="_num_requiring_confirmation" id="_num_requiring_confirmation" value="">';
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $previously_selected = array();
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
     $confirmed = get_post_meta( $post->ID, '_confirmed', true );
     if ( is_array($confirmed) && !empty($confirmed) )
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
         $previously_selected = $confirmed;
     }
 
     echo '<script>
 
-        var previously_selected = ' . json_encode($previously_selected) . ';
+        var previously_selected = ' . wp_json_encode( $previously_selected, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ';
 
         jQuery(document).ready(function()
         {
@@ -312,7 +352,10 @@ echo '<div class="propertyhive_meta_box">';
             {
                 for ( var i in options )
                 {
-                    jQuery(\'.confirmations .ph-radios\').append(\'<li><label><input type="checkbox" class="checkbox" name="_confirmed[]" value="\' + options[i].id + \'"> \' + options[i].name + \'</label></li>\');
+                        var confirmation_label = jQuery(\'<label>\');
+                        confirmation_label.append(jQuery(\'<input>\', { type: \'checkbox\', class: \'checkbox\', name: \'_confirmed[]\' }).val(options[i].id));
+                        confirmation_label.append(document.createTextNode(\' \' + options[i].name));
+                        jQuery(\'.confirmations .ph-radios\').append(jQuery(\'<li>\').append(confirmation_label));
                     num_requiring_confirmation = num_requiring_confirmation + 1;
                 }
             }
@@ -326,7 +369,7 @@ echo '<div class="propertyhive_meta_box">';
             for ( var i in previously_selected )
             {
                 //console.log(previously_selected[i]);
-                jQuery("input[name=\'_confirmed[]\'][value=\'" + previously_selected[i] + "\']").prop(\'checked\', true);
+                    jQuery("input[name=\'_confirmed[]\']").filter(function() { return this.value == previously_selected[i]; }).prop(\'checked\', true);
             }
 
             jQuery(\'#_num_requiring_confirmation\').val(num_requiring_confirmation);

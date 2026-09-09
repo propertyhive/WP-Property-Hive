@@ -15,6 +15,7 @@ if ( ! class_exists( 'PH_Admin_Reports' ) ) :
 /**
  * PH_Admin_Reports
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Reports; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Reports {
 
 	/**
@@ -25,10 +26,23 @@ class PH_Admin_Reports {
 	 */
 	public static function output() {
 
-		$reports        = self::get_reports();
-		$first_tab      = array_keys( $reports );
-		$current_tab    = ! empty( $_GET['tab'] ) ? sanitize_title( $_GET['tab'] ) : $first_tab[0];
-		$current_report = isset( $_GET['report'] ) ? sanitize_title( $_GET['report'] ) : current( array_keys( $reports[ $current_tab ]['reports'] ) );
+        if ( ! current_user_can( 'manage_propertyhive' ) ) {
+            return;
+        }
+
+        $reports = self::get_reports();
+        if ( empty( $reports ) ) {
+            return;
+        }
+        $first_tab = array_keys( $reports );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Authorized read-only report navigation; no state-changing action is performed.
+        $current_tab = ! empty( $_GET['tab'] ) && is_string( $_GET['tab'] ) ? sanitize_title( wp_unslash( $_GET['tab'] ) ) : $first_tab[0];
+        if ( ! isset( $reports[ $current_tab ] ) ) {
+            $current_tab = $first_tab[0];
+        }
+        $report_keys = array_keys( $reports[ $current_tab ]['reports'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Authorized read-only report navigation; callbacks are selected only from registered reports.
+        $current_report = isset( $_GET['report'] ) && is_string( $_GET['report'] ) ? sanitize_title( wp_unslash( $_GET['report'] ) ) : current( $report_keys );
 
 		include_once( 'reports/class-ph-admin-report.php' );
 		include_once( 'views/html-admin-page-reports.php' );
@@ -126,6 +140,7 @@ class PH_Admin_Reports {
 		$name  = sanitize_title( str_replace( '_', '-', $name ) );
 		$class = 'PH_Report_' . str_replace( '-', '_', $name );
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public Property Hive extension hook ph_admin_reports_path; changing the established name would detach installed callbacks.
 		include_once( apply_filters( 'ph_admin_reports_path', 'reports/class-ph-report-' . $name . '.php', $name, $class ) );
 
 		if ( ! class_exists( $class ) )

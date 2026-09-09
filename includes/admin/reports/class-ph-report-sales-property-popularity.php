@@ -12,7 +12,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     PropertyHive/Admin/Reports
  * @version     1.0.0
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Report_Sales_Property_Popularity; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Report_Sales_Property_Popularity extends PH_Admin_Report {
+
+    private function get_requested_date( $key, $default ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Authorized read-only popularity range; require a real calendar date before statistics lookup.
+        $value = isset( $_GET[ $key ] ) && is_string( $_GET[ $key ] ) ? sanitize_text_field( wp_unslash( $_GET[ $key ] ) ) : '';
+        if ( preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/', $value, $parts ) && checkdate( (int) $parts[2], (int) $parts[3], (int) $parts[1] ) ) {
+            return $value;
+        }
+        return $default;
+    }
 
 	private function get_property_view_data( $date_from, $date_to )
 	{
@@ -29,6 +39,7 @@ class PH_Report_Sales_Property_Popularity extends PH_Admin_Report {
 			'post_type' => 'property',
 			'nopaging' => true,
 			'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Complete stock/report totals require all matching on-market properties in the fixed department, fetched as IDs through WordPress; optional office narrowing is retained.
 			'meta_query' => array(
 				array(
 					'key' => '_on_market',
@@ -73,14 +84,14 @@ class PH_Report_Sales_Property_Popularity extends PH_Admin_Report {
 							{
 								$total_views += $view_statistics[$date_from];
 							}
-			                $date_from = date("Y-m-d", strtotime("+1 day", strtotime($date_from)));
+			                $date_from = gmdate("Y-m-d", strtotime("+1 day", strtotime($date_from)));
 						}
 
 						$date_from = $original_date_from;
 						$date_to = $original_date_to;
 
-						$date_from = date("Y-m-d", strtotime($original_date_from) - $secs_diff - 86400);
-						$date_to = date("Y-m-d", strtotime($date_to) - $secs_diff - 86400);
+						$date_from = gmdate("Y-m-d", strtotime($original_date_from) - $secs_diff - 86400);
+						$date_to = gmdate("Y-m-d", strtotime($date_to) - $secs_diff - 86400);
 
 						while (strtotime($date_from) <= strtotime($date_to)) 
 						{
@@ -89,7 +100,7 @@ class PH_Report_Sales_Property_Popularity extends PH_Admin_Report {
 								if ( $previous_time_frame === false ) { $previous_time_frame = 0; }
 								$previous_time_frame += $view_statistics[$date_from];
 							}
-			                $date_from = date("Y-m-d", strtotime("+1 day", strtotime($date_from)));
+			                $date_from = gmdate("Y-m-d", strtotime("+1 day", strtotime($date_from)));
 						}
 					}
 
@@ -110,10 +121,17 @@ class PH_Report_Sales_Property_Popularity extends PH_Admin_Report {
 	 */
 	public function output_report() {
 
-		$duration = ( ( isset($_GET['duration']) ) ? ((int)$_GET['duration'] - 1) : 6 );
-
-		$date_from = ( ( isset($_GET['date_from']) ) ? saniitize_text_field($_GET['date_from']) : date("Y-m-d", strtotime(($duration + 1) . " days ago")) );
-		$date_to = ( ( isset($_GET['date_to']) ) ? saniitize_text_field($_GET['date_to']) : date("Y-m-d", strtotime("yesterday")) );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Authorized read-only report range; malformed duration falls back to the existing seven-day default.
+        $requested_duration = isset( $_GET['duration'] ) && is_string( $_GET['duration'] ) ? sanitize_text_field( wp_unslash( $_GET['duration'] ) ) : '';
+        $duration = ctype_digit( $requested_duration ) && (int) $requested_duration > 0 ? (int) $requested_duration - 1 : 6;
+        $default_from = gmdate( 'Y-m-d', strtotime( ( $duration + 1 ) . ' days ago' ) );
+        $default_to = gmdate( 'Y-m-d', strtotime( 'yesterday' ) );
+        $date_from = $this->get_requested_date( 'date_from', $default_from );
+        $date_to = $this->get_requested_date( 'date_to', $default_to );
+        if ( $date_from > $date_to ) {
+            $date_from = $default_from;
+            $date_to = $default_to;
+        }
 
 		$properties_view_data = $this->get_property_view_data( $date_from, $date_to );
 
