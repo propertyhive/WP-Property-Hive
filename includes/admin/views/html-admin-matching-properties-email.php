@@ -2,16 +2,18 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only email composition count; the matching controller verifies propertyhive-matching-properties before including this view.
+$propertyhive_email_property_ids = isset( $_POST['email_property_id'] ) && is_array( $_POST['email_property_id'] ) ? array_filter( array_map( 'sanitize_text_field', wp_unslash( $_POST['email_property_id'] ) ), 'ctype_digit' ) : array();
 ?>
 
-<h1>Emailing <?php echo count($_POST['email_property_id']); ?> Suitable Properties To <?php echo esc_html(get_the_title($contact_id)); ?></h1>
+<h1>Emailing <?php echo count( $propertyhive_email_property_ids ); ?> Suitable Properties To <?php echo esc_html(get_the_title($contact_id)); ?></h1>
 
 <table class="form-table">
 
     <tr valign="top">
         <th scope="row" class="titledesc"><?php echo esc_html(__( 'To', 'propertyhive' )); ?></th>
         <td class="forminp">
-            <input type="text" name="to_email_address" value="<?php echo get_post_meta( $contact_id, '_email_address', TRUE ); ?>" style="width:100%; margin-bottom:5px;">
+            <input type="text" name="to_email_address" value="<?php echo esc_attr( get_post_meta( $contact_id, '_email_address', TRUE ) ); ?>" style="width:100%; margin-bottom:5px;">
             <a href="" class="show-cc">Show Cc</a> &nbsp;|&nbsp; <a href="" class="show-bcc">Show Bcc</a>
         </td>
     </tr>
@@ -54,7 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <tr valign="top">
         <th scope="row" class="titledesc"><?php echo esc_html(__( 'Email Body', 'propertyhive' )); ?></th>
         <td class="forminp">
-            <textarea name="body" style="width:100%; height:300px;"><?php echo $body; ?></textarea>
+            <textarea name="body" style="width:100%; height:300px;"><?php echo esc_textarea( $body ); ?></textarea>
         </td>
     </tr>
 
