@@ -1,5 +1,10 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+
 add_shortcode( 'avada_property_embedded_virtual_tours', function( $atts ) {
     $atts = shortcode_atts( array(
         'show_title'    => '',
@@ -17,6 +22,7 @@ add_shortcode( 'avada_property_embedded_virtual_tours', function( $atts ) {
     
     if ( empty($property) )
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared frontend property global used by the Avada shortcode contract; changing $property would break the existing property context passed to these widgets.
         $property = new PH_Property(get_the_ID());
     }
 
@@ -35,6 +41,7 @@ add_shortcode( 'avada_property_embedded_virtual_tours', function( $atts ) {
                 if ( isset($atts['oembed']) && $atts['oembed'] == 'yes' )
                 {
                     $embed_code = wp_oembed_get($virtual_tour['url']);
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_oembed_get() uses WordPress provider trust and sanitization; preserve supported provider scripts and trusted PHP filters.
                     echo $embed_code;
                 }
                 else

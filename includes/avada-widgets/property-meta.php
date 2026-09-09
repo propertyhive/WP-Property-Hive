@@ -1,7 +1,12 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+
 fusion_builder_map( array(
-    'name'        => esc_attr__( $widget, 'propertyhive' ),
+    'name'        => esc_attr__( 'Property Meta', 'propertyhive' ),
     'shortcode'   => 'avada_' . str_replace("-", "_", sanitize_title($widget)),
     'icon'        => 'fusiona-list-ul', // Use a Fusion icon
     'preview'    => dirname( PH_PLUGIN_FILE ) . '/includes/avada-widgets/' . sanitize_title($widget) . '-preview.php',
@@ -9,28 +14,28 @@ fusion_builder_map( array(
     'params'      => array(
         [
 			'type'        => 'radio_button_set',
-			'heading'     => esc_attr__( 'Alignment', 'fusion-builder' ),
-			'description' => esc_attr__( 'Choose to align the output left, right or center.', 'fusion-builder' ),
+			'heading'     => esc_attr__( 'Alignment', 'propertyhive' ),
+			'description' => esc_attr__( 'Choose to align the output left, right or center.', 'propertyhive' ),
 			'param_name'  => 'content_align',
 			'responsive'  => [
 				'state'         => 'large',
 				'default_value' => true,
 			],
 			'value'       => [
-				'left'   => esc_attr__( 'Left', 'fusion-builder' ),
-				'center' => esc_attr__( 'Center', 'fusion-builder' ),
-				'right'  => esc_attr__( 'Right', 'fusion-builder' ),
+				'left'   => esc_attr__( 'Left', 'propertyhive' ),
+				'center' => esc_attr__( 'Center', 'propertyhive' ),
+				'right'  => esc_attr__( 'Right', 'propertyhive' ),
 			],
 			'default'     => 'left',
-			'group'       => esc_attr__( 'Design', 'fusion-builder' ),
+			'group'       => esc_attr__( 'Design', 'propertyhive' ),
 		],
 		[
 			'type'             => 'typography',
 			//'remove_from_atts' => true,
 			'global'           => true,
-			'heading'          => esc_attr__( 'Typography', 'fusion-builder' ),
+			'heading'          => esc_attr__( 'Typography', 'propertyhive' ),
 			'param_name'       => 'main_typography',
-			'group'            => esc_attr__( 'Design', 'fusion-builder' ),
+			'group'            => esc_attr__( 'Design', 'propertyhive' ),
 			'choices'          => [
 				'font-family'    => 'meta_font',
 				'font-size'      => 'font_size',
@@ -49,10 +54,10 @@ fusion_builder_map( array(
 		],
 		[
 			'type'        => 'colorpickeralpha',
-			'heading'     => esc_attr__( 'Font Color', 'fusion-builder' ),
+			'heading'     => esc_attr__( 'Font Color', 'propertyhive' ),
 			'param_name'  => 'text_color',
 			'value'       => '',
-			'group'       => esc_attr__( 'Design', 'fusion-builder' ),
+			'group'       => esc_attr__( 'Design', 'propertyhive' ),
 		],
     ),
 ) );

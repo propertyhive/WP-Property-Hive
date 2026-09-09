@@ -1,5 +1,10 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+
 add_shortcode( 'avada_property_enquiry_form_link', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -23,6 +28,7 @@ add_shortcode( 'avada_property_enquiry_form_link', function( $atts ) {
     
     if ( empty($property) )
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared frontend property global used by the Avada shortcode contract; changing $property would break the existing property context passed to these widgets.
         $property = new PH_Property(get_the_ID());
     }
 
@@ -47,14 +53,14 @@ add_shortcode( 'avada_property_enquiry_form_link', function( $atts ) {
     ob_start();
 ?>
 
-    <a data-fancybox data-src="#makeEnquiry<?php echo $property->id; ?>" href="javascript:;" style="<?php echo $style; ?>"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
+    <a data-fancybox data-src="#makeEnquiry<?php echo esc_attr( $property->id ); ?>" href="javascript:;" style="<?php echo esc_attr( safecss_filter_attr( $style ) ); ?>"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
 
     <!-- LIGHTBOX FORM -->
     <div id="makeEnquiry<?php echo (int)$property->id; ?>" style="display:none;">
         
         <h2><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></h2>
         
-        <p><?php _e( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' ); ?></p>
+        <p><?php esc_html_e( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' ); ?></p>
         
         <?php propertyhive_enquiry_form(); ?>
         

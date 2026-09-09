@@ -1,5 +1,10 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+
 add_shortcode( 'avada_property_bathrooms', function( $atts ) {
     $atts = shortcode_atts( array(
         'content_align'    => 'left',
@@ -26,6 +31,7 @@ add_shortcode( 'avada_property_bathrooms', function( $atts ) {
     
     if ( empty($property) )
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared frontend property global used by the Avada shortcode contract; changing $property would break the existing property context passed to these widgets.
         $property = new PH_Property(get_the_ID());
     }
 
@@ -54,8 +60,9 @@ add_shortcode( 'avada_property_bathrooms', function( $atts ) {
 
     ob_start();
 
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- FusionBuilder::attributes() returns the complete HTML attribute fragment and escapes each attribute name and value.
     echo '<div ' . FusionBuilder::attributes( 'property-bathrooms-shortcode' ) . '>
-    	<div style="' . $style . '">';
+        <div style="' . esc_attr( safecss_filter_attr( $style ) ) . '">';
 
         if ( ! empty($atts['icon']) ) 
         {
@@ -64,12 +71,12 @@ add_shortcode( 'avada_property_bathrooms', function( $atts ) {
 
         if ( isset($atts['before']) && !empty($atts['before']) )
         {
-            echo $atts['before'] . ' ';
+            echo wp_kses_post( $atts['before'] ) . ' ';
         }
         echo esc_html($property->bathrooms);
         if ( isset($atts['after']) && !empty($atts['after']) )
         {
-            echo ' ' . $atts['after'];
+            echo ' ' . wp_kses_post( $atts['after'] );
         }
     echo '
     	</div>
