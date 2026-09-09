@@ -470,7 +470,7 @@ class PH_Emails {
 				// invalid email address
 				if ( strpos( get_post_meta( $contact_id, '_email_address', TRUE ), '@' ) === FALSE )
 				{
-					if ( $dry_run === true ) { echo 'Invalid email address. Skipping' . "<br>\n"; }
+					if ( $dry_run === true ) { echo esc_html('Invalid email address. Skipping') . "<br>\n"; }
 
 					continue;
 				}
@@ -479,7 +479,7 @@ class PH_Emails {
 				$forbidden_contact_methods = get_post_meta( $contact_id, '_forbidden_contact_methods', TRUE );
 				if ( is_array($forbidden_contact_methods) && in_array('email', $forbidden_contact_methods) )
 				{
-					if ( $dry_run === true ) { echo 'Email communication forbidden in contact preferences. Skipping' . "<br>\n"; }
+					if ( $dry_run === true ) { echo esc_html('Email communication forbidden in contact preferences. Skipping') . "<br>\n"; }
 
 					continue;
 				}
@@ -502,19 +502,19 @@ class PH_Emails {
 
 						if ( $applicant_profile == '' || !is_array($applicant_profile) || !isset($applicant_profile['department']) )
 						{
-							if ( $dry_run === true ) { echo 'Applicant relationship empty or no department set' . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Applicant relationship empty or no department set') . "<br>\n"; }
 							continue;
 						}
 
 						if ( !isset($applicant_profile['send_matching_properties']) || ( isset($applicant_profile['send_matching_properties']) && $applicant_profile['send_matching_properties'] != 'yes' ) )
 						{
-							if ( $dry_run === true ) { echo 'Send matching properties disabled' . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Send matching properties disabled') . "<br>\n"; }
 							continue;
 						}
 
 						if ( isset($applicant_profile['auto_match_disabled']) && $applicant_profile['auto_match_disabled'] == 'yes' )
 						{
-							if ( $dry_run === true ) { echo 'Auto match disabled' . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Auto match disabled') . "<br>\n"; }
 							continue;
 						}
 
@@ -522,7 +522,7 @@ class PH_Emails {
 
 						$matching_properties = $ph_admin_matching_properties->get_matching_properties( $contact_id, $i, $auto_property_match_enabled_date );
 
-						if ( $dry_run === true ) { echo 'Found ' . count($matching_properties) . ' matching properties' . "<br>\n"; }
+						if ( $dry_run === true ) { echo esc_html('Found ' . count($matching_properties) . ' matching properties') . "<br>\n"; }
 
 						if ( !empty($matching_properties) )
 						{
@@ -589,7 +589,7 @@ class PH_Emails {
 								$new_matching_properties = array_slice($new_matching_properties, 0, (int)$max_results);
 							}
 
-							if ( $dry_run === true ) { echo 'Found ' . count($new_matching_properties) . ' matching properties after removing already sent and dismissed' . "<br>\n"; }
+							if ( $dry_run === true ) { echo esc_html('Found ' . count($new_matching_properties) . ' matching properties after removing already sent and dismissed') . "<br>\n"; }
 
 							if ( !empty($new_matching_properties) )
 							{
@@ -681,7 +681,7 @@ class PH_Emails {
 								}
 								else
 								{
-									echo 'Would\'ve sent email. Not sending due to being ran in dry run mode' . "<br>\n";
+									echo esc_html('Would\'ve sent email. Not sending due to being ran in dry run mode') . "<br>\n";
 								}
 							}
 						}
@@ -689,12 +689,12 @@ class PH_Emails {
 				}
 				else
 				{
-					if ( $dry_run === true ) { echo 'No applicant profiles found. Skipping' . "<br>\n"; }
+					if ( $dry_run === true ) { echo esc_html('No applicant profiles found. Skipping') . "<br>\n"; }
 				}
 			}
 		}
 
-		if ( $dry_run === true ) { echo 'Finished auto-match process' . "<br>\n"; die(); }
+		if ( $dry_run === true ) { echo esc_html('Finished auto-match process') . "<br>\n"; die(); }
 
 		wp_reset_postdata();
 	}

@@ -95,11 +95,11 @@ class PH_Meta_Box_Property_Features {
             else
             {
                 // No features
-                echo sprintf(
+                echo wp_kses_post(sprintf(
                     /* translators: %s: URL to settings page */
                     wp_kses_post( __( 'No features available to choose from. These can be edited in the <a href="%s" target="_blank">settings area</a>.', 'propertyhive' ) ),
                     esc_url( admin_url('admin.php?page=ph-settings&tab=customfields&section=property-feature') )
-                );
+                ));
             }
 
             echo '</div>';

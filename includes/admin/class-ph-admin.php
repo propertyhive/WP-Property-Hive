@@ -60,24 +60,27 @@ class PH_Admin {
                 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                 $count = is_string($_GET['bulk_archived_posts']) ? absint($_GET['bulk_archived_posts']) : 0;
 
-                $message = sprintf(
-                    /* translators: 1: number of items, 2: post type label */
-                    _n(
-                        '%1$s %2$s moved to archive.',
-                        '%1$s %2$s moved to archive.',
-                        $count,
-                        'propertyhive'
-                    ),
-                    number_format_i18n( $count ),
-                    $count === 1
-                        ? $post_type_object->labels->singular_name
-                        : $post_type_object->labels->name
-                );
+                if ( $post_type_object )
+                {
+                    $message = sprintf(
+                        /* translators: 1: number of items, 2: post type label */
+                        _n(
+                            '%1$s %2$s moved to archive.',
+                            '%1$s %2$s moved to archive.',
+                            $count,
+                            'propertyhive'
+                        ),
+                        number_format_i18n( $count ),
+                        $count === 1
+                            ? $post_type_object->labels->singular_name
+                            : $post_type_object->labels->name
+                    );
 
-                printf(
-                    '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
-                    esc_html( $message )
-                );
+                    printf(
+                        '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
+                         esc_html( $message )
+                    );
+                }
             }
         }
 
@@ -96,24 +99,27 @@ class PH_Admin {
                 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                 $count = is_string($_GET['bulk_unarchived_posts']) ? absint($_GET['bulk_unarchived_posts']) : 0;
 
-                $message = sprintf(
-                    /* translators: 1: number of items, 2: post type label */
-                    _n(
-                        '%1$s %2$s removed from archive.',
-                        '%1$s %2$s removed from archive.',
-                        $count,
-                        'propertyhive'
-                    ),
-                    number_format_i18n( $count ),
-                    $count === 1
-                        ? $post_type_object->labels->singular_name
-                        : $post_type_object->labels->name
-                );
+                if ( $post_type_object )
+                {
+                    $message = sprintf(
+                        /* translators: 1: number of items, 2: post type label */
+                        _n(
+                            '%1$s %2$s removed from archive.',
+                            '%1$s %2$s removed from archive.',
+                            $count,
+                            'propertyhive'
+                        ),
+                        number_format_i18n( $count ),
+                        $count === 1
+                            ? $post_type_object->labels->singular_name
+                            : $post_type_object->labels->name
+                    );
 
-                printf(
-                    '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
-                    esc_html( $message )
-                );
+                    printf(
+                        '<div id="message" class="notice is-dismissible updated"><p>%s</p></div>',
+                         esc_html( $message )
+                    );
+                }
             }
         }
     }
@@ -985,7 +991,12 @@ class PH_Admin {
             }
             if ( ! wp_verify_nonce( ( isset( $_REQUEST['_wpnonce'] ) && is_string( $_REQUEST['_wpnonce'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ) : '', 'view-email' ) )
             {
-                die( 'Security check' );
+                wp_die( 'Security check' );
+            }
+
+            if ( ! current_user_can( 'manage_propertyhive' ) )
+            {
+                wp_die( esc_html__( 'Insufficient permissions.', 'propertyhive' ) );
             }
 
             if ( isset( $_GET['email_id'] ) )

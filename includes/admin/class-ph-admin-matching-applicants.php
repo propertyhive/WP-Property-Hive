@@ -127,7 +127,18 @@ class PH_Admin_Matching_Applicants {
             </p>
 
             <p>
-            <?php echo wp_kses_post( __( 'When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ) );
+            <?php
+                echo wp_kses_post(
+                    sprintf(
+                        /* translators: 1: Opening link tag to the WordPress.org SMTP plugins page, 2: Closing link tag. */
+                        __(
+                            'When sending out lots of emails we recommend using %1$sa plugin%2$s to send them out using SMTP. Your web developer or hosting company should be able to advise on this.',
+                            'propertyhive'
+                        ),
+                        '<a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank" rel="noopener noreferrer">',
+                        '</a>'
+                    )
+                );
             ?>
             </p>
 

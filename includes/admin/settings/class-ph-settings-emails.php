@@ -477,7 +477,8 @@ class PH_Settings_Emails extends PH_Settings_Page {
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The email queue date filter is a read-only GET parameter; the separate Run Now action has its own capability and nonce gate.
             $date_from = sanitize_text_field( wp_unslash( $_GET['date_from'] ) );
         }
-        if ( 'all' !== $date_from && ! preg_match( '/^\d{4}-\d{2}-\d{2}$/D', $date_from ) ) {
+        $date = DateTime::createFromFormat( 'Y-m-d', $date_from );
+        if ( 'all' !== $date_from && ( ! $date || $date->format( 'Y-m-d' ) !== $date_from ) ) {
             $date_from = gmdate( 'Y-m-d', strtotime( '-30 days' ) );
         }
         $status = '';

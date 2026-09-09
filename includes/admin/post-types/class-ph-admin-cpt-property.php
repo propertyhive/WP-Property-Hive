@@ -62,10 +62,6 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		// Sort link
 		add_filter( 'views_edit-property', array( $this, 'remove_mine' ) );
 
-		// Prouct filtering
-		/*add_action( 'restrict_manage_posts', array( $this, 'property_filters' ) );
-		add_filter( 'parse_query', array( $this, 'property_filters_query' ) );*/
-
 		// Maintain hierarchy of terms
 		/*add_filter( 'wp_terms_checklist_args', array( $this, 'disable_checked_ontop' ) );*/
 
@@ -695,33 +691,6 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	        unset( $views['mine'] );
 
 	    return $views;
-	}
-
-	/**
-	 * Show a category filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'property' != $typenow ) {
-			return;
-		}
-
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Empty base is safe; trusted PHP extensions supply admin form controls through this HTML filter.
-		echo apply_filters( 'propertyhive_property_filters', '' );
-	}
-
-	/**
-	 * Filter the products in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function property_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'property' == $typenow ) {
-			
-		}
 	}
 
 	/**

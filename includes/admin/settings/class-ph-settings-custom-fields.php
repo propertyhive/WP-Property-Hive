@@ -51,72 +51,143 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
     public function check_for_delete_additional_field()
     {
-        if ( isset($_GET['action']) && $_GET['action'] == 'deleteadditionalfield' && isset($_GET['id']) && $_GET['id'] != '' )
-        {
-            if ( ! current_user_can( 'manage_options' ) ) {
-                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
-            }
-            check_admin_referer( 'propertyhive-delete-additional-field' );
-            if ( ! is_string( $_GET['id'] ) ) {
-                wp_die( esc_html__( 'Invalid field.', 'propertyhive' ), '', array( 'response' => 400 ) );
-            }
-            $current_settings = get_option( 'propertyhive_template_assistant', array() );
-
-            $current_id = sanitize_title( wp_unslash( $_GET['id'] ) );
-
-            $existing_custom_fields = ( (isset($current_settings['custom_fields'])) ? $current_settings['custom_fields'] : array() );
-
-            if ( !isset($existing_custom_fields[$current_id]) )
-            {
-                wp_die( esc_html__( 'The selected field does not exist.', 'propertyhive' ), '', array( 'response' => 400 ) );
-            }
-
-            if ( isset($existing_custom_fields[$current_id]) )
-            {
-                unset($existing_custom_fields[$current_id]);
-            }
-
-            $current_settings['custom_fields'] = $existing_custom_fields;
-
-            update_option( 'propertyhive_template_assistant', $current_settings );
+        if (
+            ! isset( $_GET['action'] ) ||
+            'deleteadditionalfield' !== $_GET['action']
+        ) {
+            return;
         }
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die(
+                esc_html__( 'You do not have permission to manage Property Hive fields.', 'propertyhive' ),
+                '',
+                array( 'response' => 403 )
+            );
+        }
+
+        check_admin_referer( 'propertyhive_delete_additional_field' );
+
+        $current_id = isset( $_GET['id'] ) && is_string( $_GET['id'] )
+            ? sanitize_title( wp_unslash( $_GET['id'] ) )
+            : '';
+
+        if ( '' === $current_id ) {
+            wp_die(
+                esc_html__( 'Invalid additional field.', 'propertyhive' ),
+                '',
+                array( 'response' => 400 )
+            );
+        }
+
+        $current_settings = get_option(
+            'propertyhive_template_assistant',
+            array()
+        );
+
+        $existing_custom_fields =
+            isset( $current_settings['custom_fields'] )
+            && is_array( $current_settings['custom_fields'] )
+                ? $current_settings['custom_fields']
+                : array();
+
+        if ( ! isset( $existing_custom_fields[ $current_id ] ) ) {
+            wp_die(
+                esc_html__( 'The additional field does not exist.', 'propertyhive' ),
+                '',
+                array( 'response' => 404 )
+            );
+        }
+
+        unset( $existing_custom_fields[ $current_id ] );
+
+        $current_settings['custom_fields'] = $existing_custom_fields;
+
+        update_option(
+            'propertyhive_template_assistant',
+            $current_settings
+        );
+
+        wp_safe_redirect(
+            admin_url(
+                'admin.php?page=ph-settings&tab=customfields&section=additional&ph_message=' . __( 'Additional field deleted successfully', 'propertyhive' )
+            )
+        );
+        exit;
     }
 
     public function check_for_reorder_additional_fields()
     {
-        if ( isset($_GET['neworder']) && $_GET['neworder'] != '' )
-        {
-            if ( ! current_user_can( 'manage_options' ) ) {
-                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
-            }
-            check_admin_referer( 'propertyhive-reorder-additional-fields' );
-            if ( ! is_string( $_GET['neworder'] ) ) {
-                wp_die( esc_html__( 'Invalid field order.', 'propertyhive' ), '', array( 'response' => 400 ) );
-            }
-            $current_settings = get_option( 'propertyhive_template_assistant', array() );
-
-            $existing_custom_fields = ( (isset($current_settings['custom_fields'])) ? $current_settings['custom_fields'] : array() );
-
-            $new_order = explode( ',', sanitize_text_field( wp_unslash( $_GET['neworder'] ) ) );
-            $existing_ids = array_map( 'strval', array_keys( $existing_custom_fields ) );
-            if ( count( $new_order ) !== count( $existing_ids ) || count( array_unique( $new_order ) ) !== count( $new_order ) || array_diff( $new_order, $existing_ids ) ) {
-                wp_die( esc_html__( 'Invalid field order. Refresh the page and try again.', 'propertyhive' ), '', array( 'response' => 400 ) );
-            }
-
-            $new_custom_fields = array();
-
-            foreach ( $new_order as $id )
-            {
-                $new_custom_fields[] = $existing_custom_fields[$id];
-            }
-
-            $current_settings['custom_fields'] = $new_custom_fields;
-
-            update_option( 'propertyhive_template_assistant', $current_settings );
-
-            wp_safe_redirect( admin_url( 'admin.php?page=ph-settings&tab=customfields&section=additional' ) );
-            exit();
+        if ( ! isset( $_GET['neworder'] ) ) {
+            return;
         }
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die(
+                esc_html__( 'You do not have permission to manage Property Hive fields.', 'propertyhive' ),
+                '',
+                array( 'response' => 403 )
+            );
+        }
+
+        check_admin_referer( 'propertyhive_reorder_additional_fields' );
+
+        if ( ! is_string( $_GET['neworder'] ) ) {
+            wp_die( esc_html__( 'Invalid additional field order.', 'propertyhive' ), '', array( 'response' => 400 ) );
+        }
+
+        $new_order = array_map(
+            'sanitize_title',
+            explode(
+                ',',
+                sanitize_text_field(
+                    wp_unslash( $_GET['neworder'] )
+                )
+            )
+        );
+
+        $current_settings = get_option(
+            'propertyhive_template_assistant',
+            array()
+        );
+
+        $existing_custom_fields =
+            isset( $current_settings['custom_fields'] )
+            && is_array( $current_settings['custom_fields'] )
+                ? $current_settings['custom_fields']
+                : array();
+
+        if (
+            count( $new_order ) !== count( $existing_custom_fields ) ||
+            array_diff( $new_order, array_keys( $existing_custom_fields ) ) ||
+            array_diff( array_keys( $existing_custom_fields ), $new_order )
+        ) {
+            wp_die(
+                esc_html__( 'Invalid additional field order.', 'propertyhive' ),
+                '',
+                array( 'response' => 400 )
+            );
+        }
+
+        $new_custom_fields = array();
+
+        foreach ( $new_order as $id ) {
+            $new_custom_fields[ $id ] = $existing_custom_fields[ $id ];
+        }
+
+        $current_settings['custom_fields'] = $new_custom_fields;
+
+        update_option(
+            'propertyhive_template_assistant',
+            $current_settings
+        );
+
+        wp_safe_redirect(
+            admin_url(
+                'admin.php?page=ph-settings&tab=customfields&section=additional&ph_message=' . __( 'Additional fields reordered successfully', 'propertyhive' )
+            )
+        );
+        exit;
     }
 
     /**
@@ -926,9 +997,17 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                             echo '-';
                                         }
                                         echo '</td>';
+
+                                        $delete_url = wp_nonce_url(
+                                            admin_url(
+                                                'admin.php?page=ph-settings&tab=customfields&section=additional&action=deleteadditionalfield&id=' . rawurlencode( $id )
+                                            ),
+                                            'propertyhive_delete_additional_field'
+                                        );
+
                                         echo '<td class="settings">
                                             <a class="button" href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=customfields&section=editadditionalfield&id=' . $id )) . '">' . esc_html(__( 'Edit Field', 'propertyhive' )) . '</a>
-                                            <a class="button" href="' . esc_url( wp_nonce_url( admin_url( 'admin.php?page=ph-settings&tab=customfields&section=additional&action=deleteadditionalfield&id=' . $id ), 'propertyhive-delete-additional-field' ) ) . '" onclick="var confirmBox = confirm(\'Are you sure you wish to delete this custom field?\'); return confirmBox;">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>
+                                            <a class="button" href="' . esc_url( $delete_url ) . '" onclick="var confirmBox = confirm(\'Are you sure you wish to delete this custom field?\'); return confirmBox;">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>
                                         </td>';
                                     echo '</tr>';
                                 }
@@ -965,7 +1044,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     });
 
                                     // reload page
-                                    window.location.href = <?php echo wp_json_encode( add_query_arg( '_wpnonce', wp_create_nonce( 'propertyhive-reorder-additional-fields' ), admin_url( 'admin.php?page=ph-settings&tab=customfields&section=additional' ) ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> + '&neworder=' + encodeURIComponent( new_order );
+                                    window.location.href = <?php echo wp_json_encode( add_query_arg( '_wpnonce', wp_create_nonce( 'propertyhive_reorder_additional_fields' ), admin_url( 'admin.php?page=ph-settings&tab=customfields&section=additional' ) ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> + '&neworder=' + encodeURIComponent( new_order );
                             }
                         });
 

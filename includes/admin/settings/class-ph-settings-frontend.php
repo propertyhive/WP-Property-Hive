@@ -618,7 +618,8 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         <div class="group" id="' . esc_attr( $id ) . '">
             <h3>' . esc_html( trim( $id, '_' ) ) . '</h3>
             <div>';
-        if ( $id == 'department' )
+
+        if ( 'department' === $id )
         {
             echo '<p><label for="type_'. esc_attr( $id ) .'">Type:</label> <select name="type[' . esc_attr( $id ) . ']" id="type_'. esc_attr( $id ) .'">
                 <option value="radio"' . ( ( !isset($field['type']) || ( isset($field['type']) && $field['type'] == 'radio' ) ) ? ' selected' : '' ) . '>Radio Buttons</option>
@@ -639,14 +640,20 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 
                 <p><label for="after_'. esc_attr( $id ) .'">After:</label> <input type="text" name="after[' . esc_attr( $id ) . ']" id="after_'. esc_attr( $id ) .'" value="' . ( ( isset($field['after']) ) ? esc_attr($field['after']) : '' ) . '"></p>';
 
-        if ( isset($field['type']) && in_array($field['type'], array('text', 'email', 'date', 'number', 'password')) )
+        if (
+            isset( $field['type'] ) &&
+            in_array( $field['type'], array( 'text', 'email', 'date', 'number', 'password' ), true )
+        )
         {
             echo '
             <p><label for="placeholder_'. esc_attr( $id ) .'">Placeholder:</label> <input type="text" name="placeholder[' . esc_attr( $id ) . ']" id="placeholder_'. esc_attr( $id ) .'" value="' . ( ( isset($field['placeholder']) ) ? esc_attr($field['placeholder']) : '' ) . '"></p>
             ';
         }
 
-        if ( isset($field['type']) && in_array($field['type'], array('slider')) )
+        if (
+            isset( $field['type'] ) &&
+            in_array( $field['type'], array( 'slider' ), true )
+        )
         {
             echo '
             <p><label for="min_'. esc_attr( $id ) .'">Min:</label> <input type="number" name="min[' . esc_attr( $id ) . ']" id="min_'. esc_attr( $id ) .'" value="' . ( ( isset($field['min']) ) ? esc_attr($field['min']) : '0' ) . '"></p>
@@ -661,20 +668,41 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             ';
         }
 
-        if ( isset($field['type']) && in_array($field['type'], array('office')) )
+        if (
+            isset( $field['type'] ) &&
+            in_array( $field['type'], array( 'office' ), true )
+        )
         {
             echo '
             <p><label for="blank_option_'. esc_attr( $id ) .'">Blank Option:</label> <input type="text" name="blank_option[' . esc_attr( $id ) . ']" id="blank_option_'. esc_attr( $id ) .'" value="' . ( ( isset($field['blank_option']) ) ? esc_attr($field['blank_option']) : esc_attr__( 'No Preference', 'propertyhive' ) ) . '"></p>
             ';
         }
 
-        if ( taxonomy_exists($id) || ( isset($field['custom_field']) && $field['custom_field'] === true && $field['type'] == 'select' ) )
+        if (
+            taxonomy_exists( $id ) ||
+            (
+                isset( $field['custom_field'] ) &&
+                true === $field['custom_field'] &&
+                isset( $field['type'] ) &&
+                'select' === $field['type']
+            )
+        )
         {
             echo '
             <p><label for="blank_option_'. esc_attr( $id ) .'">Blank Option:</label> <input type="text" name="blank_option[' . esc_attr( $id ) . ']" id="blank_option_'. esc_attr( $id ) .'" value="' . ( ( isset($field['blank_option']) ) ? esc_attr($field['blank_option']) : esc_attr__( 'No Preference', 'propertyhive' ) ) . '"></p>
             ';
 
-            if ( taxonomy_exists($id) && in_array( $id, apply_filters( 'propertyhive_template_assistant_multi_level_taxonomy_fields', array('property_type', 'commercial_property_type', 'location') ) ) )
+            if (
+                taxonomy_exists( $id ) &&
+                in_array(
+                    $id,
+                    apply_filters(
+                        'propertyhive_template_assistant_multi_level_taxonomy_fields',
+                        array( 'property_type', 'commercial_property_type', 'location' )
+                    ),
+                    true
+                )
+            )
             {
                 echo '
                 <p><label for="parent_terms_only_'. esc_attr( $id ) .'">Top-Level Terms Only:</label> <input type="checkbox" name="parent_terms_only[' . esc_attr( $id ) . ']" id="parent_terms_only_'. esc_attr( $id ) .'" value="yes"' . ( ( isset($field['parent_terms_only']) && $field['parent_terms_only'] === true ) ? ' checked' : '' ) . '></p>
@@ -685,7 +713,17 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 ';
             }
 
-            if ( taxonomy_exists($id) && in_array( $id, apply_filters( 'propertyhive_template_assistant_dynamic_population_taxonomy_fields', array('location') ) ) )
+            if (
+                taxonomy_exists( $id ) &&
+                in_array(
+                    $id,
+                    apply_filters(
+                        'propertyhive_template_assistant_dynamic_population_taxonomy_fields',
+                        array( 'location' )
+                    ),
+                    true
+                )
+            )
             {
                 echo '
                 <p><label for="dynamic_population_'. esc_attr( $id ) .'">Dynamically Populate Cascading Dropdowns:</label> <input type="checkbox" name="dynamic_population[' . esc_attr( $id ) . ']" id="dynamic_population_'. esc_attr( $id ) .'" value="yes"' . ( ( isset($field['dynamic_population']) && $field['dynamic_population'] === true ) ? ' checked' : '' ) . '></p>
@@ -697,16 +735,23 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             ';
         }
 
-        if ( $id == 'office' )
+        if ( 'office' === $id )
         {
             echo '
             <p><label for="multiselect_'. esc_attr( $id ) .'">Multi-Select:</label> <input type="checkbox" name="multiselect[' . esc_attr( $id ) . ']" id="multiselect_'. esc_attr( $id ) .'" value="yes"' . ( ( isset($field['multiselect']) && $field['multiselect'] === true ) ? ' checked' : '' ) . '></p>
             ';
         }
 
-        if ( isset($field['options']) && !taxonomy_exists($id) && ( !isset($field['custom_field']) || ( isset($field['custom_field']) && $field['custom_field'] === false ) ) )
+        if (
+            isset( $field['options'] ) &&
+            ! taxonomy_exists( $id ) &&
+            (
+                ! isset( $field['custom_field'] ) ||
+                false === $field['custom_field']
+            )
+        )
         {
-            echo '<p><label for="">Options: ';
+            echo '<p><label>Options: ';
 
             echo '<a href="" class="add-search-form-field-option" id="add_search_form_field_option_' . esc_attr( $id ) . '">Add Option</a>';
 
@@ -720,11 +765,9 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                 echo '<input type="text" name="option_keys[' . esc_attr( $id ) . '][]" value="' . esc_attr( $key ) . '">';
                 echo '<input type="text" name="options_values[' . esc_attr( $id ) . '][]" value="' . esc_attr( $value ) . '">';
                 echo '</span>';
-
-                ++$i;
             }
-            echo '</span>';
 
+            echo '</span>';
             echo '</p>';
 ?>
 <script>
@@ -752,8 +795,8 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                     }
                 });
             });
-        </script>
-<?php
+    </script>
+    <?php
         }
 
         echo '</div>

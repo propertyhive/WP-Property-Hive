@@ -454,7 +454,7 @@ if ( !empty($actions) )
 }
 else
 {
-    echo '<div style="text-align:center">' . wp_kses_post( __( 'No actions to display', 'propertyhive' ) ) . '</div>';
+    echo '<div style="text-align:center">' . esc_html( __( 'No actions to display', 'propertyhive' ) ) . '</div>';
 }
 
 echo '</div>

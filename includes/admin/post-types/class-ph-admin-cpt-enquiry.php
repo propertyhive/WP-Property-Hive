@@ -333,7 +333,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
             case 'negotiator' :
                 if ($the_enquiry->_negotiator_id == '' || $the_enquiry->_negotiator_id == 0)
                 {
-                    echo '<em>-- ' . esc_html(__( 'Unassigned', 'propertyhive' )) . ' --</em>';
+                    echo wp_kses_post('<em>-- ' . esc_html(__( 'Unassigned', 'propertyhive' )) . ' --</em>');
                 }
                 else
                 {

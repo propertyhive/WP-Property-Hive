@@ -366,33 +366,6 @@ class PH_Admin_CPT_Viewing extends PH_Admin_CPT {
         return $actions;
     }
 
-	/**
-	 * Show a status filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'viewing' != $typenow ) {
-			return;
-		}
-
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The empty base is safe; trusted PHP extensions supply admin form controls through this HTML filter.
-		echo apply_filters( 'propertyhive_viewing_filters', '' );
-	}
-
-	/**
-	 * Filter the viewings in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function viewing_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'viewing' == $typenow ) {
-
-		}
-	}
-
 	public static function check_viewing_feedback_add( $object_id, $meta_key, $meta_value )
 	{
 		if ( get_post_type($object_id) == 'viewing' && $meta_key == '_feedback_status' && in_array($meta_value, array( 'interested', 'not_interested' )) )

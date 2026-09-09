@@ -278,33 +278,6 @@ class PH_Admin_CPT_Offer extends PH_Admin_CPT {
         unset( $actions['edit'] );
         return $actions;
     }
-
-	/**
-	 * Show a status filter box
-	 */
-	public function propertyhive_filters() {
-		global $typenow, $wp_query;
-
-		if ( 'offer' != $typenow ) {
-			return;
-		}
-
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Empty base is safe; trusted PHP extensions supply admin form controls through this HTML filter.
-		echo apply_filters( 'propertyhive_offer_filters', '' );
-	}
-
-	/**
-	 * Filter the offers in admin based on options
-	 *
-	 * @param mixed $query
-	 */
-	public function offer_filters_query( $query ) {
-		global $typenow, $wp_query;
-
-		if ( 'offer' == $typenow ) {
-
-		}
-	}
 }
 
 endif;
