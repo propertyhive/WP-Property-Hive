@@ -17,6 +17,7 @@ if ( ! class_exists( 'PH_Settings_Demo_Data' ) ) :
 /**
  * PH_Settings_Demo_Data
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Demo_Data; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Demo_Data extends PH_Settings_Page {
 
     /**
@@ -41,6 +42,7 @@ class PH_Settings_Demo_Data extends PH_Settings_Page {
     {
         global $hide_save_button;
 
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
         $hide_save_button = TRUE;
 
         return apply_filters( 'propertyhive_demo_data_settings', array(
@@ -90,7 +92,7 @@ class PH_Settings_Demo_Data extends PH_Settings_Page {
                     <p>
                         <a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=features&profilter=free')); ?>" class="button button-primary">Activate Demo Data Feature</a>
                         &nbsp;
-                        <a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=demo_data&hidetab=1')); ?>">Hide This Page</a>
+                        <a href="<?php echo esc_url( wp_nonce_url( admin_url('admin.php?page=ph-settings&tab=demo_data&hidetab=1'), 'propertyhive-hide-demo-data' ) ); ?>">Hide This Page</a>
                     </p>
                 </td>
             </tr>

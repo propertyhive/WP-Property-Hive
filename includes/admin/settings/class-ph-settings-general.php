@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive General Settings
  *
@@ -17,6 +20,7 @@ if ( ! class_exists( 'PH_Settings_General' ) ) :
 /**
  * PH_Settings_General
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_General; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_General extends PH_Settings_Page {
 
 	/**
@@ -352,7 +356,7 @@ class PH_Settings_General extends PH_Settings_Page {
             'type' => 'html',
             'html' => '<script>
 
-                var countries = '. json_encode( $countries ) . ';
+                var countries = '. wp_json_encode( $countries, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ';
 
             </script>'
         );
@@ -560,7 +564,7 @@ class PH_Settings_General extends PH_Settings_Page {
                     'recaptcha' => __( 'Google reCaptcha v2', 'propertyhive' ) . ' (<a href="https://www.google.com/recaptcha/admin/create" target="_blank">register</a>)',
                     'recaptcha-v3' => __( 'Google reCaptcha v3', 'propertyhive' ) . ' (<a href="https://www.google.com/recaptcha/admin/create" target="_blank">register</a>)',
                     'hCaptcha' => __( 'hCaptcha', 'propertyhive' ) . ' (<a href="https://www.hcaptcha.com/" target="_blank">register</a>)',
-                    'turnstile' => __( 'Cloudflare Turnstile', 'propertyhive' ) . ' (<a href="https://www.cloudflare.com/en-gb/application-services/products/turnstile/" target="_blank">register</a>)',
+                    'turnstile' => __( 'Cloudflare Turnstile', 'propertyhive' ) . ' (<a href="https://www.cloudflare.com/en-gb/application-services/products/turnstile/" target="_blank">register</a>)', // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- Registration hyperlink for the optional CAPTCHA provider.
                 ),
             ),
 
@@ -920,6 +924,10 @@ class PH_Settings_General extends PH_Settings_Page {
 	 * Save settings
 	 */
 	public function save() {
+        if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            return;
+        }
+
 		global $current_section;
 
 		if ( $current_section != '' ) 
@@ -933,34 +941,46 @@ class PH_Settings_General extends PH_Settings_Page {
 					PH_Admin_Settings::save_fields( $settings );
 					break;
 				}
-				case 'international':
-				{
-					if (!isset($_POST['propertyhive_countries']) || (isset($_POST['propertyhive_countries']) && empty($_POST['propertyhive_countries'])))
-					{
-						// If we haven't selected which countries we operate in
-						update_option( 'propertyhive_countries', array( ph_clean($_POST['propertyhive_default_country']) ) );
-					}
-					else
-					{
-						// We have default country and countries set
-						// Make sure default country is in list of countries selected
-						if ( !in_array(ph_clean($_POST['propertyhive_default_country']), ph_clean($_POST['propertyhive_countries'])) ) {
-							$_POST['propertyhive_default_country'] = $_POST['propertyhive_countries'][0];
-						}
-
-						update_option( 'propertyhive_default_country', ph_clean($_POST['propertyhive_default_country']) );
-						update_option( 'propertyhive_countries', ph_clean($_POST['propertyhive_countries']) );
-					}
-
-                    update_option( 'propertyhive_price_thousand_separator', ph_clean($_POST['propertyhive_price_thousand_separator']) );
-                    update_option( 'propertyhive_price_decimal_separator', ph_clean($_POST['propertyhive_price_decimal_separator']) );
-
-                    update_option( 'propertyhive_search_form_currency', ph_clean($_POST['propertyhive_search_form_currency']) );
-
-					do_action( 'propertyhive_update_currency_exchange_rates' );
-
-					break;
-				}
+                case 'international':
+                {
+                    $international = array();
+                    foreach ( array( 'propertyhive_default_country', 'propertyhive_price_thousand_separator', 'propertyhive_price_decimal_separator', 'propertyhive_search_form_currency' ) as $input_key ) {
+                        if ( ! isset( $_POST[$input_key] ) || ! is_string( $_POST[$input_key] ) ) {
+                            return;
+                        }
+                        $international[$input_key] = sanitize_text_field( wp_unslash( $_POST[$input_key] ) );
+                    }
+                    if ( isset( $_POST['propertyhive_countries'] ) && ! is_array( $_POST['propertyhive_countries'] ) ) {
+                        return;
+                    }
+                    $countries = array();
+                    if ( isset( $_POST['propertyhive_countries'] ) ) {
+                        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Each country is validated as a string, unslashed and sanitized in the loop before use.
+                        foreach ( $_POST['propertyhive_countries'] as $country ) {
+                            if ( ! is_string( $country ) ) {
+                                return;
+                            }
+                            $countries[] = sanitize_text_field( wp_unslash( $country ) );
+                        }
+                    }
+                    if ( empty( $countries ) ) {
+                        // Preserve the existing default-country fallback when no list is selected.
+                        update_option( 'propertyhive_countries', array( $international['propertyhive_default_country'] ) );
+                    } else {
+                        if ( ! in_array( $international['propertyhive_default_country'], $countries, true ) ) {
+                            $international['propertyhive_default_country'] = $countries[0];
+                            // Keep the normalized selection available to existing save-hook consumers.
+                            $_POST['propertyhive_default_country'] = wp_slash( $countries[0] );
+                        }
+                        update_option( 'propertyhive_default_country', $international['propertyhive_default_country'] );
+                        update_option( 'propertyhive_countries', $countries );
+                    }
+                    update_option( 'propertyhive_price_thousand_separator', $international['propertyhive_price_thousand_separator'] );
+                    update_option( 'propertyhive_price_decimal_separator', $international['propertyhive_price_decimal_separator'] );
+                    update_option( 'propertyhive_search_form_currency', $international['propertyhive_search_form_currency'] );
+                    do_action( 'propertyhive_update_currency_exchange_rates' );
+                    break;
+                }
 				case 'map':
 				{
 					$settings = $this->get_general_map_setting();
@@ -993,16 +1013,30 @@ class PH_Settings_General extends PH_Settings_Page {
                 {
                     $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
+                    if ( ! is_array( $current_settings ) ) {
+                        $current_settings = array();
+                    }
+                    foreach ( array( 'search', 'replace' ) as $field ) {
+                        if ( isset( $_POST[ $field ] ) && ! is_array( $_POST[ $field ] ) ) {
+                            return;
+                        }
+                    }
                     $text_translations = array();
                     if ( isset($_POST['search']) && is_array($_POST['search']) && !empty($_POST['search']) && isset($_POST['replace']) && is_array($_POST['replace']) && !empty($_POST['replace']) )
                     {
+                        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Search members and paired replacement strings are shape-checked, unslashed and sanitized below.
                         foreach ( $_POST['search'] as $i => $search )
                         {
-                            if ( trim($search) != '' && trim($_POST['replace'][$i]) != '' )
+                            if ( ! is_string( $search ) || ! isset( $_POST['replace'][$i] ) || ! is_string( $_POST['replace'][$i] ) ) {
+                                return;
+                            }
+                            $search = sanitize_text_field( wp_unslash( $search ) );
+                            $replace = sanitize_text_field( wp_unslash( $_POST['replace'][$i] ) );
+                            if ( trim( $search ) !== '' && trim( $replace ) !== '' )
                             {
                                 $text_translations[] = array(
-                                    'search' => sanitize_text_field(wp_unslash($search)),
-                                    'replace' => sanitize_text_field(wp_unslash($_POST['replace'][$i])),
+                                    'search' => $search,
+                                    'replace' => $replace,
                                 );
                             }
                         }
@@ -1029,6 +1063,26 @@ class PH_Settings_General extends PH_Settings_Page {
 		}
 		else
 		{
+            // Validate the complete custom-department form before any options are changed.
+            $department_lists = array();
+            foreach ( array( 'propertyhive_custom_departments', 'propertyhive_custom_departments_original' ) as $field ) {
+                if ( isset( $_POST[ $field ] ) && ! is_string( $_POST[ $field ] ) ) {
+                    return;
+                }
+                $raw_list = isset( $_POST[ $field ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) : '';
+                $department_lists[ $field ] = array_filter( explode( ',', $raw_list ) );
+            }
+            $department_details = array();
+            foreach ( $department_lists['propertyhive_custom_departments'] as $department_id ) {
+                foreach ( array( 'name', 'based_on' ) as $detail ) {
+                    $field = 'propertyhive_active_departments_' . $detail . '_' . $department_id;
+                    if ( ! isset( $_POST[ $field ] ) || ! is_string( $_POST[ $field ] ) ) {
+                        return;
+                    }
+                    $department_details[ $department_id ][ $detail ] = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+                }
+            }
+
 			$settings = $this->get_settings();
 
 			PH_Admin_Settings::save_fields( $settings );
@@ -1058,9 +1112,9 @@ class PH_Settings_General extends PH_Settings_Page {
             }
 
             $custom_departments = array();
-            if ( isset($_POST['propertyhive_custom_departments']) && !empty($_POST['propertyhive_custom_departments']) )
+            if ( ! empty( $department_lists['propertyhive_custom_departments'] ) )
             {
-                $submitted_custom_departments = explode(",", $_POST['propertyhive_custom_departments']);
+                $submitted_custom_departments = $department_lists['propertyhive_custom_departments'];
                 $submitted_custom_departments = array_filter($submitted_custom_departments);
                 if ( !empty($submitted_custom_departments) )
                 {
@@ -1080,12 +1134,12 @@ class PH_Settings_General extends PH_Settings_Page {
                         $key = $submitted_custom_department;
                         if ( substr($submitted_custom_department, 0, 6) == 'phnew-' )
                         {
-                            $key = sanitize_title($_POST['propertyhive_active_departments_name_' . $submitted_custom_department]);
+                            $key = sanitize_title( $department_details[ $submitted_custom_department ]['name'] );
                         }
 
                         $custom_departments[$key] = array(
-                            'name' => ph_clean($_POST['propertyhive_active_departments_name_' . $submitted_custom_department ]),
-                            'based_on' => ph_clean($_POST['propertyhive_active_departments_based_on_' . $submitted_custom_department ])
+                            'name' => $department_details[ $submitted_custom_department ]['name'],
+                            'based_on' => $department_details[ $submitted_custom_department ]['based_on']
                         );
 
                         update_option( 'propertyhive_active_departments_' . $key, $option_value );
@@ -1096,13 +1150,13 @@ class PH_Settings_General extends PH_Settings_Page {
             update_option( 'propertyhive_custom_departments', $custom_departments );
 
             // TO DO: Cater for deleted departments
-            if ( isset($_POST['propertyhive_custom_departments_original']) && !empty($_POST['propertyhive_custom_departments_original']) )
+            if ( ! empty( $department_lists['propertyhive_custom_departments_original'] ) )
             {
-                $original_custom_departments = explode(",", $_POST['propertyhive_custom_departments_original']);
+                $original_custom_departments = $department_lists['propertyhive_custom_departments_original'];
                 $original_custom_departments = array_filter($original_custom_departments);
                 if ( !empty($original_custom_departments) )
                 {
-                    $submitted_custom_departments = explode(",", $_POST['propertyhive_custom_departments']);
+                    $submitted_custom_departments = $department_lists['propertyhive_custom_departments'];
                     $submitted_custom_departments = array_filter($submitted_custom_departments);
 
                     foreach ( $original_custom_departments as $original_custom_department )

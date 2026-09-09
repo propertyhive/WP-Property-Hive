@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Office Settings
  *
@@ -15,6 +18,7 @@ if ( ! class_exists( 'PH_Settings_Offices' ) ) :
 /**
  * PH_Settings_Offices
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Offices; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Offices extends PH_Settings_Page {
 
     /**
@@ -29,6 +33,25 @@ class PH_Settings_Offices extends PH_Settings_Page {
         add_action( 'propertyhive_settings_save_' . $this->id, array( $this, 'save' ) );
         add_action( 'propertyhive_sections_' . $this->id, array( $this, 'output_sections' ) );
         add_action( 'propertyhive_admin_field_offices', array( $this, 'offices_setting' ) );
+    }
+
+    /**
+     * Read one scalar value from the verified office settings form.
+     *
+     * @param string $key Posted field name.
+     * @return string
+     */
+    private function get_posted_text( $key ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended -- save() verifies the settings nonce and manage_options before calling this helper; arrays are rejected before the scalar is copied.
+        if ( ! isset( $_POST[ $key ] ) || ! is_scalar( $_POST[ $key ] ) ) {
+            return '';
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotValidated, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- save() verifies the settings nonce before this helper is called; the copied scalar is unslashed immediately below and sanitized before use.
+        $raw_value = $_POST[ $key ];
+        $raw_value = wp_unslash( (string) $raw_value );
+
+        return ph_clean( $raw_value );
     }
     
     /**
@@ -60,11 +83,12 @@ class PH_Settings_Offices extends PH_Settings_Page {
         
         global $current_section;
         
-        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings selection; no state change occurs while building the form.
+        $current_id = isset( $_REQUEST['id'] ) && is_scalar( $_REQUEST['id'] ) ? absint( $_REQUEST['id'] ) : 0;
 
         $args = array(
 
-            array( 'title' => __( ( $current_section == 'add' ? 'Add New Office' : 'Edit Office Details' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'office_options' ),
+            array( 'title' => ( $current_section == 'add' ? __( 'Add New Office', 'propertyhive' ) : __( 'Edit Office Details', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'office_options' ),
             
             array(
                 'title' => __( 'Office Name', 'propertyhive' ),
@@ -197,15 +221,20 @@ class PH_Settings_Offices extends PH_Settings_Page {
         
         global $save_button_text, $post;
         
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
         $save_button_text = __( 'Delete', 'propertyhive' );
         
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- This POST field only selects the delete confirmation display; save() performs the mutation after nonce and capability checks.
         if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == 1 )
         {
             // A term has just been deleted
             global $hide_save_button, $show_cancel_button, $cancel_button_href;
             
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             $hide_save_button = TRUE;
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             $show_cancel_button = TRUE;
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             $cancel_button_href = admin_url( 'admin.php?page=ph-settings&tab=offices' );
             
             $args = array();
@@ -224,7 +253,8 @@ class PH_Settings_Offices extends PH_Settings_Page {
         }
         else
         {
-            $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings selection; no state change occurs while building the form.
+            $current_id = isset( $_REQUEST['id'] ) && is_scalar( $_REQUEST['id'] ) ? absint( $_REQUEST['id'] ) : 0;
             
             if ($current_id == '')
             {
@@ -245,6 +275,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                         'post_type' => 'property',
                         'nopaging' => true,
                         'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Count all properties assigned through _office_id across the existing statuses before offering office deletion/reassignment choices.
                         'meta_query' => array(
                             array(
                                 'key' => '_office_id',
@@ -261,11 +292,12 @@ class PH_Settings_Offices extends PH_Settings_Page {
                     
                     if ($num_properties > 0)
                     {
-                        $alternative_offices = array();
+                        $alternative_terms = array();
                         
                         $query_args = array(
                             'post_type' => 'office',
                             'nopaging' => true,
+                            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- The delete form must offer every other office as a reassignment target and must exclude the office currently being deleted.
                             'post__not_in' => array( $current_id ),
                             'orderby' => 'title',
                             'order' => 'ASC'
@@ -326,6 +358,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             $settings = $this->get_office_settings();
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             $redirect_after_save = admin_url('admin.php?page=ph-settings&tab=offices');
 
             PH_Admin_Settings::output_fields( $settings );
@@ -334,10 +367,12 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             remove_action('propertyhive_admin_field_offices', array( $this, 'offices_setting' ));
             
-            $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings selection; no state change occurs while building the form.
+            $current_id = isset( $_REQUEST['id'] ) && is_scalar( $_REQUEST['id'] ) ? absint( $_REQUEST['id'] ) : 0;
             
             $settings = $this->get_office_settings();
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             $redirect_after_save = admin_url('admin.php?page=ph-settings&tab=offices');
 
             PH_Admin_Settings::output_fields( $settings );
@@ -346,7 +381,8 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             remove_action('propertyhive_admin_field_offices', array( $this, 'offices_setting' ));
             
-            $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings selection; no state change occurs while building the form.
+            $current_id = isset( $_REQUEST['id'] ) && is_scalar( $_REQUEST['id'] ) ? absint( $_REQUEST['id'] ) : 0;
             
             $settings = $this->get_office_delete();
 
@@ -445,7 +481,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                                             ' . esc_html($address) . '
                                         </td>
                                         <td class="contact">
-                                            ' . $contact_details . '
+                                            ' . wp_kses_post( $contact_details ) . '
                                         </td>';
                                     do_action( 'propertyhive_office_table_row_columns', get_the_ID() );
                                     echo '
@@ -482,7 +518,19 @@ class PH_Settings_Offices extends PH_Settings_Page {
      * Save settings
      */
     public function save() {
+        if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            return;
+        }
+
         global $current_section, $post;
+
+        if ( in_array( $current_section, array( 'edit', 'delete' ), true ) ) {
+            $office_id = isset( $_REQUEST['id'] ) && is_scalar( $_REQUEST['id'] ) ? absint( $_REQUEST['id'] ) : 0;
+            if ( ! $office_id || 'office' !== get_post_type( $office_id ) ) {
+                PH_Admin_Settings::add_error( __( 'Please select a valid office.', 'propertyhive' ) );
+                return;
+            }
+        }
 
         if ( $current_section == 'add' ) {
             
@@ -490,7 +538,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
             // Insert office
             $office_post = array(
-              'post_title'    => ph_clean( $_POST['office_name'] ),
+              'post_title'    => wp_slash( $this->get_posted_text( 'office_name' ) ),
               'post_content'  => '',
               'post_status'   => 'publish',
               'post_type'     => 'office',
@@ -508,16 +556,15 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
         } elseif ( $current_section == 'edit' ) {
             
-            $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+            $current_id = isset( $_REQUEST['id'] ) && is_scalar( $_REQUEST['id'] ) ? absint( $_REQUEST['id'] ) : 0;
        
             // TODO: Validate
-            // TODO: Make sure this ID belongs to an office
             // TODO: Update slug?
        
             // Update office
             $office_post = array(
                 'ID'           => $current_id,
-                'post_title'   => ph_clean( $_POST['office_name'] )
+                'post_title'   => wp_slash( $this->get_posted_text( 'office_name' ) )
             );
             
             wp_update_post( $office_post );
@@ -531,15 +578,16 @@ class PH_Settings_Offices extends PH_Settings_Page {
             
         } elseif ( $current_section == 'delete' ) {
             
-            if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == '1' )
+            if ( '1' === $this->get_posted_text( 'confirm_removal' ) )
             {
-                $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+                $current_id = isset( $_REQUEST['id'] ) && is_scalar( $_REQUEST['id'] ) ? absint( $_REQUEST['id'] ) : 0;
                 
                 // Get number of properties assigned to this term
                 $query_args = array(
                     'post_type' => 'property',
                     'nopaging' => true,
                     'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Office deletion must find every property assigned to this office so each one can be reassigned before the office is removed; the office ID is read from the verified admin form.
                     'meta_query' => array(
                         array(
                             'key' => '_office_id',
@@ -558,7 +606,8 @@ class PH_Settings_Offices extends PH_Settings_Page {
                     }
                     else
                     {
-                        $post_type = get_post_type( (int)$_POST['reassign_to'] );
+                        $reassign_to = absint( $this->get_posted_text( 'reassign_to' ) );
+                        $post_type = get_post_type( $reassign_to );
                 
                         if ( $post_type != 'office' )
                         {
@@ -570,7 +619,7 @@ class PH_Settings_Offices extends PH_Settings_Page {
                     {
                         $property_query->the_post();
                         
-                        update_post_meta( $post->ID, '_office_id', (int)$_POST['reassign_to'] );
+                        update_post_meta( $post->ID, '_office_id', $reassign_to );
                         
                         // TODO: Check for WP_ERROR
                     }
@@ -611,15 +660,15 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 wp_reset_postdata();
                 
                 // Set selected office as primary
-                update_post_meta( (int)$_POST['primary'], 'primary', '1');
+                update_post_meta( absint( $this->get_posted_text( 'primary' ) ), 'primary', '1');
             }
             else
             {
-                update_post_meta($office_post_id, '_office_address_1', ph_clean( $_POST['_office_address_1'] ));
-                update_post_meta($office_post_id, '_office_address_2', ph_clean( $_POST['_office_address_2'] ));
-                update_post_meta($office_post_id, '_office_address_3', ph_clean( $_POST['_office_address_3'] ));
-                update_post_meta($office_post_id, '_office_address_4', ph_clean( $_POST['_office_address_4'] ));
-                update_post_meta($office_post_id, '_office_address_postcode', ph_clean( $_POST['_office_address_postcode'] ));
+                update_post_meta($office_post_id, '_office_address_1', wp_slash( $this->get_posted_text( '_office_address_1' ) ));
+                update_post_meta($office_post_id, '_office_address_2', wp_slash( $this->get_posted_text( '_office_address_2' ) ));
+                update_post_meta($office_post_id, '_office_address_3', wp_slash( $this->get_posted_text( '_office_address_3' ) ));
+                update_post_meta($office_post_id, '_office_address_4', wp_slash( $this->get_posted_text( '_office_address_4' ) ));
+                update_post_meta($office_post_id, '_office_address_postcode', wp_slash( $this->get_posted_text( '_office_address_postcode' ) ));
                 
                 $departments = ph_get_departments();
 
@@ -627,13 +676,15 @@ class PH_Settings_Offices extends PH_Settings_Page {
                 {
                     if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
                     {
-                        update_post_meta($office_post_id, '_office_telephone_number_' . str_replace("residential-", "", $key), (isset($_POST['_office_telephone_number_' . str_replace("residential-", "", $key)])) ? ph_clean( $_POST['_office_telephone_number_' . str_replace("residential-", "", $key)] ) : '');
-                        update_post_meta($office_post_id, '_office_email_address_' . str_replace("residential-", "", $key), (isset($_POST['_office_email_address_' . str_replace("residential-", "", $key)])) ? ph_clean( $_POST['_office_email_address_' . str_replace("residential-", "", $key)] ) : '');
+                        $ph_contact_telephone_value = ( isset( $_POST['_office_telephone_number_' . str_replace("residential-", "", $key)] ) && is_string( $_POST['_office_telephone_number_' . str_replace("residential-", "", $key)] ) ) ? sanitize_text_field( wp_unslash( $_POST['_office_telephone_number_' . str_replace("residential-", "", $key)] ) ) : '';
+                        update_post_meta( $office_post_id, '_office_telephone_number_' . str_replace("residential-", "", $key), wp_slash( $ph_contact_telephone_value ) );
+                        $ph_contact_email_value = ( isset( $_POST['_office_email_address_' . str_replace("residential-", "", $key)] ) && is_string( $_POST['_office_email_address_' . str_replace("residential-", "", $key)] ) ) ? sanitize_text_field( wp_unslash( $_POST['_office_email_address_' . str_replace("residential-", "", $key)] ) ) : '';
+                        update_post_meta( $office_post_id, '_office_email_address_' . str_replace("residential-", "", $key), wp_slash( $ph_contact_email_value ) );
                     }
                 }
                 
-                update_post_meta($office_post_id, '_office_latitude', ph_clean( $_POST['_office_latitude'] ));
-                update_post_meta($office_post_id, '_office_longitude', ph_clean( $_POST['_office_longitude'] ));
+                update_post_meta($office_post_id, '_office_latitude', wp_slash( $this->get_posted_text( '_office_latitude' ) ));
+                update_post_meta($office_post_id, '_office_longitude', wp_slash( $this->get_posted_text( '_office_longitude' ) ));
 
                 do_action( 'propertyhive_save_office', $office_post_id );
             }

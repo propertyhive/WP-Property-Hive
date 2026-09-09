@@ -17,6 +17,7 @@ if ( ! class_exists( 'PH_Settings_Template_Assistant' ) ) :
 /**
  * PH_Settings_Template_Assistant
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Template_Assistant; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Template_Assistant extends PH_Settings_Page {
 
 	/**
@@ -41,11 +42,12 @@ class PH_Settings_Template_Assistant extends PH_Settings_Page {
 		
         global $hide_save_button;
         
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
         $hide_save_button = true;
 
 		$settings = array(
 
-			array( 'title' => __( '', 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'template_assistant_moved_options' ),
+			array( 'title' => '', 'type' => 'title', 'desc' => '', 'id' => 'template_assistant_moved_options' ),
         
         );
 

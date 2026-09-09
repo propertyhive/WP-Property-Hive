@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Email Settings
  *
@@ -17,6 +20,7 @@ if ( ! class_exists( 'PH_Settings_Emails' ) ) :
 /**
  * PH_Settings_Emails.
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Emails; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Emails extends PH_Settings_Page {
 
 	/**
@@ -224,7 +228,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'availability', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'availability' ) ) );
         
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
@@ -249,7 +253,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
             'desc'    => __( 'Enabling this setting will mean applicants will automatically get sent properties.<br><br>
             	- This will only apply to properties added from the moment this option is activated.<br>
             	- When enabled, this can be disabled on a per-applicant basis by going into their record.<br>
-            	- When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ) . ( ( get_option( 'propertyhive_auto_property_match', '' ) == 'yes' && get_option( 'propertyhive_auto_property_match_enabled_date', '' ) != '' ) ? '<br><br>Enabled on ' . date("jS F Y H:i", strtotime(get_option( 'propertyhive_auto_property_match_enabled_date', '' )) + $time_offset) : '' ),
+                - When sending out lots of emails we recommend using <a href="https://en-gb.wordpress.org/plugins/tags/smtp" target="_blank">a plugin</a> to send them out using SMTP. Your web developer or hosting company should be able to advise on this.', 'propertyhive' ) . ( ( get_option( 'propertyhive_auto_property_match', '' ) == 'yes' && get_option( 'propertyhive_auto_property_match_enabled_date', '' ) != '' ) ? '<br><br>Enabled on ' . gmdate("jS F Y H:i", strtotime(get_option( 'propertyhive_auto_property_match_enabled_date', '' )) + $time_offset) : '' ),
             'id'      => 'propertyhive_auto_property_match',
             'type'    => 'checkbox',
             'default' => '',
@@ -467,21 +471,22 @@ class PH_Settings_Emails extends PH_Settings_Page {
     {
         global $wpdb, $post;
 
-        $additional_query = '';
-        $additional_query_string = '';
-        if ( isset($_GET['date_from']) && sanitize_text_field($_GET['date_from']) != '' )
-        {
-        	$additional_query_string .= '&date_from=' . sanitize_text_field($_GET['date_from']);
-        	if ( sanitize_text_field($_GET['date_from']) != 'all' )
-        	{
-	        	$additional_query .= " AND send_at >= '" . sanitize_text_field($_GET['date_from']) . " 00:00:00' ";
-	        }
+        $date_from = '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The email queue date filter is a read-only GET parameter; the separate Run Now action has its own capability and nonce gate.
+        if ( isset( $_GET['date_from'] ) && is_string( $_GET['date_from'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The email queue date filter is a read-only GET parameter; the separate Run Now action has its own capability and nonce gate.
+            $date_from = sanitize_text_field( wp_unslash( $_GET['date_from'] ) );
         }
-        else
-        {
-        	// Default to 30 days
-        	$additional_query .= " AND send_at >= '" . date("Y-m-d", strtotime('-30 days')) . " 00:00:00' ";
+        if ( 'all' !== $date_from && ! preg_match( '/^\d{4}-\d{2}-\d{2}$/D', $date_from ) ) {
+            $date_from = gmdate( 'Y-m-d', strtotime( '-30 days' ) );
         }
+        $status = '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The email queue status filter is a read-only GET parameter; the separate Run Now action has its own capability and nonce gate.
+        if ( isset( $_GET['status'] ) && is_string( $_GET['status'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The email queue status filter is a read-only GET parameter; the separate Run Now action has its own capability and nonce gate.
+            $status = sanitize_key( wp_unslash( $_GET['status'] ) );
+        }
+        $additional_query_string = '&date_from=' . rawurlencode( $date_from );
         ?>
         <tr valign="top">
             <td style="padding:0">
@@ -501,47 +506,51 @@ class PH_Settings_Emails extends PH_Settings_Page {
                     }
                     else
                     {
-                    	echo esc_html(__( 'Next scheduled to run at', 'propertyhive' ) . ' ' . date("H:i jS F Y", $next_due));
+                        echo esc_html(__( 'Next scheduled to run at', 'propertyhive' ) . ' ' . gmdate("H:i jS F Y", $next_due));
                     }
-            	?></strong> <a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&custom_email_log_cron=propertyhive_process_email_log' )); ?>" class="button">Run Now</a></p>
+                ?></strong> <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=ph-settings&tab=email&section=log&custom_email_log_cron=propertyhive_process_email_log' ), 'propertyhive-run-email-job' ) ); ?>" class="button">Run Now</a></p>
 
             	<br>
 
             	<ul class="subsubsub">
             		<?php
-	            		$emails = $wpdb->get_var("
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is stored in Property Hive's custom table, which has no WP_Query API; this live admin count must reflect asynchronous queue changes immediately.
+					$emails = $wpdb->get_var("
 							SELECT COUNT(*)
 							FROM " . $wpdb->prefix . "ph_email_log
 						");
 	            	?>
-					<li class="all"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log' . $additional_query_string)); ?>"<?php if ( !isset($_GET['status']) || (isset($_GET['status']) && $_GET['status'] == '') ) { echo ' class="current"'; } ?>>All <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<li class="all"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log' . $additional_query_string)); ?>"<?php if ( '' === $status ) { echo ' class="current"'; } ?>>All <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
 					<?php
-	            		$emails = $wpdb->get_var("
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is stored in Property Hive's custom table, which has no WP_Query API; this live admin count must reflect asynchronous queue changes immediately.
+					$emails = $wpdb->get_var("
 							SELECT COUNT(*)
 							FROM " . $wpdb->prefix . "ph_email_log
 							WHERE 
 								status = ''
 						");
 	            	?>
-					<li class="queued"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued' . $additional_query_string)); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'queued' ) { echo ' class="current"'; } ?>>Queued <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<li class="queued"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=queued' . $additional_query_string)); ?>"<?php if ( 'queued' === $status ) { echo ' class="current"'; } ?>>Queued <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
 					<?php
-            		$emails = $wpdb->get_var("
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is stored in Property Hive's custom table, which has no WP_Query API; this live admin count must reflect asynchronous queue changes immediately.
+					$emails = $wpdb->get_var("
 						SELECT COUNT(*)
 						FROM " . $wpdb->prefix . "ph_email_log
 						WHERE 
 							status IN ('fail1', 'fail2')
 					");
             	?>
-					<li class="failed"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=failed' . $additional_query_string)); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'failed' ) { echo ' class="current"'; } ?>>Failed <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
+					<li class="failed"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=failed' . $additional_query_string)); ?>"<?php if ( 'failed' === $status ) { echo ' class="current"'; } ?>>Failed <span class="count">(<?php echo number_format($emails); ?>)</span></a> |</li>
 					<?php
-            		$emails = $wpdb->get_var("
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is stored in Property Hive's custom table, which has no WP_Query API; this live admin count must reflect asynchronous queue changes immediately.
+					$emails = $wpdb->get_var("
 						SELECT COUNT(*)
 						FROM " . $wpdb->prefix . "ph_email_log
 						WHERE 
 							status = 'sent'
 					");
             	?>
-					<li class="sent"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=sent' . $additional_query_string)); ?>"<?php if ( isset($_GET['status']) && $_GET['status'] == 'sent' ) { echo ' class="current"'; } ?>>Sent <span class="count">(<?php echo number_format($emails); ?>)</span></a></li>
+					<li class="sent"><a href="<?php echo esc_url(admin_url('admin.php?page=ph-settings&tab=email&section=log&status=sent' . $additional_query_string)); ?>"<?php if ( 'sent' === $status ) { echo ' class="current"'; } ?>>Sent <span class="count">(<?php echo number_format($emails); ?>)</span></a></li>
 				</ul>
 
 				<div class="tablenav top">
@@ -550,12 +559,12 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							<input type="hidden" name="page" value="ph-settings">
 							<input type="hidden" name="tab" value="email">
 							<input type="hidden" name="section" value="log">
-							<input type="hidden" name="status" value="<?php echo ( ( isset($_GET['status']) ) ? esc_attr(ph_clean($_GET['status'])) : '' ); ?>">
+							<input type="hidden" name="status" value="<?php echo esc_attr( $status ); ?>">
 							<select name="date_from" id="dropdown_date_from">
-								<option value="<?php echo esc_attr(date("Y-m-d", strtotime("-7 days"))); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-7 days")) ) { echo ' selected'; } ?>>Last 7 Days</option>
-								<option value="<?php echo esc_attr(date("Y-m-d", strtotime("-14 days"))); ?>"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-14 days")) ) { echo ' selected'; } ?>>Last 14 Days</option>
-								<option value="<?php echo esc_attr(date("Y-m-d", strtotime("-30 days"))); ?>"<?php if ( !isset($_GET['date_from']) || ( isset($_GET['date_from']) && $_GET['date_from'] == date("Y-m-d", strtotime("-30 days")) ) ) { echo ' selected'; } ?>>Last 30 Days</option>
-								<option value="all"<?php if ( isset($_GET['date_from']) && $_GET['date_from'] == 'all' ) { echo ' selected'; } ?>>All Time</option>
+								<option value="<?php echo esc_attr(gmdate("Y-m-d", strtotime("-7 days"))); ?>"<?php if ( $date_from === gmdate("Y-m-d", strtotime("-7 days")) ) { echo ' selected'; } ?>>Last 7 Days</option>
+								<option value="<?php echo esc_attr(gmdate("Y-m-d", strtotime("-14 days"))); ?>"<?php if ( $date_from === gmdate("Y-m-d", strtotime("-14 days")) ) { echo ' selected'; } ?>>Last 14 Days</option>
+								<option value="<?php echo esc_attr(gmdate("Y-m-d", strtotime("-30 days"))); ?>"<?php if ( $date_from === gmdate("Y-m-d", strtotime("-30 days")) ) { echo ' selected'; } ?>>Last 30 Days</option>
+								<option value="all"<?php if ( 'all' === $date_from ) { echo ' selected'; } ?>>All Time</option>
 							</select>
 							<input type="submit" name="filter_action" id="post-query-submit" class="button" value="Filter">
 
@@ -584,32 +593,30 @@ class PH_Settings_Emails extends PH_Settings_Page {
                     </thead>
                     <tbody>
                    	<?php
-                   		$query = "
-							SELECT
-								email_id,
-								contact_id,
-								to_email_address,
-								subject,
-								status,
-								send_at
-							FROM " . $wpdb->prefix . "ph_email_log
-							WHERE 
-								1=1 ";
-						if ( isset($_GET['status']) )
-						{
-							switch ( ph_clean($_GET['status']) )
-							{
-								case "queued": { $query .= " AND status = '' "; break; }
-								case "failed": { $query .= " AND status IN ('fail1', 'fail2') "; break; }
-								case "sent": { $query .= " AND status = 'sent' "; break; }
-							}
-						}
-						$query .= $additional_query;
-
-						$query .= " ORDER BY send_at DESC
-							LIMIT 250
-						";
-                   		$emails = $wpdb->get_results( $query );
+                        $query = "SELECT email_id, contact_id, to_email_address, subject, status, send_at
+                            FROM {$wpdb->prefix}ph_email_log
+                            WHERE %s = %s";
+                        $query_args = array( '1', '1' );
+                        if ( 'all' !== $date_from ) {
+                            $query .= ' AND send_at >= %s';
+                            $query_args[] = $date_from . ' 00:00:00';
+                        }
+                        switch ( $status ) {
+                            case 'queued':
+                                $query .= ' AND status = %s';
+                                $query_args[] = '';
+                                break;
+                            case 'failed':
+                                $query .= " AND status IN ('fail1', 'fail2')";
+                                break;
+                            case 'sent':
+                                $query .= ' AND status = %s';
+                                $query_args[] = 'sent';
+                                break;
+                        }
+                        $query .= ' ORDER BY send_at DESC LIMIT 250';
+                        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- The email queue is stored in Property Hive's custom table, which has no WP_Query API; this live filtered log must reflect asynchronous queue changes immediately. The query contains only fixed SQL branches and passes all date/status values through $wpdb->prepare().
+                        $emails = $wpdb->get_results( $wpdb->prepare( $query, $query_args ) );
 
                    		if ( is_array($emails) && !empty($emails) )
                    		{
@@ -617,7 +624,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
 							{
 						?>
 						<tr>
-	                    	<td class="date-time"><?php echo esc_html(date("jS M Y H:i", strtotime($email->send_at))); ?></td>
+                            <td class="date-time"><?php echo esc_html(gmdate("jS M Y H:i", strtotime($email->send_at))); ?></td>
 	                    	<td class="recipient"><?php echo '<a href="' . esc_url(get_edit_post_link($email->contact_id)) . '">' . esc_html(get_the_title($email->contact_id)) . '</a><br>' . esc_html($email->to_email_address); ?></td>
 	                        <td class="subject"><?php echo esc_html($email->subject); ?></td>
 	                        <td class="status"><?php
@@ -665,6 +672,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
             	case "enquiry-auto-responder": { $settings = $this->get_enquiry_autoresponder_settings(); break; }
             	case "match": { $settings = $this->get_property_match_settings();  break; }
             	case "booking-confirmation": { $settings = $this->get_booking_confirmation_settings(); break; }
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             	case "log": { $settings = $this->get_email_queue_settings(); $hide_save_button = true; break; }
                 default: { die("Unknown setting section"); }
             }
@@ -682,6 +690,10 @@ class PH_Settings_Emails extends PH_Settings_Page {
 	 */
 	public function save() 
 	{
+        if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            return;
+        }
+
 		global $current_section;
 
 		if ( $current_section != '' ) 

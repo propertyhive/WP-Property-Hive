@@ -15,6 +15,7 @@ if ( ! class_exists( 'PH_Settings_Page' ) ) :
 /**
  * PH_Settings_Page
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Page; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Page {
 
 	protected $id    = '';
@@ -81,6 +82,10 @@ class PH_Settings_Page {
 	 * Save settings
 	 */
 	public function save() {
+        if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            return;
+        }
+
 		global $current_section;
 
 		$settings = $this->get_settings();

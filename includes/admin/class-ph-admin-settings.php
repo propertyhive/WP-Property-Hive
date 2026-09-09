@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Admin Settings Class.
  *
@@ -15,6 +18,7 @@ if ( ! class_exists( 'PH_Admin_Settings' ) ) :
 /**
  * PH_Admin_Settings
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Settings; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Settings {
 
 	private static $settings = array();
@@ -65,7 +69,11 @@ class PH_Admin_Settings {
 	public static function save() {
 		global $current_section, $current_tab;
 
-		if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-settings' ) )
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+		}
+
+		if ( empty( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) )
 	    		die( esc_html(__( 'Action failed. Please refresh the page and retry.', 'propertyhive' )) );
 
 	    // Trigger actions
@@ -111,7 +119,7 @@ class PH_Admin_Settings {
 
 				$error = wp_kses($error, $allowed_tags);
 
-				echo '<div id="message" class="error fade"><p><strong>' . $error . '</strong></p></div>';
+				echo '<div id="message" class="error fade"><p><strong>' . wp_kses( $error, $allowed_tags ) . '</strong></p></div>';
 			}
 		} elseif ( sizeof( self::$messages ) > 0 ) {
 			foreach ( self::$messages as $message )
@@ -124,7 +132,7 @@ class PH_Admin_Settings {
 
 				$message = wp_kses($message, $allowed_tags);
 
-				echo '<div id="message" class="updated fade"><p><strong>' . $message . '</strong></p></div>';
+				echo '<div id="message" class="updated fade"><p><strong>' . wp_kses( $message, $allowed_tags ) . '</strong></p></div>';
 			}
 		}
 	}
@@ -152,19 +160,30 @@ class PH_Admin_Settings {
 		self::get_settings_pages();
 
 		// Get current tab/section
-		$current_tab     = empty( $_GET['tab'] ) ? 'general' : sanitize_title( $_GET['tab'] );
-		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( $_REQUEST['section'] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- These values only select the read-only settings view; settings writes are handled by save_fields() after the settings nonce and capability checks.
+		$request_get = wp_unslash( $_GET );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- These values only select the read-only settings view; settings writes are handled by save_fields() after the settings nonce and capability checks.
+		$request_request = wp_unslash( $_REQUEST );
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
+		$current_tab     = ( isset( $request_get['tab'] ) && is_string( $request_get['tab'] ) && '' !== $request_get['tab'] ) ? sanitize_title( $request_get['tab'] ) : 'general';
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
+		$current_section = ( isset( $request_request['section'] ) && is_string( $request_request['section'] ) ) ? sanitize_title( $request_request['section'] ) : '';
 
 	    // Save settings if data has been posted
 	    //if ( ! empty( $_POST ) )
 	    //	self::save();
 
 	    // Add any posted messages
-	    if ( ! empty( $_GET['ph_error'] ) )
-	    	self::add_error( stripslashes( $_GET['ph_error'] ) );
+	    $message_allowed_tags = array(
+	        'a' => array(
+	            'href' => array(),
+	        ),
+	    );
+	    if ( isset( $request_get['ph_error'] ) && is_scalar( $request_get['ph_error'] ) && '' !== (string) $request_get['ph_error'] )
+	        self::add_error( wp_kses( (string) $request_get['ph_error'], $message_allowed_tags ) );
 
-	     if ( ! empty( $_GET['ph_message'] ) )
-	    	self::add_message( stripslashes( $_GET['ph_message'] ) );
+	     if ( isset( $request_get['ph_message'] ) && is_scalar( $request_get['ph_message'] ) && '' !== (string) $request_get['ph_message'] )
+	        self::add_message( wp_kses( (string) $request_get['ph_message'], $message_allowed_tags ) );
 
 	    self::show_messages();
 
@@ -262,11 +281,11 @@ class PH_Admin_Settings {
 
 			if ( $tip && in_array( $value['type'], array( 'checkbox' ) ) ) {
 
-				$tip = '<p class="description">' . $tip . '</p>';
+				$tip = '<p class="description">' . wp_kses_post( $tip ) . '</p>';
 
 			} elseif ( $tip ) {
 
-				$tip = '<img class="help_tip" data-tip="' . esc_attr( $tip ) . '" src="' . PH()->plugin_url() . '/assets/images/help.png" height="16" width="16" />';
+				$tip = '<img class="help_tip" data-tip="' . esc_attr( wp_kses_post( $tip ) ) . '" src="' . esc_url( PH()->plugin_url() . '/assets/images/help.png' ) . '" height="16" width="16" />';
 
 			}
 
@@ -279,7 +298,7 @@ class PH_Admin_Settings {
 	            		echo '<h3>' . esc_html( $value['title'] ) . '</h3>';
 	            	}
 	            	if ( ! empty( $value['desc'] ) ) {
-	            		echo wpautop( wptexturize( wp_kses_post( $value['desc'] ) ) );
+                        echo wp_kses_post( wpautop( wptexturize( wp_kses_post( $value['desc'] ) ) ) );
 	            	}
 	            	echo '<table class="form-table">'. "\n\n";
 	            	if ( ! empty( $value['id'] ) ) {
@@ -305,11 +324,14 @@ class PH_Admin_Settings {
                 		<?php if ( $full_width !== true ) { ?>
                         <th scope="row" class="titledesc">
                             <label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-                            <?php echo $tip; ?>
+                            <?php echo wp_kses_post( $tip ); ?>
                         </th>
                     	<?php } ?>
-                        <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-                            <?php echo $value['html']; ?>
+                        <td class="forminp forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ) ?>">
+                            <?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The html setting type is trusted PHP-supplied markup, including extension scripts; its producer owns escaping.
+                                echo $value['html'];
+                            ?>
                         </td>
                     </tr>
                 <?php
@@ -335,9 +357,9 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post( $tip ); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ) ?>">
 	                    	<input
 	                    		name="<?php echo esc_attr( $value['id'] ); ?>"
 	                    		id="<?php echo esc_attr( $value['id'] ); ?>"
@@ -345,8 +367,11 @@ class PH_Admin_Settings {
 	                    		style="<?php echo esc_attr( $value['css'] ); ?>"
 	                    		value="<?php echo esc_attr( $option_value ); ?>"
 	                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-	                    		<?php echo implode( ' ', $custom_attributes ); ?>
-	                    		/> <?php echo $description; ?>
+                                <?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every custom attribute name and value is escaped when assembled above; retain trusted PHP settings attributes.
+                                echo implode( ' ', $custom_attributes );
+                            ?>
+                                /> <?php echo wp_kses_post( $description ); ?>
 	                    </td>
 	                </tr><?php
 	            break;
@@ -371,17 +396,20 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post( $tip ); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
-	                    	<?php echo $description; ?>
+	                    <td class="forminp forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ) ?>">
+                            <?php echo wp_kses_post( $description ); ?>
 
 	                        <textarea
 	                        	name="<?php echo esc_attr( $value['id'] ); ?>"
 	                        	id="<?php echo esc_attr( $value['id'] ); ?>"
 	                        	style="<?php echo esc_attr( $value['css'] ); ?>"
 	                        	class="<?php echo esc_attr( $value['class'] ); ?>"
-	                        	<?php echo implode( ' ', $custom_attributes ); ?>
+                                <?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every custom attribute name and value is escaped when assembled above; retain trusted PHP settings attributes.
+                                echo implode( ' ', $custom_attributes );
+                            ?>
 	                        	><?php echo esc_textarea( $option_value );  ?></textarea>
 	                    </td>
 	                </tr><?php
@@ -395,18 +423,21 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post( $tip ); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ) ?>">
 	                    	
 	                    	<?php wp_editor( $option_value, esc_attr( $value['id'] ), array( 'media_buttons' => false, 'textarea_rows' => 3, 'teeny' => true ) ); ?>
 
-	                    	<?php echo '<br>' . $description; ?>
+                            <?php echo '<br>' . wp_kses_post( $description ); ?>
 
 	                        <?php /*<textarea
 	                        	name="<?php echo esc_attr( $value['id'] ); ?>"
 	                        	id="<?php echo esc_attr( $value['id'] ); ?>"
-	                        	<?php echo implode( ' ', $custom_attributes ); ?>
+                                <?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every custom attribute name and value is escaped when assembled above; retain trusted PHP settings attributes.
+                                echo implode( ' ', $custom_attributes );
+                            ?>
 	                        	><?php echo esc_textarea( $option_value );  ?></textarea>*/ ?>
 	                    </td>
 	                </tr><?php
@@ -421,15 +452,18 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post( $tip ); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ) ?>">
 	                    	<select
 	                    		name="<?php echo esc_attr( $value['id'] ); ?><?php if ( $value['type'] == 'multiselect' ) echo '[]'; ?>"
 	                    		id="<?php echo esc_attr( $value['id'] ); ?>"
 	                    		style="<?php echo esc_attr( $value['css'] ); ?>"
 	                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-	                    		<?php echo implode( ' ', $custom_attributes ); ?>
+                                <?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every custom attribute name and value is escaped when assembled above; retain trusted PHP settings attributes.
+                                echo implode( ' ', $custom_attributes );
+                            ?>
 	                    		<?php if ( $value['type'] == 'multiselect' ) echo 'multiple="multiple"'; ?>
 	                    		>
 		                    	<?php
@@ -442,11 +476,11 @@ class PH_Admin_Settings {
 				                        	else
 				                        		selected( $option_value, $key );
 
-			                        	?>><?php echo $val ?></option>
+                                        ?>><?php echo esc_html( $val ); ?></option>
 			                        	<?php
 			                        }
 			                    ?>
-	                       </select> <?php echo $description; ?>
+	                       </select> <?php echo wp_kses_post( $description ); ?>
 	                    </td>
 	                </tr><?php
 	            break;
@@ -459,11 +493,11 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post( $tip ); ?>
 						</th>
-	                    <td class="forminp forminp-<?php echo sanitize_title( $value['type'] ) ?>">
+	                    <td class="forminp forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ) ?>">
 	                    	<fieldset>
-	                    		<?php echo $description; ?>
+                                <?php echo wp_kses_post( $description ); ?>
 	                    		<ul>
 	                    		<?php
 	                    			foreach ( $value['options'] as $key => $val ) {
@@ -471,13 +505,16 @@ class PH_Admin_Settings {
 			                        	<li>
 			                        		<label><input
 				                        		name="<?php echo esc_attr( $value['id'] ); ?>"
-				                        		value="<?php echo $key; ?>"
+                                                value="<?php echo esc_attr( $key ); ?>"
 				                        		type="radio"
 					                    		style="<?php echo esc_attr( $value['css'] ); ?>"
 					                    		class="<?php echo esc_attr( $value['class'] ); ?>"
-					                    		<?php echo implode( ' ', $custom_attributes ); ?>
+                                                <?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every custom attribute name and value is escaped when assembled above; retain trusted PHP settings attributes.
+                                echo implode( ' ', $custom_attributes );
+                            ?>
 					                    		<?php checked( $key, $option_value ); ?>
-				                        		/> <?php echo $val ?></label>
+                                                /> <?php echo wp_kses_post( $val ); ?></label>
 			                        	</li>
 			                        	<?php
 			                        }
@@ -518,11 +555,11 @@ class PH_Admin_Settings {
 		            		<tr valign="top" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 								<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?></th>
 								<td class="forminp forminp-checkbox">
-									<fieldset style="<?php echo $fieldset_css; ?>">
+									<fieldset style="<?php echo esc_attr( $fieldset_css ); ?>">
 						<?php
 	            	} else { 
 	            		?>
-		            		<fieldset style="<?php echo $fieldset_css; ?>" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>">
+                            <fieldset style="<?php echo esc_attr( $fieldset_css ); ?>" class="<?php echo esc_attr( implode( ' ', $visbility_class ) ); ?>">
 	            		<?php
 	            	}
 
@@ -533,16 +570,19 @@ class PH_Admin_Settings {
 	            	}
 
 	            	?>
-						<label for="<?php echo $value['id'] ?>">
+						<label for="<?php echo esc_attr( $value['id'] ); ?>">
 							<input
 								name="<?php echo esc_attr( $name ); ?>"
 								id="<?php echo esc_attr( $value['id'] ); ?>"
 								type="checkbox"
 								value="1"
 								<?php checked( $option_value, 'yes'); ?>
-								<?php echo implode( ' ', $custom_attributes ); ?>
-							/> <?php echo $description ?>
-						</label> <?php echo $tip; ?>
+								<?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Every custom attribute name and value is escaped when assembled above; retain trusted PHP settings attributes.
+                                echo implode( ' ', $custom_attributes );
+                            ?>
+							/> <?php echo wp_kses_post( $description ); ?>
+						</label> <?php echo wp_kses_post( $tip ); ?>
 					<?php
 
 					if ( ! isset( $value['checkboxgroup'] ) || 'end' == $value['checkboxgroup'] ) {
@@ -563,15 +603,14 @@ class PH_Admin_Settings {
 
 	            	$width 	= self::get_option( $value['id'] . '[width]', $value['default']['width'] );
 	            	$height = self::get_option( $value['id'] . '[height]', $value['default']['height'] );
-	            	$crop 	= checked( 1, self::get_option( $value['id'] . '[crop]', $value['default']['crop'] ), false );
 
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
-						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo wp_kses_post( $tip ); ?></th>
 	                    <td class="forminp image_width_settings">
 
-	                    	<input name="<?php echo esc_attr( $value['id'] ); ?>[width]" id="<?php echo esc_attr( $value['id'] ); ?>-width" type="text" size="3" value="<?php echo $width; ?>" /> &times; <input name="<?php echo esc_attr( $value['id'] ); ?>[height]" id="<?php echo esc_attr( $value['id'] ); ?>-height" type="text" size="3" value="<?php echo $height; ?>" />px
+                            <input name="<?php echo esc_attr( $value['id'] ); ?>[width]" id="<?php echo esc_attr( $value['id'] ); ?>-width" type="text" size="3" value="<?php echo esc_attr( $width ); ?>" /> &times; <input name="<?php echo esc_attr( $value['id'] ); ?>[height]" id="<?php echo esc_attr( $value['id'] ); ?>-height" type="text" size="3" value="<?php echo esc_attr( $height ); ?>" />px
 
-	                    	<label><input name="<?php echo esc_attr( $value['id'] ); ?>[crop]" id="<?php echo esc_attr( $value['id'] ); ?>-crop" type="checkbox" <?php echo $crop; ?> /> <?php _e( 'Hard Crop?', 'propertyhive' ); ?></label>
+                            <label><input name="<?php echo esc_attr( $value['id'] ); ?>[crop]" id="<?php echo esc_attr( $value['id'] ); ?>-crop" type="checkbox" <?php checked( 1, self::get_option( $value['id'] . '[crop]', $value['default']['crop'] ) ); ?> /> <?php esc_html_e( 'Hard Crop?', 'propertyhive' ); ?></label>
 
 	                    	</td>
 	                </tr><?php
@@ -590,7 +629,7 @@ class PH_Admin_Settings {
 	                    	$image = wp_get_attachment_image_src( $option_value, 'thumbnail' );
 							if ($image !== FALSE)
 							{
-								echo '<img src="' . $image[0] . '" width="150" alt="">';
+								echo '<img src="' . esc_url( $image[0] ) . '" width="150" alt="">';
 							}
 							else
 							{
@@ -600,65 +639,42 @@ class PH_Admin_Settings {
 	                    </td>
 	                </tr>
 	            	<tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
-						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+						<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo wp_kses_post( $tip ); ?></th>
 	                    <td class="forminp image_settings">
 
-	                    	<a href="" class="button button-primary ph_upload_photo_button<?php echo esc_attr( $value['id'] ); ?>">Select Image</a>
-	                    	<input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="hidden" value="<?php echo $option_value; ?>" />
+                            <a href="" data-ph-image-field="<?php echo esc_attr( $value['id'] ); ?>" class="button button-primary ph_upload_photo_button<?php echo esc_attr( $value['id'] ); ?>">Select Image</a>
+                            <input name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>" type="hidden" value="<?php echo esc_attr( $option_value ); ?>" />
 
 	                    </td>
 	                </tr><?php
-	                echo '<script>
-
-		var file_frame' . $value['id'] . ';
-
-		jQuery(document).ready(function()
-        {
-        	jQuery(\'body\').on(\'click\', \'.ph_upload_photo_button' . $value['id'] . '\', function( event ){
-                 
-	            event.preventDefault();
-	         
-	            // If the media frame already exists, reopen it.
-	            if ( file_frame' . $value['id'] . ' ) {
-	              file_frame' . $value['id'] . '.open();
-	              return;
-	            }
-	         
-	            // Create the media frame.
-	            file_frame' . $value['id'] . ' = wp.media.frames.file_frame' . $value['id'] . ' = wp.media({
-	              title: jQuery( this ).data( \'uploader_title\' ),
-	              button: {
-	                text: jQuery( this ).data( \'uploader_button_text\' ),
-	              },
-	              multiple: false  // Set to true to allow multiple files to be selected
-	            });
-	         
-	            // When an image is selected, run a callback.
-	            file_frame' . $value['id'] . '.on( \'select\', function() {
-	                var selection = file_frame' . $value['id'] . '.state().get(\'selection\');
-
-	                selection.map( function( attachment ) {
-	             
-	                    attachment = attachment.toJSON();
-	             
-	                    // Do something with attachment.id and/or attachment.url here
-	                    console.log(attachment.url);
-	                    
-	                    // Add selected image to page
-	                    //add_photo_attachment_to_grid(attachment);
-
-	                    jQuery(\'#row_' . esc_attr( $value['id'] ) . '_uploaded\').show();
-	                    jQuery(\'#row_' . esc_attr( $value['id'] ) . '_uploaded td\').html(\'<img src="\' + attachment.url + \'" width="150" alt="">\');
-	                    jQuery(\'#' . esc_attr( $value['id'] ) . '\').val(attachment.id);
-	                });
-	            });
-	         
-	            // Finally, open the modal
-	            file_frame' . $value['id'] . '.open();
-	        });
-		});
-
-	</script>';
+                echo '<script>
+(function(fieldId) {
+    jQuery(function($) {
+        $(document.body).on("click", "[data-ph-image-field]", function(event) {
+            if ($(this).attr("data-ph-image-field") !== fieldId) { return; }
+            event.preventDefault();
+            var frameKey = "file_frame" + fieldId;
+            var frame = wp.media.frames[frameKey] || window[frameKey];
+            if (frame) { frame.open(); return; }
+            frame = wp.media({
+                title: $(this).data("uploader_title"),
+                button: { text: $(this).data("uploader_button_text") },
+                multiple: false
+            });
+            wp.media.frames[frameKey] = window[frameKey] = frame;
+            frame.on("select", function() {
+                frame.state().get("selection").map(function(attachment) {
+                    attachment = attachment.toJSON();
+                    var row = $(document.getElementById("row_" + fieldId + "_uploaded"));
+                    row.show().find("td").empty().append($("<img>", { src: attachment.url, width: 150, alt: "" }));
+                    $(document.getElementById(fieldId)).val(attachment.id);
+                });
+            });
+            frame.open();
+        });
+    });
+})(' . wp_json_encode( (string) $value['id'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ');
+</script>';
 	            break;
 
 	            // Single page selects
@@ -678,9 +694,11 @@ class PH_Admin_Settings {
 	            		$args = wp_parse_args( $value['args'], $args );
 
 	            	?><tr valign="top" class="single_select_page" id="row_<?php echo esc_attr( $value['id'] ); ?>">
-	                    <th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo $tip; ?></th>
+	                    <th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ) ?> <?php echo wp_kses_post( $tip ); ?></th>
 	                    <td class="forminp">
-				        	<?php echo str_replace(' id=', " data-placeholder='" . __( 'Select a page&hellip;', 'propertyhive' ) .  "' style='" . $value['css'] . "' class='" . $value['class'] . "' id=", wp_dropdown_pages( $args ) ); ?> <?php echo $description; ?>
+                            <?php
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_dropdown_pages() produces escaped select HTML; all inserted attribute values are escaped here and trusted core filters retain their HTML contract.
+                                echo str_replace(' id=', " data-placeholder='" . esc_attr__( 'Select a page&hellip;', 'propertyhive' ) .  "' style='" . esc_attr( $value['css'] ) . "' class='" . esc_attr( $value['class'] ) . "' id=", wp_dropdown_pages( $args ) ); ?> <?php echo wp_kses_post( $description ); ?>
 				        </td>
 	               	</tr><?php
 	            break;
@@ -699,13 +717,13 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post( $tip ); ?>
 						</th>
 	                    <td class="forminp">
 		                    <select name="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>">
 					        	<?php PH()->countries->country_dropdown_options( $country ); ?>
 					        </select>
-					        <?php echo $description; ?>
+					        <?php echo wp_kses_post( $description ); ?>
 	               		</td>
 	               	</tr><?php
 	            break;
@@ -724,16 +742,16 @@ class PH_Admin_Settings {
 	            	?><tr valign="top" id="row_<?php echo esc_attr( $value['id'] ); ?>">
 						<th scope="row" class="titledesc">
 							<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?></label>
-							<?php echo $tip; ?>
+							<?php echo wp_kses_post( $tip ); ?>
 						</th>
 	                    <td class="forminp">
 		                    <select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="<?php echo esc_attr( $value['css'] ); ?>">
 					        	<?php
 					        		if ( $countries )
 					        			foreach ( $countries as $key => $val )
-		                    				echo '<option value="' . esc_attr( $key ) . '" ' . selected( in_array( $key, $selections ), true, false ).'>' . $val['name'] . '</option>';
+                                            echo '<option value="' . esc_attr( $key ) . '" ' . selected( in_array( $key, $selections ), true, false ).'>' . esc_html( $val['name'] ) . '</option>';
 		                    	?>
-					        </select> <?php if ( $description ) echo $description; ?>
+					        </select> <?php if ( $description ) echo wp_kses_post( $description ); ?>
 	               		</td>
 	               	</tr><?php
 	            break;
@@ -756,8 +774,15 @@ class PH_Admin_Settings {
 	 * @return bool
 	 */
 	public static function save_fields( $options ) {
+        if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            return;
+        }
+
 	    if ( empty( $_POST ) )
 	    	return false;
+
+	    // The settings nonce and manage_options capability were verified above.
+	    $request_post = wp_unslash( $_POST );
 
 	    // Options to update will be stored here
 	    $update_options = array();
@@ -778,7 +803,7 @@ class PH_Admin_Settings {
 		    	// Standard types
 		    	case "checkbox" :
 
-		    		if ( isset( $_POST[ $value['id'] ] ) ) {
+				if ( isset( $request_post[ $value['id'] ] ) ) {
 		    			$option_value = 'yes';
 		            } else {
 		            	$option_value = 'no';
@@ -789,8 +814,8 @@ class PH_Admin_Settings {
 		    	case "textarea" :
 		    	case "wysiwyg" :
 
-			    	if ( isset( $_POST[$value['id']] ) ) {
-			    		$option_value = wp_kses_post( trim( stripslashes( $_POST[ $value['id'] ] ) ) );
+				    if ( isset( $request_post[$value['id']] ) && is_scalar( $request_post[$value['id']] ) ) {
+					$option_value = wp_kses_post( trim( $request_post[ $value['id'] ] ) );
 		            } else {
 		                $option_value = '';
 		            }
@@ -807,8 +832,8 @@ class PH_Admin_Settings {
 		    	case "single_select_country" :
 		    	case 'radio' :
 
-			       if ( isset( $_POST[$value['id']] ) ) {
-		            	$option_value = sanitize_text_field( stripslashes( $_POST[ $value['id'] ] ) );
+				       if ( isset( $request_post[$value['id']] ) && is_scalar( $request_post[$value['id']] ) ) {
+			$option_value = sanitize_text_field( $request_post[ $value['id'] ] );
 		            } else {
 		                $option_value = '';
 		            }
@@ -819,11 +844,15 @@ class PH_Admin_Settings {
 		    	case "multiselect" :
 		    	case "multi_select_countries" :
 
-		    		// Get countries array
-					if ( isset( $_POST[ $value['id'] ] ) )
-						$selected_countries = array_map( 'ph_clean', array_map( 'stripslashes', (array) $_POST[ $value['id'] ] ) );
-					else
-						$selected_countries = array();
+					// Get countries array
+					$selected_countries = array();
+					if ( isset( $request_post[ $value['id'] ] ) ) {
+						foreach ( (array) $request_post[ $value['id'] ] as $selected_country ) {
+							if ( is_scalar( $selected_country ) ) {
+								$selected_countries[] = ph_clean( $selected_country );
+							}
+						}
+					}
 
 					$option_value = $selected_countries;
 
@@ -831,12 +860,13 @@ class PH_Admin_Settings {
 
 		    	case "image_width" :
 
-			    	if ( isset( $_POST[$value['id'] ]['width'] ) ) {
+				$image_dimensions = ( isset( $request_post[ $value['id'] ] ) && is_array( $request_post[ $value['id'] ] ) ) ? $request_post[ $value['id'] ] : array();
+				if ( isset( $image_dimensions['width'] ) && is_scalar( $image_dimensions['width'] ) ) {
 
-		              	$update_options[ $value['id'] ]['width']  = ph_clean( stripslashes( $_POST[ $value['id'] ]['width'] ) );
-		              	$update_options[ $value['id'] ]['height'] = ph_clean( stripslashes( $_POST[ $value['id'] ]['height'] ) );
+			$update_options[ $value['id'] ]['width']  = ph_clean( $image_dimensions['width'] );
+			$update_options[ $value['id'] ]['height'] = ( isset( $image_dimensions['height'] ) && is_scalar( $image_dimensions['height'] ) ) ? ph_clean( $image_dimensions['height'] ) : $value['default']['height'];
 
-						if ( isset( $_POST[ $value['id'] ]['crop'] ) )
+						if ( isset( $image_dimensions['crop'] ) )
 							$update_options[ $value['id'] ]['crop'] = 1;
 						else
 							$update_options[ $value['id'] ]['crop'] = 0;

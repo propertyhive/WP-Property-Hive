@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Frontend Settings
  *
@@ -17,6 +20,7 @@ if ( ! class_exists( 'PH_Settings_Frontend' ) ) :
 /**
  * PH_Settings_Frontend.
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Frontend; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Frontend extends PH_Settings_Page {
 
 	/**
@@ -40,18 +44,19 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
     public function check_for_reset_search_form()
     {
-        if ( isset($_GET['action']) && $_GET['action'] == 'resetsearchform' && isset($_GET['id']) && $_GET['id'] != '' )
+        if ( isset($_GET['action']) && $_GET['action'] == 'resetsearchform' && isset($_GET['id']) && is_string($_GET['id']) && $_GET['id'] != '' )
         {
             if ( ! current_user_can( 'manage_options' ) ) 
             {
-                wp_die( __( 'Sorry, you are not allowed to do this.', 'propertyhive' ) );
+                wp_die( esc_html__( 'Sorry, you are not allowed to do this.', 'propertyhive' ) );
             }
 
-            check_admin_referer( 'ph_reset_search_form_' . $_GET['id'] );
+            $request_id = sanitize_text_field( wp_unslash( $_GET['id'] ) );
+            check_admin_referer( 'ph_reset_search_form_' . $request_id );
 
             $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
-            $current_id = ( !isset( $_GET['id'] ) ) ? '' : sanitize_title( $_GET['id'] );
+            $current_id = sanitize_title( $request_id );
 
             $existing_search_forms = ( (isset($current_settings['search_forms'])) ? $current_settings['search_forms'] : array() );
 
@@ -73,18 +78,19 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
     public function check_for_delete_search_form()
     {
-        if ( isset($_GET['action']) && $_GET['action'] == 'deletesearchform' && isset($_GET['id']) && $_GET['id'] != '' && $_GET['id'] != 'default' )
+        if ( isset($_GET['action']) && $_GET['action'] == 'deletesearchform' && isset($_GET['id']) && is_string($_GET['id']) && $_GET['id'] != '' && $_GET['id'] != 'default' )
         {
             if ( ! current_user_can( 'manage_options' ) ) 
             {
-                wp_die( __( 'Sorry, you are not allowed to do this.', 'propertyhive' ) );
+                wp_die( esc_html__( 'Sorry, you are not allowed to do this.', 'propertyhive' ) );
             }
 
-            check_admin_referer( 'ph_delete_search_form_' . $_GET['id'] );
+            $request_id = sanitize_text_field( wp_unslash( $_GET['id'] ) );
+            check_admin_referer( 'ph_delete_search_form_' . $request_id );
 
             $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
-            $current_id = ( !isset( $_GET['id'] ) ) ? '' : sanitize_title( $_GET['id'] );
+            $current_id = sanitize_title( $request_id );
 
             $existing_search_forms = ( (isset($current_settings['search_forms'])) ? $current_settings['search_forms'] : array() );
 
@@ -455,7 +461,8 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             $current_settings['search_forms']['default'] = array();
         }
 
-        $current_id = ( !isset( $_REQUEST['id'] ) ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only selection of a search-form editor; save() verifies its settings nonce and capability before writes.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
 
         $search_form_details = array();
 
@@ -475,7 +482,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
         $settings = array(
 
-            array( 'title' => __( ( $current_section == 'addsearchform' ? 'Add Search Form' : 'Edit Search Form' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'searchforms' ),
+            array( 'title' => ( $current_section == 'addsearchform' ? __( 'Add Search Form', 'propertyhive' ) : __( 'Edit Search Form', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'searchforms' ),
 
         );
 
@@ -608,92 +615,92 @@ class PH_Settings_Frontend extends PH_Settings_Page {
     private function output_search_form_field( $id, $field )
     {
         echo '
-        <div class="group" id="' . $id . '">
-            <h3>' . trim( $id, '_' ) . '</h3>
+        <div class="group" id="' . esc_attr( $id ) . '">
+            <h3>' . esc_html( trim( $id, '_' ) ) . '</h3>
             <div>';
         if ( $id == 'department' )
         {
-            echo '<p><label for="type_'.$id.'">Type:</label> <select name="type[' . $id . ']" id="type_'.$id.'">
+            echo '<p><label for="type_'. esc_attr( $id ) .'">Type:</label> <select name="type[' . esc_attr( $id ) . ']" id="type_'. esc_attr( $id ) .'">
                 <option value="radio"' . ( ( !isset($field['type']) || ( isset($field['type']) && $field['type'] == 'radio' ) ) ? ' selected' : '' ) . '>Radio Buttons</option>
                 <option value="select"' . ( ( isset($field['type']) && $field['type'] == 'select' ) ? ' selected' : '' ) . '>Dropdown</option>
-                ' . ( ( isset($field['type']) && $field['type'] != 'select' && $field['type'] != 'radio' ) ? '<option value="' . $field['type'] . '" selected>' . $field['type'] . '</option>' : '' ) . '
+                ' . ( ( isset($field['type']) && $field['type'] != 'select' && $field['type'] != 'radio' ) ? '<option value="' . esc_attr( $field['type'] ) . '" selected>' . esc_attr( $field['type'] ) . '</option>' : '' ) . '
             </select></p>';
         }
         else
         {
-            echo '<input type="hidden" name="type[' . $id . ']" id="type_'.$id.'" value="' . ( ( isset($field['type']) ) ? $field['type'] : '' ) . '">';
+            echo '<input type="hidden" name="type[' . esc_attr( $id ) . ']" id="type_'. esc_attr( $id ) .'" value="' . ( ( isset($field['type']) ) ? esc_attr( $field['type'] ) : '' ) . '">';
         }
 
-        echo  ' <p><label for="show_label_'.$id.'">Show Label:</label> <input type="checkbox" name="show_label[' . $id . ']" id="show_label_'.$id.'" value="1"' . ( ( isset($field['show_label']) && $field['show_label'] === true ) ? ' checked' : '' ) . '></p>
+        echo  ' <p><label for="show_label_'. esc_attr( $id ) .'">Show Label:</label> <input type="checkbox" name="show_label[' . esc_attr( $id ) . ']" id="show_label_'. esc_attr( $id ) .'" value="1"' . ( ( isset($field['show_label']) && $field['show_label'] === true ) ? ' checked' : '' ) . '></p>
                 
-                <p><label for="label_'.$id.'">Label:</label> <input type="text" name="label[' . $id . ']" id="label_'.$id.'" value="' . ( ( isset($field['label']) ) ? $field['label'] : '' ) . '"></p>
+                <p><label for="label_'. esc_attr( $id ) .'">Label:</label> <input type="text" name="label[' . esc_attr( $id ) . ']" id="label_'. esc_attr( $id ) .'" value="' . ( ( isset($field['label']) ) ? esc_attr( $field['label'] ) : '' ) . '"></p>
                 
-                <p><label for="before_'.$id.'">Before:</label> <input type="text" name="before[' . $id . ']" id="before_'.$id.'" value="' . ( ( isset($field['before']) ) ? htmlentities($field['before']) : '' ) . '"></p>
+                <p><label for="before_'. esc_attr( $id ) .'">Before:</label> <input type="text" name="before[' . esc_attr( $id ) . ']" id="before_'. esc_attr( $id ) .'" value="' . ( ( isset($field['before']) ) ? esc_attr($field['before']) : '' ) . '"></p>
                 
-                <p><label for="after_'.$id.'">After:</label> <input type="text" name="after[' . $id . ']" id="after_'.$id.'" value="' . ( ( isset($field['after']) ) ? htmlentities($field['after']) : '' ) . '"></p>';
+                <p><label for="after_'. esc_attr( $id ) .'">After:</label> <input type="text" name="after[' . esc_attr( $id ) . ']" id="after_'. esc_attr( $id ) .'" value="' . ( ( isset($field['after']) ) ? esc_attr($field['after']) : '' ) . '"></p>';
 
         if ( isset($field['type']) && in_array($field['type'], array('text', 'email', 'date', 'number', 'password')) )
         {
             echo '
-            <p><label for="placeholder_'.$id.'">Placeholder:</label> <input type="text" name="placeholder[' . $id . ']" id="placeholder_'.$id.'" value="' . ( ( isset($field['placeholder']) ) ? htmlentities($field['placeholder']) : '' ) . '"></p>
+            <p><label for="placeholder_'. esc_attr( $id ) .'">Placeholder:</label> <input type="text" name="placeholder[' . esc_attr( $id ) . ']" id="placeholder_'. esc_attr( $id ) .'" value="' . ( ( isset($field['placeholder']) ) ? esc_attr($field['placeholder']) : '' ) . '"></p>
             ';
         }
 
         if ( isset($field['type']) && in_array($field['type'], array('slider')) )
         {
             echo '
-            <p><label for="min_'.$id.'">Min:</label> <input type="number" name="min[' . $id . ']" id="min_'.$id.'" value="' . ( ( isset($field['min']) ) ? htmlentities($field['min']) : '0' ) . '"></p>
+            <p><label for="min_'. esc_attr( $id ) .'">Min:</label> <input type="number" name="min[' . esc_attr( $id ) . ']" id="min_'. esc_attr( $id ) .'" value="' . ( ( isset($field['min']) ) ? esc_attr($field['min']) : '0' ) . '"></p>
             ';
 
             echo '
-            <p><label for="max_'.$id.'">Max:</label> <input type="number" name="max[' . $id . ']" id="max_'.$id.'" value="' . ( ( isset($field['max']) ) ? htmlentities($field['max']) : '' ) . '"></p>
+            <p><label for="max_'. esc_attr( $id ) .'">Max:</label> <input type="number" name="max[' . esc_attr( $id ) . ']" id="max_'. esc_attr( $id ) .'" value="' . ( ( isset($field['max']) ) ? esc_attr($field['max']) : '' ) . '"></p>
             ';
 
             echo '
-            <p><label for="step_'.$id.'">Step:</label> <input type="number" name="step[' . $id . ']" id="step_'.$id.'" value="' . ( ( isset($field['step']) ) ? htmlentities($field['step']) : '1' ) . '"></p>
+            <p><label for="step_'. esc_attr( $id ) .'">Step:</label> <input type="number" name="step[' . esc_attr( $id ) . ']" id="step_'. esc_attr( $id ) .'" value="' . ( ( isset($field['step']) ) ? esc_attr($field['step']) : '1' ) . '"></p>
             ';
         }
 
         if ( isset($field['type']) && in_array($field['type'], array('office')) )
         {
             echo '
-            <p><label for="blank_option_'.$id.'">Blank Option:</label> <input type="text" name="blank_option[' . $id . ']" id="blank_option_'.$id.'" value="' . ( ( isset($field['blank_option']) ) ? htmlentities($field['blank_option']) : __( 'No Preference', 'propertyhive' ) ) . '"></p>
+            <p><label for="blank_option_'. esc_attr( $id ) .'">Blank Option:</label> <input type="text" name="blank_option[' . esc_attr( $id ) . ']" id="blank_option_'. esc_attr( $id ) .'" value="' . ( ( isset($field['blank_option']) ) ? esc_attr($field['blank_option']) : esc_attr__( 'No Preference', 'propertyhive' ) ) . '"></p>
             ';
         }
 
         if ( taxonomy_exists($id) || ( isset($field['custom_field']) && $field['custom_field'] === true && $field['type'] == 'select' ) )
         {
             echo '
-            <p><label for="blank_option_'.$id.'">Blank Option:</label> <input type="text" name="blank_option[' . $id . ']" id="blank_option_'.$id.'" value="' . ( ( isset($field['blank_option']) ) ? htmlentities($field['blank_option']) : __( 'No Preference', 'propertyhive' ) ) . '"></p>
+            <p><label for="blank_option_'. esc_attr( $id ) .'">Blank Option:</label> <input type="text" name="blank_option[' . esc_attr( $id ) . ']" id="blank_option_'. esc_attr( $id ) .'" value="' . ( ( isset($field['blank_option']) ) ? esc_attr($field['blank_option']) : esc_attr__( 'No Preference', 'propertyhive' ) ) . '"></p>
             ';
 
             if ( taxonomy_exists($id) && in_array( $id, apply_filters( 'propertyhive_template_assistant_multi_level_taxonomy_fields', array('property_type', 'commercial_property_type', 'location') ) ) )
             {
                 echo '
-                <p><label for="parent_terms_only_'.$id.'">Top-Level Terms Only:</label> <input type="checkbox" name="parent_terms_only[' . $id . ']" id="parent_terms_only_'.$id.'" value="yes"' . ( ( isset($field['parent_terms_only']) && $field['parent_terms_only'] === true ) ? ' checked' : '' ) . '></p>
+                <p><label for="parent_terms_only_'. esc_attr( $id ) .'">Top-Level Terms Only:</label> <input type="checkbox" name="parent_terms_only[' . esc_attr( $id ) . ']" id="parent_terms_only_'. esc_attr( $id ) .'" value="yes"' . ( ( isset($field['parent_terms_only']) && $field['parent_terms_only'] === true ) ? ' checked' : '' ) . '></p>
                 ';
 
                 echo '
-                <p><label for="hide_empty_'.$id.'">Hide Terms With No Properties Assigned:</label> <input type="checkbox" name="hide_empty[' . $id . ']" id="hide_empty_'.$id.'" value="yes"' . ( ( isset($field['hide_empty']) && $field['hide_empty'] === true ) ? ' checked' : '' ) . '></p>
+                <p><label for="hide_empty_'. esc_attr( $id ) .'">Hide Terms With No Properties Assigned:</label> <input type="checkbox" name="hide_empty[' . esc_attr( $id ) . ']" id="hide_empty_'. esc_attr( $id ) .'" value="yes"' . ( ( isset($field['hide_empty']) && $field['hide_empty'] === true ) ? ' checked' : '' ) . '></p>
                 ';
             }
 
             if ( taxonomy_exists($id) && in_array( $id, apply_filters( 'propertyhive_template_assistant_dynamic_population_taxonomy_fields', array('location') ) ) )
             {
                 echo '
-                <p><label for="dynamic_population_'.$id.'">Dynamically Populate Cascading Dropdowns:</label> <input type="checkbox" name="dynamic_population[' . $id . ']" id="dynamic_population_'.$id.'" value="yes"' . ( ( isset($field['dynamic_population']) && $field['dynamic_population'] === true ) ? ' checked' : '' ) . '></p>
+                <p><label for="dynamic_population_'. esc_attr( $id ) .'">Dynamically Populate Cascading Dropdowns:</label> <input type="checkbox" name="dynamic_population[' . esc_attr( $id ) . ']" id="dynamic_population_'. esc_attr( $id ) .'" value="yes"' . ( ( isset($field['dynamic_population']) && $field['dynamic_population'] === true ) ? ' checked' : '' ) . '></p>
                 ';
             }
 
             echo '
-            <p><label for="multiselect_'.$id.'">Multi-Select:</label> <input type="checkbox" name="multiselect[' . $id . ']" id="multiselect_'.$id.'" value="yes"' . ( ( isset($field['multiselect']) && $field['multiselect'] === true ) ? ' checked' : '' ) . '></p>
+            <p><label for="multiselect_'. esc_attr( $id ) .'">Multi-Select:</label> <input type="checkbox" name="multiselect[' . esc_attr( $id ) . ']" id="multiselect_'. esc_attr( $id ) .'" value="yes"' . ( ( isset($field['multiselect']) && $field['multiselect'] === true ) ? ' checked' : '' ) . '></p>
             ';
         }
 
         if ( $id == 'office' )
         {
             echo '
-            <p><label for="multiselect_'.$id.'">Multi-Select:</label> <input type="checkbox" name="multiselect[' . $id . ']" id="multiselect_'.$id.'" value="yes"' . ( ( isset($field['multiselect']) && $field['multiselect'] === true ) ? ' checked' : '' ) . '></p>
+            <p><label for="multiselect_'. esc_attr( $id ) .'">Multi-Select:</label> <input type="checkbox" name="multiselect[' . esc_attr( $id ) . ']" id="multiselect_'. esc_attr( $id ) .'" value="yes"' . ( ( isset($field['multiselect']) && $field['multiselect'] === true ) ? ' checked' : '' ) . '></p>
             ';
         }
 
@@ -701,17 +708,17 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         {
             echo '<p><label for="">Options: ';
 
-            echo '<a href="" class="add-search-form-field-option" id="add_search_form_field_option_' . $id . '">Add Option</a>';
+            echo '<a href="" class="add-search-form-field-option" id="add_search_form_field_option_' . esc_attr( $id ) . '">Add Option</a>';
 
             echo '</label><br>';
 
-            echo '<span class="form-field-options" id="sortable_options_' . $id . '">';
+            echo '<span class="form-field-options" id="sortable_options_' . esc_attr( $id ) . '">';
             $i = 0;
             foreach ( $field['options'] as $key => $value )
             {
                 echo '<span style="display:block"><i class="fa fa-reorder" style="cursor:pointer; opacity:0.3"></i> ';
-                echo '<input type="text" name="option_keys[' . $id . '][]" value="' . $key . '">';
-                echo '<input type="text" name="options_values[' . $id . '][]" value="' . $value . '">';
+                echo '<input type="text" name="option_keys[' . esc_attr( $id ) . '][]" value="' . esc_attr( $key ) . '">';
+                echo '<input type="text" name="options_values[' . esc_attr( $id ) . '][]" value="' . esc_attr( $value ) . '">';
                 echo '</span>';
 
                 ++$i;
@@ -723,7 +730,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 <script>
             jQuery(document).ready(function($)
             {
-                $( "#sortable_options_<?php echo $id; ?>" )
+                $( document.getElementById( <?php echo wp_json_encode( 'sortable_options_' . $id, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> ) )
                 .sortable({
                     axis: "y",
                     handle: "i",
@@ -773,7 +780,8 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             $current_settings['search_forms']['default'] = array();
         }
 
-        $current_id = ( !isset( $_REQUEST['id'] ) ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only selection of a search-form editor; save() verifies its settings nonce and capability before writes.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
 
         $search_form_details = array();
 
@@ -1232,7 +1240,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             {
                 $field_ids[] = $id;
             }
-            echo implode("|", $field_ids);
+            echo esc_attr( implode("|", $field_ids) );
         ?>">
         <input type="hidden" name="inactive_fields_order" id="inactive_fields_order" value="<?php
             $field_ids = array();
@@ -1240,7 +1248,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             {
                 $field_ids[] = $id;
             }
-            echo implode("|", $field_ids);
+            echo esc_attr( implode("|", $field_ids) );
         ?>">
 
         <script>
@@ -1434,6 +1442,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         {
         	switch ($current_section)
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             	case "search-forms": { $hide_save_button = true; $settings = $this->get_search_forms_settings(); break; }
                 case "addsearchform": { $settings = $this->get_search_form_settings(); break; }
                 case "editsearchform": { $settings = $this->get_search_form_settings(); break; }
@@ -1454,6 +1463,10 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 	 */
 	public function save() 
 	{
+        if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            return;
+        }
+
 		global $current_section;
 
         $current_settings = get_option( 'propertyhive_template_assistant', array() );
@@ -1464,12 +1477,24 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         	{
         		case "flags": 
                 {
+                    $flag_input = array();
+                    foreach ( array( 'flags_active', 'flags_active_single', 'flag_position', 'flag_bg_color', 'flag_text_color' ) as $flag_key ) {
+                        if ( isset( $_POST[$flag_key] ) && ! is_string( $_POST[$flag_key] ) ) {
+                            return;
+                        }
+                        $flag_input[$flag_key] = isset( $_POST[$flag_key] ) ? sanitize_text_field( wp_unslash( $_POST[$flag_key] ) ) : '';
+                    }
+                    foreach ( array( 'flag_position', 'flag_bg_color', 'flag_text_color' ) as $flag_key ) {
+                        if ( ! isset( $_POST[$flag_key] ) ) {
+                            return;
+                        }
+                    }
                     $propertyhive_template_assistant = array(
-                        'flags_active' => ( ( isset($_POST['flags_active']) ) ? sanitize_text_field($_POST['flags_active']) : '' ),
-                        'flags_active_single' => ( ( isset($_POST['flags_active_single']) ) ? sanitize_text_field($_POST['flags_active_single']) : '' ),
-                        'flag_position' => sanitize_text_field($_POST['flag_position']),
-                        'flag_bg_color' => sanitize_text_field($_POST['flag_bg_color']),
-                        'flag_text_color' => sanitize_text_field($_POST['flag_text_color']),
+                        'flags_active' => $flag_input['flags_active'],
+                        'flags_active_single' => $flag_input['flags_active_single'],
+                        'flag_position' => $flag_input['flag_position'],
+                        'flag_bg_color' => $flag_input['flag_bg_color'],
+                        'flag_text_color' => $flag_input['flag_text_color'],
                     );
 
                     $propertyhive_template_assistant = array_merge($current_settings, $propertyhive_template_assistant);
@@ -1480,7 +1505,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
         		case "addsearchform": 
                 case "editsearchform": 
                 {
-                    $current_id = ( !isset( $_REQUEST['id'] ) ) ? '' : sanitize_title( $_REQUEST['id'] );
+                    $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
 
                     $existing_search_forms = ( (isset($current_settings['search_forms'])) ? $current_settings['search_forms'] : array() );
 
@@ -1494,7 +1519,30 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                         unset($existing_search_forms[$current_id]);
                     }
 
-                    $current_id = ( ( isset($_POST['form_id']) && $_POST['form_id'] != '' ) ? str_replace("-", "_", sanitize_title($_POST['form_id'])) : $current_id );
+                    $submitted_fields = array();
+                    foreach ( array( 'show_label', 'label', 'type', 'before', 'after', 'placeholder', 'min', 'max', 'step', 'blank_option', 'parent_terms_only', 'dynamic_population', 'hide_empty', 'multiselect' ) as $input_key ) {
+                        if ( isset( $_POST[$input_key] ) && ! is_array( $_POST[$input_key] ) ) {
+                            return;
+                        }
+                        $submitted_fields[$input_key] = array();
+                        if ( isset( $_POST[$input_key] ) ) {
+                            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Iteration preserves the raw element type for validation; accepted strings are unslashed and sanitized inside this loop before use.
+                            foreach ( $_POST[$input_key] as $field_id => $value ) {
+                                if ( ! is_string( $value ) ) {
+                                    return;
+                                }
+                                $value = wp_unslash( $value );
+                                $submitted_fields[$input_key][$field_id] = in_array( $input_key, array( 'label', 'before', 'after' ), true ) ? wp_kses_post( $value ) : sanitize_text_field( $value );
+                            }
+                        }
+                    }
+                    foreach ( array( 'form_id', 'active_fields_order', 'inactive_fields_order' ) as $input_key ) {
+                        if ( isset( $_POST[$input_key] ) && ! is_string( $_POST[$input_key] ) ) {
+                            return;
+                        }
+                    }
+
+                    $current_id = ( ( isset($_POST['form_id']) && $_POST['form_id'] != '' ) ? str_replace("-", "_", sanitize_title( wp_unslash( $_POST['form_id'] ) )) : $current_id );
                     if ($current_section == 'addsearchform' && trim($current_id) == '' )
                     {
                         $current_id = 'custom';
@@ -1505,61 +1553,61 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
                     if ( isset($_POST['active_fields_order']) && $_POST['active_fields_order'] != '' )
                     {
-                        $field_ids = explode("|", sanitize_text_field($_POST['active_fields_order']));
+                        $field_ids = explode("|", sanitize_text_field( wp_unslash( $_POST['active_fields_order'] ) ));
                         if ( !empty($field_ids) )
                         {
                             foreach ( $field_ids as $field_id )
                             {
                                 $active_fields[$field_id] = array(
-                                    'show_label' => ( ( isset($_POST['show_label'][$field_id]) && $_POST['show_label'][$field_id] == '1' ) ? true : false ),
-                                    'label' => ( isset($_POST['label'][$field_id]) ? stripslashes($_POST['label'][$field_id]) : '' ),
+                                    'show_label' => ( ( isset($submitted_fields['show_label'][$field_id]) && $submitted_fields['show_label'][$field_id] == '1' ) ? true : false ),
+                                    'label' => ( isset($submitted_fields['label'][$field_id]) ? $submitted_fields['label'][$field_id] : '' ),
                                 );
 
-                                if ( isset($_POST['type'][$field_id]) && $_POST['type'][$field_id] != '' )
+                                if ( isset($submitted_fields['type'][$field_id]) && $submitted_fields['type'][$field_id] != '' )
                                 {
-                                    $active_fields[$field_id]['type'] = stripslashes($_POST['type'][$field_id]);
+                                    $active_fields[$field_id]['type'] = $submitted_fields['type'][$field_id];
                                 }
-                                if ( isset($_POST['before'][$field_id]) && $_POST['before'][$field_id] != '' )
+                                if ( isset($submitted_fields['before'][$field_id]) && $submitted_fields['before'][$field_id] != '' )
                                 {
-                                    $active_fields[$field_id]['before'] = stripslashes($_POST['before'][$field_id]);
+                                    $active_fields[$field_id]['before'] = $submitted_fields['before'][$field_id];
                                 }
-                                if ( isset($_POST['after'][$field_id]) && $_POST['after'][$field_id] != '' )
+                                if ( isset($submitted_fields['after'][$field_id]) && $submitted_fields['after'][$field_id] != '' )
                                 {
-                                    $active_fields[$field_id]['after'] = stripslashes($_POST['after'][$field_id]);
+                                    $active_fields[$field_id]['after'] = $submitted_fields['after'][$field_id];
                                 }
-                                if ( isset($_POST['placeholder'][$field_id]) && $_POST['placeholder'][$field_id] != '' )
+                                if ( isset($submitted_fields['placeholder'][$field_id]) && $submitted_fields['placeholder'][$field_id] != '' )
                                 {
-                                    $active_fields[$field_id]['placeholder'] = stripslashes($_POST['placeholder'][$field_id]);
+                                    $active_fields[$field_id]['placeholder'] = $submitted_fields['placeholder'][$field_id];
                                 }
-                                if ( isset($_POST['min'][$field_id]) && $_POST['min'][$field_id] != '' )
+                                if ( isset($submitted_fields['min'][$field_id]) && $submitted_fields['min'][$field_id] != '' )
                                 {
-                                    $active_fields[$field_id]['min'] = stripslashes($_POST['min'][$field_id]);
+                                    $active_fields[$field_id]['min'] = $submitted_fields['min'][$field_id];
                                 }
-                                if ( isset($_POST['max'][$field_id]) && $_POST['max'][$field_id] != '' )
+                                if ( isset($submitted_fields['max'][$field_id]) && $submitted_fields['max'][$field_id] != '' )
                                 {
-                                    $active_fields[$field_id]['max'] = stripslashes($_POST['max'][$field_id]);
+                                    $active_fields[$field_id]['max'] = $submitted_fields['max'][$field_id];
                                 }
-                                if ( isset($_POST['step'][$field_id]) && $_POST['step'][$field_id] != '' )
+                                if ( isset($submitted_fields['step'][$field_id]) && $submitted_fields['step'][$field_id] != '' )
                                 {
-                                    $active_fields[$field_id]['step'] = stripslashes($_POST['step'][$field_id]);
+                                    $active_fields[$field_id]['step'] = $submitted_fields['step'][$field_id];
                                 }
-                                if ( isset($_POST['blank_option'][$field_id]) && $_POST['blank_option'][$field_id] != '' )
+                                if ( isset($submitted_fields['blank_option'][$field_id]) && $submitted_fields['blank_option'][$field_id] != '' )
                                 {
-                                    $active_fields[$field_id]['blank_option'] = stripslashes($_POST['blank_option'][$field_id]);
+                                    $active_fields[$field_id]['blank_option'] = $submitted_fields['blank_option'][$field_id];
                                 }
-                                if ( isset($_POST['parent_terms_only'][$field_id]) && $_POST['parent_terms_only'][$field_id] != '' )
+                                if ( isset($submitted_fields['parent_terms_only'][$field_id]) && $submitted_fields['parent_terms_only'][$field_id] != '' )
                                 {
                                     $active_fields[$field_id]['parent_terms_only'] = true;
                                 }
-                                if ( isset($_POST['dynamic_population'][$field_id]) && $_POST['dynamic_population'][$field_id] != '' )
+                                if ( isset($submitted_fields['dynamic_population'][$field_id]) && $submitted_fields['dynamic_population'][$field_id] != '' )
                                 {
                                     $active_fields[$field_id]['dynamic_population'] = true;
                                 }
-                                if ( isset($_POST['hide_empty'][$field_id]) && $_POST['hide_empty'][$field_id] != '' )
+                                if ( isset($submitted_fields['hide_empty'][$field_id]) && $submitted_fields['hide_empty'][$field_id] != '' )
                                 {
                                     $active_fields[$field_id]['hide_empty'] = true;
                                 }
-                                if ( isset($_POST['multiselect'][$field_id]) && $_POST['multiselect'][$field_id] != '' )
+                                if ( isset($submitted_fields['multiselect'][$field_id]) && $submitted_fields['multiselect'][$field_id] != '' )
                                 {
                                     $active_fields[$field_id]['multiselect'] = true;
                                 }
@@ -1567,9 +1615,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                                 if ( isset($_POST['option_keys'][$field_id]) && is_array($_POST['option_keys'][$field_id]) && !empty($_POST['option_keys'][$field_id]) )
                                 {
                                     $options = array();
+                                    // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Iteration preserves the raw element type for validation; accepted strings are unslashed and sanitized inside this loop before use.
                                     foreach ( $_POST['option_keys'][$field_id] as  $i => $key )
                                     {
-                                        $options[$key] = $_POST['options_values'][$field_id][$i];
+                                        if ( ! is_string( $key ) || ! isset( $_POST['options_values'][$field_id][$i] ) || ! is_string( $_POST['options_values'][$field_id][$i] ) ) {
+                                            return;
+                                        }
+                                        $options[sanitize_text_field( wp_unslash( $key ) )] = sanitize_text_field( wp_unslash( $_POST['options_values'][$field_id][$i] ) );
                                     }
                                     $active_fields[$field_id]['options'] = $options;
                                 }
@@ -1579,49 +1631,49 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 
                     if ( isset($_POST['inactive_fields_order']) && $_POST['inactive_fields_order'] != '' )
                     {
-                        $field_ids = explode("|", sanitize_text_field($_POST['inactive_fields_order']));
+                        $field_ids = explode("|", sanitize_text_field( wp_unslash( $_POST['inactive_fields_order'] ) ));
                         if ( !empty($field_ids) )
                         {
                             foreach ( $field_ids as $field_id )
                             {
                                 $inactive_fields[$field_id] = array(
-                                    'show_label' => ( ( isset($_POST['show_label'][$field_id]) && $_POST['show_label'][$field_id] == '1' ) ? true : false ),
-                                    'label' => ( isset($_POST['label'][$field_id]) ? stripslashes($_POST['label'][$field_id]) : '' ),
+                                    'show_label' => ( ( isset($submitted_fields['show_label'][$field_id]) && $submitted_fields['show_label'][$field_id] == '1' ) ? true : false ),
+                                    'label' => ( isset($submitted_fields['label'][$field_id]) ? $submitted_fields['label'][$field_id] : '' ),
                                 );
 
-                                if ( isset($_POST['type'][$field_id]) && $_POST['type'][$field_id] != '' )
+                                if ( isset($submitted_fields['type'][$field_id]) && $submitted_fields['type'][$field_id] != '' )
                                 {
-                                    $inactive_fields[$field_id]['type'] = stripslashes($_POST['type'][$field_id]);
+                                    $inactive_fields[$field_id]['type'] = $submitted_fields['type'][$field_id];
                                 }
-                                if ( isset($_POST['before'][$field_id]) && $_POST['before'][$field_id] != '' )
+                                if ( isset($submitted_fields['before'][$field_id]) && $submitted_fields['before'][$field_id] != '' )
                                 {
-                                    $inactive_fields[$field_id]['before'] = stripslashes($_POST['before'][$field_id]);
+                                    $inactive_fields[$field_id]['before'] = $submitted_fields['before'][$field_id];
                                 }
-                                if ( isset($_POST['after'][$field_id]) && $_POST['after'][$field_id] != '' )
+                                if ( isset($submitted_fields['after'][$field_id]) && $submitted_fields['after'][$field_id] != '' )
                                 {
-                                    $inactive_fields[$field_id]['after'] = stripslashes($_POST['after'][$field_id]);
+                                    $inactive_fields[$field_id]['after'] = $submitted_fields['after'][$field_id];
                                 }
-                                if ( isset($_POST['placeholder'][$field_id]) && $_POST['placeholder'][$field_id] != '' )
+                                if ( isset($submitted_fields['placeholder'][$field_id]) && $submitted_fields['placeholder'][$field_id] != '' )
                                 {
-                                    $inactive_fields[$field_id]['placeholder'] = stripslashes($_POST['placeholder'][$field_id]);
+                                    $inactive_fields[$field_id]['placeholder'] = $submitted_fields['placeholder'][$field_id];
                                 }
-                                if ( isset($_POST['blank_option'][$field_id]) && $_POST['blank_option'][$field_id] != '' )
+                                if ( isset($submitted_fields['blank_option'][$field_id]) && $submitted_fields['blank_option'][$field_id] != '' )
                                 {
-                                    $inactive_fields[$field_id]['blank_option'] = stripslashes($_POST['blank_option'][$field_id]);
+                                    $inactive_fields[$field_id]['blank_option'] = $submitted_fields['blank_option'][$field_id];
                                 }
-                                if ( isset($_POST['parent_terms_only'][$field_id]) && $_POST['parent_terms_only'][$field_id] != '' )
+                                if ( isset($submitted_fields['parent_terms_only'][$field_id]) && $submitted_fields['parent_terms_only'][$field_id] != '' )
                                 {
                                     $inactive_fields[$field_id]['parent_terms_only'] = true;
                                 }
-                                if ( isset($_POST['dynamic_population'][$field_id]) && $_POST['dynamic_population'][$field_id] != '' )
+                                if ( isset($submitted_fields['dynamic_population'][$field_id]) && $submitted_fields['dynamic_population'][$field_id] != '' )
                                 {
                                     $inactive_fields[$field_id]['dynamic_population'] = true;
                                 }
-                                if ( isset($_POST['hide_empty'][$field_id]) && $_POST['hide_empty'][$field_id] != '' )
+                                if ( isset($submitted_fields['hide_empty'][$field_id]) && $submitted_fields['hide_empty'][$field_id] != '' )
                                 {
                                     $inactive_fields[$field_id]['hide_empty'] = true;
                                 }
-                                if ( isset($_POST['multiselect'][$field_id]) && $_POST['multiselect'][$field_id] != '' )
+                                if ( isset($submitted_fields['multiselect'][$field_id]) && $submitted_fields['multiselect'][$field_id] != '' )
                                 {
                                     $inactive_fields[$field_id]['multiselect'] = true;
                                 }
@@ -1629,9 +1681,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                                 if ( isset($_POST['option_keys'][$field_id]) && is_array($_POST['option_keys'][$field_id]) && !empty($_POST['option_keys'][$field_id]) )
                                 {
                                     $options = array();
+                                    // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Iteration preserves the raw element type for validation; accepted strings are unslashed and sanitized inside this loop before use.
                                     foreach ( $_POST['option_keys'][$field_id] as  $i => $key )
                                     {
-                                        $options[$key] = $_POST['options_values'][$field_id][$i];
+                                        if ( ! is_string( $key ) || ! isset( $_POST['options_values'][$field_id][$i] ) || ! is_string( $_POST['options_values'][$field_id][$i] ) ) {
+                                            return;
+                                        }
+                                        $options[sanitize_text_field( wp_unslash( $key ) )] = sanitize_text_field( wp_unslash( $_POST['options_values'][$field_id][$i] ) );
                                     }
                                     $inactive_fields[$field_id]['options'] = $options;
                                 }
@@ -1655,10 +1711,31 @@ class PH_Settings_Frontend extends PH_Settings_Page {
 		}
 		else
 		{
+            $frontend_input = array();
+            foreach ( array( 'search_result_default_order', 'search_result_columns', 'search_result_layout', 'search_result_image_size', 'search_result_fields_custom_field', 'search_result_css' ) as $input_key ) {
+                if ( isset( $_POST[$input_key] ) && ! is_string( $_POST[$input_key] ) ) {
+                    return;
+                }
+                $frontend_input[$input_key] = isset( $_POST[$input_key] ) ? sanitize_text_field( wp_unslash( $_POST[$input_key] ) ) : '';
+            }
+            foreach ( array( 'search_result_default_order', 'search_result_columns', 'search_result_layout', 'search_result_css' ) as $input_key ) {
+                if ( ! isset( $_POST[$input_key] ) ) {
+                    return;
+                }
+            }
+            if ( isset( $_POST['search_result_fields'] ) && ! is_array( $_POST['search_result_fields'] ) ) {
+                return;
+            }
 			$search_results_fields = array();
             if ( isset($_POST['search_result_fields']) && is_array($_POST['search_result_fields']) )
             {
-                $search_results_fields = $_POST['search_result_fields'];
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Iteration preserves the raw element type for validation; accepted strings are unslashed and sanitized inside this loop before use.
+                foreach ( $_POST['search_result_fields'] as $search_result_field ) {
+                    if ( ! is_string( $search_result_field ) ) {
+                        return;
+                    }
+                    $search_results_fields[] = sanitize_text_field( wp_unslash( $search_result_field ) );
+                }
 
                 $new_search_results_fields = array();
                 foreach ( $search_results_fields as $search_results_field )
@@ -1667,7 +1744,7 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                     {  
                         if ( isset($_POST['search_result_fields_custom_field']) && $_POST['search_result_fields_custom_field'] != '' )
                         {
-                            $new_search_results_fields[] = ph_clean($_POST['search_result_fields_custom_field']);
+                            $new_search_results_fields[] = $frontend_input['search_result_fields_custom_field'];
                         }
                     }
                     else
@@ -1680,12 +1757,13 @@ class PH_Settings_Frontend extends PH_Settings_Page {
             }
 
             $propertyhive_template_assistant = array(
-                'search_result_default_order' => ph_clean($_POST['search_result_default_order']),
-                'search_result_columns' => (int)$_POST['search_result_columns'],
-                'search_result_layout' => (int)$_POST['search_result_layout'],
+                'search_result_default_order' => $frontend_input['search_result_default_order'],
+                'search_result_columns' => (int)$frontend_input['search_result_columns'],
+                'search_result_layout' => (int)$frontend_input['search_result_layout'],
                 'search_result_fields' => $search_results_fields,
-                'search_result_image_size' => ( isset($_POST['search_result_image_size']) ? ph_clean($_POST['search_result_image_size']) : 'medium' ),
-                'search_result_css' => wp_unslash($_POST['search_result_css']),
+                'search_result_image_size' => ( isset($_POST['search_result_image_size']) ? $frontend_input['search_result_image_size'] : 'medium' ),
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Administrator-authored CSS is intentionally preserved; the type is validated above and its stylesheet output protects the closing style boundary.
+                'search_result_css' => isset( $_POST['search_result_css'] ) ? wp_unslash($_POST['search_result_css']) : '',
                 'search_result_css_all_pages' => isset($_POST['search_result_css_all_pages']) ? 'yes' : '',
             );
 
