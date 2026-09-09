@@ -46,6 +46,7 @@ class Divi_Property_Embedded_Virtual_Tours_Widget extends ET_Builder_Module
                     if ( isset($settings['oembed']) && $settings['oembed'] == 'yes' )
                     {
                         $embed_code = wp_oembed_get($virtual_tour['url']);
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_oembed_get() uses WordPress provider trust and sanitization; preserve supported provider scripts and trusted PHP filters.
                         echo $embed_code;
                     }
                     else

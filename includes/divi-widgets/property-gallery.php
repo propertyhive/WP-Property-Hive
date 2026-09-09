@@ -251,6 +251,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                     $id_text = $image_number == ($max_images - 1) ? 'id="more-images-link"' : '';
                     $id_text_mobile = $image_number == 1 ? 'id="more-images-link-mobile"' : '';
 
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Both optional ID fragments are fixed literal attributes assigned above; dynamic image URLs are escaped with esc_url.
                     echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="divi-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
 
                     if ( $image_number == 1 )
@@ -258,7 +259,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                         echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
-                            __( 'See all %d images', 'propertyhive' ), 
+                            esc_html__( 'See all %d images', 'propertyhive' ),
                             count($images) + count($images_hidden) 
                         );
                         echo '</a></div></div>';
@@ -268,7 +269,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                         echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
-                            __( 'See all %d images', 'propertyhive' ), 
+                            esc_html__( 'See all %d images', 'propertyhive' ),
                             count($images) + count($images_hidden) 
                         );
                         echo '</a></div></div>';

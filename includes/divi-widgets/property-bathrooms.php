@@ -38,7 +38,7 @@ class Divi_Property_Bathrooms_Widget extends ET_Builder_Module
                 'toggle_slug' => 'icon',
             ),
             'icon_width'     => array(
-                'label'           => esc_html__( 'Icon Size', 'et_builder' ),
+                'label'           => esc_html__( 'Icon Size', 'propertyhive' ),
                 'default'         => '24px',
                 'range_settings'  => array(
                     'min'  => '1',
@@ -46,7 +46,7 @@ class Divi_Property_Bathrooms_Widget extends ET_Builder_Module
                     'step' => '1',
                 ),
                 'toggle_slug'     => 'icon_settings',
-                'description'     => esc_html__( 'Here you can choose icon width.', 'et_builder' ),
+                'description'     => esc_html__( 'Here you can choose icon width.', 'propertyhive' ),
                 'type'            => 'range',
                 'option_category' => 'layout',
                 'tab_slug'        => 'advanced',
@@ -60,9 +60,9 @@ class Divi_Property_Bathrooms_Widget extends ET_Builder_Module
             ),
             'icon_color'     => array(
                 'default'        => et_builder_accent_color(),
-                'label'          => esc_html__( 'Icon Colour', 'et_builder' ),
+                'label'          => esc_html__( 'Icon Colour', 'propertyhive' ),
                 'type'           => 'color-alpha',
-                'description'    => esc_html__( 'Here you can define a custom color for your icon.', 'et_builder' ),
+                'description'    => esc_html__( 'Here you can define a custom color for your icon.', 'propertyhive' ),
                 'tab_slug'       => 'advanced',
                 'toggle_slug'    => 'icon_settings',
                 'hover'          => 'tabs',
