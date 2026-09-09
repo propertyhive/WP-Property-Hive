@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Load assets.
  *
@@ -15,6 +18,7 @@ if ( ! class_exists( 'PH_Admin_Assets' ) ) :
 /**
  * PH_Admin_Assets Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Assets; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Assets {
 
     /**
@@ -65,7 +69,8 @@ class PH_Admin_Assets {
 
         if ( in_array( $screen->id, array( 'property' ) ) )
         {
-            if ( isset($_GET['tutorial']) && sanitize_text_field($_GET['tutorial']) == 'yes' )
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only tour asset selection; no data is changed.
+            if ( isset( $_GET['tutorial'] ) && is_string( $_GET['tutorial'] ) && sanitize_text_field( wp_unslash( $_GET['tutorial'] ) ) === 'yes' )
             {
                 wp_register_style( 'tour-css', PH()->plugin_url() .  '/assets/css/tours/style.css', array(), '1.0.1' );
                 wp_register_style( 'driver-css', PH()->plugin_url() . '/assets/css/tours/driver-js.css', array(), '1.0.1' );
@@ -76,12 +81,12 @@ class PH_Admin_Assets {
 
 	    if ( in_array( $screen->id, array( 'edit-contact', 'edit-enquiry', 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale', 'edit-key_date' ) ) )
 	    {
-		    wp_enqueue_style( 'daterangepicker.css', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css' );
+		    wp_enqueue_style( 'daterangepicker.css', PH()->plugin_url() . '/assets/js/daterangepicker/daterangepicker.css', array(), '3.1.0' );
 	    }
 
 	    if ( in_array( $screen->id, array( 'edit-key_date') ) )
 	    {
-		    wp_enqueue_style( 'admin-hide-default-post-data.css', PH()->plugin_url() . '/assets/css/admin-hide-default-post-data.css', PH_VERSION );
+		    wp_enqueue_style( 'admin-hide-default-post-data.css', PH()->plugin_url() . '/assets/css/admin-hide-default-post-data.css', array(), PH_VERSION );
 	    }
 
         if ( 
@@ -121,27 +126,27 @@ class PH_Admin_Assets {
         $suffix       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
         // Register scripts
-        wp_register_script( 'propertyhive_dashboard', PH()->plugin_url() . '/assets/js/admin/dashboard' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
+        wp_register_script( 'propertyhive_dashboard', PH()->plugin_url() . '/assets/js/admin/dashboard' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
 
-        wp_register_script( 'propertyhive_admin', PH()->plugin_url() . '/assets/js/admin/admin' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-tiptip' ), PH_VERSION );
+        wp_register_script( 'propertyhive_admin', PH()->plugin_url() . '/assets/js/admin/admin' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-tiptip' ), PH_VERSION, true );
 
         wp_register_script( 'jquery-tiptip', PH()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
 
-        wp_register_script( 'propertyhive_admin_meta_boxes', PH()->plugin_url() . '/assets/js/admin/meta-boxes' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker', 'jquery-ui-sortable' ), PH_VERSION );
+        wp_register_script( 'propertyhive_admin_meta_boxes', PH()->plugin_url() . '/assets/js/admin/meta-boxes' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker', 'jquery-ui-sortable' ), PH_VERSION, true );
 
-        wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery', 'wp-color-picker' ), PH_VERSION );
+        wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery', 'wp-color-picker' ), PH_VERSION, true );
 
-        wp_register_script( 'propertyhive_admin_recently_viewed', PH()->plugin_url() . '/assets/js/admin/recently-viewed' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION );
+        wp_register_script( 'propertyhive_admin_recently_viewed', PH()->plugin_url() . '/assets/js/admin/recently-viewed' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
 
-        wp_register_script( 'ajax-chosen', PH()->plugin_url() . '/assets/js/chosen/ajax-chosen.jquery' . /*$suffix .*/ '.js', array('jquery', 'chosen'), PH_VERSION );
+        wp_register_script( 'ajax-chosen', PH()->plugin_url() . '/assets/js/chosen/ajax-chosen.jquery' . /*$suffix .*/ '.js', array('jquery', 'chosen'), PH_VERSION, true );
 
-        wp_register_script( 'chosen', PH()->plugin_url() . '/assets/js/chosen/chosen.jquery' . /*$suffix .*/ '.js', array('jquery'), PH_VERSION );
+        wp_register_script( 'chosen', PH()->plugin_url() . '/assets/js/chosen/chosen.jquery' . /*$suffix .*/ '.js', array('jquery'), PH_VERSION, true );
 
-        wp_register_script( 'multiselect', PH()->plugin_url() . '/assets/js/multiselect/jquery.multiselect' . /*$suffix .*/ '.js', array('jquery'), '2.4.18' );
+        wp_register_script( 'multiselect', PH()->plugin_url() . '/assets/js/multiselect/jquery.multiselect' . /*$suffix .*/ '.js', array('jquery'), '2.4.18', true );
 
-        wp_register_script( 'flot', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot' . $suffix . '.js', array( 'jquery' ), PH_VERSION );
-        wp_register_script( 'flot-resize', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.resize' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
-        wp_register_script( 'flot-time', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.time' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
+        wp_register_script( 'flot', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot' . $suffix . '.js', array( 'jquery' ), PH_VERSION, true );
+        wp_register_script( 'flot-resize', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.resize' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION, true );
+        wp_register_script( 'flot-time', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.time' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION, true );
         //wp_register_script( 'flot-pie', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.pie' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
         //wp_register_script( 'flot-stack', PH()->plugin_url() . '/assets/js/jquery-flot/jquery.flot.stack' . $suffix . '.js', array( 'jquery', 'flot' ), PH_VERSION );
 
@@ -154,6 +159,7 @@ class PH_Admin_Assets {
             isset($post->ID) &&
             function_exists( 'use_block_editor_for_post_type' ) && 
             use_block_editor_for_post_type( get_post_type($post->ID) ) && 
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only classic/block editor selection controls the scripts loaded.
             !isset( $_GET['classic-editor'] ) &&
             is_array($tabs) &&
             !empty($tabs)
@@ -213,14 +219,14 @@ class PH_Admin_Assets {
 
 	    if ( in_array( $screen->id, array( 'edit-contact', 'edit-enquiry', 'edit-appraisal', 'edit-viewing', 'edit-offer', 'edit-sale', 'edit-key_date' ) ) )
 	    {
-		    wp_enqueue_script( 'moment.js', '//cdn.jsdelivr.net/momentjs/latest/moment.min.js' );
-		    wp_enqueue_script( 'daterangepicker.js', '//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js' );
-		    wp_enqueue_script( 'date_range_filter.js', PH()->plugin_url() . '/assets/js/admin/date_range_filter.js', array('jquery', 'moment.js', 'daterangepicker.js'), PH_VERSION );
+		    wp_enqueue_script( 'moment' );
+		    wp_enqueue_script( 'daterangepicker.js', PH()->plugin_url() . '/assets/js/daterangepicker/daterangepicker.js', array( 'jquery', 'moment' ), '3.1.0', true );
+		    wp_enqueue_script( 'date_range_filter.js', PH()->plugin_url() . '/assets/js/admin/date_range_filter.js', array( 'jquery', 'moment', 'daterangepicker.js' ), PH_VERSION, true );
 	    }
 
 	    if ( in_array( $screen->id, array( 'edit-key_date' ) ) )
 	    {
-		    wp_enqueue_script( 'inline-edit-key_date.js', PH()->plugin_url() . '/assets/js/admin/inline-edit-key_date.js', array('jquery'), PH_VERSION );
+		    wp_enqueue_script( 'inline-edit-key_date.js', PH()->plugin_url() . '/assets/js/admin/inline-edit-key_date.js', array('jquery'), PH_VERSION, true );
 	    }
 
         if ( 
@@ -228,7 +234,7 @@ class PH_Admin_Assets {
             in_array( $screen->id, array( 'property', 'contact' ) ) 
         )
         {
-		    wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/jquery.fancybox.js', array('jquery'), '3.5.7' );
+		    wp_enqueue_script( 'propertyhive_fancybox', PH()->plugin_url() . '/assets/js/fancybox/jquery.fancybox.js', array('jquery'), '3.5.7', true );
 	    }
 
         if ( in_array( $screen->id, array( 'property' ) ) )
@@ -239,10 +245,11 @@ class PH_Admin_Assets {
             }
             add_action( 'admin_print_footer_scripts', array( '_WP_Editors', 'print_default_editor_scripts' ) );
 
-            if ( isset($_GET['tutorial']) && sanitize_text_field($_GET['tutorial']) == 'yes' )
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only tour asset selection; no data is changed.
+            if ( isset( $_GET['tutorial'] ) && is_string( $_GET['tutorial'] ) && sanitize_text_field( wp_unslash( $_GET['tutorial'] ) ) === 'yes' )
             {
-                wp_enqueue_script( 'driver-js', PH()->plugin_url() . '/assets/js/tours/driver-js.js', array(), '1.0.1' );
-                wp_register_script( 'tour', PH()->plugin_url() . '/assets/js/tours/tour.js', array( 'driver-js' ), '1.0.1' );
+                wp_enqueue_script( 'driver-js', PH()->plugin_url() . '/assets/js/tours/driver-js.js', array(), '1.0.1', true );
+                wp_register_script( 'tour', PH()->plugin_url() . '/assets/js/tours/tour.js', array( 'driver-js' ), '1.0.1', true );
                 wp_enqueue_script( 'tour' );
 
                 $tours = [
@@ -314,13 +321,13 @@ class PH_Admin_Assets {
             
             if ( get_option('propertyhive_maps_provider') == 'mapbox' )
             {
-                wp_register_script('mapbox', PH()->plugin_url() . '/assets/js/mapbox/mapbox-gl.js', false, '3.8.0');
+                wp_register_script('mapbox', PH()->plugin_url() . '/assets/js/mapbox/mapbox-gl.js', false, '3.8.0', true );
                 wp_enqueue_script('mapbox');
 
                 if ( get_option('propertyhive_geocoding_provider') == '' )
                 {
                     $api_key = get_option('propertyhive_google_maps_geocoding_api_key');
-                    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+                    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3', true );
                     wp_enqueue_script('googlemaps');
                 }
             }
@@ -335,14 +342,14 @@ class PH_Admin_Assets {
                 if ( get_option('propertyhive_geocoding_provider') == '' )
                 {
                     $api_key = get_option('propertyhive_google_maps_geocoding_api_key');
-                    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+                    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3', true );
                     wp_enqueue_script('googlemaps');
                 }
             }
             else
             {
                 $api_key = get_option('propertyhive_google_maps_api_key');
-                wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+                wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3', true );
                 wp_enqueue_script('googlemaps');
             }
 
@@ -362,6 +369,8 @@ class PH_Admin_Assets {
                 'pin_note_nonce'                => wp_create_nonce("pin-note"),
                 'add_note_nonce'                => wp_create_nonce("add-note"),
                 'delete_note_nonce'             => wp_create_nonce("delete-note"),
+                'add_key_date_nonce'            => wp_create_nonce( 'propertyhive-add-key-date' ),
+                'export_sub_grid_nonce'         => wp_create_nonce( 'propertyhive-export-sub-grid' ),
                 'viewing_details_meta_nonce'    => wp_create_nonce( 'viewing-details-meta-box' ),
                 'viewing_actions_nonce'         => wp_create_nonce( 'viewing-actions' ),
                 'save_key_date_nonce'         => wp_create_nonce( 'save-key-date' ),
@@ -395,11 +404,13 @@ class PH_Admin_Assets {
                 'no_countries_selected'                     => __( 'Please select which countries you operate in', 'propertyhive' ),
                 'default_country_not_in_selected'           => __( 'The default country hasn\'t been selected as a country you operate in', 'propertyhive' ),
                 'admin_url'                                 => admin_url(),
-                'taxonomy_section'                          => ( ( isset($_GET['section']) ) ? sanitize_text_field($_GET['section']) : '' ),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings section passed through WordPress script localization.
+                'taxonomy_section'                          => isset( $_GET['section'] ) && is_string( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '',
                 'ajax_nonce'                                => wp_create_nonce("updates"),
                 'features_settings_url'                     => admin_url('admin.php?page=ph-settings&tab=features'),
             );
-            if ( isset($_GET['tab']) && ph_clean($_GET['tab']) == 'licensekey' )
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Settings tab determines whether the existing license status is refreshed.
+            if ( isset( $_GET['tab'] ) && is_string( $_GET['tab'] ) && sanitize_text_field( wp_unslash( $_GET['tab'] ) ) === 'licensekey' )
             {
                 $params['valid_pro_license_key'] = PH()->license->is_valid_pro_license_key(true);
             }

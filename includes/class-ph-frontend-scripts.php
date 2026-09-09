@@ -20,9 +20,24 @@ class PH_Frontend_Scripts {
 	 */
 	public static function init() {
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'load_scripts' ) );
+		add_filter( 'script_loader_tag', array( __CLASS__, 'embed_script_attributes' ), 10, 2 );
 		add_action( 'wp_print_scripts', array( __CLASS__, 'check_jquery' ), 25 );
 		add_action( 'wp_print_scripts', array( __CLASS__, 'localize_printed_scripts' ), 5 );
 		add_action( 'wp_print_footer_scripts', array( __CLASS__, 'localize_printed_scripts' ), 5 );
+	}
+
+	/**
+	 * Preserve the provider attributes used by the original Reel embeds.
+	 */
+	public static function embed_script_attributes( $tag, $handle ) {
+		if ( 'propertyhive-instagram-embed' === $handle ) {
+			return str_replace( '<script ', '<script async ', $tag );
+		}
+		if ( 'propertyhive-facebook-embed' === $handle ) {
+			$tag = str_replace( array( 'id="propertyhive-facebook-embed-js"', "id='propertyhive-facebook-embed-js'" ), 'id="facebook-jssdk"', $tag );
+			return str_replace( '<script ', '<script async defer crossorigin="anonymous" ', $tag );
+		}
+		return $tag;
 	}
 
 	/**
@@ -90,6 +105,7 @@ class PH_Frontend_Scripts {
 		{
 			if ( get_option( 'propertyhive_captcha_site_key', '' ) != '' && get_option( 'propertyhive_captcha_secret', '' ) != '' )
 			{
+				// phpcs:ignore PluginCheck.CodeAnalysis.EnqueuedResourceOffloading.OffloadedContent -- Required by the configured Cloudflare Turnstile service.
 				wp_enqueue_script( 'turnstile', 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=ph_init_turnstile', array(), PH_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 			}
 		}
@@ -210,7 +226,7 @@ class PH_Frontend_Scripts {
 		// Enforce minimum version of jQuery
 		if ( ! empty( $wp_scripts->registered['jquery']->ver ) && ! empty( $wp_scripts->registered['jquery']->src ) && 0 >= version_compare( $wp_scripts->registered['jquery']->ver, '1.8' ) ) {
 			wp_deregister_script( 'jquery' );
-			wp_register_script( 'jquery', '/wp-includes/js/jquery/jquery.js', array(), '1.8' );
+			wp_register_script( 'jquery', '/wp-includes/js/jquery/jquery.js', array(), '1.8', false );
 			wp_enqueue_script( 'jquery' );
 		}
 	}
