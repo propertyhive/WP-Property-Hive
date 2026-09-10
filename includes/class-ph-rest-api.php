@@ -584,6 +584,7 @@ class PH_Rest_Api {
 		$field_array = array(
 			'department',
 			'reference_number',
+			'address_name_number',
 			'address_street',
 			'address_two',
 			'address_three',
@@ -1252,6 +1253,11 @@ class PH_Rest_Api {
 	            unset($data[$k]);
 	        }
 	    }
+
+	    if ( !current_user_can( 'manage_propertyhive' ) )
+		{
+			 unset( $data['address_name_number'] );
+		}
 
 	    $response->set_data($data);
 
