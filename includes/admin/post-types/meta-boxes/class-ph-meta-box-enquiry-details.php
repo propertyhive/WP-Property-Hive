@@ -374,8 +374,8 @@ function viewing_update_selected_properties()
                             'property_id'          => $property_post_id,
                         );
                         $url_args = apply_filters('propertyhive_enquiry_book_viewing_link_args', $url_args);
-                        echo '<a href="' . esc_url(add_query_arg( array( $url_args ), admin_url('post-new.php?post_type=viewing') )) . '" class="button" style="position:absolute; top:0; right:00;">' . esc_html(__( 'Book Viewing', 'propertyhive' )) . '</a>';
-                        $right_padding = '105px';
+                        echo '<a href="' . esc_url(add_query_arg( array( $url_args ), admin_url('post-new.php?post_type=viewing') )) . '" class="button" style="position:absolute; top:0; right:0;">' . esc_html(__( 'Book Viewing', 'propertyhive' )) . '</a>';
+                        $right_padding = '120px';
                     }
 
                     echo '<a href="' . esc_url(get_edit_post_link($enquiry_contact_id, '')) . '" class="button" style="position:absolute; top:0; right:' . esc_attr($right_padding) . ';">' . esc_html(__( 'View', 'propertyhive' ) . ' ' . $enquiry_contact_type) . '</a>';

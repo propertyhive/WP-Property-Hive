@@ -187,7 +187,13 @@ class PH_AJAX {
     {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Shared record guard: mutating callers verify their own action nonce; read-only callers are CRM-only through authorize_admin_ajax. This helper performs no writes.
         $post_id = isset( $_POST[$field] ) && is_scalar( $_POST[$field] ) ? absint( $_POST[$field] ) : 0;
-        if ( $post_id < 1 || ! in_array( get_post_type( $post_id ), (array) $post_type, true ) || ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) ) {
+        if ( !is_array($post_type) ) { $post_type = array($post_type); }
+        if ( 
+            $post_id < 1 || 
+            ! in_array( get_post_type( $post_id ), $post_type, true ) || 
+            ! current_user_can( 'manage_propertyhive' ) || 
+            ! current_user_can( 'edit_post', $post_id ) ) 
+        {
             wp_send_json_error( __( 'Invalid record or insufficient permissions.', 'propertyhive' ), 403 );
         }
         return $post_id;
@@ -964,14 +970,8 @@ class PH_AJAX {
 
                     if ( $contacts_query->have_posts() )
                     {
-                        while ( $contacts_query->have_posts() )
-                        {
-                            $contacts_query->the_post();
-
-                            $contact_post_id = get_the_ID();
-                        }
                         // Public registration does not prove ownership of an existing CRM contact.
-                        $errors[] = __( 'Unable to register with this email address. Please sign in or contact the agency.', 'propertyhive' );
+                        $errors[] = __( 'This email address is already registered to a user. Please sign in or contact the agency.', 'propertyhive' );
                     }
                     else
                     {
@@ -8138,7 +8138,7 @@ class PH_AJAX {
     public function get_key_dates_quick_edit_row()
     {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
-        $post_id = $this->get_authorized_record_id( 'post_id', 'key_date' );
+        $post_id = $this->get_authorized_record_id( 'post_id', array( 'tenancy', 'property' ) );
 
         include( PH()->plugin_path() . '/includes/admin/views/html-key-dates-quick-edit.php' );
 

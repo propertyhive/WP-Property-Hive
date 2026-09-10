@@ -660,9 +660,8 @@ class PH_Settings_General extends PH_Settings_Page {
 
         $settings[] = array(
             'type'      => 'html',
+            'full_width' => true,
             'html'      => '
-
-            <style type="text/css">.form-table .titledesc { display:none; }</style>
 
             <table class="widefat striped" style="max-width:520px;" >
                 <thead>

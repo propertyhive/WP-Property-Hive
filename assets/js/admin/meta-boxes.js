@@ -860,6 +860,12 @@ jQuery( function($){
         new_location = new_location.split("#");
         new_location = new_location[0];
 
+        if ( record_ids.length == 0 )
+        {
+            alert('No records to export');
+            return;
+        }
+
         window.location.href = new_location + '&sub_grid=' + encodeURIComponent($(this).attr('id').replace("export-", "")) + '&record_ids=' + encodeURIComponent(record_ids.join("|")) + '&ph_export_nonce=' + encodeURIComponent(propertyhive_admin_meta_boxes.export_sub_grid_nonce);
     });
     

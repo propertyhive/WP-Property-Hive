@@ -341,31 +341,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         $hide_save_button = true;
 
         $i = 0;
-        $html = '<style>
-
-            .ph-custom-fields-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:22px; }
-            .ph-custom-fields-grid > div { display:flex; gap:20px; background:#FFF; padding:25px; border:1px solid #AAA }
-            .ph-custom-fields-grid > div .ph-grid-image { flex:0 0 50px; }
-            .ph-custom-fields-grid > div .ph-grid-image-bg { background:#fbfcd4; border:1px solid #ffcd00; padding:10px; border-radius:7px; }
-            .ph-custom-fields-grid > div .ph-grid-image img { max-width:40px; height:40px; display:block }
-            .ph-custom-fields-grid > div .feature-card-content { flex:1; min-width:0; }
-            .ph-custom-fields-grid > div h3 { margin-top:0; margin-bottom:0.6em }
-
-            @media (max-width:1750px) {
-
-                .ph-custom-fields-grid { grid-template-columns:repeat(3, 1fr); }
-
-            }
-
-            @media (max-width:1370px) {
-
-                .ph-custom-fields-grid { grid-template-columns:repeat(2, 1fr); }
-
-            }
-
-        </style>
-
-        <div class="ph-custom-fields-grid">';
+        $html = '<div class="ph-custom-fields-grid">';
         foreach ( $this->custom_field_sections as $key => $value )
         {
             $image = 'default.png';

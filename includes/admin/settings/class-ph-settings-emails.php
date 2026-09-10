@@ -507,7 +507,7 @@ class PH_Settings_Emails extends PH_Settings_Page {
                     }
                     else
                     {
-                        echo esc_html(__( 'Next scheduled to run at', 'propertyhive' ) . ' ' . gmdate("H:i jS F Y", $next_due));
+                        echo esc_html(__( 'Next scheduled to run at', 'propertyhive' ) . ' ' . wp_date("H:i jS F Y", $next_due));
                     }
                 ?></strong> <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=ph-settings&tab=email&section=log&custom_email_log_cron=propertyhive_process_email_log' ), 'propertyhive-run-email-job' ) ); ?>" class="button">Run Now</a></p>
 

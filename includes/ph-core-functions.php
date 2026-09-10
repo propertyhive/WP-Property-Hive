@@ -465,6 +465,7 @@ function ph_ordinal_suffix( $number, $return_words = true, $return_number = true
     }
     return $return_words ? $number_in_words : ( $return_number ? $number . $suffix : $suffix );
 }
+
 /**
  * Save an ordered property media list without modifying unauthorized attachments.
  * The caller verifies the property form nonce before invoking this helper.
@@ -484,11 +485,20 @@ function propertyhive_save_media_attachment_list( $post_id, $meta_key, $submitte
     $ids = array_values( array_unique( array_filter( array_map( 'absint', explode( ',', $submitted_ids ) ) ) ) );
     $previous_ids = get_post_meta( $post_id, $meta_key, true );
     $previous_ids = is_array( $previous_ids ) ? array_map( 'absint', $previous_ids ) : array();
-    foreach ( $ids as $attachment_id ) {
-        if ( 'attachment' !== get_post_type( $attachment_id ) || ! current_user_can( 'edit_post', $attachment_id ) ) {
+    
+    foreach ( $ids as $index => $attachment_id ) {
+        if ( 'attachment' !== get_post_type( $attachment_id ) ) {
+            unset( $ids[$index] );
+            continue;
+        }
+
+        if ( ! current_user_can( 'edit_post', $attachment_id ) ) {
             return false;
         }
     }
+
+    $ids = array_values( $ids );
+    
     foreach ( $ids as $attachment_id ) {
         wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $post_id ) );
         clean_attachment_cache( $attachment_id );

@@ -459,15 +459,14 @@ class PH_Licenses {
 		update_option( 'propertyhive_last_license_check', time() );
 
 		// Retain last-known license details during outages; replace them only with a valid HTTPS response.
-		update_option( 'propertyhive_license_https_verified', false, 'no' );
 		update_option( 'propertyhive_license_key_error', '', 'no' );
 
 		$data = $this->get_data_for_license_check();
 
-		$request = wp_remote_post( 'https://license.wp-property-hive.com/check-license.php', array(
+		$request = wp_remote_post( 'http://license.wp-property-hive.com/check-license.php', array(
 			'method'      => 'POST',
 			'timeout'     => 20,
-			'redirection' => 0,
+			'redirection' => 1,
 			'httpversion' => '1.1',
 			'blocking'    => true,
 			'body'        => $data,
@@ -476,25 +475,24 @@ class PH_Licenses {
 
 		if ( is_wp_error( $request ) )
 		{
-			update_option( 'propertyhive_license_key_error', __( 'The legacy license service could not be reached securely. Contact Property Hive support. Your saved license details have been retained.', 'propertyhive' ), 'no' );
+			update_option( 'propertyhive_license_key_error', __( 'The license service could not be reached securely. Your saved license details have been retained.', 'propertyhive' ) . ' ' . $request->get_error_message(), 'no' );
 			return false;
 		}
 
 		if ( 200 !== wp_remote_retrieve_response_code( $request ) || '' === wp_remote_retrieve_body( $request ) )
 		{
-			update_option( 'propertyhive_license_key_error', __( 'The legacy license service returned an invalid response. Contact Property Hive support.', 'propertyhive' ), 'no' );
+			update_option( 'propertyhive_license_key_error', __( 'The license service returned an invalid response.', 'propertyhive' ) . ' ' . wp_remote_retrieve_response_code( $request ), 'no' );
 			return false;
 		}
 
 		$body = @unserialize($request['body'], ['allowed_classes' => false]);
-		if ( $body !== FALSE && is_array($body) && !empty($body) )
+		if ( $body !== FALSE && is_array($body) )
 		{
 			update_option( 'propertyhive_license_key_details', $body, 'no' );
-			update_option( 'propertyhive_license_https_verified', true, 'no' );
 		}
 		else
 		{
-			update_option( 'propertyhive_license_key_error', __( 'The legacy license service returned invalid license data. Contact Property Hive support.', 'propertyhive' ), 'no' );
+			update_option( 'propertyhive_license_key_error', __( 'The license service returned invalid license data.', 'propertyhive' ) . ' ' . print_r($body, true), 'no' );
 		}
 	}
 
